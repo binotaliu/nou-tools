@@ -12,11 +12,10 @@
         @if(isset($previousSchedule) && !isset($schedule))
             <div class="mb-6 p-4 rounded border-l-4 border-yellow-400 bg-yellow-50 text-yellow-800 flex items-center justify-between">
                 <div>
-                    <div class="font-medium">你曾建立過課表：<span class="text-warm-900">{{ $previousSchedule['name'] ?? '（未命名）' }}</span></div>
+                    <div class="font-medium">你曾建立過課表：<span class="text-warm-900">{{ $previousSchedule['name'] ?? '（未命名）' }}</span>，確定要繼續新增新課表嗎？</div>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{{ route('schedule.edit', $previousSchedule['id']) }}" class="px-4 py-2 bg-yellow-400 text-yellow-900 rounded font-semibold hover:bg-yellow-500">編輯舊課表</a>
-                    <a href="{{ route('schedule.create', ['new' => 1]) }}" class="px-4 py-2 bg-white border border-warm-200 rounded">建立新課表</a>
+                    <a href="{{ route('schedule.show', $previousSchedule['uuid']) }}" class="px-4 py-2 bg-yellow-400 text-yellow-900 rounded font-semibold hover:bg-yellow-500">檢視舊課表</a>
                 </div>
             </div>
         @endif

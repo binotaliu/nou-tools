@@ -97,7 +97,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($schedule->items as $item)
+                        @php
+                            // Sort items by their next upcoming class date (earliest first).
+                            // Items without a future date are pushed to the end.
+                            $itemsSorted = $schedule->items->sortBy(function ($item) {
+                                $next = $item->courseClass->schedules
+                                    ->filter(fn($s) => $s->date->isToday() || $s->date->isFuture())
+                                    ->sortBy('date')
+                                    ->first();
+
+                                return $next ? $next->date->timestamp : PHP_INT_MAX;
+                            })->values();
+                        @endphp
+
+                        @forelse ($itemsSorted as $item)
                             <tr class="border-b border-warm-200 hover:bg-warm-50">
                                 <td class="px-4 py-3 font-semibold text-warm-900">
                                     {{ $item->courseClass->course->name }}
