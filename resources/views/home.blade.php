@@ -33,7 +33,7 @@
             @if(isset($previousSchedule))
                 <div class="mt-3 text-sm text-warm-600 w-full">
                     <a
-                        href="{{ route('schedule.show', $previousSchedule['uuid']) }}"
+                        href="{{ route('schedule.show', $previousSchedule['token']) }}"
                         class="inline-flex items-center gap-3 w-full bg-warm-50 border border-warm-200 text-warm-700 text-center px-3 py-2 rounded hover:bg-warm-100 transition"
                     >
                         <div class="truncate max-w-xs font-medium text-warm-800">{{ $previousSchedule['name'] ?? '（未命名）' }}</div>

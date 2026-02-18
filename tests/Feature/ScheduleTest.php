@@ -91,7 +91,7 @@ it('stores schedule metadata in an encrypted cookie when saving', function () {
     expect($schedule)->not->toBeNull();
 
     $cookie = collect($response->headers->getCookies())->first(fn ($c) => $c->getName() === 'student_schedule');
-    $decrypted = json_decode(decryptString($cookie->getValue()), true);
+    $decrypted = json_decode(decrypt($cookie->getValue()), true);
 
     expect($decrypted['id'])->toBe($schedule->id);
     expect($decrypted['uuid'])->toBe($schedule->uuid);
@@ -113,7 +113,8 @@ it('shows previous schedule on home when cookie exists', function () {
     $response->assertStatus(200)
         ->assertSee('Previously Saved')
         ->assertSee('ID: '.$schedule->id)
-        ->assertSee(route('schedule.edit', $schedule->id));
+        ->assertSee(route('schedule.edit', $schedule->id))
+        ->assertSee(route('schedule.show', $schedule));
 });
 
 it('shows prompt on schedule create page when cookie exists and can be ignored with ?new=1', function () {
@@ -131,7 +132,8 @@ it('shows prompt on schedule create page when cookie exists and can be ignored w
     $response->assertStatus(200)
         ->assertSee('你曾建立過課表')
         ->assertSee('My Old Schedule')
-        ->assertSee(route('schedule.edit', $schedule->id));
+        ->assertSee(route('schedule.edit', $schedule->id))
+        ->assertSee(route('schedule.show', $schedule));
 
     $response2 = $this->withCookie('student_schedule', json_encode([
         'id' => $schedule->id,
@@ -162,7 +164,7 @@ it('updates the stored cookie when schedule is updated', function () {
     $response->assertCookie('student_schedule');
 
     $cookie = collect($response->headers->getCookies())->first(fn ($c) => $c->getName() === 'student_schedule');
-    $decrypted = json_decode(decryptString($cookie->getValue()), true);
+    $decrypted = json_decode(decrypt($cookie->getValue()), true);
 
     expect($decrypted['name'])->toBe('New Name');
 });

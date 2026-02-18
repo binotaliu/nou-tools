@@ -51,6 +51,7 @@ class ScheduleController extends Controller
                         $previousSchedule = [
                             'id' => $model->id,
                             'uuid' => $model->uuid,
+                            'token' => $model->getRouteKey(),
                             'name' => $model->name,
                         ];
                     }

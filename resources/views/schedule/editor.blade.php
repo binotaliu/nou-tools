@@ -15,7 +15,7 @@
                     <div class="font-medium">你曾建立過課表：<span class="text-warm-900">{{ $previousSchedule['name'] ?? '（未命名）' }}</span>，確定要繼續新增新課表嗎？</div>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{{ route('schedule.show', $previousSchedule['uuid']) }}" class="px-4 py-2 bg-yellow-400 text-yellow-900 rounded font-semibold hover:bg-yellow-500">檢視舊課表</a>
+                    <a href="{{ route('schedule.show', $previousSchedule['token']) }}" class="px-4 py-2 bg-yellow-400 text-yellow-900 rounded font-semibold hover:bg-yellow-500">檢視舊課表</a>
                 </div>
             </div>
         @endif
