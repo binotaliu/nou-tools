@@ -44,7 +44,7 @@ class ScheduleCalendarController extends Controller
                 $endDateTime = $this->convertToICSDateTime($classSchedule->date, $endTime);
 
                 $lines[] = 'BEGIN:VEVENT';
-                $lines[] = 'UID:'.$schedule->uuid.'-'.$item->id.'-'.$classSchedule->id.'@noutools.local';
+                $lines[] = 'UID:'.$schedule->uuid.'-'.$item->id.'-'.$classSchedule->id.'@noutools.binota.org';
                 $lines[] = 'DTSTAMP:'.now()->format('Ymd\THis\Z');
                 $lines[] = 'DTSTART:'.$startDateTime;
                 $lines[] = 'DTEND:'.$endDateTime;
