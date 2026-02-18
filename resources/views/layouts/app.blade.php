@@ -18,6 +18,18 @@
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
+
+        @if (app()->environment('production'))
+            <!-- Google Analytics -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=G-1B65SQ4673"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+
+                gtag('config', 'G-1B65SQ4673');
+            </script>
+        @endif
     </head>
     <body class="bg-warm-50 text-warm-900">
         <header class="bg-white border-b border-warm-200 sticky top-0 z-40">
