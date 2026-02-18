@@ -170,12 +170,22 @@ class ScheduleController extends Controller
                 $lines[] = 'DTSTART:'.$startDateTime;
                 $lines[] = 'DTEND:'.$endDateTime;
                 $lines[] = 'SUMMARY:'.$this->escapeICSString($course->name.' ('.$courseClass->code.')');
+
+                // Build DESCRIPTION with instructor (if any) and an edit link to the saved schedule.
+                $descriptionParts = [];
                 if ($courseClass->teacher_name) {
-                    $lines[] = 'DESCRIPTION:'.$this->escapeICSString('Instructor: '.$courseClass->teacher_name);
+                    $descriptionParts[] = '老師: '.$courseClass->teacher_name;
                 }
+                $descriptionParts[] = '編輯課表: '.route('schedule.edit', $schedule);
+                $lines[] = 'DESCRIPTION:'.collect($descriptionParts)
+                    ->map($this->escapeICSString(...))
+                    ->implode('\n');
+
+                // Keep original class link (if any) and also provide an explicit edit URL so calendar apps show it.
                 if ($courseClass->link) {
                     $lines[] = 'URL:'.$courseClass->link;
                 }
+
                 $lines[] = 'END:VEVENT';
             }
         }
