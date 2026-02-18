@@ -148,7 +148,7 @@
                 <input
                     type="text"
                     x-model="scheduleName"
-                    placeholder="例如：2026年春季課表"
+                    placeholder="例如：浣熊的課表"
                     class="w-full px-4 py-3 border-2 border-warm-300 rounded-lg focus:outline-none focus:border-orange-500"
                 />
             </div>
