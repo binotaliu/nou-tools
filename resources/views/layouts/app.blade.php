@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="zh-hant">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,8 +51,14 @@
         </main>
 
         <footer class="bg-warm-100 text-warm-700 py-6 mt-12">
-            <div class="max-w-7xl mx-auto px-6 text-center text-sm">
-                <p>&copy; {{ date('Y') }} NOU 小幫手</p>
+            <div class="max-w-7xl mx-auto px-6 text-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="w-full md:w-auto text-center md:text-left">
+                    <p class="text-warm-700">&copy; {{ date('Y') }} NOU 小幫手 | <a href="mailto:nou-tools-contact@binota.org" class="hover:text-warm-900">聯絡本網站作者</a></p>
+                </div>
+
+                <div class="w-full md:w-2/3 text-center md:text-right">
+                    <p class="mt-2 text-xs text-warm-500">免責聲明：本網站為學生自發製作之工具，僅供同學參考使用，並非學校官方發布；所有資訊以學校正式公告為準。</p>
+                </div>
             </div>
         </footer>
     </body>
