@@ -10,11 +10,6 @@ use Illuminate\Support\Str;
 
 class ScheduleController extends Controller
 {
-    public function index(): \Illuminate\View\View
-    {
-        return view('schedule.index');
-    }
-
     public function create(): \Illuminate\View\View
     {
         $sessionToken = Str::uuid()->toString();
@@ -96,20 +91,6 @@ class ScheduleController extends Controller
             'currentSemester' => $currentSemester,
             'semesterDisplay' => $this->formatSemesterDisplay($currentSemester),
         ]);
-    }
-
-    public function search(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $query = $request->input('q', '');
-        $limit = $request->input('limit', 20);
-
-        $courses = Course::query()
-            ->where('name', 'like', "%{$query}%")
-            ->with('classes')
-            ->limit($limit)
-            ->get();
-
-        return response()->json($courses);
     }
 
     public function store(Request $request): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse

@@ -148,7 +148,7 @@
                     <span x-show="!submitting">保存課表</span>
                     <span x-show="submitting">保存中...</span>
                 </button>
-                <a href="{{ isset($schedule) ? route('schedule.show', $schedule) : route('schedule.index') }}" class="flex-1 bg-warm-200 hover:bg-warm-300 text-warm-900 font-bold py-3 rounded-lg text-lg text-center transition">
+                <a href="{{ isset($schedule) ? route('schedule.show', $schedule) : route('schedule.create') }}" class="flex-1 bg-warm-200 hover:bg-warm-300 text-warm-900 font-bold py-3 rounded-lg text-lg text-center transition">
                     取消
                 </a>
             </div>
