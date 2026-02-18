@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aa90dd7730d613728d13aae11f0da744",
+    "content-hash": "d32619e46ea809679b9c943ed44987b0",
     "packages": [
         {
             "name": "brick/math",
@@ -5783,6 +5783,46 @@
                 }
             ],
             "time": "2026-01-01T22:13:48+00:00"
+        },
+        {
+            "name": "terpomoj/base64-url-helpers",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/terpomoj/base64-url-helpers.git",
+                "reference": "d87f5828803b8b1b5ec99419849dce6b40c272ee"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/terpomoj/base64-url-helpers/zipball/d87f5828803b8b1b5ec99419849dce6b40c272ee",
+                "reference": "d87f5828803b8b1b5ec99419849dce6b40c272ee",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "./src/helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "BinotaLIU",
+                    "email": "binota@binota.org"
+                }
+            ],
+            "description": "Provides base64_url_encode/base64_url_decode.",
+            "support": {
+                "issues": "https://github.com/terpomoj/base64-url-helpers/issues",
+                "source": "https://github.com/terpomoj/base64-url-helpers/tree/v0.1.0"
+            },
+            "time": "2022-06-01T07:39:27+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",

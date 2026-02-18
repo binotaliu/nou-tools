@@ -24,11 +24,8 @@ it('returns JSON and creates schedule on application/json POST', function () {
     ]);
 });
 
-it('allows creating multiple schedules within the same session token', function () {
+it('allows creating multiple schedules', function () {
     $courseClass = CourseClass::factory()->create();
-
-    // simulate an existing session token
-    session(['schedule_token' => 'same-session-token']);
 
     $payload = [
         'name' => '第一次',
@@ -37,7 +34,6 @@ it('allows creating multiple schedules within the same session token', function 
 
     $this->postJson(route('schedule.store'), $payload)->assertStatus(200);
 
-    // same session token again
     $payload['name'] = '第二次';
     $this->postJson(route('schedule.store'), $payload)->assertStatus(200);
 
@@ -54,7 +50,6 @@ it('returns an .ics calendar for a saved schedule', function () {
 
     $schedule = StudentSchedule::create([
         'uuid' => \Illuminate\Support\Str::uuid(),
-        'session_token' => 'test-token',
         'name' => 'ICS Export',
     ]);
 

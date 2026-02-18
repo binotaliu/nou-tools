@@ -12,9 +12,6 @@ class ScheduleController extends Controller
 {
     public function create(): \Illuminate\View\View
     {
-        $sessionToken = Str::uuid()->toString();
-        session(['schedule_token' => $sessionToken]);
-
         $currentSemester = config('app.current_semester');
         $courses = Course::query()
             ->where('term', $currentSemester)
@@ -43,7 +40,6 @@ class ScheduleController extends Controller
             });
 
         return view('schedule.editor', [
-            'sessionToken' => $sessionToken,
             'courses' => $courses,
             'currentSemester' => $currentSemester,
             'semesterDisplay' => $this->formatSemesterDisplay($currentSemester),
@@ -53,9 +49,6 @@ class ScheduleController extends Controller
     public function edit(StudentSchedule $schedule): \Illuminate\View\View
     {
         $schedule->load(['items.courseClass.course']);
-
-        $sessionToken = session('schedule_token') ?: Str::uuid()->toString();
-        session(['schedule_token' => $sessionToken]);
 
         $currentSemester = config('app.current_semester');
         $courses = Course::query()
@@ -86,7 +79,6 @@ class ScheduleController extends Controller
 
         return view('schedule.editor', [
             'schedule' => $schedule,
-            'sessionToken' => $sessionToken,
             'courses' => $courses,
             'currentSemester' => $currentSemester,
             'semesterDisplay' => $this->formatSemesterDisplay($currentSemester),
@@ -113,11 +105,8 @@ class ScheduleController extends Controller
             $validated = $request->validate($rules);
         }
 
-        $sessionToken = session('schedule_token') ?: Str::uuid()->toString();
-
         $schedule = StudentSchedule::create([
-            'uuid' => Str::uuid(),
-            'session_token' => $sessionToken,
+            'uuid' => Str::uuid()->toString(),
             'name' => $validated['name'] ?? null,
         ]);
 
