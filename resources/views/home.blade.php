@@ -5,7 +5,7 @@
 @section('content')
 <div class="space-y-8">
     <!-- greeting -->
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-warm-200">
+    <div class="bg-white p-6 rounded-lg border border-warm-200">
         <div class="flex items-baseline justify-between gap-4">
             <div>
                 <h2 class="text-3xl font-semibold">{{ $greeting }}，歡迎回來！</h2>
@@ -19,7 +19,7 @@
     </div>
 
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-warm-200">
+        <div class="bg-white p-6 rounded-lg border border-warm-200">
             <h4 class="font-medium mb-3">功能選單</h4>
 
             <a href="{{ route('schedule.create') }}" class="inline-flex items-center px-4 py-2 bg-warm-700 text-white rounded hover:bg-warm-800 gap-2">
@@ -49,7 +49,7 @@
     @include('partials.school-calendar', ['scheduleEvents' => $scheduleEvents ?? [], 'countdownEvent' => $countdownEvent ?? null])
 
     <!-- 今日面授 -->
-    <div class="bg-white p-6 rounded-lg shadow-sm border border-warm-200" x-data="{ date: '{{ $selectedDate }}' }">
+    <div class="bg-white p-6 rounded-lg border border-warm-200" x-data="{ date: '{{ $selectedDate }}' }">
         <div class="flex items-center justify-between">
             <h3 class="text-lg font-medium">今日視訊面授</h3>
             <div class="flex items-center gap-3">
