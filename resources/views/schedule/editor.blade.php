@@ -138,7 +138,11 @@
         </div>
 
         <!-- Submit Section -->
-        <form @submit.prevent="submitForm" class="bg-white p-6 rounded-lg border border-warm-200">
+        <form action="{{ isset($schedule) ? route('schedule.update', $schedule) : route('schedule.store') }}" method="POST" @submit.prevent="submitForm" class="bg-white p-6 rounded-lg border border-warm-200">
+            @csrf
+            @if(isset($schedule))
+                @method('PUT')
+            @endif
             <div class="mb-4">
                 <label class="block text-lg font-semibold text-warm-900 mb-2">課表名稱（可選）</label>
                 <input
@@ -282,8 +286,14 @@
                     this.submitting = true;
 
                     try {
-                        const response = await fetch('{{ route('schedule.store') }}', {
-                            method: 'POST',
+                        const isEdit = !!this.schedule;
+                        const url = isEdit
+                            ? '{{ isset($schedule) ? route('schedule.update', $schedule) : '' }}'
+                            : '{{ route('schedule.store') }}';
+                        const method = isEdit ? 'PUT' : 'POST';
+
+                        const response = await fetch(url, {
+                            method,
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}',

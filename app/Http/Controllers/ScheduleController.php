@@ -158,16 +158,28 @@ class ScheduleController extends Controller
             ->cookie($cookie);
     }
 
-    public function update(StudentSchedule $schedule, Request $request): \Illuminate\Http\RedirectResponse
+    public function update(StudentSchedule $schedule, Request $request): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
-        $validated = $request->validate([
+        $rules = [
             'name' => 'nullable|string|max:255',
             'items' => 'required|array|min:1',
             'items.*' => 'required|exists:course_classes,id',
-        ]);
+        ];
+
+        // If the client sent a JSON payload (e.g. fetch/axios), validate and return JSON errors.
+        if ($request->isJson()) {
+            $validator = \Illuminate\Support\Facades\Validator::make($request->json()->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $validated = $validator->validated();
+        } else {
+            $validated = $request->validate($rules);
+        }
 
         $schedule->update([
-            'name' => $validated['name'],
+            'name' => $validated['name'] ?? null,
         ]);
 
         $schedule->items()->delete();
@@ -185,10 +197,18 @@ class ScheduleController extends Controller
             'uuid' => $schedule->uuid,
             'name' => $schedule->name,
         ]);
+        $cookie = cookie()->forever('student_schedule', $cookieValue);
+
+        if ($request->wantsJson() || $request->isJson()) {
+            return response()->json([
+                'success' => true,
+                'redirect_url' => route('schedule.show', $schedule),
+            ])->cookie($cookie);
+        }
 
         return redirect()->route('schedule.show', $schedule)
             ->with('success', '課表已更新！')
-            ->cookie(cookie()->forever('student_schedule', $cookieValue));
+            ->cookie($cookie);
     }
 
     public function show(StudentSchedule $schedule): \Illuminate\View\View

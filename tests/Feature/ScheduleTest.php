@@ -166,3 +166,24 @@ it('updates the stored cookie when schedule is updated', function () {
 
     expect($decrypted['name'])->toBe('New Name');
 });
+
+it('edit page form posts to update route and includes method spoofing', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => \Illuminate\Support\Str::uuid(),
+        'name' => 'Edit Me',
+    ]);
+
+    $response = $this->get(route('schedule.edit', $schedule));
+
+    $response->assertStatus(200)
+        ->assertSee('action="'.route('schedule.update', $schedule).'"')
+        ->assertSee('name="_method" value="PUT"');
+});
+
+it('create page form posts to store route and does not include method spoofing', function () {
+    $response = $this->get(route('schedule.create'));
+
+    $response->assertStatus(200)
+        ->assertSee('action="'.route('schedule.store').'"')
+        ->assertDontSee('name="_method" value="PUT"');
+});
