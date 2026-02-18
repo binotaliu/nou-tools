@@ -123,4 +123,17 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Current Semester
+    |--------------------------------------------------------------------------
+    |
+    | The current semester for course selection. Format: YYYYX where X is
+    | A (first semester), B (second semester), or C (summer).
+    | Example: 2025B
+    |
+    */
+
+    'current_semester' => env('CURRENT_SEMESTER', '2025B'),
+
 ];

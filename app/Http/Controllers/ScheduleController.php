@@ -20,8 +20,38 @@ class ScheduleController extends Controller
         $sessionToken = session('schedule_token') ?: Str::uuid()->toString();
         session(['schedule_token' => $sessionToken]);
 
+        $currentSemester = config('app.current_semester');
+        $courses = Course::query()
+            ->where('term', $currentSemester)
+            ->with(['classes' => function ($query) {
+                $query->orderBy('type');
+            }])
+            ->orderBy('name')
+            ->get()
+            ->map(function ($course) {
+                return [
+                    'id' => $course->id,
+                    'name' => $course->name,
+                    'term' => $course->term,
+                    'classes' => $course->classes->map(function ($class) {
+                        return [
+                            'id' => $class->id,
+                            'code' => $class->code,
+                            'type' => $class->type->value,
+                            'type_label' => $class->type->label(),
+                            'start_time' => $class->start_time,
+                            'end_time' => $class->end_time,
+                            'teacher_name' => $class->teacher_name,
+                        ];
+                    }),
+                ];
+            });
+
         return view('schedule.editor', [
             'sessionToken' => $sessionToken,
+            'courses' => $courses,
+            'currentSemester' => $currentSemester,
+            'semesterDisplay' => $this->formatSemesterDisplay($currentSemester),
         ]);
     }
 
@@ -30,9 +60,39 @@ class ScheduleController extends Controller
         $sessionToken = session('schedule_token') ?: Str::uuid()->toString();
         session(['schedule_token' => $sessionToken]);
 
+        $currentSemester = config('app.current_semester');
+        $courses = Course::query()
+            ->where('term', $currentSemester)
+            ->with(['classes' => function ($query) {
+                $query->orderBy('type');
+            }])
+            ->orderBy('name')
+            ->get()
+            ->map(function ($course) {
+                return [
+                    'id' => $course->id,
+                    'name' => $course->name,
+                    'term' => $course->term,
+                    'classes' => $course->classes->map(function ($class) {
+                        return [
+                            'id' => $class->id,
+                            'code' => $class->code,
+                            'type' => $class->type->value,
+                            'type_label' => $class->type->label(),
+                            'start_time' => $class->start_time,
+                            'end_time' => $class->end_time,
+                            'teacher_name' => $class->teacher_name,
+                        ];
+                    }),
+                ];
+            });
+
         return view('schedule.editor', [
             'schedule' => $schedule,
             'sessionToken' => $sessionToken,
+            'courses' => $courses,
+            'currentSemester' => $currentSemester,
+            'semesterDisplay' => $this->formatSemesterDisplay($currentSemester),
         ]);
     }
 
@@ -207,5 +267,35 @@ class ScheduleController extends Controller
     private function escapeICSString(string $string): string
     {
         return str_replace(["\r\n", "\n", ',', ';', '\\'], ['\\n', '\\n', '\\,', '\\;', '\\\\'], $string);
+    }
+
+    /**
+     * Format semester code to display format.
+     * Example: 2025B → 114學年度下學期
+     */
+    private function formatSemesterDisplay(string $semester): string
+    {
+        // Extract year and term code
+        preg_match('/^(\d{4})([ABC])$/', $semester, $matches);
+
+        if (count($matches) !== 3) {
+            return $semester;
+        }
+
+        $year = (int) $matches[1];
+        $termCode = $matches[2];
+
+        // Convert to ROC year (民國)
+        $rocYear = $year - 1911;
+
+        // Map term code to Chinese
+        $termName = match ($termCode) {
+            'A' => '上學期',
+            'B' => '下學期',
+            'C' => '暑期',
+            default => $termCode,
+        };
+
+        return "{$rocYear}學年度{$termName}";
     }
 }

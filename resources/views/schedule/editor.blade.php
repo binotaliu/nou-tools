@@ -4,7 +4,10 @@
 
 @section('content')
     <div x-data="scheduleEditor()" class="max-w-5xl mx-auto">
-        <h2 class="text-3xl font-bold text-warm-900 mb-6">編輯您的課表</h2>
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold text-warm-900">編輯您的課表</h2>
+            <div class="text-lg font-semibold text-orange-600">{{ $semesterDisplay }}</div>
+        </div>
 
         <!-- Search Section -->
         <div class="bg-white p-6 rounded-lg border border-warm-200 mb-8">
@@ -13,27 +16,23 @@
                 <input
                     type="text"
                     x-model="searchQuery"
-                    @input="searchCourses()"
-                    placeholder="輸入課程名稱... (例如：數學、英文、物理)
+                    @input="filterCourses()"
+                    placeholder="輸入課程名稱... (例如：數學、英文、物理)"
                     class="w-full px-4 py-3 border-2 border-warm-300 rounded-lg focus:outline-none focus:border-orange-500 text-lg"
                     autocomplete="off"
                 />
-                <template x-if="searching">
-                    <div class="absolute right-4 top-3 text-warm-600">🔄 搜尋中...</div>
-                </template>
             </div>
 
             <!-- Search Results Dropdown -->
-            <div x-show="showResults && courses.length > 0" class="absolute mt-2 w-full bg-white border border-warm-200 rounded-lg shadow-lg z-10 max-h-96 overflow-y-auto">
-                <template x-for="course in courses" :key="course.id">
+            <div x-show="showResults && filteredCourses.length > 0" class="mt-2 bg-white border border-warm-200 rounded-lg shadow-lg max-h-96 overflow-y-auto">
+                <template x-for="course in filteredCourses" :key="course.id">
                     <div @click="selectCourse(course)" class="p-4 border-b border-warm-100 hover:bg-warm-50 cursor-pointer">
                         <div class="font-semibold text-warm-900" x-text="course.name"></div>
-                        <div class="text-sm text-warm-600" x-text="`學期：${course.term}`"></div>
                     </div>
                 </template>
             </div>
 
-            <template x-if="showResults && courses.length === 0 && !searching && searchQuery">
+            <template x-if="showResults && filteredCourses.length === 0 && searchQuery.trim()">
                 <div class="mt-2 p-4 bg-warm-50 border border-warm-200 rounded-lg text-warm-700">
                     找不到符合的課程。請試試其他關鍵字。
                 </div>
@@ -56,7 +55,6 @@
                         <div class="flex justify-between items-start mb-3">
                             <div>
                                 <div class="text-lg font-bold text-warm-900" x-text="item.course.name"></div>
-                                <div class="text-sm text-warm-600" x-text="`學期：${item.course.term}`"></div>
                             </div>
                             <button @click="removeItem(index)" class="bg-red-100 hover:bg-red-200 text-red-700 rounded px-3 py-1 text-sm font-semibold">
                                 移除
@@ -65,32 +63,63 @@
 
                         <!-- Class Selection -->
                         <div class="mt-3">
-                            <label class="block text-sm font-semibold text-warm-800 mb-2">選擇班級：</label>
-                            <div class="space-y-2">
-                                <template x-for="courseClass in item.course.classes" :key="courseClass.id">
-                                    <label class="flex items-start p-3 bg-white border-2 rounded-lg cursor-pointer hover:border-orange-300 transition"
-                                           :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200'">
-                                        <input
-                                            type="radio"
-                                            :name="`class_${index}`"
-                                            :value="courseClass.id"
-                                            x-model.number="item.selectedClassId"
-                                            @change="updateSelectedClass(index, courseClass.id)"
-                                            class="mt-1 mr-3 cursor-pointer w-5 h-5"
-                                        />
-                                        <div class="flex-1">
-                                            <div class="font-semibold text-warm-900" x-text="courseClass.code"></div>
-                                            <div class="text-sm text-warm-600">
-                                                <span x-show="courseClass.start_time" x-text="`時間：${courseClass.start_time} - ${courseClass.end_time}`"></span>
-                                            </div>
-                                            <div class="text-sm text-warm-600" x-show="courseClass.teacher_name" x-text="`教師：${courseClass.teacher_name}`"></div>
-                                            <div class="text-sm text-warm-600" x-show="courseClass.link">
-                                                <a :href="courseClass.link" target="_blank" class="text-orange-600 hover:underline">📎 課程連結</a>
+                            <template x-if="getClassTypes(item.course).length > 1">
+                                <div>
+                                    <label class="block text-sm font-semibold text-warm-800 mb-2">選擇班級：</label>
+                                    <template x-for="type in getClassTypes(item.course)" :key="type">
+                                        <div class="mb-4">
+                                            <div class="text-sm font-semibold text-warm-700 mb-2" x-text="getTypeLabel(type)"></div>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                <template x-for="courseClass in getClassesByType(item.course, type)" :key="courseClass.id">
+                                                    <label class="flex items-start p-3 bg-white border-2 rounded-lg cursor-pointer hover:border-orange-300 transition"
+                                                           :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200'">
+                                                        <input
+                                                            type="radio"
+                                                            :name="`class_${index}`"
+                                                            :value="courseClass.id"
+                                                            x-model.number="item.selectedClassId"
+                                                            class="mt-1 mr-3 cursor-pointer w-5 h-5"
+                                                        />
+                                                        <div class="flex-1 min-w-0">
+                                                            <div class="font-semibold text-warm-900" x-text="courseClass.code"></div>
+                                                            <div class="text-sm text-warm-600" x-show="courseClass.start_time">
+                                                                <span x-text="`${courseClass.start_time} - ${courseClass.end_time}`"></span>
+                                                            </div>
+                                                            <div class="text-sm text-warm-600 truncate" x-show="courseClass.teacher_name" x-text="`${courseClass.teacher_name}`"></div>
+                                                        </div>
+                                                    </label>
+                                                </template>
                                             </div>
                                         </div>
-                                    </label>
-                                </template>
-                            </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="getClassTypes(item.course).length === 1">
+                                <div>
+                                    <label class="block text-sm font-semibold text-warm-800 mb-2">班級：</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        <template x-for="courseClass in item.course.classes" :key="courseClass.id">
+                                            <label class="flex items-start p-3 bg-white border-2 rounded-lg cursor-pointer hover:border-orange-300 transition"
+                                                   :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200'">
+                                                <input
+                                                    type="radio"
+                                                    :name="`class_${index}`"
+                                                    :value="courseClass.id"
+                                                    x-model.number="item.selectedClassId"
+                                                    class="mt-1 mr-3 cursor-pointer w-5 h-5"
+                                                />
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-semibold text-warm-900" x-text="courseClass.code"></div>
+                                                    <div class="text-sm text-warm-600" x-show="courseClass.start_time">
+                                                        <span x-text="`${courseClass.start_time} - ${courseClass.end_time}`"></span>
+                                                    </div>
+                                                    <div class="text-sm text-warm-600 truncate" x-show="courseClass.teacher_name" x-text="`${courseClass.teacher_name}`"></div>
+                                                </div>
+                                            </label>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </template>
@@ -129,48 +158,51 @@
     <script>
         function scheduleEditor() {
             return {
+                allCourses: @json($courses),
                 searchQuery: '',
-                courses: [],
+                filteredCourses: [],
                 showResults: false,
-                searching: false,
                 selectedItems: [],
                 scheduleName: '',
                 submitting: false,
-                searchTimeout: null,
 
-                searchCourses() {
-                    this.showResults = true;
-                    clearTimeout(this.searchTimeout);
+                init() {
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', (e) => {
+                        if (!e.target.closest('.relative')) {
+                            this.showResults = false;
+                        }
+                    });
+                },
 
-                    if (!this.searchQuery.trim()) {
-                        this.courses = [];
+                filterCourses() {
+                    const query = this.searchQuery.trim().toLowerCase();
+
+                    if (!query) {
+                        this.filteredCourses = [];
+                        this.showResults = false;
                         return;
                     }
 
-                    this.searching = true;
-                    this.searchTimeout = setTimeout(() => {
-                        fetch(`{{ route('api.courses.search') }}?q=${encodeURIComponent(this.searchQuery)}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                this.courses = data;
-                                this.searching = false;
-                            })
-                            .catch(error => {
-                                console.error('搜尋出錯:', error);
-                                this.searching = false;
-                            });
-                    }, 300);
+                    this.filteredCourses = this.allCourses.filter(course =>
+                        course.name.toLowerCase().includes(query)
+                    );
+                    this.showResults = true;
                 },
 
                 selectCourse(course) {
                     if (!this.selectedItems.some(item => item.course.id === course.id)) {
+                        const selectedClassId = course.classes.length === 1
+                            ? course.classes[0].id
+                            : (course.classes.length > 0 ? course.classes[0].id : null);
+
                         this.selectedItems.push({
                             course: course,
-                            selectedClassId: course.classes.length > 0 ? course.classes[0].id : null,
+                            selectedClassId: selectedClassId,
                         });
                     }
                     this.searchQuery = '';
-                    this.courses = [];
+                    this.filteredCourses = [];
                     this.showResults = false;
                 },
 
@@ -178,8 +210,29 @@
                     this.selectedItems.splice(index, 1);
                 },
 
-                updateSelectedClass(itemIndex, classId) {
-                    this.selectedItems[itemIndex].selectedClassId = classId;
+                getClassTypes(course) {
+                    const typeOrder = {
+                        'morning': 0,
+                        'afternoon': 1,
+                        'evening': 2,
+                        'full_remote': 3,
+                    };
+                    const types = [...new Set(course.classes.map(c => c.type))];
+                    return types.sort((a, b) => (typeOrder[a] ?? 99) - (typeOrder[b] ?? 99));
+                },
+
+                getClassesByType(course, type) {
+                    return course.classes.filter(c => c.type === type);
+                },
+
+                getTypeLabel(type) {
+                    const labels = {
+                        'morning': '上午班',
+                        'afternoon': '下午班',
+                        'evening': '夜間班',
+                        'full_remote': '全遠距'
+                    };
+                    return labels[type] || type;
                 },
 
                 async submitForm() {

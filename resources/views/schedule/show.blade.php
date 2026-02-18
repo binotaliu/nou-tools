@@ -9,9 +9,6 @@
                 <h2 class="text-3xl font-bold text-warm-900 mb-2">
                     {{ $schedule->name ?: '課表' }}
                 </h2>
-                <p class="text-warm-600 text-lg">
-                    ID: <code class="bg-warm-100 px-2 py-1 rounded font-mono">{{ $schedule->uuid }}</code>
-                </p>
             </div>
             <div class="flex gap-3">
                 <a href="{{ route('schedule.edit', $schedule) }}"
@@ -60,9 +57,9 @@
                         <tr class="bg-warm-100 border-b-2 border-warm-300">
                             <th class="px-4 py-3 text-left font-bold text-warm-900">課程名稱</th>
                             <th class="px-4 py-3 text-left font-bold text-warm-900">班級</th>
+                            <th class="px-4 py-3 text-left font-bold text-warm-900">下次上課</th>
                             <th class="px-4 py-3 text-left font-bold text-warm-900">時間</th>
                             <th class="px-4 py-3 text-left font-bold text-warm-900">教師</th>
-                            <th class="px-4 py-3 text-left font-bold text-warm-900">課程數</th>
                             <th class="px-4 py-3 text-left font-bold text-warm-900">操作</th>
                         </tr>
                     </thead>
@@ -76,6 +73,24 @@
                                     {{ $item->courseClass->code }}
                                 </td>
                                 <td class="px-4 py-3 text-warm-800">
+                                    @php
+                                        $nextSchedule = $item->courseClass->schedules
+                                            ->filter(fn($s) => $s->date->isToday() || $s->date->isFuture())
+                                            ->sortBy('date')
+                                            ->first();
+                                    @endphp
+
+                                    @if ($nextSchedule)
+                                        @php
+                                            $d = $nextSchedule->date;
+                                            $weekdayZh = ['日','一','二','三','四','五','六'][$d->dayOfWeek];
+                                        @endphp
+                                        {{ $d->format('n/j') }} ({{ $weekdayZh }})
+                                    @else
+                                        <span class="text-warm-500">無未來課程</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-warm-800">
                                     @if ($item->courseClass->start_time)
                                         {{ $item->courseClass->start_time }} ~ {{ $item->courseClass->end_time }}
                                     @else
@@ -83,10 +98,26 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-warm-800">
-                                    {{ $item->courseClass->teacher_name ?: '−' }}
-                                </td>
-                                <td class="px-4 py-3 text-warm-800 text-center">
-                                    {{ count($item->courseClass->schedules) }}
+                                    @if ($item->courseClass->teacher_name)
+                                        @php
+                                            $teacher = $item->courseClass->teacher_name;
+                                            $suffix = mb_substr($teacher, -2, null, 'UTF-8');
+                                            $base = mb_substr($teacher, 0, mb_strlen($teacher, 'UTF-8') - 2, 'UTF-8');
+                                        @endphp
+
+                                        @if ($suffix === '老師')
+                                            <span class="inline-flex items-baseline">
+                                                @if ($base !== '')
+                                                    <span>{{ $base }}</span>
+                                                @endif
+                                                <span class="text-xs align-text-top ml-1">{{ $suffix }}</span>
+                                            </span>
+                                        @else
+                                            {{ $teacher }}
+                                        @endif
+                                    @else
+                                        −
+                                    @endif
                                 </td>
                                 <td class="px-4 py-3">
                                     @if ($item->courseClass->link)
@@ -138,20 +169,24 @@
                         }
                     @endphp
 
-                    @foreach (array_reverse($coursesByMonth) as $monthData)
+                    @foreach (collect($coursesByMonth)->sortKeys() as $monthData)
                         <div class="bg-white rounded-lg border border-warm-200 p-6">
                             <h4 class="text-xl font-bold text-warm-900 mb-4">{{ $monthData['month'] }}</h4>
                             <div class="space-y-3">
                                 @foreach (collect($monthData['dates'])->sortKeys() as $dateStr => $courses)
                                     <div class="border-l-4 border-orange-500 pl-4 py-2">
-                                        <div class="font-semibold text-warm-900 mb-1">
-                                            {{ \Carbon\Carbon::parse($dateStr)->translatedFormat('D, M j') }}
-                                        </div>
-                                        <div class="space-y-1">
+                                        @php
+                                    $d = \Carbon\Carbon::parse($dateStr);
+                                    $weekdayZh = ['日','一','二','三','四','五','六'][$d->dayOfWeek];
+                                @endphp
+                                <div class="font-semibold text-warm-900 mb-1">
+                                    {{ $d->format('n/j') }} ({{ $weekdayZh }})
+                                </div>
+                                <div class="space-y-1">
                                             @foreach ($courses as $course)
                                                 <div class="text-sm text-warm-700">
                                                     <span class="font-semibold">{{ $course['courseName'] }}</span>
-                                                    <span class="text-warm-600">({{ $course['code'] }})</span>
+                                                    <span class="text-xs text-warm-600">({{ $course['code'] }})</span><br>
                                                     <span class="text-warm-600">{{ $course['time'] }}</span>
                                                 </div>
                                             @endforeach
@@ -167,12 +202,13 @@
 
         <!-- Share Section -->
         <div class="mt-8 bg-warm-50 rounded-lg border border-warm-200 p-6">
-            <h3 class="text-xl font-bold text-warm-900 mb-3">分享課表</h3>
+            <h3 class="text-xl font-bold text-warm-900 mb-3">連結</h3>
             <p class="text-warm-700 mb-3">
-                您可以使用以下連結來編輯或查看此課表。無需登入！
+                您可以使用以下連結來編輯或查看此課表，請妥善保管此連結。<br>
+                <span class="font-semibold text-red-600">⚠️ 注意：任何擁有此連結的人都可以編輯您的課表，請勿隨意分享。</span>
             </p>
             <div class="bg-white p-3 rounded border border-warm-300 font-mono text-sm break-all text-warm-600">
-                {{ url(route('schedule.edit', $schedule)) }}
+                {{ url(route('schedule.show', $schedule)) }}
             </div>
         </div>
 
@@ -185,6 +221,4 @@
             </a>
         </div>
     </div>
-
-    <!-- 已移除下載按鈕的 JS；改為提供訂閱連結 -->
 @endsection
