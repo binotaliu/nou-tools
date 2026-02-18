@@ -17,7 +17,7 @@ class ScheduleController extends Controller
 
     public function create(): \Illuminate\View\View
     {
-        $sessionToken = session('schedule_token') ?: Str::uuid()->toString();
+        $sessionToken = Str::uuid()->toString();
         session(['schedule_token' => $sessionToken]);
 
         $currentSemester = config('app.current_semester');
