@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ScheduleCalendarController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,4 +11,4 @@ Route::post('/schedule', [ScheduleController::class, 'store'])->name('schedule.s
 Route::get('/schedule/{schedule}', [ScheduleController::class, 'show'])->name('schedule.show');
 Route::get('/schedule/{schedule}/edit', [ScheduleController::class, 'edit'])->name('schedule.edit');
 Route::put('/schedule/{schedule}', [ScheduleController::class, 'update'])->name('schedule.update');
-Route::get('/schedule/{schedule}/calendar', [ScheduleController::class, 'calendar'])->name('schedule.calendar');
+Route::get('/schedule/{schedule}/calendar', ScheduleCalendarController::class)->name('schedule.calendar');

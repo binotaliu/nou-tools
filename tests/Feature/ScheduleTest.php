@@ -1,6 +1,9 @@
 <?php
 
+use App\Models\ClassSchedule;
 use App\Models\CourseClass;
+use App\Models\StudentSchedule;
+use App\Models\StudentScheduleItem;
 
 it('returns JSON and creates schedule on application/json POST', function () {
     $courseClass = CourseClass::factory()->create();
@@ -41,4 +44,35 @@ it('allows creating multiple schedules within the same session token', function 
     $this->assertDatabaseCount('student_schedules', 2);
     $this->assertDatabaseHas('student_schedules', ['name' => '第一次']);
     $this->assertDatabaseHas('student_schedules', ['name' => '第二次']);
+});
+
+it('returns an .ics calendar for a saved schedule', function () {
+    $courseClass = CourseClass::factory()->create([
+        'start_time' => '09:00',
+        'end_time' => '10:00',
+    ]);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => \Illuminate\Support\Str::uuid(),
+        'session_token' => 'test-token',
+        'name' => 'ICS Export',
+    ]);
+
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $courseClass->id,
+    ]);
+
+    ClassSchedule::factory()->create([
+        'class_id' => $courseClass->id,
+        'date' => now()->addWeek()->toDateString(),
+    ]);
+
+    $response = $this->get(route('schedule.calendar', $schedule));
+
+    $response->assertStatus(200)
+        ->assertHeader('Content-Type', 'text/calendar; charset=utf-8')
+        ->assertSee('BEGIN:VCALENDAR')
+        ->assertSee($courseClass->course->name)
+        ->assertSee($courseClass->code);
 });
