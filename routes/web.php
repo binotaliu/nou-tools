@@ -1,7 +1,15 @@
 <?php
 
+use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', '/schedule');
+
+Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
+Route::get('/schedule/create', [ScheduleController::class, 'create'])->name('schedule.create');
+Route::post('/schedule', [ScheduleController::class, 'store'])->name('schedule.store');
+Route::get('/schedule/{schedule}', [ScheduleController::class, 'show'])->name('schedule.show');
+Route::get('/schedule/{schedule}/edit', [ScheduleController::class, 'edit'])->name('schedule.edit');
+Route::put('/schedule/{schedule}', [ScheduleController::class, 'update'])->name('schedule.update');
+Route::get('/schedule/{schedule}/calendar', [ScheduleController::class, 'calendar'])->name('schedule.calendar');
+Route::get('/api/courses/search', [ScheduleController::class, 'search'])->name('api.courses.search');
