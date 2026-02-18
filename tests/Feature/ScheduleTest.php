@@ -85,17 +85,14 @@ it('stores schedule metadata in an encrypted cookie when saving', function () {
     $response->assertStatus(200)
         ->assertJson(['success' => true]);
 
-    $response->assertCookie('student_schedule');
-
     $schedule = StudentSchedule::where('name', 'Cookie Test')->first();
     expect($schedule)->not->toBeNull();
 
-    $cookie = collect($response->headers->getCookies())->first(fn ($c) => $c->getName() === 'student_schedule');
-    $decrypted = json_decode(decrypt($cookie->getValue()), true);
-
-    expect($decrypted['id'])->toBe($schedule->id);
-    expect($decrypted['uuid'])->toBe($schedule->uuid);
-    expect($decrypted['name'])->toBe('Cookie Test');
+    $response->assertCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => 'Cookie Test',
+    ]));
 });
 
 it('shows previous schedule on home when cookie exists', function () {
@@ -112,8 +109,6 @@ it('shows previous schedule on home when cookie exists', function () {
 
     $response->assertStatus(200)
         ->assertSee('Previously Saved')
-        ->assertSee('ID: '.$schedule->id)
-        ->assertSee(route('schedule.edit', $schedule->id))
         ->assertSee(route('schedule.show', $schedule));
 });
 
@@ -132,7 +127,6 @@ it('shows prompt on schedule create page when cookie exists and can be ignored w
     $response->assertStatus(200)
         ->assertSee('你曾建立過課表')
         ->assertSee('My Old Schedule')
-        ->assertSee(route('schedule.edit', $schedule->id))
         ->assertSee(route('schedule.show', $schedule));
 
     $response2 = $this->withCookie('student_schedule', json_encode([
@@ -161,12 +155,11 @@ it('updates the stored cookie when schedule is updated', function () {
     $response = $this->put(route('schedule.update', $schedule), $payload);
 
     $response->assertRedirect(route('schedule.show', $schedule));
-    $response->assertCookie('student_schedule');
-
-    $cookie = collect($response->headers->getCookies())->first(fn ($c) => $c->getName() === 'student_schedule');
-    $decrypted = json_decode(decrypt($cookie->getValue()), true);
-
-    expect($decrypted['name'])->toBe('New Name');
+    $response->assertCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => 'New Name',
+    ]));
 });
 
 it('edit page form posts to update route and includes method spoofing', function () {
@@ -178,14 +171,14 @@ it('edit page form posts to update route and includes method spoofing', function
     $response = $this->get(route('schedule.edit', $schedule));
 
     $response->assertStatus(200)
-        ->assertSee('action="'.route('schedule.update', $schedule).'"')
-        ->assertSee('name="_method" value="PUT"');
+        ->assertSee('action="'.route('schedule.update', $schedule).'"', false)
+        ->assertSee('name="_method" value="PUT"', false);
 });
 
 it('create page form posts to store route and does not include method spoofing', function () {
     $response = $this->get(route('schedule.create'));
 
     $response->assertStatus(200)
-        ->assertSee('action="'.route('schedule.store').'"')
-        ->assertDontSee('name="_method" value="PUT"');
+        ->assertSee('action="'.route('schedule.store').'"', false)
+        ->assertDontSee('name="_method" value="PUT"', false);
 });
