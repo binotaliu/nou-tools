@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class ScheduleController extends Controller
 {
-    public function create(): \Illuminate\View\View
+    public function create(\Illuminate\Http\Request $request): \Illuminate\View\View
     {
         $currentSemester = config('app.current_semester');
         $courses = Course::query()
@@ -39,10 +39,30 @@ class ScheduleController extends Controller
                 ];
             });
 
+        // If the user explicitly requested a fresh/new schedule view, ignore cookie
+        $previousSchedule = null;
+        if (! $request->query('new')) {
+            $cookie = $request->cookie('student_schedule');
+            if ($cookie) {
+                $data = json_decode($cookie, true);
+                if (is_array($data) && isset($data['id'], $data['uuid'])) {
+                    $model = StudentSchedule::find($data['id']);
+                    if ($model) {
+                        $previousSchedule = [
+                            'id' => $model->id,
+                            'uuid' => $model->uuid,
+                            'name' => $model->name,
+                        ];
+                    }
+                }
+            }
+        }
+
         return view('schedule.editor', [
             'courses' => $courses,
             'currentSemester' => $currentSemester,
             'semesterDisplay' => $this->formatSemesterDisplay($currentSemester),
+            'previousSchedule' => $previousSchedule,
         ]);
     }
 
@@ -117,16 +137,25 @@ class ScheduleController extends Controller
             ]);
         }
 
+        // persist schedule metadata into an encrypted, long-lived cookie so only backend can read it
+        $cookieValue = json_encode([
+            'id' => $schedule->id,
+            'uuid' => $schedule->uuid,
+            'name' => $schedule->name,
+        ]);
+        $cookie = cookie()->forever('student_schedule', $cookieValue);
+
         // Treat requests with a JSON body as expecting JSON responses too (fetch doesn't always set Accept).
         if ($request->wantsJson() || $request->isJson()) {
             return response()->json([
                 'success' => true,
                 'redirect_url' => route('schedule.show', $schedule),
-            ]);
+            ])->cookie($cookie);
         }
 
         return redirect()->route('schedule.show', $schedule)
-            ->with('success', '課表已保存！');
+            ->with('success', '課表已保存！')
+            ->cookie($cookie);
     }
 
     public function update(StudentSchedule $schedule, Request $request): \Illuminate\Http\RedirectResponse
@@ -150,8 +179,16 @@ class ScheduleController extends Controller
             ]);
         }
 
+        // update the stored cookie so name/uuid stay in sync
+        $cookieValue = json_encode([
+            'id' => $schedule->id,
+            'uuid' => $schedule->uuid,
+            'name' => $schedule->name,
+        ]);
+
         return redirect()->route('schedule.show', $schedule)
-            ->with('success', '課表已更新！');
+            ->with('success', '課表已更新！')
+            ->cookie(cookie()->forever('student_schedule', $cookieValue));
     }
 
     public function show(StudentSchedule $schedule): \Illuminate\View\View

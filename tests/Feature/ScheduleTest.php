@@ -71,3 +71,98 @@ it('returns an .ics calendar for a saved schedule', function () {
         ->assertSee($courseClass->course->name)
         ->assertSee($courseClass->code);
 });
+
+it('stores schedule metadata in an encrypted cookie when saving', function () {
+    $courseClass = CourseClass::factory()->create();
+
+    $payload = [
+        'name' => 'Cookie Test',
+        'items' => [$courseClass->id],
+    ];
+
+    $response = $this->postJson(route('schedule.store'), $payload);
+
+    $response->assertStatus(200)
+        ->assertJson(['success' => true]);
+
+    $response->assertCookie('student_schedule');
+
+    $schedule = StudentSchedule::where('name', 'Cookie Test')->first();
+    expect($schedule)->not->toBeNull();
+
+    $cookie = collect($response->headers->getCookies())->first(fn ($c) => $c->getName() === 'student_schedule');
+    $decrypted = json_decode(decryptString($cookie->getValue()), true);
+
+    expect($decrypted['id'])->toBe($schedule->id);
+    expect($decrypted['uuid'])->toBe($schedule->uuid);
+    expect($decrypted['name'])->toBe('Cookie Test');
+});
+
+it('shows previous schedule on home when cookie exists', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => \Illuminate\Support\Str::uuid(),
+        'name' => 'Previously Saved',
+    ]);
+
+    $response = $this->withCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => $schedule->name,
+    ]))->get(route('home'));
+
+    $response->assertStatus(200)
+        ->assertSee('Previously Saved')
+        ->assertSee('ID: '.$schedule->id)
+        ->assertSee(route('schedule.edit', $schedule->id));
+});
+
+it('shows prompt on schedule create page when cookie exists and can be ignored with ?new=1', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => \Illuminate\Support\Str::uuid(),
+        'name' => 'My Old Schedule',
+    ]);
+
+    $response = $this->withCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => $schedule->name,
+    ]))->get(route('schedule.create'));
+
+    $response->assertStatus(200)
+        ->assertSee('你曾建立過課表')
+        ->assertSee('My Old Schedule')
+        ->assertSee(route('schedule.edit', $schedule->id));
+
+    $response2 = $this->withCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => $schedule->name,
+    ]))->get(route('schedule.create').'?new=1');
+
+    $response2->assertStatus(200)
+        ->assertDontSee('你曾建立過課表');
+});
+
+it('updates the stored cookie when schedule is updated', function () {
+    $courseClass = CourseClass::factory()->create();
+
+    $schedule = StudentSchedule::create([
+        'uuid' => \Illuminate\Support\Str::uuid(),
+        'name' => 'Old Name',
+    ]);
+
+    $payload = [
+        'name' => 'New Name',
+        'items' => [$courseClass->id],
+    ];
+
+    $response = $this->put(route('schedule.update', $schedule), $payload);
+
+    $response->assertRedirect(route('schedule.show', $schedule));
+    $response->assertCookie('student_schedule');
+
+    $cookie = collect($response->headers->getCookies())->first(fn ($c) => $c->getName() === 'student_schedule');
+    $decrypted = json_decode(decryptString($cookie->getValue()), true);
+
+    expect($decrypted['name'])->toBe('New Name');
+});
