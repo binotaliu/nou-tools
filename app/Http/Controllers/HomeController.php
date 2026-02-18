@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+
+class HomeController extends Controller
+{
+    public function index(Request $request): \Illuminate\View\View
+    {
+        // Use Taiwan time for greeting and default date
+        $nowTaipei = Carbon::now('Asia/Taipei');
+
+        // determine greeting
+        $hour = (int) $nowTaipei->format('H');
+        if ($hour >= 5 && $hour < 12) {
+            $greeting = '早安';
+        } elseif ($hour >= 12 && $hour < 18) {
+            $greeting = '午安';
+        } else {
+            $greeting = '晚安';
+        }
+
+        // date to show / query (YYYY-MM-DD) — accept ?date=YYYY-MM-DD
+        $dateParam = $request->query('date');
+        try {
+            $selectedDate = $dateParam ? Carbon::createFromFormat('Y-m-d', $dateParam, 'Asia/Taipei')->format('Y-m-d') : $nowTaipei->format('Y-m-d');
+        } catch (\Exception $e) {
+            $selectedDate = $nowTaipei->format('Y-m-d');
+        }
+
+        // load courses that have classes scheduled on the selected date
+        $courses = \App\Models\Course::with(['classes' => function ($query) use ($selectedDate) {
+            $query->with(['schedules' => function ($q) use ($selectedDate) {
+                $q->whereDate('date', $selectedDate);
+            }])->whereHas('schedules', function ($q) use ($selectedDate) {
+                $q->whereDate('date', $selectedDate);
+            });
+        }])
+            ->whereHas('classes.schedules', function ($query) use ($selectedDate) {
+                $query->whereDate('date', $selectedDate);
+            })
+            ->get();
+
+        return view('home', [
+            'greeting' => $greeting,
+            'nowTaipei' => $nowTaipei,
+            'selectedDate' => $selectedDate,
+            'courses' => $courses,
+        ]);
+    }
+}
