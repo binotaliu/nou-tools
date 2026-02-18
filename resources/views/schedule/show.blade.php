@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', '您的課表')
+@section('title', $schedule->name ?: '我的課表')
 
 @section('content')
     <div class="max-w-5xl mx-auto">
