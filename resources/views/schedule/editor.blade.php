@@ -17,7 +17,7 @@
                     type="text"
                     x-model="searchQuery"
                     @input="filterCourses()"
-                    placeholder="輸入課程名稱... (例如：數學、英文、物理)"
+                    placeholder="輸入課程名稱..."
                     class="w-full px-4 py-3 border-2 border-warm-300 rounded-lg focus:outline-none focus:border-orange-500 text-lg"
                     autocomplete="off"
                 />
