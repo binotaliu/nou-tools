@@ -7,3 +7,4 @@
 /public/mix-manifest.json
 /package-lock.json
 /yarn.lock
+/tests/fixtures
