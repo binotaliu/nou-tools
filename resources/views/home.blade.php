@@ -77,7 +77,7 @@
                 @foreach ($courses as $course)
                     <div>
                         <h4 class="font-semibold text-warm-800 mb-3">{{ $course->name }}</h4>
-                        <div class="space-y-2 ml-2">
+                        <div class="space-y-2 ml-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                             @php
                                 $typeLabels = [
                                     'morning' => '上午班',
@@ -90,8 +90,8 @@
 
                             @foreach ($typeLabels as $typeKey => $label)
                                 @if (isset($grouped[$typeKey]) && $grouped[$typeKey]->isNotEmpty())
-                                    <div class="mb-4">
-                                        <div class="text-sm font-semibold text-warm-700 mb-2">{{ $label }}</div>
+                                    <div class="flex flex-col gap-2 items-stretch">
+                                        <div class="text-sm font-semibold text-warm-700">{{ $label }}</div>
 
                                         @php
                                             // group classes by start/end time so we show the time once per time slot
@@ -100,9 +100,9 @@
                                             });
                                         @endphp
 
-                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        <div class="flex gap-1 w-full">
                                             @foreach ($timeGroups as $timeLabel => $classesAtTime)
-                                                <div class="border rounded p-3 bg-white">
+                                                <div class="border rounded border-warm-800 p-3 bg-white w-full">
                                                     <div class="text-sm text-warm-600 font-medium mb-3">{{ $timeLabel }}</div>
 
                                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -151,7 +151,7 @@
                                                 <div class="border rounded p-3 bg-white">
                                                     <div class="text-sm text-warm-600 font-medium mb-3">{{ $timeLabel }}</div>
 
-                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                    <div class="flex w-full gap-2">
                                                         @foreach ($classesAtTime as $courseClass)
                                                             @if ($courseClass->link)
                                                                 <a href="{{ $courseClass->link }}" target="_blank" rel="noopener noreferrer" class="block w-full text-left px-4 py-3 rounded border border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 transition">
