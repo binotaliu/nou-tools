@@ -57,6 +57,8 @@ class ScheduleController extends Controller
 
     public function edit(StudentSchedule $schedule): \Illuminate\View\View
     {
+        $schedule->load(['items.courseClass.course']);
+
         $sessionToken = session('schedule_token') ?: Str::uuid()->toString();
         session(['schedule_token' => $sessionToken]);
 

@@ -148,7 +148,7 @@
                     <span x-show="!submitting">保存課表</span>
                     <span x-show="submitting">保存中...</span>
                 </button>
-                <a href="{{ route('schedule.index') }}" class="flex-1 bg-warm-200 hover:bg-warm-300 text-warm-900 font-bold py-3 rounded-lg text-lg text-center transition">
+                <a href="{{ isset($schedule) ? route('schedule.show', $schedule) : route('schedule.index') }}" class="flex-1 bg-warm-200 hover:bg-warm-300 text-warm-900 font-bold py-3 rounded-lg text-lg text-center transition">
                     取消
                 </a>
             </div>
@@ -159,6 +159,7 @@
         function scheduleEditor() {
             return {
                 allCourses: @json($courses),
+                schedule: @json($schedule ?? null),
                 searchQuery: '',
                 filteredCourses: [],
                 showResults: false,
@@ -167,6 +168,26 @@
                 submitting: false,
 
                 init() {
+                    // 如果正在編輯現有課表，加載現有數據
+                    if (this.schedule && this.schedule.items && this.schedule.items.length > 0) {
+                        this.scheduleName = this.schedule.name || '';
+
+                        // 為每個項目建立 selectedItem
+                        this.schedule.items.forEach(item => {
+                            const courseClass = item.course_class;
+                            const course = courseClass.course;
+
+                            // 從 allCourses 中找到對應的課程
+                            const fullCourse = this.allCourses.find(c => c.id === course.id);
+                            if (fullCourse) {
+                                this.selectedItems.push({
+                                    course: fullCourse,
+                                    selectedClassId: courseClass.id,
+                                });
+                            }
+                        });
+                    }
+
                     // Close dropdown when clicking outside
                     document.addEventListener('click', (e) => {
                         if (!e.target.closest('.relative')) {
