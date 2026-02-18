@@ -70,6 +70,8 @@
         </div>
     </div>
 
+    {{-- School Calendar --}}
+    @include('partials.school-calendar', ['scheduleEvents' => $scheduleEvents ?? [], 'countdownEvent' => $countdownEvent ?? null])
 
     <!-- 今日面授 -->
     <div class="bg-white p-6 rounded-lg shadow-sm border border-warm-200" x-data="{ date: '{{ $selectedDate }}' }">

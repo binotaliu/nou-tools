@@ -225,7 +225,7 @@
                     @endphp
 
                     @foreach (collect($coursesByMonth)->sortKeys() as $monthData)
-                        <div class="bg-white rounded-lg border border-warm-200 p-6">
+                        <div class="bg-white rounded-lg border border-warm-200 p-6 mb-4">
                             <h4 class="text-xl font-bold text-warm-900 mb-4">{{ $monthData['month'] }}</h4>
                             <div class="space-y-3">
                                 @foreach (collect($monthData['dates'])->sortKeys() as $dateStr => $courses)
@@ -255,14 +255,17 @@
             </div>
         @endif
 
+        {{-- School Calendar --}}
+        @include('partials.school-calendar', ['scheduleEvents' => $scheduleEvents ?? [], 'countdownEvent' => $countdownEvent ?? null])
+
         <!-- Share Section -->
-        <div class="mt-8 bg-warm-50 rounded-lg border border-warm-200 p-6">
+        <div class="mt-8 bg-white rounded-lg border border-warm-200 p-6">
             <h3 class="text-xl font-bold text-warm-900 mb-3">連結</h3>
             <p class="text-warm-700 mb-3">
                 您可以使用以下連結來編輯或查看此課表，請妥善保管此連結。<br>
                 <span class="font-semibold text-red-600">⚠️ 注意：任何擁有此連結的人都可以編輯您的課表，請勿隨意分享。</span>
             </p>
-            <div class="bg-white p-3 rounded border border-warm-300 font-mono text-sm break-all text-warm-600">
+            <div class="bg-warm-50 p-3 rounded border border-warm-300 font-mono text-sm break-all text-warm-600">
                 {{ url(route('schedule.show', $schedule)) }}
             </div>
         </div>
