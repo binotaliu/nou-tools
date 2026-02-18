@@ -17,7 +17,10 @@ return new class extends Migration
             $table->foreignId('course_class_id')->constrained('course_classes')->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['student_schedule_id', 'course_class_id']);
+            $table->unique(
+                ['student_schedule_id', 'course_class_id'],
+                'student_schedule_items_ssid_ccid_unique'
+            );
         });
     }
 
