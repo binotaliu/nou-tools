@@ -89,7 +89,7 @@
         </div>
 
         <!-- Schedule Table -->
-        <div class="bg-white rounded-lg border border-warm-200 overflow-hidden">
+        <div class="bg-white rounded-lg border border-warm-200 overflow-hidden mb-4">
             <div class="overflow-x-auto">
                 <table class="w-full border-collapse">
                     <thead>
@@ -196,11 +196,13 @@
             </div>
         </div>
 
+        @include('partials.common-links')
+
         <!-- Schedule Calendar View -->
         @if (count($schedule->items) > 0)
             <div class="mt-8">
                 <h3 class="text-2xl font-bold text-warm-900 mb-4">課程日期</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-4">
                     @php
                         $coursesByMonth = [];
                         foreach ($schedule->items as $item) {
@@ -225,7 +227,7 @@
                     @endphp
 
                     @foreach (collect($coursesByMonth)->sortKeys() as $monthData)
-                        <div class="bg-white rounded-lg border border-warm-200 p-6 mb-4">
+                        <div class="bg-white rounded-lg border border-warm-200 p-6">
                             <h4 class="text-xl font-bold text-warm-900 mb-4">{{ $monthData['month'] }}</h4>
                             <div class="space-y-3">
                                 @foreach (collect($monthData['dates'])->sortKeys() as $dateStr => $courses)
