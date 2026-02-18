@@ -60,7 +60,7 @@
                             <th class="px-4 py-3 text-left font-bold text-warm-900">下次上課</th>
                             <th class="px-4 py-3 text-left font-bold text-warm-900">時間</th>
                             <th class="px-4 py-3 text-left font-bold text-warm-900">教師</th>
-                            <th class="px-4 py-3 text-left font-bold text-warm-900">操作</th>
+                            <th class="px-4 py-3 text-left font-bold text-warm-900">動作</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -122,8 +122,8 @@
                                 <td class="px-4 py-3">
                                     @if ($item->courseClass->link)
                                         <a href="{{ $item->courseClass->link }}" target="_blank"
-                                           class="text-orange-600 hover:text-orange-700 font-semibold underline">
-                                            📎 連結
+                                           class="text-orange-600 hover:text-orange-700 font-semibold underline underline-offset-4 hover:no-underline">
+                                            📎 視訊上課
                                         </a>
                                     @endif
                                 </td>
