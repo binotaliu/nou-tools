@@ -22,81 +22,106 @@
         <x-card class="mb-6">
             <h3 class="text-xl font-bold text-warm-900 mb-6">課程資訊</h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- 科目內容 -->
                 @if ($course->description_url)
                     <div>
-                        <h4 class="font-semibold text-warm-900 mb-2">科目內容</h4>
-                        <a href="{{ $course->description_url }}" target="_blank" rel="noopener" class="text-orange-600 hover:text-orange-700 underline underline-offset-4 inline-flex items-center gap-1">
-                            檢視詳細內容
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                            </svg>
-                        </a>
+                        <dt class="font-semibold text-warm-900 mb-2">科目內容</dt>
+                        <dd class="text-warm-700">
+                            <a href="{{ $course->description_url }}" target="_blank" rel="noopener" class="text-orange-600 hover:text-orange-700 underline underline-offset-4 inline-flex items-center gap-1">
+                                檢視詳細內容
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                </svg>
+                            </a>
+                        </dd>
                     </div>
                 @endif
 
                 <!-- 必/選修 -->
                 @if ($course->credit_type)
                     <div>
-                        <h4 class="font-semibold text-warm-900 mb-2">必/選修</h4>
-                        <p class="text-warm-700">{{ $course->credit_type }}</p>
+                        <dt class="font-semibold text-warm-900 mb-2">必/選修</dt>
+                        <dd class="text-warm-700">{{ $course->credit_type }}</dd>
                     </div>
                 @endif
 
                 <!-- 學分 -->
                 @if ($course->credits)
                     <div>
-                        <h4 class="font-semibold text-warm-900 mb-2">學分</h4>
-                        <p class="text-warm-700">{{ $course->credits }} 學分</p>
+                        <dt class="font-semibold text-warm-900 mb-2">學分</dt>
+                        <dd class="text-warm-700">
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-1 text-orange-500" aria-hidden="true">
+                                    @php
+                                        $starCount = (int) floor($course->credits);
+                                        $displayStars = min($starCount, 6);
+                                    @endphp
+
+                                    @for ($i = 0; $i < $displayStars; $i++)
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+                                            <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" />
+                                        </svg>
+                                    @endfor
+
+                                    @if ($starCount > $displayStars)
+                                        <span class="text-xs text-warm-600">+{{ $starCount - $displayStars }}</span>
+                                    @endif
+                                </div>
+
+                                <div class="text-sm text-warm-600">{{ $course->credits }} 學分</div>
+                            </div>
+                        </dd>
                     </div>
                 @endif
 
                 <!-- 學系 -->
                 @if ($course->department)
                     <div>
-                        <h4 class="font-semibold text-warm-900 mb-2">學系</h4>
-                        <p class="text-warm-700">{{ $course->department }}</p>
+                        <dt class="font-semibold text-warm-900 mb-2">學系</dt>
+                        <dd class="text-warm-700">{{ $course->department }}</dd>
                     </div>
                 @endif
 
                 <!-- 面授類別 -->
                 @if ($course->in_person_class_type)
                     <div>
-                        <h4 class="font-semibold text-warm-900 mb-2">面授類別</h4>
-                        <p class="text-warm-700">{{ $course->in_person_class_type }}</p>
+                        <dt class="font-semibold text-warm-900 mb-2">面授類別</dt>
+                        <dd class="text-warm-700">{{ $course->in_person_class_type }}</dd>
                     </div>
                 @endif
 
                 <!-- 媒體 -->
                 @if ($course->media)
                     <div>
-                        <h4 class="font-semibold text-warm-900 mb-2">媒體</h4>
-                        <p class="text-warm-700">{{ $course->media }}</p>
+                        <dt class="font-semibold text-warm-900 mb-2">媒體</dt>
+                        <dd class="text-warm-700">{{ $course->media }}</dd>
                     </div>
                 @endif
 
                 <!-- 多媒體簡介 -->
                 @if ($course->multimedia_url)
                     <div>
-                        <h4 class="font-semibold text-warm-900 mb-2">多媒體簡介</h4>
-                        <a href="{{ $course->multimedia_url }}" target="_blank" rel="noopener" class="text-orange-600 hover:text-orange-700 underline underline-offset-4 inline-flex items-center gap-1">
-                            檢視簡介
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                            </svg>
-                        </a>
+                        <dt class="font-semibold text-warm-900 mb-2">多媒體簡介</dt>
+                        <dd class="text-warm-700">
+                            <a href="{{ $course->multimedia_url }}" target="_blank" rel="noopener" class="text-orange-600 hover:text-orange-700 underline underline-offset-4 inline-flex items-center gap-1">
+                                檢視簡介
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                </svg>
+                            </a>
+                        </dd>
                     </div>
                 @endif
 
                 <!-- 課程性質 -->
                 @if ($course->nature)
                     <div>
-                        <h4 class="font-semibold text-warm-900 mb-2">課程性質</h4>
-                        <p class="text-warm-700">{{ $course->nature }}</p>
+                        <dt class="font-semibold text-warm-900 mb-2">課程性質</dt>
+                        <dd class="text-warm-700">{{ $course->nature }}</dd>
                     </div>
                 @endif
-            </div>
+            </dl>
         </x-card>
 
         <!-- Course Classes -->
