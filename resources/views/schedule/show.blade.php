@@ -88,7 +88,11 @@
                             <th class="px-4 py-3 text-left font-bold text-warm-900">下次上課</th>
                             <th class="px-4 py-3 text-left font-bold text-warm-900">時間</th>
                             <th class="px-4 py-3 text-left font-bold text-warm-900">教師</th>
-                            <th class="px-4 py-3 text-left font-bold text-warm-900">動作</th>
+                            <th class="px-4 py-3 text-left font-bold text-warm-900">
+                                <span class="sr-only">
+                                    動作
+                                </span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -110,10 +114,10 @@
                                 <td class="px-4 py-3 font-semibold text-warm-900">
                                     {{ $item->courseClass->course->name }}
                                 </td>
-                                <td class="px-4 py-3 text-warm-800">
+                                <td class="px-4 py-3 text-warm-800 tabular-nums">
                                     {{ $item->courseClass->code }}
                                 </td>
-                                <td class="px-4 py-3 text-warm-800">
+                                <td class="px-4 py-3 text-warm-800 tabular-nums">
                                     @php
                                         $nextSchedule = $item->courseClass->schedules
                                             ->filter(fn($s) => $s->date->isToday() || $s->date->isFuture())
@@ -131,7 +135,7 @@
                                         <span class="text-warm-500">無未來課程</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-warm-800">
+                                <td class="px-4 py-3 text-warm-800 tabular-nums">
                                     @php
                                         // Use schedule time override if it exists for the next class
                                         $nextSchedule = $item->courseClass->schedules
@@ -180,6 +184,15 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3">
+                                    <a href="{{ route('course.show', $item->courseClass->course) }}"
+                                        class="text-warm-800 hover:text-warm-900 font-semibold underline underline-offset-4 mr-3 inline-flex gap-2 items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                                            </svg>
+
+                                        課程資訊
+                                    </a>
+
                                     @if ($item->courseClass->link)
                                         <a href="{{ $item->courseClass->link }}" target="_blank"
                                            class="text-orange-600 hover:text-orange-700 font-semibold underline underline-offset-4 hover:no-underline inline-flex items-center gap-2">
