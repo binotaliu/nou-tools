@@ -6,7 +6,7 @@
 @source '../**/*.js';
 
 @theme {
-  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+  --font-sans: system-ui, sans-serif;
   --color-warm-50: oklch(0.98 0.01 40);
   --color-warm-100: oklch(0.96 0.02 40);
   --color-warm-200: oklch(0.93 0.04 40);
