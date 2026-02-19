@@ -6,9 +6,7 @@
     <div class="max-w-5xl mx-auto">
         <div class="mb-8">
             <a href="{{ isset($previousSchedule) ? route('schedule.show', $previousSchedule['token']) : url()->previous() }}" class="text-orange-600 hover:text-orange-700 font-semibold mb-4 inline-flex items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                </svg>
+                <x-heroicon-o-chevron-left class="size-4" />
                 回到我的課表
             </a>
             <h2 class="text-3xl font-bold text-warm-900 mb-2">{{ $course->name }}</h2>
@@ -30,9 +28,7 @@
                         <dd class="text-warm-700">
                             <a href="{{ $course->description_url }}" target="_blank" rel="noopener" class="text-orange-600 hover:text-orange-700 underline underline-offset-4 inline-flex items-center gap-1">
                                 檢視詳細內容
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                </svg>
+                                <x-heroicon-o-arrow-top-right-on-square class="size-4" />
                             </a>
                         </dd>
                     </div>
@@ -59,9 +55,7 @@
                                     @endphp
 
                                     @for ($i = 0; $i < $displayStars; $i++)
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
-                                            <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" />
-                                        </svg>
+                                        <x-heroicon-s-star class="size-4" />
                                     @endfor
 
                                     @if ($starCount > $displayStars)
@@ -106,9 +100,7 @@
                         <dd class="text-warm-700">
                             <a href="{{ $course->multimedia_url }}" target="_blank" rel="noopener" class="text-orange-600 hover:text-orange-700 underline underline-offset-4 inline-flex items-center gap-1">
                                 檢視簡介
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                </svg>
+                                <x-heroicon-o-arrow-top-right-on-square class="size-4" />
                             </a>
                         </dd>
                     </div>

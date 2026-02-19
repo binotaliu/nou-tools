@@ -10,9 +10,7 @@
                     {{ $schedule->name ?: '我的課表' }}
                 </h2>
                 <p class="text-sm text-warm-600 mt-1 gap-1 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-                    </svg>
+                    <x-heroicon-o-information-circle class="size-4 inline" />
                     小提示：將此頁加入瀏覽器書籤，下次即可快速開啟課表。
                 </p>
             </div>
@@ -22,9 +20,7 @@
                        href="{{ route('schedule.edit', $schedule) }}"
                        class="w-1/2 md:w-auto bg-white hover:bg-warm-50 text-warm border border-warm-300 font-semibold py-2 px-4 rounded-lg transition inline-flex justify-center md:justify-start items-center gap-2"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                        </svg>
+                        <x-heroicon-o-pencil-square class="size-4" />
                         編輯課表
                     </a>
 
@@ -37,10 +33,7 @@
 
                 <button type="button" @click="subscribeOpen = true"
                    class="w-1/2 md:w-auto bg-warm-500 hover:bg-warm-600 border border-warm-500 text-white font-semibold py-2 px-4 rounded-lg transition inline-flex justify-center md:justify-start items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-                    </svg>
-
+                    <x-heroicon-o-calendar class="size-4 inline" />
                     訂閱行事曆
                 </button>
 
@@ -97,9 +90,7 @@
 
                 @if ($hasAnyOverride)
                     <p class="text-sm text-warm-600 mb-4 flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 text-orange-600">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                        </svg>
+                        <x-heroicon-o-exclamation-triangle class="size-4 text-orange-600" />
                         表示該次面授時間與一般時間不同
                     </p>
                 @endif
@@ -154,9 +145,7 @@
                                                     <span class="text-warm-600 inline-flex items-center gap-1">
                                                         {{ $course['time'] }}
                                                         @if ($course['hasOverride'])
-                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 text-orange-600">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                                                            </svg>
+                                                            <x-heroicon-o-exclamation-triangle class="size-4 text-orange-600" title="該次課程時間與一般時間不同" />
                                                         @endif
                                                     </span>
                                                 </div>
