@@ -1,6 +1,8 @@
+@props(['scheduleEvents' => [], 'countdownEvent' => null])
+
 {{-- School Schedule Calendar Component --}}
 @if(!empty($scheduleEvents) || $countdownEvent)
-    <div class="bg-white p-6 rounded-lg border border-warm-200">
+    <x-card>
         <h3 class="text-lg font-medium mb-4">學校行事曆</h3>
 
         <div class="flex flex-col md:flex-row md:items-start md:gap-6">
@@ -78,5 +80,5 @@
                 </div>
             @endif
         </div>
-    </div>
+    </x-card>
 @endif

@@ -10,18 +10,18 @@
         </div>
 
         @if(isset($previousSchedule) && !isset($schedule))
-            <div class="mb-6 p-4 rounded border-l-4 border-yellow-400 bg-yellow-50 text-yellow-800 flex items-center justify-between">
+            <x-alert type="warning" class="flex items-center justify-between">
                 <div>
                     <div class="font-medium">你曾建立過課表：<span class="text-warm-900">{{ $previousSchedule['name'] ?? '（未命名）' }}</span>，確定要繼續新增新課表嗎？</div>
                 </div>
                 <div class="flex gap-2">
                     <a href="{{ route('schedule.show', $previousSchedule['token']) }}" class="px-4 py-2 bg-yellow-400 text-yellow-900 rounded font-semibold hover:bg-yellow-500">檢視舊課表</a>
                 </div>
-            </div>
+            </x-alert>
         @endif
 
         <!-- Search Section -->
-        <div class="bg-white p-6 rounded-lg border border-warm-200 mb-8">
+        <x-card class="mb-8">
             <label class="block text-lg font-semibold text-warm-900 mb-3">搜尋課程</label>
             <div class="relative">
                 <input
@@ -48,10 +48,10 @@
                     找不到符合的課程。請試試其他關鍵字。
                 </div>
             </template>
-        </div>
+        </x-card>
 
         <!-- Selected Schedule Section -->
-        <div class="bg-white p-6 rounded-lg border border-warm-200 mb-8">
+        <x-card class="mb-8">
             <h3 class="text-2xl font-bold text-warm-900 mb-4">您的課表</h3>
 
             <template x-if="selectedItems.length === 0">
@@ -135,7 +135,7 @@
                     </div>
                 </template>
             </div>
-        </div>
+        </x-card>
 
         <!-- Submit Section -->
         <form action="{{ isset($schedule) ? route('schedule.update', $schedule) : route('schedule.store') }}" method="POST" @submit.prevent="submitForm" class="bg-white p-6 rounded-lg border border-warm-200">

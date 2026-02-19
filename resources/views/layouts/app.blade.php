@@ -44,19 +44,19 @@
 
         <main class="max-w-7xl mx-auto px-6 py-8">
             @if (session('success'))
-                <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
+                <x-alert type="success">
                     {{ session('success') }}
-                </div>
+                </x-alert>
             @endif
 
             @if ($errors->any())
-                <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
+                <x-alert type="error">
                     <ul>
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                </div>
+                </x-alert>
             @endif
 
             @yield('content')

@@ -44,19 +44,7 @@
                 </button>
 
                 <!-- Subscribe modal -->
-                <div x-cloak x-show="subscribeOpen" x-transition.opacity.scale.95.duration.150
-                     @keydown.escape.window="subscribeOpen = false"
-                     class="fixed inset-0 z-50 flex items-center justify-center">
-                    <template x-teleport="body">
-                        <div class="fixed inset-0 bg-black/40" @click="subscribeOpen = false" x-show="subscribeOpen" aria-hidden="true"></div>
-                    </template>
-
-                    <div role="dialog" aria-modal="true" aria-labelledby="subscribe-modal-title"
-                         @click.outside="subscribeOpen = false"
-                         class="relative bg-white rounded-lg shadow-lg w-full max-w-md mx-4 p-6">
-                        <h3 id="subscribe-modal-title" class="text-lg font-semibold text-warm-900 mb-2">訂閱行事曆</h3>
-                        <p class="text-sm text-warm-600 mb-4">選擇要使用的方式來訂閱或下載您的課表行事曆：</p>
-
+                <x-modal name="subscribeOpen" title="訂閱行事曆" description="選擇要使用的方式來訂閱或下載您的課表行事曆：">
                         <div class="grid gap-3">
                             <a href="{{ $webcalUrl }}" @click="subscribeOpen = false"
                                class="w-full inline-flex items-center justify-center gap-2 bg-white border border-warm-200 text-warm-900 py-2 px-3 rounded hover:bg-warm-50">
@@ -79,12 +67,11 @@
                             </a>
                         </div>
 
-                        <div class="mt-4 flex justify-end">
+                        <x-slot:footer>
                             <button type="button" @click="subscribeOpen = false"
                                     class="px-4 py-2 text-sm text-warm-700 hover:underline">取消</button>
-                        </div>
-                    </div>
-                </div>
+                        </x-slot:footer>
+                </x-modal>
             </div>
         </div>
 
@@ -230,7 +217,7 @@
             @endif
         </div>
 
-        @include('partials.common-links')
+        <x-common-links />
 
         <!-- Schedule Calendar View -->
         @if (count($schedule->items) > 0)
@@ -275,7 +262,7 @@
                     @endphp
 
                     @foreach (collect($coursesByMonth)->sortKeys() as $monthData)
-                        <div class="bg-white rounded-lg border border-warm-200 p-6">
+                        <x-card>
                             <h4 class="text-xl font-bold text-warm-900 mb-4">{{ $monthData['month'] }}</h4>
                             <div class="space-y-3">
                                 @foreach (collect($monthData['dates'])->sortKeys() as $dateStr => $courses)
@@ -306,17 +293,17 @@
                                     </div>
                                 @endforeach
                             </div>
-                        </div>
+                        </x-card>
                     @endforeach
                 </div>
             </div>
         @endif
 
         {{-- School Calendar --}}
-        @include('partials.school-calendar', ['scheduleEvents' => $scheduleEvents ?? [], 'countdownEvent' => $countdownEvent ?? null])
+        <x-school-calendar :schedule-events="$scheduleEvents ?? []" :countdown-event="$countdownEvent ?? null" />
 
         <!-- Share Section -->
-        <div class="mt-8 bg-white rounded-lg border border-warm-200 p-6">
+        <x-card class="mt-8">
             <h3 class="text-xl font-bold text-warm-900 mb-3">連結</h3>
             <p class="text-warm-700 mb-3">
                 您可以使用以下連結來編輯或查看此課表，請妥善保管此連結。<br>
@@ -325,6 +312,6 @@
             <div class="bg-warm-50 p-3 rounded border border-warm-300 font-mono text-sm break-all text-warm-600">
                 {{ url(route('schedule.show', $schedule)) }}
             </div>
-        </div>
+        </x-card>
     </div>
 @endsection

@@ -5,7 +5,7 @@
 @section('content')
 <div class="space-y-8">
     <!-- greeting -->
-    <div class="bg-white p-6 rounded-lg border border-warm-200">
+    <x-card>
         <div class="flex items-baseline justify-between gap-4">
             <div>
                 <h2 class="text-3xl font-semibold">{{ $greeting }}，歡迎回來！</h2>
@@ -16,10 +16,10 @@
                 <p class="mt-1 text-warm-500">{{ $__selectedDate->format('Y年m月d日') }}（{{ $__weekdayMap[$__selectedDate->dayOfWeek] }}）</p>
             </div>
         </div>
-    </div>
+    </x-card>
 
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div class="bg-white p-6 rounded-lg border border-warm-200">
+        <x-card>
             <h4 class="font-medium mb-3">功能選單</h4>
 
             <a href="{{ route('schedule.create') }}" class="inline-flex items-center px-4 py-2 bg-warm-700 text-white rounded hover:bg-warm-800 gap-2">
@@ -40,16 +40,16 @@
                     </a>
                 </div>
             @endif
-        </div>
+        </x-card>
 
-        @include('partials.common-links')
+        <x-common-links />
     </div>
 
     {{-- School Calendar --}}
-    @include('partials.school-calendar', ['scheduleEvents' => $scheduleEvents ?? [], 'countdownEvent' => $countdownEvent ?? null])
+    <x-school-calendar :schedule-events="$scheduleEvents ?? []" :countdown-event="$countdownEvent ?? null" />
 
     <!-- 今日面授 -->
-    <div class="bg-white p-6 rounded-lg border border-warm-200" x-data="{ date: '{{ $selectedDate }}' }">
+    <x-card x-data="{ date: '{{ $selectedDate }}' }">
         <div class="flex items-center justify-between">
             <h3 class="text-lg font-medium">今日視訊面授</h3>
             <div class="flex items-center gap-3">
@@ -175,7 +175,7 @@
                 @endforeach
             @endif
         </div>
-    </div>
+    </x-card>
 
 
 </div>
