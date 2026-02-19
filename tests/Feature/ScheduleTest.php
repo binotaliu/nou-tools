@@ -13,7 +13,7 @@ it('returns JSON and creates schedule on application/json POST', function () {
         'items' => [$courseClass->id],
     ];
 
-    $response = $this->postJson(route('schedule.store'), $payload);
+    $response = $this->postJson(route('schedules.store'), $payload);
 
     $response->assertStatus(200)
         ->assertJsonStructure(['success', 'redirect_url'])
@@ -32,10 +32,10 @@ it('allows creating multiple schedules', function () {
         'items' => [$courseClass->id],
     ];
 
-    $this->postJson(route('schedule.store'), $payload)->assertStatus(200);
+    $this->postJson(route('schedules.store'), $payload)->assertStatus(200);
 
     $payload['name'] = '第二次';
-    $this->postJson(route('schedule.store'), $payload)->assertStatus(200);
+    $this->postJson(route('schedules.store'), $payload)->assertStatus(200);
 
     $this->assertDatabaseCount('student_schedules', 2);
     $this->assertDatabaseHas('student_schedules', ['name' => '第一次']);
@@ -63,7 +63,7 @@ it('returns an .ics calendar for a saved schedule', function () {
         'date' => now()->addWeek()->toDateString(),
     ]);
 
-    $response = $this->get(route('schedule.calendar', $schedule));
+    $response = $this->get(route('schedules.calendar', $schedule));
 
     $response->assertStatus(200)
         ->assertHeader('Content-Type', 'text/calendar; charset=utf-8')
@@ -80,7 +80,7 @@ it('stores schedule metadata in an encrypted cookie when saving', function () {
         'items' => [$courseClass->id],
     ];
 
-    $response = $this->postJson(route('schedule.store'), $payload);
+    $response = $this->postJson(route('schedules.store'), $payload);
 
     $response->assertStatus(200)
         ->assertJson(['success' => true]);
@@ -109,7 +109,7 @@ it('shows previous schedule on home when cookie exists', function () {
 
     $response->assertStatus(200)
         ->assertSee('Previously Saved')
-        ->assertSee(route('schedule.show', $schedule));
+        ->assertSee(route('schedules.show', $schedule));
 });
 
 it('shows prompt on schedule create page when cookie exists and can be ignored with ?new=1', function () {
@@ -122,18 +122,18 @@ it('shows prompt on schedule create page when cookie exists and can be ignored w
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
-    ]))->get(route('schedule.create'));
+    ]))->get(route('schedules.create'));
 
     $response->assertStatus(200)
         ->assertSee('你曾建立過課表')
         ->assertSee('My Old Schedule')
-        ->assertSee(route('schedule.show', $schedule));
+        ->assertSee(route('schedules.show', $schedule));
 
     $response2 = $this->withCookie('student_schedule', json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
-    ]))->get(route('schedule.create').'?new=1');
+    ]))->get(route('schedules.create').'?new=1');
 
     $response2->assertStatus(200)
         ->assertDontSee('你曾建立過課表');
@@ -152,9 +152,9 @@ it('updates the stored cookie when schedule is updated', function () {
         'items' => [$courseClass->id],
     ];
 
-    $response = $this->put(route('schedule.update', $schedule), $payload);
+    $response = $this->put(route('schedules.update', $schedule), $payload);
 
-    $response->assertRedirect(route('schedule.show', $schedule));
+    $response->assertRedirect(route('schedules.show', $schedule));
     $response->assertCookie('student_schedule', json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
@@ -168,17 +168,17 @@ it('edit page form posts to update route and includes method spoofing', function
         'name' => 'Edit Me',
     ]);
 
-    $response = $this->get(route('schedule.edit', $schedule));
+    $response = $this->get(route('schedules.edit', $schedule));
 
     $response->assertStatus(200)
-        ->assertSee('action="'.route('schedule.update', $schedule).'"', false)
+        ->assertSee('action="'.route('schedules.update', $schedule).'"', false)
         ->assertSee('name="_method" value="PUT"', false);
 });
 
 it('create page form posts to store route and does not include method spoofing', function () {
-    $response = $this->get(route('schedule.create'));
+    $response = $this->get(route('schedules.create'));
 
     $response->assertStatus(200)
-        ->assertSee('action="'.route('schedule.store').'"', false)
+        ->assertSee('action="'.route('schedules.store').'"', false)
         ->assertDontSee('name="_method" value="PUT"', false);
 });

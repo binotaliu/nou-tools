@@ -103,7 +103,7 @@
         @empty
             <tr>
                 <td colspan="6" class="px-4 py-6 text-center text-warm-600">
-                    沒有課程。<a href="{{ route('schedule.edit', $schedule) }}"
+                    沒有課程。<a href="{{ route('schedules.edit', $schedule) }}"
                                class="text-orange-600 hover:underline font-semibold">點擊編輯課表</a>
                 </td>
             </tr>

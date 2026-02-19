@@ -54,7 +54,7 @@ class ScheduleCalendarController extends Controller
                 if ($courseClass->teacher_name) {
                     $descriptionParts[] = '老師: '.$courseClass->teacher_name;
                 }
-                $descriptionParts[] = '編輯課表: '.route('schedule.show', $schedule);
+                $descriptionParts[] = '編輯課表: '.route('schedules.show', $schedule);
                 $lines[] = 'DESCRIPTION:'.collect($descriptionParts)
                     ->map($this->escapeICSString(...))
                     ->implode('\n');

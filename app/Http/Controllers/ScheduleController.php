@@ -157,11 +157,11 @@ class ScheduleController extends Controller
         if ($request->wantsJson() || $request->isJson()) {
             return response()->json([
                 'success' => true,
-                'redirect_url' => route('schedule.show', $schedule),
+                'redirect_url' => route('schedules.show', $schedule),
             ])->cookie($cookie);
         }
 
-        return redirect()->route('schedule.show', $schedule)
+        return redirect()->route('schedules.show', $schedule)
             ->with('success', '課表已保存！')
             ->cookie($cookie);
     }
@@ -210,11 +210,11 @@ class ScheduleController extends Controller
         if ($request->wantsJson() || $request->isJson()) {
             return response()->json([
                 'success' => true,
-                'redirect_url' => route('schedule.show', $schedule),
+                'redirect_url' => route('schedules.show', $schedule),
             ])->cookie($cookie);
         }
 
-        return redirect()->route('schedule.show', $schedule)
+        return redirect()->route('schedules.show', $schedule)
             ->with('success', '課表已更新！')
             ->cookie($cookie);
     }

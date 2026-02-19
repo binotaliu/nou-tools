@@ -139,5 +139,5 @@ test('course show page shows previous-schedule link when cookie exists', functio
 
     $response->assertStatus(200)
         ->assertSee('回到我的課表')
-        ->assertSee(route('schedule.show', $schedule));
+        ->assertSee(route('schedules.show', $schedule));
 });

@@ -5,7 +5,7 @@
 @section('content')
     <div class="max-w-5xl mx-auto">
         <div class="mb-8">
-            <a href="{{ isset($previousSchedule) ? route('schedule.show', $previousSchedule['token']) : url()->previous() }}" class="text-orange-600 hover:text-orange-700 font-semibold mb-4 inline-flex items-center gap-1">
+            <a href="{{ isset($previousSchedule) ? route('schedules.show', $previousSchedule['token']) : url()->previous() }}" class="text-orange-600 hover:text-orange-700 font-semibold mb-4 inline-flex items-center gap-1">
                 <x-heroicon-o-chevron-left class="size-4" />
                 回到我的課表
             </a>

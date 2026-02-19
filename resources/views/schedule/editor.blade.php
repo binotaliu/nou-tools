@@ -15,7 +15,7 @@
                     <div class="font-medium">你曾建立過課表：<span class="text-warm-900">{{ $previousSchedule['name'] ?? '（未命名）' }}</span>，確定要繼續新增新課表嗎？</div>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{{ route('schedule.show', $previousSchedule['token']) }}" class="px-4 py-2 bg-yellow-400 text-yellow-900 rounded font-semibold hover:bg-yellow-500">檢視舊課表</a>
+                    <a href="{{ route('schedules.show', $previousSchedule['token']) }}" class="px-4 py-2 bg-yellow-400 text-yellow-900 rounded font-semibold hover:bg-yellow-500">檢視舊課表</a>
                 </div>
             </x-alert>
         @endif
@@ -138,7 +138,7 @@
         </x-card>
 
         <!-- Submit Section -->
-        <form action="{{ isset($schedule) ? route('schedule.update', $schedule) : route('schedule.store') }}" method="POST" @submit.prevent="submitForm" class="bg-white p-6 rounded-lg border border-warm-200">
+        <form action="{{ isset($schedule) ? route('schedules.update', $schedule) : route('schedules.store') }}" method="POST" @submit.prevent="submitForm" class="bg-white p-6 rounded-lg border border-warm-200">
             @csrf
             @if(isset($schedule))
                 @method('PUT')
@@ -163,7 +163,7 @@
                     <span x-show="!submitting">保存課表</span>
                     <span x-show="submitting">保存中...</span>
                 </button>
-                <a href="{{ isset($schedule) ? route('schedule.show', $schedule) : route('schedule.create') }}" class="flex-1 bg-warm-200 hover:bg-warm-300 text-warm-900 font-bold py-3 rounded-lg text-lg text-center transition">
+                <a href="{{ isset($schedule) ? route('schedules.show', $schedule) : route('schedules.create') }}" class="flex-1 bg-warm-200 hover:bg-warm-300 text-warm-900 font-bold py-3 rounded-lg text-lg text-center transition">
                     取消
                 </a>
             </div>
@@ -288,8 +288,8 @@
                     try {
                         const isEdit = !!this.schedule;
                         const url = isEdit
-                            ? '{{ isset($schedule) ? route('schedule.update', $schedule) : '' }}'
-                            : '{{ route('schedule.store') }}';
+                            ? '{{ isset($schedule) ? route('schedules.update', $schedule) : '' }}'
+                            : '{{ route('schedules.store') }}';
                         const method = isEdit ? 'PUT' : 'POST';
 
                         const response = await fetch(url, {

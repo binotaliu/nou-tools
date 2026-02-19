@@ -17,7 +17,7 @@
 
                 <div class="flex gap-2 w-full md:w-auto print:hidden" x-data="{ subscribeOpen: false }">
                     <a
-                       href="{{ route('schedule.edit', $schedule) }}"
+                       href="{{ route('schedules.edit', $schedule) }}"
                        class="w-1/2 md:w-auto bg-white hover:bg-warm-50 text-warm border border-warm-300 font-semibold py-2 px-4 rounded-lg transition inline-flex justify-center md:justify-start items-center gap-2"
                     >
                         <x-heroicon-o-pencil-square class="size-4" />
@@ -25,7 +25,7 @@
                     </a>
 
                 @php
-                    $icsUrl = route('schedule.calendar', $schedule);
+                    $icsUrl = route('schedules.calendar', $schedule);
                     $webcalUrl = preg_replace('/^https?/', 'webcal', $icsUrl);
                     $googleUrl = 'https://calendar.google.com/calendar/r?cid=' . urlencode($webcalUrl);
                     $outlookWebUrl = 'https://outlook.office.com/calendar/0/addfromweb?url=' . urlencode($webcalUrl);
@@ -180,13 +180,13 @@
                     </p>
 
                     <div class="bg-warm-50 p-3 rounded border border-warm-300 font-mono text-sm break-all text-warm-600">
-                        {{ url(route('schedule.show', $schedule)) }}
+                        {{ url(route('schedules.show', $schedule)) }}
                     </div>
                 </div>
 
                 <div class="hidden md:flex print:flex flex-col justify-center items-center w-28">
                     <div class="bg-white p-2 rounded border border-warm-200">
-                        {!! DNS2D::getBarcodeSVG(url(route('schedule.show', $schedule)), 'QRCODE') !!}
+                        {!! DNS2D::getBarcodeSVG(url(route('schedules.show', $schedule)), 'QRCODE') !!}
                     </div>
                 </div>
             </div>

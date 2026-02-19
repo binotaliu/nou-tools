@@ -10,9 +10,14 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/courses/{course}', [CourseController::class, 'show'])->name('course.show');
 
-Route::get('/schedule/create', [ScheduleController::class, 'create'])->name('schedule.create');
-Route::post('/schedule', [ScheduleController::class, 'store'])->name('schedule.store');
-Route::get('/schedule/{schedule}', [ScheduleController::class, 'show'])->name('schedule.show');
-Route::get('/schedule/{schedule}/edit', [ScheduleController::class, 'edit'])->name('schedule.edit');
-Route::put('/schedule/{schedule}', [ScheduleController::class, 'update'])->name('schedule.update');
-Route::get('/schedule/{schedule}/calendar', ScheduleCalendarController::class)->name('schedule.calendar');
+Route::permanentRedirect('/schedule/create', '/schedules/create');
+Route::permanentRedirect('/schedule/{schedule}', '/schedules/{schedule}');
+Route::permanentRedirect('/schedule/{schedule}/edit', '/schedules/{schedule}/edit');
+Route::permanentRedirect('/schedule/{schedule}/calendar', '/schedules/{schedule}/calendar');
+
+Route::get('/schedules/create', [ScheduleController::class, 'create'])->name('schedules.create');
+Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
+Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show');
+Route::get('/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('schedules.edit');
+Route::put('/schedules/{schedule}', [ScheduleController::class, 'update'])->name('schedules.update');
+Route::get('/schedules/{schedule}/calendar', ScheduleCalendarController::class)->name('schedules.calendar');

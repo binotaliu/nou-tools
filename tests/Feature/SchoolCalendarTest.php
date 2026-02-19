@@ -101,7 +101,7 @@ it('displays school calendar on schedule show page', function () {
         'course_class_id' => $courseClass->id,
     ]);
 
-    $response = $this->get(route('schedule.show', $schedule));
+    $response = $this->get(route('schedules.show', $schedule));
 
     $response->assertStatus(200)
         ->assertSee('學校行事曆')
