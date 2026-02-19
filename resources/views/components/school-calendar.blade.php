@@ -13,10 +13,10 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <h4 class="font-semibold text-warm-800">{{ $countdownEvent['name'] }}</h4>
-                                <p class="text-sm text-warm-600 mt-1">
-                                    {{ $countdownEvent['start']->format('Y年m月d日') }}
+                                <p class="text-sm text-warm-600 mt-1 tabular-nums">
+                                    {{ $countdownEvent['start']->format('Y 年 n 月 j 日') }}
                                     @if($countdownEvent['start']->format('Y-m-d') !== $countdownEvent['end']->format('Y-m-d'))
-                                        - {{ $countdownEvent['end']->format('m月d日') }}
+                                        – {{ $countdownEvent['end']->format('n 月 j 日') }}
                                     @endif
                                 </p>
                             </div>
@@ -61,16 +61,16 @@
                         @foreach($eventsToShow as $event)
                             <div class="flex items-center justify-between py-2 border-b border-warm-100 last:border-0">
                                 <span class="font-medium text-warm-800">{{ $event['name'] }}</span>
-                                <div class="flex items-center gap-2 text-sm text-warm-600">
+                                <div class="flex items-center gap-2 text-sm text-warm-600 tabular-nums">
                                     @if($event['status'] === 'ongoing')
                                         <span class="inline-flex items-center px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs font-medium">
                                             進行中
                                         </span>
                                     @endif
                                     <span>
-                                        {{ $event['start']->format('m月d日') }}
+                                        {{ $event['start']->format('n 月 j 日') }}
                                         @if($event['start']->format('Y-m-d') !== $event['end']->format('Y-m-d'))
-                                            - {{ $event['end']->format('m月d日') }}
+                                            – {{ $event['end']->format('n 月 j 日') }}
                                         @endif
                                     </span>
                                 </div>
