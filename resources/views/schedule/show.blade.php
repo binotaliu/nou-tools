@@ -167,6 +167,191 @@
             class="mb-8"
         />
 
+        @php
+            // Collect unique courses that appear in this schedule and sort by earliest exam datetime (ascending)
+            $courses = $schedule->items->map(fn($it) => $it->courseClass->course)->unique('id')->values();
+
+            $coursesWithExam = $courses->filter(fn($c) => $c->midterm_date || $c->final_date || $c->exam_time_start || $c->exam_time_end)
+                ->map(function ($course) {
+                    $dates = collect();
+
+                    if ($course->midterm_date) {
+                        $dt = \Illuminate\Support\Carbon::parse($course->midterm_date);
+                        if ($course->exam_time_start) {
+                            $dt = $dt->setTimeFromTimeString($course->exam_time_start);
+                        }
+                        $dates->push($dt);
+                    }
+
+                    if ($course->final_date) {
+                        $dt = \Illuminate\Support\Carbon::parse($course->final_date);
+                        if ($course->exam_time_start) {
+                            $dt = $dt->setTimeFromTimeString($course->exam_time_start);
+                        }
+                        $dates->push($dt);
+                    }
+
+                    // attach earliest exam datetime (or null)
+                    $course->earliest_exam_at = $dates->count() ? $dates->min() : null;
+
+                    return $course;
+                })
+                ->sortBy(function ($c) {
+                    return $c->earliest_exam_at ? $c->earliest_exam_at->getTimestamp() : PHP_INT_MAX;
+                })->values();
+        @endphp
+
+        @if ($coursesWithExam->isNotEmpty())
+            <x-card class="mb-8">
+                <h3 class="text-2xl font-bold text-warm-900 mb-4">考試資訊</h3>
+                <p class="text-sm text-warm-600 mb-4">以下為您加入課表的科目之期中 / 期末考試日期與節次。</p>
+
+                <!-- 手機：卡片列表 -->
+                <div class="md:hidden space-y-3">
+                    @foreach ($coursesWithExam as $course)
+                        @php
+                            $firstClass = $schedule->items->first(fn($it) => $it->courseClass->course->id === $course->id)?->courseClass;
+                        @endphp
+
+                        <div class="bg-white rounded-lg border border-warm-200 p-4">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-warm-900">{{ $course->name }}</div>
+                                    @if ($firstClass)
+                                        <div class="text-xs text-warm-600 mt-1">{{ $firstClass->code }}</div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="mt-3 grid grid-cols-2 gap-3">
+                                <div>
+                                    <p class="text-xs font-semibold text-warm-600 uppercase tracking-wide mb-1">期中考</p>
+                                    @if ($course->midterm_date)
+                                        @php
+                                            $md = \Illuminate\Support\Carbon::parse($course->midterm_date);
+                                            $weekday = ['日','一','二','三','四','五','六'][$md->dayOfWeek];
+                                        @endphp
+
+                                        <div class="text-warm-900 font-semibold">{{ $md->format('n/j') }} ({{ $weekday }})</div>
+
+                                        @if ($course->exam_time_start || $course->exam_time_end)
+                                            <div class="text-sm text-warm-600 mt-1">
+                                                @if ($course->exam_time_start && $course->exam_time_end)
+                                                    {{ $course->exam_time_start }} - {{ $course->exam_time_end }}
+                                                @else
+                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                                @endif
+                                            </div>
+                                        @endif
+                                    @else
+                                        <div class="text-warm-500">—</div>
+                                    @endif
+                                </div>
+
+                                <div>
+                                    <p class="text-xs font-semibold text-warm-600 uppercase tracking-wide mb-1">期末考</p>
+                                    @if ($course->final_date)
+                                        @php
+                                            $fd = \Illuminate\Support\Carbon::parse($course->final_date);
+                                            $weekday = ['日','一','二','三','四','五','六'][$fd->dayOfWeek];
+                                        @endphp
+
+                                        <div class="text-warm-900 font-semibold">{{ $fd->format('n/j') }} ({{ $weekday }})</div>
+
+                                        @if ($course->exam_time_start || $course->exam_time_end)
+                                            <div class="text-sm text-warm-600 mt-1">
+                                                @if ($course->exam_time_start && $course->exam_time_end)
+                                                    {{ $course->exam_time_start }} - {{ $course->exam_time_end }}
+                                                @else
+                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                                @endif
+                                            </div>
+                                        @endif
+                                    @else
+                                        <div class="text-warm-500">—</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- 桌面：維持表格，但只在 md+ 顯示 -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full border-collapse overflow-hidden rounded">
+                        <thead>
+                            <tr class="bg-warm-100 border-b-2 border-warm-300 rounded-t">
+                                <th class="px-4 py-3 text-left font-bold text-warm-900">課程</th>
+                                <th class="px-4 py-3 text-left font-bold text-warm-900">期中考</th>
+                                <th class="px-4 py-3 text-left font-bold text-warm-900">期末考</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($coursesWithExam as $course)
+                                @php
+                                    $firstClass = $schedule->items->first(fn($it) => $it->courseClass->course->id === $course->id)?->courseClass;
+                                @endphp
+                                <tr class="border-b border-warm-200 hover:bg-warm-50">
+                                    <td class="px-4 py-3 font-semibold text-warm-900">
+                                        {{ $course->name }}
+                                        @if ($firstClass)
+                                            <div class="text-xs text-warm-600 mt-1">{{ $firstClass->code }}</div>
+                                        @endif
+                                    </td>
+
+                                    <td class="px-4 py-3 text-warm-800 tabular-nums">
+                                        @if ($course->midterm_date)
+                                            @php
+                                                $md = \Illuminate\Support\Carbon::parse($course->midterm_date);
+                                                $weekday = ['日','一','二','三','四','五','六'][$md->dayOfWeek];
+                                            @endphp
+
+                                            <div class="font-semibold">{{ $md->format('n/j') }} ({{ $weekday }})</div>
+                                        @else
+                                            <div class="text-warm-500">—</div>
+                                        @endif
+
+                                        @if ($course->exam_time_start || $course->exam_time_end)
+                                            <div class="text-sm text-warm-600 mt-1">
+                                                @if ($course->exam_time_start && $course->exam_time_end)
+                                                    {{ $course->exam_time_start }} - {{ $course->exam_time_end }}
+                                                @else
+                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </td>
+
+                                    <td class="px-4 py-3 text-warm-800 tabular-nums">
+                                        @if ($course->final_date)
+                                            @php
+                                                $fd = \Illuminate\Support\Carbon::parse($course->final_date);
+                                                $weekday = ['日','一','二','三','四','五','六'][$fd->dayOfWeek];
+                                            @endphp
+
+                                            <div class="font-semibold">{{ $fd->format('n/j') }} ({{ $weekday }})</div>
+                                        @else
+                                            <div class="text-warm-500">—</div>
+                                        @endif
+
+                                        @if ($course->exam_time_start || $course->exam_time_end)
+                                            <div class="text-sm text-warm-600 mt-1">
+                                                @if ($course->exam_time_start && $course->exam_time_end)
+                                                    {{ $course->exam_time_start }} - {{ $course->exam_time_end }}
+                                                @else
+                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </x-card>
+        @endif
+
         <!-- Share Section -->
         <x-card>
             <div class="print:flex flex items-center justify-between gap-4">

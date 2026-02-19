@@ -72,6 +72,42 @@ it('returns an .ics calendar for a saved schedule', function () {
         ->assertSee($courseClass->code);
 });
 
+it('schedule show page displays exam information for selected courses', function () {
+    $course = \App\Models\Course::factory()->create([
+        'name' => 'Exam Course From Schedule',
+        'midterm_date' => '2025-04-25',
+        'final_date' => '2025-06-27',
+        'exam_time_start' => '13:30',
+        'exam_time_end' => '14:40',
+    ]);
+
+    $class = \App\Models\CourseClass::factory()->create([
+        'course_id' => $course->id,
+        'code' => 'EXM101',
+    ]);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => \Illuminate\Support\Str::uuid(),
+        'name' => 'Exam Schedule',
+    ]);
+
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $class->id,
+    ]);
+
+    $response = $this->get(route('schedules.show', $schedule));
+
+    $response->assertStatus(200)
+        ->assertSee('考試資訊')
+        ->assertSee('期中考')
+        ->assertSee('期末考')
+        ->assertSee('4/25')
+        ->assertSee('6/27')
+        ->assertSee('13:30 - 14:40')
+        ->assertSee('EXM101');
+});
+
 it('stores schedule metadata in an encrypted cookie when saving', function () {
     $courseClass = CourseClass::factory()->create();
 
