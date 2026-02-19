@@ -16,8 +16,8 @@ return [
             'countdown' => true,
         ],
         [
-            'start' => '2026-02-25',
-            'end' => '2026-02-26',
+            'start' => '2026-04-25',
+            'end' => '2026-04-26',
             'name' => '114下學期期中考',
             'countdown' => true,
         ],
