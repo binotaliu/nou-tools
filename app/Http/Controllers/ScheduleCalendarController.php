@@ -28,6 +28,7 @@ class ScheduleCalendarController extends Controller
             'VERSION:2.0',
             'PRODID:-//Nou Tools//Schedule//EN',
             'CALSCALE:GREGORIAN',
+            'X-WR-CALNAME:'.$this->escapeICSString($schedule->name ?? '我的課表'),
             'METHOD:PUBLISH',
         ];
 
@@ -74,11 +75,17 @@ class ScheduleCalendarController extends Controller
 
     private function convertToICSDateTime(\DateTime $date, string $time): string
     {
-        $timeParts = explode(':', $time);
-        $hour = $timeParts[0] ?? '09';
-        $minute = $timeParts[1] ?? '00';
+        // Stored times are local (UTC+8). Interpret date+time as Asia/Taipei,
+        // convert to UTC and emit a Z-suffixed timestamp for ICS consumers.
+        $sourceTz = new \DateTimeZone('Asia/Taipei');
 
-        return $date->format('Ymd').'T'.str_pad($hour, 2, '0', STR_PAD_LEFT).str_pad($minute, 2, '0', STR_PAD_LEFT).'00Z';
+        $dateTime = \Carbon\Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $date->format('Y-m-d').' '.substr($time, 0, 5),
+            $sourceTz
+        )->setTimezone('UTC');
+
+        return $dateTime->format('Ymd\THis\Z');
     }
 
     private function escapeICSString(string $string): string

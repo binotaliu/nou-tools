@@ -42,7 +42,7 @@ it('allows creating multiple schedules', function () {
     $this->assertDatabaseHas('student_schedules', ['name' => '第二次']);
 });
 
-it('returns an .ics calendar for a saved schedule', function () {
+it('returns an .ics calendar for a saved schedule and converts UTC+8 times to UTC', function () {
     $courseClass = CourseClass::factory()->create([
         'start_time' => '09:00',
         'end_time' => '10:00',
@@ -58,18 +58,31 @@ it('returns an .ics calendar for a saved schedule', function () {
         'course_class_id' => $courseClass->id,
     ]);
 
+    $date = now()->addWeek()->toDateString();
+
     ClassSchedule::factory()->create([
         'class_id' => $courseClass->id,
-        'date' => now()->addWeek()->toDateString(),
+        'date' => $date,
     ]);
 
     $response = $this->get(route('schedules.calendar', $schedule));
 
+    $expectedStart = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $date.' 09:00', 'Asia/Taipei')
+        ->setTimezone('UTC')
+        ->format('Ymd\THis\Z');
+
+    $expectedEnd = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $date.' 10:00', 'Asia/Taipei')
+        ->setTimezone('UTC')
+        ->format('Ymd\THis\Z');
+
     $response->assertStatus(200)
         ->assertHeader('Content-Type', 'text/calendar; charset=utf-8')
         ->assertSee('BEGIN:VCALENDAR')
+        ->assertSee('X-WR-CALNAME:ICS Export')
         ->assertSee($courseClass->course->name)
-        ->assertSee($courseClass->code);
+        ->assertSee($courseClass->code)
+        ->assertSee('DTSTART:'.$expectedStart)
+        ->assertSee('DTEND:'.$expectedEnd);
 });
 
 it('schedule show page displays exam information for selected courses', function () {
