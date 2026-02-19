@@ -18,3 +18,11 @@
   --color-warm-800: oklch(0.45 0.1 35);
   --color-warm-900: oklch(0.35 0.08 35);
 }
+
+@layer base {
+  [x-cloak],
+  [data-cloak],
+  .x-cloak {
+    display: none !important;
+  }
+}
