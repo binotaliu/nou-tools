@@ -96,7 +96,7 @@ If existing pages and components support dark mode, new pages and components mus
 <!-- Dark Mode -->
 
 ```html
-<div class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+<div class="bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
   Content adapts to color scheme
 </div>
 ```
@@ -119,7 +119,7 @@ If existing pages and components support dark mode, new pages and components mus
 <!-- Grid Layout -->
 
 ```html
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
   <div>Card 1</div>
   <div>Card 2</div>
   <div>Card 3</div>
