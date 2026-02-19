@@ -20,6 +20,7 @@ class ScheduleController extends Controller
         $currentSemester = config('app.current_semester');
         $courses = Course::query()
             ->where('term', $currentSemester)
+            ->whereHas('classes')
             ->with(['classes' => function ($query) {
                 $query->orderBy('type');
             }])
@@ -79,6 +80,7 @@ class ScheduleController extends Controller
         $currentSemester = config('app.current_semester');
         $courses = Course::query()
             ->where('term', $currentSemester)
+            ->whereHas('classes')
             ->with(['classes' => function ($query) {
                 $query->orderBy('type');
             }])

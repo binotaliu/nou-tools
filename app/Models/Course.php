@@ -14,6 +14,14 @@ class Course extends Model
     protected $fillable = [
         'name',
         'term',
+        'description_url',
+        'credit_type',
+        'credits',
+        'department',
+        'in_person_class_type',
+        'media',
+        'multimedia_url',
+        'nature',
     ];
 
     /**
