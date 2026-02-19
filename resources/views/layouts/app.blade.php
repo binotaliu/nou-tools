@@ -35,7 +35,8 @@
         <header class="bg-white border-b border-warm-200 sticky top-0 z-40 print:static">
             <div class="max-w-7xl mx-auto px-6 py-4">
                 <div class="flex items-center justify-between">
-                    <h1 class="text-2xl font-bold text-warm-700 pb-0 mb-0!">
+                    <h1 class="text-2xl font-bold text-warm-700 pb-0 mb-0! inline-flex items-center gap-4">
+                        <x-heroicon-o-book-open class="size-6 text-warm-700" />
                         <a href="{{ url('/') }}">NOU 小幫手</a>
                     </h1>
                 </div>
@@ -62,14 +63,44 @@
             @yield('content')
         </main>
 
-        <footer class="bg-warm-100 text-warm-700 py-6 mt-12">
-            <div class="max-w-7xl mx-auto px-6 text-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 print:hidden">
-                <div class="w-full md:w-auto text-center md:text-left">
-                    <p class="text-warm-700">&copy; {{ date('Y') }} NOU 小幫手 | <a href="mailto:nou-tools-contact@binota.org" class="hover:text-warm-900">聯絡本網站作者</a></p>
+        <footer class="bg-warm-100 text-warm-900 py-8 mt-12 border-t border-warm-200 print:bg-white print:text-black">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="hidden print:block text-xs text-warm-800 text-center py-2">
+                    <p class="mb-1">&copy; {{ date('Y') }} NOU 小幫手 — {{ url('/') }}<br>免責聲明：本網站為學生自發製作之工具，僅供參考，請以學校正式公告為準。</p>
+                    <p class="text-xs">聯絡網站作者：nou-tools-contact@binota.org</p>
                 </div>
 
-                <div class="w-full md:w-2/3 text-center md:text-right">
-                    <p class="mt-2 text-xs text-warm-500">免責聲明：本網站為學生自發製作之工具，僅供同學參考使用，並非學校官方發布；所有資訊以學校正式公告為準。</p>
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 print:hidden">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3">
+                            <x-heroicon-o-book-open class="size-6 text-warm-700" />
+                        </div>
+
+                        <div>
+                            <a href="{{ url('/') }}" class="text-lg font-semibold text-warm-700 hover:text-warm-900">NOU 小幫手</a>
+                            <p class="text-xs text-warm-500 mt-1">給 NOU 同學的非官方小工具</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-6 items-center">
+
+                        <div class="text-sm text-warm-400 max-w-[40ch] text-center md:text-right">
+                            <p class="text-xs text-left">免責聲明：<br>本網站為學生自發製作之工具，僅供同學參考使用，並非學校官方發布；所有資訊以學校正式公告為準。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom row (screen only) -->
+                <div class="mt-6 border-t border-warm-200 pt-4 text-xs text-warm-500 flex flex-col md:flex-row justify-between gap-3 items-center print:hidden">
+                    <div>&copy; {{ date('Y') }} NOU 小幫手</div>
+                    <div class="flex flex-col md:flex-row gap-y-2 gap-x-8 items-center">
+                        <div class="text-xs">
+                            <a href="mailto:nou-tools-contact@binota.org" class="inline-flex items-center gap-1 text-warm-500 hover:text-warm-600">
+                                <x-heroicon-o-envelope class="size-3" />
+                                聯絡作者
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </footer>
