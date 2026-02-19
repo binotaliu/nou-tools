@@ -5,16 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
-use App\Services\SchoolScheduleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class ScheduleController extends Controller
 {
-    public function __construct(
-        private SchoolScheduleService $scheduleService
-    ) {}
-
     public function create(\Illuminate\Http\Request $request): \Illuminate\View\View
     {
         $currentSemester = config('app.current_semester');
@@ -225,8 +220,6 @@ class ScheduleController extends Controller
 
         return view('schedule.show', [
             'schedule' => $schedule,
-            'scheduleEvents' => $this->scheduleService->getUpcomingAndOngoingEvents(),
-            'countdownEvent' => $this->scheduleService->getCountdownEvent(),
         ]);
     }
 

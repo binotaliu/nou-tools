@@ -1,5 +1,3 @@
-@props(['scheduleEvents' => [], 'countdownEvent' => null])
-
 {{-- School Schedule Calendar Component --}}
 @if (! empty($scheduleEvents) || $countdownEvent)
   <x-card {{ $attributes }}>

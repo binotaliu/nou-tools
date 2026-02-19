@@ -2,16 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\SchoolScheduleService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function __construct(
-        private SchoolScheduleService $scheduleService
-    ) {}
-
     public function index(Request $request): \Illuminate\View\View
     {
         // Use Taiwan time for greeting and default date
@@ -72,8 +67,6 @@ class HomeController extends Controller
             'selectedDate' => $selectedDate,
             'courses' => $courses,
             'previousSchedule' => $previousSchedule,
-            'scheduleEvents' => $this->scheduleService->getUpcomingAndOngoingEvents(),
-            'countdownEvent' => $this->scheduleService->getCountdownEvent(),
         ]);
     }
 }

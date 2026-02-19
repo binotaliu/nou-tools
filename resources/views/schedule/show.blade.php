@@ -219,11 +219,7 @@
     @endif
 
     {{-- School Calendar --}}
-    <x-school-calendar
-      :schedule-events="$scheduleEvents ?? []"
-      :countdown-event="$countdownEvent ?? null"
-      class="mb-8"
-    />
+    <x-school-calendar class="mb-8" />
 
     @php
       // Collect unique courses that appear in this schedule and sort by earliest exam datetime (ascending)

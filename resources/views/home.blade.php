@@ -39,10 +39,7 @@
     </div>
 
     {{-- School Calendar --}}
-    <x-school-calendar
-      :schedule-events="$scheduleEvents ?? []"
-      :countdown-event="$countdownEvent ?? null"
-    />
+    <x-school-calendar />
 
     {{-- 今日面授 --}}
     <x-card x-data="{ date: '{{ $selectedDate }}' }">
