@@ -169,15 +169,26 @@
 
         <!-- Share Section -->
         <x-card>
-            <p class="text-warm-700 mb-3">
-                您可以使用以下連結來編輯或檢視此課表，請妥善保管此連結。<br>
-                <span class="font-semibold text-red-600 inline-flex items-center gap-1">
-                    <x-heroicon-o-exclamation-triangle class="size-4" />
-                    注意：任何擁有此連結的人都可以編輯您的課表，請勿隨意分享。
-                </span>
-            </p>
-            <div class="bg-warm-50 p-3 rounded border border-warm-300 font-mono text-sm break-all text-warm-600">
-                {{ url(route('schedule.show', $schedule)) }}
+            <div class="print:flex flex items-center justify-between gap-4">
+                <div class="md:flex-1 print:flex-1">
+                    <p class="text-warm-700 mb-3">
+                        您可以使用以下連結來編輯或檢視此課表，請妥善保管此連結。<br>
+                        <span class="font-semibold text-red-600 inline-flex items-center gap-1">
+                            <x-heroicon-o-exclamation-triangle class="size-4" />
+                            注意：任何擁有此連結的人都可以編輯您的課表。
+                        </span>
+                    </p>
+
+                    <div class="bg-warm-50 p-3 rounded border border-warm-300 font-mono text-sm break-all text-warm-600">
+                        {{ url(route('schedule.show', $schedule)) }}
+                    </div>
+                </div>
+
+                <div class="hidden md:flex print:flex flex-col justify-center items-center w-28">
+                    <div class="bg-white p-2 rounded border border-warm-200">
+                        {!! DNS2D::getBarcodeSVG(url(route('schedule.show', $schedule)), 'QRCODE') !!}
+                    </div>
+                </div>
             </div>
         </x-card>
     </div>
