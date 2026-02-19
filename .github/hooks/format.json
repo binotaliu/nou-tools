@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "npm run format && npm run format:php"
+      }
+    ]
+  }
+}
