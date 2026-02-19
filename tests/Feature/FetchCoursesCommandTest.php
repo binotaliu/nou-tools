@@ -181,3 +181,65 @@ it('stores full remote courses with custom time slots', function () {
     $schedules = $class->schedules;
     expect($schedules)->toHaveCount(6);
 });
+
+it('stores micro-credit courses separately from full remote', function () {
+    $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
+
+    Http::fake([
+        'vc.nou.edu.tw/vc1/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc2/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc3/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc4/*' => Http::response($html, 200),
+    ]);
+
+    $this->artisan('course:fetch', ['term' => '2025B'])
+        ->assertSuccessful();
+
+    $fullRemoteClasses = CourseClass::query()->where('type', CourseClassType::FullRemote)->count();
+    $microCreditClasses = CourseClass::query()->where('type', CourseClassType::MicroCredit)->count();
+
+    expect($fullRemoteClasses)->toBe(1);
+    expect($microCreditClasses)->toBeGreaterThan(0);
+});
+
+it('stores schedule time overrides for courses with irregular times', function () {
+    $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
+
+    Http::fake([
+        'vc.nou.edu.tw/vc1/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc2/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc3/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc4/*' => Http::response($html, 200),
+    ]);
+
+    $this->artisan('course:fetch', ['term' => '2025B'])
+        ->assertSuccessful();
+
+    $germanLaw = Course::query()->where('name', '法學德文（三）')->first();
+    expect($germanLaw)->not->toBeNull();
+
+    $class = $germanLaw->classes()->first();
+    expect($class->type)->toBe(CourseClassType::MicroCredit);
+    expect($class->start_time)->toBe('09:10');
+    expect($class->end_time)->toBe('12:00');
+
+    $schedules = $class->schedules()->orderBy('date')->get();
+    expect($schedules)->toHaveCount(5);
+
+    // Sessions 1 and 2 (02/24, 03/03) should have time overrides
+    expect($schedules[0]->date->format('Y-m-d'))->toBe('2026-02-24');
+    expect($schedules[0]->start_time)->toBe('18:30');
+    expect($schedules[0]->end_time)->toBe('21:00');
+
+    expect($schedules[1]->date->format('Y-m-d'))->toBe('2026-03-03');
+    expect($schedules[1]->start_time)->toBe('18:30');
+    expect($schedules[1]->end_time)->toBe('21:00');
+
+    // Sessions 3, 4, 5 should have no time overrides (use class defaults)
+    expect($schedules[2]->start_time)->toBeNull();
+    expect($schedules[2]->end_time)->toBeNull();
+    expect($schedules[3]->start_time)->toBeNull();
+    expect($schedules[3]->end_time)->toBeNull();
+    expect($schedules[4]->start_time)->toBeNull();
+    expect($schedules[4]->end_time)->toBeNull();
+});

@@ -143,8 +143,29 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-warm-800">
-                                    @if ($item->courseClass->start_time)
-                                        {{ $item->courseClass->start_time }} ~ {{ $item->courseClass->end_time }}
+                                    @php
+                                        // Use schedule time override if it exists for the next class
+                                        $nextSchedule = $item->courseClass->schedules
+                                            ->filter(fn($s) => $s->date->isToday() || $s->date->isFuture())
+                                            ->sortBy('date')
+                                            ->first();
+                                        if ($item->courseClass->course->name === '法學德文（三）') {
+                                            ray($item);
+                                            ray($nextSchedule);
+                                        }
+
+                                        $displayStartTime = $nextSchedule && $nextSchedule->start_time
+                                            ? $nextSchedule->start_time
+                                            : $item->courseClass->start_time;
+                                        $displayEndTime = $nextSchedule && $nextSchedule->end_time
+                                            ? $nextSchedule->end_time
+                                            : $item->courseClass->end_time;
+                                    @endphp
+                                    @if ($displayStartTime)
+                                        {{ $displayStartTime }} ~ {{ $displayEndTime }}
+                                        @if ($nextSchedule && $nextSchedule->start_time)
+                                            <span class="text-xs text-orange-600">*</span>
+                                        @endif
                                     @else
                                         <span class="text-warm-500">未設定</span>
                                     @endif
@@ -194,6 +215,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="px-4 py-2 bg-warm-50 border-t border-warm-200 text-xs text-warm-600">
+                <span class="text-orange-600">*</span> 表示該次課程時間與一般時間不同
+            </div>
         </div>
 
         @include('partials.common-links')
@@ -202,6 +226,9 @@
         @if (count($schedule->items) > 0)
             <div class="mt-8">
                 <h3 class="text-2xl font-bold text-warm-900 mb-4">課程日期</h3>
+                <p class="text-sm text-warm-600 mb-4">
+                    <span class="text-orange-600">*</span> 表示該次課程時間與一般時間不同
+                </p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-4">
                     @php
                         $coursesByMonth = [];
@@ -216,10 +243,16 @@
                                 if (!isset($coursesByMonth[$monthKey]['dates'][$dateKey])) {
                                     $coursesByMonth[$monthKey]['dates'][$dateKey] = [];
                                 }
+                                // Use schedule time override if it exists, otherwise use class default
+                                $displayStartTime = $classSchedule->start_time ?? $item->courseClass->start_time;
+                                $displayEndTime = $classSchedule->end_time ?? $item->courseClass->end_time;
+                                $hasOverride = $classSchedule->start_time !== null;
+
                                 $coursesByMonth[$monthKey]['dates'][$dateKey][] = [
                                     'courseName' => $item->courseClass->course->name,
                                     'code' => $item->courseClass->code,
-                                    'time' => $item->courseClass->start_time ? $item->courseClass->start_time . ' - ' . $item->courseClass->end_time : '未設定',
+                                    'time' => $displayStartTime ? $displayStartTime . ' - ' . $displayEndTime : '未設定',
+                                    'hasOverride' => $hasOverride,
                                     'date' => $classSchedule->date,
                                 ];
                             }
@@ -244,7 +277,12 @@
                                                 <div class="text-sm text-warm-700">
                                                     <span class="font-semibold">{{ $course['courseName'] }}</span>
                                                     <span class="text-xs text-warm-600">({{ $course['code'] }})</span><br>
-                                                    <span class="text-warm-600">{{ $course['time'] }}</span>
+                                                    <span class="text-warm-600">
+                                                        {{ $course['time'] }}
+                                                        @if ($course['hasOverride'])
+                                                            <span class="text-xs text-orange-600">*</span>
+                                                        @endif
+                                                    </span>
                                                 </div>
                                             @endforeach
                                         </div>

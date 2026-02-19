@@ -71,7 +71,8 @@
                                     'morning' => '上午班',
                                     'afternoon' => '下午班',
                                     'evening' => '夜間班',
-                                    'full_remote' => '全遠距 / 微學分',
+                                    'full_remote' => '全遠距',
+                                    'micro_credit' => '微學分',
                                 ];
                                 $grouped = $course->classes->groupBy('type');
                             @endphp
@@ -83,7 +84,12 @@
 
                                         @php
                                             // group classes by start/end time so we show the time once per time slot
-                                            $timeGroups = $grouped[$typeKey]->groupBy(function ($c) {
+                                            // If there's a schedule override for today, use that instead
+                                            $timeGroups = $grouped[$typeKey]->groupBy(function ($c) use ($selectedDate) {
+                                                $todaySchedule = $c->schedules->first();
+                                                if ($todaySchedule && $todaySchedule->start_time && $todaySchedule->end_time) {
+                                                    return $todaySchedule->start_time.' - '.$todaySchedule->end_time;
+                                                }
                                                 return $c->start_time ? $c->start_time.' - '.$c->end_time : '時間未定';
                                             });
                                         @endphp

@@ -25,6 +25,7 @@ class FetchCoursesCommand extends Command
         'https://vc.nou.edu.tw/vc2/' => CourseClassType::Afternoon,
         'https://vc.nou.edu.tw/vc3/' => CourseClassType::Evening,
         'https://vc.nou.edu.tw/vc4/' => CourseClassType::FullRemote,
+        'https://vc.nou.edu.tw/vc4/#micro' => CourseClassType::MicroCredit,
     ];
 
     public function handle(NouCourseParser $parser): int
@@ -44,13 +45,23 @@ class FetchCoursesCommand extends Command
         $totalCourses = 0;
         $totalClasses = 0;
 
-        foreach ($this->sources as $url => $type) {
-            $this->info("Fetching {$type->label()} from {$url}...");
+        /** @var array<string, string|null> */
+        $htmlCache = [];
 
-            $html = $this->fetchHtml($url);
+        foreach ($this->sources as $url => $type) {
+            // Strip fragment identifiers for actual HTTP fetching
+            $fetchUrl = preg_replace('/#.*$/', '', $url) ?? $url;
+
+            $this->info("Fetching {$type->label()} from {$fetchUrl}...");
+
+            if (! isset($htmlCache[$fetchUrl])) {
+                $htmlCache[$fetchUrl] = $this->fetchHtml($fetchUrl);
+            }
+
+            $html = $htmlCache[$fetchUrl];
 
             if ($html === null) {
-                $this->warn("Failed to fetch {$url}, skipping...");
+                $this->warn("Failed to fetch {$fetchUrl}, skipping...");
 
                 continue;
             }
@@ -70,9 +81,9 @@ class FetchCoursesCommand extends Command
                         [
                             'course_id' => $course->id,
                             'code' => $code,
-                            'type' => $type,
                         ],
                         [
+                            'type' => $type,
                             'start_time' => $classData['start_time'],
                             'end_time' => $classData['end_time'],
                             'teacher_name' => $classData['teacher_name'],
@@ -88,21 +99,25 @@ class FetchCoursesCommand extends Command
                         'link' => $classData['link'],
                     ]);
 
-                    foreach ($classData['dates'] as $dateString) {
+                    foreach ($classData['dates'] as $index => $dateString) {
                         $date = $this->parseDate($dateString, $year);
 
                         if ($date !== null) {
                             $dateStr = $date->format('Y-m-d');
-                            // Use upsert for better handling of the date field
+                            $sessionNumber = $index + 1;
+                            $override = $classData['schedule_time_overrides'][$sessionNumber] ?? null;
+
                             DB::table('class_schedules')->upsert(
                                 [
                                     'class_id' => $courseClass->id,
                                     'date' => $dateStr,
+                                    'start_time' => $override['start_time'] ?? null,
+                                    'end_time' => $override['end_time'] ?? null,
                                     'created_at' => Carbon::now(),
                                     'updated_at' => Carbon::now(),
                                 ],
                                 ['class_id', 'date'],
-                                ['updated_at'],
+                                ['start_time', 'end_time', 'updated_at'],
                             );
                         }
                     }

@@ -14,6 +14,8 @@ class ClassSchedule extends Model
     protected $fillable = [
         'class_id',
         'date',
+        'start_time',
+        'end_time',
     ];
 
     /**
