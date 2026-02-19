@@ -4,19 +4,8 @@
 
 @section('content')
 <div class="space-y-8">
-    <!-- greeting -->
-    <x-card>
-        <div class="flex items-baseline justify-between gap-4">
-            <div>
-                <h2 class="text-3xl font-semibold">{{ $greeting }}，歡迎回來！</h2>
-                @php
-                    $__selectedDate = \Carbon\Carbon::parse($selectedDate, 'Asia/Taipei');
-                    $__weekdayMap = ['日', '一', '二', '三', '四', '五', '六'];
-                @endphp
-                <p class="mt-1 text-warm-500">{{ $__selectedDate->format('Y年m月d日') }}（{{ $__weekdayMap[$__selectedDate->dayOfWeek] }}）</p>
-            </div>
-        </div>
-    </x-card>
+    <x-greeting />
+
 
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <x-card>

@@ -135,5 +135,9 @@ return [
     */
 
     'current_semester' => env('CURRENT_SEMESTER', '2025B'),
+    'current_semester_range' => [
+        env('CURRENT_SEMESTER_START', '2026-02-23'),
+        env('CURRENT_SEMESTER_END', '2026-07-05'),
+    ],
 
 ];

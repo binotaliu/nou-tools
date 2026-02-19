@@ -75,6 +75,8 @@
             </div>
         </div>
 
+        <x-greeting class="mb-4" />
+
         <!-- Schedule Table -->
         <div class="bg-white rounded-lg border border-warm-200 overflow-hidden mb-4">
             <div class="overflow-x-auto">
