@@ -113,6 +113,61 @@
                         <dd class="text-warm-700">{{ $course->nature }}</dd>
                     </div>
                 @endif
+
+                @if ($course->midterm_date || $course->final_date || $course->exam_time_start || $course->exam_time_end)
+                    <div>
+                        <dt class="font-semibold text-warm-900 mb-2">考試資訊</dt>
+                        <dd class="text-warm-700">
+                            @if ($course->midterm_date)
+                                @php
+                                    $md = \Illuminate\Support\Carbon::parse($course->midterm_date);
+                                    $weekdayMd = ['日','一','二','三','四','五','六'][$md->dayOfWeek];
+                                @endphp
+
+                                <div class="mb-2">
+                                    <div class="font-semibold">期中考</div>
+                                    <div class="text-sm text-warm-700 flex items-center justify-start gap-x-2 tabular-nums">
+                                        <div>{{ $md->format('n/j') }} ({{ $weekdayMd }})</div>
+
+                                        @if ($course->exam_time_start || $course->exam_time_end)
+                                            <div class="text-sm text-warm-600 whitespace-nowrap">
+                                                @if ($course->exam_time_start && $course->exam_time_end)
+                                                    {{ $course->exam_time_start }} - {{ $course->exam_time_end }}
+                                                @else
+                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if ($course->final_date)
+                                @php
+                                    $fd = \Illuminate\Support\Carbon::parse($course->final_date);
+                                    $weekdayFd = ['日','一','二','三','四','五','六'][$fd->dayOfWeek];
+                                @endphp
+
+                                <div>
+                                    <div class="font-semibold">期末考</div>
+                                    <div class="text-sm text-warm-700 flex items-center justify-start gap-x-2 tabular-nums">
+                                        <div>{{ $fd->format('n/j') }} ({{ $weekdayFd }})</div>
+
+                                        @if ($course->exam_time_start || $course->exam_time_end)
+                                            <div class="text-sm text-warm-600 whitespace-nowrap">
+                                                @if ($course->exam_time_start && $course->exam_time_end)
+                                                    {{ $course->exam_time_start }} - {{ $course->exam_time_end }}
+                                                @else
+                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                        </dd>
+                    </div>
+                @endif
             </dl>
         </x-card>
 

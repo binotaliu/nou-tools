@@ -141,3 +141,22 @@ test('course show page shows previous-schedule link when cookie exists', functio
         ->assertSee('回到我的課表')
         ->assertSee(route('schedules.show', $schedule));
 });
+
+test('course show page displays exam information', function () {
+    $course = Course::factory()->create([
+        'name' => 'Exam Course',
+        'midterm_date' => '2025-04-25',
+        'final_date' => '2025-06-27',
+        'exam_time_start' => '13:30',
+        'exam_time_end' => '14:40',
+    ]);
+
+    $response = $this->get(route('course.show', $course));
+
+    $response->assertStatus(200)
+        ->assertSee('期中考')
+        ->assertSee('期末考')
+        ->assertSee('4/25')
+        ->assertSee('6/27')
+        ->assertSee('13:30 - 14:40');
+});
