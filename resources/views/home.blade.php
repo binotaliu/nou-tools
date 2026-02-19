@@ -44,7 +44,7 @@
       :countdown-event="$countdownEvent ?? null"
     />
 
-    <!-- 今日面授 -->
+    {{-- 今日面授 --}}
     <x-card x-data="{ date: '{{ $selectedDate }}' }">
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-medium">今日視訊面授</h3>

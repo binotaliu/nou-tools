@@ -21,12 +21,12 @@
       @endif
     </div>
 
-    <!-- Course Information -->
+    {{-- Course Information --}}
     <x-card class="mb-6">
       <h3 class="mb-6 text-xl font-bold text-warm-900">課程資訊</h3>
 
       <dl class="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <!-- 科目內容 -->
+        {{-- 科目內容 --}}
         @if ($course->description_url)
           <div>
             <dt class="mb-2 font-semibold text-warm-900">科目內容</dt>
@@ -44,7 +44,7 @@
           </div>
         @endif
 
-        <!-- 必/選修 -->
+        {{-- 必/選修 --}}
         @if ($course->credit_type)
           <div>
             <dt class="mb-2 font-semibold text-warm-900">必/選修</dt>
@@ -52,7 +52,7 @@
           </div>
         @endif
 
-        <!-- 學分 -->
+        {{-- 學分 --}}
         @if ($course->credits)
           <div>
             <dt class="mb-2 font-semibold text-warm-900">學分</dt>
@@ -86,7 +86,7 @@
           </div>
         @endif
 
-        <!-- 學系 -->
+        {{-- 學系 --}}
         @if ($course->department)
           <div>
             <dt class="mb-2 font-semibold text-warm-900">學系</dt>
@@ -94,7 +94,7 @@
           </div>
         @endif
 
-        <!-- 面授類別 -->
+        {{-- 面授類別 --}}
         @if ($course->in_person_class_type)
           <div>
             <dt class="mb-2 font-semibold text-warm-900">面授類別</dt>
@@ -102,7 +102,7 @@
           </div>
         @endif
 
-        <!-- 媒體 -->
+        {{-- 媒體 --}}
         @if ($course->media)
           <div>
             <dt class="mb-2 font-semibold text-warm-900">媒體</dt>
@@ -110,7 +110,7 @@
           </div>
         @endif
 
-        <!-- 多媒體簡介 -->
+        {{-- 多媒體簡介 --}}
         @if ($course->multimedia_url)
           <div>
             <dt class="mb-2 font-semibold text-warm-900">多媒體簡介</dt>
@@ -128,7 +128,7 @@
           </div>
         @endif
 
-        <!-- 課程性質 -->
+        {{-- 課程性質 --}}
         @if ($course->nature)
           <div>
             <dt class="mb-2 font-semibold text-warm-900">課程性質</dt>
@@ -199,7 +199,7 @@
       </dl>
     </x-card>
 
-    <!-- Course Classes -->
+    {{-- Course Classes --}}
     @if ($course->classes->isNotEmpty())
       <x-card class="mb-6">
         <h3 class="mb-6 text-xl font-bold text-warm-900">

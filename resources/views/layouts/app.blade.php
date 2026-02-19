@@ -7,26 +7,26 @@
 
     <title>@yield('title', 'NOU 小幫手')</title>
 
-    <!-- Fonts -->
+    {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.bunny.net" />
     <link
       href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600"
       rel="stylesheet"
     />
 
-    <!-- Alpine.js -->
+    {{-- Alpine.js --}}
     <script
       defer
       src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
     ></script>
 
-    <!-- Styles / Scripts -->
+    {{-- Styles / Scripts --}}
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
       @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 
     @if (app()->environment('production'))
-      <!-- Google Analytics -->
+      {{-- Google Analytics --}}
       <script
         async
         src="https://www.googletagmanager.com/gtag/js?id=G-1B65SQ4673"
@@ -126,7 +126,7 @@
           </div>
         </div>
 
-        <!-- Bottom row (screen only) -->
+        {{-- Bottom row (screen only) --}}
         <div
           class="mt-6 flex flex-col items-center justify-between gap-3 border-t border-warm-200 pt-4 text-xs text-warm-500 md:flex-row print:hidden"
         >

@@ -22,12 +22,12 @@
   <div
     {{ $attributes->merge(['class' => 'bg-white rounded-lg border border-warm-200 border-b-0 p-4 hover:shadow-md transition']) }}
   >
-    <!-- 課程名稱 -->
+    {{-- 課程名稱 --}}
     <h3 class="mb-2 text-lg font-semibold text-warm-900">
       {{ $item->courseClass->course->name }}
     </h3>
 
-    <!-- 班級代碼 -->
+    {{-- 班級代碼 --}}
     <div class="mb-3 flex items-center gap-2">
       <span
         class="inline-block rounded bg-warm-100 px-2 py-1 font-mono text-xs text-warm-800"
@@ -56,9 +56,9 @@
       @endif
     </div>
 
-    <!-- 課程資訊網格 -->
+    {{-- 課程資訊網格 --}}
     <div class="mb-4 space-y-3">
-      <!-- 下次上課 -->
+      {{-- 下次上課 --}}
       <div>
         <p
           class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase"
@@ -89,7 +89,7 @@
       </div>
     </div>
 
-    <!-- 操作按鈕 -->
+    {{-- 操作按鈕 --}}
     <div class="flex gap-2 border-t border-warm-100 pt-3">
       <a
         href="{{ route('course.show', $item->courseClass->course) }}"

@@ -33,7 +33,7 @@
       </x-alert>
     @endif
 
-    <!-- Search Section -->
+    {{-- Search Section --}}
     <x-card class="mb-8">
       <label class="mb-3 block text-lg font-semibold text-warm-900">
         搜尋課程
@@ -49,7 +49,7 @@
         />
       </div>
 
-      <!-- Search Results Dropdown -->
+      {{-- Search Results Dropdown --}}
       <div
         x-show="showResults && filteredCourses.length > 0"
         class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-warm-200 bg-white shadow-lg"
@@ -78,7 +78,7 @@
       </template>
     </x-card>
 
-    <!-- Selected Schedule Section -->
+    {{-- Selected Schedule Section --}}
     <x-card class="mb-8">
       <h3 class="mb-4 text-2xl font-bold text-warm-900">您的課表</h3>
 
@@ -108,7 +108,7 @@
               </button>
             </div>
 
-            <!-- Class Selection -->
+            {{-- Class Selection --}}
             <div class="mt-3">
               <template x-if="getClassTypes(item.course).length > 1">
                 <div>
@@ -221,7 +221,7 @@
       </div>
     </x-card>
 
-    <!-- Submit Section -->
+    {{-- Submit Section --}}
     <form
       action="{{ isset($schedule) ? route('schedules.update', $schedule) : route('schedules.store') }}"
       method="POST"

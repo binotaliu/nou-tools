@@ -25,12 +25,12 @@
 @endphp
 
 <div class="mb-4 overflow-hidden rounded-lg border border-warm-200 bg-white">
-  <!-- 桌面版表格 -->
+  {{-- 桌面版表格 --}}
   <div class="hidden overflow-x-auto md:block print:block">
     <x-schedule-items-table :items="$itemsSorted" :schedule="$schedule" />
   </div>
 
-  <!-- 手機版卡片列表 -->
+  {{-- 手機版卡片列表 --}}
   <div class="md:hidden print:hidden">
     @forelse ($itemsSorted as $item)
       <div class="border-b border-warm-200 last:border-b-0">
@@ -52,7 +52,7 @@
     @endforelse
   </div>
 
-  <!-- 溫馨提示 (時間異動) -->
+  {{-- 溫馨提示 (時間異動) --}}
   @if ($hasAnyOverride)
     <div
       class="flex items-center gap-1 border-t border-warm-200 bg-warm-50 px-4 py-2 text-xs text-warm-600"

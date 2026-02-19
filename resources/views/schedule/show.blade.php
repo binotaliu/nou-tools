@@ -47,7 +47,7 @@
           訂閱行事曆
         </button>
 
-        <!-- Subscribe modal -->
+        {{-- Subscribe modal --}}
         <x-modal
           name="subscribeOpen"
           title="訂閱行事曆"
@@ -109,12 +109,12 @@
 
     <x-greeting class="mb-4 print:hidden" />
 
-    <!-- Schedule Items - Responsive Table/Cards -->
+    {{-- Schedule Items - Responsive Table/Cards --}}
     <x-schedule-items :items="$schedule->items" :schedule="$schedule" />
 
     <x-common-links class="mb-8 print:hidden" />
 
-    <!-- Schedule Calendar View -->
+    {{-- Schedule Calendar View --}}
     @if (count($schedule->items) > 0)
       <div class="mb-8">
         <h3 class="mb-4 text-2xl font-bold text-warm-900">面授日期</h3>
@@ -271,7 +271,7 @@
           以下為您加入課表的科目之期中 / 期末考試日期與節次。
         </p>
 
-        <!-- 手機：卡片列表 -->
+        {{-- 手機：卡片列表 --}}
         <div class="space-y-3 md:hidden">
           @foreach ($coursesWithExam as $course)
             @php
@@ -359,7 +359,7 @@
           @endforeach
         </div>
 
-        <!-- 桌面：維持表格，但只在 md+ 顯示 -->
+        {{-- 桌面：維持表格，但只在 md+ 顯示 --}}
         <div class="hidden overflow-x-auto md:block">
           <table class="w-full border-collapse overflow-hidden rounded">
             <thead>
@@ -450,7 +450,7 @@
       </x-card>
     @endif
 
-    <!-- Share Section -->
+    {{-- Share Section --}}
     <x-card>
       <div class="flex items-center justify-between gap-4 print:flex">
         <div class="md:flex-1 print:flex-1">
