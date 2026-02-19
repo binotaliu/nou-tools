@@ -191,5 +191,16 @@
                 </div>
             </div>
         </x-card>
+
+        <div class="mt-6 flex justify-end print:hidden">
+            <button
+                type="button"
+                onclick="window.print()"
+                class="bg-warm-500 hover:bg-warm-600 border border-warm-500 text-white font-semibold py-2 px-4 rounded-lg transition inline-flex items-center gap-2"
+            >
+                <x-heroicon-o-printer class="size-4 inline" />
+                列印
+            </button>
+        </div>
     </div>
 @endsection
