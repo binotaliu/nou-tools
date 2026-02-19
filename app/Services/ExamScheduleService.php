@@ -13,9 +13,9 @@ class ExamScheduleService
      */
     public function normalizeName(string $name): string
     {
-        // Remove or replace special characters: （）：～ and spaces
+        // Remove or replace special characters: （）：～, ASCII variants, dashes, and spaces.
         $normalized = trim($name);
-        $normalized = str_replace(['（', '）', '：', '～', ' '], '', $normalized);
+        $normalized = str_replace(['（', '）', '(', ')', '：', ':', '～', '~', '—', '－', '-', '–', '　', ' '], '', $normalized);
 
         return $normalized;
     }
@@ -109,15 +109,11 @@ class ExamScheduleService
             ->where('term', $term)
             ->where(function ($query) use ($normalizedTitle) {
                 $query->whereRaw(
-                    "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, '（', ''), '）', ''), '：', ''), '～', ''), ' ', '') = ?",
+                    "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, '（', ''), '）', ''), '(', ''), ')', ''), '：', ''), ':', ''), '～', ''), '~', ''), '—', ''), '－', ''), '-', ''), '–', ''), '　', ''), ' ', '') = ?",
                     [$normalizedTitle]
                 );
             })
             ->first();
-
-        if (! $course) {
-            return false;
-        }
 
         $course->update([
             'midterm_date' => $midtermDate,
