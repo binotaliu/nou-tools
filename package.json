@@ -16,7 +16,7 @@
     "concurrently": "^9.0.1",
     "husky": "^8.0.3",
     "laravel-vite-plugin": "^2.0.0",
-    "lint-staged": "^13.3.0",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.8.0",
     "prettier-plugin-blade": "^2.1.21",
     "prettier-plugin-tailwindcss": "^0.7.2",
