@@ -32,7 +32,7 @@
         @endif
     </head>
     <body class="bg-warm-50 text-warm-900">
-        <header class="bg-white border-b border-warm-200 sticky top-0 z-40">
+        <header class="bg-white border-b border-warm-200 sticky top-0 z-40 print:static">
             <div class="max-w-7xl mx-auto px-6 py-4">
                 <div class="flex items-center justify-between">
                     <h1 class="text-2xl font-bold text-warm-700 pb-0 mb-0!">
@@ -63,7 +63,7 @@
         </main>
 
         <footer class="bg-warm-100 text-warm-700 py-6 mt-12">
-            <div class="max-w-7xl mx-auto px-6 text-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="max-w-7xl mx-auto px-6 text-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 print:hidden">
                 <div class="w-full md:w-auto text-center md:text-left">
                     <p class="text-warm-700">&copy; {{ date('Y') }} NOU 小幫手 | <a href="mailto:nou-tools-contact@binota.org" class="hover:text-warm-900">聯絡本網站作者</a></p>
                 </div>

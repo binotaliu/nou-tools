@@ -8,10 +8,10 @@
         <tr class="bg-warm-100 border-b-2 border-warm-300">
             <th class="px-4 py-3 text-left font-bold text-warm-900">課程名稱</th>
             <th class="px-4 py-3 text-left font-bold text-warm-900">班級</th>
-            <th class="px-4 py-3 text-left font-bold text-warm-900">下次上課</th>
-            <th class="px-4 py-3 text-left font-bold text-warm-900">時間</th>
+            <th class="px-4 py-3 text-left font-bold text-warm-900 print:hidden">下次上課</th>
+            <th class="px-4 py-3 text-left font-bold text-warm-900 print:hidden">時間</th>
             <th class="px-4 py-3 text-left font-bold text-warm-900">教師</th>
-            <th class="px-4 py-3 text-left font-bold text-warm-900">
+            <th class="px-4 py-3 text-left font-bold text-warm-900 print:hidden">
                 <span class="sr-only">
                     動作
                 </span>
@@ -41,7 +41,7 @@
                 <td class="px-4 py-3 text-warm-800 tabular-nums text-sm">
                     {{ $item->courseClass->code }}
                 </td>
-                <td class="px-4 py-3 text-warm-800 tabular-nums">
+                <td class="px-4 py-3 text-warm-800 tabular-nums print:hidden">
                     @if ($nextSchedule)
                         @php
                             $d = $nextSchedule->date;
@@ -52,7 +52,7 @@
                         <span class="text-warm-500">無未來課程</span>
                     @endif
                 </td>
-                <td class="px-4 py-3 text-warm-800 tabular-nums">
+                <td class="px-4 py-3 text-warm-800 tabular-nums print:hidden">
                     @if ($displayStartTime)
                         {{ $displayStartTime }} ~ {{ $displayEndTime }}
                         @if ($nextSchedule && $nextSchedule->start_time)
@@ -84,7 +84,7 @@
                         −
                     @endif
                 </td>
-                <td class="px-4 py-3">
+                <td class="px-4 py-3 print:hidden">
                     <a href="{{ route('course.show', $item->courseClass->course) }}"
                         class="text-warm-800 hover:text-warm-900 font-semibold underline underline-offset-4 mr-3 inline-flex gap-1 items-center">
                         <x-heroicon-o-information-circle class="size-4 inline" />

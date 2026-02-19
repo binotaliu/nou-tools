@@ -2,13 +2,13 @@
 
 {{-- School Schedule Calendar Component --}}
 @if(!empty($scheduleEvents) || $countdownEvent)
-    <x-card>
+    <x-card {{ $attributes }}>
         <h3 class="text-lg font-medium mb-4">學校行事曆</h3>
 
         <div class="flex flex-col md:flex-row md:items-start md:gap-6">
             {{-- Countdown (mobile 上方，桌面右側 1/3) --}}
             @if($countdownEvent)
-                <div class="w-full @if(!empty($scheduleEvents)) order-first md:order-last md:w-1/3 @else order-first md:w-full @endif">
+                <div class="w-full print:hidden @if(!empty($scheduleEvents)) order-first md:order-last md:w-1/3 @else order-first md:w-full @endif">
                     <div class="mb-4 p-4 bg-warm-50 border border-warm-200 rounded-lg">
                         <div class="flex items-center justify-between">
                             <div>
@@ -37,30 +37,26 @@
                 </div>
             @endif
 
-            {{-- Schedule Events (手機在 countdown 之下，桌面佔 2/3) --}}
+            {{-- Schedule Events (手機在 countdown 之下，桌面佔 2/3)
+                 當有 countdownEvent 時：不從列表移除該項目；在渲染時把該行於畫面上隱藏、僅於列印時顯示（避免畫面重複但列印可見）。 --}}
             @php
-                // 當 countdownEvent 存在時，從列表中排除該項目，避免在倒數區塊與列表中重複顯示。
                 $eventsToShow = $scheduleEvents ?? [];
-                if ($countdownEvent) {
-                    $eventsToShow = array_values(array_filter($eventsToShow, function ($e) use ($countdownEvent) {
-                        // 以 name + start date 精準比對並排除相同的倒數事件
-                        return !(
-                            $e['name'] === $countdownEvent['name']
-                            && $e['start']->format('Y-m-d') === $countdownEvent['start']->format('Y-m-d')
-                        );
-                    }));
-                }
             @endphp
 
             @if(!empty($eventsToShow))
-                <div class="w-full @if($countdownEvent) order-last md:order-first md:w-2/3 @else order-first md:w-full @endif">
+                <div class="w-full print:w-full @if($countdownEvent) order-last md:order-first md:w-2/3 @else order-first md:w-full @endif">
                     <div class="space-y-2">
                         @foreach($eventsToShow as $event)
-                            <div class="flex items-center justify-between py-2 border-b border-warm-100 last:border-0">
+                            @php
+                                $isCountdownMatch = $countdownEvent
+                                    && $event['name'] === $countdownEvent['name']
+                                    && $event['start']->format('Y-m-d') === $countdownEvent['start']->format('Y-m-d');
+                            @endphp
+                            <div class="@if($isCountdownMatch) hidden print:flex @else flex @endif items-center justify-between py-2 border-b border-warm-100 last:border-0">
                                 <span class="font-medium text-warm-800">{{ $event['name'] }}</span>
                                 <div class="flex items-center gap-2 text-sm text-warm-600 tabular-nums">
                                     @if($event['status'] === 'ongoing')
-                                        <span class="inline-flex items-center px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs font-medium">
+                                        <span class="print:hidden inline-flex items-center px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs font-medium">
                                             進行中
                                         </span>
                                     @endif

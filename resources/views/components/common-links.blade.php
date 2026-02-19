@@ -1,4 +1,4 @@
-<x-card class="w-full md:w-auto">
+<x-card {{ $attributes->class('w-full md:w-auto') }}>
     <h4 class="font-medium mb-3">常用連結</h4>
     <div class="flex flex-col md:flex-row md:items-center gap-2">
         <x-external-link href="https://www.nou.edu.tw">

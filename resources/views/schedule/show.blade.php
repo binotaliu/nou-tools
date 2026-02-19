@@ -9,13 +9,13 @@
                 <h2 class="text-3xl font-bold text-warm-900 mb-2">
                     {{ $schedule->name ?: '我的課表' }}
                 </h2>
-                <p class="text-sm text-warm-600 mt-1 gap-1 flex items-center">
+                <p class="text-sm text-warm-600 mt-1 gap-1 flex items-center print:hidden">
                     <x-heroicon-o-information-circle class="size-4 inline" />
                     小提示：將此頁加入瀏覽器書籤，下次即可快速開啟課表。
                 </p>
             </div>
 
-                <div class="flex gap-2 w-full md:w-auto" x-data="{ subscribeOpen: false }">
+                <div class="flex gap-2 w-full md:w-auto print:hidden" x-data="{ subscribeOpen: false }">
                     <a
                        href="{{ route('schedule.edit', $schedule) }}"
                        class="w-1/2 md:w-auto bg-white hover:bg-warm-50 text-warm border border-warm-300 font-semibold py-2 px-4 rounded-lg transition inline-flex justify-center md:justify-start items-center gap-2"
@@ -69,16 +69,16 @@
             </div>
         </div>
 
-        <x-greeting class="mb-4" />
+        <x-greeting class="mb-4 print:hidden" />
 
         <!-- Schedule Items - Responsive Table/Cards -->
         <x-schedule-items :items="$schedule->items" :schedule="$schedule" />
 
-        <x-common-links />
+        <x-common-links class="print:hidden mb-8" />
 
         <!-- Schedule Calendar View -->
         @if (count($schedule->items) > 0)
-            <div class="mt-8">
+            <div class="mb-8">
                 <h3 class="text-2xl font-bold text-warm-900 mb-4">面授日期</h3>
                 @php
                     $hasAnyOverride = $schedule->items->contains(function ($item) {
@@ -94,7 +94,7 @@
                         表示該次面授時間與一般時間不同
                     </p>
                 @endif
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 print:grid-cols-1 gap-x-6 gap-y-4 mb-4">
                     @php
                         $coursesByMonth = [];
                         foreach ($schedule->items as $item) {
@@ -127,17 +127,17 @@
                     @foreach (collect($coursesByMonth)->sortKeys() as $monthData)
                         <x-card>
                             <h4 class="text-xl font-bold text-warm-900 mb-4">{{ $monthData['month'] }}</h4>
-                            <div class="space-y-3">
+                            <div class="space-y-3 grid grid-cols-1 print:grid-cols-2 gap-x-6 gap-y-1">
                                 @foreach (collect($monthData['dates'])->sortKeys() as $dateStr => $courses)
-                                    <div class="border-l-4 border-orange-500 pl-4 py-2">
+                                    <div class="border-l-4 border-orange-500 pl-4 py-2 break-inside-avoid-page">
                                         @php
-                                    $d = \Carbon\Carbon::parse($dateStr);
-                                    $weekdayZh = ['日','一','二','三','四','五','六'][$d->dayOfWeek];
-                                @endphp
-                                <div class="font-semibold text-warm-900 mb-1">
-                                    {{ $d->format('n/j') }} ({{ $weekdayZh }})
-                                </div>
-                                <div class="space-y-1">
+                                            $d = \Carbon\Carbon::parse($dateStr);
+                                            $weekdayZh = ['日','一','二','三','四','五','六'][$d->dayOfWeek];
+                                        @endphp
+                                        <div class="font-semibold text-warm-900 mb-1">
+                                            {{ $d->format('n/j') }} ({{ $weekdayZh }})
+                                        </div>
+                                        <div class="space-y-1">
                                             @foreach ($courses as $course)
                                                 <div class="text-sm text-warm-700">
                                                     <span class="font-semibold">{{ $course['courseName'] }}</span>
@@ -161,14 +161,20 @@
         @endif
 
         {{-- School Calendar --}}
-        <x-school-calendar :schedule-events="$scheduleEvents ?? []" :countdown-event="$countdownEvent ?? null" />
+        <x-school-calendar
+            :schedule-events="$scheduleEvents ?? []"
+            :countdown-event="$countdownEvent ?? null"
+            class="mb-8"
+        />
 
         <!-- Share Section -->
-        <x-card class="mt-8">
-            <h3 class="text-xl font-bold text-warm-900 mb-3">連結</h3>
+        <x-card>
             <p class="text-warm-700 mb-3">
-                您可以使用以下連結來編輯或查看此課表，請妥善保管此連結。<br>
-                <span class="font-semibold text-red-600">⚠️ 注意：任何擁有此連結的人都可以編輯您的課表，請勿隨意分享。</span>
+                您可以使用以下連結來編輯或檢視此課表，請妥善保管此連結。<br>
+                <span class="font-semibold text-red-600 inline-flex items-center gap-1">
+                    <x-heroicon-o-exclamation-triangle class="size-4" />
+                    注意：任何擁有此連結的人都可以編輯您的課表，請勿隨意分享。
+                </span>
             </p>
             <div class="bg-warm-50 p-3 rounded border border-warm-300 font-mono text-sm break-all text-warm-600">
                 {{ url(route('schedule.show', $schedule)) }}

@@ -24,12 +24,12 @@
 
 <div class="bg-white rounded-lg border border-warm-200 overflow-hidden mb-4">
     <!-- 桌面版表格 -->
-    <div class="hidden md:block overflow-x-auto">
+    <div class="hidden md:block print:block overflow-x-auto">
         <x-schedule-items-table :items="$itemsSorted" :schedule="$schedule" />
     </div>
 
     <!-- 手機版卡片列表 -->
-    <div class="md:hidden">
+    <div class="md:hidden print:hidden">
         @forelse ($itemsSorted as $item)
             <div class="border-b border-warm-200 last:border-b-0">
                 <x-schedule-item-card :item="$item" class="rounded-none m-0 border-0 border-b border-warm-200" />
