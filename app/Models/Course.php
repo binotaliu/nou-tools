@@ -22,6 +22,10 @@ class Course extends Model
         'media',
         'multimedia_url',
         'nature',
+        'midterm_date',
+        'final_date',
+        'exam_time_start',
+        'exam_time_end',
     ];
 
     /**
