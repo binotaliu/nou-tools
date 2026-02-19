@@ -149,10 +149,6 @@
                                             ->filter(fn($s) => $s->date->isToday() || $s->date->isFuture())
                                             ->sortBy('date')
                                             ->first();
-                                        if ($item->courseClass->course->name === '法學德文（三）') {
-                                            ray($item);
-                                            ray($nextSchedule);
-                                        }
 
                                         $displayStartTime = $nextSchedule && $nextSchedule->start_time
                                             ? $nextSchedule->start_time
