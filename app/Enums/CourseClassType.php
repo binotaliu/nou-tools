@@ -9,6 +9,7 @@ enum CourseClassType: string
     case Evening = 'evening';
     case FullRemote = 'full_remote';
     case MicroCredit = 'micro_credit';
+    case ComputerLab = 'computer_lab';
 
     /**
      * @return array{start: string, end: string}|null
@@ -21,6 +22,7 @@ enum CourseClassType: string
             self::Evening => ['start' => '19:00', 'end' => '20:50'],
             self::FullRemote => null,
             self::MicroCredit => null,
+            self::ComputerLab => null,
         };
     }
 
@@ -32,6 +34,7 @@ enum CourseClassType: string
             self::Evening => '夜間班',
             self::FullRemote => '全遠距',
             self::MicroCredit => '微學分',
+            self::ComputerLab => '電腦實習',
         };
     }
 

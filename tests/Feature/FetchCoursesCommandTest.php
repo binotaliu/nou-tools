@@ -26,6 +26,7 @@ it('fetches and stores courses from HTML pages', function () {
         'vc.nou.edu.tw/vc2/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc3/*' => Http::response($vc3Html, 200),
         'vc.nou.edu.tw/vc4/*' => Http::response($vc4Html, 200),
+        'vc.nou.edu.tw/vc5/*' => Http::response('<html><body></body></html>', 200),
     ]);
 
     $this->artisan('course:fetch', ['term' => '2025B'])
@@ -56,6 +57,7 @@ it('creates schedules with correct dates for B semester', function () {
         'vc.nou.edu.tw/vc2/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc3/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc4/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc5/*' => Http::response('<html><body></body></html>', 200),
     ]);
 
     $this->artisan('course:fetch', ['term' => '2025B'])
@@ -79,6 +81,8 @@ it('creates schedules with correct dates for A semester', function () {
         'vc.nou.edu.tw/vc2/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc3/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc4/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc5/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc5/*' => Http::response('<html><body></body></html>', 200),
     ]);
 
     $this->artisan('course:fetch', ['term' => '2025A'])
@@ -99,6 +103,7 @@ it('does not duplicate courses on re-run', function () {
         'vc.nou.edu.tw/vc2/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc3/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc4/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc5/*' => Http::response('<html><body></body></html>', 200),
     ]);
 
     $this->artisan('course:fetch', ['term' => '2025B'])->assertSuccessful();
@@ -118,6 +123,7 @@ it('does not duplicate course classes on re-run and preserves IDs', function () 
         'vc.nou.edu.tw/vc2/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc3/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc4/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc5/*' => Http::response('<html><body></body></html>', 200),
     ]);
 
     // First run
@@ -149,6 +155,7 @@ it('handles HTTP failures gracefully', function () {
         'vc.nou.edu.tw/vc2/*' => Http::response('', 500),
         'vc.nou.edu.tw/vc3/*' => Http::response('', 500),
         'vc.nou.edu.tw/vc4/*' => Http::response('', 500),
+        'vc.nou.edu.tw/vc5/*' => Http::response('', 500),
     ]);
 
     $this->artisan('course:fetch', ['term' => '2025B'])
@@ -165,6 +172,7 @@ it('stores full remote courses with custom time slots', function () {
         'vc.nou.edu.tw/vc2/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc3/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc4/*' => Http::response($vc4Html, 200),
+        'vc.nou.edu.tw/vc5/*' => Http::response('<html><body></body></html>', 200),
     ]);
 
     $this->artisan('course:fetch', ['term' => '2025B'])
@@ -190,6 +198,7 @@ it('stores micro-credit courses separately from full remote', function () {
         'vc.nou.edu.tw/vc2/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc3/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc4/*' => Http::response($html, 200),
+        'vc.nou.edu.tw/vc5/*' => Http::response('<html><body></body></html>', 200),
     ]);
 
     $this->artisan('course:fetch', ['term' => '2025B'])
@@ -210,6 +219,7 @@ it('stores schedule time overrides for courses with irregular times', function (
         'vc.nou.edu.tw/vc2/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc3/*' => Http::response('<html><body></body></html>', 200),
         'vc.nou.edu.tw/vc4/*' => Http::response($html, 200),
+        'vc.nou.edu.tw/vc5/*' => Http::response('<html><body></body></html>', 200),
     ]);
 
     $this->artisan('course:fetch', ['term' => '2025B'])

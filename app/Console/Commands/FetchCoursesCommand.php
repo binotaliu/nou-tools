@@ -26,6 +26,7 @@ class FetchCoursesCommand extends Command
         'https://vc.nou.edu.tw/vc3/' => CourseClassType::Evening,
         'https://vc.nou.edu.tw/vc4/' => CourseClassType::FullRemote,
         'https://vc.nou.edu.tw/vc4/#micro' => CourseClassType::MicroCredit,
+        'https://vc.nou.edu.tw/vc5/' => CourseClassType::ComputerLab,
     ];
 
     public function handle(NouCourseParser $parser): int
