@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', '編輯課表 - 課程自主編排')
+@section('title', '編輯課表 - NOU 小幫手')
 
 @section('content')
     <div x-data="scheduleEditor()" class="max-w-5xl mx-auto">

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $course->name)
+@section('title', $course->name . ' - 檢視課程 - NOU 小幫手')
 
 @section('content')
     <div class="max-w-5xl mx-auto">
