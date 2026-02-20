@@ -78,7 +78,16 @@
                             rel="noopener"
                             @click="subscribeOpen = false"
                         >
-                            Microsoft 365 / Outlook.com
+                            Windows 日曆 (Microsoft 365 / Outlook.com)
+                        </x-link-button>
+
+                        <x-link-button
+                            :href="$webcalUrl"
+                            variant="ghost"
+                            full-width
+                            @click="subscribeOpen = false"
+                        >
+                            Webcal 連結 (其他支援 Webcal 的行事曆)
                         </x-link-button>
 
                         <x-link-button
