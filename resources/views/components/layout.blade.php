@@ -1,8 +1,12 @@
-@props(['title' => 'NOU 小幫手'])
+@props(['title' => 'NOU 小幫手', 'noindex' => false])
 
 <!DOCTYPE html>
 <html lang="zh-hant">
     <head>
+        @if ($noindex)
+            <meta name="robots" content="noindex, nofollow" />
+        @endif
+
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="csrf-token" content="{{ csrf_token() }}" />

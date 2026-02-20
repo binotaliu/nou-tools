@@ -1,4 +1,4 @@
-<x-layout :title="($schedule->name ?: '我的課表') . ' - NOU 小幫手'">
+<x-layout :title="($schedule->name ?: '我的課表') . ' - NOU 小幫手'" :noindex="true">
     <div class="mx-auto max-w-5xl">
         <div
             class="mb-8 flex flex-col items-start justify-between gap-y-4 md:flex-row"
