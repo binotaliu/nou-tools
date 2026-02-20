@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
                 default => $termCode,
             };
 
-            return "{$rocYear}學年度{$termName}";
+            return "{$rocYear} 學年度{$termName}";
         });
 
         // Request macro: parse the encrypted `student_schedule` cookie and

@@ -13,7 +13,7 @@ it('computes semester info during the semester (component)', function () {
 
     expect($component->dateString)->toBe('2026 年 2 月 24 日')
         ->and($component->weekday)->toBe('二')
-        ->and($component->semesterInfo)->toBe('114學年度下學期第一週');
+        ->and($component->semesterInfo)->toBe('114 學年度下學期第一週');
 });
 
 it('shows 尚未開始 before semester (component)', function () {
@@ -24,7 +24,7 @@ it('shows 尚未開始 before semester (component)', function () {
 
     $component = new Greeting;
 
-    expect($component->semesterInfo)->toBe('114學年度下學期尚未開始');
+    expect($component->semesterInfo)->toBe('114 學年度下學期尚未開始');
 });
 
 it('shows 已結束 after semester (component)', function () {
@@ -35,5 +35,5 @@ it('shows 已結束 after semester (component)', function () {
 
     $component = new Greeting;
 
-    expect($component->semesterInfo)->toBe('114學年度下學期已結束');
+    expect($component->semesterInfo)->toBe('114 學年度下學期已結束');
 });
