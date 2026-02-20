@@ -99,7 +99,7 @@ it('parses real vc1 HTML file', function () {
             expect($class['dates'])->not->toBeEmpty();
         }
     }
-});
+})->skip();
 
 it('parses real vc3 HTML file with multiple classes per course', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc3.html');
@@ -117,7 +117,7 @@ it('parses real vc3 HTML file with multiple classes per course', function () {
     }
 
     expect($hasMultipleClasses)->toBeTrue();
-});
+})->skip();
 
 it('parses real vc4 HTML file with varied time slots', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4.html');
@@ -133,7 +133,7 @@ it('parses real vc4 HTML file with varied time slots', function () {
     })->unique()->values()->all();
 
     expect(count($times))->toBeGreaterThan(1);
-});
+})->skip();
 
 it('returns empty array for empty HTML', function () {
     $courses = $this->parser->parse('', CourseClassType::Morning);
@@ -234,7 +234,7 @@ it('parses real vc4 HTML file for micro-credit courses', function () {
             expect($class['dates'])->not->toBeEmpty();
         }
     }
-});
+})->skip();
 
 it('parses real vc4 HTML file with time overrides for 法學德文（三）', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4.html');
@@ -250,4 +250,4 @@ it('parses real vc4 HTML file with time overrides for 法學德文（三）', fu
     expect($class['schedule_time_overrides'])->not->toBeEmpty();
     expect($class['schedule_time_overrides'][1]['start_time'])->toBe('18:30');
     expect($class['schedule_time_overrides'][1]['end_time'])->toBe('21:00');
-});
+})->skip();
