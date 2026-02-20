@@ -7,7 +7,7 @@
     <div class="mb-6 flex items-center justify-between">
       <h2 class="text-3xl font-bold text-warm-900">編輯您的課表</h2>
       <div class="text-lg font-semibold text-orange-600">
-        {{ $semesterDisplay }}
+        {{ \Illuminate\Support\Str::toSemesterDisplay(config('app.current_semester')) }}
       </div>
     </div>
 

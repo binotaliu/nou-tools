@@ -63,7 +63,6 @@ class ScheduleController extends Controller
         return view('schedule.editor', [
             'courses' => $courses,
             'currentSemester' => $currentSemester,
-            'semesterDisplay' => $this->formatSemesterDisplay($currentSemester),
             'previousSchedule' => $previousSchedule,
         ]);
     }
@@ -104,7 +103,6 @@ class ScheduleController extends Controller
             'schedule' => $schedule,
             'courses' => $courses,
             'currentSemester' => $currentSemester,
-            'semesterDisplay' => $this->formatSemesterDisplay($currentSemester),
         ]);
     }
 
@@ -221,35 +219,5 @@ class ScheduleController extends Controller
         return view('schedule.show', [
             'schedule' => $schedule,
         ]);
-    }
-
-    /**
-     * Format semester code to display format.
-     * Example: 2025B → 114學年度下學期
-     */
-    private function formatSemesterDisplay(string $semester): string
-    {
-        // Extract year and term code
-        preg_match('/^(\d{4})([ABC])$/', $semester, $matches);
-
-        if (count($matches) !== 3) {
-            return $semester;
-        }
-
-        $year = (int) $matches[1];
-        $termCode = $matches[2];
-
-        // Convert to ROC year (民國)
-        $rocYear = $year - 1911;
-
-        // Map term code to Chinese
-        $termName = match ($termCode) {
-            'A' => '上學期',
-            'B' => '下學期',
-            'C' => '暑期',
-            default => $termCode,
-        };
-
-        return "{$rocYear}學年度{$termName}";
     }
 }

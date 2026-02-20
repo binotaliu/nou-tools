@@ -16,8 +16,10 @@
         {{ $course->name }}
       </h2>
 
-      @if (! empty($semesterDisplay))
-        <div class="mb-4 text-sm text-warm-600">{{ $semesterDisplay }}</div>
+      @if (! empty($course->term))
+        <div class="mb-4 text-sm text-warm-600">
+          {{ \Illuminate\Support\Str::toSemesterDisplay($course->term) }}
+        </div>
       @endif
     </div>
 

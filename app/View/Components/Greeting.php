@@ -33,16 +33,9 @@ class Greeting extends Component
         $this->weekday = $weekdayMap[$now->dayOfWeek];
         $this->dateString = $now->format('Y 年 n 月 j 日');
 
-        // semester display (e.g. 2025B -> "114 下學期")
+        // semester display (e.g. 2025B -> "114學年度下學期")
         $semesterCode = config('app.current_semester');
-        $semesterLabel = $semesterCode;
-
-        if (preg_match('/^(\d{4})([ABC])$/', (string) $semesterCode, $m)) {
-            $rocYear = (int) $m[1] - 1911;
-            $termMap = ['A' => '上學期', 'B' => '下學期', 'C' => '暑期'];
-            $termName = $termMap[$m[2]] ?? $m[2];
-            $semesterLabel = "{$rocYear} {$termName}";
-        }
+        $semesterLabel = \Illuminate\Support\Str::toSemesterDisplay((string) $semesterCode);
 
         $range = config('app.current_semester_range', []);
         $semesterInfo = $semesterCode;
