@@ -94,9 +94,10 @@ class ScheduleController extends Controller
 
     public function store(Request $request): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
+        // limit to 10 classes per schedule
         $rules = [
             'name' => 'nullable|string|max:255',
-            'items' => 'required|array|min:1',
+            'items' => 'required|array|min:1|max:10',
             'items.*' => 'required|exists:course_classes,id',
         ];
 
@@ -147,9 +148,10 @@ class ScheduleController extends Controller
 
     public function update(StudentSchedule $schedule, Request $request): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
+        // limit to 10 classes per schedule
         $rules = [
             'name' => 'nullable|string|max:255',
-            'items' => 'required|array|min:1',
+            'items' => 'required|array|min:1|max:10',
             'items.*' => 'required|exists:course_classes,id',
         ];
 

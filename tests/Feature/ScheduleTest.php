@@ -42,6 +42,28 @@ it('allows creating multiple schedules', function () {
     $this->assertDatabaseHas('student_schedules', ['name' => '第二次']);
 });
 
+it('rejects schedules with more than ten items', function () {
+    $classes = CourseClass::factory()->count(11)->create();
+
+    $payload = [
+        'name' => 'Too Many',
+        'items' => $classes->pluck('id')->all(),
+    ];
+
+    $this->postJson(route('schedules.store'), $payload)
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('items');
+
+    // also try update path
+    $schedule = StudentSchedule::create([
+        'uuid' => \Illuminate\Support\Str::uuid(),
+        'name' => 'Existing',
+    ]);
+
+    $response = $this->putJson(route('schedules.update', $schedule), $payload);
+    $response->assertStatus(422)->assertJsonValidationErrors('items');
+});
+
 it('returns an .ics calendar for a saved schedule and converts UTC+8 times to UTC', function () {
     $courseClass = CourseClass::factory()->create([
         'start_time' => '09:00',

@@ -42,6 +42,7 @@
                     placeholder="輸入課程名稱..."
                     class="w-full rounded-lg border-2 border-warm-300 px-4 py-3 text-lg focus:border-orange-500 focus:outline-none"
                     autocomplete="off"
+                    :disabled="selectedItems.length >= 10"
                 />
             </div>
 
@@ -344,6 +345,12 @@
                 },
 
                 selectCourse(course) {
+                    // enforce limit
+                    if (this.selectedItems.length >= 10) {
+                        alert('最多只能選擇 10 門課程')
+                        return
+                    }
+
                     if (
                         !this.selectedItems.some(
                             item => item.course.id === course.id
@@ -400,6 +407,11 @@
                 async submitForm() {
                     if (this.selectedItems.length === 0) {
                         alert('請至少選擇一門課程')
+                        return
+                    }
+
+                    if (this.selectedItems.length > 10) {
+                        alert('最多只能選擇 10 門課程')
                         return
                     }
 
