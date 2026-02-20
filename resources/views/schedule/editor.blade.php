@@ -35,7 +35,7 @@
 
         {{-- Search Section --}}
         <x-card class="mb-8">
-            <label class="mb-3 block text-lg font-semibold text-warm-900">
+            <label class="mb-1 block text-xl font-semibold text-warm-900">
                 搜尋課程
             </label>
             <div class="relative">
@@ -79,9 +79,7 @@
         </x-card>
 
         {{-- Selected Schedule Section --}}
-        <x-card class="mb-8">
-            <h3 class="mb-4 text-2xl font-bold text-warm-900">您的課表</h3>
-
+        <x-card class="mb-8" title="您的課表">
             <template x-if="selectedItems.length === 0">
                 <div
                     class="rounded-lg border-2 border-dashed border-warm-300 bg-warm-50 p-6 text-center text-warm-700"
@@ -252,7 +250,7 @@
             @endif
 
             <div class="mb-4">
-                <label class="mb-2 block text-lg font-semibold text-warm-900">
+                <label class="mb-1 block text-xl font-semibold text-warm-900">
                     課表名稱（可選）
                 </label>
                 <input

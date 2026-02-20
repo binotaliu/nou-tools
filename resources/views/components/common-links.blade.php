@@ -1,5 +1,4 @@
-<x-card {{ $attributes->class('w-full md:w-auto') }}>
-    <h4 class="mb-3 font-medium">常用連結</h4>
+<x-card {{ $attributes->merge(['title' => '常用連結'])->class('w-full md:w-auto') }}>
     <div class="flex flex-col gap-2 md:flex-row md:items-center">
         <x-external-link href="https://www.nou.edu.tw">
             <x-slot:icon>

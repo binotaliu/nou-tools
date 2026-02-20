@@ -9,9 +9,7 @@
         <div
             class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
         >
-            <x-card>
-                <h4 class="mb-3 font-medium">功能選單</h4>
-
+            <x-card title="功能選單">
                 <a
                     href="{{ route('schedules.create') }}"
                     class="inline-flex items-center gap-2 rounded bg-warm-700 px-4 py-2 text-white hover:bg-warm-800"
@@ -44,9 +42,8 @@
         <x-school-calendar />
 
         {{-- 今日面授 --}}
-        <x-card x-data="{ date: '{{ $selectedDate }}' }">
+        <x-card x-data="{ date: '{{ $selectedDate }}' }" title="今日視訊面授">
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-medium">今日視訊面授</h3>
                 <div class="flex items-center gap-3">
                     <label class="text-sm text-warm-500">選擇日期</label>
                     <input

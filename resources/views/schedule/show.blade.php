@@ -170,10 +170,7 @@
                     @endphp
 
                     @foreach (collect($coursesByMonth)->sortKeys() as $monthData)
-                        <x-card>
-                            <h4 class="mb-4 text-xl font-bold text-warm-900">
-                                {{ $monthData['month'] }}
-                            </h4>
+                        <x-card :title="$monthData['month']">
                             <div
                                 class="grid grid-cols-1 space-y-3 gap-x-6 gap-y-1 print:grid-cols-2"
                             >
@@ -272,12 +269,11 @@
         @endphp
 
         @if ($coursesWithExam->isNotEmpty())
-            <x-card class="mb-8">
-                <h3 class="mb-4 text-2xl font-bold text-warm-900">考試資訊</h3>
-                <p class="mb-4 text-sm text-warm-600">
-                    以下為您加入課表的科目之期中 / 期末考試日期與節次。
-                </p>
-
+            <x-card
+                class="mb-8"
+                title="考試資訊"
+                subtitle="以下為您加入課表的科目之期中 / 期末考試日期與節次。"
+            >
                 {{-- 手機：卡片列表 --}}
                 <div class="space-y-3 md:hidden">
                     @foreach ($coursesWithExam as $course)

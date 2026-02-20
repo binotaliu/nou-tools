@@ -24,9 +24,7 @@
         </div>
 
         {{-- Course Information --}}
-        <x-card class="mb-6">
-            <h3 class="mb-6 text-xl font-bold text-warm-900">課程資訊</h3>
-
+        <x-card class="mb-6" title="課程資訊">
             <dl class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {{-- 科目內容 --}}
                 @if ($course->description_url)
@@ -237,11 +235,7 @@
 
         {{-- Course Classes --}}
         @if ($course->classes->isNotEmpty())
-            <x-card class="mb-6">
-                <h3 class="mb-6 text-xl font-bold text-warm-900">
-                    視訊面授班級與上課時間
-                </h3>
-
+            <x-card class="mb-6" title="視訊面授班級與上課時間">
                 @php
                     $typeOrder = ['morning', 'afternoon', 'evening', 'full_remote', 'micro_credit', 'computer_lab'];
                     $grouped = $course->classes->groupBy(fn ($c) => $c->type->value);

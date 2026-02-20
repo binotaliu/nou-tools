@@ -1,8 +1,6 @@
 {{-- School Schedule Calendar Component --}}
 @if (! empty($scheduleEvents) || $countdownEvent)
-    <x-card {{ $attributes }}>
-        <h3 class="mb-4 text-lg font-medium">學校行事曆</h3>
-
+    <x-card {{ $attributes->merge(['title' => '學校行事曆']) }}>
         <div class="flex flex-col md:flex-row md:items-start md:gap-6">
             {{-- Countdown (mobile 上方，桌面右側 1/3) --}}
             @if ($countdownEvent)
