@@ -1,32 +1,29 @@
 {
   "$schema": "https://getcomposer.org/schema.json",
-  "name": "laravel/laravel",
+  "name": "binotaliu/nou-tools",
   "type": "project",
-  "description": "The skeleton application for the Laravel framework.",
-  "keywords": [
-    "laravel",
-    "framework"
-  ],
-  "license": "MIT",
+  "description": "Class schedule tool for NOU students — helps users search for courses, create and manage personal schedules, supports iCal/webcal subscription, .ics export, printing and QR code sharing, and displays in-person class dates and exam information.",
+  "keywords": [],
+  "license": "AGPL-3.0-or-later",
   "require": {
-    "php": "^8.2",
+    "php": "^8.4",
     "blade-ui-kit/blade-heroicons": "^2.6",
-    "laravel/framework": "^12.0",
+    "laravel/framework": "^12.52",
     "laravel/prompts": "^0.3.13",
-    "laravel/tinker": "^2.10.1",
+    "laravel/tinker": "^2.11.1",
     "milon/barcode": "^12.1",
-    "spatie/laravel-ray": "^1.43",
+    "spatie/laravel-ray": "^1.43.5",
     "terpomoj/base64-url-helpers": "^0.1.0"
   },
   "require-dev": {
-    "fakerphp/faker": "^1.23",
-    "laravel/boost": "^2.1",
-    "laravel/pail": "^1.2.2",
-    "laravel/pint": "^1.24",
-    "laravel/sail": "^1.41",
-    "mockery/mockery": "^1.6",
-    "nunomaduro/collision": "^8.6",
-    "pestphp/pest": "^4.4",
+    "fakerphp/faker": "^1.24.1",
+    "laravel/boost": "^2.1.6",
+    "laravel/pail": "^1.2.6",
+    "laravel/pint": "^1.27.1",
+    "laravel/sail": "^1.53",
+    "mockery/mockery": "^1.6.12",
+    "nunomaduro/collision": "^8.9.1",
+    "pestphp/pest": "^4.4.1",
     "pestphp/pest-plugin-laravel": "^4.0"
   },
   "autoload": {

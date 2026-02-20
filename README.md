@@ -1,59 +1,158 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# NOU 小幫手 (nou-tools)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+給 NOU 學生的課表工具 — 幫助使用者搜尋課程、建立並設定個人課表，支援 iCal / webcal 訂閱、匯出 .ics、列印與 QR code 分享，以及顯示課程的面授日期與考試資訊。
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 主要功能
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- 建立、編輯與分享個人課表（含 QR code）
+- 課程搜尋、班級選擇與課表項目管理
+- 匯出 / 訂閱 iCal（webcal）行事曆
+- 顯示面授日期、覆寫上課時間與考試資訊
+- 學校行事曆（學期重要日程）顯示
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 技術堆疊
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- PHP 8.4+
+- Laravel v12
+- Tailwind CSS v4 + Vite
+- Pest v4（測試）
+- SQLite（開發/測試預設）
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 快速開始（本機）
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. 取得原始碼
 
-### Premium Partners
+   ```bash
+   git clone <repo> && cd nou-tools
+   ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+2. 安裝 PHP 依賴與前端套件（有一個一步驟腳本）
 
-## Contributing
+   ```bash
+   composer run setup
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+   或分步驟：
 
-## Code of Conduct
+   ```bash
+   composer install
+   cp .env.example .env
+   php artisan key:generate
+   php artisan migrate
+   npm install
+   npm run dev
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+3. 啟動開發伺服器
+   - 使用內建開發腳本（會同時啟動 server、queue、logs 與 Vite）
 
-## Security Vulnerabilities
+     ```bash
+     composer dev
+     ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+   - 或單獨啟動：
 
-## License
+     ```bash
+     php artisan serve
+     npm run dev
+     ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+   - 使用 Laravel Herd 時，網站通常可在 `https://nou-tools.test`（或專案目錄 kebab-case）存取。
+
+---
+
+## 常用指令
+
+- 本機開發（所有服務）：`composer dev`
+- 建置資產：`npm run build`
+- 格式化前端檔案：`npm run format`
+- 格式化 PHP：`vendor/bin/pint` 或 `npm run format:php`
+- 執行測試：`composer test` 或 `php artisan test --compact`
+
+---
+
+## 環境設定（重要）
+
+- 複製 `.env.example` 並設定資料庫與其他服務。
+- 用於顯示學期的設定（預設放在 `.env` / `config/app.php`）：
+
+  ```env
+  CURRENT_SEMESTER=2025B
+  CURRENT_SEMESTER_START=2026-02-23
+  CURRENT_SEMESTER_END=2026-07-05
+  ```
+
+> 注意：學校行事曆事件定義在 `config/school-schedules.php`，可依學期更新。
+
+---
+
+## 主要路由（摘錄）
+
+- GET / — 首頁（功能選單、今日面授）
+- GET /schedules/create — 建立課表
+- POST /schedules — 儲存課表
+- GET /schedules/{schedule} — 檢視 / 分享課表（含 QR / 下載 .ics / webcal）
+- GET /schedules/{schedule}/edit — 編輯已存課表
+- GET /schedules/{schedule}/calendar — 下載 / 訂閱 iCal
+- GET /courses/{course} — 檢視單一課程與班級資訊
+
+(完整路由請參考 `routes/web.php`)
+
+---
+
+## 資料模型 & 目錄概覽
+
+- 主要 Eloquent 模型：`Course`, `CourseClass`, `ClassSchedule`, `StudentSchedule`, `StudentScheduleItem`, `User`
+- 重要目錄：
+  - `app/Services/` — 資料解析與排程邏輯（例如 NOU 解析器、考試/學期服務）
+  - `resources/views/` — Blade 視圖（編輯、檢視、首頁）
+  - `tests/` — Pest 測試
+
+---
+
+## 測試與 CI
+
+- 使用 Pest（PHP）執行測試：`composer test`
+- 測試環境使用 SQLite（記憶體或 `database/database.sqlite`）— 相關設定見 `phpunit.xml`。
+
+---
+
+## 開發規範
+
+- 代碼格式化：前端使用 Prettier、Blade plugin；PHP 使用 Pint。
+- 提交前會透過 Husky + lint-staged 自動執行格式化。
+- 新增功能請附上 Pest 測試（feature/unit）並確保 `composer test` 全綠。
+
+---
+
+## 想法 / TODO（快速導覽）
+
+- 支援更多學期資料來源匯入
+- UI/UX 優化（行事曆視覺化）
+- 使用者帳號與雲端同步（目前以「擁有連結即可編輯」為分享機制）
+
+---
+
+## 貢獻
+
+歡迎開 PR。請先執行：
+
+```bash
+composer install
+npm install
+npm run format
+vendor/bin/pint
+composer test
+```
+
+---
+
+## 授權
+
+AGPL-3.0-or-later
