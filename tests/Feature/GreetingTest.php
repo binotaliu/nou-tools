@@ -11,7 +11,7 @@ it('shows semester week during the semester on the home page', function () {
     $response = $this->get('/');
 
     $response->assertStatus(200)
-        ->assertSee('今天是 2026 年 2 月 24 日 (二)，114 下學期第一週');
+        ->assertSee('今天是 2026 年 2 月 24 日 (二)，114學年度下學期第一週');
 });
 
 it('shows "尚未開始" when today is before semester start', function () {
@@ -23,7 +23,7 @@ it('shows "尚未開始" when today is before semester start', function () {
     $response = $this->get('/');
 
     $response->assertStatus(200)
-        ->assertSee('114 下學期尚未開始');
+        ->assertSee('114學年度下學期尚未開始');
 });
 
 it('shows "已結束" when today is after semester end', function () {
@@ -35,5 +35,5 @@ it('shows "已結束" when today is after semester end', function () {
     $response = $this->get('/');
 
     $response->assertStatus(200)
-        ->assertSee('114 下學期已結束');
+        ->assertSee('114學年度下學期已結束');
 });

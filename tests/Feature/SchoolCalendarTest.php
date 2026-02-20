@@ -125,8 +125,8 @@ it('displays events with date ranges correctly', function () {
 
     $response->assertStatus(200)
         ->assertSee('選課期間')
-        ->assertSee('05月01日')
-        ->assertSee('05月20日');
+        ->assertSee('5 月 1 日')
+        ->assertSee('5 月 20 日');
 });
 
 it('does not display days until for non-countdown events', function () {

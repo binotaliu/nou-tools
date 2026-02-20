@@ -28,8 +28,18 @@ class SchoolCalendar extends Component
         $this->scheduleService = $scheduleService ?? app(SchoolScheduleService::class);
 
         // Use provided values when passed (from a view); otherwise load from service.
-        $this->scheduleEvents = $scheduleEvents ?? $this->scheduleService->getUpcomingAndOngoingEvents();
+        $allEvents = $scheduleEvents ?? $this->scheduleService->getUpcomingAndOngoingEvents();
         $this->countdownEvent = $countdownEvent ?? $this->scheduleService->getCountdownEvent();
+
+        // Filter out the countdown event from the schedule events list to avoid duplication
+        if ($this->countdownEvent && is_array($allEvents)) {
+            $this->scheduleEvents = array_filter($allEvents, fn ($event) => ! (
+                $event['name'] === $this->countdownEvent['name'] &&
+                $event['start']->format('Y-m-d') === $this->countdownEvent['start']->format('Y-m-d')
+            ));
+        } else {
+            $this->scheduleEvents = $allEvents;
+        }
     }
 
     public function render(): View

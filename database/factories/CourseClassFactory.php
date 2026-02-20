@@ -28,8 +28,8 @@ class CourseClassFactory extends Factory
             'course_id' => Course::factory(),
             'code' => 'zzz'.fake()->numerify('###'),
             'type' => $type,
-            'start_time' => $timeSlot['start'] ?? '19:00',
-            'end_time' => $timeSlot['end'] ?? '20:50',
+            'start_time' => $timeSlot ? $timeSlot['start'] : '09:00',
+            'end_time' => $timeSlot ? $timeSlot['end'] : '10:50',
             'teacher_name' => fake()->name().'老師',
             'link' => fake()->url(),
         ];

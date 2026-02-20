@@ -2,8 +2,8 @@
 
 use App\Enums\CourseClassType;
 
-it('has five cases', function () {
-    expect(CourseClassType::cases())->toHaveCount(5);
+it('has six cases', function () {
+    expect(CourseClassType::cases())->toHaveCount(6);
 });
 
 it('has correct string values', function (CourseClassType $type, string $value) {
@@ -14,6 +14,7 @@ it('has correct string values', function (CourseClassType $type, string $value) 
     [CourseClassType::Evening, 'evening'],
     [CourseClassType::FullRemote, 'full_remote'],
     [CourseClassType::MicroCredit, 'micro_credit'],
+    [CourseClassType::ComputerLab, 'computer_lab'],
 ]);
 
 it('returns correct labels', function (CourseClassType $type, string $label) {
@@ -24,6 +25,7 @@ it('returns correct labels', function (CourseClassType $type, string $label) {
     [CourseClassType::Evening, '夜間班'],
     [CourseClassType::FullRemote, '全遠距'],
     [CourseClassType::MicroCredit, '微學分'],
+    [CourseClassType::ComputerLab, '電腦實習'],
 ]);
 
 it('returns correct default time slots', function (CourseClassType $type, ?array $expected) {
@@ -32,6 +34,7 @@ it('returns correct default time slots', function (CourseClassType $type, ?array
     [CourseClassType::Morning, ['start' => '09:00', 'end' => '10:50']],
     [CourseClassType::Afternoon, ['start' => '14:00', 'end' => '15:50']],
     [CourseClassType::Evening, ['start' => '19:00', 'end' => '20:50']],
+    [CourseClassType::ComputerLab, null],
     [CourseClassType::FullRemote, null],
     [CourseClassType::MicroCredit, null],
 ]);
