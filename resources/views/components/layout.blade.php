@@ -141,6 +141,17 @@
                     >
                         <div class="text-xs">
                             <a
+                                href="https://github.com/binotaliu/nou-tools"
+                                class="inline-flex items-center gap-1 text-warm-500 hover:text-warm-600"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <x-heroicon-o-code-bracket class="size-3" />
+                                網站原始碼
+                            </a>
+                        </div>
+                        <div class="text-xs">
+                            <a
                                 href="mailto:nou-tools-contact@binota.org"
                                 class="inline-flex items-center gap-1 text-warm-500 hover:text-warm-600"
                             >
