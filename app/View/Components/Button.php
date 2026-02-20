@@ -39,7 +39,7 @@ class Button extends Component
             'ghost' => 'border border-warm-200 bg-white text-warm-900 hover:bg-warm-50 disabled:border-warm-100',
             'warm-dark' => 'bg-warm-700 text-white hover:bg-warm-800 disabled:bg-warm-600',
             'warm-subtle' => 'bg-warm-200 text-warm-900 hover:bg-warm-300 disabled:bg-warm-100',
-            'link' => 'text-orange-600 hover:text-orange-700 underline underline-offset-4',
+            'link' => 'text-orange-600 hover:text-orange-700 underline underline-offset-4 hover:no-underline',
             'text-link' => 'text-orange-600 hover:text-orange-700',
             default => 'bg-orange-500 text-white hover:bg-orange-600 disabled:bg-orange-300',
         };

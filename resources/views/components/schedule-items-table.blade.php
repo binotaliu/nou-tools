@@ -108,7 +108,7 @@
                 <td class="px-4 py-3 print:hidden">
                     <a
                         href="{{ route('course.show', $item->courseClass->course) }}"
-                        class="mr-3 inline-flex items-center gap-1 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900"
+                        class="mr-3 inline-flex items-center gap-1 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline"
                     >
                         <x-heroicon-o-information-circle
                             class="inline size-4"
