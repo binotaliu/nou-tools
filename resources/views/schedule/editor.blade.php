@@ -17,14 +17,14 @@
           <div class="font-medium">
             你曾建立過課表：
             <span class="text-warm-900">
-              {{ $previousSchedule['name'] ?? '（未命名）' }}
+              {{ $previousSchedule->name ?? '（未命名）' }}
             </span>
             ，確定要繼續新增新課表嗎？
           </div>
         </div>
         <div class="flex gap-2">
           <a
-            href="{{ route('schedules.show', $previousSchedule['token']) }}"
+            href="{{ route('schedules.show', $previousSchedule->token) }}"
             class="rounded bg-yellow-400 px-4 py-2 font-semibold text-yellow-900 hover:bg-yellow-500"
           >
             檢視舊課表

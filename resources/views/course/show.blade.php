@@ -6,7 +6,7 @@
   <div class="mx-auto max-w-5xl">
     <div class="mb-8">
       <a
-        href="{{ isset($previousSchedule) ? route('schedules.show', $previousSchedule['token']) : url()->previous() }}"
+        href="{{ isset($previousSchedule) ? route('schedules.show', $previousSchedule->token) : url()->previous() }}"
         class="mb-4 inline-flex items-center gap-1 font-semibold text-orange-600 hover:text-orange-700"
       >
         <x-heroicon-o-chevron-left class="size-4" />

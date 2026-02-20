@@ -43,21 +43,7 @@ class ScheduleController extends Controller
         // If the user explicitly requested a fresh/new schedule view, ignore cookie
         $previousSchedule = null;
         if (! $request->query('new')) {
-            $cookie = $request->cookie('student_schedule');
-            if ($cookie) {
-                $data = json_decode($cookie, true);
-                if (is_array($data) && isset($data['id'], $data['uuid'])) {
-                    $model = StudentSchedule::find($data['id']);
-                    if ($model) {
-                        $previousSchedule = [
-                            'id' => $model->id,
-                            'uuid' => $model->uuid,
-                            'token' => $model->getRouteKey(),
-                            'name' => $model->name,
-                        ];
-                    }
-                }
-            }
+            $previousSchedule = $request->studentScheduleFromCookie();
         }
 
         return view('schedule.editor', [

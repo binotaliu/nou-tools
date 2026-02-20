@@ -33,22 +33,7 @@ class HomeController extends Controller
             ->get();
 
         // read encrypted cookie (only backend can read it)
-        $previousSchedule = null;
-        $cookie = $request->cookie('student_schedule');
-        if ($cookie) {
-            $data = json_decode($cookie, true);
-            if (is_array($data) && isset($data['id'], $data['uuid'])) {
-                $model = \App\Models\StudentSchedule::find($data['id']);
-                if ($model) {
-                    $previousSchedule = [
-                        'id' => $model->id,
-                        'uuid' => $model->uuid,
-                        'token' => $model->getRouteKey(),
-                        'name' => $model->name,
-                    ];
-                }
-            }
-        }
+        $previousSchedule = $request->studentScheduleFromCookie();
 
         return view('home', [
             'selectedDate' => $selectedDate,

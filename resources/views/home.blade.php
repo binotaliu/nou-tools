@@ -24,11 +24,11 @@
         @if (isset($previousSchedule))
           <div class="mt-3 w-full text-sm text-warm-600">
             <a
-              href="{{ route('schedules.show', $previousSchedule['token']) }}"
+              href="{{ route('schedules.show', $previousSchedule->token) }}"
               class="inline-flex w-full items-center gap-3 rounded border border-warm-200 bg-warm-50 px-3 py-2 text-center text-warm-700 transition hover:bg-warm-100"
             >
               <div class="max-w-xs truncate font-medium text-warm-800">
-                {{ $previousSchedule['name'] ?? '（未命名）' }}
+                {{ $previousSchedule->name ?? '（未命名）' }}
               </div>
             </a>
           </div>
