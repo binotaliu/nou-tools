@@ -513,9 +513,67 @@
                     </p>
 
                     <div
-                        class="rounded border border-warm-300 bg-warm-50 p-3 font-mono text-sm break-all text-warm-600"
+                        x-data="{
+                            shareUrl: {{ Js::from(url(route('schedules.show', $schedule))) }},
+                            copied: false,
+                            async copy() {
+                                try {
+                                    await navigator.clipboard.writeText(this.shareUrl)
+                                } catch (e) {
+                                    this.$refs.shareInput.select()
+                                    document.execCommand('copy')
+                                }
+
+                                this.copied = true
+                                setTimeout(() => (this.copied = false), 2000)
+                            },
+                        }"
+                        class="rounded border border-warm-300 bg-white text-sm text-warm-600"
                     >
-                        {{ url(route('schedules.show', $schedule)) }}
+                        <div class="flex items-stretch gap-3">
+                            <input
+                                class="flex-1 px-3 py-2 font-mono break-all text-warm-600 print:hidden"
+                                :value="shareUrl"
+                                readonly
+                                @click="$event.target.select()"
+                                x-ref="shareInput"
+                            />
+                            <div
+                                class="hidden items-center px-3 py-2 font-mono break-all text-warm-600 print:flex"
+                                x-text="shareUrl"
+                            ></div>
+
+                            <div class="shrink-0">
+                                <x-button
+                                    type="button"
+                                    variant="warm-subtle"
+                                    size="sm"
+                                    @click="copy()"
+                                    x-bind:aria-pressed="copied.toString()"
+                                    class="ml-2 h-full rounded-l-none rounded-r whitespace-nowrap print:hidden"
+                                >
+                                    <span x-show="!copied">
+                                        <x-heroicon-o-clipboard-document
+                                            class="inline size-4"
+                                        />
+                                        複製連結
+                                    </span>
+                                    <span x-show="copied">
+                                        <x-heroicon-o-check
+                                            class="inline size-4"
+                                        />
+                                        已複製！
+                                    </span>
+                                </x-button>
+
+                                <div
+                                    class="sr-only"
+                                    role="status"
+                                    aria-live="polite"
+                                    x-text="copied ? '已複製' : ''"
+                                ></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
