@@ -90,6 +90,8 @@
                         免責聲明：本網站為學生自發製作之工具，僅供參考，請以學校正式公告為準。
                     </p>
                     <p class="text-xs">
+                        網站原始碼：https://github.com/binotaliu/nou-tools
+                        <br />
                         聯絡網站作者：nou-tools-contact@binota.org
                     </p>
                 </div>
@@ -119,13 +121,13 @@
 
                     <div class="flex flex-col items-center gap-6 sm:flex-row">
                         <div
-                            class="max-w-[40ch] text-center text-sm text-warm-400 md:text-right"
+                            class="max-w-lg text-center text-sm text-warm-400 md:text-right"
                         >
                             <p class="text-left text-xs">
                                 <span class="font-semibold">免責聲明</span>
                                 ：
                                 <br />
-                                本網站為學生自發製作之工具，僅供同學參考使用，並非學校官方發布；所有資訊以學校正式公告為準；本網站已盡可能提供準確資訊，但不保證其完整性或正確性；針對重要資訊，請使用者自行查證並以學校官方公告為準；使用本網站即表示同意此免責聲明之內容。
+                                本網站為學生自發製作之工具，僅供同學參考使用，並非學校官方發布；所有資訊以學校正式公告為準；本網站已盡可能提供準確資訊，但不保證其完整性或正確性；針對重要資訊，請使用者自行查證並以學校官方公告為準；課程相關資訊係搜集整理自學校官方公告、網站，與其他官方資料，採用合理使用原則提供同學參考使用；使用本網站即表示同意此免責聲明之內容。
                             </p>
                         </div>
                     </div>
