@@ -9,25 +9,14 @@ class HomeController extends Controller
 {
     public function index(Request $request): \Illuminate\View\View
     {
-        // Use Taiwan time for greeting and default date
-        $nowTaipei = Carbon::now('Asia/Taipei');
-
-        // determine greeting
-        $hour = (int) $nowTaipei->format('H');
-        if ($hour >= 5 && $hour < 12) {
-            $greeting = '早安';
-        } elseif ($hour >= 12 && $hour < 18) {
-            $greeting = '午安';
-        } else {
-            $greeting = '晚安';
-        }
-
-        // date to show / query (YYYY-MM-DD) — accept ?date=YYYY-MM-DD
+        // default date (Taipei timezone) — accept ?date=YYYY-MM-DD
         $dateParam = $request->query('date');
         try {
-            $selectedDate = $dateParam ? Carbon::createFromFormat('Y-m-d', $dateParam, 'Asia/Taipei')->format('Y-m-d') : $nowTaipei->format('Y-m-d');
+            $selectedDate = $dateParam
+                ? Carbon::createFromFormat('Y-m-d', $dateParam, 'Asia/Taipei')->format('Y-m-d')
+                : Carbon::now('Asia/Taipei')->format('Y-m-d');
         } catch (\Exception $e) {
-            $selectedDate = $nowTaipei->format('Y-m-d');
+            $selectedDate = Carbon::now('Asia/Taipei')->format('Y-m-d');
         }
 
         // load courses that have classes scheduled on the selected date
@@ -62,8 +51,6 @@ class HomeController extends Controller
         }
 
         return view('home', [
-            'greeting' => $greeting,
-            'nowTaipei' => $nowTaipei,
             'selectedDate' => $selectedDate,
             'courses' => $courses,
             'previousSchedule' => $previousSchedule,

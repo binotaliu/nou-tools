@@ -54,170 +54,157 @@
         x-show="showResults && filteredCourses.length > 0"
         class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-warm-200 bg-white shadow-lg"
       >
-        <template x-for="course in filteredCourses" :key="course.id">
+        <div
+          x-for="course in filteredCourses"
+          :key="course.id"
+          @click="selectCourse(course)"
+          class="cursor-pointer border-b border-warm-100 p-4 hover:bg-warm-50"
+        >
           <div
-            @click="selectCourse(course)"
-            class="cursor-pointer border-b border-warm-100 p-4 hover:bg-warm-50"
-          >
-            <div
-              class="font-semibold text-warm-900"
-              x-text="course.name"
-            ></div>
-          </div>
-        </template>
+            class="font-semibold text-warm-900"
+            x-text="course.name"
+          ></div>
+        </div>
       </div>
 
-      <template
-        x-if="showResults && filteredCourses.length === 0 && searchQuery.trim()"
+      <div
+        x-show="showResults && filteredCourses.length === 0 && searchQuery.trim()"
+        class="mt-2 rounded-lg border border-warm-200 bg-warm-50 p-4 text-warm-700"
       >
-        <div
-          class="mt-2 rounded-lg border border-warm-200 bg-warm-50 p-4 text-warm-700"
-        >
-          找不到符合的課程。請試試其他關鍵字。
-        </div>
-      </template>
+        找不到符合的課程。請試試其他關鍵字。
+      </div>
     </x-card>
 
     {{-- Selected Schedule Section --}}
     <x-card class="mb-8">
       <h3 class="mb-4 text-2xl font-bold text-warm-900">您的課表</h3>
 
-      <template x-if="selectedItems.length === 0">
-        <div
-          class="rounded-lg border-2 border-dashed border-warm-300 bg-warm-50 p-6 text-center text-warm-700"
-        >
-          <p class="text-lg">還沒有選擇任何課程。請在上方搜尋並選擇課程。</p>
-        </div>
-      </template>
+      <div
+        x-show="selectedItems.length === 0"
+        class="rounded-lg border-2 border-dashed border-warm-300 bg-warm-50 p-6 text-center text-warm-700"
+      >
+        <p class="text-lg">還沒有選擇任何課程。請在上方搜尋並選擇課程。</p>
+      </div>
 
       <div class="space-y-4">
-        <template x-for="(item, index) in selectedItems" :key="index">
-          <div class="rounded-lg border-2 border-warm-300 bg-warm-50 p-4">
-            <div class="mb-3 flex items-start justify-between">
-              <div>
-                <div
-                  class="text-lg font-bold text-warm-900"
-                  x-text="item.course.name"
-                ></div>
-              </div>
-              <button
-                @click="removeItem(index)"
-                class="rounded bg-red-100 px-3 py-1 text-sm font-semibold text-red-700 hover:bg-red-200"
-              >
-                移除
-              </button>
+        <div
+          x-for="(item, index) in selectedItems"
+          :key="index"
+          class="rounded-lg border-2 border-warm-300 bg-warm-50 p-4"
+        >
+          <div class="mb-3 flex items-start justify-between">
+            <div>
+              <div
+                class="text-lg font-bold text-warm-900"
+                x-text="item.course.name"
+              ></div>
             </div>
+            <button
+              @click="removeItem(index)"
+              class="rounded bg-red-100 px-3 py-1 text-sm font-semibold text-red-700 hover:bg-red-200"
+            >
+              移除
+            </button>
+          </div>
 
-            {{-- Class Selection --}}
-            <div class="mt-3">
-              <template x-if="getClassTypes(item.course).length > 1">
-                <div>
-                  <label class="mb-2 block text-sm font-semibold text-warm-800">
-                    選擇班級：
-                  </label>
-                  <template
-                    x-for="type in getClassTypes(item.course)"
-                    :key="type"
+          {{-- Class Selection --}}
+          <div class="mt-3">
+            <div x-show="getClassTypes(item.course).length > 1">
+              <label class="mb-2 block text-sm font-semibold text-warm-800">
+                選擇班級：
+              </label>
+
+              <div
+                x-for="type in getClassTypes(item.course)"
+                :key="type"
+                class="mb-4"
+              >
+                <div
+                  class="mb-2 text-sm font-semibold text-warm-700"
+                  x-text="getTypeLabel(type)"
+                ></div>
+                <div
+                  class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3"
+                >
+                  <label
+                    x-for="courseClass in getClassesByType(item.course, type)"
+                    :key="courseClass.id"
+                    class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300"
+                    :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200'"
                   >
-                    <div class="mb-4">
+                    <input
+                      type="radio"
+                      :name="`class_${index}`"
+                      :value="courseClass.id"
+                      x-model.number="item.selectedClassId"
+                      class="mt-1 mr-3 h-5 w-5 cursor-pointer"
+                    />
+                    <div class="min-w-0 flex-1">
                       <div
-                        class="mb-2 text-sm font-semibold text-warm-700"
-                        x-text="getTypeLabel(type)"
+                        class="font-semibold text-warm-900"
+                        x-text="courseClass.code"
                       ></div>
                       <div
-                        class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3"
+                        class="text-sm text-warm-600"
+                        x-show="courseClass.start_time"
                       >
-                        <template
-                          x-for="courseClass in getClassesByType(item.course, type)"
-                          :key="courseClass.id"
-                        >
-                          <label
-                            class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300"
-                            :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200'"
-                          >
-                            <input
-                              type="radio"
-                              :name="`class_${index}`"
-                              :value="courseClass.id"
-                              x-model.number="item.selectedClassId"
-                              class="mt-1 mr-3 h-5 w-5 cursor-pointer"
-                            />
-                            <div class="min-w-0 flex-1">
-                              <div
-                                class="font-semibold text-warm-900"
-                                x-text="courseClass.code"
-                              ></div>
-                              <div
-                                class="text-sm text-warm-600"
-                                x-show="courseClass.start_time"
-                              >
-                                <span
-                                  x-text="`${courseClass.start_time} - ${courseClass.end_time}`"
-                                ></span>
-                              </div>
-                              <div
-                                class="truncate text-sm text-warm-600"
-                                x-show="courseClass.teacher_name"
-                                x-text="`${courseClass.teacher_name}`"
-                              ></div>
-                            </div>
-                          </label>
-                        </template>
+                        <span
+                          x-text="`${courseClass.start_time} - ${courseClass.end_time}`"
+                        ></span>
                       </div>
+                      <div
+                        class="truncate text-sm text-warm-600"
+                        x-show="courseClass.teacher_name"
+                        x-text="`${courseClass.teacher_name}`"
+                      ></div>
                     </div>
-                  </template>
-                </div>
-              </template>
-              <template x-if="getClassTypes(item.course).length === 1">
-                <div>
-                  <label class="mb-2 block text-sm font-semibold text-warm-800">
-                    班級：
                   </label>
-                  <div
-                    class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3"
-                  >
-                    <template
-                      x-for="courseClass in item.course.classes"
-                      :key="courseClass.id"
-                    >
-                      <label
-                        class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300"
-                        :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200'"
-                      >
-                        <input
-                          type="radio"
-                          :name="`class_${index}`"
-                          :value="courseClass.id"
-                          x-model.number="item.selectedClassId"
-                          class="mt-1 mr-3 h-5 w-5 cursor-pointer"
-                        />
-                        <div class="min-w-0 flex-1">
-                          <div
-                            class="font-semibold text-warm-900"
-                            x-text="courseClass.code"
-                          ></div>
-                          <div
-                            class="text-sm text-warm-600"
-                            x-show="courseClass.start_time"
-                          >
-                            <span
-                              x-text="`${courseClass.start_time} - ${courseClass.end_time}`"
-                            ></span>
-                          </div>
-                          <div
-                            class="truncate text-sm text-warm-600"
-                            x-show="courseClass.teacher_name"
-                            x-text="`${courseClass.teacher_name}`"
-                          ></div>
-                        </div>
-                      </label>
-                    </template>
-                  </div>
                 </div>
-              </template>
+              </div>
+            </div>
+
+            <div x-show="getClassTypes(item.course).length === 1">
+              <label class="mb-2 block text-sm font-semibold text-warm-800">
+                班級：
+              </label>
+              <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                <label
+                  x-for="courseClass in item.course.classes"
+                  :key="courseClass.id"
+                  class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300"
+                  :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200'"
+                >
+                  <input
+                    type="radio"
+                    :name="`class_${index}`"
+                    :value="courseClass.id"
+                    x-model.number="item.selectedClassId"
+                    class="mt-1 mr-3 h-5 w-5 cursor-pointer"
+                  />
+                  <div class="min-w-0 flex-1">
+                    <div
+                      class="font-semibold text-warm-900"
+                      x-text="courseClass.code"
+                    ></div>
+                    <div
+                      class="text-sm text-warm-600"
+                      x-show="courseClass.start_time"
+                    >
+                      <span
+                        x-text="`${courseClass.start_time} - ${courseClass.end_time}`"
+                      ></span>
+                    </div>
+                    <div
+                      class="truncate text-sm text-warm-600"
+                      x-show="courseClass.teacher_name"
+                      x-text="`${courseClass.teacher_name}`"
+                    ></div>
+                  </div>
+                </label>
+              </div>
             </div>
           </div>
-        </template>
+        </div>
       </div>
     </x-card>
 
