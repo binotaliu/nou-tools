@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "773d1f84766bde7b080240d07f573a66",
+    "content-hash": "743e2f307945c79df67821e758f66fc1",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -3711,25 +3711,25 @@
         },
         {
             "name": "spatie/laravel-ray",
-            "version": "1.43.5",
+            "version": "1.43.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-ray.git",
-                "reference": "2003e627d4a17e8411fff18153e47a754f0c028d"
+                "reference": "117a4addce2cb8adfc01b864435b5b278e2f0c40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-ray/zipball/2003e627d4a17e8411fff18153e47a754f0c028d",
-                "reference": "2003e627d4a17e8411fff18153e47a754f0c028d",
+                "url": "https://api.github.com/repos/spatie/laravel-ray/zipball/117a4addce2cb8adfc01b864435b5b278e2f0c40",
+                "reference": "117a4addce2cb8adfc01b864435b5b278e2f0c40",
                 "shasum": ""
             },
             "require": {
                 "composer-runtime-api": "^2.2",
                 "ext-json": "*",
-                "illuminate/contracts": "^7.20|^8.19|^9.0|^10.0|^11.0|^12.0",
-                "illuminate/database": "^7.20|^8.19|^9.0|^10.0|^11.0|^12.0",
-                "illuminate/queue": "^7.20|^8.19|^9.0|^10.0|^11.0|^12.0",
-                "illuminate/support": "^7.20|^8.19|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/contracts": "^7.20|^8.19|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/database": "^7.20|^8.19|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/queue": "^7.20|^8.19|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^7.20|^8.19|^9.0|^10.0|^11.0|^12.0|^13.0",
                 "php": "^7.4|^8.0",
                 "spatie/backtrace": "^1.7.1",
                 "spatie/ray": "^1.45.0",
@@ -3738,9 +3738,9 @@
             },
             "require-dev": {
                 "guzzlehttp/guzzle": "^7.3",
-                "laravel/framework": "^7.20|^8.19|^9.0|^10.0|^11.0|^12.0",
+                "laravel/framework": "^7.20|^8.19|^9.0|^10.0|^11.0|^12.0|^13.0",
                 "laravel/pint": "^1.27",
-                "orchestra/testbench-core": "^5.0|^6.0|^7.0|^8.0|^9.0|^10.0",
+                "orchestra/testbench-core": "^5.0|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
                 "pestphp/pest": "^1.22|^2.0|^3.0|^4.0",
                 "phpstan/phpstan": "^1.10.57|^2.0.2",
                 "phpunit/phpunit": "^9.3|^10.1|^11.0.10|^12.4",
@@ -3784,7 +3784,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-ray/issues",
-                "source": "https://github.com/spatie/laravel-ray/tree/1.43.5"
+                "source": "https://github.com/spatie/laravel-ray/tree/1.43.6"
             },
             "funding": [
                 {
@@ -3796,7 +3796,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-01-26T19:05:19+00:00"
+            "time": "2026-02-19T10:24:51+00:00"
         },
         {
             "name": "spatie/macroable",
@@ -7488,16 +7488,16 @@
         },
         {
             "name": "laravel/boost",
-            "version": "v2.1.6",
+            "version": "v2.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/boost.git",
-                "reference": "b8923e6131e5b705da299891284d327562445618"
+                "reference": "a475ecb520c94357201c70039e984bce6c67c917"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/boost/zipball/b8923e6131e5b705da299891284d327562445618",
-                "reference": "b8923e6131e5b705da299891284d327562445618",
+                "url": "https://api.github.com/repos/laravel/boost/zipball/a475ecb520c94357201c70039e984bce6c67c917",
+                "reference": "a475ecb520c94357201c70039e984bce6c67c917",
                 "shasum": ""
             },
             "require": {
@@ -7550,7 +7550,7 @@
                 "issues": "https://github.com/laravel/boost/issues",
                 "source": "https://github.com/laravel/boost"
             },
-            "time": "2026-02-16T23:53:14+00:00"
+            "time": "2026-02-20T08:12:25+00:00"
         },
         {
             "name": "laravel/mcp",
@@ -10524,16 +10524,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "2.1.4",
+            "version": "2.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/assert.git",
-                "reference": "b39f1870fc7c3e9e4a26106df5053354b9260a33"
+                "reference": "79155f94852fa27e2f73b459f6503f5e87e2c188"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/assert/zipball/b39f1870fc7c3e9e4a26106df5053354b9260a33",
-                "reference": "b39f1870fc7c3e9e4a26106df5053354b9260a33",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/79155f94852fa27e2f73b459f6503f5e87e2c188",
+                "reference": "79155f94852fa27e2f73b459f6503f5e87e2c188",
                 "shasum": ""
             },
             "require": {
@@ -10580,9 +10580,9 @@
             ],
             "support": {
                 "issues": "https://github.com/webmozarts/assert/issues",
-                "source": "https://github.com/webmozarts/assert/tree/2.1.4"
+                "source": "https://github.com/webmozarts/assert/tree/2.1.5"
             },
-            "time": "2026-02-17T12:17:51+00:00"
+            "time": "2026-02-18T14:09:36+00:00"
         }
     ],
     "aliases": [],
