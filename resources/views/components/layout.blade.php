@@ -1,3 +1,5 @@
+@props(['title' => 'NOU 小幫手'])
+
 <!DOCTYPE html>
 <html lang="zh-hant">
     <head>
@@ -5,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="csrf-token" content="{{ csrf_token() }}" />
 
-        <title>@yield('title', 'NOU 小幫手')</title>
+        <title>{{ $title }}</title>
 
         {{-- Alpine.js --}}
         <script
@@ -68,7 +70,7 @@
                 </x-alert>
             @endif
 
-            @yield('content')
+            {{ $slot }}
         </main>
 
         <footer

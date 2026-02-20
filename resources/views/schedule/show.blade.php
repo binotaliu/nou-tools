@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', ($schedule->name ?: '我的課表') . ' - NOU 小幫手')
-
-@section('content')
+<x-layout :title="($schedule->name ?: '我的課表') . ' - NOU 小幫手'">
     <div class="mx-auto max-w-5xl">
         <div
             class="mb-8 flex flex-col items-start justify-between gap-y-4 md:flex-row"
@@ -538,4 +534,4 @@
             </button>
         </div>
     </div>
-@endsection
+</x-layout>

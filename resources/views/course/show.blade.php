@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', $course->name . ' - 檢視課程 - NOU 小幫手')
-
-@section('content')
+<x-layout :title="$course->name . ' - 檢視課程 - NOU 小幫手'">
     <div class="mx-auto max-w-5xl">
         <div class="mb-8">
             <a
@@ -384,4 +380,4 @@
 
         <x-common-links />
     </div>
-@endsection
+</x-layout>

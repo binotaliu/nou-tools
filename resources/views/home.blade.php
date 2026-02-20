@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'NOU 小幫手')
-
-@section('content')
+<x-layout>
     <div class="space-y-8">
         <x-greeting />
 
@@ -255,4 +251,4 @@
             </div>
         </x-card>
     </div>
-@endsection
+</x-layout>

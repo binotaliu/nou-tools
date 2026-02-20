@@ -5,7 +5,11 @@
             {{-- Countdown (mobile 上方，桌面右側 1/3) --}}
             @if ($countdownEvent)
                 <div
-                    class="@if(!empty($scheduleEvents)) order-first md:order-last md:w-1/3 @else order-first md:w-full @endif w-full print:hidden"
+                    @class([
+                        'w-full print:hidden',
+                        'order-first md:order-last md:w-1/3' => ! empty($scheduleEvents),
+                        'order-first md:w-full' => empty($scheduleEvents),
+                    ])
                 >
                     <div
                         class="mb-4 rounded-lg border border-warm-200 bg-warm-50 p-4"
@@ -58,7 +62,11 @@
 
             @if (! empty($eventsToShow))
                 <div
-                    class="@if($countdownEvent) order-last md:order-first md:w-2/3 @else order-first md:w-full @endif w-full print:w-full"
+                    @class([
+                        'w-full print:w-full',
+                        'order-last md:order-first md:w-2/3' => $countdownEvent,
+                        'order-first md:w-full' => ! $countdownEvent,
+                    ])
                 >
                     <div class="space-y-2">
                         @foreach ($eventsToShow as $event)
@@ -70,7 +78,11 @@
                             @endphp
 
                             <div
-                                class="@if($isCountdownMatch) hidden print:flex @else flex @endif items-center justify-between border-b border-warm-100 py-2 last:border-0"
+                                @class([
+                                    'items-center justify-between border-b border-warm-100 py-2 last:border-0',
+                                    'hidden print:flex' => $isCountdownMatch,
+                                    'flex' => ! $isCountdownMatch,
+                                ])
                             >
                                 <span class="font-medium text-warm-800">
                                     {{ $event['name'] }}

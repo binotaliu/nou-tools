@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', '編輯課表 - NOU 小幫手')
-
-@section('content')
+<x-layout title="編輯課表 - NOU 小幫手">
     <div x-data="scheduleEditor()" class="mx-auto max-w-5xl">
         <div class="mb-6 flex items-center justify-between">
             <h2 class="text-3xl font-bold text-warm-900">編輯您的課表</h2>
@@ -460,4 +456,4 @@
             }
         }
     </script>
-@endsection
+</x-layout>
