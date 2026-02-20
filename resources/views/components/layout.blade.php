@@ -1,4 +1,8 @@
-@props(['title' => 'NOU 小幫手', 'noindex' => false])
+@props([
+    'title' => 'NOU 小幫手',
+    'description' => '給 NOU 同學的非官方小工具：管理個人課表與學習進度',
+    'noindex' => false,
+])
 
 <!DOCTYPE html>
 <html lang="zh-hant">
@@ -12,6 +16,14 @@
         <meta name="csrf-token" content="{{ csrf_token() }}" />
 
         <title>{{ $title }}</title>
+
+        {{-- basic description for SEO/social; allow override via prop --}}
+        <meta name="description" content="{{ $description }}" />
+
+        <meta property="og:title" content="{{ $title }}" />
+        <meta property="og:description" content="{{ $description }}" />
+
+        <meta property="og:image" content="{{ asset('og-image.png') }}" />
 
         {{-- Alpine.js --}}
         <script
