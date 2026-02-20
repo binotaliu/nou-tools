@@ -87,3 +87,37 @@ jobs:
 
       - name: Pint — check PHP formatting
         run: ./vendor/bin/pint --test
+
+  dispatch-deploy-repo:
+    name: Trigger Deployment
+    runs-on: ubuntu-latest
+    needs: [tests, linter]
+    if: >
+      needs.tests.result == 'success' &&
+      needs.linter.result == 'success' &&
+      (
+        github.event_name == 'push' ||
+        (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+      )
+    steps:
+      - name: Trigger deployment workflow
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.DEPLOYER_TRIGGER_TOKEN }}
+          script: |
+            try {
+              const fullRepoName = '${{ secrets.DEPLOYER_TRIGGER_REPO }}'
+              await github.rest.actions.createWorkflowDispatch({
+                owner: fullRepoName.split('/')[0],
+                repo: fullRepoName.split('/')[1],
+                workflow_id: '${{ secrets.DEPLOYER_TRIGGER_WORKFLOW }}',
+                ref: 'main'
+              })
+
+              core.info('Dispatched')
+            } catch (error) {
+              core.setFailed(`Failed to dispatch workflow: ${error.message}`)
+            }
+
+      - name: Confirm dispatch
+        run: echo "Triggered"
