@@ -3,12 +3,13 @@
         <x-greeting />
 
         <div
-            class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+            class="flex flex-col gap-4 md:flex-row md:items-stretch md:justify-between"
         >
             <x-card title="功能選單">
                 <x-link-button
                     :href="route('schedules.create')"
                     variant="warm-dark"
+                    full-width
                 >
                     <x-heroicon-o-table-cells class="size-4" />
 
