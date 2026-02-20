@@ -57,7 +57,12 @@
 
             <div class="mt-4 space-y-6">
                 @if ($courses->isEmpty())
-                    <div class="text-sm text-warm-500">今日無面授課程。</div>
+                    <div
+                        class="flex min-h-64 items-center justify-center gap-x-2 text-2xl text-warm-500"
+                    >
+                        <x-heroicon-o-face-smile class="size-8" />
+                        今日無面授課程
+                    </div>
                 @else
                     @foreach ($courses as $course)
                         <div>
