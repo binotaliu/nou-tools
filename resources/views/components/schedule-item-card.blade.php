@@ -29,11 +29,7 @@
 
         {{-- 班級代碼 --}}
         <div class="mb-3 flex items-center gap-2">
-            <span
-                class="inline-block rounded bg-warm-100 px-2 py-1 font-mono text-xs text-warm-800"
-            >
-                {{ $item->courseClass->code }}
-            </span>
+            <x-class-code>{{ $item->courseClass->code }}</x-class-code>
 
             @if ($item->courseClass->teacher_name)
                 @php

@@ -51,7 +51,7 @@
                     {{ $item->courseClass->course->name }}
                 </td>
                 <td class="px-4 py-3 text-sm text-warm-800 tabular-nums">
-                    {{ $item->courseClass->code }}
+                    <x-class-code :code="$item->courseClass->code" />
                 </td>
                 <td class="px-4 py-3 text-warm-800 tabular-nums print:hidden">
                     @if ($nextSchedule)

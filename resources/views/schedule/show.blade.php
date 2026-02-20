@@ -197,11 +197,9 @@
                                                     <span class="font-semibold">
                                                         {{ $course['courseName'] }}
                                                     </span>
-                                                    <span
-                                                        class="text-xs text-warm-600"
-                                                    >
-                                                        ({{ $course['code'] }})
-                                                    </span>
+                                                    <x-class-code>
+                                                        {{ $course['code'] }}
+                                                    </x-class-code>
                                                     <br />
                                                     <span
                                                         class="inline-flex items-center gap-1 text-warm-600"
@@ -290,8 +288,10 @@
                                         {{ $course->name }}
                                     </div>
                                     @if ($firstClass)
-                                        <div class="mt-1 text-xs text-warm-600">
-                                            {{ $firstClass->code }}
+                                        <div class="mt-1">
+                                            <x-class-code>
+                                                {{ $firstClass->code }}
+                                            </x-class-code>
                                         </div>
                                     @endif
                                 </div>
@@ -416,10 +416,10 @@
                                     >
                                         {{ $course->name }}
                                         @if ($firstClass)
-                                            <div
-                                                class="mt-1 text-xs text-warm-600"
-                                            >
-                                                {{ $firstClass->code }}
+                                            <div class="mt-1">
+                                                <x-class-code>
+                                                    {{ $firstClass->code }}
+                                                </x-class-code>
                                             </div>
                                         @endif
                                     </td>
