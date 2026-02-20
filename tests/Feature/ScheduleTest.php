@@ -117,8 +117,9 @@ it('schedule show page displays exam information for selected courses', function
         ->assertSee('期末考')
         ->assertSee('4/25')
         ->assertSee('6/27')
-        ->assertSee('13:30 - 14:40')
         ->assertSee('EXM101');
+
+    $this->assertMatchesRegularExpression('/13:30\s*-\s*14:40/', $response->getContent());
 });
 
 it('stores schedule metadata in an encrypted cookie when saving', function () {

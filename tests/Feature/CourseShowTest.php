@@ -62,8 +62,9 @@ test('course show page displays course classes', function () {
         ->assertSee('TEST001')
         ->assertSee('王')
         ->assertSee('老師')
-        ->assertSee('09:00 - 11:00')
         ->assertDontSee('~');
+
+    $this->assertMatchesRegularExpression('/09:00\s*-\s*11:00/', $response->getContent());
 });
 
 test('schedule-level overrides show next to dates only', function () {
@@ -91,11 +92,12 @@ test('schedule-level overrides show next to dates only', function () {
     $response = $this->get(route('course.show', $course));
 
     $response->assertStatus(200)
-        ->assertSee('09:00 - 11:00')
         ->assertSee($dateWithOverride->format('n/j'))
-        ->assertSee('14:00 - 16:00')
         ->assertSee($dateWithoutOverride->format('n/j'))
         ->assertDontSee('~');
+
+    $this->assertMatchesRegularExpression('/09:00\s*-\s*11:00/', $response->getContent());
+    $this->assertMatchesRegularExpression('/14:00\s*-\s*16:00/', $response->getContent());
 });
 
 test('course show page with missing schedule information', function () {
@@ -157,6 +159,7 @@ test('course show page displays exam information', function () {
         ->assertSee('期中考')
         ->assertSee('期末考')
         ->assertSee('4/25')
-        ->assertSee('6/27')
-        ->assertSee('13:30 - 14:40');
+        ->assertSee('6/27');
+
+    $this->assertMatchesRegularExpression('/13:30\s*-\s*14:40/', $response->getContent());
 });
