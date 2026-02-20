@@ -101,12 +101,13 @@
                                     x-text="item.course.name"
                                 ></div>
                             </div>
-                            <button
+                            <x-button
+                                variant="danger"
+                                size="sm"
                                 @click="removeItem(index)"
-                                class="rounded bg-red-100 px-3 py-1 text-sm font-semibold text-red-700 hover:bg-red-200"
                             >
                                 移除
-                            </button>
+                            </x-button>
                         </div>
 
                         {{-- Class Selection --}}
@@ -258,21 +259,24 @@
             </div>
 
             <div class="flex gap-4">
-                <button
+                <x-button
                     type="submit"
-                    :disabled="selectedItems.length === 0 || submitting"
-                    :class="selectedItems.length === 0 || submitting ? 'opacity-50 cursor-not-allowed' : ''"
-                    class="flex-1 rounded-lg bg-orange-500 py-3 text-lg font-bold text-white transition hover:bg-orange-600"
+                    variant="primary"
+                    size="lg"
+                    full-width
+                    ::disabled="selectedItems.length === 0 || submitting"
                 >
                     <span x-show="!submitting">保存課表</span>
                     <span x-show="submitting">保存中...</span>
-                </button>
-                <a
-                    href="{{ isset($schedule) ? route('schedules.show', $schedule) : route('schedules.create') }}"
-                    class="flex-1 rounded-lg bg-warm-200 py-3 text-center text-lg font-bold text-warm-900 transition hover:bg-warm-300"
+                </x-button>
+                <x-link-button
+                    :href="isset($schedule) ? route('schedules.show', $schedule) : route('schedules.create')"
+                    variant="secondary"
+                    size="lg"
+                    full-width
                 >
                     取消
-                </a>
+                </x-link-button>
             </div>
         </form>
     </div>

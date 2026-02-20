@@ -6,27 +6,29 @@
             class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
         >
             <x-card title="功能選單">
-                <a
-                    href="{{ route('schedules.create') }}"
-                    class="inline-flex items-center gap-2 rounded bg-warm-700 px-4 py-2 text-white hover:bg-warm-800"
+                <x-link-button
+                    :href="route('schedules.create')"
+                    variant="warm-dark"
                 >
                     <x-heroicon-o-table-cells class="size-4" />
 
                     建立我的課表
-                </a>
+                </x-link-button>
 
                 @if (isset($previousSchedule))
                     <div class="mt-3 w-full text-sm text-warm-600">
-                        <a
-                            href="{{ route('schedules.show', $previousSchedule->token) }}"
-                            class="inline-flex w-full items-center gap-3 rounded border border-warm-200 bg-warm-50 px-3 py-2 text-center text-warm-700 transition hover:bg-warm-100"
+                        <x-link-button
+                            :href="route('schedules.show', $previousSchedule->token)"
+                            variant="secondary"
+                            full-width
+                            class="text-center text-warm-700"
                         >
                             <div
                                 class="max-w-xs truncate font-medium text-warm-800"
                             >
                                 {{ $previousSchedule->name ?? '（未命名）' }}
                             </div>
-                        </a>
+                        </x-link-button>
                     </div>
                 @endif
             </x-card>

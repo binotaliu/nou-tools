@@ -19,13 +19,13 @@
                 class="flex w-full gap-2 md:w-auto print:hidden"
                 x-data="{ subscribeOpen: false }"
             >
-                <a
-                    href="{{ route('schedules.edit', $schedule) }}"
-                    class="text-warm inline-flex w-1/2 items-center justify-center gap-2 rounded-lg border border-warm-300 bg-white px-4 py-2 font-semibold transition hover:bg-warm-50 md:w-auto md:justify-start"
+                <x-link-button
+                    :href="route('schedules.edit', $schedule)"
+                    variant="secondary"
                 >
                     <x-heroicon-o-pencil-square class="size-4" />
                     編輯課表
-                </a>
+                </x-link-button>
 
                 @php
                     $icsUrl = route('schedules.calendar', $schedule);
@@ -34,14 +34,14 @@
                     $outlookWebUrl = 'https://outlook.office.com/calendar/0/addfromweb?url=' . urlencode($webcalUrl);
                 @endphp
 
-                <button
+                <x-button
                     type="button"
+                    variant="primary"
                     @click="subscribeOpen = true"
-                    class="inline-flex w-1/2 items-center justify-center gap-2 rounded-lg border border-warm-500 bg-warm-500 px-4 py-2 font-semibold text-white transition hover:bg-warm-600 md:w-auto md:justify-start"
                 >
                     <x-heroicon-o-calendar class="inline size-4" />
                     訂閱行事曆
-                </button>
+                </x-button>
 
                 {{-- Subscribe modal --}}
                 <x-modal
@@ -50,54 +50,60 @@
                     description="選擇要使用的方式來訂閱或下載您的課表行事曆："
                 >
                     <div class="grid gap-3">
-                        <a
-                            href="{{ $webcalUrl }}"
+                        <x-link-button
+                            :href="$webcalUrl"
+                            variant="ghost"
+                            full-width
                             @click="subscribeOpen = false"
-                            class="inline-flex w-full items-center justify-center gap-2 rounded border border-warm-200 bg-white px-3 py-2 text-warm-900 hover:bg-warm-50"
                         >
                             Apple 日曆 (iOS / macOS)
-                        </a>
+                        </x-link-button>
 
-                        <a
-                            href="{{ $googleUrl }}"
+                        <x-link-button
+                            :href="$googleUrl"
+                            variant="ghost"
+                            full-width
                             target="_blank"
                             rel="noopener"
                             @click="subscribeOpen = false"
-                            class="inline-flex w-full items-center justify-center gap-2 rounded border border-blue-100 bg-blue-50 px-3 py-2 text-warm-900 hover:bg-blue-100"
                         >
                             Google 日曆
-                        </a>
+                        </x-link-button>
 
-                        <a
-                            href="{{ $outlookWebUrl }}"
+                        <x-link-button
+                            :href="$outlookWebUrl"
+                            variant="ghost"
+                            full-width
                             target="_blank"
                             rel="noopener"
                             @click="subscribeOpen = false"
-                            class="inline-flex w-full items-center justify-center gap-2 rounded border border-sky-100 bg-sky-50 px-3 py-2 text-warm-900 hover:bg-sky-100"
                         >
                             Microsoft 365 / Outlook.com
-                        </a>
+                        </x-link-button>
 
-                        <a
-                            href="{{ $icsUrl }}"
+                        <x-link-button
+                            :href="$icsUrl"
+                            variant="ghost"
+                            full-width
                             target="_blank"
                             rel="noopener"
-                            download
+                            :download="true"
                             @click="subscribeOpen = false"
-                            class="inline-flex w-full items-center justify-center gap-2 rounded border border-warm-200 bg-warm-50 px-3 py-2 text-warm-900 hover:bg-warm-100"
                         >
                             下載 iCal（.ics）
-                        </a>
+                        </x-link-button>
                     </div>
 
                     <x-slot:footer>
-                        <button
+                        <x-button
                             type="button"
+                            variant="warm-subtle"
+                            size="sm"
                             @click="subscribeOpen = false"
-                            class="px-4 py-2 text-sm text-warm-700 hover:underline"
+                            class="px-4 py-2 text-sm"
                         >
                             取消
-                        </button>
+                        </x-button>
                     </x-slot>
                 </x-modal>
             </div>
@@ -524,14 +530,14 @@
         </x-card>
 
         <div class="mt-6 flex justify-end print:hidden">
-            <button
+            <x-button
                 type="button"
+                variant="warm-subtle"
                 onclick="window.print()"
-                class="inline-flex items-center gap-2 rounded-lg border border-warm-500 bg-warm-500 px-4 py-2 font-semibold text-white transition hover:bg-warm-600"
             >
                 <x-heroicon-o-printer class="inline size-4" />
                 列印
-            </button>
+            </x-button>
         </div>
     </div>
 </x-layout>

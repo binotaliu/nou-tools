@@ -1,13 +1,14 @@
 <x-layout :title="$course->name . ' - 檢視課程 - NOU 小幫手'">
     <div class="mx-auto max-w-5xl">
         <div class="mb-8">
-            <a
-                href="{{ isset($previousSchedule) ? route('schedules.show', $previousSchedule->token) : url()->previous() }}"
-                class="mb-4 inline-flex items-center gap-1 font-semibold text-orange-600 hover:text-orange-700"
+            <x-link-button
+                :href="isset($previousSchedule) ? route('schedules.show', $previousSchedule->token) : url()->previous()"
+                variant="text-link"
+                class="mb-4"
             >
                 <x-heroicon-o-chevron-left class="size-4" />
                 回到我的課表
-            </a>
+            </x-link-button>
             <h2 class="mb-2 text-3xl font-bold text-warm-900">
                 {{ $course->name }}
             </h2>
@@ -29,17 +30,17 @@
                             科目內容
                         </dt>
                         <dd class="text-warm-700">
-                            <a
-                                href="{{ $course->description_url }}"
+                            <x-link-button
+                                :href="$course->description_url"
+                                variant="link"
                                 target="_blank"
                                 rel="noopener"
-                                class="inline-flex items-center gap-1 text-orange-600 underline underline-offset-4 hover:text-orange-700"
                             >
                                 檢視詳細內容
                                 <x-heroicon-o-arrow-top-right-on-square
                                     class="size-4"
                                 />
-                            </a>
+                            </x-link-button>
                         </dd>
                     </div>
                 @endif
@@ -127,17 +128,17 @@
                             多媒體簡介
                         </dt>
                         <dd class="text-warm-700">
-                            <a
-                                href="{{ $course->multimedia_url }}"
+                            <x-link-button
+                                :href="$course->multimedia_url"
+                                variant="link"
                                 target="_blank"
                                 rel="noopener"
-                                class="inline-flex items-center gap-1 text-orange-600 underline underline-offset-4 hover:text-orange-700"
                             >
                                 檢視簡介
                                 <x-heroicon-o-arrow-top-right-on-square
                                     class="size-4"
                                 />
-                            </a>
+                            </x-link-button>
                         </dd>
                     </div>
                 @endif
