@@ -384,7 +384,7 @@
         {{-- Share Section --}}
         <x-card>
             <div class="flex items-center justify-between gap-4 print:flex">
-                <div class="md:flex-1 print:flex-1">
+                <div class="w-full md:w-auto md:flex-1 print:flex-1">
                     <p class="mb-3 text-warm-700">
                         您可以使用以下連結來編輯或檢視此課表，請妥善保管此連結。
                         <br />
