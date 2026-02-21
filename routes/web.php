@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LearningProgressController;
 use App\Http\Controllers\ScheduleCalendarController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
@@ -21,3 +22,8 @@ Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('
 Route::get('/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('schedules.edit');
 Route::put('/schedules/{schedule}', [ScheduleController::class, 'update'])->name('schedules.update');
 Route::get('/schedules/{schedule}/calendar', ScheduleCalendarController::class)->name('schedules.calendar');
+
+Route::get('/schedules/{schedule}/learning-progress/{term}', [LearningProgressController::class, 'show'])
+    ->name('learning-progress.show');
+Route::put('/schedules/{schedule}/learning-progress/{term}', [LearningProgressController::class, 'update'])
+    ->name('learning-progress.update');

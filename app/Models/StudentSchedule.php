@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Ramsey\Uuid\Uuid;
 
 class StudentSchedule extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'uuid',
         'name',
@@ -56,5 +59,13 @@ class StudentSchedule extends Model
     public function items(): HasMany
     {
         return $this->hasMany(StudentScheduleItem::class);
+    }
+
+    /**
+     * @return HasMany<LearningProgress, $this>
+     */
+    public function learningProgresses(): HasMany
+    {
+        return $this->hasMany(LearningProgress::class);
     }
 }

@@ -30,6 +30,14 @@
                     編輯課表
                 </x-link-button>
 
+                <x-link-button
+                    :href="route('learning-progress.show', [$viewModel->uuid, config('app.current_semester')])"
+                    variant="secondary"
+                >
+                    <x-heroicon-o-clipboard class="size-4" />
+                    學習進度表
+                </x-link-button>
+
                 @php
                     $icsUrl = $viewModel->calendarUrls->ics;
                     $webcalUrl = $viewModel->calendarUrls->webcal;
