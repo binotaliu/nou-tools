@@ -71,13 +71,13 @@
 
         <main class="mx-auto max-w-7xl px-6 py-8">
             @if (session('success'))
-                <x-alert type="success">
+                <x-alert type="success" class="print:hidden">
                     {{ session('success') }}
                 </x-alert>
             @endif
 
             @if ($errors->any())
-                <x-alert type="error">
+                <x-alert type="error" class="print:hidden">
                     <ul>
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>

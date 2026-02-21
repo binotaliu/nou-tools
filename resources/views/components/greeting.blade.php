@@ -1,4 +1,4 @@
-<x-card {{ $attributes->merge() }}>
+<x-card {{ $attributes->class(['print:hidden'])->merge() }}>
     <div class="flex items-baseline justify-between gap-4">
         <div>
             <h2 class="text-3xl font-semibold">

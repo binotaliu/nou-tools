@@ -68,7 +68,7 @@
                 id="progress-form"
                 method="POST"
                 action="{{ route('learning-progress.update', [$viewModel->scheduleUuid, $viewModel->term]) }}"
-                class="max-h-180 max-w-full overflow-x-auto rounded bg-linear-to-b from-warm-100 to-white"
+                class="max-h-180 max-w-full overflow-x-auto rounded bg-linear-to-b from-warm-100 to-white print:max-h-full"
                 style="
                     --courses-count: {{ count($viewModel->courses) }};
                     --weeks-count: {{ count($viewModel->weeks) }};
@@ -79,33 +79,53 @@
                 @csrf
                 @method('PUT')
 
-                <table class="w-full min-w-4xl border-collapse rounded">
-                    <thead>
-                        <tr class="sticky top-0 z-20 rounded-t bg-warm-100">
+                <table
+                    class="w-full min-w-4xl table-fixed border-collapse rounded print:min-w-0"
+                >
+                    <thead class="print:table-header-group">
+                        <tr
+                            class="sticky top-0 z-20 rounded-t bg-warm-100 print:static"
+                        >
                             <th
-                                class="sticky left-0 z-30 w-28 rounded-tl border border-t-0 border-l-0 border-warm-300 bg-warm-100 px-3 py-2 text-center text-sm font-bold text-warm-900"
+                                class="sticky left-0 z-30 w-24 rounded-tl border border-t-0 border-l-0 border-warm-300 bg-warm-100 px-0 py-2 text-center text-sm font-bold text-warm-900 print:static"
+                                rowspan="2"
                             >
                                 週次 \ 課程
 
                                 <div
-                                    class="absolute top-full left-0 h-px w-full bg-warm-300"
+                                    class="absolute top-full left-0 h-px w-full bg-warm-300 print:hidden"
                                 ></div>
                             </th>
                             @foreach ($viewModel->courses as $course)
                                 <th
-                                    class="relative w-[calc((100%-7rem)/var(--courses-count))] border border-t-0 border-warm-300 px-2 py-2 text-center text-sm font-bold text-warm-900 last:rounded-tr last:border-r-0"
+                                    class="relative w-[calc((100%-6rem)/var(--courses-count))] border border-t-0 border-warm-300 px-2 py-2 text-center font-bold text-warm-900 last:rounded-tr last:border-r-0 print:static"
                                     colspan="2"
                                 >
-                                    <div class="text-sm">
-                                        {{ $course['code'] }}
-                                    </div>
-                                    <div class="text-xs">
+                                    <div
+                                        class="line-clamp-2 w-full overflow-hidden text-xs"
+                                    >
                                         {{ $course['name'] }}
                                     </div>
 
                                     <div
-                                        class="absolute top-full left-0 h-px w-full bg-warm-300"
+                                        class="absolute top-full left-0 h-px w-full bg-warm-300 print:hidden"
                                     ></div>
+                                </th>
+                            @endforeach
+                        </tr>
+                        <tr
+                            class="hidden border-b border-warm-300 bg-warm-100 print:table-row"
+                        >
+                            @foreach ($viewModel->courses as $course)
+                                <th
+                                    class="border border-t-0 border-b-0 border-warm-300 px-0 py-1 text-center text-xs font-medium text-warm-700"
+                                >
+                                    影音
+                                </th>
+                                <th
+                                    class="border border-t-0 border-b-0 border-warm-300 px-0 py-1 text-center text-xs font-medium text-warm-700 last:border-r-0"
+                                >
+                                    課本
                                 </th>
                             @endforeach
                         </tr>
@@ -113,11 +133,11 @@
                     <tbody>
                         @foreach ($viewModel->weeks as $week)
                             <tr
-                                class="border-b border-warm-300 hover:bg-warm-50 [&:nth-child(calc(var(--weeks-count)*2-1))]:border-b-0"
+                                class="border-b border-warm-300 hover:bg-warm-50"
                             >
                                 <td
                                     @class([
-                                        'sticky left-0 z-10 border border-b-0 border-l-0 border-warm-300 px-3 py-3 font-semibold text-warm-900',
+                                        'sticky left-0 z-10 break-inside-avoid border border-b-0 border-l-0 border-warm-300 px-0 py-0 font-semibold text-warm-900 print:static print:bg-warm-50',
                                         match (true) {
                                             $currentWeek === $week['num'] => 'bg-blue-50',
                                             collect($viewModel->courses)->every(
@@ -141,12 +161,12 @@
                                     rowspan="2"
                                 >
                                     <div
-                                        class="text-center text-xs font-semibold"
+                                        class="text-center text-xs font-semibold print:text-black!"
                                     >
                                         第{{ Str::toChineseNumber($week['num']) }}週
                                     </div>
                                     <div
-                                        class="text-center text-xs text-warm-600"
+                                        class="text-center text-xs text-warm-600 print:text-warm-600!"
                                     >
                                         {{ $week['start'] }} -
                                         {{ $week['end'] }}
@@ -154,13 +174,13 @@
 
                                     {{-- we need this thing to mimic the border of the first column when the header is sticky --}}
                                     <div
-                                        class="absolute top-0 left-full h-full w-px bg-warm-300"
+                                        class="absolute top-0 left-full h-full w-px bg-warm-300 print:hidden"
                                     ></div>
                                 </td>
                                 @foreach ($viewModel->courses as $course)
                                     <td
                                         @class([
-                                            'border border-warm-300 px-2 py-3 text-center last:border-r-0 [&:has(input:checked)]:bg-white',
+                                            'border border-warm-300 text-center last:border-r-0 [&:has(input:checked)]:bg-white',
                                             match (true) {
                                                 $currentWeek === $week['num'] => 'bg-blue-50',
                                                 $viewModel->isWeekPassed($week['num']) => 'bg-red-50',
@@ -169,14 +189,14 @@
                                         ])
                                     >
                                         <label
-                                            class="group flex cursor-pointer items-center gap-1"
+                                            class="group flex h-full w-full cursor-pointer items-center justify-center gap-1 px-2 py-3"
                                         >
                                             <x-learning-progress-checkbox
                                                 :name="'progress[' . $course['id'] . '][' . $week['num'] . '][video]'"
                                                 :checked="$viewModel->progress[$course['id']][$week['num']]['video'] ?? false"
                                             />
                                             <span
-                                                class="text-xs group-has-checked:text-gray-400"
+                                                class="text-xs group-has-checked:text-gray-400 print:hidden"
                                             >
                                                 影音
                                             </span>
@@ -184,7 +204,7 @@
                                     </td>
                                     <td
                                         @class([
-                                            'border border-warm-300 px-2 py-3 text-center last:border-r-0 [&:has(input:checked)]:bg-white',
+                                            'border border-warm-300 text-center last:border-r-0 [&:has(input:checked)]:bg-white',
                                             match (true) {
                                                 $currentWeek === $week['num'] => 'bg-blue-50',
                                                 $viewModel->isWeekPassed($week['num']) => 'bg-red-50',
@@ -193,14 +213,14 @@
                                         ])
                                     >
                                         <label
-                                            class="group flex cursor-pointer items-center gap-1"
+                                            class="group flex h-full w-full cursor-pointer items-center justify-center gap-1 px-2 py-3"
                                         >
                                             <x-learning-progress-checkbox
                                                 :name="'progress[' . $course['id'] . '][' . $week['num'] . '][textbook]'"
                                                 :checked="$viewModel->progress[$course['id']][$week['num']]['textbook'] ?? false"
                                             />
                                             <span
-                                                class="text-xs group-has-checked:text-gray-400"
+                                                class="text-xs group-has-checked:text-gray-400 print:hidden"
                                             >
                                                 課本
                                             </span>
@@ -211,7 +231,7 @@
                             <tr>
                                 @foreach ($viewModel->courses as $course)
                                     <td
-                                        @class(['border border-b-0 border-warm-300 last:border-r-0', 'bg-white'])
+                                        @class(['border border-b-0 border-warm-300 last:border-r-0 print:h-16', 'bg-white'])
                                         colspan="2"
                                     >
                                         {{-- Note textarea --}}
@@ -219,7 +239,7 @@
                                             name="notes[{{ $course['id'] }}][{{ $week['num'] }}]"
                                             placeholder="（尚未設定目標）"
                                             @class([
-                                                'm-0 h-full w-full resize-none px-2 py-2 text-xs placeholder-gray-400 focus:border-blue-500 focus:outline-none print:hidden',
+                                                'm-0 h-full w-full resize-none px-2 py-2 text-xs placeholder-gray-400 focus:border-blue-500 focus:outline-none print:text-black print:placeholder-transparent',
                                                 $viewModel->isProgressComplete($course['id'], $week['num'])
                                                     ? 'text-gray-400'
                                                     : 'text-warm-700',
