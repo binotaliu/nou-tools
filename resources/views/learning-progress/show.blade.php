@@ -30,7 +30,7 @@
                     variant="secondary"
                 >
                     <x-heroicon-o-arrow-left class="size-4" />
-                    返回課表
+                    回到課表
                 </x-link-button>
 
                 <x-button
