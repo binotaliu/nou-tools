@@ -68,5 +68,27 @@ class AppServiceProvider extends ServiceProvider
 
             return StudentScheduleCookie::fromModel($model);
         });
+
+        Str::macro('toChineseNumber', function (int $n): string {
+            if ($n > 99) {
+                return (string) " {$n} "; // Fallback to digits for large numbers
+            }
+
+            $digits = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+
+            if ($n <= 10) {
+                return $n === 10 ? '十' : $digits[$n];
+            }
+
+            if ($n < 20) {
+                return '十'.($n % 10 ? $digits[$n % 10] : '');
+            }
+
+            $tens = intdiv($n, 10);
+            $ones = $n % 10;
+            $res = ($tens == 1 ? '十' : $digits[$tens].'十').($ones ? $digits[$ones] : '');
+
+            return $res;
+        });
     }
 }

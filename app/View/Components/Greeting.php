@@ -3,6 +3,7 @@
 namespace App\View\Components;
 
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
@@ -48,30 +49,11 @@ class Greeting extends Component
             } else {
                 $diffDays = $today->diffInDays($start, absolute: true);
                 $weekNum = intdiv($diffDays, 7) + 1;
-                $semesterInfo = "{$semesterLabel}第".$this->toChinese($weekNum).'週';
+                $semesterInfo = "{$semesterLabel}第".Str::toChineseNumber($weekNum).'週';
             }
         }
 
         $this->semesterInfo = $semesterInfo;
-    }
-
-    private function toChinese(int $n): string
-    {
-        $digits = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
-
-        if ($n <= 10) {
-            return $n === 10 ? '十' : $digits[$n];
-        }
-
-        if ($n < 20) {
-            return '十'.($n % 10 ? $digits[$n % 10] : '');
-        }
-
-        $tens = intdiv($n, 10);
-        $ones = $n % 10;
-        $res = ($tens == 1 ? '十' : $digits[$tens].'十').($ones ? $digits[$ones] : '');
-
-        return $res;
     }
 
     public function render(): View
