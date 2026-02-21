@@ -11,7 +11,11 @@ use Spatie\LaravelData\DataCollection;
 final class ScheduleViewModel extends Data
 {
     public function __construct(
-        public StudentSchedule $schedule,
+        public int $id,
+        public string $uuid,
+        public ?string $name,
+        #[DataCollectionOf(StudentScheduleItemViewModel::class)]
+        public DataCollection $items,
         public bool $hasAnyOverride,
         #[DataCollectionOf(ScheduleMonthViewModel::class)]
         public DataCollection $months,
@@ -23,7 +27,13 @@ final class ScheduleViewModel extends Data
     public static function fromModel(StudentSchedule $schedule): self
     {
         return new self(
-            schedule: $schedule,
+            id: $schedule->id,
+            uuid: $schedule->getRouteKey(),
+            name: $schedule->name,
+            items: StudentScheduleItemViewModel::collect(
+                $schedule->items->map(fn ($item) => StudentScheduleItemViewModel::fromModel($item)),
+                DataCollection::class
+            ),
             hasAnyOverride: self::checkHasAnyOverride($schedule),
             months: self::buildMonthsCollection($schedule),
             exams: self::buildExamsCollection($schedule),

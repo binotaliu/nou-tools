@@ -1,5 +1,5 @@
 <x-layout
-    :title="($viewModel->schedule->name ?: '我的課表') . ' - NOU 小幫手'"
+    :title="($viewModel->name ?: '我的課表') . ' - NOU 小幫手'"
     :noindex="true"
 >
     <div class="mx-auto max-w-5xl">
@@ -8,7 +8,7 @@
         >
             <div>
                 <h2 class="mb-2 text-3xl font-bold text-warm-900">
-                    {{ $viewModel->schedule->name ?: '我的課表' }}
+                    {{ $viewModel->name ?: '我的課表' }}
                 </h2>
                 <p
                     class="mt-1 flex items-center gap-1 text-sm text-warm-600 print:hidden"
@@ -23,7 +23,7 @@
                 x-data="{ subscribeOpen: false }"
             >
                 <x-link-button
-                    :href="route('schedules.edit', $viewModel->schedule)"
+                    :href="route('schedules.edit', $viewModel->uuid)"
                     variant="secondary"
                 >
                     <x-heroicon-o-pencil-square class="size-4" />
@@ -125,14 +125,15 @@
 
         {{-- Schedule Items - Responsive Table/Cards --}}
         <x-schedule-items
-            :items="$viewModel->schedule->items"
-            :schedule="$viewModel->schedule"
+            :items="$viewModel->items"
+            :scheduleUuid="$viewModel->uuid"
+            :hasAnyOverride="$viewModel->hasAnyOverride"
         />
 
         <x-common-links class="mb-8 print:hidden" />
 
         {{-- Schedule Calendar View --}}
-        @if (count($viewModel->schedule->items) > 0)
+        @if (count($viewModel->items) > 0)
             <div class="mb-8">
                 <h3 class="mb-4 text-2xl font-bold text-warm-900">面授日期</h3>
                 @if ($viewModel->hasAnyOverride)
@@ -386,8 +387,7 @@
 
                     <div
                         x-data="{
-                            shareUrl:
-                                {{ Js::from(url(route('schedules.show', $viewModel->schedule))) }},
+                            shareUrl: {{ Js::from(url(route('schedules.show', $viewModel->uuid))) }},
                             copied: false,
                             async copy() {
                                 try {
@@ -454,7 +454,7 @@
                     class="hidden w-28 flex-col items-center justify-center md:flex print:flex"
                 >
                     <div class="rounded border border-warm-200 bg-white p-2">
-                        {!! DNS2D::getBarcodeSVG(url(route('schedules.show', $viewModel->schedule)), 'QRCODE') !!}
+                        {!! DNS2D::getBarcodeSVG(url(route('schedules.show', $viewModel->uuid)), 'QRCODE') !!}
                     </div>
                 </div>
             </div>

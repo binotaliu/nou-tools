@@ -1,6 +1,6 @@
 @props([
     'items' => [],
-    'schedule' => null,
+    'scheduleUuid' => null,
 ])
 
 <table {{ $attributes->merge(['class' => 'w-full border-collapse']) }}>
