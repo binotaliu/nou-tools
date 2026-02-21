@@ -46,7 +46,7 @@ class Greeting extends Component
             } elseif ($today->gt($end)) {
                 $semesterInfo = "{$semesterLabel}已結束";
             } else {
-                $diffDays = $today->diffInDays($start);
+                $diffDays = $today->diffInDays($start, absolute: true);
                 $weekNum = intdiv($diffDays, 7) + 1;
                 $semesterInfo = "{$semesterLabel}第".$this->toChinese($weekNum).'週';
             }
