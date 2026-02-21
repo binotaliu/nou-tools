@@ -19,6 +19,15 @@ class LearningProgressController extends Controller
      */
     public function show(StudentSchedule $schedule, string $term): View
     {
+        // 確認課表內該學期是否有任何課程，如果沒有則返回 404
+        $hasCourses = $schedule->items()
+            ->whereHas('courseClass.course', fn (Builder $q) => $q->where('term', $term))
+            ->exists();
+
+        if (! $hasCourses) {
+            abort(404);
+        }
+
         // 取得或建立該學期的學習進度
         $learningProgress = $schedule->learningProgresses()
             ->where('term', $term)
@@ -48,6 +57,11 @@ class LearningProgressController extends Controller
             ->unique('id')
             ->values()
             ->toArray();
+
+        // 如果該學期沒有任何課程，視為資源不存在
+        if (empty($courses)) {
+            abort(404);
+        }
 
         // 計算學期的週次信息
         [$semesterStart, $semesterEnd, $weeks] = $this->calculateSemesterWeeks($term);

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Course;
+use App\Models\CourseClass;
 use App\Models\LearningProgress;
 use App\Models\StudentSchedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -8,6 +10,15 @@ uses(RefreshDatabase::class);
 
 test('can view learning progress page', function () {
     $schedule = StudentSchedule::factory()->create();
+
+    // add a course for the term so the page is accessible
+    $courseClass = CourseClass::factory()
+        ->for(
+            Course::factory()->state(['term' => '2025B'])
+        )
+        ->create();
+
+    $schedule->items()->create(['course_class_id' => $courseClass->id]);
 
     $response = $this->get(route('learning-progress.show', [
         'schedule' => $schedule,
@@ -22,8 +33,34 @@ test('can view learning progress page', function () {
     $response->assertSee('完成進度');
 });
 
+test('returns 404 when schedule has no courses for the term', function () {
+    $schedule = StudentSchedule::factory()->create();
+
+    // no items created for any term, so 2025B should be empty
+    $response = $this->get(route('learning-progress.show', [
+        'schedule' => $schedule,
+        'term' => '2025B',
+    ]));
+
+    $response->assertStatus(404);
+
+    // ensure no progress record was created inadvertently
+    $this->assertDatabaseMissing('learning_progresses', [
+        'student_schedule_id' => $schedule->id,
+        'term' => '2025B',
+    ]);
+});
+
 test('creates learning progress record if not exists', function () {
     $schedule = StudentSchedule::factory()->create();
+
+    // attach at least one course item for the term
+    $courseClass = CourseClass::factory()
+        ->for(
+            Course::factory()->state(['term' => '2025B'])
+        )
+        ->create();
+    $schedule->items()->create(['course_class_id' => $courseClass->id]);
 
     // Ensure no learning progress exists
     $this->assertDatabaseMissing('learning_progresses', [
