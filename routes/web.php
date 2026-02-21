@@ -23,7 +23,7 @@ Route::get('/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->n
 Route::put('/schedules/{schedule}', [ScheduleController::class, 'update'])->name('schedules.update');
 Route::get('/schedules/{schedule}/calendar', ScheduleCalendarController::class)->name('schedules.calendar');
 
-Route::get('/schedules/{schedule}/learning-progress/{term}', [LearningProgressController::class, 'show'])
+Route::get('/schedules/{schedule}/{term}/learning-progress', [LearningProgressController::class, 'show'])
     ->name('learning-progress.show');
-Route::put('/schedules/{schedule}/learning-progress/{term}', [LearningProgressController::class, 'update'])
+Route::put('/schedules/{schedule}/{term}/learning-progress', [LearningProgressController::class, 'update'])
     ->name('learning-progress.update');
