@@ -55,14 +55,14 @@
                 </td>
                 <td class="px-4 py-3 text-warm-800 tabular-nums print:hidden">
                     @if ($nextSchedule)
-                        {{ Date::parse($nextSchedule->date)->isoFormat('M/D (dd)') }}
+                        {!! str_replace(' ', '&nbsp;', e(Date::parse($nextSchedule->date)->isoFormat('M/D (dd)'))) !!}
                     @else
                         <span class="text-warm-500">無未來課程</span>
                     @endif
                 </td>
                 <td class="px-4 py-3 text-warm-800 tabular-nums print:hidden">
                     @if ($displayStartTime)
-                        {{ $displayStartTime }} ~ {{ $displayEndTime }}
+                        {{ $displayStartTime }}&nbsp;~ {{ $displayEndTime }}
                         @if ($nextSchedule && $nextSchedule->start_time)
                             <x-heroicon-o-exclamation-triangle
                                 class="size-4 text-orange-600"

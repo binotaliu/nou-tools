@@ -4,7 +4,7 @@
 >
     <div class="mx-auto max-w-5xl">
         <div
-            class="mb-8 flex flex-col items-start justify-between gap-y-4 md:flex-row"
+            class="mb-8 flex flex-col items-start justify-between gap-y-4 lg:flex-row"
         >
             <div>
                 <h2 class="mb-2 text-3xl font-bold text-warm-900">
@@ -19,12 +19,13 @@
             </div>
 
             <div
-                class="flex w-full gap-2 md:w-auto print:hidden"
+                class="flex w-full gap-2 lg:w-auto print:hidden"
                 x-data="{ subscribeOpen: false }"
             >
                 <x-link-button
                     :href="route('schedules.edit', $viewModel->uuid)"
                     variant="secondary"
+                    class="w-1/3 lg:w-auto"
                 >
                     <x-heroicon-o-pencil-square class="size-4" />
                     編輯課表
@@ -33,6 +34,7 @@
                 <x-link-button
                     :href="route('learning-progress.show', [$viewModel->uuid, config('app.current_semester')])"
                     variant="secondary"
+                    class="w-1/3 lg:w-auto"
                 >
                     <x-heroicon-o-clipboard class="size-4" />
                     學習進度表
@@ -49,6 +51,7 @@
                     type="button"
                     variant="primary"
                     @click="subscribeOpen = true"
+                    class="w-1/3 lg:w-auto"
                 >
                     <x-heroicon-o-calendar class="inline size-4" />
                     訂閱行事曆
