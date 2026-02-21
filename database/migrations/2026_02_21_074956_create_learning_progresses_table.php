@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_schedule_id')->constrained()->cascadeOnDelete();
             $table->string('term');
-            $table->json('progress')->default('{}');
-            $table->json('notes')->default('{}');
+            $table->json('progress');
+            $table->json('notes');
             $table->timestamps();
 
             // 每個課表中每個學期只能有一個學習進度表
