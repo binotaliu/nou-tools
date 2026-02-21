@@ -1,11 +1,14 @@
-<x-layout :title="($schedule->name ?: '我的課表') . ' - NOU 小幫手'" :noindex="true">
+<x-layout
+    :title="($viewModel->schedule->name ?: '我的課表') . ' - NOU 小幫手'"
+    :noindex="true"
+>
     <div class="mx-auto max-w-5xl">
         <div
             class="mb-8 flex flex-col items-start justify-between gap-y-4 md:flex-row"
         >
             <div>
                 <h2 class="mb-2 text-3xl font-bold text-warm-900">
-                    {{ $schedule->name ?: '我的課表' }}
+                    {{ $viewModel->schedule->name ?: '我的課表' }}
                 </h2>
                 <p
                     class="mt-1 flex items-center gap-1 text-sm text-warm-600 print:hidden"
@@ -20,7 +23,7 @@
                 x-data="{ subscribeOpen: false }"
             >
                 <x-link-button
-                    :href="route('schedules.edit', $schedule)"
+                    :href="route('schedules.edit', $viewModel->schedule)"
                     variant="secondary"
                 >
                     <x-heroicon-o-pencil-square class="size-4" />
@@ -28,10 +31,10 @@
                 </x-link-button>
 
                 @php
-                    $icsUrl = route('schedules.calendar', $schedule);
-                    $webcalUrl = preg_replace('/^https?/', 'webcal', $icsUrl);
-                    $googleUrl = 'https://calendar.google.com/calendar/r?cid=' . urlencode($webcalUrl);
-                    $outlookWebUrl = 'https://outlook.office.com/calendar/0/addfromweb?url=' . urlencode($webcalUrl);
+                    $icsUrl = $viewModel->calendarUrls->ics;
+                    $webcalUrl = $viewModel->calendarUrls->webcal;
+                    $googleUrl = $viewModel->calendarUrls->google;
+                    $outlookWebUrl = $viewModel->calendarUrls->outlook;
                 @endphp
 
                 <x-button
@@ -121,23 +124,18 @@
         <x-greeting class="mb-4 print:hidden" />
 
         {{-- Schedule Items - Responsive Table/Cards --}}
-        <x-schedule-items :items="$schedule->items" :schedule="$schedule" />
+        <x-schedule-items
+            :items="$viewModel->schedule->items"
+            :schedule="$viewModel->schedule"
+        />
 
         <x-common-links class="mb-8 print:hidden" />
 
         {{-- Schedule Calendar View --}}
-        @if (count($schedule->items) > 0)
+        @if (count($viewModel->schedule->items) > 0)
             <div class="mb-8">
                 <h3 class="mb-4 text-2xl font-bold text-warm-900">面授日期</h3>
-                @php
-                    $hasAnyOverride = $schedule->items->contains(function ($item) {
-                        return $item->courseClass->schedules->contains(function ($s) {
-                            return $s->start_time !== null;
-                        });
-                    });
-                @endphp
-
-                @if ($hasAnyOverride)
+                @if ($viewModel->hasAnyOverride)
                     <p
                         class="mb-4 flex items-center gap-1 text-sm text-warm-600"
                     >
@@ -151,66 +149,37 @@
                 <div
                     class="mb-4 grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 print:grid-cols-1"
                 >
-                    @php
-                        $coursesByMonth = [];
-                        foreach ($schedule->items as $item) {
-                            foreach ($item->courseClass->schedules as $classSchedule) {
-                                $monthKey = $classSchedule->date->format('Y-m');
-                                $monthKey_display = Date::parse($classSchedule->date)->isoFormat('Y 年 M 月');
-                                if (! isset($coursesByMonth[$monthKey])) {
-                                    $coursesByMonth[$monthKey] = ['month' => $monthKey_display, 'dates' => []];
-                                }
-                                $dateKey = $classSchedule->date->format('Y-m-d');
-                                if (! isset($coursesByMonth[$monthKey]['dates'][$dateKey])) {
-                                    $coursesByMonth[$monthKey]['dates'][$dateKey] = [];
-                                }
-                                // Use schedule time override if it exists, otherwise use class default
-                                $displayStartTime = $classSchedule->start_time ?? $item->courseClass->start_time;
-                                $displayEndTime = $classSchedule->end_time ?? $item->courseClass->end_time;
-                                $hasOverride = $classSchedule->start_time !== null;
-
-                                $coursesByMonth[$monthKey]['dates'][$dateKey][] = [
-                                    'courseName' => $item->courseClass->course->name,
-                                    'code' => $item->courseClass->code,
-                                    'time' => $displayStartTime ? $displayStartTime . ' - ' . $displayEndTime : '未設定',
-                                    'hasOverride' => $hasOverride,
-                                    'date' => $classSchedule->date,
-                                ];
-                            }
-                        }
-                    @endphp
-
-                    @foreach (collect($coursesByMonth)->sortKeys() as $monthData)
-                        <x-card :title="$monthData['month']">
+                    @foreach ($viewModel->months as $month)
+                        <x-card :title="$month->monthDisplay">
                             <div
                                 class="grid grid-cols-1 space-y-3 gap-x-6 gap-y-1 print:grid-cols-2"
                             >
-                                @foreach (collect($monthData['dates'])->sortKeys() as $dateStr => $courses)
+                                @foreach ($month->dates as $date)
                                     <div
                                         class="break-inside-avoid-page border-l-4 border-orange-500 py-2 pl-4"
                                     >
                                         <div
                                             class="mb-1 font-semibold text-warm-900"
                                         >
-                                            {{ Date::parse($dateStr)->isoFormat('M/D (dd)') }}
+                                            {{ $date->formattedDate() }}
                                         </div>
                                         <div class="space-y-1">
-                                            @foreach ($courses as $course)
+                                            @foreach ($date->courses as $course)
                                                 <div
                                                     class="text-sm text-warm-700"
                                                 >
                                                     <span class="font-semibold">
-                                                        {{ $course['courseName'] }}
+                                                        {{ $course->courseName }}
                                                     </span>
                                                     <x-class-code>
-                                                        {{ $course['code'] }}
+                                                        {{ $course->code }}
                                                     </x-class-code>
                                                     <br />
                                                     <span
                                                         class="inline-flex items-center gap-1 text-warm-600"
                                                     >
-                                                        {{ $course['time'] }}
-                                                        @if ($course['hasOverride'])
+                                                        {{ $course->time }}
+                                                        @if ($course->hasOverride)
                                                             <x-heroicon-o-exclamation-triangle
                                                                 class="size-4 text-orange-600"
                                                                 title="該次課程時間與一般時間不同"
@@ -232,43 +201,6 @@
         {{-- School Calendar --}}
         <x-school-calendar class="mb-8" />
 
-        @php
-            // Collect unique courses that appear in this schedule and sort by earliest exam datetime (ascending)
-            $courses = $schedule->items
-                ->map(fn ($it) => $it->courseClass->course)
-                ->unique('id')
-                ->values();
-
-            $coursesWithExam = $courses
-                ->filter(fn ($c) => $c->midterm_date || $c->final_date || $c->exam_time_start || $c->exam_time_end)
-                ->map(function ($course) {
-                    $dates = collect();
-
-                    if ($course->midterm_date) {
-                        $dt = Date::parse($course->midterm_date);
-                        if ($course->exam_time_start) {
-                            $dt = $dt->setTimeFromTimeString($course->exam_time_start);
-                        }
-                        $dates->push($dt);
-                    }
-
-                    if ($course->final_date) {
-                        $dt = Date::parse($course->final_date);
-                        if ($course->exam_time_start) {
-                            $dt = $dt->setTimeFromTimeString($course->exam_time_start);
-                        }
-                        $dates->push($dt);
-                    }
-
-                    // attach earliest exam datetime (or null)
-                    $course->earliest_exam_at = $dates->count() ? $dates->min() : null;
-
-                    return $course;
-                })
-                ->sortBy(fn ($c) => $c->earliest_exam_at?->getTimestamp() ?: PHP_INT_MAX)
-                ->values();
-        @endphp
-
         <x-card
             class="mb-8"
             title="考試資訊"
@@ -276,21 +208,17 @@
         >
             {{-- 手機：卡片列表 --}}
             <div class="space-y-3 md:hidden">
-                @forelse ($coursesWithExam as $course)
-                    @php
-                        $firstClass = $schedule->items->first(fn ($it) => $it->courseClass->course->id === $course->id)?->courseClass;
-                    @endphp
-
+                @forelse ($viewModel->exams as $exam)
                     <div class="rounded-lg border border-warm-200 bg-white p-4">
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex-1">
                                 <div class="font-semibold text-warm-900">
-                                    {{ $course->name }}
+                                    {{ $exam->courseName }}
                                 </div>
-                                @if ($firstClass)
+                                @if ($exam->classCode)
                                     <div class="mt-1">
                                         <x-class-code>
-                                            {{ $firstClass->code }}
+                                            {{ $exam->classCode }}
                                         </x-class-code>
                                     </div>
                                 @endif
@@ -304,20 +232,14 @@
                                 >
                                     期中考
                                 </p>
-                                @if ($course->midterm_date)
+                                @if ($exam->midtermDate)
                                     <div class="font-semibold text-warm-900">
-                                        {{ Date::parse($course->midterm_date)->isoFormat('M/D (dd)') }}
+                                        {{ $exam->formattedMidtermDate() }}
                                     </div>
 
-                                    @if ($course->exam_time_start || $course->exam_time_end)
+                                    @if ($exam->formattedExamTime())
                                         <div class="mt-1 text-sm text-warm-600">
-                                            @if ($course->exam_time_start && $course->exam_time_end)
-                                                {{ $course->exam_time_start }}
-                                                -
-                                                {{ $course->exam_time_end }}
-                                            @else
-                                                {{ $course->exam_time_start ?? $course->exam_time_end }}
-                                            @endif
+                                            {{ $exam->formattedExamTime() }}
                                         </div>
                                     @endif
                                 @else
@@ -331,20 +253,14 @@
                                 >
                                     期末考
                                 </p>
-                                @if ($course->final_date)
+                                @if ($exam->finalDate)
                                     <div class="font-semibold text-warm-900">
-                                        {{ Date::parse($course->final_date)->isoFormat('M/D (dd)') }}
+                                        {{ $exam->formattedFinalDate() }}
                                     </div>
 
-                                    @if ($course->exam_time_start || $course->exam_time_end)
+                                    @if ($exam->formattedExamTime())
                                         <div class="mt-1 text-sm text-warm-600">
-                                            @if ($course->exam_time_start && $course->exam_time_end)
-                                                {{ $course->exam_time_start }}
-                                                -
-                                                {{ $course->exam_time_end }}
-                                            @else
-                                                {{ $course->exam_time_start ?? $course->exam_time_end }}
-                                            @endif
+                                            {{ $exam->formattedExamTime() }}
                                         </div>
                                     @endif
                                 @else
@@ -385,22 +301,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($coursesWithExam as $course)
-                            @php
-                                $firstClass = $schedule->items->first(fn ($it) => $it->courseClass->course->id === $course->id)?->courseClass;
-                            @endphp
-
+                        @forelse ($viewModel->exams as $exam)
                             <tr
                                 class="border-b border-warm-200 hover:bg-warm-50"
                             >
                                 <td
                                     class="px-4 py-3 font-semibold text-warm-900"
                                 >
-                                    {{ $course->name }}
-                                    @if ($firstClass)
+                                    {{ $exam->courseName }}
+                                    @if ($exam->classCode)
                                         <div class="mt-1">
                                             <x-class-code>
-                                                {{ $firstClass->code }}
+                                                {{ $exam->classCode }}
                                             </x-class-code>
                                         </div>
                                     @endif
@@ -409,23 +321,17 @@
                                 <td
                                     class="px-4 py-3 text-warm-800 tabular-nums"
                                 >
-                                    @if ($course->midterm_date)
+                                    @if ($exam->midtermDate)
                                         <div class="font-semibold">
-                                            {{ Date::parse($course->midterm_date)->isoFormat('M/D (dd)') }}
+                                            {{ $exam->formattedMidtermDate() }}
                                         </div>
                                     @else
                                         <div class="text-warm-500">—</div>
                                     @endif
 
-                                    @if ($course->exam_time_start || $course->exam_time_end)
+                                    @if ($exam->formattedExamTime())
                                         <div class="mt-1 text-sm text-warm-600">
-                                            @if ($course->exam_time_start && $course->exam_time_end)
-                                                {{ $course->exam_time_start }}
-                                                -
-                                                {{ $course->exam_time_end }}
-                                            @else
-                                                {{ $course->exam_time_start ?? $course->exam_time_end }}
-                                            @endif
+                                            {{ $exam->formattedExamTime() }}
                                         </div>
                                     @endif
                                 </td>
@@ -433,23 +339,17 @@
                                 <td
                                     class="px-4 py-3 text-warm-800 tabular-nums"
                                 >
-                                    @if ($course->final_date)
+                                    @if ($exam->finalDate)
                                         <div class="font-semibold">
-                                            {{ Date::parse($course->final_date)->isoFormat('M/D (dd)') }}
+                                            {{ $exam->formattedFinalDate() }}
                                         </div>
                                     @else
                                         <div class="text-warm-500">—</div>
                                     @endif
 
-                                    @if ($course->exam_time_start || $course->exam_time_end)
+                                    @if ($exam->formattedExamTime())
                                         <div class="mt-1 text-sm text-warm-600">
-                                            @if ($course->exam_time_start && $course->exam_time_end)
-                                                {{ $course->exam_time_start }}
-                                                -
-                                                {{ $course->exam_time_end }}
-                                            @else
-                                                {{ $course->exam_time_start ?? $course->exam_time_end }}
-                                            @endif
+                                            {{ $exam->formattedExamTime() }}
                                         </div>
                                     @endif
                                 </td>
@@ -486,7 +386,8 @@
 
                     <div
                         x-data="{
-                            shareUrl: {{ Js::from(url(route('schedules.show', $schedule))) }},
+                            shareUrl:
+                                {{ Js::from(url(route('schedules.show', $viewModel->schedule))) }},
                             copied: false,
                             async copy() {
                                 try {
@@ -553,7 +454,7 @@
                     class="hidden w-28 flex-col items-center justify-center md:flex print:flex"
                 >
                     <div class="rounded border border-warm-200 bg-white p-2">
-                        {!! DNS2D::getBarcodeSVG(url(route('schedules.show', $schedule)), 'QRCODE') !!}
+                        {!! DNS2D::getBarcodeSVG(url(route('schedules.show', $viewModel->schedule)), 'QRCODE') !!}
                     </div>
                 </div>
             </div>

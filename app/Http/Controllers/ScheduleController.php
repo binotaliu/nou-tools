@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
+use App\ViewModels\ScheduleViewModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -205,7 +206,7 @@ class ScheduleController extends Controller
         $schedule->load(['items.courseClass.course', 'items.courseClass.schedules']);
 
         return view('schedule.show', [
-            'schedule' => $schedule,
+            'viewModel' => ScheduleViewModel::fromModel($schedule),
         ]);
     }
 }
