@@ -4,19 +4,19 @@ namespace App\ViewModels;
 
 use App\Models\StudentSchedule;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 
-final readonly class ScheduleViewModel
+final class ScheduleViewModel extends Data
 {
-    /**
-     * @param  Collection<int, \App\ViewModels\ScheduleMonthViewModel>  $months
-     * @param  Collection<int, \App\ViewModels\ScheduleExamViewModel>  $exams
-     */
     public function __construct(
         public StudentSchedule $schedule,
         public bool $hasAnyOverride,
-        public Collection $months,
-        public Collection $exams,
+        #[DataCollectionOf(ScheduleMonthViewModel::class)]
+        public DataCollection $months,
+        #[DataCollectionOf(ScheduleExamViewModel::class)]
+        public DataCollection $exams,
         public ScheduleCalendarUrlsViewModel $calendarUrls,
     ) {}
 
@@ -45,10 +45,8 @@ final readonly class ScheduleViewModel
 
     /**
      * Group course schedules by month with formatted display data
-     *
-     * @return Collection<int, ScheduleMonthViewModel>
      */
-    private static function buildMonthsCollection(StudentSchedule $schedule): Collection
+    private static function buildMonthsCollection(StudentSchedule $schedule): DataCollection
     {
         $coursesByMonth = [];
 
@@ -89,17 +87,20 @@ final readonly class ScheduleViewModel
             }
         }
 
-        return collect($coursesByMonth)
+        $months = collect($coursesByMonth)
             ->sortKeys()
             ->map(function ($monthData) {
-                $dates = collect($monthData['dates'])
-                    ->sortKeys()
-                    ->map(fn ($dateData) => new ScheduleDateViewModel(
-                        date: $dateData['date'],
-                        dateKey: $dateData['dateKey'],
-                        courses: collect($dateData['courses']),
-                    ))
-                    ->values();
+                $dates = ScheduleDateViewModel::collect(
+                    collect($monthData['dates'])
+                        ->sortKeys()
+                        ->map(fn ($dateData) => [
+                            'date' => $dateData['date'],
+                            'dateKey' => $dateData['dateKey'],
+                            'courses' => ScheduleCourseItemViewModel::collect($dateData['courses'], DataCollection::class),
+                        ])
+                        ->values(),
+                    DataCollection::class
+                );
 
                 return new ScheduleMonthViewModel(
                     monthKey: $monthData['monthKey'],
@@ -108,14 +109,14 @@ final readonly class ScheduleViewModel
                 );
             })
             ->values();
+
+        return ScheduleMonthViewModel::collect($months, DataCollection::class);
     }
 
     /**
      * Get all courses with exam information, sorted by earliest exam date
-     *
-     * @return Collection<int, ScheduleExamViewModel>
      */
-    private static function buildExamsCollection(StudentSchedule $schedule): Collection
+    private static function buildExamsCollection(StudentSchedule $schedule): DataCollection
     {
         $courses = $schedule->items
             ->map(fn ($it) => $it->courseClass->course)
@@ -134,6 +135,6 @@ final readonly class ScheduleViewModel
             ->sortBy(fn ($exam) => $exam->earliestExamAt?->getTimestamp() ?? PHP_INT_MAX)
             ->values();
 
-        return $exams;
+        return ScheduleExamViewModel::collect($exams, DataCollection::class);
     }
 }

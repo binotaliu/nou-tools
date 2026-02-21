@@ -3,8 +3,9 @@
 namespace App\ViewModels;
 
 use App\Models\StudentSchedule;
+use Spatie\LaravelData\Data;
 
-final readonly class ScheduleCalendarUrlsViewModel
+final class ScheduleCalendarUrlsViewModel extends Data
 {
     public function __construct(
         public string $ics,

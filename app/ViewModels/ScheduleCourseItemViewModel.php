@@ -3,8 +3,9 @@
 namespace App\ViewModels;
 
 use DateTimeInterface;
+use Spatie\LaravelData\Data;
 
-final readonly class ScheduleCourseItemViewModel
+final class ScheduleCourseItemViewModel extends Data
 {
     public function __construct(
         public string $courseName,

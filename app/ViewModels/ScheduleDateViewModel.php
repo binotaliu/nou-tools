@@ -3,17 +3,17 @@
 namespace App\ViewModels;
 
 use Carbon\CarbonInterface;
-use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 
-final readonly class ScheduleDateViewModel
+final class ScheduleDateViewModel extends Data
 {
-    /**
-     * @param  Collection<int, \App\ViewModels\ScheduleCourseItemViewModel>  $courses
-     */
     public function __construct(
         public CarbonInterface $date,
         public string $dateKey,
-        public Collection $courses,
+        #[DataCollectionOf(ScheduleCourseItemViewModel::class)]
+        public DataCollection $courses,
     ) {}
 
     public function formattedDate(): string

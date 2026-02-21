@@ -2,16 +2,16 @@
 
 namespace App\ViewModels;
 
-use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 
-final readonly class ScheduleMonthViewModel
+final class ScheduleMonthViewModel extends Data
 {
-    /**
-     * @param  Collection<int, \App\ViewModels\ScheduleDateViewModel>  $dates
-     */
     public function __construct(
         public string $monthKey,
         public string $monthDisplay,
-        public Collection $dates,
+        #[DataCollectionOf(ScheduleDateViewModel::class)]
+        public DataCollection $dates,
     ) {}
 }

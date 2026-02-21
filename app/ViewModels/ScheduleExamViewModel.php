@@ -6,8 +6,9 @@ use App\Models\Course;
 use App\Models\CourseClass;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Date;
+use Spatie\LaravelData\Data;
 
-final readonly class ScheduleExamViewModel
+final class ScheduleExamViewModel extends Data
 {
     public function __construct(
         public int $courseId,
