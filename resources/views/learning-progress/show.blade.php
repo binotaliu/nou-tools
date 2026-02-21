@@ -284,9 +284,9 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <div
-                            class="size-3 rounded border-2 border-orange-400 bg-orange-50"
+                            class="size-3 rounded border-2 border-red-400 bg-red-50"
                         ></div>
-                        <span class="text-xs text-warm-700">
+                        <span class="text-xs text-red-700">
                             進度落後（未完成）
                         </span>
                     </div>
