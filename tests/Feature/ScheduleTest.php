@@ -252,5 +252,8 @@ it('create page form posts to store route and does not include method spoofing',
 
     $response->assertStatus(200)
         ->assertSee('action="'.route('schedules.store').'"', false)
-        ->assertDontSee('name="_method" value="PUT"', false);
+        ->assertDontSee('name="_method" value="PUT"', false)
+        // the form uses Alpine to render hidden inputs for selected course classes
+        ->assertSee('template x-for="item in selectedItems"', false)
+        ->assertSee('name="name"', false); // schedule name field should have a name attribute
 });

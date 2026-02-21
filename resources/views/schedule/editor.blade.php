@@ -239,6 +239,7 @@
         <form
             action="{{ isset($schedule) ? route('schedules.update', $schedule) : route('schedules.store') }}"
             method="POST"
+            x-ref="form"
             @submit.prevent="submitForm"
             class="rounded-lg border border-warm-200 bg-white p-6"
         >
@@ -253,11 +254,21 @@
                 </label>
                 <input
                     type="text"
+                    name="name"
                     x-model="scheduleName"
                     placeholder="例如：浣熊的課表"
                     class="w-full rounded-lg border-2 border-warm-300 px-4 py-3 focus:border-orange-500 focus:outline-none"
                 />
             </div>
+
+            {{-- hidden fields for selected items --}}
+            <template x-for="item in selectedItems" :key="item.course.id">
+                <input
+                    type="hidden"
+                    name="items[]"
+                    :value="item.selectedClassId"
+                />
+            </template>
 
             <div class="flex gap-4">
                 <x-button
@@ -404,7 +415,7 @@
                     return labels[type] || type
                 },
 
-                async submitForm() {
+                submitForm() {
                     if (this.selectedItems.length === 0) {
                         alert('請至少選擇一門課程')
                         return
@@ -423,51 +434,9 @@
                         return
                     }
 
+                    // let the browser handle the submission normally
                     this.submitting = true
-
-                    try {
-                        const isEdit = !!this.schedule
-                        const url = isEdit
-                            ? '{{ isset($schedule) ? route('schedules.update', $schedule) : '' }}'
-                            : '{{ route('schedules.store') }}'
-                        const method = isEdit ? 'PUT' : 'POST'
-
-                        const response = await fetch(url, {
-                            method,
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN':
-                                    document.querySelector(
-                                        'meta[name="csrf-token"]'
-                                    )?.content || '{{ csrf_token() }}',
-                            },
-                            body: JSON.stringify({
-                                name: this.scheduleName,
-                                items: this.selectedItems.map(
-                                    item => item.selectedClassId
-                                ),
-                            }),
-                        })
-
-                        if (response.ok) {
-                            const result = await response.json()
-                            window.location.href = result.redirect_url
-                        } else {
-                            const errors = await response.json()
-                            let errorMsg = '保存失敗:\n'
-                            if (errors.errors) {
-                                Object.values(errors.errors).forEach(msgs => {
-                                    errorMsg += msgs.join('\n') + '\n'
-                                })
-                            }
-                            alert(errorMsg)
-                        }
-                    } catch (error) {
-                        console.error('提交出錯:', error)
-                        alert('保存失敗，請重試')
-                    } finally {
-                        this.submitting = false
-                    }
+                    this.$refs.form.submit()
                 },
             }
         }
