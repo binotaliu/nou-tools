@@ -11,6 +11,7 @@ class LearningProgressViewModel
     public function __construct(
         public int $id,
         public string $scheduleUuid,
+        public string $scheduleName,
         public string $term,
         public array $courses,
         public array $weeks,
@@ -35,6 +36,7 @@ class LearningProgressViewModel
         return new self(
             id: $learningProgress->id,
             scheduleUuid: $schedule->getRouteKey(),
+            scheduleName: $schedule->name,
             term: $learningProgress->term,
             courses: $courses,
             weeks: $weeks,
