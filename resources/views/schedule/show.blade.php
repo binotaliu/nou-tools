@@ -265,33 +265,138 @@
 
                     return $course;
                 })
-                ->sortBy(function ($c) {
-                    return $c->earliest_exam_at ? $c->earliest_exam_at->getTimestamp() : PHP_INT_MAX;
-                })
+                ->sortBy(fn ($c) => $c->earliest_exam_at?->getTimestamp() ?: PHP_INT_MAX)
                 ->values();
         @endphp
 
-        @if ($coursesWithExam->isNotEmpty())
-            <x-card
-                class="mb-8"
-                title="考試資訊"
-                subtitle="以下為您加入課表的科目之期中 / 期末考試日期與節次。"
-            >
-                {{-- 手機：卡片列表 --}}
-                <div class="space-y-3 md:hidden">
-                    @foreach ($coursesWithExam as $course)
-                        @php
-                            $firstClass = $schedule->items->first(fn ($it) => $it->courseClass->course->id === $course->id)?->courseClass;
-                        @endphp
+        <x-card
+            class="mb-8"
+            title="考試資訊"
+            subtitle="以下為您加入課表的科目之期中 / 期末考試日期與節次。"
+        >
+            {{-- 手機：卡片列表 --}}
+            <div class="space-y-3 md:hidden">
+                @forelse ($coursesWithExam as $course)
+                    @php
+                        $firstClass = $schedule->items->first(fn ($it) => $it->courseClass->course->id === $course->id)?->courseClass;
+                    @endphp
 
-                        <div
-                            class="rounded-lg border border-warm-200 bg-white p-4"
-                        >
-                            <div class="flex items-start justify-between gap-3">
-                                <div class="flex-1">
-                                    <div class="font-semibold text-warm-900">
-                                        {{ $course->name }}
+                    <div class="rounded-lg border border-warm-200 bg-white p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex-1">
+                                <div class="font-semibold text-warm-900">
+                                    {{ $course->name }}
+                                </div>
+                                @if ($firstClass)
+                                    <div class="mt-1">
+                                        <x-class-code>
+                                            {{ $firstClass->code }}
+                                        </x-class-code>
                                     </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="mt-3 grid grid-cols-2 gap-3">
+                            <div>
+                                <p
+                                    class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase"
+                                >
+                                    期中考
+                                </p>
+                                @if ($course->midterm_date)
+                                    <div class="font-semibold text-warm-900">
+                                        {{ Date::parse($course->midterm_date)->isoFormat('M/D (dd)') }}
+                                    </div>
+
+                                    @if ($course->exam_time_start || $course->exam_time_end)
+                                        <div class="mt-1 text-sm text-warm-600">
+                                            @if ($course->exam_time_start && $course->exam_time_end)
+                                                {{ $course->exam_time_start }}
+                                                -
+                                                {{ $course->exam_time_end }}
+                                            @else
+                                                {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                            @endif
+                                        </div>
+                                    @endif
+                                @else
+                                    <div class="text-warm-500">—</div>
+                                @endif
+                            </div>
+
+                            <div>
+                                <p
+                                    class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase"
+                                >
+                                    期末考
+                                </p>
+                                @if ($course->final_date)
+                                    <div class="font-semibold text-warm-900">
+                                        {{ Date::parse($course->final_date)->isoFormat('M/D (dd)') }}
+                                    </div>
+
+                                    @if ($course->exam_time_start || $course->exam_time_end)
+                                        <div class="mt-1 text-sm text-warm-600">
+                                            @if ($course->exam_time_start && $course->exam_time_end)
+                                                {{ $course->exam_time_start }}
+                                                -
+                                                {{ $course->exam_time_end }}
+                                            @else
+                                                {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                            @endif
+                                        </div>
+                                    @endif
+                                @else
+                                    <div class="text-warm-500">—</div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="px-4 py-16 text-center text-warm-500">
+                        您的課表中沒有任何科目有設定考試日期。
+                    </div>
+                @endforelse
+            </div>
+
+            {{-- 桌面：維持表格，但只在 md+ 顯示 --}}
+            <div class="hidden overflow-x-auto md:block">
+                <table class="w-full border-collapse overflow-hidden rounded">
+                    <thead>
+                        <tr
+                            class="rounded-t border-b-2 border-warm-300 bg-warm-100"
+                        >
+                            <th
+                                class="px-4 py-3 text-left font-bold text-warm-900"
+                            >
+                                課程
+                            </th>
+                            <th
+                                class="px-4 py-3 text-left font-bold text-warm-900"
+                            >
+                                期中考
+                            </th>
+                            <th
+                                class="px-4 py-3 text-left font-bold text-warm-900"
+                            >
+                                期末考
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($coursesWithExam as $course)
+                            @php
+                                $firstClass = $schedule->items->first(fn ($it) => $it->courseClass->course->id === $course->id)?->courseClass;
+                            @endphp
+
+                            <tr
+                                class="border-b border-warm-200 hover:bg-warm-50"
+                            >
+                                <td
+                                    class="px-4 py-3 font-semibold text-warm-900"
+                                >
+                                    {{ $course->name }}
                                     @if ($firstClass)
                                         <div class="mt-1">
                                             <x-class-code>
@@ -299,182 +404,70 @@
                                             </x-class-code>
                                         </div>
                                     @endif
-                                </div>
-                            </div>
+                                </td>
 
-                            <div class="mt-3 grid grid-cols-2 gap-3">
-                                <div>
-                                    <p
-                                        class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase"
-                                    >
-                                        期中考
-                                    </p>
+                                <td
+                                    class="px-4 py-3 text-warm-800 tabular-nums"
+                                >
                                     @if ($course->midterm_date)
-                                        <div
-                                            class="font-semibold text-warm-900"
-                                        >
+                                        <div class="font-semibold">
                                             {{ Date::parse($course->midterm_date)->isoFormat('M/D (dd)') }}
                                         </div>
-
-                                        @if ($course->exam_time_start || $course->exam_time_end)
-                                            <div
-                                                class="mt-1 text-sm text-warm-600"
-                                            >
-                                                @if ($course->exam_time_start && $course->exam_time_end)
-                                                    {{ $course->exam_time_start }}
-                                                    -
-                                                    {{ $course->exam_time_end }}
-                                                @else
-                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
-                                                @endif
-                                            </div>
-                                        @endif
                                     @else
                                         <div class="text-warm-500">—</div>
                                     @endif
-                                </div>
 
-                                <div>
-                                    <p
-                                        class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase"
-                                    >
-                                        期末考
-                                    </p>
+                                    @if ($course->exam_time_start || $course->exam_time_end)
+                                        <div class="mt-1 text-sm text-warm-600">
+                                            @if ($course->exam_time_start && $course->exam_time_end)
+                                                {{ $course->exam_time_start }}
+                                                -
+                                                {{ $course->exam_time_end }}
+                                            @else
+                                                {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                            @endif
+                                        </div>
+                                    @endif
+                                </td>
+
+                                <td
+                                    class="px-4 py-3 text-warm-800 tabular-nums"
+                                >
                                     @if ($course->final_date)
-                                        <div
-                                            class="font-semibold text-warm-900"
-                                        >
+                                        <div class="font-semibold">
                                             {{ Date::parse($course->final_date)->isoFormat('M/D (dd)') }}
                                         </div>
-
-                                        @if ($course->exam_time_start || $course->exam_time_end)
-                                            <div
-                                                class="mt-1 text-sm text-warm-600"
-                                            >
-                                                @if ($course->exam_time_start && $course->exam_time_end)
-                                                    {{ $course->exam_time_start }}
-                                                    -
-                                                    {{ $course->exam_time_end }}
-                                                @else
-                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
-                                                @endif
-                                            </div>
-                                        @endif
                                     @else
                                         <div class="text-warm-500">—</div>
                                     @endif
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
 
-                {{-- 桌面：維持表格，但只在 md+ 顯示 --}}
-                <div class="hidden overflow-x-auto md:block">
-                    <table
-                        class="w-full border-collapse overflow-hidden rounded"
-                    >
-                        <thead>
-                            <tr
-                                class="rounded-t border-b-2 border-warm-300 bg-warm-100"
-                            >
-                                <th
-                                    class="px-4 py-3 text-left font-bold text-warm-900"
-                                >
-                                    課程
-                                </th>
-                                <th
-                                    class="px-4 py-3 text-left font-bold text-warm-900"
-                                >
-                                    期中考
-                                </th>
-                                <th
-                                    class="px-4 py-3 text-left font-bold text-warm-900"
-                                >
-                                    期末考
-                                </th>
+                                    @if ($course->exam_time_start || $course->exam_time_end)
+                                        <div class="mt-1 text-sm text-warm-600">
+                                            @if ($course->exam_time_start && $course->exam_time_end)
+                                                {{ $course->exam_time_start }}
+                                                -
+                                                {{ $course->exam_time_end }}
+                                            @else
+                                                {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                            @endif
+                                        </div>
+                                    @endif
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($coursesWithExam as $course)
-                                @php
-                                    $firstClass = $schedule->items->first(fn ($it) => $it->courseClass->course->id === $course->id)?->courseClass;
-                                @endphp
-
-                                <tr
-                                    class="border-b border-warm-200 hover:bg-warm-50"
+                        @empty
+                            <tr>
+                                <td
+                                    class="px-4 py-16 text-center text-warm-500"
+                                    colspan="3"
                                 >
-                                    <td
-                                        class="px-4 py-3 font-semibold text-warm-900"
-                                    >
-                                        {{ $course->name }}
-                                        @if ($firstClass)
-                                            <div class="mt-1">
-                                                <x-class-code>
-                                                    {{ $firstClass->code }}
-                                                </x-class-code>
-                                            </div>
-                                        @endif
-                                    </td>
-
-                                    <td
-                                        class="px-4 py-3 text-warm-800 tabular-nums"
-                                    >
-                                        @if ($course->midterm_date)
-                                            <div class="font-semibold">
-                                                {{ Date::parse($course->midterm_date)->isoFormat('M/D (dd)') }}
-                                            </div>
-                                        @else
-                                            <div class="text-warm-500">—</div>
-                                        @endif
-
-                                        @if ($course->exam_time_start || $course->exam_time_end)
-                                            <div
-                                                class="mt-1 text-sm text-warm-600"
-                                            >
-                                                @if ($course->exam_time_start && $course->exam_time_end)
-                                                    {{ $course->exam_time_start }}
-                                                    -
-                                                    {{ $course->exam_time_end }}
-                                                @else
-                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
-                                                @endif
-                                            </div>
-                                        @endif
-                                    </td>
-
-                                    <td
-                                        class="px-4 py-3 text-warm-800 tabular-nums"
-                                    >
-                                        @if ($course->final_date)
-                                            <div class="font-semibold">
-                                                {{ Date::parse($course->final_date)->isoFormat('M/D (dd)') }}
-                                            </div>
-                                        @else
-                                            <div class="text-warm-500">—</div>
-                                        @endif
-
-                                        @if ($course->exam_time_start || $course->exam_time_end)
-                                            <div
-                                                class="mt-1 text-sm text-warm-600"
-                                            >
-                                                @if ($course->exam_time_start && $course->exam_time_end)
-                                                    {{ $course->exam_time_start }}
-                                                    -
-                                                    {{ $course->exam_time_end }}
-                                                @else
-                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
-                                                @endif
-                                            </div>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </x-card>
-        @endif
+                                    您的課表中沒有任何科目有設定考試日期。
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </x-card>
 
         {{-- Share Section --}}
         <x-card>
