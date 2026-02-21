@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Data\StudentScheduleCookie;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
@@ -22,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        CarbonImmutable::setLocale(config('app.locale'));
+        Date::use(CarbonImmutable::class);
+
         // Register a Str macro to format semester codes (always full format).
         Str::macro('toSemesterDisplay', function (string $semester): string {
             if (! preg_match('/^(\d{4})([ABC])$/', (string) $semester, $m)) {

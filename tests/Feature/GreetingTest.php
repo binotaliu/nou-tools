@@ -12,8 +12,7 @@ it('shows semester week during the semester on the home page', function () {
 
     $response->assertStatus(200)
         ->assertSeeInOrder([
-            '今天是 2026 年 2 月 24 日',
-            '(二)',
+            '今天是 2026 年 2 月 24 日 (二)',
             '114 學年度下學期第一週',
         ]);
 });

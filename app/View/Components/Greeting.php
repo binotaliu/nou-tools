@@ -12,8 +12,6 @@ class Greeting extends Component
 
     public string $dateString;
 
-    public string $weekday;
-
     public string $semesterInfo;
 
     public function __construct()
@@ -29,9 +27,7 @@ class Greeting extends Component
             $this->greetingText = '晚安';
         }
 
-        $weekdayMap = ['日', '一', '二', '三', '四', '五', '六'];
-        $this->weekday = $weekdayMap[$now->dayOfWeek];
-        $this->dateString = $now->format('Y 年 n 月 j 日');
+        $this->dateString = $now->isoFormat('Y 年 M 月 D 日 (dd)');
 
         // semester display (e.g. 2025B -> "114學年度下學期")
         $semesterCode = config('app.current_semester');

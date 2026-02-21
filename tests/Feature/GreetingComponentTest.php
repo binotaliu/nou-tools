@@ -11,8 +11,7 @@ it('computes semester info during the semester (component)', function () {
 
     $component = new Greeting;
 
-    expect($component->dateString)->toBe('2026 年 2 月 24 日')
-        ->and($component->weekday)->toBe('二')
+    expect($component->dateString)->toBe('2026 年 2 月 24 日 (二)')
         ->and($component->semesterInfo)->toBe('114 學年度下學期第一週');
 });
 

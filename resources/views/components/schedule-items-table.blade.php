@@ -55,12 +55,7 @@
                 </td>
                 <td class="px-4 py-3 text-warm-800 tabular-nums print:hidden">
                     @if ($nextSchedule)
-                        @php
-                            $d = $nextSchedule->date;
-                            $weekdayZh = ['日', '一', '二', '三', '四', '五', '六'][$d->dayOfWeek];
-                        @endphp
-
-                        {{ $d->format('n/j') }} ({{ $weekdayZh }})
+                        {{ Date::parse($nextSchedule->date)->isoFormat('M/D (dd)') }}
                     @else
                         <span class="text-warm-500">無未來課程</span>
                     @endif

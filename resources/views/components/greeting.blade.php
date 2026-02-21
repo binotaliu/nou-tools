@@ -6,8 +6,7 @@
             </h2>
 
             <p class="mt-1 text-warm-500">
-                今天是 {{ $dateString }}
-                ({{ $weekday }})，{{ $semesterInfo }}
+                今天是 {{ $dateString }}，{{ $semesterInfo }}
             </p>
         </div>
     </div>

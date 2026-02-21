@@ -77,7 +77,7 @@ class ScheduleCalendarController extends Controller
         return implode("\r\n", $lines);
     }
 
-    private function convertToICSDateTime(\DateTime $date, string $time): string
+    private function convertToICSDateTime(\DateTimeInterface $date, string $time): string
     {
         // Stored times are local (UTC+8). Interpret date+time as Asia/Taipei,
         // convert to UTC and emit a Z-suffixed timestamp for ICS consumers.

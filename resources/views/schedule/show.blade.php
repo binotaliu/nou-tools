@@ -156,7 +156,7 @@
                         foreach ($schedule->items as $item) {
                             foreach ($item->courseClass->schedules as $classSchedule) {
                                 $monthKey = $classSchedule->date->format('Y-m');
-                                $monthKey_display = $classSchedule->date->format('Y 年 n 月');
+                                $monthKey_display = Date::parse($classSchedule->date)->isoFormat('Y 年 M 月');
                                 if (! isset($coursesByMonth[$monthKey])) {
                                     $coursesByMonth[$monthKey] = ['month' => $monthKey_display, 'dates' => []];
                                 }
@@ -189,16 +189,10 @@
                                     <div
                                         class="break-inside-avoid-page border-l-4 border-orange-500 py-2 pl-4"
                                     >
-                                        @php
-                                            $d = \Carbon\Carbon::parse($dateStr);
-                                            $weekdayZh = ['日', '一', '二', '三', '四', '五', '六'][$d->dayOfWeek];
-                                        @endphp
-
                                         <div
                                             class="mb-1 font-semibold text-warm-900"
                                         >
-                                            {{ $d->format('n/j') }}
-                                            ({{ $weekdayZh }})
+                                            {{ Date::parse($dateStr)->isoFormat('M/D (dd)') }}
                                         </div>
                                         <div class="space-y-1">
                                             @foreach ($courses as $course)
@@ -251,7 +245,7 @@
                     $dates = collect();
 
                     if ($course->midterm_date) {
-                        $dt = \Illuminate\Support\Carbon::parse($course->midterm_date);
+                        $dt = Date::parse($course->midterm_date);
                         if ($course->exam_time_start) {
                             $dt = $dt->setTimeFromTimeString($course->exam_time_start);
                         }
@@ -259,7 +253,7 @@
                     }
 
                     if ($course->final_date) {
-                        $dt = \Illuminate\Support\Carbon::parse($course->final_date);
+                        $dt = Date::parse($course->final_date);
                         if ($course->exam_time_start) {
                             $dt = $dt->setTimeFromTimeString($course->exam_time_start);
                         }
@@ -316,16 +310,10 @@
                                         期中考
                                     </p>
                                     @if ($course->midterm_date)
-                                        @php
-                                            $md = \Illuminate\Support\Carbon::parse($course->midterm_date);
-                                            $weekday = ['日', '一', '二', '三', '四', '五', '六'][$md->dayOfWeek];
-                                        @endphp
-
                                         <div
                                             class="font-semibold text-warm-900"
                                         >
-                                            {{ $md->format('n/j') }}
-                                            ({{ $weekday }})
+                                            {{ Date::parse($course->midterm_date)->isoFormat('M/D (dd)') }}
                                         </div>
 
                                         @if ($course->exam_time_start || $course->exam_time_end)
@@ -353,16 +341,10 @@
                                         期末考
                                     </p>
                                     @if ($course->final_date)
-                                        @php
-                                            $fd = \Illuminate\Support\Carbon::parse($course->final_date);
-                                            $weekday = ['日', '一', '二', '三', '四', '五', '六'][$fd->dayOfWeek];
-                                        @endphp
-
                                         <div
                                             class="font-semibold text-warm-900"
                                         >
-                                            {{ $fd->format('n/j') }}
-                                            ({{ $weekday }})
+                                            {{ Date::parse($course->final_date)->isoFormat('M/D (dd)') }}
                                         </div>
 
                                         @if ($course->exam_time_start || $course->exam_time_end)
@@ -439,14 +421,8 @@
                                         class="px-4 py-3 text-warm-800 tabular-nums"
                                     >
                                         @if ($course->midterm_date)
-                                            @php
-                                                $md = \Illuminate\Support\Carbon::parse($course->midterm_date);
-                                                $weekday = ['日', '一', '二', '三', '四', '五', '六'][$md->dayOfWeek];
-                                            @endphp
-
                                             <div class="font-semibold">
-                                                {{ $md->format('n/j') }}
-                                                ({{ $weekday }})
+                                                {{ Date::parse($course->midterm_date)->isoFormat('M/D (dd)') }}
                                             </div>
                                         @else
                                             <div class="text-warm-500">—</div>
@@ -471,14 +447,8 @@
                                         class="px-4 py-3 text-warm-800 tabular-nums"
                                     >
                                         @if ($course->final_date)
-                                            @php
-                                                $fd = \Illuminate\Support\Carbon::parse($course->final_date);
-                                                $weekday = ['日', '一', '二', '三', '四', '五', '六'][$fd->dayOfWeek];
-                                            @endphp
-
                                             <div class="font-semibold">
-                                                {{ $fd->format('n/j') }}
-                                                ({{ $weekday }})
+                                                {{ Date::parse($course->final_date)->isoFormat('M/D (dd)') }}
                                             </div>
                                         @else
                                             <div class="text-warm-500">—</div>
