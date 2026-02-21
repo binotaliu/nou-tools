@@ -19,7 +19,7 @@ class LearningProgressFactory extends Factory
     {
         return [
             'student_schedule_id' => StudentSchedule::factory(),
-            'semester_code' => '2025B',
+            'term' => '2025B',
             'progress' => [],
             'notes' => [],
         ];

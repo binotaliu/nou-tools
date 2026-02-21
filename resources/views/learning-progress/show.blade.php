@@ -46,12 +46,34 @@
 
         <x-greeting class="mb-6" />
 
+        {{-- overall completion progress bar --}}
+        <div class="mb-4 w-full print:hidden">
+            <p class="mb-1 text-sm text-warm-700">
+                本學期完成進度：{{ number_format($viewModel->percentage, 0) }}%
+            </p>
+            <div
+                class="relative h-2 w-full overflow-hidden rounded bg-warm-200"
+            >
+                <div
+                    class="h-full bg-warm-500"
+                    style="width: {{ $viewModel->percentage }}%"
+                ></div>
+            </div>
+        </div>
+
         {{-- Learning Progress Table --}}
         <div
             class="relative rounded border border-warm-300"
             x-data="{
                 showHorizontalGradient: false,
                 showVerticalGradient: false,
+                dirty: false,
+                unloadListener: null,
+
+                init() {
+                    this.checkGradientVisibility()
+                },
+
                 checkGradientVisibility() {
                     const progressForm = this.$refs.progressForm
                     this.showHorizontalGradient =

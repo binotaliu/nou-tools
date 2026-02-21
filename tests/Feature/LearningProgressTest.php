@@ -17,6 +17,9 @@ test('can view learning progress page', function () {
     $response->assertStatus(200);
     $response->assertViewHas('viewModel');
     $response->assertViewIs('learning-progress.show');
+
+    // progress bar text should be present, default 0%
+    $response->assertSee('完成進度');
 });
 
 test('creates learning progress record if not exists', function () {
@@ -25,7 +28,7 @@ test('creates learning progress record if not exists', function () {
     // Ensure no learning progress exists
     $this->assertDatabaseMissing('learning_progresses', [
         'student_schedule_id' => $schedule->id,
-        'semester_code' => '2025B',
+        'term' => '2025B',
     ]);
 
     // Visit the page
@@ -37,9 +40,8 @@ test('creates learning progress record if not exists', function () {
     // Should create a new record
     $this->assertDatabaseHas('learning_progresses', [
         'student_schedule_id' => $schedule->id,
-        'semester_code' => '2025B',
+        'term' => '2025B',
     ]);
-
     $response->assertStatus(200);
 });
 
@@ -47,7 +49,7 @@ test('can update learning progress', function () {
     $schedule = StudentSchedule::factory()->create();
     $progress = LearningProgress::factory()->create([
         'student_schedule_id' => $schedule->id,
-        'semester_code' => '2025B',
+        'term' => '2025B',
     ]);
 
     $updateData = [
@@ -81,7 +83,7 @@ test('learning progress has correct structure', function () {
     $schedule = StudentSchedule::factory()->create();
     $progress = LearningProgress::factory()->create([
         'student_schedule_id' => $schedule->id,
-        'semester_code' => '2025B',
+        'term' => '2025B',
         'progress' => [
             '1' => [
                 '1' => ['video' => true, 'textbook' => false],
@@ -101,12 +103,12 @@ test('learning progress has correct structure', function () {
     $this->assertEquals('Sample note', $progress->notes[1][1]);
 });
 
-test('unique constraint on student_schedule_id and semester_code', function () {
+test('unique constraint on student_schedule_id and term', function () {
     $schedule = StudentSchedule::factory()->create();
 
     LearningProgress::factory()->create([
         'student_schedule_id' => $schedule->id,
-        'semester_code' => '2025B',
+        'term' => '2025B',
     ]);
 
     // Try to create duplicate
@@ -114,6 +116,6 @@ test('unique constraint on student_schedule_id and semester_code', function () {
 
     LearningProgress::factory()->create([
         'student_schedule_id' => $schedule->id,
-        'semester_code' => '2025B',
+        'term' => '2025B',
     ]);
 });
