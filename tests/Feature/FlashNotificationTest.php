@@ -9,15 +9,21 @@ it('shows a toast notification when session has success', function () {
 
     $response->assertStatus(200);
 
-    // the toast markup should appear with the message and position classes
+    // message must be rendered
     $response->assertSee('Saved successfully');
-    $response->assertSee('fixed top-4 right-4');
+    // make sure the notification container is present (raw html, unescaped)
+    $response->assertSee('pointer-events-none fixed inset-0', false);
 });
 
 it('shows first error message in a toast when validation fails', function () {
-    $response = $this->withErrors(['first' => 'First error'])->get('/');
+    // manually craft the standard error bag that ShareErrorsFromSession middleware expects
+    $bag = new \Illuminate\Support\ViewErrorBag;
+    $bag->put('default', new \Illuminate\Support\MessageBag(['first' => 'First error']));
+
+    $response = $this->withSession(['errors' => $bag])->get('/');
 
     $response->assertStatus(200);
     $response->assertSee('First error');
-    $response->assertSee('bg-red-500');
+    // design now uses a red icon instead of background color
+    $response->assertSee('text-red-400');
 });
