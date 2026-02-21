@@ -24,10 +24,11 @@
                 </p>
             </div>
 
-            <div class="flex gap-2 print:hidden">
+            <div class="flex w-full gap-2 md:w-auto print:hidden">
                 <x-link-button
                     :href="route('schedules.show', $viewModel->scheduleUuid)"
                     variant="secondary"
+                    class="w-1/2 md:w-auto"
                 >
                     <x-heroicon-o-arrow-left class="size-4" />
                     回到課表
@@ -37,6 +38,7 @@
                     type="button"
                     variant="primary"
                     onclick="document.getElementById('progress-form').submit()"
+                    class="w-1/2 md:w-auto"
                 >
                     <x-heroicon-o-check class="size-4" />
                     保存進度
