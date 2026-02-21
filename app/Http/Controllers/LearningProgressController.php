@@ -19,9 +19,6 @@ class LearningProgressController extends Controller
      */
     public function show(StudentSchedule $schedule, string $term): View
     {
-
-        // 測試：轉到 2026-02-27
-        \Date::setTestNow(\Carbon\CarbonImmutable::parse('2026-03-27'));
         // 取得或建立該學期的學習進度
         $learningProgress = $schedule->learningProgresses()
             ->where('term', $term)
@@ -31,12 +28,10 @@ class LearningProgressController extends Controller
             $learningProgress = $this->createLearningProgress($schedule, $term);
         }
 
-        ray()->showQueries();
         $schedule->load([
             'items' => fn (HasMany $q) => $q->whereHas('courseClass.course', fn (Builder $q) => $q->where('term', $term)),
             'items.courseClass.course' => fn (BelongsTo $q) => $q->where('term', $term),
         ]);
-        ray()->stopShowingQueries();
 
         // 取得該課表的所有課程（該學期）
         $courses = $schedule->items
