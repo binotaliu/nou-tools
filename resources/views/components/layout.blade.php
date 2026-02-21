@@ -70,20 +70,22 @@
         </header>
 
         <main class="mx-auto max-w-7xl px-6 py-8">
+            {{-- flash notifications use slide‑in toasts instead of the old alert box --}}
             @if (session('success'))
-                <x-alert type="success" class="print:hidden">
-                    {{ session('success') }}
-                </x-alert>
+                <x-notification
+                    type="success"
+                    :message="session('success')"
+                    class="print:hidden"
+                />
             @endif
 
             @if ($errors->any())
-                <x-alert type="error" class="print:hidden">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </x-alert>
+                {{-- show first error only in toast; the page can still display the full list if needed --}}
+                <x-notification
+                    type="error"
+                    :message="$errors->first()"
+                    class="print:hidden"
+                />
             @endif
 
             {{ $slot }}
