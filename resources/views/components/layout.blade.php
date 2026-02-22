@@ -25,6 +25,19 @@
 
         <meta property="og:image" content="{{ asset('og-image.png') }}" />
 
+        <link rel="icon" href="{{ asset('favicon.ico') }}?v=2" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="512x512"
+            href="{{ asset('favicon.png') }}?v=2"
+        />
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            href="{{ asset('favicon.svg') }}?v=2"
+        />
+
         {{-- Alpine.js --}}
         <script
             defer
