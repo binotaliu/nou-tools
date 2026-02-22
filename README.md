@@ -1,158 +1,31 @@
-# NOU 小幫手 (nou-tools)
+<h1 align="center">📖 NOU 小幫手・NOU Tools</h1>
 
-給 NOU 學生的課表工具 — 幫助使用者搜尋課程、建立並設定個人課表，支援 iCal / webcal 訂閱、匯出 .ics、列印與 QR code 分享，以及顯示課程的面授日期與考試資訊。
+NOU 小幫手 (NOU Tools) 是一款由 NOU 學生為同學打造的非官方小工具，旨在為 NOU 學生提供便利的功能，包含課表管理與學習進度追蹤等。
 
----
+## 功能 / Features
 
-## 主要功能
+- **課表管理**：自訂課表，可快速看到視訊面授時間，並支援 WebCal 訂閱。
+- **學習進度追蹤**：記錄每週的課本與影音課程學習進度，並可加入個人備註。
 
-- 建立、編輯與分享個人課表（含 QR code）
-- 課程搜尋、班級選擇與課表項目管理
-- 匯出 / 訂閱 iCal（webcal）行事曆
-- 顯示面授日期、覆寫上課時間與考試資訊
-- 學校行事曆（學期重要日程）顯示
+## 開發 / Development
 
----
+本專案採用 Laravel 框架開發，前端使用 Blade 與 TailwindCSS 搭配 Alpine.js 製作。  
+若您有興趣參與貢獻，可 Clone 本專案後，依照以下步驟進行：
 
-## 技術堆疊
+1. 請確保您的環境有 PHP 8.4 以上與 Node.js 22 以上。
+2. 安裝相依套件：`composer install`
+3. 執行 `composer run setup` —— 此指令會建立 `.env` 檔案、產生應用程式金鑰、執行資料庫遷移、安裝前端套件並打包前端資源。
+4. 抓取課程資料：`php artisan course:fetch`、`php artisan course:fetch-map`、`php artisan exams:import`。
+5. 啟動開發伺服器：`composer run dev`，預設會在 `http://localhost:8000` 提供服務。
 
-- PHP 8.4+
-- Laravel v12
-- Tailwind CSS v4 + Vite
-- Pest v4（測試）
-- SQLite（開發/測試預設）
+開發時請遵守 [Code of Conduct](CODE_OF_CONDUCT.md) 中的行為準則，維持友善且包容的社群環境。
 
----
+本專案含有測試，可執行 `php artisan test` 來確保功能正常。
 
-## 快速開始（本機）
+## 授權 / License
 
-1. 取得原始碼
+本專案採用 `AGPL-3.0-or-later` 開放原始碼授權，詳細內容請參閱 [LICENSE](LICENSE) 檔案。
 
-   ```bash
-   git clone <repo> && cd nou-tools
-   ```
-
-2. 安裝 PHP 依賴與前端套件（有一個一步驟腳本）
-
-   ```bash
-   composer run setup
-   ```
-
-   或分步驟：
-
-   ```bash
-   composer install
-   cp .env.example .env
-   php artisan key:generate
-   php artisan migrate
-   npm install
-   npm run dev
-   ```
-
-3. 啟動開發伺服器
-   - 使用內建開發腳本（會同時啟動 server、queue、logs 與 Vite）
-
-     ```bash
-     composer dev
-     ```
-
-   - 或單獨啟動：
-
-     ```bash
-     php artisan serve
-     npm run dev
-     ```
-
-   - 使用 Laravel Herd 時，網站通常可在 `https://nou-tools.test`（或專案目錄 kebab-case）存取。
-
----
-
-## 常用指令
-
-- 本機開發（所有服務）：`composer dev`
-- 建置資產：`npm run build`
-- 格式化前端檔案：`npm run format`
-- 格式化 PHP：`vendor/bin/pint` 或 `npm run format:php`
-- 執行測試：`composer test` 或 `php artisan test --compact`
-
----
-
-## 環境設定（重要）
-
-- 複製 `.env.example` 並設定資料庫與其他服務。
-- 用於顯示學期的設定（預設放在 `.env` / `config/app.php`）：
-
-  ```env
-  CURRENT_SEMESTER=2025B
-  CURRENT_SEMESTER_START=2026-02-23
-  CURRENT_SEMESTER_END=2026-07-05
-  ```
-
-> 注意：學校行事曆事件定義在 `config/school-schedules.php`，可依學期更新。
-
----
-
-## 主要路由（摘錄）
-
-- GET / — 首頁（功能選單、今日面授）
-- GET /schedules/create — 建立課表
-- POST /schedules — 儲存課表
-- GET /schedules/{schedule} — 檢視 / 分享課表（含 QR / 下載 .ics / webcal）
-- GET /schedules/{schedule}/edit — 編輯已存課表
-- GET /schedules/{schedule}/calendar — 下載 / 訂閱 iCal
-- GET /courses/{course} — 檢視單一課程與班級資訊
-
-(完整路由請參考 `routes/web.php`)
-
----
-
-## 資料模型 & 目錄概覽
-
-- 主要 Eloquent 模型：`Course`, `CourseClass`, `ClassSchedule`, `StudentSchedule`, `StudentScheduleItem`, `User`
-- 重要目錄：
-  - `app/Services/` — 資料解析與排程邏輯（例如 NOU 解析器、考試/學期服務）
-  - `resources/views/` — Blade 視圖（編輯、檢視、首頁）
-  - `tests/` — Pest 測試
-
----
-
-## 測試與 CI
-
-- 使用 Pest（PHP）執行測試：`composer test`
-- 測試環境使用 SQLite（記憶體或 `database/database.sqlite`）— 相關設定見 `phpunit.xml`。
-
----
-
-## 開發規範
-
-- 代碼格式化：前端使用 Prettier、Blade plugin；PHP 使用 Pint。
-- 提交前會透過 Husky + lint-staged 自動執行格式化。
-- 新增功能請附上 Pest 測試（feature/unit）並確保 `composer test` 全綠。
-
----
-
-## 想法 / TODO（快速導覽）
-
-- 支援更多學期資料來源匯入
-- UI/UX 優化（行事曆視覺化）
-- 使用者帳號與雲端同步（目前以「擁有連結即可編輯」為分享機制）
-
----
-
-## 貢獻
-
-歡迎開 PR。請先執行：
-
-```bash
-composer install
-npm install
-npm run format
-vendor/bin/pint
-composer test
-```
-
----
-
-## 授權
-
-AGPL-3.0-or-later
+> [!NOTE]  
+> 本專案使用了部分來自 NOU 官方網站的資料，這些資料的版權屬於原作者，請勿將本專案用於商業用途。
+> 此外，由於我們採用 AGPL 授權，凡是使用到本專案程式碼的衍生作品也必須遵守相同的授權條款。換句話說，若您使用了本專案的程式碼，無論是修改還是直接使用，且包含通過網路提供服務，都必須將您的作品公開原始碼並採用 AGPL 授權。
