@@ -98,7 +98,7 @@
                 id="progress-form"
                 method="POST"
                 action="{{ route('learning-progress.update', [$viewModel->scheduleUuid, $viewModel->term]) }}"
-                class="max-h-180 max-w-full overflow-x-auto rounded bg-linear-to-b from-warm-100 to-white print:max-h-full"
+                class="max-h-[min(45rem,90vh)] max-w-full overflow-x-auto rounded bg-linear-to-b from-warm-100 to-white print:max-h-full"
                 style="
                     --courses-count: {{ count($viewModel->courses) }};
                     --weeks-count: {{ count($viewModel->weeks) }};
@@ -290,13 +290,13 @@
             {{-- horizontal gradient to hide the scrollbar, only on screen, not in print --}}
             <div
                 :class="showHorizontalGradient ? 'opacity-100' : 'opacity-0'"
-                class="pointer-events-none absolute bottom-0 left-0 z-50 h-32 w-[calc(100%-2px)] bg-linear-to-t from-stone-900/30 to-transparent transition-opacity duration-150 ease-in print:hidden"
+                class="pointer-events-none absolute bottom-0 left-0 z-20 h-16 w-full rounded-b bg-linear-to-t from-stone-900/20 to-transparent transition-opacity duration-150 ease-in md:h-32 print:hidden"
             ></div>
 
             {{-- vertical gradient to hide the border when the first column is sticky --}}
             <div
                 :class="showVerticalGradient ? 'opacity-100' : 'opacity-0'"
-                class="pointer-events-none absolute top-0 right-0 z-50 h-[calc(100%-2px)] w-32 bg-linear-to-l from-stone-900/30 to-transparent transition-opacity duration-150 ease-in print:hidden"
+                class="pointer-events-none absolute top-0 right-0 z-20 h-full w-16 rounded-r bg-linear-to-l from-stone-900/20 to-transparent transition-opacity duration-150 ease-in md:w-32 print:hidden"
             ></div>
         </div>
 
