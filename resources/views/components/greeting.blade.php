@@ -1,7 +1,7 @@
 <x-card {{ $attributes->class(['print:hidden'])->merge() }}>
     <div class="flex items-baseline justify-between gap-4">
         <div>
-            <h2 class="text-3xl font-semibold">
+            <h2 class="text-xl font-semibold sm:text-2xl md:text-3xl">
                 {{ $greetingText }}，歡迎回來！
             </h2>
 
