@@ -3,25 +3,37 @@
     'scheduleUuid' => null,
 ])
 
-<table {{ $attributes->merge(['class' => 'w-full border-collapse']) }}>
+<table
+    {{ $attributes->merge(['class' => 'w-full border-collapse', 'aria-describedby' => 'schedule-items-caption']) }}
+>
+    <caption id="schedule-items-caption" class="sr-only">
+        課程時間表項目清單
+    </caption>
     <thead>
         <tr class="border-b-2 border-warm-300 bg-warm-100">
-            <th class="px-4 py-3 text-left font-bold text-warm-900">
+            <th scope="col" class="px-4 py-3 text-left font-bold text-warm-900">
                 課程名稱
             </th>
-            <th class="px-4 py-3 text-left font-bold text-warm-900">班級</th>
+            <th scope="col" class="px-4 py-3 text-left font-bold text-warm-900">
+                班級
+            </th>
             <th
+                scope="col"
                 class="px-4 py-3 text-left font-bold text-warm-900 print:hidden"
             >
                 下次上課
             </th>
             <th
+                scope="col"
                 class="px-4 py-3 text-left font-bold text-warm-900 print:hidden"
             >
                 時間
             </th>
-            <th class="px-4 py-3 text-left font-bold text-warm-900">教師</th>
+            <th scope="col" class="px-4 py-3 text-left font-bold text-warm-900">
+                教師
+            </th>
             <th
+                scope="col"
                 class="px-4 py-3 text-left font-bold text-warm-900 print:hidden"
             >
                 <span class="sr-only">動作</span>
@@ -47,9 +59,12 @@
             @endphp
 
             <tr class="border-b border-warm-200 hover:bg-warm-50">
-                <td class="px-4 py-3 font-semibold text-warm-900">
+                <th
+                    scope="row"
+                    class="px-4 py-3 text-left font-semibold text-warm-900"
+                >
                     {{ $item->courseClass->course->name }}
-                </td>
+                </th>
                 <td class="px-4 py-3 text-sm text-warm-800 tabular-nums">
                     <x-class-code :code="$item->courseClass->code" />
                 </td>
@@ -67,7 +82,11 @@
                             <x-heroicon-o-exclamation-triangle
                                 class="size-4 text-warm-500"
                                 title="該次課程時間與一般時間不同"
+                                aria-hidden="true"
                             />
+                            <span class="sr-only">
+                                該次課程時間與一般時間不同。
+                            </span>
                         @endif
                     @else
                         <span class="text-warm-400">未設定</span>
@@ -84,6 +103,7 @@
                         @if ($suffix === '老師')
                             <span
                                 class="inline-flex flex-wrap items-baseline gap-1"
+                                aria-label="{{ $teacher }}"
                             >
                                 @if ($base !== '')
                                     <span class="shrink-0">{{ $base }}</span>
@@ -104,9 +124,11 @@
                     <a
                         href="{{ route('course.show', $item->courseClass->course) }}"
                         class="mr-3 inline-flex items-center gap-1 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline"
+                        aria-label="{{ $item->courseClass->course->name }} 的課程資訊"
                     >
                         <x-heroicon-o-information-circle
                             class="inline size-4"
+                            aria-hidden="true"
                         />
                         課程資訊
                     </a>
@@ -117,8 +139,12 @@
                             target="_blank"
                             rel="noopener"
                             class="inline-flex items-center gap-1 font-semibold text-warm-500 underline underline-offset-4 hover:text-warm-400 hover:no-underline"
+                            aria-label="前往 {{ $item->courseClass->course->name }} 的視訊上課連結"
                         >
-                            <x-heroicon-o-video-camera class="inline size-4" />
+                            <x-heroicon-o-video-camera
+                                class="inline size-4"
+                                aria-hidden="true"
+                            />
                             視訊上課
                         </a>
                     @endif
