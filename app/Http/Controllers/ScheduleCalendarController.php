@@ -16,6 +16,10 @@ class ScheduleCalendarController extends Controller
 
         $ics = $this->generateICS($schedule);
 
+        StudentSchedule::withoutTouching(
+            fn () => $schedule->forceFill(['last_calendar_sync_at' => now()])->save()
+        );
+
         return response($ics)
             ->header('Content-Type', 'text/calendar; charset=utf-8')
             ->header('Content-Disposition', 'attachment; filename="schedule.ics"');

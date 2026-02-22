@@ -73,6 +73,7 @@ it('returns an .ics calendar for a saved schedule and converts UTC+8 times to UT
     $schedule = StudentSchedule::create([
         'uuid' => \Illuminate\Support\Str::uuid(),
         'name' => 'ICS Export',
+        'last_calendar_sync_at' => null,
     ]);
 
     StudentScheduleItem::create([
@@ -88,6 +89,9 @@ it('returns an .ics calendar for a saved schedule and converts UTC+8 times to UT
     ]);
 
     $response = $this->get(route('schedules.calendar', $schedule));
+
+    $schedule->refresh();
+    expect($schedule->last_calendar_sync_at)->not->toBeNull();
 
     $expectedStart = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $date.' 09:00', 'Asia/Taipei')
         ->setTimezone('UTC')

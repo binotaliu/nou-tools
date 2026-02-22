@@ -14,6 +14,7 @@ class StudentSchedule extends Model
     protected $fillable = [
         'uuid',
         'name',
+        'last_calendar_sync_at',
     ];
 
     /**
@@ -60,6 +61,10 @@ class StudentSchedule extends Model
     {
         return $this->hasMany(StudentScheduleItem::class);
     }
+
+    protected $casts = [
+        'last_calendar_sync_at' => 'datetime',
+    ];
 
     /**
      * @return HasMany<LearningProgress, $this>
