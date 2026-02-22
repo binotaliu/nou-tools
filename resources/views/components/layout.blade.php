@@ -57,13 +57,17 @@
         <header
             class="sticky top-0 z-40 border-b border-warm-200 bg-white print:static"
         >
-            <div class="mx-auto max-w-7xl px-6 py-4">
+            <div class="mx-auto max-w-7xl px-3 py-2 md:px-6 md:py-4">
                 <div class="flex items-center justify-between">
                     <h1
-                        class="mb-0! inline-flex items-center gap-4 pb-0 text-2xl font-bold text-warm-700"
+                        class="inline-flex items-center gap-2 pb-0 text-lg font-bold text-warm-700 md:gap-4 md:text-2xl"
                     >
-                        <x-heroicon-o-book-open class="size-6 text-warm-700" />
-                        <a href="{{ url('/') }}">NOU 小幫手</a>
+                        <x-heroicon-o-book-open
+                            class="size-5 shrink-0 text-warm-700 md:size-6"
+                        />
+                        <a href="{{ url('/') }}" class="shrink-0">
+                            NOU 小幫手
+                        </a>
                     </h1>
                 </div>
             </div>
