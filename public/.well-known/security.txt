@@ -1,0 +1,7 @@
+# security.txt for nou-tools
+# Refer to https://securitytxt.org/ for specification
+
+Contact: mailto:me@binota.org
+Encryption: https://binota.org/pgp-key.txt
+Acknowledgements: https://github.com/binotaliu/nou-tools/blob/main/SECURITY.md
+Preferred-Languages: en, zh

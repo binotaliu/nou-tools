@@ -1,0 +1,5 @@
+Site: NOU Tools
+Maintainer: BinotaLIU <me@binota.org>
+Repository: https://github.com/binotaliu/nou-tools
+
+Proundly made with Laravel, TailwindCSS, and Alpine.js.
