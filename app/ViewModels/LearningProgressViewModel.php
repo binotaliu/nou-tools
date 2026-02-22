@@ -11,7 +11,7 @@ class LearningProgressViewModel
     public function __construct(
         public int $id,
         public string $scheduleUuid,
-        public string $scheduleName,
+        public ?string $scheduleName,
         public string $term,
         public array $courses,
         public array $weeks,

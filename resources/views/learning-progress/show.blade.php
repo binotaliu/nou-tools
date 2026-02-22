@@ -6,7 +6,7 @@
 @endphp
 
 <x-layout
-    :title="'學習進度表 - ' . $semesterLabel . ' - ' . $viewModel->scheduleName . '- NOU 小幫手'"
+    :title="'學習進度表 - ' . $semesterLabel . (empty($viewModel->scheduleName) ? (' - ' . $viewModel->scheduleName) : '') . '- NOU 小幫手'"
     :noindex="true"
 >
     <div class="mx-auto max-w-7xl">
@@ -17,7 +17,9 @@
             <div>
                 <h2 class="mb-2 text-3xl font-bold text-warm-900">
                     學習進度表
-                    <small>— {{ $viewModel->scheduleName }}</small>
+                    @if (! empty($viewModel->scheduleName))
+                        <small>— {{ $viewModel->scheduleName }}</small>
+                    @endif
                 </h2>
                 <p class="text-lg text-warm-700">
                     {{ $semesterLabel }}
