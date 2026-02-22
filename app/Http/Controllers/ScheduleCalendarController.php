@@ -16,7 +16,7 @@ class ScheduleCalendarController extends Controller
 
         $ics = $this->generateICS($schedule);
 
-        StudentSchedule::withoutTouching(
+        StudentSchedule::withoutTimestamps(
             fn () => $schedule->forceFill(['last_calendar_sync_at' => now()])->save()
         );
 
