@@ -65,12 +65,12 @@
                         {{ $displayStartTime }}&nbsp;~ {{ $displayEndTime }}
                         @if ($nextSchedule && $nextSchedule->start_time)
                             <x-heroicon-o-exclamation-triangle
-                                class="size-4 text-orange-600"
+                                class="size-4 text-warm-500"
                                 title="該次課程時間與一般時間不同"
                             />
                         @endif
                     @else
-                        <span class="text-warm-500">未設定</span>
+                        <span class="text-warm-400">未設定</span>
                     @endif
                 </td>
                 <td class="px-4 py-3 text-warm-800">
@@ -116,7 +116,7 @@
                             href="{{ $item->courseClass->link }}"
                             target="_blank"
                             rel="noopener"
-                            class="inline-flex items-center gap-1 font-semibold text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                            class="inline-flex items-center gap-1 font-semibold text-warm-500 underline underline-offset-4 hover:text-warm-400 hover:no-underline"
                         >
                             <x-heroicon-o-video-camera class="inline size-4" />
                             視訊上課

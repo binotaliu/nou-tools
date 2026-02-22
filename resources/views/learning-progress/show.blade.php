@@ -57,6 +57,7 @@
             </p>
             <div
                 class="relative h-2 w-full overflow-hidden rounded bg-warm-200"
+                aria-hidden="true"
             >
                 <div
                     class="h-full bg-warm-500"
@@ -224,6 +225,7 @@
                                             <x-learning-progress-checkbox
                                                 :name="'progress[' . $course['id'] . '][' . $week['num'] . '][video]'"
                                                 :checked="$viewModel->progress[$course['id']][$week['num']]['video'] ?? false"
+                                                :aria-label="'第' . Str::toChineseNumber($week['num']) . '週 ' . $course['name'] . ' 的影音學習進度'"
                                             />
                                             <span
                                                 class="text-xs group-has-checked:text-gray-400 print:hidden"
@@ -248,6 +250,7 @@
                                             <x-learning-progress-checkbox
                                                 :name="'progress[' . $course['id'] . '][' . $week['num'] . '][textbook]'"
                                                 :checked="$viewModel->progress[$course['id']][$week['num']]['textbook'] ?? false"
+                                                :aria-label="'第' . Str::toChineseNumber($week['num']) . '週 ' . $course['name'] . ' 的課本學習進度'"
                                             />
                                             <span
                                                 class="text-xs group-has-checked:text-gray-400 print:hidden"
@@ -275,6 +278,7 @@
                                                     : 'text-warm-700',
                                             ])
                                             rows="2"
+                                            aria-label="第{{ Str::toChineseNumber($week['num']) }}週 {{ $course['name'] }} 的學習目標與備註"
                                         >
 {{ $viewModel->getNote($course['id'], $week['num']) }}</textarea
                                         >
@@ -303,7 +307,7 @@
         {{-- Print button --}}
         <div class="mt-6 flex items-start justify-between">
             {{-- Legend --}}
-            <div class="bg-warm-50 print:hidden">
+            <div class="bg-warm-50 print:hidden" aria-hidden="true">
                 <p class="mb-2 text-sm font-semibold text-warm-900">圖例：</p>
                 <div class="flex items-center justify-start gap-4">
                     <div class="flex items-center gap-2">

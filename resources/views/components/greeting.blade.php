@@ -1,13 +1,11 @@
 <x-card {{ $attributes->class(['print:hidden'])->merge() }}>
-    <div class="flex items-baseline justify-between gap-4">
-        <div>
-            <h2 class="text-xl font-semibold sm:text-2xl md:text-3xl">
-                {{ $greetingText }}，歡迎回來！
-            </h2>
+    <div class="flex flex-col justify-between gap-1">
+        <heading class="text-xl font-semibold sm:text-2xl md:text-3xl">
+            {{ $greetingText }}，歡迎回來！
+        </heading>
 
-            <p class="mt-1 text-warm-500">
-                今天是 {{ $dateString }}，{{ $semesterInfo }}
-            </p>
-        </div>
+        <p class="text-warm-500">
+            今天是 {{ $dateString }}，{{ $semesterInfo }}
+        </p>
     </div>
 </x-card>

@@ -44,9 +44,15 @@
         <x-card x-data="{ date: '{{ $selectedDate }}' }" title="今日視訊面授">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <label class="text-sm text-warm-500">選擇日期</label>
+                    <label
+                        for="video-course-date"
+                        class="text-sm text-warm-500"
+                    >
+                        選擇日期
+                    </label>
                     <input
                         type="date"
+                        id="video-course-date"
                         class="rounded border px-3 py-1 text-sm"
                         x-model="date"
                         @change="window.location = `?date=${date}`"

@@ -16,9 +16,9 @@
                     >
                         <div class="flex items-center justify-between">
                             <div>
-                                <h4 class="font-semibold text-warm-800">
+                                <div class="font-semibold text-warm-800">
                                     {{ $countdownEvent['name'] }}
-                                </h4>
+                                </div>
                                 <p
                                     class="mt-1 text-sm text-warm-600 tabular-nums"
                                 >

@@ -43,7 +43,7 @@
                 沒有課程。
                 <a
                     href="{{ route('schedules.edit', $scheduleUuid) }}"
-                    class="font-semibold text-orange-600 hover:underline"
+                    class="font-semibold text-warm-600 hover:underline"
                 >
                     點擊編輯課表
                 </a>
@@ -56,7 +56,7 @@
         <div
             class="flex items-center gap-1 border-t border-warm-200 bg-warm-50 px-4 py-2 text-xs text-warm-600"
         >
-            <x-heroicon-o-exclamation-triangle class="size-4 text-orange-600" />
+            <x-heroicon-o-exclamation-triangle class="size-4 text-warm-500" />
             <span>表示該次課程時間與一般時間不同</span>
         </div>
     @endif

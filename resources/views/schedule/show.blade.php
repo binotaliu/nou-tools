@@ -168,7 +168,7 @@
                             >
                                 @foreach ($month->dates as $date)
                                     <div
-                                        class="break-inside-avoid-page border-l-4 border-orange-500 py-2 pl-4"
+                                        class="break-inside-avoid-page border-l-4 border-warm-500 py-2 pl-4"
                                     >
                                         <div
                                             class="mb-1 font-semibold text-warm-900"
@@ -193,7 +193,7 @@
                                                         {{ $course->time }}
                                                         @if ($course->hasOverride)
                                                             <x-heroicon-o-exclamation-triangle
-                                                                class="size-4 text-orange-600"
+                                                                class="size-4 text-warm-500"
                                                                 title="該次課程時間與一般時間不同"
                                                             />
                                                         @endif
@@ -421,6 +421,7 @@
                                 readonly
                                 @click="$event.target.select()"
                                 x-ref="shareInput"
+                                aria-label="我的課表連結"
                             />
                             <div
                                 class="hidden items-center px-3 py-2 font-mono break-all text-warm-600 print:flex"
