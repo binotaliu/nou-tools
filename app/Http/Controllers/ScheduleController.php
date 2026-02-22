@@ -181,6 +181,8 @@ class ScheduleController extends Controller
             ]);
         }
 
+        $schedule->touch();
+
         // update the stored cookie so name/uuid stay in sync
         $cookieValue = json_encode([
             'id' => $schedule->id,
