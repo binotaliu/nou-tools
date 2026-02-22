@@ -54,6 +54,13 @@
         @endif
     </head>
     <body class="bg-warm-50 text-warm-900">
+        <a
+            href="#main-content"
+            class="skip-link absolute top-auto -left-100 z-999 bg-transparent px-2 py-1 focus:top-0 focus:left-0 focus:bg-white focus:text-warm-900 focus:ring-2 focus:ring-warm-500"
+        >
+            跳到主要區塊
+        </a>
+
         <header
             class="sticky top-0 z-40 border-b border-warm-200 bg-white print:static"
         >
@@ -73,7 +80,7 @@
             </div>
         </header>
 
-        <main class="mx-auto max-w-7xl px-6 py-8">
+        <main id="main-content" class="mx-auto max-w-7xl px-6 py-8">
             {{-- flash notifications use slide‑in toasts instead of the old alert box --}}
             @if (session('success'))
                 <x-notification
