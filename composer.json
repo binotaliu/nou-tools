@@ -8,6 +8,7 @@
   "require": {
     "php": "^8.4",
     "blade-ui-kit/blade-heroicons": "^2.6",
+    "genealabs/laravel-caffeine": "^12.0",
     "laravel/framework": "^12.52",
     "laravel/prompts": "^0.3.13",
     "laravel/tinker": "^2.11.1",
