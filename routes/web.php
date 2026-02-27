@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LearningProgressController;
@@ -27,3 +28,6 @@ Route::get('/schedules/{schedule}/{term}/learning-progress', [LearningProgressCo
     ->name('learning-progress.show');
 Route::put('/schedules/{schedule}/{term}/learning-progress', [LearningProgressController::class, 'update'])
     ->name('learning-progress.update');
+
+Route::get('/{type}', [ArticleController::class, 'index'])->name('articles.index');
+Route::get('/{type}/{slug}', [ArticleController::class, 'show'])->name('articles.show');
