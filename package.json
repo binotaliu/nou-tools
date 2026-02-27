@@ -8,9 +8,12 @@
     "dev": "vite",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,css,scss,html,blade.php,json,md,yml,yaml,vue}\"",
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,css,scss,html,blade.php,json,md,yml,yaml,vue}\"",
-    "format:php": "vendor/bin/pint"
+    "format:php": "vendor/bin/pint",
+    "lint:commit": "commitlint --edit $1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.4.2",
+    "@commitlint/config-conventional": "^20.4.2",
     "@tailwindcss/vite": "^4.0.0",
     "axios": "^1.11.0",
     "concurrently": "^9.0.1",

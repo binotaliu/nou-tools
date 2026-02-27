@@ -22,6 +22,12 @@ NOU 小幫手 (NOU Tools) 是一款由 NOU 學生為同學打造的非官方小�
 
 本專案含有測試，可執行 `php artisan test` 來確保功能正常。
 
+本專案使用「[Conventional Commits](https://www.conventionalcommits.org/)」風格，範例：
+
+```
+feat(parser): support new exam schedule format
+```
+
 ## 授權 / License
 
 本專案採用 `AGPL-3.0-or-later` 開放原始碼授權，詳細內容請參閱 [LICENSE](LICENSE) 檔案。
