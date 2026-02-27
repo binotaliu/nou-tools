@@ -53,7 +53,9 @@ test('viewmodel calculates completion percentage correctly', function () {
         $semesterEnd,
     );
 
-    expect($vm->totalCount)->toEqual(4);
-    expect($vm->completedCount)->toEqual(3);
-    expect($vm->percentage)->toBe(75.0);
+    // two courses × two weeks × 2 items (video + textbook) = 8 total
+    expect($vm->totalCount)->toEqual(8);
+    // above progress data contains seven completed items
+    expect($vm->completedCount)->toEqual(7);
+    expect($vm->percentage)->toBe(87.5);
 });

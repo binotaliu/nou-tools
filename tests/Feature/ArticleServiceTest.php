@@ -49,7 +49,7 @@ test('can get an article from markdown file', function () {
         ->and($article->author)->toBe('Test Author')
         ->and($article->type)->toBe($type)
         ->and($article->slug)->toBe($slug)
-        ->and($article->content)->toContain('<h1>Heading</h1>');
+        ->and((string) $article->content)->toContain('<h1>Heading</h1>');
 });
 
 test('returns null for non-existent article', function () {
@@ -86,7 +86,7 @@ MD;
 
     $article = $this->articleService->getArticle($type, $slug);
 
-    expect($article->content)
+    expect((string) $article->content)
         ->toContain('<h1>')
         ->toContain('</h1>')
         ->toContain('<p>')
@@ -104,7 +104,8 @@ test('can get index content', function () {
     $indexContent = $this->articleService->getIndex($type);
 
     expect($indexContent)
-        ->toBeString()
+        ->toBeInstanceOf(\Illuminate\Support\HtmlString::class)
+        ->and((string) $indexContent)
         ->toContain('<h1>操作手冊</h1>')
         ->toContain('歡迎使用 NOU 小幫手');
 });
@@ -131,7 +132,8 @@ test('can get sidebar content', function () {
     $sidebarContent = $this->articleService->getSidebar($type);
 
     expect($sidebarContent)
-        ->toBeString()
+        ->toBeInstanceOf(\Illuminate\Support\HtmlString::class)
+        ->and((string) $sidebarContent)
         ->toContain('<h2>文章列表</h2>')
         ->toContain('歡迎使用 NOU 小幫手');
 });

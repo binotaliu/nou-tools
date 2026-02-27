@@ -21,6 +21,9 @@ it('displays school calendar on home page', function () {
         ],
     ]]);
 
+    // travel to a date just before events start so they appear as upcoming
+    $this->travelTo('2026-02-22');
+
     $response = $this->get('/');
 
     $response->assertStatus(200)
@@ -90,6 +93,9 @@ it('displays school calendar on schedule show page', function () {
             'countdown' => true,
         ],
     ]]);
+
+    // ensure events are treated as upcoming by moving time before start
+    $this->travelTo('2026-02-22');
 
     $courseClass = CourseClass::factory()->create();
     $schedule = StudentSchedule::create([

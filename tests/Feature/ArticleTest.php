@@ -4,6 +4,7 @@ use App\Data\Article;
 use App\Enums\ArticleType;
 use App\Services\ArticleService;
 use Carbon\Carbon;
+use Illuminate\Support\HtmlString;
 
 beforeEach(function () {
     // swap the real service for a mock so views never hit the filesystem
@@ -29,7 +30,7 @@ test('article index page loads successfully', function () {
     $this->articleService->shouldReceive('getIndex')
         ->once()
         ->with(ArticleType::MANUAL)
-        ->andReturn('<h1>操作手冊</h1>');
+        ->andReturn(new HtmlString('<h1>操作手冊</h1>'));
 
     $response = $this->get(route('articles.index', ['type' => ArticleType::MANUAL->value]));
 
@@ -41,7 +42,7 @@ test('knowledge base index page loads successfully', function () {
     $this->articleService->shouldReceive('getIndex')
         ->once()
         ->with(ArticleType::KNOWLEDGE_BASE)
-        ->andReturn('<h1>知識庫</h1>');
+        ->andReturn(new HtmlString('<h1>知識庫</h1>'));
 
     $response = $this->get(route('articles.index', ['type' => ArticleType::KNOWLEDGE_BASE->value]));
 
@@ -53,7 +54,7 @@ test('article index displays index content with links', function () {
     $this->articleService->shouldReceive('getIndex')
         ->once()
         ->with(ArticleType::MANUAL)
-        ->andReturn('<h1>操作手冊</h1><p>歡迎使用 <a href="#">NOU 小幫手</a></p>');
+        ->andReturn(new HtmlString('<h1>操作手冊</h1><p>歡迎使用 <a href="#">NOU 小幫手</a></p>'));
 
     $response = $this->get(route('articles.index', ['type' => ArticleType::MANUAL->value]));
 
@@ -72,7 +73,7 @@ test('article show page loads successfully', function () {
     $this->articleService->shouldReceive('getSidebar')
         ->once()
         ->with(ArticleType::MANUAL)
-        ->andReturn('<div>操作手冊</div>');
+        ->andReturn(new HtmlString('<div>操作手冊</div>'));
 
     $response = $this->get(route('articles.show', [
         'type' => ArticleType::MANUAL->value,
@@ -103,7 +104,7 @@ test('article show page displays article content', function () {
     $this->articleService->shouldReceive('getSidebar')
         ->once()
         ->with(ArticleType::KNOWLEDGE_BASE)
-        ->andReturn('<div></div>');
+        ->andReturn(new HtmlString('<div></div>'));
 
     $response = $this->get(route('articles.show', [
         'type' => ArticleType::KNOWLEDGE_BASE->value,
@@ -120,7 +121,7 @@ test('article show page displays sidebar with other articles', function () {
     $this->articleService->shouldReceive('getArticle')
         ->andReturn($article);
     $this->articleService->shouldReceive('getSidebar')
-        ->andReturn('<a href="#">返回列表</a>');
+        ->andReturn(new HtmlString('<a href="#">返回列表</a>'));
 
     $response = $this->get(route('articles.show', [
         'type' => ArticleType::MANUAL->value,
@@ -138,7 +139,7 @@ test('article show page displays license information', function () {
     $this->articleService->shouldReceive('getArticle')
         ->andReturn($article);
     $this->articleService->shouldReceive('getSidebar')
-        ->andReturn('<div></div>');
+        ->andReturn(new HtmlString('<div></div>'));
 
     $response = $this->get(route('articles.show', [
         'type' => ArticleType::MANUAL->value,
