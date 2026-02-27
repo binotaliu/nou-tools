@@ -26,6 +26,8 @@
                     :href="route('schedules.edit', $viewModel->uuid)"
                     variant="secondary"
                     class="w-full sm:w-1/3 lg:w-auto"
+                    data-analytics-event="schedule_edit"
+                    data-analytics-feature="schedule"
                 >
                     <x-heroicon-o-pencil-square class="size-4" />
                     編輯課表
@@ -35,6 +37,8 @@
                     :href="route('learning-progress.show', [$viewModel->uuid, config('app.current_semester')])"
                     variant="secondary"
                     class="w-full sm:w-1/3 lg:w-auto"
+                    data-analytics-event="learning_progress_open"
+                    data-analytics-feature="learning_progress"
                 >
                     <x-heroicon-o-clipboard class="size-4" />
                     學習進度表
@@ -52,6 +56,8 @@
                     variant="primary"
                     @click="subscribeOpen = true"
                     class="w-full sm:w-1/3 lg:w-auto"
+                    data-analytics-event="calendar_subscribe_open"
+                    data-analytics-feature="schedule"
                 >
                     <x-heroicon-o-calendar class="inline size-4" />
                     訂閱行事曆
@@ -69,6 +75,9 @@
                             variant="ghost"
                             full-width
                             @click="subscribeOpen = false"
+                            data-analytics-event="calendar_subscribe"
+                            data-analytics-feature="schedule"
+                            data-analytics-label="webcal"
                         >
                             Apple 日曆 (iOS / macOS)
                         </x-link-button>
@@ -80,6 +89,9 @@
                             target="_blank"
                             rel="noopener"
                             @click="subscribeOpen = false"
+                            data-analytics-event="calendar_subscribe"
+                            data-analytics-feature="schedule"
+                            data-analytics-label="google"
                         >
                             Google 日曆
                         </x-link-button>
@@ -91,6 +103,9 @@
                             target="_blank"
                             rel="noopener"
                             @click="subscribeOpen = false"
+                            data-analytics-event="calendar_subscribe"
+                            data-analytics-feature="schedule"
+                            data-analytics-label="outlook"
                         >
                             Windows 日曆 (Microsoft 365 / Outlook.com)
                         </x-link-button>
@@ -100,6 +115,9 @@
                             variant="ghost"
                             full-width
                             @click="subscribeOpen = false"
+                            data-analytics-event="calendar_subscribe"
+                            data-analytics-feature="schedule"
+                            data-analytics-label="webcal_generic"
                         >
                             Webcal 連結 (其他支援 Webcal 的行事曆)
                         </x-link-button>
@@ -112,6 +130,9 @@
                             rel="noopener"
                             :download="true"
                             @click="subscribeOpen = false"
+                            data-analytics-event="calendar_download"
+                            data-analytics-feature="schedule"
+                            data-analytics-label="ics"
                         >
                             下載 iCal（.ics）
                         </x-link-button>

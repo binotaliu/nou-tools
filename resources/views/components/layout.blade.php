@@ -4,6 +4,26 @@
     'noindex' => false,
 ])
 
+@php
+    $routeName = request()
+        ->route()
+        ?->getName();
+
+    $analyticsPage = match ($routeName) {
+        'schedules.show' => '/schedules/:schedule',
+        'schedules.edit' => '/schedules/:schedule/edit',
+        'learning-progress.show' => '/schedules/:schedule/learning-progress',
+        default => '/' . ltrim(request()->path(), '/'),
+    };
+
+    $analyticsTitle = match ($routeName) {
+        'schedules.show' => '我的課表 - NOU 小幫手',
+        'schedules.edit' => '編輯課表 - NOU 小幫手',
+        'learning-progress.show' => '學習進度表 - NOU 小幫手',
+        default => $title,
+    };
+@endphp
+
 <!DOCTYPE html>
 <html lang="zh-hant">
     <head>
@@ -62,11 +82,15 @@
                 }
                 gtag('js', new Date())
 
-                gtag('config', 'G-1B65SQ4673')
+                gtag('config', 'G-1B65SQ4673', { send_page_view: false })
             </script>
         @endif
     </head>
-    <body class="bg-warm-50 text-warm-900">
+    <body
+        class="bg-warm-50 text-warm-900"
+        data-analytics-page="{{ $analyticsPage }}"
+        data-analytics-title="{{ $analyticsTitle }}"
+    >
         <a
             href="#main-content"
             class="skip-link absolute top-auto -left-100 z-999 bg-transparent px-2 py-1 focus:top-0 focus:left-0 focus:bg-white focus:text-warm-900 focus:ring-2 focus:ring-warm-500"
@@ -201,5 +225,28 @@
                 </div>
             </div>
         </footer>
+
+        @if (app()->environment('production'))
+            <script>
+                ;(() => {
+                    if (typeof window.gtag !== 'function') {
+                        return
+                    }
+
+                    const page = document.body?.dataset?.analyticsPage
+                    const title = document.body?.dataset?.analyticsTitle
+
+                    if (!page || !title) {
+                        return
+                    }
+
+                    window.gtag('event', 'page_view', {
+                        page_path: page,
+                        page_title: title,
+                        page_location: window.location.href,
+                    })
+                })()
+            </script>
+        @endif
     </body>
 </html>

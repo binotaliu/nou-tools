@@ -35,6 +35,8 @@
                                 variant="link"
                                 target="_blank"
                                 rel="noopener"
+                                data-analytics-event="course_description_open"
+                                data-analytics-feature="course"
                             >
                                 檢視詳細內容
                                 <x-heroicon-o-arrow-top-right-on-square

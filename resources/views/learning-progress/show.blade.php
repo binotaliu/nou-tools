@@ -31,6 +31,8 @@
                     :href="route('schedules.show', $viewModel->scheduleUuid)"
                     variant="secondary"
                     class="w-1/2 md:w-auto"
+                    data-analytics-event="learning_progress_back"
+                    data-analytics-feature="learning_progress"
                 >
                     <x-heroicon-o-arrow-left class="size-4" />
                     回到課表
@@ -41,6 +43,8 @@
                     variant="primary"
                     onclick="document.getElementById('progress-form').submit()"
                     class="w-1/2 md:w-auto"
+                    data-analytics-event="learning_progress_save"
+                    data-analytics-feature="learning_progress"
                 >
                     <x-heroicon-o-check class="size-4" />
                     保存進度

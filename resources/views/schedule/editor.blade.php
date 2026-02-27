@@ -22,6 +22,8 @@
                     <a
                         href="{{ route('schedules.show', $previousSchedule->token) }}"
                         class="rounded bg-yellow-400 px-4 py-2 font-semibold text-yellow-900 hover:bg-yellow-500"
+                        data-analytics-event="schedule_open_previous"
+                        data-analytics-feature="schedule"
                     >
                         檢視舊課表
                     </a>

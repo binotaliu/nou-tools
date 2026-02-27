@@ -10,6 +10,8 @@
                     :href="route('schedules.create')"
                     variant="warm-dark"
                     full-width
+                    data-analytics-event="schedule_create_start"
+                    data-analytics-feature="schedule"
                 >
                     <x-heroicon-o-table-cells class="size-4" />
 
@@ -23,6 +25,8 @@
                             variant="secondary"
                             full-width
                             class="text-center text-warm-700"
+                            data-analytics-event="schedule_open_previous"
+                            data-analytics-feature="schedule"
                         >
                             <div
                                 class="max-w-xs truncate font-medium text-warm-800"
