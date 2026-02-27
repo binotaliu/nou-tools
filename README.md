@@ -12,7 +12,7 @@ NOU 小幫手 (NOU Tools) 是一款由 NOU 學生為同學打造的非官方小�
 本專案採用 Laravel 框架開發，前端使用 Blade 與 TailwindCSS 搭配 Alpine.js 製作。  
 若您有興趣參與貢獻，可 Clone 本專案後，依照以下步驟進行：
 
-1. 請確保您的環境有 PHP 8.4 以上與 Node.js 22 以上。
+1. 請確保您的環境有 PHP 8.4 以上與 Node.js 22 以上。您可使用 [PHP.new](https://php.new/) 或 [Laravel Herd](https://herd.laravel.com)，快速建立 PHP 開發環境。
 2. 安裝相依套件：`composer install`
 3. 執行 `composer run setup` —— 此指令會建立 `.env` 檔案、產生應用程式金鑰、執行資料庫遷移、安裝前端套件並打包前端資源。
 4. 抓取課程資料：`php artisan course:fetch`、`php artisan course:fetch-map`、`php artisan exams:import`。
