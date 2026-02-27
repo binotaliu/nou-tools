@@ -39,7 +39,8 @@ class LearningProgressViewModel
     ): self {
         $progressData = $learningProgress->progress ?? [];
 
-        $total = count($courses) * count($weeks);
+        // 2: video + textbook
+        $total = count($courses) * count($weeks) * 2;
         $completed = 0;
 
         foreach ($courses as $course) {
@@ -49,7 +50,10 @@ class LearningProgressViewModel
 
                 $slot = $progressData[$courseId][$weekNum] ?? [];
 
-                if (($slot['video'] ?? false) && ($slot['textbook'] ?? false)) {
+                if (($slot['video'] ?? false)) {
+                    $completed++;
+                }
+                if (($slot['textbook'] ?? false)) {
                     $completed++;
                 }
             }
