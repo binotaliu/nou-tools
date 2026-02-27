@@ -365,6 +365,12 @@
             </x-card>
         @endif
 
-        <x-common-links />
+        <x-common-links class="mb-6" />
+
+        <x-card title="免責聲明">
+            <p class="text-sm text-warm-600">
+                課程資料來自國立空中大學之公開資料，基於合理使用原則，以非商用、公開的方式供其他上課同學參考使用，資料版權屬於國立空中大學所有。本站只搜集課程之詮釋資料（Metadata），例如課程名稱、教師、學分數、上課時間等，不保存其他資料。
+            </p>
+        </x-card>
     </div>
 </x-layout>
