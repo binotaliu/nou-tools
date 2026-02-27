@@ -248,7 +248,10 @@ it('edit page form posts to update route and includes method spoofing', function
 
     $response->assertStatus(200)
         ->assertSee('action="'.route('schedules.update', $schedule).'"', false)
-        ->assertSee('name="_method" value="PUT"', false);
+        ->assertSee('name="_method" value="PUT"', false)
+        // heading and button should reflect editing state
+        ->assertSee('編輯您的課表')
+        ->assertSee('更新課表');
 });
 
 it('create page form posts to store route and does not include method spoofing', function () {
@@ -257,6 +260,9 @@ it('create page form posts to store route and does not include method spoofing',
     $response->assertStatus(200)
         ->assertSee('action="'.route('schedules.store').'"', false)
         ->assertDontSee('name="_method" value="PUT"', false)
+        // heading and button should reflect creation state
+        ->assertSee('建立您的課表')
+        ->assertSee('建立課表')
         // the form uses Alpine to render hidden inputs for selected course classes
         ->assertSee('template x-for="item in selectedItems"', false)
         ->assertSee('name="name"', false); // schedule name field should have a name attribute

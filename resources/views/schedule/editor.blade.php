@@ -1,7 +1,17 @@
-<x-layout title="編輯課表 - NOU 小幫手" :noindex="true">
+@php
+    $editing = isset($schedule);
+    $pageTitle = $editing ? '編輯課表' : '新增課表';
+    $headingText = $editing ? '編輯您的課表' : '建立您的課表';
+    $submitLabel = $editing ? '更新課表' : '建立課表';
+    $submittingLabel = $editing ? '更新中...' : '建立中...';
+@endphp
+
+<x-layout title="{{ $pageTitle }} - NOU 小幫手" :noindex="true">
     <div x-data="scheduleEditor()" class="mx-auto max-w-5xl">
         <div class="mb-6 flex items-center justify-between">
-            <h2 class="text-3xl font-bold text-warm-900">編輯您的課表</h2>
+            <h2 class="text-3xl font-bold text-warm-900">
+                {{ $headingText }}
+            </h2>
             <div class="text-lg font-semibold text-warm-500">
                 {{ \Illuminate\Support\Str::toSemesterDisplay(config('app.current_semester')) }}
             </div>
@@ -292,8 +302,8 @@
                     full-width
                     ::disabled="selectedItems.length === 0 || submitting"
                 >
-                    <span x-show="!submitting">保存課表</span>
-                    <span x-show="submitting">保存中...</span>
+                    <span x-show="!submitting">{{ $submitLabel }}</span>
+                    <span x-show="submitting">{{ $submittingLabel }}</span>
                 </x-button>
                 <x-link-button
                     :href="isset($schedule) ? route('schedules.show', $schedule) : route('schedules.create')"

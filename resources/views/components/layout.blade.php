@@ -18,6 +18,7 @@
 
     $analyticsTitle = match ($routeName) {
         'schedules.show' => '我的課表 - NOU 小幫手',
+        'schedules.create' => '新增課表 - NOU 小幫手',
         'schedules.edit' => '編輯課表 - NOU 小幫手',
         'learning-progress.show' => '學習進度表 - NOU 小幫手',
         default => $title,
