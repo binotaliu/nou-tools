@@ -435,7 +435,11 @@
 
         {{-- Previous Exams Section (only shown when user has a schedule cookie) --}}
         @if ($previousExams->isNotEmpty())
-            <x-card class="mb-6" title="考古題" id="previous-exams">
+            <x-card
+                class="mb-6 print:hidden"
+                title="考古題"
+                id="previous-exams"
+            >
                 <div class="overflow-x-auto">
                     <x-table caption="考古題">
                         <x-table-head>
