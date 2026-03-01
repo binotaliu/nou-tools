@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Course extends Model
 {
@@ -34,5 +35,10 @@ class Course extends Model
     public function classes(): HasMany
     {
         return $this->hasMany(CourseClass::class);
+    }
+
+    public function textbook(): HasOne
+    {
+        return $this->hasOne(Textbook::class);
     }
 }

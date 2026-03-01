@@ -163,3 +163,25 @@ test('course show page displays exam information', function () {
 
     $this->assertMatchesRegularExpression('/13:30\s*-\s*14:40/', $response->getContent());
 });
+
+test('course show page displays textbook information', function () {
+    $course = Course::factory()->create();
+    $textbook = \App\Models\Textbook::factory()->create([
+        'course_id' => $course->id,
+        'book_title' => 'Introduction to Testing',
+        'edition' => '第2版',
+        'department' => '測試學系',
+        'price_info' => '200元',
+        'reference_url' => 'https://example.com/book',
+    ]);
+
+    $response = $this->get(route('course.show', $course));
+
+    $response->assertStatus(200)
+        ->assertSee('教科書資訊')
+        ->assertSee('Introduction to Testing')
+        ->assertSee('第2版')
+        ->assertSee('測試學系')
+        ->assertSee('200元')
+        ->assertSee('https://example.com/book');
+});

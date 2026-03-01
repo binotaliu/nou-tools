@@ -221,6 +221,72 @@
         </x-card>
 
         {{-- Course Classes --}}
+        {{-- 教科書資訊 --}}
+        @if ($course->textbook !== null)
+            <x-card class="mb-6" title="教科書資訊">
+                <dl class="grid grid-cols-1 gap-6 text-warm-700 md:grid-cols-2">
+                    <div>
+                        <dt class="mb-2 font-semibold text-warm-900">書名</dt>
+                        <dd class="text-warm-700">
+                            {{ $course->textbook->book_title }}
+                        </dd>
+                    </div>
+
+                    @if ($course->textbook->edition)
+                        <div>
+                            <dt class="mb-2 font-semibold text-warm-900">
+                                版本
+                            </dt>
+                            <dd class="text-warm-700">
+                                {{ $course->textbook->edition }}
+                            </dd>
+                        </div>
+                    @endif
+
+                    @if ($course->textbook->price_info && is_numeric($course->textbook->price_info))
+                        <div>
+                            <dt class="mb-2 font-semibold text-warm-900">
+                                價格
+                            </dt>
+                            <dd class="text-warm-700">
+                                ${{ number_format($course->textbook->price_info) }}
+                            </dd>
+                        </div>
+                    @else($course->textbook->price_info)
+                        <div>
+                            <dt class="mb-2 font-semibold text-warm-900">
+                                坊間教科書資訊
+                            </dt>
+                            <dd class="text-warm-700">
+                                {{ $course->textbook->price_info }}
+                            </dd>
+                        </div>
+                    @endif
+
+                    @if ($course->textbook->reference_url)
+                        <div>
+                            <dt class="mb-2 font-semibold text-warm-900">
+                                參考連結
+                            </dt>
+                            <dd class="text-warm-700">
+                                <x-link-button
+                                    :href="$course->textbook->reference_url"
+                                    variant="link"
+                                    target="_blank"
+                                    rel="noopener"
+                                >
+                                    開啟
+                                    <x-heroicon-o-arrow-top-right-on-square
+                                        class="size-4"
+                                    />
+                                </x-link-button>
+                            </dd>
+                        </div>
+                    @endif
+                </dl>
+            </x-card>
+        @endif
+
         @if ($course->classes->isNotEmpty())
             <x-card class="mb-6" title="視訊面授班級與上課時間">
                 @php
