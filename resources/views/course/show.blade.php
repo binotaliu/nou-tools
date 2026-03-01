@@ -433,6 +433,120 @@
             </x-card>
         @endif
 
+        {{-- Previous Exams Section (only shown when user has a schedule cookie) --}}
+        @if ($previousExams->isNotEmpty())
+            <x-card class="mb-6" title="考古題" id="previous-exams">
+                <div class="overflow-x-auto">
+                    <x-table caption="考古題">
+                        <x-table-head>
+                            <x-table-row>
+                                <x-table-head-column class="text-center">
+                                    學期
+                                </x-table-head-column>
+                                <x-table-head-column class="text-center">
+                                    期中考正參
+                                </x-table-head-column>
+                                <x-table-head-column class="text-center">
+                                    期中考副參
+                                </x-table-head-column>
+                                <x-table-head-column class="text-center">
+                                    期末考正參
+                                </x-table-head-column>
+                                <x-table-head-column class="text-center">
+                                    期末考副參
+                                </x-table-head-column>
+                            </x-table-row>
+                        </x-table-head>
+
+                        <x-table-body>
+                            @foreach ($previousExams as $exam)
+                                <x-table-row>
+                                    <x-table-head-column
+                                        scope="row"
+                                        class="text-center tabular-nums"
+                                    >
+                                        {{ $exam->term ?? '-' }}
+                                    </x-table-head-column>
+                                    <x-table-column class="text-center">
+                                        @if ($exam->midterm_reference_primary)
+                                            <x-link-button
+                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midterm_reference_primary }}"
+                                                variant="link"
+                                                target="_blank"
+                                                rel="noopener"
+                                                aria-label="{{ $exam->term }}的期中考正參"
+                                            >
+                                                正參考
+                                                <x-heroicon-o-arrow-top-right-on-square
+                                                    class="size-4"
+                                                />
+                                            </x-link-button>
+                                        @else
+                                                —
+                                        @endif
+                                    </x-table-column>
+                                    <x-table-column class="text-center">
+                                        @if ($exam->midterm_reference_secondary)
+                                            <x-link-button
+                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midterm_reference_secondary }}"
+                                                variant="link"
+                                                target="_blank"
+                                                rel="noopener"
+                                                aria-label="{{ $exam->term }}的期中考副參"
+                                            >
+                                                副參考
+                                                <x-heroicon-o-arrow-top-right-on-square
+                                                    class="size-4"
+                                                />
+                                            </x-link-button>
+                                        @else
+                                                —
+                                        @endif
+                                    </x-table-column>
+                                    <x-table-column class="text-center">
+                                        @if ($exam->final_reference_primary)
+                                            <x-link-button
+                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->final_reference_primary }}"
+                                                variant="link"
+                                                target="_blank"
+                                                rel="noopener"
+                                                aria-label="{{ $exam->term }}的期末考正參"
+                                            >
+                                                正參考
+                                                <x-heroicon-o-arrow-top-right-on-square
+                                                    class="size-4"
+                                                />
+                                            </x-link-button>
+                                        @else
+                                                —
+                                        @endif
+                                    </x-table-column>
+                                    <x-table-column class="text-center">
+                                        @if ($exam->final_reference_secondary)
+                                            <x-link-button
+                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->final_reference_secondary }}"
+                                                variant="link"
+                                                target="_blank"
+                                                rel="noopener"
+                                                aria-label="{{ $exam->term }}的期末考副參"
+                                            >
+                                                副參考
+                                                <x-heroicon-o-arrow-top-right-on-square
+                                                    class="size-4"
+                                                />
+                                            </x-link-button>
+                                        @else
+                                                —
+                                        @endif
+                                    </x-table-column>
+                                </x-table-row>
+                            @endforeach
+                        </x-table-body>
+                    </x-table>
+                </div>
+            </x-card>
+        @endif
+
         <x-common-links class="mb-6" />
 
         <x-card title="免責聲明">

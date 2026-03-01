@@ -42,6 +42,10 @@
       --color-warm-900: oklch(0.02 0.08 35 / 1);
     }
   }
+
+  th {
+    @apply text-left;
+  }
 }
 
 @utility prose-warm {

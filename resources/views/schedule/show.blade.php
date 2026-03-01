@@ -311,49 +311,50 @@
 
             {{-- 桌面：維持表格，但只在 md+ 顯示 --}}
             <div class="hidden overflow-x-auto md:block">
-                <table class="w-full border-collapse overflow-hidden rounded">
-                    <thead>
-                        <tr
+                <x-table class="border-collapse overflow-hidden rounded">
+                    <x-table-head>
+                        <x-table-row
                             class="rounded-t border-b-2 border-warm-300 bg-warm-100"
                         >
-                            <th
-                                class="px-4 py-3 text-left font-bold text-warm-900"
-                            >
-                                課程
-                            </th>
-                            <th
-                                class="px-4 py-3 text-left font-bold text-warm-900"
-                            >
-                                期中考
-                            </th>
-                            <th
-                                class="px-4 py-3 text-left font-bold text-warm-900"
-                            >
-                                期末考
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                            <x-table-head-column>課程</x-table-head-column>
+                            <x-table-head-column>期中考</x-table-head-column>
+                            <x-table-head-column>期末考</x-table-head-column>
+                        </x-table-row>
+                    </x-table-head>
+
+                    <x-table-body>
                         @forelse ($viewModel->exams as $exam)
-                            <tr
+                            <x-table-row
                                 class="border-b border-warm-200 hover:bg-warm-50"
                             >
-                                <td
-                                    class="px-4 py-3 font-semibold text-warm-900"
+                                <x-table-column
+                                    class="font-semibold text-warm-900"
                                 >
                                     {{ $exam->courseName }}
                                     @if ($exam->classCode)
-                                        <div class="mt-1">
+                                        <div
+                                            class="mt-1 flex items-center gap-2"
+                                        >
                                             <x-class-code>
                                                 {{ $exam->classCode }}
                                             </x-class-code>
+
+                                            <a
+                                                href="{{ route('course.show', $exam->courseId) }}#previous-exams"
+                                                class="mr-3 inline-flex items-center gap-1 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline"
+                                                aria-label="{{ $exam->courseName }} 的課程資訊"
+                                            >
+                                                <x-heroicon-o-information-circle
+                                                    class="inline size-4"
+                                                    aria-hidden="true"
+                                                />
+                                                考古題
+                                            </a>
                                         </div>
                                     @endif
-                                </td>
+                                </x-table-column>
 
-                                <td
-                                    class="px-4 py-3 text-warm-800 tabular-nums"
-                                >
+                                <x-table-column class="tabular-nums">
                                     @if ($exam->midtermDate)
                                         <div class="font-semibold">
                                             {{ $exam->formattedMidtermDate() }}
@@ -367,11 +368,9 @@
                                             {{ $exam->formattedExamTime() }}
                                         </div>
                                     @endif
-                                </td>
+                                </x-table-column>
 
-                                <td
-                                    class="px-4 py-3 text-warm-800 tabular-nums"
-                                >
+                                <x-table-column class="tabular-nums">
                                     @if ($exam->finalDate)
                                         <div class="font-semibold">
                                             {{ $exam->formattedFinalDate() }}
@@ -385,20 +384,20 @@
                                             {{ $exam->formattedExamTime() }}
                                         </div>
                                     @endif
-                                </td>
-                            </tr>
+                                </x-table-column>
+                            </x-table-row>
                         @empty
-                            <tr>
-                                <td
-                                    class="px-4 py-16 text-center text-warm-500"
+                            <x-table-row>
+                                <x-table-column
                                     colspan="3"
+                                    class="px-4 py-16 text-center text-warm-500"
                                 >
                                     您的課表中沒有任何科目有設定考試日期。
-                                </td>
-                            </tr>
+                                </x-table-column>
+                            </x-table-row>
                         @endforelse
-                    </tbody>
-                </table>
+                    </x-table-body>
+                </x-table>
             </div>
         </x-card>
 

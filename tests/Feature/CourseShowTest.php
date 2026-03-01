@@ -2,6 +2,7 @@
 
 use App\Models\Course;
 use App\Models\CourseClass;
+use App\Models\PreviousExam;
 
 test('course show page loads successfully', function () {
     $course = Course::factory()->create([
@@ -144,6 +145,54 @@ test('course show page shows previous-schedule link when cookie exists', functio
         ->assertSee(route('schedules.show', $schedule));
 });
 
+// new test for multiple previous exams
+
+test('course show page displays all previous exams for course when cookie exists', function () {
+    $course = Course::factory()->create(['name' => 'History 101']);
+
+    $schedule = \App\Models\StudentSchedule::create([
+        'uuid' => \Illuminate\Support\Str::uuid(),
+        'name' => 'My Schedule',
+    ]);
+
+    PreviousExam::create([
+        'course_name' => $course->name,
+        'course_no' => 'HIST101',
+        'term' => '114上學期',
+        'midterm_reference_primary' => 'mid1.pdf',
+        'midterm_reference_secondary' => 'mid1b.pdf',
+        'final_reference_primary' => 'fin1.pdf',
+        'final_reference_secondary' => 'fin1b.pdf',
+    ]);
+
+    PreviousExam::create([
+        'course_name' => $course->name,
+        'course_no' => 'HIST101',
+        'term' => '115下學期',
+        'midterm_reference_primary' => 'mid2.pdf',
+        'midterm_reference_secondary' => null,
+        'final_reference_primary' => null,
+        'final_reference_secondary' => 'fin2b.pdf',
+    ]);
+
+    $response = $this->withCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => $schedule->name,
+    ]))->get(route('course.show', $course));
+
+    $response->assertStatus(200)
+        ->assertSee('考古題')
+        ->assertSee('114上學期')
+        ->assertSee('115下學期')
+        ->assertSee('mid1.pdf')
+        ->assertSee('mid1b.pdf')
+        ->assertSee('fin1.pdf')
+        ->assertSee('fin1b.pdf')
+        ->assertSee('mid2.pdf')
+        ->assertSee('fin2b.pdf');
+});
+
 test('course show page displays exam information', function () {
     $course = Course::factory()->create([
         'name' => 'Exam Course',
@@ -170,7 +219,6 @@ test('course show page displays textbook information', function () {
         'course_id' => $course->id,
         'book_title' => 'Introduction to Testing',
         'edition' => '第2版',
-        'department' => '測試學系',
         'price_info' => '200元',
         'reference_url' => 'https://example.com/book',
     ]);
@@ -181,7 +229,6 @@ test('course show page displays textbook information', function () {
         ->assertSee('教科書資訊')
         ->assertSee('Introduction to Testing')
         ->assertSee('第2版')
-        ->assertSee('測試學系')
         ->assertSee('200元')
         ->assertSee('https://example.com/book');
 });

@@ -3,44 +3,29 @@
     'scheduleUuid' => null,
 ])
 
-<table
-    {{ $attributes->merge(['class' => 'w-full border-collapse', 'aria-describedby' => 'schedule-items-caption']) }}
+<x-table
+    {{ $attributes->merge(['class' => 'border-collapse', 'aria-describedby' => 'schedule-items-caption']) }}
 >
     <caption id="schedule-items-caption" class="sr-only">
         課程時間表項目清單
     </caption>
-    <thead>
-        <tr class="border-b-2 border-warm-300 bg-warm-100">
-            <th scope="col" class="px-4 py-3 text-left font-bold text-warm-900">
-                課程名稱
-            </th>
-            <th scope="col" class="px-4 py-3 text-left font-bold text-warm-900">
-                班級
-            </th>
-            <th
-                scope="col"
-                class="px-4 py-3 text-left font-bold text-warm-900 print:hidden"
-            >
+
+    <x-table-head>
+        <x-table-row>
+            <x-table-head-column>課程名稱</x-table-head-column>
+            <x-table-head-column>班級</x-table-head-column>
+            <x-table-head-column class="print:hidden">
                 下次上課
-            </th>
-            <th
-                scope="col"
-                class="px-4 py-3 text-left font-bold text-warm-900 print:hidden"
-            >
-                時間
-            </th>
-            <th scope="col" class="px-4 py-3 text-left font-bold text-warm-900">
-                教師
-            </th>
-            <th
-                scope="col"
-                class="px-4 py-3 text-left font-bold text-warm-900 print:hidden"
-            >
+            </x-table-head-column>
+            <x-table-head-column class="print:hidden">時間</x-table-head-column>
+            <x-table-head-column>教師</x-table-head-column>
+            <x-table-head-column class="print:hidden">
                 <span class="sr-only">動作</span>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
+            </x-table-head-column>
+        </x-table-row>
+    </x-table-head>
+
+    <x-table-body>
         @forelse ($items as $item)
             @php
                 $nextSchedule = $item->courseClass->schedules
@@ -58,24 +43,27 @@
                         : $item->courseClass->end_time;
             @endphp
 
-            <tr class="border-b border-warm-200 hover:bg-warm-50">
-                <th
+            <x-table-row>
+                <x-table-head-column
                     scope="row"
-                    class="px-4 py-3 text-left font-semibold text-warm-900"
+                    class="font-semibold text-warm-900"
                 >
                     {{ $item->courseClass->course->name }}
-                </th>
-                <td class="px-4 py-3 text-sm text-warm-800 tabular-nums">
+                </x-table-head-column>
+
+                <x-table-column class="text-sm tabular-nums">
                     <x-class-code :code="$item->courseClass->code" />
-                </td>
-                <td class="px-4 py-3 text-warm-800 tabular-nums print:hidden">
+                </x-table-column>
+
+                <x-table-column class="tabular-nums print:hidden">
                     @if ($nextSchedule)
                         {!! str_replace(' ', '&nbsp;', e(Date::parse($nextSchedule->date)->isoFormat('M/D (dd)'))) !!}
                     @else
                         <span class="text-warm-500">無未來課程</span>
                     @endif
-                </td>
-                <td class="px-4 py-3 text-warm-800 tabular-nums print:hidden">
+                </x-table-column>
+
+                <x-table-column class="tabular-nums print:hidden">
                     @if ($displayStartTime)
                         {{ $displayStartTime }}&nbsp;~ {{ $displayEndTime }}
                         @if ($nextSchedule && $nextSchedule->start_time)
@@ -91,8 +79,9 @@
                     @else
                         <span class="text-warm-400">未設定</span>
                     @endif
-                </td>
-                <td class="px-4 py-3 text-warm-800">
+                </x-table-column>
+
+                <x-table-column>
                     @if ($item->courseClass->teacher_name)
                         @php
                             $teacher = $item->courseClass->teacher_name;
@@ -119,8 +108,9 @@
                     @else
                             −
                     @endif
-                </td>
-                <td class="px-4 py-3 print:hidden">
+                </x-table-column>
+
+                <x-table-column class="print:hidden">
                     <a
                         href="{{ route('course.show', $item->courseClass->course) }}"
                         class="mr-3 inline-flex items-center gap-1 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline"
@@ -148,11 +138,14 @@
                             視訊上課
                         </a>
                     @endif
-                </td>
-            </tr>
+                </x-table-column>
+            </x-table-row>
         @empty
-            <tr>
-                <td colspan="6" class="px-4 py-6 text-center text-warm-600">
+            <x-table-row>
+                <x-table-column
+                    colspan="6"
+                    class="px-4 py-6 text-center text-warm-600"
+                >
                     沒有課程。
                     <a
                         href="{{ route('schedules.edit', $schedule) }}"
@@ -160,8 +153,8 @@
                     >
                         點擊編輯課表
                     </a>
-                </td>
-            </tr>
+                </x-table-column>
+            </x-table-row>
         @endforelse
-    </tbody>
-</table>
+    </x-table-body>
+</x-table>
