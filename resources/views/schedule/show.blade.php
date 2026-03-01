@@ -341,7 +341,7 @@
 
                                             <a
                                                 href="{{ route('course.show', $exam->courseId) }}#previous-exams"
-                                                class="mr-3 inline-flex items-center gap-1 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline print:hidden"
+                                                class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline print:hidden"
                                                 aria-label="{{ $exam->courseName }} 的課程資訊"
                                             >
                                                 <x-heroicon-o-information-circle
