@@ -6,8 +6,6 @@ use App\Models\StudentSchedule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use NouTools\Domains\Schedules\Actions\BuildScheduleEditorPage;
 use NouTools\Domains\Schedules\Actions\BuildStudentScheduleCookie;
@@ -40,14 +38,8 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function store(Request $request, CreateSchedule $createSchedule, BuildStudentScheduleCookie $buildStudentScheduleCookie): JsonResponse|RedirectResponse
+    public function store(StudentScheduleUpsertData $input, Request $request, CreateSchedule $createSchedule, BuildStudentScheduleCookie $buildStudentScheduleCookie): JsonResponse|RedirectResponse
     {
-        $input = $this->resolveUpsertData($request);
-
-        if ($input instanceof JsonResponse) {
-            return $input;
-        }
-
         $schedule = $createSchedule($input);
         $cookie = $buildStudentScheduleCookie($schedule);
 
@@ -63,14 +55,8 @@ class ScheduleController extends Controller
             ->cookie($cookie);
     }
 
-    public function update(StudentSchedule $schedule, Request $request, UpdateSchedule $updateSchedule, BuildStudentScheduleCookie $buildStudentScheduleCookie): JsonResponse|RedirectResponse
+    public function update(StudentSchedule $schedule, StudentScheduleUpsertData $input, Request $request, UpdateSchedule $updateSchedule, BuildStudentScheduleCookie $buildStudentScheduleCookie): JsonResponse|RedirectResponse
     {
-        $input = $this->resolveUpsertData($request);
-
-        if ($input instanceof JsonResponse) {
-            return $input;
-        }
-
         $schedule = $updateSchedule($schedule, $input);
         $cookie = $buildStudentScheduleCookie($schedule);
 
@@ -91,21 +77,5 @@ class ScheduleController extends Controller
         return view('schedule.show', [
             'viewModel' => $showSchedulePage($schedule),
         ]);
-    }
-
-    private function resolveUpsertData(Request $request): StudentScheduleUpsertData|JsonResponse
-    {
-        $payload = $request->isJson() ? $request->json()->all() : $request->all();
-        $validator = Validator::make($payload, StudentScheduleUpsertData::rules());
-
-        if ($validator->fails()) {
-            if ($request->isJson()) {
-                return response()->json(['errors' => $validator->errors()], 422);
-            }
-
-            throw new ValidationException($validator);
-        }
-
-        return StudentScheduleUpsertData::from($validator->validated());
     }
 }
