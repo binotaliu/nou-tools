@@ -13,7 +13,7 @@ beforeEach(function () {
     $this->showArticleIndexPage = new ShowArticleIndexPage;
 
     // helpers stored on the test instance to avoid polluting global namespace
-    $this->articlePath = fn (\App\Enums\ArticleType $type, string $slug): string => resource_path("articles/{$type->directory()}/{$slug}.md");
+    $this->articlePath = fn (ArticleType $type, string $slug): string => resource_path("articles/{$type->directory()}/{$slug}.md");
 
     $this->sampleMarkdown = function (): string {
         return <<<'MD'

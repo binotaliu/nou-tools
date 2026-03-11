@@ -2,11 +2,12 @@
 
 use App\Models\StudentSchedule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use NouTools\Domains\Schedules\ViewModels\StudentScheduleCookieViewModel;
 
 it('parses student_schedule cookie via request macro and returns data class', function () {
     $schedule = StudentSchedule::create([
-        'uuid' => \Illuminate\Support\Str::uuid()->toString(),
+        'uuid' => Str::uuid()->toString(),
         'name' => 'My Saved Schedule',
     ]);
 

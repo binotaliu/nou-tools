@@ -1,6 +1,7 @@
 <?php
 
 use App\View\Components\SchoolCalendar;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 
 it('loads events from SchoolScheduleService when no props supplied (component)', function () {
@@ -21,8 +22,8 @@ it('allows overriding scheduleEvents and countdownEvent via constructor (compone
     $overrideEvents = [
         [
             'name' => 'Custom Event',
-            'start' => \Carbon\Carbon::parse('2026-05-01', 'Asia/Taipei'),
-            'end' => \Carbon\Carbon::parse('2026-05-01', 'Asia/Taipei'),
+            'start' => Carbon::parse('2026-05-01', 'Asia/Taipei'),
+            'end' => Carbon::parse('2026-05-01', 'Asia/Taipei'),
             'status' => 'upcoming',
             'daysUntil' => 12,
             'countdown' => false,

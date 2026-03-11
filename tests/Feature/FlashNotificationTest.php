@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
 
 uses(RefreshDatabase::class);
 
@@ -17,8 +19,8 @@ it('shows a toast notification when session has success', function () {
 
 it('shows first error message in a toast when validation fails', function () {
     // manually craft the standard error bag that ShareErrorsFromSession middleware expects
-    $bag = new \Illuminate\Support\ViewErrorBag;
-    $bag->put('default', new \Illuminate\Support\MessageBag(['first' => 'First error']));
+    $bag = new ViewErrorBag;
+    $bag->put('default', new MessageBag(['first' => 'First error']));
 
     $response = $this->withSession(['errors' => $bag])->get('/');
 

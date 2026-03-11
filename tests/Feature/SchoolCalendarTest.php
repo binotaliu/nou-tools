@@ -3,6 +3,7 @@
 use App\Models\CourseClass;
 use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
+use Illuminate\Support\Str;
 
 it('displays school calendar on home page', function () {
     config(['app.current_semester' => '2025B']);
@@ -99,7 +100,7 @@ it('displays school calendar on schedule show page', function () {
 
     $courseClass = CourseClass::factory()->create();
     $schedule = StudentSchedule::create([
-        'uuid' => \Illuminate\Support\Str::uuid(),
+        'uuid' => Str::uuid(),
         'name' => '我的課表',
     ]);
     StudentScheduleItem::create([

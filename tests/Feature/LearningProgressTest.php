@@ -4,6 +4,7 @@ use App\Models\Course;
 use App\Models\CourseClass;
 use App\Models\LearningProgress;
 use App\Models\StudentSchedule;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -149,7 +150,7 @@ test('unique constraint on student_schedule_id and term', function () {
     ]);
 
     // Try to create duplicate
-    $this->expectException(\Illuminate\Database\QueryException::class);
+    $this->expectException(QueryException::class);
 
     LearningProgress::factory()->create([
         'student_schedule_id' => $schedule->id,

@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\StudentSchedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Ramsey\Uuid\Uuid;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\StudentSchedule>
+ * @extends Factory<StudentSchedule>
  */
 class StudentScheduleFactory extends Factory
 {

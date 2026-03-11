@@ -3,6 +3,9 @@
 use App\Models\Course;
 use App\Models\CourseClass;
 use App\Models\PreviousExam;
+use App\Models\StudentSchedule;
+use App\Models\Textbook;
+use Illuminate\Support\Str;
 
 test('course show page loads successfully', function () {
     $course = Course::factory()->create([
@@ -129,8 +132,8 @@ test('course show page without classes', function () {
 test('course show page shows previous-schedule link when cookie exists', function () {
     $course = Course::factory()->create();
 
-    $schedule = \App\Models\StudentSchedule::create([
-        'uuid' => \Illuminate\Support\Str::uuid(),
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
         'name' => 'My Saved Schedule',
     ]);
 
@@ -150,8 +153,8 @@ test('course show page shows previous-schedule link when cookie exists', functio
 test('course show page displays all previous exams for course when cookie exists', function () {
     $course = Course::factory()->create(['name' => 'History 101']);
 
-    $schedule = \App\Models\StudentSchedule::create([
-        'uuid' => \Illuminate\Support\Str::uuid(),
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
         'name' => 'My Schedule',
     ]);
 
@@ -215,7 +218,7 @@ test('course show page displays exam information', function () {
 
 test('course show page displays textbook information', function () {
     $course = Course::factory()->create();
-    $textbook = \App\Models\Textbook::factory()->create([
+    $textbook = Textbook::factory()->create([
         'course_id' => $course->id,
         'book_title' => 'Introduction to Testing',
         'edition' => '第2版',

@@ -6,7 +6,7 @@ use App\Models\Textbook;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Textbook>
+ * @extends Factory<Textbook>
  */
 class TextbookFactory extends Factory
 {

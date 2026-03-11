@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\LearningProgress;
 use App\Models\StudentSchedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\LearningProgress>
+ * @extends Factory<LearningProgress>
  */
 class LearningProgressFactory extends Factory
 {

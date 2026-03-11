@@ -3,6 +3,7 @@
 namespace NouTools\Domains\Schedules\Actions;
 
 use App\Models\StudentSchedule;
+use Carbon\Carbon;
 
 final class GenerateScheduleCalendar
 {
@@ -68,7 +69,7 @@ final class GenerateScheduleCalendar
 
     private function convertToICSDateTime(\DateTimeInterface $date, string $time): string
     {
-        $dateTime = \Carbon\Carbon::createFromFormat(
+        $dateTime = Carbon::createFromFormat(
             'Y-m-d H:i',
             $date->format('Y-m-d').' '.substr($time, 0, 5),
             new \DateTimeZone('Asia/Taipei'),

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CourseClassType;
+use Database\Factories\CourseClassFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CourseClass extends Model
 {
-    /** @use HasFactory<\Database\Factories\CourseClassFactory> */
+    /** @use HasFactory<CourseClassFactory> */
     use HasFactory;
 
     protected $fillable = [

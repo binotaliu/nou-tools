@@ -50,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
         // Request macro: parse the encrypted `student_schedule` cookie and
         // return a `StudentScheduleCookie` data object when valid.
         Request::macro('studentScheduleFromCookie', function () {
-            /** @var \Illuminate\Http\Request $this */
+            /** @var Request $this */
             return app(ReadStudentScheduleCookie::class)($this);
         });
 

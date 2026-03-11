@@ -6,6 +6,7 @@ use App\Enums\ArticleType;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\HtmlString;
+use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\FrontMatter\FrontMatterExtension;
 use League\CommonMark\Extension\FrontMatter\Output\RenderedContentWithFrontMatter;
@@ -57,7 +58,7 @@ final class ShowArticlePage
 
     private function buildConverter(): MarkdownConverter
     {
-        $environment = new \League\CommonMark\Environment\Environment;
+        $environment = new Environment;
         $environment->addExtension(new CommonMarkCoreExtension);
         $environment->addExtension(new FrontMatterExtension);
 

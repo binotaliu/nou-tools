@@ -32,7 +32,7 @@ class Greeting extends Component
 
         // semester display (e.g. 2025B -> "114學年度下學期")
         $semesterCode = config('app.current_semester');
-        $semesterLabel = \Illuminate\Support\Str::toSemesterDisplay((string) $semesterCode);
+        $semesterLabel = Str::toSemesterDisplay((string) $semesterCode);
 
         $range = config('app.current_semester_range', []);
         $semesterInfo = $semesterCode;

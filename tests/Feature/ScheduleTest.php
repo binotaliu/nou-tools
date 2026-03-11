@@ -1,9 +1,12 @@
 <?php
 
 use App\Models\ClassSchedule;
+use App\Models\Course;
 use App\Models\CourseClass;
 use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 it('returns JSON and creates schedule on application/json POST', function () {
     $courseClass = CourseClass::factory()->create();
@@ -56,7 +59,7 @@ it('rejects schedules with more than ten items', function () {
 
     // also try update path
     $schedule = StudentSchedule::create([
-        'uuid' => \Illuminate\Support\Str::uuid(),
+        'uuid' => Str::uuid(),
         'name' => 'Existing',
     ]);
 
@@ -71,7 +74,7 @@ it('returns an .ics calendar for a saved schedule and converts UTC+8 times to UT
     ]);
 
     $schedule = StudentSchedule::create([
-        'uuid' => \Illuminate\Support\Str::uuid(),
+        'uuid' => Str::uuid(),
         'name' => 'ICS Export',
         'last_calendar_sync_at' => null,
     ]);
@@ -93,11 +96,11 @@ it('returns an .ics calendar for a saved schedule and converts UTC+8 times to UT
     $schedule->refresh();
     expect($schedule->last_calendar_sync_at)->not->toBeNull();
 
-    $expectedStart = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $date.' 09:00', 'Asia/Taipei')
+    $expectedStart = Carbon::createFromFormat('Y-m-d H:i', $date.' 09:00', 'Asia/Taipei')
         ->setTimezone('UTC')
         ->format('Ymd\THis\Z');
 
-    $expectedEnd = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $date.' 10:00', 'Asia/Taipei')
+    $expectedEnd = Carbon::createFromFormat('Y-m-d H:i', $date.' 10:00', 'Asia/Taipei')
         ->setTimezone('UTC')
         ->format('Ymd\THis\Z');
 
@@ -112,7 +115,7 @@ it('returns an .ics calendar for a saved schedule and converts UTC+8 times to UT
 });
 
 it('schedule show page displays exam information for selected courses', function () {
-    $course = \App\Models\Course::factory()->create([
+    $course = Course::factory()->create([
         'name' => 'Exam Course From Schedule',
         'midterm_date' => '2025-04-25',
         'final_date' => '2025-06-27',
@@ -120,13 +123,13 @@ it('schedule show page displays exam information for selected courses', function
         'exam_time_end' => '14:40',
     ]);
 
-    $class = \App\Models\CourseClass::factory()->create([
+    $class = CourseClass::factory()->create([
         'course_id' => $course->id,
         'code' => 'EXM101',
     ]);
 
     $schedule = StudentSchedule::create([
-        'uuid' => \Illuminate\Support\Str::uuid(),
+        'uuid' => Str::uuid(),
         'name' => 'Exam Schedule',
     ]);
 
@@ -173,7 +176,7 @@ it('stores schedule metadata in an encrypted cookie when saving', function () {
 
 it('shows previous schedule on home when cookie exists', function () {
     $schedule = StudentSchedule::create([
-        'uuid' => \Illuminate\Support\Str::uuid(),
+        'uuid' => Str::uuid(),
         'name' => 'Previously Saved',
     ]);
 
@@ -190,7 +193,7 @@ it('shows previous schedule on home when cookie exists', function () {
 
 it('shows prompt on schedule create page when cookie exists and can be ignored with ?new=1', function () {
     $schedule = StudentSchedule::create([
-        'uuid' => \Illuminate\Support\Str::uuid(),
+        'uuid' => Str::uuid(),
         'name' => 'My Old Schedule',
     ]);
 
@@ -219,7 +222,7 @@ it('updates the stored cookie when schedule is updated', function () {
     $courseClass = CourseClass::factory()->create();
 
     $schedule = StudentSchedule::create([
-        'uuid' => \Illuminate\Support\Str::uuid(),
+        'uuid' => Str::uuid(),
         'name' => 'Old Name',
     ]);
 
@@ -240,7 +243,7 @@ it('updates the stored cookie when schedule is updated', function () {
 
 it('edit page form posts to update route and includes method spoofing', function () {
     $schedule = StudentSchedule::create([
-        'uuid' => \Illuminate\Support\Str::uuid(),
+        'uuid' => Str::uuid(),
         'name' => 'Edit Me',
     ]);
 

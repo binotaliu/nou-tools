@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\StudentSchedule;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 use NouTools\Domains\Schedules\Actions\BuildScheduleEditorPage;
 use NouTools\Domains\Schedules\Actions\BuildStudentScheduleCookie;
 use NouTools\Domains\Schedules\Actions\CreateSchedule;
@@ -15,7 +18,7 @@ use NouTools\Domains\Schedules\DataTransferObjects\StudentScheduleUpsertData;
 
 class ScheduleController extends Controller
 {
-    public function create(Request $request, BuildScheduleEditorPage $buildScheduleEditorPage): \Illuminate\View\View
+    public function create(Request $request, BuildScheduleEditorPage $buildScheduleEditorPage): View
     {
         $page = $buildScheduleEditorPage($request);
 
@@ -26,7 +29,7 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function edit(StudentSchedule $schedule, Request $request, BuildScheduleEditorPage $buildScheduleEditorPage): \Illuminate\View\View
+    public function edit(StudentSchedule $schedule, Request $request, BuildScheduleEditorPage $buildScheduleEditorPage): View
     {
         $page = $buildScheduleEditorPage($request, $schedule);
 
@@ -37,7 +40,7 @@ class ScheduleController extends Controller
         ]);
     }
 
-    public function store(Request $request, CreateSchedule $createSchedule, BuildStudentScheduleCookie $buildStudentScheduleCookie): JsonResponse|\Illuminate\Http\RedirectResponse
+    public function store(Request $request, CreateSchedule $createSchedule, BuildStudentScheduleCookie $buildStudentScheduleCookie): JsonResponse|RedirectResponse
     {
         $input = $this->resolveUpsertData($request);
 
@@ -60,7 +63,7 @@ class ScheduleController extends Controller
             ->cookie($cookie);
     }
 
-    public function update(StudentSchedule $schedule, Request $request, UpdateSchedule $updateSchedule, BuildStudentScheduleCookie $buildStudentScheduleCookie): JsonResponse|\Illuminate\Http\RedirectResponse
+    public function update(StudentSchedule $schedule, Request $request, UpdateSchedule $updateSchedule, BuildStudentScheduleCookie $buildStudentScheduleCookie): JsonResponse|RedirectResponse
     {
         $input = $this->resolveUpsertData($request);
 
@@ -83,7 +86,7 @@ class ScheduleController extends Controller
             ->cookie($cookie);
     }
 
-    public function show(StudentSchedule $schedule, ShowSchedulePage $showSchedulePage): \Illuminate\View\View
+    public function show(StudentSchedule $schedule, ShowSchedulePage $showSchedulePage): View
     {
         return view('schedule.show', [
             'viewModel' => $showSchedulePage($schedule),
@@ -93,7 +96,7 @@ class ScheduleController extends Controller
     private function resolveUpsertData(Request $request): StudentScheduleUpsertData|JsonResponse
     {
         $payload = $request->isJson() ? $request->json()->all() : $request->all();
-        $validator = \Illuminate\Support\Facades\Validator::make($payload, StudentScheduleUpsertData::rules());
+        $validator = Validator::make($payload, StudentScheduleUpsertData::rules());
 
         if ($validator->fails()) {
             if ($request->isJson()) {

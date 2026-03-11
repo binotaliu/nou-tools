@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\ClassScheduleFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ClassSchedule extends Model
 {
-    /** @use HasFactory<\Database\Factories\ClassScheduleFactory> */
+    /** @use HasFactory<ClassScheduleFactory> */
     use HasFactory;
 
     protected $fillable = [
