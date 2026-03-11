@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Course;
-use App\Services\CourseMapParser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use NouTools\Domains\Courses\Actions\ParseCourseMap;
 
 class FetchCourseMapCommand extends Command
 {
@@ -42,7 +42,7 @@ class FetchCourseMapCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle(CourseMapParser $parser): int
+    public function handle(ParseCourseMap $parseCourseMap): int
     {
         $term = $this->argument('term');
 
@@ -78,7 +78,7 @@ class FetchCourseMapCommand extends Command
                 continue;
             }
 
-            $courses = $parser->parse($html);
+            $courses = $parseCourseMap($html);
 
             foreach ($courses as $courseData) {
                 $existing = Course::query()

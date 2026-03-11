@@ -1,8 +1,8 @@
 <?php
 
-use App\Data\StudentScheduleCookie;
 use App\Models\StudentSchedule;
 use Illuminate\Http\Request;
+use NouTools\Domains\Schedules\ViewModels\StudentScheduleCookieViewModel;
 
 it('parses student_schedule cookie via request macro and returns data class', function () {
     $schedule = StudentSchedule::create([
@@ -20,7 +20,7 @@ it('parses student_schedule cookie via request macro and returns data class', fu
 
     $result = $request->studentScheduleFromCookie();
 
-    expect($result)->toBeInstanceOf(StudentScheduleCookie::class);
+    expect($result)->toBeInstanceOf(StudentScheduleCookieViewModel::class);
     expect($result?->id)->toBe($schedule->id);
     expect($result?->uuid)->toBe($schedule->uuid);
     expect($result?->token)->toBe((string) $schedule->getRouteKey());

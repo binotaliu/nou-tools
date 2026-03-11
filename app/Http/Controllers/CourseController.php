@@ -3,34 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
-use App\Models\PreviousExam;
+use Illuminate\Http\Request;
+use NouTools\Domains\Courses\Actions\ShowCoursePage;
 
 class CourseController extends Controller
 {
-    public function show(Course $course): \Illuminate\View\View
+    public function show(Course $course, Request $request, ShowCoursePage $showCoursePage): \Illuminate\View\View
     {
-        $course->load([
-            'classes' => function ($query) {
-                $query->with('schedules')->orderBy('type');
-            },
-            'textbook',
-        ]);
-
-        $previousSchedule = request()->studentScheduleFromCookie();
-
-        // Load previous exam data if schedule cookie exists
-        $previousExams = collect();
-        if ($previousSchedule) {
-            $previousExams = PreviousExam::query()
-                ->where('course_name', $course->name)
-                ->orderByDesc('term')
-                ->get();
-        }
+        $page = $showCoursePage($course, $request);
 
         return view('course.show', [
-            'course' => $course,
-            'previousSchedule' => $previousSchedule,
-            'previousExams' => $previousExams,
+            'course' => $page->course,
+            'previousSchedule' => $page->previousSchedule,
+            'previousExams' => $page->previousExams,
         ]);
     }
 }

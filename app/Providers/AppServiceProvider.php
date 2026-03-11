@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use App\Data\StudentScheduleCookie;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use NouTools\Domains\Schedules\Actions\ReadStudentScheduleCookie;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -49,24 +49,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Request macro: parse the encrypted `student_schedule` cookie and
         // return a `StudentScheduleCookie` data object when valid.
-        Request::macro('studentScheduleFromCookie', function (): ?StudentScheduleCookie {
+        Request::macro('studentScheduleFromCookie', function () {
             /** @var \Illuminate\Http\Request $this */
-            $cookie = $this->cookie('student_schedule');
-            if (! $cookie) {
-                return null;
-            }
-
-            $data = json_decode($cookie, true);
-            if (! is_array($data) || ! isset($data['id'], $data['uuid'])) {
-                return null;
-            }
-
-            $model = \App\Models\StudentSchedule::find($data['id']);
-            if (! $model) {
-                return null;
-            }
-
-            return StudentScheduleCookie::fromModel($model);
+            return app(ReadStudentScheduleCookie::class)($this);
         });
 
         Str::macro('toChineseNumber', function (int $n): string {

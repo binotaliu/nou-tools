@@ -5,11 +5,11 @@ namespace App\Console\Commands;
 use App\Enums\CourseClassType;
 use App\Models\Course;
 use App\Models\CourseClass;
-use App\Services\NouCourseParser;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use NouTools\Domains\Courses\Actions\ParseNouCourses;
 
 class FetchCoursesCommand extends Command
 {
@@ -29,7 +29,7 @@ class FetchCoursesCommand extends Command
         'https://vc.nou.edu.tw/vc5/' => CourseClassType::ComputerLab,
     ];
 
-    public function handle(NouCourseParser $parser): int
+    public function handle(ParseNouCourses $parseNouCourses): int
     {
         $term = $this->argument('term');
 
@@ -67,7 +67,7 @@ class FetchCoursesCommand extends Command
                 continue;
             }
 
-            $courses = $parser->parse($html, $type);
+            $courses = $parseNouCourses($html, $type);
 
             foreach ($courses as $courseData) {
                 $course = Course::query()->firstOrCreate(

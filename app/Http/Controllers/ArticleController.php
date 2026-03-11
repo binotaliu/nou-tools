@@ -3,38 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ArticleType;
-use App\Services\ArticleService;
 use Illuminate\View\View;
+use NouTools\Domains\Articles\Actions\ShowArticleIndexPage;
+use NouTools\Domains\Articles\Actions\ShowArticlePage;
 
 class ArticleController extends Controller
 {
-    public function __construct(
-        public ArticleService $articleService
-    ) {}
-
-    public function index(ArticleType $type): View
+    public function index(ArticleType $type, ShowArticleIndexPage $showArticleIndexPage): View
     {
-        $indexContent = $this->articleService->getIndex($type);
+        $page = $showArticleIndexPage($type);
 
-        abort_if($indexContent === null, 404);
+        abort_if($page === null, 404);
 
         return view('articles.index', [
-            'type' => $type,
-            'indexContent' => $indexContent,
+            'type' => $page->type,
+            'indexContent' => $page->indexContent,
         ]);
     }
 
-    public function show(ArticleType $type, string $slug): View
+    public function show(ArticleType $type, string $slug, ShowArticlePage $showArticlePage): View
     {
-        $article = $this->articleService->getArticle($type, $slug);
+        $page = $showArticlePage($type, $slug);
 
-        abort_if($article === null, 404);
-
-        $sidebarContent = $this->articleService->getSidebar($type);
+        abort_if($page === null, 404);
 
         return view('articles.show', [
-            'article' => $article,
-            'sidebarContent' => $sidebarContent,
+            'article' => $page->article,
+            'sidebarContent' => $page->sidebarContent,
         ]);
     }
 }

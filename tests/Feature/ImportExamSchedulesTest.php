@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\Course;
-use App\Services\ExamScheduleService;
 use Illuminate\Support\Facades\File;
+use NouTools\Domains\Courses\Actions\ImportExamSchedulesFromJson;
 
 beforeEach(function () {
     // Create test courses
@@ -124,15 +124,15 @@ it('uses file facade for reading exam schedules', function () {
             ],
         ]));
 
-    $service = new ExamScheduleService;
-    $result = $service->import('2025B');
+    $action = new ImportExamSchedulesFromJson;
+    $result = $action('2025B');
 
     expect($result['success'])->toBe(0);
     expect($result['failed'])->toBe(0);
 });
 
 it('normalizes course names correctly', function () {
-    $service = new ExamScheduleService;
+    $service = new ImportExamSchedulesFromJson;
 
     expect($service->normalizeName('做伙唱歌學台語'))->toBe('做伙唱歌學台語');
     expect($service->normalizeName('當代治理新趨勢（二）：理論與個案'))->toBe('當代治理新趨勢二理論與個案');

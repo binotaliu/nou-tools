@@ -1,9 +1,9 @@
 <?php
 
-use App\Services\SchoolScheduleService;
+use NouTools\Domains\SchoolCalendar\Actions\ListUpcomingSchoolEvents;
 
 beforeEach(function () {
-    $this->service = new SchoolScheduleService;
+    $this->service = new ListUpcomingSchoolEvents;
 });
 
 it('returns empty array when no schedules configured', function () {

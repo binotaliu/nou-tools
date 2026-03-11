@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Services\ExamScheduleService;
 use Illuminate\Console\Command;
+use NouTools\Domains\Courses\Actions\ImportExamSchedulesFromJson;
 
 class ImportExamSchedules extends Command
 {
@@ -24,7 +24,7 @@ class ImportExamSchedules extends Command
     /**
      * Execute the console command.
      */
-    public function handle(ExamScheduleService $service): int
+    public function handle(ImportExamSchedulesFromJson $importExamSchedulesFromJson): int
     {
         $term = $this->argument('term');
 
@@ -37,7 +37,7 @@ class ImportExamSchedules extends Command
         try {
             $this->info("Importing exam schedules for term: {$term}");
 
-            $result = $service->import($term);
+            $result = $importExamSchedulesFromJson($term);
 
             $this->info('Import completed successfully!');
             $this->info("Matched: {$result['success']} courses");

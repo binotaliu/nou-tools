@@ -1,13 +1,16 @@
 <?php
 
-use App\Data\Article;
 use App\Enums\ArticleType;
-use App\Services\ArticleService;
 use Illuminate\Support\Facades\File;
+use NouTools\Domains\Articles\Actions\ShowArticleIndexPage;
+use NouTools\Domains\Articles\Actions\ShowArticlePage;
+use NouTools\Domains\Articles\ViewModels\ArticleIndexPageViewModel;
+use NouTools\Domains\Articles\ViewModels\ArticleShowPageViewModel;
+use NouTools\Domains\Articles\ViewModels\ArticleViewModel;
 
 beforeEach(function () {
-    // always instantiate a fresh service
-    $this->articleService = new ArticleService;
+    $this->showArticlePage = new ShowArticlePage;
+    $this->showArticleIndexPage = new ShowArticleIndexPage;
 
     // helpers stored on the test instance to avoid polluting global namespace
     $this->articlePath = fn (\App\Enums\ArticleType $type, string $slug): string => resource_path("articles/{$type->directory()}/{$slug}.md");
@@ -26,8 +29,6 @@ Content paragraph.
 MD;
     };
 
-    // reset any previous facade expectations
-
 });
 
 test('can get an article from markdown file', function () {
@@ -38,18 +39,19 @@ test('can get an article from markdown file', function () {
 
     File::shouldReceive('exists')->once()->with($path)->andReturn(true);
     File::shouldReceive('get')->once()->with($path)->andReturn(($this->sampleMarkdown)());
+    File::shouldReceive('exists')->once()->with(resource_path("articles/{$type->directory()}/_sidebar.md"))->andReturn(false);
 
     // act
-    $article = $this->articleService->getArticle($type, $slug);
+    $page = ($this->showArticlePage)($type, $slug);
 
-    // assert
-    expect($article)
-        ->toBeInstanceOf(Article::class)
-        ->and($article->title)->toBe('My Test Article')
-        ->and($article->author)->toBe('Test Author')
-        ->and($article->type)->toBe($type)
-        ->and($article->slug)->toBe($slug)
-        ->and((string) $article->content)->toContain('<h1>Heading</h1>');
+    expect($page)
+        ->toBeInstanceOf(ArticleShowPageViewModel::class)
+        ->and($page->article)->toBeInstanceOf(ArticleViewModel::class)
+        ->and($page->article->title)->toBe('My Test Article')
+        ->and($page->article->author)->toBe('Test Author')
+        ->and($page->article->type)->toBe($type)
+        ->and($page->article->slug)->toBe($slug)
+        ->and((string) $page->article->content)->toContain('<h1>Heading</h1>');
 });
 
 test('returns null for non-existent article', function () {
@@ -59,7 +61,7 @@ test('returns null for non-existent article', function () {
 
     File::shouldReceive('exists')->once()->with($path)->andReturn(false);
 
-    $article = $this->articleService->getArticle($type, $slug);
+    $article = ($this->showArticlePage)($type, $slug);
 
     expect($article)->toBeNull();
 });
@@ -83,10 +85,11 @@ MD;
 
     File::shouldReceive('exists')->once()->with($path)->andReturn(true);
     File::shouldReceive('get')->once()->with($path)->andReturn($markdown);
+    File::shouldReceive('exists')->once()->with(resource_path("articles/{$type->directory()}/_sidebar.md"))->andReturn(false);
 
-    $article = $this->articleService->getArticle($type, $slug);
+    $article = ($this->showArticlePage)($type, $slug);
 
-    expect((string) $article->content)
+    expect((string) $article->article->content)
         ->toContain('<h1>')
         ->toContain('</h1>')
         ->toContain('<p>')
@@ -101,11 +104,11 @@ test('can get index content', function () {
     File::shouldReceive('exists')->once()->with($path)->andReturn(true);
     File::shouldReceive('get')->once()->with($path)->andReturn($markdown);
 
-    $indexContent = $this->articleService->getIndex($type);
+    $indexContent = ($this->showArticleIndexPage)($type);
 
     expect($indexContent)
-        ->toBeInstanceOf(\Illuminate\Support\HtmlString::class)
-        ->and((string) $indexContent)
+        ->toBeInstanceOf(ArticleIndexPageViewModel::class)
+        ->and((string) $indexContent->indexContent)
         ->toContain('<h1>操作手冊</h1>')
         ->toContain('歡迎使用 NOU 小幫手');
 });
@@ -116,37 +119,61 @@ test('returns null when index does not exist', function () {
 
     File::shouldReceive('exists')->once()->with($path)->andReturn(false);
 
-    $indexContent = $this->articleService->getIndex($type);
+    $indexContent = ($this->showArticleIndexPage)($type);
 
     expect($indexContent)->toBeNull();
 });
 
 test('can get sidebar content', function () {
     $type = ArticleType::MANUAL;
+    $articlePath = resource_path("articles/{$type->directory()}/foo.md");
     $path = resource_path("articles/{$type->directory()}/_sidebar.md");
     $markdown = "## 文章列表\n\n歡迎使用 NOU 小幫手";
+    $articleMarkdown = <<<'MD'
+---
+title: Foo
+author: Bar
+---
 
+Body
+MD;
+
+    File::shouldReceive('exists')->once()->with($articlePath)->andReturn(true);
+    File::shouldReceive('get')->once()->with($articlePath)->andReturn($articleMarkdown);
     File::shouldReceive('exists')->once()->with($path)->andReturn(true);
     File::shouldReceive('get')->once()->with($path)->andReturn($markdown);
 
-    $sidebarContent = $this->articleService->getSidebar($type);
+    $sidebarContent = ($this->showArticlePage)($type, 'foo');
 
     expect($sidebarContent)
-        ->toBeInstanceOf(\Illuminate\Support\HtmlString::class)
-        ->and((string) $sidebarContent)
+        ->toBeInstanceOf(ArticleShowPageViewModel::class)
+        ->and((string) $sidebarContent->sidebarContent)
         ->toContain('<h2>文章列表</h2>')
         ->toContain('歡迎使用 NOU 小幫手');
 });
 
 test('returns null when sidebar does not exist', function () {
     $type = ArticleType::MANUAL;
+    $articlePath = resource_path("articles/{$type->directory()}/foo.md");
     $path = resource_path("articles/{$type->directory()}/_sidebar.md");
+    $articleMarkdown = <<<'MD'
+---
+title: Foo
+author: Bar
+---
 
+Body
+MD;
+
+    File::shouldReceive('exists')->once()->with($articlePath)->andReturn(true);
+    File::shouldReceive('get')->once()->with($articlePath)->andReturn($articleMarkdown);
     File::shouldReceive('exists')->once()->with($path)->andReturn(false);
 
-    $sidebar = $this->articleService->getSidebar($type);
+    $sidebar = ($this->showArticlePage)($type, 'foo');
 
-    expect($sidebar)->toBeNull();
+    expect($sidebar)
+        ->toBeInstanceOf(ArticleShowPageViewModel::class)
+        ->and($sidebar->sidebarContent)->toBeNull();
 });
 
 // security: slugs containing forbidden characters should be treated as
@@ -159,7 +186,7 @@ test('invalid slug is ignored and returns null', function () {
     File::shouldReceive('exists')->never();
     File::shouldReceive('get')->never();
 
-    $article = $this->articleService->getArticle($type, $slug);
+    $article = ($this->showArticlePage)($type, $slug);
     expect($article)->toBeNull();
 });
 
@@ -170,6 +197,6 @@ test('slug with directory separator returns null', function () {
     File::shouldReceive('exists')->never();
     File::shouldReceive('get')->never();
 
-    $article = $this->articleService->getArticle($type, $slug);
+    $article = ($this->showArticlePage)($type, $slug);
     expect($article)->toBeNull();
 });

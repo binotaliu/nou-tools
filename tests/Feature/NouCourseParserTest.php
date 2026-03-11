@@ -1,16 +1,16 @@
 <?php
 
 use App\Enums\CourseClassType;
-use App\Services\NouCourseParser;
+use NouTools\Domains\Courses\Actions\ParseNouCourses;
 
 beforeEach(function () {
-    $this->parser = new NouCourseParser;
+    $this->parser = new ParseNouCourses;
 });
 
 it('parses morning class courses from vc1 sample', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc1_sample.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::Morning);
+    $courses = ($this->parser)($html, CourseClassType::Morning);
 
     expect($courses)->toHaveCount(2);
 
@@ -32,7 +32,7 @@ it('parses morning class courses from vc1 sample', function () {
 it('parses evening class courses with multiple classes per course from vc3 sample', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc3_sample.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::Evening);
+    $courses = ($this->parser)($html, CourseClassType::Evening);
 
     expect($courses)->toHaveCount(1);
     expect($courses[0]['name'])->toBe('做伙唱歌學台語');
@@ -53,7 +53,7 @@ it('parses evening class courses with multiple classes per course from vc3 sampl
 it('parses full remote courses with custom time from vc4 sample', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4_sample.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::FullRemote);
+    $courses = ($this->parser)($html, CourseClassType::FullRemote);
 
     expect($courses)->toHaveCount(2);
 
@@ -73,7 +73,7 @@ it('parses full remote courses with custom time from vc4 sample', function () {
 it('extracts teacher name correctly even with complex format', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4_sample.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::FullRemote);
+    $courses = ($this->parser)($html, CourseClassType::FullRemote);
 
     $familyHistory = $courses[1];
     expect($familyHistory['classes'][0]['teacher_name'])->toBe('沈佳姍老師');
@@ -82,7 +82,7 @@ it('extracts teacher name correctly even with complex format', function () {
 it('parses real vc1 HTML file', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc1.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::Morning);
+    $courses = ($this->parser)($html, CourseClassType::Morning);
 
     expect($courses)->not->toBeEmpty();
 
@@ -104,7 +104,7 @@ it('parses real vc1 HTML file', function () {
 it('parses real vc3 HTML file with multiple classes per course', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc3.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::Evening);
+    $courses = ($this->parser)($html, CourseClassType::Evening);
 
     expect($courses)->not->toBeEmpty();
 
@@ -122,7 +122,7 @@ it('parses real vc3 HTML file with multiple classes per course', function () {
 it('parses real vc4 HTML file with varied time slots', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::FullRemote);
+    $courses = ($this->parser)($html, CourseClassType::FullRemote);
 
     expect($courses)->not->toBeEmpty();
 
@@ -136,7 +136,7 @@ it('parses real vc4 HTML file with varied time slots', function () {
 })->skip();
 
 it('returns empty array for empty HTML', function () {
-    $courses = $this->parser->parse('', CourseClassType::Morning);
+    $courses = ($this->parser)('', CourseClassType::Morning);
 
     expect($courses)->toBeEmpty();
 });
@@ -144,7 +144,7 @@ it('returns empty array for empty HTML', function () {
 it('returns empty array for HTML without course cards', function () {
     $html = '<html><body><div>No courses here</div></body></html>';
 
-    $courses = $this->parser->parse($html, CourseClassType::Morning);
+    $courses = ($this->parser)($html, CourseClassType::Morning);
 
     expect($courses)->toBeEmpty();
 });
@@ -152,7 +152,7 @@ it('returns empty array for HTML without course cards', function () {
 it('parses micro-credit courses from vc4 micro sample', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::MicroCredit);
+    $courses = ($this->parser)($html, CourseClassType::MicroCredit);
 
     expect($courses)->toHaveCount(3);
 
@@ -173,8 +173,8 @@ it('parses micro-credit courses from vc4 micro sample', function () {
 it('filters sections correctly so full remote does not include micro-credit', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
 
-    $fullRemoteCourses = $this->parser->parse($html, CourseClassType::FullRemote);
-    $microCreditCourses = $this->parser->parse($html, CourseClassType::MicroCredit);
+    $fullRemoteCourses = ($this->parser)($html, CourseClassType::FullRemote);
+    $microCreditCourses = ($this->parser)($html, CourseClassType::MicroCredit);
 
     expect($fullRemoteCourses)->toHaveCount(1);
     expect($fullRemoteCourses[0]['name'])->toBe('閱讀英文學文化');
@@ -186,7 +186,7 @@ it('filters sections correctly so full remote does not include micro-credit', fu
 it('parses session time overrides for micro-credit courses', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::MicroCredit);
+    $courses = ($this->parser)($html, CourseClassType::MicroCredit);
 
     $germanLaw3 = $courses[1];
     expect($germanLaw3['name'])->toBe('法學德文（三）');
@@ -206,7 +206,7 @@ it('parses session time overrides for micro-credit courses', function () {
 it('does not have time overrides for courses with single time', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::MicroCredit);
+    $courses = ($this->parser)($html, CourseClassType::MicroCredit);
 
     $germanLaw4 = $courses[2];
     expect($germanLaw4['name'])->toBe('法學德文（四）');
@@ -218,7 +218,7 @@ it('does not have time overrides for courses with single time', function () {
 it('parses real vc4 HTML file for micro-credit courses', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::MicroCredit);
+    $courses = ($this->parser)($html, CourseClassType::MicroCredit);
 
     expect($courses)->not->toBeEmpty();
 
@@ -239,7 +239,7 @@ it('parses real vc4 HTML file for micro-credit courses', function () {
 it('parses real vc4 HTML file with time overrides for 法學德文（三）', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4.html');
 
-    $courses = $this->parser->parse($html, CourseClassType::MicroCredit);
+    $courses = ($this->parser)($html, CourseClassType::MicroCredit);
 
     $germanLaw = collect($courses)->firstWhere('name', '法學德文（三）');
     expect($germanLaw)->not->toBeNull();

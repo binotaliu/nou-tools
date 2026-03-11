@@ -2,9 +2,9 @@
 
 namespace App\View\Components;
 
-use App\Services\SchoolScheduleService;
 use Illuminate\View\Component;
 use Illuminate\View\View;
+use NouTools\Domains\SchoolCalendar\Actions\ListUpcomingSchoolEvents;
 
 class SchoolCalendar extends Component
 {
@@ -18,18 +18,17 @@ class SchoolCalendar extends Component
      */
     public ?array $countdownEvent = null;
 
-    private SchoolScheduleService $scheduleService;
+    private ListUpcomingSchoolEvents $scheduleEventsAction;
 
     /**
      * Accept optional overrides for events (keeps backwards compatibility when callers pass props).
      */
-    public function __construct(?array $scheduleEvents = null, ?array $countdownEvent = null, ?SchoolScheduleService $scheduleService = null)
+    public function __construct(?array $scheduleEvents = null, ?array $countdownEvent = null, ?ListUpcomingSchoolEvents $scheduleEventsAction = null)
     {
-        $this->scheduleService = $scheduleService ?? app(SchoolScheduleService::class);
+        $this->scheduleEventsAction = $scheduleEventsAction ?? app(ListUpcomingSchoolEvents::class);
 
-        // Use provided values when passed (from a view); otherwise load from service.
-        $allEvents = $scheduleEvents ?? $this->scheduleService->getUpcomingAndOngoingEvents();
-        $this->countdownEvent = $countdownEvent ?? $this->scheduleService->getCountdownEvent();
+        $allEvents = $scheduleEvents ?? $this->scheduleEventsAction->getUpcomingAndOngoingEvents();
+        $this->countdownEvent = $countdownEvent ?? $this->scheduleEventsAction->getCountdownEvent();
 
         // Filter out the countdown event from the schedule events list to avoid duplication
         if ($this->countdownEvent && is_array($allEvents)) {
