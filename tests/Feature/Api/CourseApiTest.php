@@ -15,7 +15,7 @@ it('returns empty data when no courses exist for the current semester', function
 
     getJson('/api/v1/courses')
         ->assertOk()
-        ->assertJsonCount(0, 'data');
+        ->assertJsonCount(0);
 });
 
 it('returns courses for the current semester by default', function (): void {
@@ -25,7 +25,7 @@ it('returns courses for the current semester by default', function (): void {
 
     getJson('/api/v1/courses')
         ->assertOk()
-        ->assertJsonCount(3, 'data');
+        ->assertJsonCount(3);
 });
 
 it('filters courses by the term query parameter', function (): void {
@@ -34,7 +34,7 @@ it('filters courses by the term query parameter', function (): void {
 
     getJson('/api/v1/courses?term=2024A')
         ->assertOk()
-        ->assertJsonCount(2, 'data');
+        ->assertJsonCount(2);
 });
 
 it('returns only id, name, and term in course list items', function (): void {
@@ -42,7 +42,7 @@ it('returns only id, name, and term in course list items', function (): void {
 
     $item = getJson('/api/v1/courses?term=2025B')
         ->assertOk()
-        ->json('data.0');
+        ->json('0');
 
     expect($item)
         ->toHaveKey('id')
@@ -70,7 +70,7 @@ it('returns full course detail', function (): void {
 
     $data = getJson("/api/v1/courses/{$course->id}")
         ->assertOk()
-        ->json('data');
+        ->json();
 
     expect($data)
         ->toHaveKey('id', $course->id)
@@ -97,7 +97,7 @@ it('includes textbook in course detail when present', function (): void {
 
     $data = getJson("/api/v1/courses/{$course->id}")
         ->assertOk()
-        ->json('data');
+        ->json();
 
     expect($data['textbook'])
         ->toHaveKey('bookTitle', '統計學導論')
@@ -111,7 +111,7 @@ it('returns null textbook when course has no textbook', function (): void {
 
     $data = getJson("/api/v1/courses/{$course->id}")
         ->assertOk()
-        ->json('data');
+        ->json();
 
     expect($data['textbook'])->toBeNull();
 });
@@ -135,7 +135,7 @@ it('includes previous exams matched by course name', function (): void {
 
     $data = getJson("/api/v1/courses/{$course->id}")
         ->assertOk()
-        ->json('data');
+        ->json();
 
     expect($data['previousExams'])->toHaveCount(2);
     expect($data['previousExams'][0])
@@ -166,7 +166,7 @@ it('includes classes with sessions in course detail', function (): void {
 
     $data = getJson("/api/v1/courses/{$course->id}")
         ->assertOk()
-        ->json('data');
+        ->json();
 
     expect($data['classes'])->toHaveCount(1);
 

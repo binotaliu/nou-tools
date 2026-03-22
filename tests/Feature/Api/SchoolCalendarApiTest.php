@@ -14,7 +14,7 @@ it('returns school calendar events for the current semester', function (): void 
 
     getJson('/api/v1/school-calendar')
         ->assertOk()
-        ->assertJsonCount(3, 'data');
+        ->assertJsonCount(3);
 });
 
 it('returns the expected school calendar event fields', function (): void {
@@ -27,7 +27,7 @@ it('returns the expected school calendar event fields', function (): void {
 
     $item = getJson('/api/v1/school-calendar')
         ->assertOk()
-        ->json('data.0');
+        ->json('0');
 
     expect($item)
         ->toHaveKey('name', '期末考')
@@ -41,5 +41,5 @@ it('returns empty data when the current semester has no calendar configured', fu
 
     getJson('/api/v1/school-calendar')
         ->assertOk()
-        ->assertJsonCount(0, 'data');
+        ->assertJsonCount(0);
 });
