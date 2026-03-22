@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ArticleType;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
@@ -7,6 +8,13 @@ use App\Http\Controllers\LearningProgressController;
 use App\Http\Controllers\ScheduleCalendarController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
+
+Route::view('/docs/api', 'redocly')->name('docs.api.view');
+Route::get('/docs/api.yaml', function () {
+    return response()->file(base_path('docs/openapi.yaml'), [
+        'Content-Type' => 'application/yaml; charset=utf-8',
+    ]);
+})->name('docs.api.yaml');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -29,5 +37,7 @@ Route::get('/schedules/{schedule}/{term}/learning-progress', [LearningProgressCo
 Route::put('/schedules/{schedule}/{term}/learning-progress', [LearningProgressController::class, 'update'])
     ->name('learning-progress.update');
 
-Route::get('/{type}', [ArticleController::class, 'index'])->name('articles.index');
-Route::get('/{type}/{slug}', [ArticleController::class, 'show'])->name('articles.show');
+Route::get('/{type}', [ArticleController::class, 'index'])->name('articles.index')
+    ->whereIn('type', ArticleType::cases());
+Route::get('/{type}/{slug}', [ArticleController::class, 'show'])->name('articles.show')
+    ->whereIn('type', ArticleType::cases());

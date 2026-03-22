@@ -1,0 +1,348 @@
+openapi: 3.1.0
+info:
+  title: NOU Tools API
+  version: 1.0.0
+  license:
+    name: AGPL-3.0-or-later
+    identifier: AGPL-3.0-or-later
+servers:
+  - url: /api
+    description: Application API base path
+security: []
+tags:
+  - name: Courses
+    x-displayName: 課程
+    description: 課程相關的 API
+  - name: School Calendar
+    x-displayName: 學校行事曆
+    description: 學校行事曆相關的 API
+paths:
+  /v1/courses:
+    get:
+      tags:
+        - Courses
+      summary: 列出 指定學期的課程
+      description: |
+        回傳精簡課程列表（課程 ID、名稱、學期）。
+        未提供 `term` 時，會使用系統判定的目前學期。
+      operationId: listCourses
+      parameters:
+        - name: term
+          in: query
+          required: false
+          description: 學期代碼（例如 `2025B`）
+          schema:
+            type: string
+            pattern: '^[0-9]{4}[ABC]$'
+            example: '2025B'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseSummary'
+        '400':
+          description: Request 參數錯誤
+  /v1/courses/{course}:
+    get:
+      tags:
+        - Courses
+      summary: 取得 課程詳細資訊
+      description: |
+        回傳課程完整內容，包含考試日期、參考書、考古題與班級資訊。
+      operationId: getCourseDetail
+      parameters:
+        - name: course
+          in: path
+          required: true
+          description: 課程 ID
+          schema:
+            type: integer
+            minimum: 1
+            example: 1234
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDetail'
+        '404':
+          description: 找不到課程
+  /v1/school-calendar:
+    get:
+      tags:
+        - School Calendar
+      summary: 取得 當期學校行事曆
+      description: |
+        回傳當期學期的行事曆事件（如開學、期中考、期末考、註冊期間）。
+      operationId: getCurrentSchoolCalendar
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SchoolCalendarEvent'
+        '400':
+          description: Request 參數錯誤
+components:
+  schemas:
+    CourseSummary:
+      type: object
+      required:
+        - id
+        - name
+        - term
+      properties:
+        id:
+          type: integer
+          example: 1234
+        name:
+          type: string
+          example: 管理學
+        term:
+          type: string
+          example: 2025B
+    CourseDetail:
+      type: object
+      required:
+        - id
+        - name
+        - term
+        - previousExams
+        - classes
+      properties:
+        id:
+          type: integer
+          example: 1234
+        name:
+          type: string
+          example: 管理學
+        term:
+          type: string
+          example: 2025B
+        descriptionUrl:
+          type:
+            - string
+            - 'null'
+          format: uri
+          example: https://nou.edu.tw/course/1234
+        creditType:
+          type:
+            - string
+            - 'null'
+          example: 必修
+        credits:
+          type:
+            - integer
+            - 'null'
+          example: 3
+        department:
+          type:
+            - string
+            - 'null'
+          example: 管理與資訊學系
+        nature:
+          type:
+            - string
+            - 'null'
+          example: 專業科目
+        midtermDate:
+          type:
+            - string
+            - 'null'
+          format: date
+          example: 2025-11-15
+        finalDate:
+          type:
+            - string
+            - 'null'
+          format: date
+          example: 2026-01-10
+        examTimeStart:
+          type:
+            - string
+            - 'null'
+          format: time
+          example: '09:00:00+08:00'
+        examTimeEnd:
+          type:
+            - string
+            - 'null'
+          format: time
+          example: '10:30:00+08:00'
+        textbook:
+          oneOf:
+            - $ref: '#/components/schemas/Textbook'
+            - type: 'null'
+        previousExams:
+          type: array
+          items:
+            $ref: '#/components/schemas/PreviousExam'
+        classes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassWithSessions'
+    Textbook:
+      type: object
+      required:
+        - bookTitle
+      properties:
+        bookTitle:
+          type: string
+          example: 管理學概論
+        edition:
+          type:
+            - string
+            - 'null'
+          example: 第三版
+        priceInfo:
+          type:
+            - string
+            - 'null'
+          example: NT$450
+        referenceUrl:
+          type:
+            - string
+            - 'null'
+          format: uri
+          example: https://example.com/book/123
+    PreviousExam:
+      type: object
+      required:
+        - term
+      properties:
+        term:
+          type: string
+          example: 2024B
+        midtermReferencePrimary:
+          type:
+            - string
+            - 'null'
+          format: uri
+          example: https://example.com/exams/midterm-a.pdf
+        midtermReferenceSecondary:
+          type:
+            - string
+            - 'null'
+          format: uri
+          example: https://example.com/exams/midterm-b.pdf
+        finalReferencePrimary:
+          type:
+            - string
+            - 'null'
+          format: uri
+          example: https://example.com/exams/final-a.pdf
+        finalReferenceSecondary:
+          type:
+            - string
+            - 'null'
+          format: uri
+          example: https://example.com/exams/final-b.pdf
+    ClassWithSessions:
+      type: object
+      required:
+        - id
+        - code
+        - type
+        - typeLabel
+        - startTime
+        - endTime
+        - teacherName
+        - link
+        - sessions
+      properties:
+        id:
+          type: integer
+          example: 5566
+        code:
+          type: string
+          example: 901A
+        type:
+          $ref: '#/components/schemas/CourseClassType'
+        typeLabel:
+          type: string
+          example: 上午班
+        startTime:
+          type: string
+          format: time
+          example: '09:00:00+08:00'
+        endTime:
+          type: string
+          format: time
+          example: '10:50:00+08:00'
+        teacherName:
+          type: string
+          example: 王小明
+        link:
+          type: string
+          format: uri
+          example: https://meet.example.com/abc-defg-hij
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClassSession'
+    ClassSession:
+      type: object
+      required:
+        - date
+        - startTime
+        - endTime
+      properties:
+        date:
+          type: string
+          format: date
+          example: 2025-10-12
+        startTime:
+          type: string
+          format: time
+          example: '09:00:00+08:00'
+        endTime:
+          type: string
+          format: time
+          example: '10:50:00+08:00'
+    CourseClassType:
+      type: string
+      enum:
+        - morning
+        - afternoon
+        - evening
+        - full_remote
+        - micro_credit
+        - computer_lab
+      description: 班別代碼
+      x-enumDescriptions:
+        morning: 上午班
+        afternoon: 下午班
+        evening: 夜間班
+        full_remote: 全遠距
+        micro_credit: 微學分
+        computer_lab: 電腦實習
+    SchoolCalendarEvent:
+      type: object
+      required:
+        - name
+        - startDate
+        - endDate
+        - isCountdown
+      properties:
+        name:
+          type: string
+          example: 期中考
+        startDate:
+          type: string
+          format: date
+          example: 2025-11-15
+        endDate:
+          type: string
+          format: date
+          example: 2025-11-16
+        isCountdown:
+          type: boolean
+          example: true
