@@ -445,21 +445,9 @@
                 <h1
                     class="inline-flex items-center gap-2 text-lg font-bold text-warm-700 md:gap-4 md:text-2xl"
                 >
-                    <svg
+                    <x-heroicon-o-book-open
                         class="size-5 shrink-0 text-warm-700 md:size-6"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                        <path
-                            d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
-                        ></path>
-                    </svg>
+                    />
                     <a href="{{ url('/') }}" class="shrink-0">NOU 小幫手</a>
                 </h1>
             </div>
