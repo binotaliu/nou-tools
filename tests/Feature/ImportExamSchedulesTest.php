@@ -71,15 +71,15 @@ it('imports exam schedules correctly', function () {
 
     // Check that exam dates were assigned
     $course = Course::where('name', '做伙唱歌學台語')->first();
-    expect($course->midterm_date)->toBe('2025-04-25');
-    expect($course->final_date)->toBe('2025-06-27');
+    expect($course->midterm_date?->toDateString())->toBe('2025-04-25');
+    expect($course->final_date?->toDateString())->toBe('2025-06-27');
     expect($course->exam_time_start)->toBe('13:30');
     expect($course->exam_time_end)->toBe('14:40');
 
     // Check Saturday course "三國演義"
     $sunday = Course::where('name', '三國演義')->first();
-    expect($sunday->midterm_date)->toBe('2025-04-25');
-    expect($sunday->final_date)->toBe('2025-06-27');
+    expect($sunday->midterm_date?->toDateString())->toBe('2025-04-25');
+    expect($sunday->final_date?->toDateString())->toBe('2025-06-27');
     expect($sunday->exam_time_start)->toBe('13:30');
     expect($sunday->exam_time_end)->toBe('14:40');
 });
@@ -92,8 +92,8 @@ it('matches courses with special characters via normalization', function () {
         ->assertSuccessful();
 
     $course->refresh();
-    expect($course->midterm_date)->toBe('2025-04-26');
-    expect($course->final_date)->toBe('2025-06-28');
+    expect($course->midterm_date?->toDateString())->toBe('2025-04-26');
+    expect($course->final_date?->toDateString())->toBe('2025-06-28');
     expect($course->exam_time_start)->toBe('08:30');
     expect($course->exam_time_end)->toBe('09:40');
 });
