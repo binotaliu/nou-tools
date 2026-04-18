@@ -3,7 +3,7 @@
   "guidelines": true,
   "mcp": true,
   "nightwatch_mcp": false,
-  "packages": ["spatie/laravel-ray"],
+  "packages": ["spatie/laravel-ray", "filament/filament"],
   "sail": false,
   "skills": [
     "laravel-best-practices",
