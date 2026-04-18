@@ -31,6 +31,17 @@ class Course extends Model
     ];
 
     /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'midterm_date' => 'date',
+            'final_date' => 'date',
+        ];
+    }
+
+    /**
      * @return HasMany<CourseClass, $this>
      */
     public function classes(): HasMany
@@ -41,5 +52,13 @@ class Course extends Model
     public function textbook(): HasOne
     {
         return $this->hasOne(Textbook::class);
+    }
+
+    /**
+     * @return HasMany<PreviousExam, $this>
+     */
+    public function previousExams(): HasMany
+    {
+        return $this->hasMany(PreviousExam::class, 'course_name', 'name');
     }
 }

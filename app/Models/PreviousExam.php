@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PreviousExam extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'course_name',
         'course_no',
@@ -15,4 +19,12 @@ class PreviousExam extends Model
         'final_reference_primary',
         'final_reference_secondary',
     ];
+
+    /**
+     * @return BelongsTo<Course, $this>
+     */
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class, 'course_name', 'name');
+    }
 }
