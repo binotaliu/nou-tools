@@ -26,7 +26,7 @@
                 >
                     <x-heroicon-o-megaphone class="size-4" />
 
-                    查看最新公告
+                    檢視學校公告
                 </x-link-button>
 
                 @if (isset($previousSchedule))
