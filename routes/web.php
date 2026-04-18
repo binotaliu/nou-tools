@@ -18,6 +18,8 @@ Route::get('/docs/api.yaml', function () {
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+Route::view('/alt-uu', 'alt-uu')->name('alt-uu');
+
 Route::get('/courses/{course}', [CourseController::class, 'show'])->name('course.show');
 
 Route::permanentRedirect('/schedule/create', '/schedules/create');
