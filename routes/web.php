@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\ArticleType;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
@@ -19,6 +20,8 @@ Route::get('/docs/api.yaml', function () {
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::view('/alt-uu', 'alt-uu')->name('alt-uu');
+
+Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 
 Route::get('/courses/{course}', [CourseController::class, 'show'])->name('course.show');
 

@@ -164,6 +164,21 @@
                             </a>
 
                             <a
+                                href="{{ route('announcements.index') }}"
+                                @class([
+                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
+                                    'bg-warm-100 text-warm-900' => $routeName === 'announcements.index',
+                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900' =>
+                                        $routeName !== 'announcements.index',
+                                ])
+                            >
+                                <x-heroicon-o-megaphone
+                                    class="size-4 shrink-0"
+                                />
+                                <span class="hidden sm:inline">學校公告</span>
+                            </a>
+
+                            <a
                                 href="{{ route('alt-uu') }}"
                                 @class([
                                     '-m-2 inline-flex items-center gap-1.5 rounded-md px-5 py-2 text-sm font-medium transition-colors md:px-3',
@@ -202,6 +217,19 @@
                     >
                         <x-heroicon-o-table-cells class="size-4 shrink-0" />
                         我的課表
+                    </a>
+
+                    <a
+                        href="{{ route('announcements.index') }}"
+                        @class([
+                            'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                            'bg-warm-100 text-warm-900' => $routeName === 'announcements.index',
+                            'text-warm-600 hover:bg-warm-100 hover:text-warm-900' =>
+                                $routeName !== 'announcements.index',
+                        ])
+                    >
+                        <x-heroicon-o-megaphone class="size-4 shrink-0" />
+                        學校公告
                     </a>
 
                     <a

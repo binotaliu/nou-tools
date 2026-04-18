@@ -18,6 +18,17 @@
                     建立我的課表
                 </x-link-button>
 
+                <x-link-button
+                    :href="route('announcements.index')"
+                    variant="secondary"
+                    full-width
+                    class="mt-3"
+                >
+                    <x-heroicon-o-megaphone class="size-4" />
+
+                    查看最新公告
+                </x-link-button>
+
                 @if (isset($previousSchedule))
                     <div class="mt-3 w-full text-sm text-warm-600">
                         <x-link-button
