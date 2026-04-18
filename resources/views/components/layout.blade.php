@@ -4,10 +4,17 @@
     'noindex' => false,
 ])
 
+@inject('readScheduleCookie', 'NouTools\Domains\Schedules\Actions\ReadStudentScheduleCookie')
+
 @php
     $routeName = request()
         ->route()
         ?->getName();
+
+    $scheduleFromCookie = $readScheduleCookie(request());
+    $scheduleNavHref = $scheduleFromCookie
+        ? route('schedules.show', $scheduleFromCookie->token)
+        : route('schedules.create');
 
     $analyticsPage = match ($routeName) {
         'schedules.show' => '/schedules/:schedule',
@@ -102,7 +109,10 @@
         <header
             class="sticky top-0 z-40 border-b border-warm-200 bg-white print:static"
         >
-            <div class="mx-auto max-w-7xl px-3 py-2 md:px-6 md:py-4">
+            <div
+                x-data="{ open: false }"
+                class="relative mx-auto max-w-7xl px-3 py-2 md:px-6 md:py-4"
+            >
                 <div class="flex items-center justify-between">
                     <h1
                         class="inline-flex items-center gap-2 pb-0 text-lg font-bold text-warm-700 md:gap-4 md:text-2xl"
@@ -114,6 +124,100 @@
                             NOU 小幫手
                         </a>
                     </h1>
+
+                    <div class="flex items-center gap-2">
+                        <button
+                            type="button"
+                            @click="open = !open"
+                            :aria-expanded="open.toString()"
+                            class="inline-flex items-center justify-center rounded-md border border-warm-200 bg-white p-2 text-warm-700 transition hover:bg-warm-50 focus:ring-2 focus:ring-warm-500 focus:outline-none md:hidden"
+                        >
+                            <span class="sr-only">切換選單</span>
+
+                            <x-heroicon-o-bars-3
+                                x-show="!open"
+                                class="size-5"
+                            />
+
+                            <x-heroicon-o-x-mark x-show="open" class="size-5" />
+                        </button>
+
+                        <nav class="hidden items-center gap-1 gap-x-6 md:flex">
+                            <a
+                                href="{{ $scheduleNavHref }}"
+                                @class([
+                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
+                                    'bg-warm-100 text-warm-900' => str_starts_with(
+                                        $routeName ?? '',
+                                        'schedules',
+                                    ),
+                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900' => ! str_starts_with(
+                                        $routeName ?? '',
+                                        'schedules',
+                                    ),
+                                ])
+                            >
+                                <x-heroicon-o-table-cells
+                                    class="size-4 shrink-0"
+                                />
+                                <span class="hidden sm:inline">我的課表</span>
+                            </a>
+
+                            <a
+                                href="{{ route('alt-uu') }}"
+                                @class([
+                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-5 py-2 text-sm font-medium transition-colors md:px-3',
+                                    'bg-warm-100 text-warm-900' => $routeName === 'alt-uu',
+                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900' =>
+                                        $routeName !== 'alt-uu',
+                                ])
+                            >
+                                <x-heroicon-o-device-phone-mobile
+                                    class="size-4 shrink-0"
+                                />
+                                <span class="hidden sm:inline">Alt UU</span>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+
+                <div
+                    x-show="open"
+                    @click.outside="open = false"
+                    class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-warm-200 bg-white p-3 shadow-lg md:hidden"
+                >
+                    <a
+                        href="{{ $scheduleNavHref }}"
+                        @class([
+                            'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                            'bg-warm-100 text-warm-900' => str_starts_with(
+                                $routeName ?? '',
+                                'schedules',
+                            ),
+                            'text-warm-600 hover:bg-warm-100 hover:text-warm-900' => ! str_starts_with(
+                                $routeName ?? '',
+                                'schedules',
+                            ),
+                        ])
+                    >
+                        <x-heroicon-o-table-cells class="size-4 shrink-0" />
+                        我的課表
+                    </a>
+
+                    <a
+                        href="{{ route('alt-uu') }}"
+                        @class([
+                            'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                            'bg-warm-100 text-warm-900' => $routeName === 'alt-uu',
+                            'text-warm-600 hover:bg-warm-100 hover:text-warm-900' =>
+                                $routeName !== 'alt-uu',
+                        ])
+                    >
+                        <x-heroicon-o-device-phone-mobile
+                            class="size-4 shrink-0"
+                        />
+                        Alt UU
+                    </a>
                 </div>
             </div>
         </header>
