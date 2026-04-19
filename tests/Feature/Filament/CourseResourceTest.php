@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Filament\Resources\Courses\CourseResource;
 use App\Filament\Resources\Courses\Resources\CourseClasses\CourseClassResource;
 use App\Filament\Resources\Courses\Resources\CourseClasses\Resources\ClassSchedules\ClassScheduleResource;
@@ -15,7 +16,9 @@ use function Pest\Laravel\actingAs;
 
 test('authenticated users can access the course filament resource pages', function () {
     /** @var User $user */
-    $user = User::factory()->createOne();
+    $user = User::factory()->createOne([
+        'roles' => [UserRole::Admin->value],
+    ]);
     $course = Course::factory()->create([
         'name' => '管理測試課程',
         'term' => '2025B',
@@ -39,7 +42,9 @@ test('authenticated users can access the course filament resource pages', functi
 
 test('nested filament resource pages resolve correctly for course data', function () {
     /** @var User $user */
-    $user = User::factory()->createOne();
+    $user = User::factory()->createOne([
+        'roles' => [UserRole::Admin->value],
+    ]);
     $course = Course::factory()->create([
         'name' => '巢狀課程',
         'term' => '2025B',
