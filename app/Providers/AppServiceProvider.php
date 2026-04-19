@@ -2,11 +2,23 @@
 
 namespace App\Providers;
 
+use App\Models\Announcement;
+use App\Models\Course;
+use App\Models\DiscountStore;
+use App\Models\DiscountStoreCategory;
+use App\Models\User;
+use App\Policies\AnnouncementPolicy;
+use App\Policies\CoursePolicy;
+use App\Policies\DiscountStoreCategoryPolicy;
+use App\Policies\DiscountStorePolicy;
+use App\Policies\UserPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use NouTools\Domains\Schedules\Actions\ReadStudentScheduleCookie;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,6 +36,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Password::defaults(fn (): Password => Password::min(8)->uncompromised());
+
+        Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(Announcement::class, AnnouncementPolicy::class);
+        Gate::policy(Course::class, CoursePolicy::class);
+        Gate::policy(DiscountStore::class, DiscountStorePolicy::class);
+        Gate::policy(DiscountStoreCategory::class, DiscountStoreCategoryPolicy::class);
+
         CarbonImmutable::setLocale(config('app.locale'));
         Date::use(CarbonImmutable::class);
 
