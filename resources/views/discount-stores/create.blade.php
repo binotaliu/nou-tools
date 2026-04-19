@@ -40,7 +40,7 @@
                                 name="name"
                                 value="{{ old('name') }}"
                                 class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300"
-                                placeholder="例如：麥當勞、Spotify"
+                                placeholder="店家名稱或網站名稱"
                             />
                             @error('name')
                                 <p class="mt-1 text-xs text-red-500">
