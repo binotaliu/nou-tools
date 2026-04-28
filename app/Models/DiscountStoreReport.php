@@ -16,7 +16,6 @@ class DiscountStoreReport extends Model
         'store_id',
         'is_valid',
         'comment',
-        '',
     ];
 
     /**

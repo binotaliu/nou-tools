@@ -165,9 +165,7 @@
                     data-index="{{ $loop->index }}"
                     x-show="isStoreVisible($el.dataset.index)"
                 >
-                    <div
-                        class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
-                    >
+                    <div class="flex flex-col gap-3">
                         <div class="min-w-0 flex-1 space-y-2">
                             <div
                                 class="flex flex-wrap items-center gap-2 text-sm"
@@ -233,6 +231,38 @@
                                     檢視詳情
                                 </x-link-button>
                             </div>
+                        </div>
+
+                        <div>
+                            @if ($store->latestReport === null)
+                                <span
+                                    class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800"
+                                >
+                                    <x-heroicon-o-question-mark-circle
+                                        class="size-4"
+                                    />
+                                    尚無回報
+                                </span>
+                            @elseif ($store->latestReport->is_valid)
+                                <span
+                                    class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800"
+                                >
+                                    <x-heroicon-o-check-circle class="size-4" />
+                                    有效 –
+                                    <span
+                                        title="{{ $store->latestReport->created_at->format('Y-m-d H:i') }}"
+                                    >
+                                        {{ $store->latestReport->created_at->format('Y/m/d') }}
+                                    </span>
+                                </span>
+                            @else
+                                <span
+                                    class="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800"
+                                >
+                                    <x-heroicon-o-x-circle class="size-4" />
+                                    此優惠似乎無法使用
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </x-card>

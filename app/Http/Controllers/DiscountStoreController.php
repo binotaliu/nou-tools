@@ -68,6 +68,7 @@ class DiscountStoreController extends Controller
 
         $store->load([
             'category',
+            'reports' => fn ($query) => $query->latest()->limit(6),
             'comments' => fn ($query) => $query->where('is_approved', true)->latest(),
         ])->loadCount([
             'reports as valid_reports_count' => fn ($query) => $query->where('is_valid', true),

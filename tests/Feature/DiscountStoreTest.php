@@ -65,12 +65,48 @@ it('displays the discount store detail page and adds noindex robots meta', funct
     $response->assertSuccessful();
     $response->assertSee('詳細頁店家');
     $response->assertSee('詳細優惠內容');
-    $response->assertSee('回報有效');
+    $response->assertSee('最新回報');
+    $response->assertSee('目前還沒有回報資料。');
     $response->assertSee('留言（審核後顯示）');
     $response->assertSee('學生小芳');
     $response->assertSee('這個優惠很棒');
     $response->assertDontSee('這是未審核留言');
     $response->assertSee('<meta name="robots" content="noindex, nofollow" />', false);
+});
+
+it('shows latest report details and expandable recent report list on store detail page', function () {
+    $store = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'status' => DiscountStoreStatus::Online,
+        ]);
+
+    DiscountStoreReport::factory()->for($store, 'store')->create([
+        'is_valid' => true,
+        'comment' => '最舊回報',
+        'created_at' => now()->subHours(3),
+    ]);
+
+    DiscountStoreReport::factory()->for($store, 'store')->create([
+        'is_valid' => false,
+        'comment' => '較新回報',
+        'created_at' => now()->subHours(2),
+    ]);
+
+    DiscountStoreReport::factory()->for($store, 'store')->create([
+        'is_valid' => true,
+        'comment' => '最新回報內容',
+        'created_at' => now()->subHour(),
+    ]);
+
+    $response = get(route('discount-stores.show', $store));
+
+    $response->assertSuccessful();
+    $response->assertSee('最新回報');
+    $response->assertSee('最新回報內容');
+    $response->assertSee('展開看更多近期回報（2）');
+    $response->assertSee('較新回報');
+    $response->assertSee('最舊回報');
 });
 
 it('returns not found when opening a non-online discount store detail page', function () {

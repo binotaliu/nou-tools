@@ -18,7 +18,7 @@ final readonly class ShowDiscountStorePage
     {
         $stores = DiscountStore::query()
             ->where('status', DiscountStoreStatus::Online)
-            ->with('category')
+            ->with(['category', 'latestReport'])
             ->orderByDesc('id')
             ->get();
 

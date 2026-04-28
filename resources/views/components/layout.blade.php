@@ -93,6 +93,8 @@
                 gtag('config', 'G-1B65SQ4673', { send_page_view: false })
             </script>
         @endif
+
+        @stack('head')
     </head>
     <body
         class="bg-warm-50 text-warm-900"

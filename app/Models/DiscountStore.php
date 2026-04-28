@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class DiscountStore extends Model
 {
@@ -61,5 +62,11 @@ class DiscountStore extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(DiscountStoreComment::class, 'store_id');
+    }
+
+    public function latestReport(): ?HasOne
+    {
+        return $this->hasOne(DiscountStoreReport::class, 'store_id')
+            ->latestOfMany();
     }
 }
