@@ -192,6 +192,7 @@
                                 @if ($store->city)
                                     <span class="text-warm-500">
                                         {{ $store->city }}
+                                        {{ $store->district }}
                                     </span>
                                 @endif
                             </div>

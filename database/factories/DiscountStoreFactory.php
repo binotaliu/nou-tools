@@ -7,6 +7,7 @@ use App\Enums\DiscountStoreType;
 use App\Models\DiscountStore;
 use App\Models\DiscountStoreCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\File;
 
 /**
  * @extends Factory<DiscountStore>
@@ -20,11 +21,16 @@ class DiscountStoreFactory extends Factory
      */
     public function definition(): array
     {
+        $taiwanRegionsData = File::json(resource_path('data/taiwan-regions.json'));
+        $randomCityData = fake()->randomElement($taiwanRegionsData);
+
         return [
             'name' => fake()->company(),
             'status' => DiscountStoreStatus::Pending,
             'type' => fake()->randomElement(DiscountStoreType::cases()),
             'category_id' => DiscountStoreCategory::factory(),
+            'city' => $randomCityData['name'],
+            'district' => fake()->randomElement($randomCityData['districts'])['name'],
             'address' => fake()->address(),
             'verification_method' => '學生證',
             'discount_details' => fake()->sentence(),
