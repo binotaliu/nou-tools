@@ -6,7 +6,7 @@
     href="{{ $href }}"
     target="_blank"
     rel="noopener noreferrer"
-    {{ $attributes->merge(['class' => 'inline-flex flex-col justify-center items-center px-3 py-2 text-base bg-white border border-warm-200 text-warm-700 rounded hover:bg-warm-50 gap-2']) }}
+    {{ $attributes->merge(['class' => 'inline-flex flex-col justify-center items-center px-3 py-2 text-base bg-white border border-warm-200 text-warm-700 rounded hover:bg-warm-50 gap-2 truncate']) }}
 >
     @isset($icon)
         {{ $icon }}
