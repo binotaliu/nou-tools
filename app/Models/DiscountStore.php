@@ -24,6 +24,8 @@ class DiscountStore extends Model
         'city',
         'district',
         'address',
+        'latitude',
+        'longitude',
         'verification_method',
         'discount_details',
         'notes',
@@ -37,6 +39,8 @@ class DiscountStore extends Model
         return [
             'status' => DiscountStoreStatus::class,
             'type' => DiscountStoreType::class,
+            'latitude' => 'decimal:8',
+            'longitude' => 'decimal:8',
         ];
     }
 

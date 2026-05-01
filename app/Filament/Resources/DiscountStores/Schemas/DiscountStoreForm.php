@@ -4,6 +4,8 @@ namespace App\Filament\Resources\DiscountStores\Schemas;
 
 use App\Enums\DiscountStoreStatus;
 use App\Enums\DiscountStoreType;
+use Dotswan\MapPicker\Fields\Map;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -89,6 +91,26 @@ class DiscountStoreForm
                             ->maxLength(500)
                             ->default('')
                             ->dehydrateStateUsing(fn (mixed $state): string => $state ?? ''),
+                        Hidden::make('latitude')
+                            ->dehydrateStateUsing(fn (mixed $state): ?float => filled($state) ? (float) $state : null),
+                        Hidden::make('longitude')
+                            ->dehydrateStateUsing(fn (mixed $state): ?float => filled($state) ? (float) $state : null),
+                        Map::make('location')
+                            ->label('地圖座標選擇')
+                            ->columnSpanFull()
+                            ->visible(fn (Get $get): bool => $get('type') !== DiscountStoreType::Online->value)
+                            ->showMarker()
+                            ->clickable(true)
+                            ->draggable()
+                            ->showZoomControl()
+                            ->showFullscreenControl()
+                            ->showMyLocationButton()
+                            ->zoom(16)
+                            ->tilesUrl(config('services.map.tileLayer'))
+                            ->extraTileControl([
+                                'attribution' => config('services.map.tileLayerAttribution'),
+                            ])
+                            ->extraStyles(['min-height: 24rem', 'border-radius: 0.75rem']),
                     ])
                     ->columns(2),
                 Section::make('優惠資訊')

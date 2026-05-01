@@ -42,4 +42,9 @@ return [
             'new_comment' => env('DISCORD_WEBHOOK_URL_NEW_COMMENT'),
         ],
     ],
+
+    'map' => [
+        'tileLayer' => env('MAP_TILE_LAYER', 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+        'tileLayerAttribution' => env('MAP_TILE_LAYER_ATTRIBUTION', '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'),
+    ],
 ];

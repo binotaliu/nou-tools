@@ -27,11 +27,13 @@ class DiscountStoreFactory extends Factory
         return [
             'name' => fake()->company(),
             'status' => DiscountStoreStatus::Pending,
-            'type' => fake()->randomElement(DiscountStoreType::cases()),
+            'type' => $type = fake()->randomElement(DiscountStoreType::cases()),
             'category_id' => DiscountStoreCategory::factory(),
-            'city' => $randomCityData['name'],
-            'district' => fake()->randomElement($randomCityData['districts'])['name'],
-            'address' => fake()->address(),
+            'city' => $type === DiscountStoreType::Local ? $randomCityData['name'] : '',
+            'district' => $type === DiscountStoreType::Local ? fake()->randomElement($randomCityData['districts'])['name'] : '',
+            'address' => $type === DiscountStoreType::Local ? fake()->address() : '',
+            'latitude' => fake()->optional()->latitude(),
+            'longitude' => fake()->optional()->longitude(),
             'verification_method' => '學生證',
             'discount_details' => fake()->sentence(),
             'notes' => fake()->optional()->sentence(),
@@ -55,8 +57,13 @@ class DiscountStoreFactory extends Factory
 
     public function ofTypeOnline(): static
     {
+        $taiwanRegionsData = File::json(resource_path('data/taiwan-regions.json'));
+        $randomCityData = fake()->randomElement($taiwanRegionsData);
+
         return $this->state(fn (): array => [
             'type' => DiscountStoreType::Online,
+            'city' => $randomCityData['name'],
+            'district' => fake()->randomElement($randomCityData['districts'])['name'],
             'address' => fake()->url(),
         ]);
     }

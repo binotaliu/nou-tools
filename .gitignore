@@ -18,7 +18,9 @@
 /public/storage
 /public/fonts/filament
 /public/css/filament
+/public/css/dotswan
 /public/js/filament
+/public/js/dotswan
 /storage/*.key
 /storage/pail
 /vendor

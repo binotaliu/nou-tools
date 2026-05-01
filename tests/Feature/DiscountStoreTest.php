@@ -45,6 +45,12 @@ it('displays the discount store detail page and adds noindex robots meta', funct
         ->create([
             'name' => '詳細頁店家',
             'status' => DiscountStoreStatus::Online,
+            'type' => DiscountStoreType::Local,
+            'city' => '臺南市',
+            'district' => '中西區',
+            'address' => '中正路 1 號',
+            'latitude' => 22.9909,
+            'longitude' => 120.1971,
             'discount_details' => '詳細優惠內容',
         ]);
 
@@ -71,7 +77,23 @@ it('displays the discount store detail page and adds noindex robots meta', funct
     $response->assertSee('學生小芳');
     $response->assertSee('這個優惠很棒');
     $response->assertDontSee('這是未審核留言');
+    $response->assertSee('x-ref="mapContainer"', false);
     $response->assertSee('<meta name="robots" content="noindex, nofollow" />', false);
+});
+
+it('does not render map block on online discount store detail page', function () {
+    $store = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'status' => DiscountStoreStatus::Online,
+            'type' => DiscountStoreType::Online,
+            'address' => 'https://example.com',
+        ]);
+
+    $response = get(route('discount-stores.show', $store));
+
+    $response->assertSuccessful();
+    $response->assertDontSee('x-ref="mapContainer"', false);
 });
 
 it('shows latest report details and expandable recent report list on store detail page', function () {

@@ -1,3 +1,7 @@
+@push('head')
+    @vite(['resources/js/leaflet.js'])
+@endpush
+
 <x-layout
     title="{{ $store->name }} - 優惠店家 - NOU 小幫手"
     description="{{ $store->name }} 的學生優惠與使用資訊。"
@@ -5,10 +9,28 @@
 >
     <div
         class="mx-auto max-w-4xl space-y-6"
-        x-data="discountStoreReportForm({ storeName: @js($store->name) })"
+        x-data="discountStoreReportForm({
+                    storeName: @js($store->name),
+                    hasCoordinates: @js($store->latitude !== null && $store->longitude !== null),
+                    latitude: @js((float) $store->latitude),
+                    longitude: @js((float) $store->longitude),
+                    address: @js($store->address),
+                    shouldShowMap: @js($store->type !== \App\Enums\DiscountStoreType::Online && filled($store->address) && $store->latitude !== null && $store->longitude !== null),
+                    mapTileLayer: @js(config('services.map.tileLayer')),
+                    mapTileLayerAttribution: @js(config('services.map.tileLayerAttribution')),
+                    mapMarkerIconUrl: @js(asset('favicon.svg')),
+                })"
+        x-on:leaflet-loaded.window.camel="
+            if (shouldShowMap) {
+                initMap()
+            }
+        "
         x-init="init()"
     >
-        <div class="flex flex-wrap items-center gap-2 text-sm">
+        <div
+            class="flex flex-col flex-wrap items-start justify-center gap-2 text-sm"
+        >
+            <h2 class="text-3xl font-bold text-warm-900">優惠店家詳情</h2>
             <a
                 href="{{ route('discount-stores.index') }}"
                 class="inline-flex items-center gap-1 text-warm-600 transition hover:text-warm-900 hover:underline"
@@ -69,9 +91,29 @@
                             @endif
                         @else
                             <x-heroicon-o-map-pin class="inline-block size-4" />
-                            {{ $store->address }}
+                            <button
+                                type="button"
+                                class="text-orange-600 hover:underline"
+                                @click="openMapSelectionModal()"
+                                :disabled="!hasCoordinates"
+                                :class="hasCoordinates ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'"
+                            >
+                                {{ $store->address }}
+                            </button>
                         @endif
                     </p>
+                @endif
+
+                @if ($store->type !== \App\Enums\DiscountStoreType::Online && filled($store->address) && $store->latitude !== null && $store->longitude !== null)
+                    <div class="space-y-2">
+                        <div
+                            x-ref="mapContainer"
+                            class="h-80 w-full rounded-lg border border-warm-100"
+                        ></div>
+                        <p class="text-xs text-warm-500">
+                            點擊上方地址以在不同地圖應用開啟此位置。
+                        </p>
+                    </div>
                 @endif
 
                 <div class="text-sm text-warm-700">
@@ -287,6 +329,72 @@
             </div>
         </x-card>
 
+        <template x-if="showMapSelectionModal">
+            <div
+                x-transition.opacity
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+                @click.self="closeMapSelectionModal()"
+            >
+                <div
+                    class="mx-4 w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+                >
+                    <h3 class="mb-4 text-lg font-semibold text-warm-900">
+                        選擇地圖應用
+                    </h3>
+                    <p class="mb-6 text-sm text-warm-600">
+                        在哪個地圖應用中開啟此位置？
+                    </p>
+                    <div class="space-y-2">
+                        <button
+                            type="button"
+                            @click="openInMap('osm')"
+                            class="w-full rounded-lg border border-warm-200 px-4 py-3 text-left text-sm font-medium text-warm-700 transition hover:bg-warm-50"
+                        >
+                            <span class="flex items-center gap-2">
+                                <x-heroicon-o-globe-alt class="size-4" />
+                                在 OpenStreetMap 開啟
+                            </span>
+                        </button>
+                        <button
+                            type="button"
+                            @click="openInMap('apple')"
+                            class="w-full rounded-lg border border-warm-200 px-4 py-3 text-left text-sm font-medium text-warm-700 transition hover:bg-warm-50"
+                        >
+                            <span class="flex items-center gap-2">
+                                <svg
+                                    class="size-4"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        d="M18.71 19.71a6 6 0 0 1-8.485 0l-.88-.89a.996.996 0 1 0-1.41 1.41l.89.89a8 8 0 0 0 11.31 0l-.889-.889a.996.996 0 0 0-1.41 1.41l.88.889zM12.005 5.999a5.991 5.991 0 0 0-4.241 10.247l.884.883a.996.996 0 1 0 1.41-1.41l-.883-.884a4 4 0 1 1 5.657 0l-.884.884a.996.996 0 1 0 1.41 1.41l.883-.883A5.991 5.991 0 0 0 12.005 5.999z"
+                                    ></path>
+                                </svg>
+                                在 Apple 地圖開啟
+                            </span>
+                        </button>
+                        <button
+                            type="button"
+                            @click="openInMap('google')"
+                            class="w-full rounded-lg border border-warm-200 px-4 py-3 text-left text-sm font-medium text-warm-700 transition hover:bg-warm-50"
+                        >
+                            <span class="flex items-center gap-2">
+                                <x-heroicon-o-map class="size-4" />
+                                在 Google 地圖開啟
+                            </span>
+                        </button>
+                    </div>
+                    <button
+                        type="button"
+                        class="mt-4 w-full rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-700 transition hover:bg-warm-50"
+                        @click="closeMapSelectionModal()"
+                    >
+                        關閉
+                    </button>
+                </div>
+            </div>
+        </template>
+
         @if ($store->comments->isNotEmpty())
             <x-card>
                 <div class="space-y-2">
@@ -414,9 +522,21 @@
             function discountStoreReportForm(config) {
                 return {
                     storeName: config.storeName,
+                    hasCoordinates: config.hasCoordinates,
+                    latitude: config.latitude,
+                    longitude: config.longitude,
+                    address: config.address,
+                    shouldShowMap: config.shouldShowMap,
+                    mapTileLayer: config.mapTileLayer,
+                    mapTileLayerAttribution: config.mapTileLayerAttribution,
+                    mapMarkerIconUrl: config.mapMarkerIconUrl,
                     showReportModal: false,
                     showCommentModal: false,
+                    showMapSelectionModal: false,
                     isValid: true,
+                    map: null,
+                    marker: null,
+                    mapInitialized: false,
                     reportTurnstileWidgetId: null,
                     commentTurnstileWidgetId: null,
                     reportFormTurnstileChallengeExecuted: false,
@@ -425,6 +545,98 @@
                     init() {
                         if (@js((bool) old('nickname') || (bool) old('content'))) {
                             this.openCommentModal()
+                        }
+
+                        if (this.shouldShowMap) {
+                            this.$nextTick(() => {
+                                this.initMap()
+                            })
+                        }
+                    },
+
+                    async initMap() {
+                        if (
+                            this.mapInitialized ||
+                            !this.shouldShowMap ||
+                            !this.$refs.mapContainer ||
+                            !window.leaflet
+                        ) {
+                            console.warn('地圖初始化失敗：', {
+                                mapInitialized: this.mapInitialized,
+                                shouldShowMap: this.shouldShowMap,
+                                mapContainerExists: !!this.$refs.mapContainer,
+                                leafletLoaded: !!window.leaflet,
+                            })
+                            return
+                        }
+
+                        this.mapInitialized = true
+
+                        const markerIcon = window.leaflet.icon({
+                            iconUrl: this.mapMarkerIconUrl,
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 32],
+                            popupAnchor: [0, -32],
+                        })
+
+                        this.map = window.leaflet
+                            .map(this.$refs.mapContainer, {
+                                zoomControl: true,
+                                boxZoom: true,
+                                doubleClickZoom: false,
+                                dragging: true,
+                                keyboard: false,
+                                scrollWheelZoom: true,
+                                touchZoom: true,
+                            })
+                            .setView([this.latitude, this.longitude], 16)
+
+                        this.marker = window.leaflet
+                            .marker([this.latitude, this.longitude])
+                            .addTo(this.map)
+
+                        this.marker.bindPopup(this.storeName)
+
+                        window.leaflet
+                            .tileLayer(this.mapTileLayer, {
+                                attribution: this.mapTileLayerAttribution,
+                            })
+                            .addTo(this.map)
+                    },
+
+                    openMapSelectionModal() {
+                        if (!this.hasCoordinates) {
+                            return
+                        }
+                        this.showMapSelectionModal = true
+                    },
+
+                    closeMapSelectionModal() {
+                        this.showMapSelectionModal = false
+                    },
+
+                    openInMap(mapService) {
+                        const lat = this.latitude
+                        const lon = this.longitude
+                        const label = encodeURIComponent(this.storeName)
+
+                        let url = ''
+
+                        switch (mapService) {
+                            case 'osm':
+                                url = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}&zoom=16&layers=M`
+                                break
+                            case 'apple':
+                                url = `maps://maps.apple.com/?q=${label}&ll=${lat},${lon}&z=16`
+                                break
+                            case 'google':
+                                url = `https://maps.google.com/maps?q=${label}@${lat},${lon}&z=16`
+                                break
+                        }
+
+                        if (url) {
+                            window.open(url, '_blank')
+                            this.closeMapSelectionModal()
                         }
                     },
 
