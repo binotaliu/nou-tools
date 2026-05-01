@@ -22,27 +22,29 @@
                 class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden"
                 x-data="{ subscribeOpen: false }"
             >
-                <x-link-button
-                    :href="route('schedules.edit', $viewModel->uuid)"
-                    variant="secondary"
-                    class="w-full sm:w-1/2 lg:w-auto"
-                    data-analytics-event="schedule_edit"
-                    data-analytics-feature="schedule"
-                >
-                    <x-heroicon-o-pencil-square class="size-4" />
-                    編輯
-                </x-link-button>
+                <div class="flex w-full shrink-0 gap-2 sm:w-1/2 lg:w-auto">
+                    <x-link-button
+                        :href="route('schedules.edit', $viewModel->uuid)"
+                        variant="secondary"
+                        class="w-full sm:w-1/2 lg:w-auto"
+                        data-analytics-event="schedule_edit"
+                        data-analytics-feature="schedule"
+                    >
+                        <x-heroicon-o-pencil-square class="size-4" />
+                        編輯
+                    </x-link-button>
 
-                <x-link-button
-                    :href="route('schedules.customize', $viewModel->uuid)"
-                    variant="secondary"
-                    class="w-full sm:w-1/2 lg:w-auto"
-                    data-analytics-event="schedule_customize_open"
-                    data-analytics-feature="schedule"
-                >
-                    <x-heroicon-o-cog-6-tooth class="size-4" />
-                    自訂
-                </x-link-button>
+                    <x-link-button
+                        :href="route('schedules.customize', $viewModel->uuid)"
+                        variant="secondary"
+                        class="w-full sm:w-1/2 lg:w-auto"
+                        data-analytics-event="schedule_customize_open"
+                        data-analytics-feature="schedule"
+                    >
+                        <x-heroicon-o-cog-6-tooth class="size-4" />
+                        自訂
+                    </x-link-button>
+                </div>
 
                 <x-link-button
                     :href="route('learning-progress.show', [$viewModel->uuid, config('app.current_semester')])"
