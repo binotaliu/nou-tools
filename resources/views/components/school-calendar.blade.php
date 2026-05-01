@@ -79,7 +79,7 @@
 
                             <div
                                 @class([
-                                    'items-center justify-between border-b border-warm-100 py-2 last:border-0',
+                                    'flex-col-reverse items-start justify-between gap-x-2 gap-y-1 border-b border-warm-100 py-2 last:border-0 sm:flex-row sm:items-center',
                                     'hidden print:flex' => $isCountdownMatch,
                                     'flex' => ! $isCountdownMatch,
                                 ])
@@ -88,17 +88,17 @@
                                     {{ $event['name'] }}
                                 </span>
                                 <div
-                                    class="flex items-center gap-2 text-sm text-warm-600 tabular-nums"
+                                    class="flex flex-col-reverse items-start gap-x-2 text-sm text-warm-600 tabular-nums sm:flex-row sm:items-center"
                                 >
                                     @if ($event['status'] === 'ongoing')
                                         <span
-                                            class="inline-flex items-center rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 print:hidden"
+                                            class="inline-flex shrink-0 items-center rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 print:hidden"
                                         >
                                             進行中
                                         </span>
                                     @endif
 
-                                    <span>
+                                    <span class="shrink-0">
                                         {{ $event['start']->format('n 月 j 日') }}
                                         @if ($event['start']->format('Y-m-d') !== $event['end']->format('Y-m-d'))
                                             –
