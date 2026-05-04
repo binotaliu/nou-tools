@@ -160,6 +160,193 @@ return [
             'tracks_expiry' => true,
             'is_active' => true,
         ],
+        'student-affairs-latest-news' => [
+            'name' => '學務處',
+            'category' => '最新消息',
+            'fetch_url' => 'https://www2.nou.edu.tw/coach/doclist.aspx?uid=4377&pid=4376',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/coach',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'student-affairs-career-news' => [
+            'name' => '學務處',
+            'category' => '職涯訊息',
+            'fetch_url' => 'https://www2.nou.edu.tw/coach/List.aspx?uid=4385&pid=4376',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/coach',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'student-affairs-scholarship-news' => [
+            'name' => '學務處',
+            'category' => '獎學金訊息',
+            'fetch_url' => 'https://www2.nou.edu.tw/coach/List.aspx?uid=4439&pid=4376',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/coach',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'student-affairs-graduation-news' => [
+            'name' => '學務處',
+            'category' => '畢業典禮訊息',
+            'fetch_url' => 'https://www2.nou.edu.tw/coach/List.aspx?uid=4440&pid=4376',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/coach',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'student-affairs-gender-equality-news' => [
+            'name' => '學務處',
+            'category' => '性平訊息',
+            'fetch_url' => 'https://www2.nou.edu.tw/coach/List.aspx?uid=4441&pid=4376',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/coach',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'student-affairs-life-education-news' => [
+            'name' => '學務處',
+            'category' => '生命教育訊息',
+            'fetch_url' => 'https://www2.nou.edu.tw/coach/List.aspx?uid=4442&pid=4376',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/coach',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'student-affairs-indigenous-news' => [
+            'name' => '學務處',
+            'category' => '原住民族訊息',
+            'fetch_url' => 'https://www2.nou.edu.tw/coach/List.aspx?uid=4443&pid=4376',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/coach',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'student-affairs-sports-health-news' => [
+            'name' => '學務處',
+            'category' => '體育衛生訊息',
+            'fetch_url' => 'https://www2.nou.edu.tw/coach/List.aspx?uid=5847&pid=4376',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/coach',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'student-union-announcements' => [
+            'name' => '學務處',
+            'category' => '學生會公告',
+            'fetch_url' => 'https://www2.nou.edu.tw/coach/doclist.aspx?uid=5849&pid=4429',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/coach',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'student-club-activities-news' => [
+            'name' => '學務處',
+            'category' => '社團活動訊息',
+            'fetch_url' => 'https://www2.nou.edu.tw/coach/doclist.aspx?uid=4462&pid=4429',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/coach',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'publishing-center-latest-news' => [
+            'name' => '出版中心',
+            'category' => '最新消息',
+            'fetch_url' => 'https://www2.nou.edu.tw/pd/docList.aspx?uid=3486&pid=3486',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/pd',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'continuing-education-latest-course-news' => [
+            'name' => '推廣教育處',
+            'category' => '最新課程消息',
+            'fetch_url' => 'https://www2.nou.edu.tw/pd/docList.aspx?uid=3486&pid=3486',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/pd',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'continuing-education-course-changes' => [
+            'name' => '推廣教育處',
+            'category' => '課程異動公告',
+            'fetch_url' => 'https://www2.nou.edu.tw/myec/docList.aspx?uid=5098&pid=5098',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/myec',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'continuing-education-event-news' => [
+            'name' => '推廣教育處',
+            'category' => '活動訊息',
+            'fetch_url' => 'https://www2.nou.edu.tw/myec/docList.aspx?uid=5099&pid=5099',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/myec',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'continuing-education-general-announcements' => [
+            'name' => '推廣教育處',
+            'category' => '一般公告',
+            'fetch_url' => 'https://www2.nou.edu.tw/myec/docList.aspx?uid=5175&pid=5175',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/myec',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'international-affairs-focus-news' => [
+            'name' => '國際事務處',
+            'category' => '焦點新聞',
+            'fetch_url' => 'https://www2.nou.edu.tw/oia/docList.aspx?uid=6290&pid=6290',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/oia',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
+        'international-affairs-academic-exchange-news' => [
+            'name' => '國際事務處',
+            'category' => '學術與交流活動',
+            'fetch_url' => 'https://www2.nou.edu.tw/oia/List.aspx?uid=6299&pid=6289',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/oia',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
         // endregion
 
         // region 學系
