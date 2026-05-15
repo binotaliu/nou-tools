@@ -102,7 +102,7 @@
                                         'micro_credit' => '微學分',
                                         'other' => '其他',
                                     ];
-                                    $grouped = $course->classes->groupBy(fn ($class) => in_array($class->type, array_keys($typeLabels)) ? $class->type : 'other');
+                                    $grouped = $course->classes->groupBy(fn ($class) => in_array($class->type->value, array_keys($typeLabels)) ? $class->type : 'other');
                                 @endphp
 
                                 @foreach ($typeLabels as $typeKey => $label)
@@ -128,7 +128,9 @@
                                                 });
                                             @endphp
 
-                                            <div class="flex w-full gap-1">
+                                            <div
+                                                class="flex w-full flex-col gap-1"
+                                            >
                                                 @foreach ($timeGroups as $timeLabel => $classesAtTime)
                                                     <div
                                                         class="w-full rounded border border-warm-800 bg-white p-3"
