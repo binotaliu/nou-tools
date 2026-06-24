@@ -59,7 +59,7 @@
                     @if ($nextSchedule)
                         {!! str_replace(' ', '&nbsp;', e(Date::parse($nextSchedule->date)->isoFormat('M/D (dd)'))) !!}
                     @else
-                        <span class="text-warm-500">無未來課程</span>
+                        <span class="text-sm text-warm-500">無未來課程</span>
                     @endif
                 </x-table-column>
 
@@ -77,7 +77,7 @@
                             </span>
                         @endif
                     @else
-                        <span class="text-warm-400">未設定</span>
+                        <span class="text-sm text-warm-400">未設定</span>
                     @endif
                 </x-table-column>
 
