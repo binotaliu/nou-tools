@@ -22,151 +22,181 @@
                 </p>
             </div>
 
-            <div
-                class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden"
-                x-data="{ subscribeOpen: false }"
-            >
-                <div class="flex w-full shrink-0 gap-2 sm:w-1/2 lg:w-auto">
-                    <x-link-button
-                        :href="route('schedules.edit', $viewModel->uuid)"
-                        variant="secondary"
-                        class="w-full sm:w-1/2 lg:w-auto"
-                        data-analytics-event="schedule_edit"
-                        data-analytics-feature="schedule"
-                    >
-                        <x-heroicon-o-pencil-square class="size-4" />
-                        編輯
-                    </x-link-button>
-
-                    <x-link-button
-                        :href="route('schedules.customize', $viewModel->uuid)"
-                        variant="secondary"
-                        class="w-full sm:w-1/2 lg:w-auto"
-                        data-analytics-event="schedule_customize_open"
-                        data-analytics-feature="schedule"
-                    >
-                        <x-heroicon-o-cog-6-tooth class="size-4" />
-                        自訂
-                    </x-link-button>
-                </div>
-
-                <x-link-button
-                    :href="route('learning-progress.show', [$viewModel->uuid, $viewModel->selectedTerm])"
-                    variant="secondary"
-                    class="w-full sm:w-1/2 lg:w-auto"
-                    data-analytics-event="learning_progress_open"
-                    data-analytics-feature="learning_progress"
+            <div class="flex w-full flex-col items-end gap-2 lg:w-auto">
+                <div
+                    class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden"
+                    x-data="{ subscribeOpen: false }"
                 >
-                    <x-heroicon-o-clipboard class="size-4" />
-                    學習進度表
-                </x-link-button>
-
-                @php
-                    $icsUrl = $viewModel->calendarUrls->ics;
-                    $webcalUrl = $viewModel->calendarUrls->webcal;
-                    $googleUrl = $viewModel->calendarUrls->google;
-                    $outlookWebUrl = $viewModel->calendarUrls->outlook;
-                @endphp
-
-                <x-button
-                    type="button"
-                    variant="primary"
-                    @click="subscribeOpen = true"
-                    class="w-full sm:w-1/2 lg:w-auto"
-                    data-analytics-event="calendar_subscribe_open"
-                    data-analytics-feature="schedule"
-                >
-                    <x-heroicon-o-calendar class="inline size-4" />
-                    訂閱行事曆
-                </x-button>
-
-                {{-- Subscribe modal --}}
-                <x-modal
-                    name="subscribeOpen"
-                    title="訂閱行事曆"
-                    description="選擇要使用的方式來訂閱或下載您的課表行事曆："
-                >
-                    <div class="grid gap-3">
+                    <div class="flex w-full shrink-0 gap-2 sm:w-1/2 lg:w-auto">
                         <x-link-button
-                            :href="$webcalUrl"
-                            variant="ghost"
-                            full-width
-                            @click="subscribeOpen = false"
-                            data-analytics-event="calendar_subscribe"
+                            :href="route('schedules.edit', $viewModel->uuid)"
+                            variant="secondary"
+                            class="w-full sm:w-1/2 lg:w-auto"
+                            data-analytics-event="schedule_edit"
                             data-analytics-feature="schedule"
-                            data-analytics-label="webcal"
                         >
-                            Apple 日曆 (iOS / macOS)
+                            <x-heroicon-o-pencil-square class="size-4" />
+                            編輯
                         </x-link-button>
 
                         <x-link-button
-                            :href="$googleUrl"
-                            variant="ghost"
-                            full-width
-                            target="_blank"
-                            rel="noopener"
-                            @click="subscribeOpen = false"
-                            data-analytics-event="calendar_subscribe"
+                            :href="route('schedules.customize', $viewModel->uuid)"
+                            variant="secondary"
+                            class="w-full sm:w-1/2 lg:w-auto"
+                            data-analytics-event="schedule_customize_open"
                             data-analytics-feature="schedule"
-                            data-analytics-label="google"
                         >
-                            Google 日曆
-                        </x-link-button>
-
-                        <x-link-button
-                            :href="$outlookWebUrl"
-                            variant="ghost"
-                            full-width
-                            target="_blank"
-                            rel="noopener"
-                            @click="subscribeOpen = false"
-                            data-analytics-event="calendar_subscribe"
-                            data-analytics-feature="schedule"
-                            data-analytics-label="outlook"
-                        >
-                            Windows 日曆 (Microsoft 365 / Outlook.com)
-                        </x-link-button>
-
-                        <x-link-button
-                            :href="$webcalUrl"
-                            variant="ghost"
-                            full-width
-                            @click="subscribeOpen = false"
-                            data-analytics-event="calendar_subscribe"
-                            data-analytics-feature="schedule"
-                            data-analytics-label="webcal_generic"
-                        >
-                            Webcal 連結 (其他支援 Webcal 的行事曆)
-                        </x-link-button>
-
-                        <x-link-button
-                            :href="$icsUrl"
-                            variant="ghost"
-                            full-width
-                            target="_blank"
-                            rel="noopener"
-                            :download="true"
-                            @click="subscribeOpen = false"
-                            data-analytics-event="calendar_download"
-                            data-analytics-feature="schedule"
-                            data-analytics-label="ics"
-                        >
-                            下載 iCal（.ics）
+                            <x-heroicon-o-cog-6-tooth class="size-4" />
+                            自訂
                         </x-link-button>
                     </div>
 
-                    <x-slot:footer>
-                        <x-button
-                            type="button"
-                            variant="warm-subtle"
-                            size="sm"
-                            @click="subscribeOpen = false"
-                            class="px-4 py-2 text-sm"
-                        >
-                            取消
-                        </x-button>
-                    </x-slot>
-                </x-modal>
+                    <x-link-button
+                        :href="route('learning-progress.show', [$viewModel->uuid, $viewModel->selectedTerm])"
+                        variant="secondary"
+                        class="w-full sm:w-1/2 lg:w-auto"
+                        data-analytics-event="learning_progress_open"
+                        data-analytics-feature="learning_progress"
+                    >
+                        <x-heroicon-o-clipboard class="size-4" />
+                        學習進度表
+                    </x-link-button>
+
+                    @php
+                        $icsUrl = $viewModel->calendarUrls->ics;
+                        $webcalUrl = $viewModel->calendarUrls->webcal;
+                        $googleUrl = $viewModel->calendarUrls->google;
+                        $outlookWebUrl = $viewModel->calendarUrls->outlook;
+                    @endphp
+
+                    <x-button
+                        type="button"
+                        variant="primary"
+                        @click="subscribeOpen = true"
+                        class="w-full sm:w-1/2 lg:w-auto"
+                        data-analytics-event="calendar_subscribe_open"
+                        data-analytics-feature="schedule"
+                    >
+                        <x-heroicon-o-calendar class="inline size-4" />
+                        訂閱行事曆
+                    </x-button>
+
+                    {{-- Subscribe modal --}}
+                    <x-modal
+                        name="subscribeOpen"
+                        title="訂閱行事曆"
+                        description="選擇要使用的方式來訂閱或下載您的課表行事曆："
+                    >
+                        <div class="grid gap-3">
+                            <x-link-button
+                                :href="$webcalUrl"
+                                variant="ghost"
+                                full-width
+                                @click="subscribeOpen = false"
+                                data-analytics-event="calendar_subscribe"
+                                data-analytics-feature="schedule"
+                                data-analytics-label="webcal"
+                            >
+                                Apple 日曆 (iOS / macOS)
+                            </x-link-button>
+
+                            <x-link-button
+                                :href="$googleUrl"
+                                variant="ghost"
+                                full-width
+                                target="_blank"
+                                rel="noopener"
+                                @click="subscribeOpen = false"
+                                data-analytics-event="calendar_subscribe"
+                                data-analytics-feature="schedule"
+                                data-analytics-label="google"
+                            >
+                                Google 日曆
+                            </x-link-button>
+
+                            <x-link-button
+                                :href="$outlookWebUrl"
+                                variant="ghost"
+                                full-width
+                                target="_blank"
+                                rel="noopener"
+                                @click="subscribeOpen = false"
+                                data-analytics-event="calendar_subscribe"
+                                data-analytics-feature="schedule"
+                                data-analytics-label="outlook"
+                            >
+                                Windows 日曆 (Microsoft 365 / Outlook.com)
+                            </x-link-button>
+
+                            <x-link-button
+                                :href="$webcalUrl"
+                                variant="ghost"
+                                full-width
+                                @click="subscribeOpen = false"
+                                data-analytics-event="calendar_subscribe"
+                                data-analytics-feature="schedule"
+                                data-analytics-label="webcal_generic"
+                            >
+                                Webcal 連結 (其他支援 Webcal 的行事曆)
+                            </x-link-button>
+
+                            <x-link-button
+                                :href="$icsUrl"
+                                variant="ghost"
+                                full-width
+                                target="_blank"
+                                rel="noopener"
+                                :download="true"
+                                @click="subscribeOpen = false"
+                                data-analytics-event="calendar_download"
+                                data-analytics-feature="schedule"
+                                data-analytics-label="ics"
+                            >
+                                下載 iCal（.ics）
+                            </x-link-button>
+                        </div>
+
+                        <x-slot:footer>
+                            <x-button
+                                type="button"
+                                variant="warm-subtle"
+                                size="sm"
+                                @click="subscribeOpen = false"
+                                class="px-4 py-2 text-sm"
+                            >
+                                取消
+                            </x-button>
+                        </x-slot>
+                    </x-modal>
+                </div>
+
+                <form
+                    method="GET"
+                    action="{{ route('schedules.show', $viewModel->uuid) }}"
+                    class="w-full sm:w-1/2 lg:w-32 print:hidden"
+                >
+                    <label for="term" class="sr-only">選擇學期</label>
+                    <x-select
+                        id="term"
+                        name="term"
+                        onchange="this.form.submit()"
+                        aria-label="選擇學期"
+                        class="bg-white"
+                    >
+                        @foreach ($viewModel->availableTerms as $term)
+                            <option
+                                value="{{ $term }}"
+                                @selected($term === $viewModel->selectedTerm)
+                            >
+                                {{ \Illuminate\Support\Str::toShortSemesterDisplay($term) }}
+                            </option>
+                        @endforeach
+                    </x-select>
+                </form>
+
+                <span class="hidden text-sm text-warm-600 print:inline">
+                    {{ \Illuminate\Support\Str::toSemesterDisplay($viewModel->selectedTerm) }}
+                </span>
             </div>
         </div>
 
@@ -175,32 +205,6 @@
         @endif
 
         <x-alt-uu-banner class="print:hidden" />
-
-        <div class="mb-4 flex items-center justify-center md:justify-end">
-            <form
-                method="GET"
-                action="{{ route('schedules.show', $viewModel->uuid) }}"
-                class="w-full sm:w-1/2 lg:w-32"
-            >
-                <label for="term" class="sr-only">選擇學期</label>
-                <x-select
-                    id="term"
-                    name="term"
-                    onchange="this.form.submit()"
-                    aria-label="選擇學期"
-                    class="bg-white"
-                >
-                    @foreach ($viewModel->availableTerms as $term)
-                        <option
-                            value="{{ $term }}"
-                            @selected($term === $viewModel->selectedTerm)
-                        >
-                            {{ \Illuminate\Support\Str::toShortSemesterDisplay($term) }}
-                        </option>
-                    @endforeach
-                </x-select>
-            </form>
-        </div>
 
         @if (! $hasCourses)
             <x-card class="mb-8" title="此學期尚無課程">
