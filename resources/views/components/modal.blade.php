@@ -10,7 +10,7 @@
     x-show="{{ $name }}"
     x-transition.opacity.scale.95.duration.150
     @keydown.escape.window="{{ $name }} = false"
-    class="fixed inset-0 z-50 flex items-center justify-center"
+    class="fixed inset-0 z-50 flex items-start justify-center p-4 sm:items-center sm:p-0"
 >
     <template x-teleport="body">
         <div
@@ -25,7 +25,7 @@
         role="dialog"
         aria-modal="true"
         @click.outside="{{ $name }} = false"
-        {{ $attributes->merge(['class' => "relative bg-white rounded-lg shadow-lg w-full {$maxWidth} mx-4 p-6"]) }}
+        {{ $attributes->merge(['class' => "relative w-full {$maxWidth} max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-lg bg-white p-6 shadow-lg sm:max-h-[calc(100vh-2rem)]"]) }}
     >
         @if ($title)
             <h3 class="mb-2 text-lg font-semibold text-warm-900">
