@@ -2,6 +2,10 @@
     :title="($viewModel->name ?: '我的課表') . ' - NOU 小幫手'"
     :noindex="true"
 >
+    @php
+        $hasCourses = count($viewModel->items) > 0;
+    @endphp
+
     <div class="mx-auto max-w-5xl">
         <div
             class="mb-8 flex flex-col items-start justify-between gap-y-4 lg:flex-row"
@@ -47,7 +51,7 @@
                 </div>
 
                 <x-link-button
-                    :href="route('learning-progress.show', [$viewModel->uuid, config('app.current_semester')])"
+                    :href="route('learning-progress.show', [$viewModel->uuid, $viewModel->selectedTerm])"
                     variant="secondary"
                     class="w-full sm:w-1/2 lg:w-auto"
                     data-analytics-event="learning_progress_open"
@@ -172,8 +176,59 @@
 
         <x-alt-uu-banner class="print:hidden" />
 
+        <div class="mb-4 flex items-center justify-center md:justify-end">
+            <form
+                method="GET"
+                action="{{ route('schedules.show', $viewModel->uuid) }}"
+                class="w-full sm:w-1/2 lg:w-32"
+            >
+                <label for="term" class="sr-only">選擇學期</label>
+                <x-select
+                    id="term"
+                    name="term"
+                    onchange="this.form.submit()"
+                    aria-label="選擇學期"
+                    class="bg-white"
+                >
+                    @foreach ($viewModel->availableTerms as $term)
+                        <option
+                            value="{{ $term }}"
+                            @selected($term === $viewModel->selectedTerm)
+                        >
+                            {{ \Illuminate\Support\Str::toShortSemesterDisplay($term) }}
+                        </option>
+                    @endforeach
+                </x-select>
+            </form>
+        </div>
+
+        @if (! $hasCourses)
+            <x-card class="mb-8" title="此學期尚無課程">
+                <div class="space-y-3 text-warm-700">
+                    <p>
+                        目前選擇的學期
+                        <span class="font-semibold text-warm-900">
+                            {{ \Illuminate\Support\Str::toSemesterDisplay($viewModel->selectedTerm) }}
+                        </span>
+                        沒有課程。
+                    </p>
+
+                    <p class="text-sm text-warm-600">
+                        您可以切換其他學期，或前往
+                        <a
+                            href="{{ route('schedules.edit', $viewModel->uuid) }}"
+                            class="font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline"
+                        >
+                            編輯課表
+                        </a>
+                        新增課程。
+                    </p>
+                </div>
+            </x-card>
+        @endif
+
         {{-- Schedule Items - Responsive Table/Cards --}}
-        @if ($viewModel->displayOptions['show_schedule_items'])
+        @if ($viewModel->displayOptions['show_schedule_items'] && $hasCourses)
             <x-schedule-items
                 :items="$viewModel->items"
                 :scheduleUuid="$viewModel->uuid"

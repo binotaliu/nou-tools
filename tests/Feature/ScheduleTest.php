@@ -115,6 +115,8 @@ it('returns an .ics calendar for a saved schedule and converts UTC+8 times to UT
 });
 
 it('schedule show page displays exam information for selected courses', function () {
+    config()->set('app.current_semester', '2025B');
+
     $course = Course::factory()->create([
         'name' => 'Exam Course From Schedule',
         'midterm_date' => '2025-04-25',
@@ -149,6 +151,82 @@ it('schedule show page displays exam information for selected courses', function
         ->assertSee('EXM101');
 
     $this->assertMatchesRegularExpression('/13:30\s*-\s*14:40/', $response->getContent());
+});
+
+it('schedule show page defaults to current semester courses and updates learning progress link', function () {
+    config()->set('app.current_semester', '2026C');
+
+    $currentCourse = Course::factory()->create([
+        'name' => 'Current Semester Course',
+        'term' => '2026C',
+    ]);
+    $currentClass = CourseClass::factory()->create([
+        'course_id' => $currentCourse->id,
+        'code' => 'CUR101',
+    ]);
+
+    $otherCourse = Course::factory()->create([
+        'name' => 'Other Semester Course',
+        'term' => '2025B',
+    ]);
+    $otherClass = CourseClass::factory()->create([
+        'course_id' => $otherCourse->id,
+        'code' => 'OLD101',
+    ]);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Term Filtered Schedule',
+    ]);
+
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $currentClass->id,
+    ]);
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $otherClass->id,
+    ]);
+
+    $response = $this->get(route('schedules.show', $schedule));
+
+    $response->assertStatus(200)
+        ->assertSee('Current Semester Course')
+        ->assertSee('CUR101')
+        ->assertDontSee('Other Semester Course')
+        ->assertDontSee('OLD101')
+        ->assertSee(route('learning-progress.show', [$schedule, '2026C']), false)
+        ->assertSee('name="term"', false)
+        ->assertSee('value="2026C"', false);
+});
+
+it('schedule show page shows empty state for selected semester without courses', function () {
+    config()->set('app.current_semester', '2026C');
+
+    $otherCourse = Course::factory()->create([
+        'name' => 'Only Other Semester Course',
+        'term' => '2025B',
+    ]);
+    $otherClass = CourseClass::factory()->create([
+        'course_id' => $otherCourse->id,
+    ]);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'No Current Semester Course',
+    ]);
+
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $otherClass->id,
+    ]);
+
+    $response = $this->get(route('schedules.show', ['schedule' => $schedule, 'term' => '2026C']));
+
+    $response->assertStatus(200)
+        ->assertSee('此學期尚無課程')
+        ->assertSee('沒有課程。')
+        ->assertDontSee(route('learning-progress.show', [$schedule, '2026C']), false);
 });
 
 it('stores schedule metadata in an encrypted cookie when saving', function () {
@@ -239,6 +317,54 @@ it('updates the stored cookie when schedule is updated', function () {
         'uuid' => $schedule->uuid,
         'name' => 'New Name',
     ]));
+});
+
+it('updating schedule only replaces classes in current semester', function () {
+    config()->set('app.current_semester', '2026C');
+
+    $currentCourseA = Course::factory()->create(['term' => '2026C']);
+    $currentCourseB = Course::factory()->create(['term' => '2026C']);
+    $otherTermCourse = Course::factory()->create(['term' => '2025B']);
+
+    $currentClassA = CourseClass::factory()->create(['course_id' => $currentCourseA->id]);
+    $currentClassB = CourseClass::factory()->create(['course_id' => $currentCourseB->id]);
+    $otherTermClass = CourseClass::factory()->create(['course_id' => $otherTermCourse->id]);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Cross Term Schedule',
+    ]);
+
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $currentClassA->id,
+    ]);
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $otherTermClass->id,
+    ]);
+
+    $response = $this->putJson(route('schedules.update', $schedule), [
+        'name' => 'Cross Term Schedule Updated',
+        'items' => [$currentClassB->id],
+    ]);
+
+    $response->assertSuccessful();
+
+    $this->assertDatabaseMissing('student_schedule_items', [
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $currentClassA->id,
+    ]);
+
+    $this->assertDatabaseHas('student_schedule_items', [
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $currentClassB->id,
+    ]);
+
+    $this->assertDatabaseHas('student_schedule_items', [
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $otherTermClass->id,
+    ]);
 });
 
 it('edit page form posts to update route and includes method spoofing', function () {

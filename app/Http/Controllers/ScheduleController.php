@@ -75,10 +75,10 @@ class ScheduleController extends Controller
             ->cookie($cookie);
     }
 
-    public function show(StudentSchedule $schedule, ShowSchedulePage $showSchedulePage): View
+    public function show(StudentSchedule $schedule, Request $request, ShowSchedulePage $showSchedulePage): View
     {
         return view('schedule.show', [
-            'viewModel' => $showSchedulePage($schedule),
+            'viewModel' => $showSchedulePage($schedule, $request->query('term')),
         ]);
     }
 

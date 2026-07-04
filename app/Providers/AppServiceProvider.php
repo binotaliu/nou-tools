@@ -66,6 +66,24 @@ class AppServiceProvider extends ServiceProvider
 
             return "{$rocYear} 學年度{$termName}";
         });
+        Str::macro('toShortSemesterDisplay', function (string $semester): string {
+            if (! preg_match('/^(\d{4})([ABC])$/', (string) $semester, $m)) {
+                return $semester;
+            }
+
+            $year = (int) $m[1];
+            $termCode = $m[2];
+            $rocYear = $year - 1911;
+
+            $termName = match ($termCode) {
+                'A' => '上學期',
+                'B' => '下學期',
+                'C' => '暑期',
+                default => $termCode,
+            };
+
+            return "{$rocYear} {$termName}";
+        });
 
         // Request macro: parse the encrypted `student_schedule` cookie and
         // return a `StudentScheduleCookie` data object when valid.

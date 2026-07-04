@@ -14,6 +14,9 @@ final class ScheduleViewModel extends Data
         public int $id,
         public string $uuid,
         public ?string $name,
+        public string $selectedTerm,
+        /** @var array<int, string> */
+        public array $availableTerms,
         /** @var array<string, bool> */
         public array $displayOptions,
         /** @var array<int, array{title: string, url: string}> */
@@ -28,12 +31,17 @@ final class ScheduleViewModel extends Data
         public ScheduleCalendarUrlsViewModel $calendarUrls,
     ) {}
 
-    public static function fromModel(StudentSchedule $schedule): self
+    /**
+     * @param  array<int, string>  $availableTerms
+     */
+    public static function fromModel(StudentSchedule $schedule, string $selectedTerm, array $availableTerms): self
     {
         return new self(
             id: $schedule->id,
             uuid: $schedule->getRouteKey(),
             name: $schedule->name,
+            selectedTerm: $selectedTerm,
+            availableTerms: $availableTerms,
             displayOptions: ScheduleCustomizationPageViewModel::normalizeDisplayOptions($schedule->display_options),
             customLinks: ScheduleCustomizationPageViewModel::normalizeCustomLinks($schedule->custom_links),
             items: StudentScheduleItemViewModel::collect(
