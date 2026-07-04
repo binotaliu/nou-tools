@@ -22,6 +22,7 @@ final class ClassWithSessionsViewModel extends Data
         public string $endTime,
         public string $teacherName,
         public string $link,
+        public ?string $backupClassroomUrl,
         #[DataCollectionOf(ClassSessionViewModel::class)]
         public DataCollection $sessions,
     ) {}
@@ -37,6 +38,7 @@ final class ClassWithSessionsViewModel extends Data
             endTime: $class->end_time,
             teacherName: $class->teacher_name,
             link: $class->link,
+            backupClassroomUrl: $class->backup_classroom_url,
             sessions: ClassSessionViewModel::collect(
                 $class->schedules->map(fn ($s) => ClassSessionViewModel::fromModel($s)),
                 DataCollection::class,

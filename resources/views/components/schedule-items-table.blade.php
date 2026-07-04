@@ -138,6 +138,22 @@
                             視訊上課
                         </a>
                     @endif
+
+                    @if ($item->courseClass->backup_classroom_url)
+                        <a
+                            href="{{ $item->courseClass->backup_classroom_url }}"
+                            target="_blank"
+                            rel="noopener"
+                            class="inline-flex items-center gap-1 font-semibold text-warm-700 underline underline-offset-4 hover:text-warm-900 hover:no-underline"
+                            aria-label="前往 {{ $item->courseClass->course->name }} 的備用教室連結"
+                        >
+                            <x-heroicon-o-squares-plus
+                                class="inline size-4"
+                                aria-hidden="true"
+                            />
+                            備用教室
+                        </a>
+                    @endif
                 </x-table-column>
             </x-table-row>
         @empty

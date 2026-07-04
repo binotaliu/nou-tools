@@ -22,6 +22,7 @@ class CourseClass extends Model
         'end_time',
         'teacher_name',
         'link',
+        'backup_classroom_url',
     ];
 
     /**

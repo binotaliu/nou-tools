@@ -284,6 +284,12 @@ components:
           type: string
           format: uri
           example: https://meet.example.com/abc-defg-hij
+        backupClassroomUrl:
+          type:
+            - string
+            - 'null'
+          format: uri
+          example: https://meet.example.com/backup-room
         sessions:
           type: array
           items:

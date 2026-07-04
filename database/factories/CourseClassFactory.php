@@ -32,6 +32,7 @@ class CourseClassFactory extends Factory
             'end_time' => $timeSlot ? $timeSlot['end'] : '10:50',
             'teacher_name' => fake()->name().'老師',
             'link' => fake()->url(),
+            'backup_classroom_url' => null,
         ];
     }
 }

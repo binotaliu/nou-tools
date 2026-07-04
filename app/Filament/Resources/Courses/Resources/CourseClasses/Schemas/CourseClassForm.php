@@ -33,6 +33,10 @@ class CourseClassForm
                             ->label('視訊連結')
                             ->url()
                             ->maxLength(255),
+                        TextInput::make('backup_classroom_url')
+                            ->label('備用教室連結')
+                            ->url()
+                            ->maxLength(255),
                         TextInput::make('start_time')
                             ->label('預設開始時間')
                             ->placeholder('09:00')

@@ -47,6 +47,20 @@ final class ParseNouCourses
             $classes = [];
 
             foreach ($footers as $footer) {
+                if ($this->isBackupFooter($footer, $xpath)) {
+                    $backupClassroomUrl = $this->extractFooterLink($footer, $xpath);
+
+                    if ($backupClassroomUrl !== null && $classes !== []) {
+                        $lastClassIndex = array_key_last($classes);
+
+                        if ($lastClassIndex !== null) {
+                            $classes[$lastClassIndex]['backup_classroom_url'] = $backupClassroomUrl;
+                        }
+                    }
+
+                    continue;
+                }
+
                 $classData = $this->parseClassFooter($footer, $xpath, $type, $defaultTime, $sessionTimeOverrides);
 
                 if ($classData !== null) {
@@ -198,9 +212,34 @@ final class ParseNouCourses
             'end_time' => $time['end'],
             'teacher_name' => $teacherNode ? $this->extractTeacherName(trim($teacherNode->textContent)) : '',
             'link' => $linkNode instanceof DOMElement ? $linkNode->getAttribute('href') : '',
+            'backup_classroom_url' => null,
             'dates' => $dateNode ? $this->extractDates(trim($dateNode->textContent)) : [],
             'schedule_time_overrides' => $sessionTimeOverrides,
         ];
+    }
+
+    private function isBackupFooter(DOMNode $footer, DOMXPath $xpath): bool
+    {
+        $teacherNode = $xpath->query('.//c1text', $footer)->item(0);
+
+        if (! $teacherNode) {
+            return false;
+        }
+
+        return str_contains(trim($teacherNode->textContent), '備用教室');
+    }
+
+    private function extractFooterLink(DOMNode $footer, DOMXPath $xpath): ?string
+    {
+        $linkNode = $xpath->query('.//class_icon//a', $footer)->item(0);
+
+        if (! $linkNode instanceof DOMElement) {
+            return null;
+        }
+
+        $href = trim($linkNode->getAttribute('href'));
+
+        return $href === '' ? null : $href;
     }
 
     private function extractClassCode(string $alt): string

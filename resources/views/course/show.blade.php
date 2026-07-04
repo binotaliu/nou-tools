@@ -362,6 +362,40 @@
                                                 </div>
                                             </div>
 
+                                            @if ($class->link || $class->backup_classroom_url)
+                                                <div
+                                                    class="mb-3 flex flex-wrap gap-2"
+                                                >
+                                                    @if ($class->link)
+                                                        <a
+                                                            href="{{ $class->link }}"
+                                                            target="_blank"
+                                                            rel="noopener"
+                                                            class="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-700 transition hover:bg-orange-100"
+                                                        >
+                                                            <x-heroicon-o-video-camera
+                                                                class="size-4"
+                                                            />
+                                                            視訊上課
+                                                        </a>
+                                                    @endif
+
+                                                    @if ($class->backup_classroom_url)
+                                                        <a
+                                                            href="{{ $class->backup_classroom_url }}"
+                                                            target="_blank"
+                                                            rel="noopener"
+                                                            class="inline-flex items-center gap-1 rounded-full border border-warm-200 bg-white px-3 py-1.5 text-sm font-semibold text-warm-700 transition hover:bg-warm-100"
+                                                        >
+                                                            <x-heroicon-o-squares-plus
+                                                                class="size-4"
+                                                            />
+                                                            備用教室
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            @endif
+
                                             @if ($class->schedules->isNotEmpty())
                                                 <div
                                                     class="mt-2 rounded bg-white p-3"

@@ -253,3 +253,45 @@ it('stores schedule time overrides for courses with irregular times', function (
     expect($schedules[4]->start_time)->toBeNull();
     expect($schedules[4]->end_time)->toBeNull();
 });
+
+it('fetches summer courses from vc0 and keeps backup classrooms on the same class', function () {
+    $vc0Html = file_get_contents(__DIR__.'/../fixtures/vc0_sample.html');
+
+    Http::fake([
+        'vc.nou.edu.tw/vc0/*' => Http::response($vc0Html, 200),
+        'vc.nou.edu.tw/*' => Http::response('<html><body></body></html>', 200),
+    ]);
+
+    $this->artisan('course:fetch', ['term' => '2026C'])
+        ->assertSuccessful();
+
+    expect(Course::query()->count())->toBe(4);
+    expect(CourseClass::query()->count())->toBe(4);
+
+    $summerCourse = Course::query()->where('name', '暑假科學探索')->first();
+
+    expect($summerCourse)->not->toBeNull();
+    expect($summerCourse->term)->toBe('2026C');
+    expect($summerCourse->classes()->first()->code)->toBe('不分班');
+
+    $summerSchedules = $summerCourse->classes()->first()->schedules()->orderBy('date')->get();
+
+    expect($summerSchedules)->toHaveCount(2);
+    expect($summerSchedules[0]->date->format('Y-m-d'))->toBe('2026-07-13');
+    expect($summerSchedules[1]->date->format('Y-m-d'))->toBe('2026-08-03');
+
+    $lifestyleCourse = Course::query()->where('name', '生活品味專題')->first();
+
+    expect($lifestyleCourse)->not->toBeNull();
+    expect($lifestyleCourse->classes)->toHaveCount(1);
+
+    $lifestyleClass = $lifestyleCourse->classes->first();
+    expect($lifestyleClass->code)->toBe('不分班');
+    expect($lifestyleClass->link)->toBe('https://example.com/class/04');
+    expect($lifestyleClass->backup_classroom_url)->toBe('https://example.com/class/04-b');
+
+    $lifestyleSchedules = $lifestyleClass->schedules()->orderBy('date')->get();
+    expect($lifestyleSchedules)->toHaveCount(2);
+    expect($lifestyleSchedules[0]->date->format('Y-m-d'))->toBe('2026-07-14');
+    expect($lifestyleSchedules[1]->date->format('Y-m-d'))->toBe('2026-08-04');
+});

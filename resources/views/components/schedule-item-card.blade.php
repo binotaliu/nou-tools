@@ -29,7 +29,9 @@
 
         {{-- 班級代碼 --}}
         <div class="mb-3 flex items-center gap-2">
-            <x-class-code>{{ $item->courseClass->code }}</x-class-code>
+            <x-class-code>
+                {{ $item->courseClass->code }}
+            </x-class-code>
 
             @if ($item->courseClass->teacher_name)
                 @php
@@ -108,6 +110,18 @@
                 >
                     <x-heroicon-o-video-camera class="mr-1 inline size-4" />
                     視訊上課
+                </a>
+            @endif
+
+            @if ($item->courseClass->backup_classroom_url)
+                <a
+                    href="{{ $item->courseClass->backup_classroom_url }}"
+                    target="_blank"
+                    rel="noopener"
+                    class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-warm-600 underline underline-offset-4 transition hover:bg-warm-50 hover:text-warm-500"
+                >
+                    <x-heroicon-o-squares-plus class="mr-1 inline size-4" />
+                    備用教室
                 </a>
             @endif
         </div>

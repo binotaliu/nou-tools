@@ -145,44 +145,62 @@
                                                             class="grid grid-cols-1 gap-2 sm:grid-cols-2"
                                                         >
                                                             @foreach ($classesAtTime as $courseClass)
-                                                                @if ($courseClass->link)
-                                                                    <a
-                                                                        href="{{ $courseClass->link }}"
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        class="block w-full rounded border border-orange-200 bg-orange-50 px-4 py-3 text-left text-orange-700 transition hover:bg-orange-100"
-                                                                    >
-                                                                        <div
-                                                                            class="text-lg font-semibold"
+                                                                <div
+                                                                    class="flex w-full flex-col gap-2"
+                                                                >
+                                                                    @if ($courseClass->link)
+                                                                        <a
+                                                                            href="{{ $courseClass->link }}"
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            class="block w-full rounded border border-orange-200 bg-orange-50 px-4 py-3 text-left text-orange-700 transition hover:bg-orange-100"
                                                                         >
-                                                                            {{ $courseClass->code ?? '—' }}
-                                                                        </div>
-                                                                        @if ($courseClass->teacher_name)
                                                                             <div
-                                                                                class="mt-1 truncate text-sm text-warm-600"
+                                                                                class="text-lg font-semibold"
                                                                             >
-                                                                                {{ $courseClass->teacher_name }}
+                                                                                {{ $courseClass->code }}
                                                                             </div>
-                                                                        @endif
-                                                                    </a>
-                                                                @else
-                                                                    <div
-                                                                        class="block w-full rounded border bg-gray-50 px-4 py-3 text-left text-warm-500"
-                                                                    >
+                                                                            @if ($courseClass->teacher_name)
+                                                                                <div
+                                                                                    class="mt-1 truncate text-sm text-warm-600"
+                                                                                >
+                                                                                    {{ $courseClass->teacher_name }}
+                                                                                </div>
+                                                                            @endif
+                                                                        </a>
+                                                                    @else
                                                                         <div
-                                                                            class="text-lg font-semibold"
+                                                                            class="block w-full rounded border bg-gray-50 px-4 py-3 text-left text-warm-500"
                                                                         >
-                                                                            {{ $courseClass->code ?? '—' }}
-                                                                        </div>
-                                                                        @if ($courseClass->teacher_name)
                                                                             <div
-                                                                                class="mt-1 truncate text-sm text-warm-600"
+                                                                                class="text-lg font-semibold"
                                                                             >
-                                                                                {{ $courseClass->teacher_name }}
+                                                                                {{ $courseClass->code }}
                                                                             </div>
-                                                                        @endif
-                                                                    </div>
-                                                                @endif
+                                                                            @if ($courseClass->teacher_name)
+                                                                                <div
+                                                                                    class="mt-1 truncate text-sm text-warm-600"
+                                                                                >
+                                                                                    {{ $courseClass->teacher_name }}
+                                                                                </div>
+                                                                            @endif
+                                                                        </div>
+                                                                    @endif
+
+                                                                    @if ($courseClass->backup_classroom_url)
+                                                                        <a
+                                                                            href="{{ $courseClass->backup_classroom_url }}"
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            class="inline-flex items-center justify-center gap-1 rounded border border-warm-200 bg-warm-50 px-3 py-2 text-sm font-semibold text-warm-700 transition hover:bg-warm-100"
+                                                                        >
+                                                                            <x-heroicon-o-squares-plus
+                                                                                class="size-4"
+                                                                            />
+                                                                            備用教室
+                                                                        </a>
+                                                                    @endif
+                                                                </div>
                                                             @endforeach
                                                         </div>
                                                     </div>

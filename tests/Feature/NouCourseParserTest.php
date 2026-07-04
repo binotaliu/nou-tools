@@ -203,6 +203,30 @@ it('parses session time overrides for micro-credit courses', function () {
     ]);
 });
 
+it('parses summer courses from vc0 sample and keeps backup classrooms on the same class', function () {
+    $html = file_get_contents(__DIR__.'/../fixtures/vc0_sample.html');
+
+    $courses = ($this->parser)($html, CourseClassType::Evening);
+
+    expect($courses)->toHaveCount(4);
+
+    expect($courses[0]['name'])->toBe('暑假科學探索');
+    expect($courses[0]['classes'])->toHaveCount(1);
+    expect($courses[0]['classes'][0]['code'])->toBe('zzz001');
+    expect($courses[0]['classes'][0]['teacher_name'])->toBe('張小明老師');
+    expect($courses[0]['classes'][0]['dates'])->toBe(['07/13', '08/03']);
+    expect($courses[0]['classes'][0]['backup_classroom_url'])->toBeNull();
+
+    $lifestyleCourse = collect($courses)->firstWhere('name', '生活品味專題');
+
+    expect($lifestyleCourse)->not->toBeNull();
+    expect($lifestyleCourse['classes'])->toHaveCount(1);
+    expect($lifestyleCourse['classes'][0]['teacher_name'])->toBe('陳志宏老師');
+    expect($lifestyleCourse['classes'][0]['link'])->toBe('https://example.com/class/04');
+    expect($lifestyleCourse['classes'][0]['backup_classroom_url'])->toBe('https://example.com/class/04-b');
+    expect($lifestyleCourse['classes'][0]['dates'])->toBe(['07/14', '08/04']);
+});
+
 it('does not have time overrides for courses with single time', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
 

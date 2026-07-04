@@ -17,18 +17,6 @@ class FetchCoursesCommand extends Command
 
     protected $description = 'Fetch course data from NOU website and save to database';
 
-    /**
-     * @var array<string, CourseClassType>
-     */
-    private array $sources = [
-        'https://vc.nou.edu.tw/vc1/' => CourseClassType::Morning,
-        'https://vc.nou.edu.tw/vc2/' => CourseClassType::Afternoon,
-        'https://vc.nou.edu.tw/vc3/' => CourseClassType::Evening,
-        'https://vc.nou.edu.tw/vc4/' => CourseClassType::FullRemote,
-        'https://vc.nou.edu.tw/vc4/#micro' => CourseClassType::MicroCredit,
-        'https://vc.nou.edu.tw/vc5/' => CourseClassType::ComputerLab,
-    ];
-
     public function handle(ParseNouCourses $parseNouCourses): int
     {
         $term = $this->argument('term');
@@ -49,7 +37,7 @@ class FetchCoursesCommand extends Command
         /** @var array<string, string|null> */
         $htmlCache = [];
 
-        foreach ($this->sources as $url => $type) {
+        foreach ($this->sourcesForTerm($term) as $url => $type) {
             // Strip fragment identifiers for actual HTTP fetching
             $fetchUrl = preg_replace('/#.*$/', '', $url) ?? $url;
 
@@ -75,7 +63,7 @@ class FetchCoursesCommand extends Command
                 );
 
                 foreach ($courseData['classes'] as $classData) {
-                    $code = strtoupper($classData['code']);
+                    $code = $this->normalizeClassCode($classData['code'], $term);
                     $type = $classData['type']->value;
 
                     $courseClass = CourseClass::query()->firstOrCreate(
@@ -89,6 +77,7 @@ class FetchCoursesCommand extends Command
                             'end_time' => $classData['end_time'],
                             'teacher_name' => $classData['teacher_name'],
                             'link' => $classData['link'],
+                            'backup_classroom_url' => $classData['backup_classroom_url'],
                         ],
                     );
 
@@ -98,6 +87,7 @@ class FetchCoursesCommand extends Command
                         'end_time' => $classData['end_time'],
                         'teacher_name' => $classData['teacher_name'],
                         'link' => $classData['link'],
+                        'backup_classroom_url' => $classData['backup_classroom_url'],
                     ]);
 
                     foreach ($classData['dates'] as $index => $dateString) {
@@ -138,6 +128,27 @@ class FetchCoursesCommand extends Command
     }
 
     /**
+     * @return array<string, CourseClassType>
+     */
+    private function sourcesForTerm(string $term): array
+    {
+        if ($this->isSummerTerm($term)) {
+            return [
+                'https://vc.nou.edu.tw/vc0/' => CourseClassType::Evening,
+            ];
+        }
+
+        return [
+            'https://vc.nou.edu.tw/vc1/' => CourseClassType::Morning,
+            'https://vc.nou.edu.tw/vc2/' => CourseClassType::Afternoon,
+            'https://vc.nou.edu.tw/vc3/' => CourseClassType::Evening,
+            'https://vc.nou.edu.tw/vc4/' => CourseClassType::FullRemote,
+            'https://vc.nou.edu.tw/vc4/#micro' => CourseClassType::MicroCredit,
+            'https://vc.nou.edu.tw/vc5/' => CourseClassType::ComputerLab,
+        ];
+    }
+
+    /**
      * Fetch HTML content from a URL.
      */
     protected function fetchHtml(string $url): ?string
@@ -159,11 +170,25 @@ class FetchCoursesCommand extends Command
         $yearPart = (int) substr($term, 0, 4);
         $semester = substr($term, 4, 1);
 
-        if ($semester === 'A') {
-            return $yearPart;
+        if ($semester === 'B') {
+            return $yearPart + 1;
         }
 
-        return $yearPart + 1;
+        return $yearPart;
+    }
+
+    private function isSummerTerm(string $term): bool
+    {
+        return substr($term, 4, 1) === 'C';
+    }
+
+    private function normalizeClassCode(string $code, string $term): string
+    {
+        if ($this->isSummerTerm($term)) {
+            return '不分班';
+        }
+
+        return strtoupper($code);
     }
 
     /**
