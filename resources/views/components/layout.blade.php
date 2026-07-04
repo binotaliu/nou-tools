@@ -359,8 +359,19 @@
                             class="max-w-lg text-center text-sm text-warm-400 md:text-left"
                         >
                             <span class="font-semibold">免責聲明：</span>
-                            <p class="text-justify text-xs md:text-left">
+                            <p class="mb-2 text-justify text-xs md:text-left">
                                 本網站為學生自發製作之工具，僅供同學參考使用，並非學校官方發布；所有資訊以學校正式公告為準；本網站已盡可能提供準確資訊，但不保證其完整性或正確性；針對重要資訊，請使用者自行查證並以學校官方公告為準；課程相關資訊係搜集整理自學校官方公告、網站，與其他官方資料，採用合理使用原則提供同學參考使用；使用本網站即表示同意此免責聲明之內容。
+                            </p>
+                            <span class="font-semibold">
+                                開放原始碼授權聲明：
+                            </span>
+                            <p class="text-justify text-xs md:text-left">
+                                本網站是自由且開放原始碼之軟體，使用 AGPL-3.0
+                                授權條款。歡迎各位同學自由審閱、修改、使用、再散佈本網站原始碼，但請遵守
+                                AGPL
+                                授權條款。如果您以任何形式參考了本網站之原始碼並開發了新的軟體，則此一沿伸軟體也必須使用與遵守
+                                AGPL
+                                授權條款，請在閱讀、參考、引用本網站原始碼時特別注意授權問題。
                             </p>
                         </div>
                     </div>
