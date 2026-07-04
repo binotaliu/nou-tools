@@ -60,7 +60,7 @@ final class ImportExamSchedulesFromJson
         return ['success' => $success, 'failed' => $failed];
     }
 
-    private function updateCourseExamSchedule(string $title, string $term, string $midtermDate, string $finalDate, string $startTime, string $endTime, int &$success, int &$failed): void
+    private function updateCourseExamSchedule(string $title, string $term, ?string $midtermDate, string $finalDate, string $startTime, string $endTime, int &$success, int &$failed): void
     {
         $normalizedTitle = $this->normalizeName($title);
         $course = Course::query()

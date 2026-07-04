@@ -143,5 +143,86 @@
         ]
       }
     ]
+  },
+  "2026C": {
+    "label": "115 暑期",
+    "source": "https://studadm.nou.edu.tw/FileUploads/File/7570/c6f51759-891a-4e75-b20c-f0fed5e24b3a.pdf",
+    "dates": {
+      "saturday": { "midterm": null, "final": "2026-09-05" },
+      "sunday": { "midterm": null, "final": "2026-09-06" }
+    },
+    "slots": [
+      {
+        "time": "08:30-09:40",
+        "saturday": [],
+        "sunday": [
+          { "code": "004", "title": "智慧手機與生活" },
+          { "code": "005", "title": "台灣史重要文獻導讀" },
+          { "code": "019", "title": "行政學名家選粹(一)" }
+        ]
+      },
+      {
+        "time": "10:00-11:10",
+        "saturday": [],
+        "sunday": [
+          { "code": "008", "title": "善惡報應思想與故事" },
+          { "code": "015", "title": "綠色行銷" },
+          { "code": "020", "title": "政府與工會" },
+          { "code": "029", "title": "問題與個案分析" }
+        ]
+      },
+      {
+        "time": "11:30-12:40",
+        "saturday": [],
+        "sunday": [
+          { "code": "009", "title": "音樂賞析—西洋古典篇" },
+          { "code": "017", "title": "商業倫理" },
+          { "code": "023", "title": "公務倫理的故事" },
+          { "code": "032", "title": "企業永續經營—ESG及CSR" }
+        ]
+      },
+      {
+        "time": "13:30-14:40",
+        "saturday": [
+          { "code": "003", "title": "生活中無所不在的物理" },
+          { "code": "006", "title": "台灣民間信仰" },
+          { "code": "014", "title": "文創行銷" }
+        ],
+        "sunday": [
+          { "code": "010", "title": "成人發展與適應" },
+          { "code": "018", "title": "永續治理與政策" },
+          { "code": "026", "title": "美容營養學概論" },
+          { "code": "030", "title": "雲端與行動生活實務" }
+        ]
+      },
+      {
+        "time": "15:00-16:10",
+        "saturday": [
+          { "code": "001", "title": "人生100幸福處方箋" },
+          { "code": "007", "title": "生活攝影" },
+          { "code": "024", "title": "服飾與生活" },
+          { "code": "031", "title": "商業自動化概論" }
+        ],
+        "sunday": [
+          { "code": "011", "title": "創造與生活" },
+          { "code": "016", "title": "金融市場常識與職業道德" },
+          { "code": "027", "title": "職場文書與文案企劃" }
+        ]
+      },
+      {
+        "time": "16:30-17:40",
+        "saturday": [
+          { "code": "002", "title": "台灣傳統糕餅文化與創新" },
+          { "code": "013", "title": "智慧生活與法律" },
+          { "code": "021", "title": "文化行政與政策分析" }
+        ],
+        "sunday": [
+          { "code": "012", "title": "志願服務" },
+          { "code": "022", "title": "環境治理" },
+          { "code": "025", "title": "休閒活動設計" },
+          { "code": "028", "title": "生活中的多媒體剪輯與製作" }
+        ]
+      }
+    ]
   }
 }

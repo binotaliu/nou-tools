@@ -98,6 +98,46 @@ it('matches courses with special characters via normalization', function () {
     expect($course->exam_time_end)->toBe('09:40');
 });
 
+it('imports summer term schedules without midterm date', function () {
+    Course::factory()->create([
+        'name' => '智慧手機與生活',
+        'term' => '2026C',
+    ]);
+
+    File::shouldReceive('get')
+        ->once()
+        ->with(resource_path('data/exams.json'))
+        ->andReturn(json_encode([
+            '2026C' => [
+                'label' => '115 暑期',
+                'dates' => [
+                    'saturday' => ['midterm' => null, 'final' => '2026-09-05'],
+                    'sunday' => ['midterm' => null, 'final' => '2026-09-06'],
+                ],
+                'slots' => [
+                    [
+                        'time' => '08:30-09:40',
+                        'saturday' => [],
+                        'sunday' => [
+                            ['title' => '智慧手機與生活'],
+                        ],
+                    ],
+                ],
+            ],
+        ]));
+
+    $this->artisan('exam:import', ['term' => '2026C'])
+        ->assertSuccessful()
+        ->expectsOutput('Matched: 1 courses');
+
+    $course = Course::where('name', '智慧手機與生活')->where('term', '2026C')->first();
+
+    expect($course->midterm_date)->toBeNull();
+    expect($course->final_date?->toDateString())->toBe('2026-09-06');
+    expect($course->exam_time_start)->toBe('08:30');
+    expect($course->exam_time_end)->toBe('09:40');
+});
+
 it('fails with invalid term', function () {
     $this->artisan('exam:import', ['term' => 'INVALID'])
         ->assertFailed()

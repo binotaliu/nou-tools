@@ -357,30 +357,32 @@
                             </div>
 
                             <div class="mt-3 grid grid-cols-2 gap-3">
-                                <div>
-                                    <p
-                                        class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase"
-                                    >
-                                        期中考
-                                    </p>
-                                    @if ($exam->midtermDate)
-                                        <div
-                                            class="font-semibold text-warm-900"
+                                @if (! str_ends_with($viewModel->selectedTerm, 'C'))
+                                    <div>
+                                        <p
+                                            class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase"
                                         >
-                                            {{ $exam->formattedMidtermDate() }}
-                                        </div>
-
-                                        @if ($exam->formattedExamTime())
+                                            期中考
+                                        </p>
+                                        @if ($exam->midtermDate)
                                             <div
-                                                class="mt-1 text-sm text-warm-600"
+                                                class="font-semibold text-warm-900"
                                             >
-                                                {{ $exam->formattedExamTime() }}
+                                                {{ $exam->formattedMidtermDate() }}
                                             </div>
+
+                                            @if ($exam->formattedExamTime())
+                                                <div
+                                                    class="mt-1 text-sm text-warm-600"
+                                                >
+                                                    {{ $exam->formattedExamTime() }}
+                                                </div>
+                                            @endif
+                                        @else
+                                            <div class="text-warm-500">—</div>
                                         @endif
-                                    @else
-                                        <div class="text-warm-500">—</div>
-                                    @endif
-                                </div>
+                                    </div>
+                                @endif
 
                                 <div>
                                     <p
@@ -423,9 +425,12 @@
                                 class="rounded-t border-b-2 border-warm-300 bg-warm-100"
                             >
                                 <x-table-head-column>課程</x-table-head-column>
-                                <x-table-head-column>
-                                    期中考
-                                </x-table-head-column>
+                                @if (! str_ends_with($viewModel->selectedTerm, 'C'))
+                                    <x-table-head-column>
+                                        期中考
+                                    </x-table-head-column>
+                                @endif
+
                                 <x-table-head-column>
                                     期末考
                                 </x-table-head-column>
@@ -464,23 +469,27 @@
                                         @endif
                                     </x-table-column>
 
-                                    <x-table-column class="tabular-nums">
-                                        @if ($exam->midtermDate)
-                                            <div class="font-semibold">
-                                                {{ $exam->formattedMidtermDate() }}
-                                            </div>
-                                        @else
-                                            <div class="text-warm-500">—</div>
-                                        @endif
+                                    @if (! str_ends_with($viewModel->selectedTerm, 'C'))
+                                        <x-table-column class="tabular-nums">
+                                            @if ($exam->midtermDate)
+                                                <div class="font-semibold">
+                                                    {{ $exam->formattedMidtermDate() }}
+                                                </div>
+                                            @else
+                                                <div class="text-warm-500">
+                                                    —
+                                                </div>
+                                            @endif
 
-                                        @if ($exam->formattedExamTime())
-                                            <div
-                                                class="mt-1 text-sm text-warm-600"
-                                            >
-                                                {{ $exam->formattedExamTime() }}
-                                            </div>
-                                        @endif
-                                    </x-table-column>
+                                            @if ($exam->formattedExamTime())
+                                                <div
+                                                    class="mt-1 text-sm text-warm-600"
+                                                >
+                                                    {{ $exam->formattedExamTime() }}
+                                                </div>
+                                            @endif
+                                        </x-table-column>
+                                    @endif
 
                                     <x-table-column class="tabular-nums">
                                         @if ($exam->finalDate)
