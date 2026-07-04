@@ -13,9 +13,12 @@ use NouTools\Domains\Schedules\Actions\BuildStudentScheduleCookie;
 use NouTools\Domains\Schedules\Actions\CreateSchedule;
 use NouTools\Domains\Schedules\Actions\ShowSchedulePage;
 use NouTools\Domains\Schedules\Actions\UpdateSchedule;
+use NouTools\Domains\Schedules\Actions\UpdateScheduleCalendarSettings;
 use NouTools\Domains\Schedules\Actions\UpdateScheduleCustomization;
+use NouTools\Domains\Schedules\DataTransferObjects\ScheduleCalendarSettingsUpsertData;
 use NouTools\Domains\Schedules\DataTransferObjects\ScheduleCustomizationUpsertData;
 use NouTools\Domains\Schedules\DataTransferObjects\StudentScheduleUpsertData;
+use NouTools\Domains\Schedules\ViewModels\ScheduleCustomizationPageViewModel;
 
 class ScheduleController extends Controller
 {
@@ -95,5 +98,19 @@ class ScheduleController extends Controller
 
         return redirect()->route('schedules.show', $schedule)
             ->with('success', '課表自訂設定已更新！');
+    }
+
+    public function updateCalendarSettings(StudentSchedule $schedule, ScheduleCalendarSettingsUpsertData $input, UpdateScheduleCalendarSettings $updateScheduleCalendarSettings): JsonResponse
+    {
+        $schedule = $updateScheduleCalendarSettings($schedule, $input);
+
+        $calendarSettings = ScheduleCustomizationPageViewModel::normalizeCalendarSettings(
+            is_array($schedule->display_options['calendar_settings'] ?? null) ? $schedule->display_options['calendar_settings'] : null,
+        );
+
+        return response()->json([
+            'success' => true,
+            'calendar_settings' => $calendarSettings,
+        ]);
     }
 }

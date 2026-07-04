@@ -19,6 +19,8 @@ final class ScheduleViewModel extends Data
         public array $availableTerms,
         /** @var array<string, bool> */
         public array $displayOptions,
+        /** @var array{include_school_calendar: bool, include_exams: bool, class_reminders_enabled: bool, reminder_offsets: array<int, int>} */
+        public array $calendarSettings,
         /** @var array<int, array{title: string, url: string}> */
         public array $customLinks,
         #[DataCollectionOf(StudentScheduleItemViewModel::class)]
@@ -43,6 +45,9 @@ final class ScheduleViewModel extends Data
             selectedTerm: $selectedTerm,
             availableTerms: $availableTerms,
             displayOptions: ScheduleCustomizationPageViewModel::normalizeDisplayOptions($schedule->display_options),
+            calendarSettings: ScheduleCustomizationPageViewModel::normalizeCalendarSettings(
+                is_array($schedule->display_options['calendar_settings'] ?? null) ? $schedule->display_options['calendar_settings'] : null,
+            ),
             customLinks: ScheduleCustomizationPageViewModel::normalizeCustomLinks($schedule->custom_links),
             items: StudentScheduleItemViewModel::collect(
                 $schedule->items->map(fn ($item) => StudentScheduleItemViewModel::fromModel($item)),

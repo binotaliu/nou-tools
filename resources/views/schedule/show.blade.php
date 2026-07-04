@@ -25,7 +25,86 @@
             <div class="flex w-full flex-col items-end gap-2 lg:w-auto">
                 <div
                     class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden"
-                    x-data="{ subscribeOpen: false }"
+                    x-data="{
+                        subscribeOpen: false,
+                        includeSchoolCalendar: {{ Js::from($viewModel->calendarSettings['include_school_calendar']) }},
+                        includeExams: {{ Js::from($viewModel->calendarSettings['include_exams']) }},
+                        classRemindersEnabled: {{ Js::from($viewModel->calendarSettings['class_reminders_enabled']) }},
+                        primaryReminder: {{ Js::from($viewModel->calendarSettings['reminder_offsets'][0] ?? 30) }},
+                        secondaryReminderEnabled: {{ Js::from(isset($viewModel->calendarSettings['reminder_offsets'][1])) }},
+                        secondaryReminder: {{ Js::from($viewModel->calendarSettings['reminder_offsets'][1] ?? 10) }},
+                        saveSettingsMessage: '',
+                        saveSettingsState: 'idle',
+                        isSavingSettings: false,
+                        buildReminderOffsets() {
+                            const offsets = [Number(this.primaryReminder)]
+
+                            if (this.secondaryReminderEnabled) {
+                                offsets.push(Number(this.secondaryReminder))
+                            }
+
+                            return [...new Set(offsets)].slice(0, 2)
+                        },
+                        async saveCalendarSettings() {
+                            if (this.isSavingSettings) {
+                                return
+                            }
+
+                            this.isSavingSettings = true
+                            this.saveSettingsMessage = ''
+                            this.saveSettingsState = 'idle'
+
+                            try {
+                                const csrfToken = document
+                                    .querySelector('meta[name=\'csrf-token\']')
+                                    ?.getAttribute('content')
+
+                                const response = await fetch({{ Js::from(route('schedules.calendar-settings.update', $viewModel->uuid)) }}, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Accept': 'application/json',
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': csrfToken ?? '',
+                                    },
+                                    body: JSON.stringify({
+                                        include_school_calendar: this.includeSchoolCalendar,
+                                        include_exams: this.includeExams,
+                                        class_reminders_enabled: this.classRemindersEnabled,
+                                        reminder_offsets: this.classRemindersEnabled ? this.buildReminderOffsets() : [Number(this.primaryReminder)],
+                                    }),
+                                })
+
+                                if (!response.ok) {
+                                    throw new Error('儲存失敗')
+                                }
+
+                                const result = await response.json()
+                                const settings = result.calendar_settings ?? null
+
+                                if (settings) {
+                                    this.includeSchoolCalendar = Boolean(settings.include_school_calendar)
+                                    this.includeExams = Boolean(settings.include_exams)
+                                    this.classRemindersEnabled = Boolean(settings.class_reminders_enabled)
+
+                                    const reminderOffsets = Array.isArray(settings.reminder_offsets) && settings.reminder_offsets.length > 0
+                                        ? settings.reminder_offsets
+                                        : [30]
+
+                                    this.primaryReminder = Number(reminderOffsets[0])
+                                    this.secondaryReminderEnabled = reminderOffsets.length > 1
+                                    this.secondaryReminder = Number(reminderOffsets[1] ?? this.secondaryReminder)
+                                }
+
+                                this.saveSettingsState = 'success'
+                                this.saveSettingsMessage = '已儲存設定。'
+                            } catch (e) {
+                                this.saveSettingsState = 'error'
+                                this.saveSettingsMessage = '儲存失敗，請稍後再試。'
+                            } finally {
+                                this.isSavingSettings = false
+                            }
+                        },
+                    }"
                 >
                     <div class="flex w-full shrink-0 gap-2 sm:w-1/2 lg:w-auto">
                         <x-link-button
@@ -85,7 +164,8 @@
                     <x-modal
                         name="subscribeOpen"
                         title="訂閱行事曆"
-                        description="選擇要使用的方式來訂閱或下載您的課表行事曆："
+                        description="先設定此課表的預設訂閱內容，再選擇要使用的訂閱方式。"
+                        max-width="max-w-lg"
                     >
                         <div class="grid gap-3">
                             <x-link-button
@@ -156,16 +236,193 @@
                             </x-link-button>
                         </div>
 
-                        <x-slot:footer>
-                            <x-button
-                                type="button"
-                                variant="warm-subtle"
-                                size="sm"
-                                @click="subscribeOpen = false"
-                                class="px-4 py-2 text-sm"
+                        <div
+                            class="mt-5 space-y-4 border-t border-warm-200 pt-4"
+                        >
+                            <p class="text-sm text-warm-700">
+                                保存此處設定後，原先訂閱的行事曆會在同步時自動更新。若您使用的是
+                                Google 日曆，請注意 Google
+                                日曆可能需要數小時才會更新訂閱內容。
+                            </p>
+
+                            <label
+                                class="flex cursor-pointer items-center gap-3 rounded-lg border border-warm-200 bg-white px-3 py-2"
                             >
-                                取消
-                            </x-button>
+                                <input
+                                    type="checkbox"
+                                    x-model="includeSchoolCalendar"
+                                    class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500"
+                                />
+                                <span class="text-sm font-medium text-warm-800">
+                                    包含學校行事曆
+                                </span>
+                            </label>
+
+                            <label
+                                class="flex cursor-pointer items-center gap-3 rounded-lg border border-warm-200 bg-white px-3 py-2"
+                            >
+                                <input
+                                    type="checkbox"
+                                    x-model="includeExams"
+                                    class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500"
+                                />
+                                <span class="text-sm font-medium text-warm-800">
+                                    包含考試時段
+                                </span>
+                            </label>
+
+                            <div
+                                class="rounded-lg border border-warm-200 bg-white p-3"
+                            >
+                                <label
+                                    class="flex cursor-pointer items-center gap-3"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        x-model="classRemindersEnabled"
+                                        class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500"
+                                    />
+                                    <span
+                                        class="text-sm font-medium text-warm-800"
+                                    >
+                                        面授課程提醒
+                                    </span>
+                                </label>
+
+                                <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                                    <div>
+                                        <label
+                                            class="mb-1 block text-xs font-semibold text-warm-700"
+                                        >
+                                            第一次提醒
+                                        </label>
+
+                                        <x-select
+                                            x-model="primaryReminder"
+                                            x-bind:disabled="!classRemindersEnabled"
+                                            class="bg-white"
+                                        >
+                                            <option value="5">
+                                                課前 5 分鐘
+                                            </option>
+                                            <option value="10">
+                                                課前 10 分鐘
+                                            </option>
+                                            <option value="15">
+                                                課前 15 分鐘
+                                            </option>
+                                            <option value="30">
+                                                課前 30 分鐘
+                                            </option>
+                                            <option value="60">
+                                                課前 1 小時
+                                            </option>
+                                            <option value="120">
+                                                課前 2 小時
+                                            </option>
+                                            <option value="180">
+                                                課前 3 小時
+                                            </option>
+                                            <option value="1440">
+                                                課前 1 天
+                                            </option>
+                                        </x-select>
+                                    </div>
+
+                                    <div>
+                                        <label
+                                            class="mb-1 block text-xs font-semibold text-warm-700"
+                                        >
+                                            第二次提醒（可選）
+                                        </label>
+
+                                        <div class="flex gap-2">
+                                            <label
+                                                class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-2 py-1 text-xs text-warm-700"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    x-model="secondaryReminderEnabled"
+                                                    x-bind:disabled="!classRemindersEnabled"
+                                                    class="size-3 rounded border-warm-400 text-warm-700 focus:ring-warm-500"
+                                                />
+                                                啟用
+                                            </label>
+
+                                            <x-select
+                                                x-model="secondaryReminder"
+                                                x-bind:disabled="!classRemindersEnabled || !secondaryReminderEnabled"
+                                                class="bg-white"
+                                            >
+                                                <option value="5">
+                                                    課前 5 分鐘
+                                                </option>
+                                                <option value="10">
+                                                    課前 10 分鐘
+                                                </option>
+                                                <option value="15">
+                                                    課前 15 分鐘
+                                                </option>
+                                                <option value="30">
+                                                    課前 30 分鐘
+                                                </option>
+                                                <option value="60">
+                                                    課前 1 小時
+                                                </option>
+                                                <option value="120">
+                                                    課前 2 小時
+                                                </option>
+                                                <option value="180">
+                                                    課前 3 小時
+                                                </option>
+                                                <option value="1440">
+                                                    課前 1 天
+                                                </option>
+                                            </x-select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p
+                                x-show="saveSettingsMessage"
+                                x-text="saveSettingsMessage"
+                                x-bind:class="
+                                    saveSettingsState === 'success'
+                                        ? 'text-sm text-green-700'
+                                        : 'text-sm text-red-700'
+                                "
+                            ></p>
+                        </div>
+
+                        <x-slot:footer>
+                            <div class="flex w-full justify-end gap-2">
+                                <x-button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    @click="saveCalendarSettings()"
+                                    x-bind:disabled="isSavingSettings"
+                                    class="px-4 py-2 text-sm"
+                                >
+                                    <span x-show="!isSavingSettings">
+                                        儲存設定
+                                    </span>
+                                    <span x-show="isSavingSettings">
+                                        儲存中...
+                                    </span>
+                                </x-button>
+
+                                <x-button
+                                    type="button"
+                                    variant="warm-subtle"
+                                    size="sm"
+                                    @click="subscribeOpen = false"
+                                    class="px-4 py-2 text-sm"
+                                >
+                                    關閉
+                                </x-button>
+                            </div>
                         </x-slot>
                     </x-modal>
                 </div>

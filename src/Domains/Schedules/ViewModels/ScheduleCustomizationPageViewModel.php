@@ -6,6 +6,9 @@ use App\Models\StudentSchedule;
 
 final readonly class ScheduleCustomizationPageViewModel
 {
+    /** @var array<int, int> */
+    public const REMINDER_OFFSET_OPTIONS = [5, 10, 15, 30, 60, 120, 180, 1440];
+
     /**
      * @param  array<string, bool>  $displayOptions
      * @param  array<int, array{title: string, url: string}>  $customLinks
@@ -51,6 +54,71 @@ final readonly class ScheduleCustomizationPageViewModel
         }
 
         return $defaults;
+    }
+
+    /**
+     * @return array{include_school_calendar: bool, include_exams: bool, class_reminders_enabled: bool, reminder_offsets: array<int, int>}
+     */
+    public static function defaultCalendarSettings(): array
+    {
+        return [
+            'include_school_calendar' => true,
+            'include_exams' => true,
+            'class_reminders_enabled' => false,
+            'reminder_offsets' => [30],
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $calendarSettings
+     * @return array{include_school_calendar: bool, include_exams: bool, class_reminders_enabled: bool, reminder_offsets: array<int, int>}
+     */
+    public static function normalizeCalendarSettings(?array $calendarSettings): array
+    {
+        $defaults = self::defaultCalendarSettings();
+
+        if (! is_array($calendarSettings)) {
+            return $defaults;
+        }
+
+        $includeSchoolCalendar = filter_var($calendarSettings['include_school_calendar'] ?? $defaults['include_school_calendar'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaults['include_school_calendar'];
+        $includeExams = filter_var($calendarSettings['include_exams'] ?? $defaults['include_exams'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaults['include_exams'];
+        $classRemindersEnabled = filter_var($calendarSettings['class_reminders_enabled'] ?? $defaults['class_reminders_enabled'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaults['class_reminders_enabled'];
+        $reminderOffsets = self::normalizeReminderOffsets($calendarSettings['reminder_offsets'] ?? $defaults['reminder_offsets']);
+
+        if ($reminderOffsets === []) {
+            $reminderOffsets = $defaults['reminder_offsets'];
+        }
+
+        return [
+            'include_school_calendar' => $includeSchoolCalendar,
+            'include_exams' => $includeExams,
+            'class_reminders_enabled' => $classRemindersEnabled,
+            'reminder_offsets' => $reminderOffsets,
+        ];
+    }
+
+    /**
+     * @param  array<int|string, int|string>|string|null  $reminderOffsets
+     * @return array<int, int>
+     */
+    public static function normalizeReminderOffsets(array|string|null $reminderOffsets): array
+    {
+        if (is_string($reminderOffsets)) {
+            $reminderOffsets = array_filter(explode(',', $reminderOffsets), fn (string $value): bool => trim($value) !== '');
+        }
+
+        if (! is_array($reminderOffsets)) {
+            return [];
+        }
+
+        return collect($reminderOffsets)
+            ->map(fn ($offset): int => (int) $offset)
+            ->filter(fn (int $offset): bool => in_array($offset, self::REMINDER_OFFSET_OPTIONS, true))
+            ->unique()
+            ->take(2)
+            ->values()
+            ->all();
     }
 
     /**

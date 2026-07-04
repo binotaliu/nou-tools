@@ -114,6 +114,178 @@ it('returns an .ics calendar for a saved schedule and converts UTC+8 times to UT
         ->assertSee('DTEND:'.$expectedEnd);
 });
 
+it('saves calendar subscription settings as schedule defaults', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Calendar Settings',
+        'display_options' => [
+            'show_greeting' => true,
+            'show_schedule_items' => true,
+            'show_common_links' => true,
+            'show_class_dates' => true,
+            'show_school_calendar' => true,
+            'show_exam_info' => true,
+            'show_share_section' => true,
+            'show_print_button' => true,
+        ],
+    ]);
+
+    $response = $this->putJson(route('schedules.calendar-settings.update', $schedule), [
+        'include_school_calendar' => false,
+        'include_exams' => true,
+        'class_reminders_enabled' => true,
+        'reminder_offsets' => [60, 15],
+    ]);
+
+    $response->assertSuccessful()
+        ->assertJsonPath('success', true)
+        ->assertJsonPath('calendar_settings.include_school_calendar', false)
+        ->assertJsonPath('calendar_settings.include_exams', true)
+        ->assertJsonPath('calendar_settings.class_reminders_enabled', true)
+        ->assertJsonPath('calendar_settings.reminder_offsets', [60, 15]);
+
+    $schedule->refresh();
+
+    expect($schedule->display_options['calendar_settings'])->toBe([
+        'include_school_calendar' => false,
+        'include_exams' => true,
+        'class_reminders_enabled' => true,
+        'reminder_offsets' => [60, 15],
+    ]);
+});
+
+it('calendar output includes school events exams and reminders when defaults are enabled', function () {
+    config()->set('app.current_semester', '2026A');
+    config()->set('school-schedules.2026A', [
+        [
+            'name' => '學校重要日',
+            'start' => '2026-03-01',
+            'end' => '2026-03-01',
+            'countdown' => true,
+        ],
+    ]);
+
+    $course = Course::factory()->create([
+        'name' => '提醒測試課程',
+        'midterm_date' => '2026-04-25',
+        'final_date' => null,
+        'exam_time_start' => '13:30',
+        'exam_time_end' => '14:30',
+    ]);
+
+    $courseClass = CourseClass::factory()->create([
+        'course_id' => $course->id,
+        'code' => 'REM101',
+        'start_time' => '09:00',
+        'end_time' => '10:00',
+    ]);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Calendar Full',
+        'display_options' => [
+            'show_greeting' => true,
+            'show_schedule_items' => true,
+            'show_common_links' => true,
+            'show_class_dates' => true,
+            'show_school_calendar' => true,
+            'show_exam_info' => true,
+            'show_share_section' => true,
+            'show_print_button' => true,
+            'calendar_settings' => [
+                'include_school_calendar' => true,
+                'include_exams' => true,
+                'class_reminders_enabled' => true,
+                'reminder_offsets' => [30, 5],
+            ],
+        ],
+    ]);
+
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $courseClass->id,
+    ]);
+
+    ClassSchedule::factory()->create([
+        'class_id' => $courseClass->id,
+        'date' => '2026-03-12',
+    ]);
+
+    $response = $this->get(route('schedules.calendar', $schedule));
+
+    $response->assertSuccessful()
+        ->assertSee('SUMMARY:學校重要日')
+        ->assertSee('SUMMARY:提醒測試課程 - 期中考')
+        ->assertSee('BEGIN:VALARM')
+        ->assertSee('TRIGGER:-PT30M')
+        ->assertSee('TRIGGER:-PT5M');
+});
+
+it('calendar output excludes school events exams and reminders when defaults are disabled', function () {
+    config()->set('app.current_semester', '2026A');
+    config()->set('school-schedules.2026A', [
+        [
+            'name' => '不應出現的學校事件',
+            'start' => '2026-03-01',
+            'end' => '2026-03-01',
+            'countdown' => true,
+        ],
+    ]);
+
+    $course = Course::factory()->create([
+        'name' => '不應出現的考試課程',
+        'midterm_date' => '2026-04-25',
+        'final_date' => null,
+        'exam_time_start' => '13:30',
+        'exam_time_end' => '14:30',
+    ]);
+
+    $courseClass = CourseClass::factory()->create([
+        'course_id' => $course->id,
+        'code' => 'DIS101',
+        'start_time' => '09:00',
+        'end_time' => '10:00',
+    ]);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Calendar Limited',
+        'display_options' => [
+            'show_greeting' => true,
+            'show_schedule_items' => true,
+            'show_common_links' => true,
+            'show_class_dates' => true,
+            'show_school_calendar' => true,
+            'show_exam_info' => true,
+            'show_share_section' => true,
+            'show_print_button' => true,
+            'calendar_settings' => [
+                'include_school_calendar' => false,
+                'include_exams' => false,
+                'class_reminders_enabled' => false,
+                'reminder_offsets' => [30],
+            ],
+        ],
+    ]);
+
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $courseClass->id,
+    ]);
+
+    ClassSchedule::factory()->create([
+        'class_id' => $courseClass->id,
+        'date' => '2026-03-12',
+    ]);
+
+    $response = $this->get(route('schedules.calendar', $schedule));
+
+    $response->assertSuccessful()
+        ->assertDontSee('SUMMARY:不應出現的學校事件')
+        ->assertDontSee('SUMMARY:不應出現的考試課程 - 期中考')
+        ->assertDontSee('BEGIN:VALARM');
+});
+
 it('schedule show page displays exam information for selected courses', function () {
     config()->set('app.current_semester', '2025B');
 
@@ -522,7 +694,6 @@ it('schedule show page hides disabled sections and shows custom links', function
 
     $response->assertStatus(200)
         ->assertDontSee('今天是')
-        ->assertDontSee('學校行事曆')
         ->assertDontSee('複製連結')
         ->assertDontSee('列印')
         ->assertSee('我的自訂連結')
