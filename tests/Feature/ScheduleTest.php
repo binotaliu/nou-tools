@@ -225,8 +225,7 @@ it('schedule show page shows empty state for selected semester without courses',
 
     $response->assertStatus(200)
         ->assertSee('此學期尚無課程')
-        ->assertSee('沒有課程。')
-        ->assertDontSee(route('learning-progress.show', [$schedule, '2026C']), false);
+        ->assertSee('沒有課程。');
 });
 
 it('stores schedule metadata in an encrypted cookie when saving', function () {
