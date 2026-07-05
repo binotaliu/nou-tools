@@ -20,7 +20,33 @@ final readonly class ShowDiscountStorePage
             ->where('status', DiscountStoreStatus::Online)
             ->with(['category', 'latestReport'])
             ->orderByDesc('id')
-            ->get();
+            ->get()
+            ->sort(function (DiscountStore $leftStore, DiscountStore $rightStore): int {
+                $toPriority = static function (DiscountStore $store): int {
+                    if ($store->latestReport?->is_valid === true) {
+                        return 0;
+                    }
+
+                    if ($store->latestReport === null) {
+                        return 1;
+                    }
+
+                    return 2;
+                };
+
+                $leftPriority = $toPriority($leftStore);
+                $rightPriority = $toPriority($rightStore);
+
+                if ($leftPriority !== $rightPriority) {
+                    return $leftPriority <=> $rightPriority;
+                }
+
+                $leftTimestamp = $leftStore->latestReport?->created_at?->timestamp ?? 0;
+                $rightTimestamp = $rightStore->latestReport?->created_at?->timestamp ?? 0;
+
+                return $rightTimestamp <=> $leftTimestamp;
+            })
+            ->values();
 
         $categories = DiscountStoreCategory::query()
             ->orderBy('sort_order')

@@ -200,6 +200,47 @@ it('initializes filter state from query parameters', function () {
     $response->assertSee('臺北市');
 });
 
+it('orders stores by latest report validity priority on index page', function () {
+    $validStore = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '可用優先店家',
+            'status' => DiscountStoreStatus::Online,
+        ]);
+
+    DiscountStoreReport::factory()->for($validStore, 'store')->create([
+        'is_valid' => true,
+        'created_at' => now()->subHour(),
+    ]);
+
+    DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '尚無確認店家',
+            'status' => DiscountStoreStatus::Online,
+        ]);
+
+    $invalidStore = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '不可用最後店家',
+            'status' => DiscountStoreStatus::Online,
+        ]);
+
+    DiscountStoreReport::factory()->for($invalidStore, 'store')->create([
+        'is_valid' => false,
+        'created_at' => now()->subMinutes(30),
+    ]);
+
+    $response = get(route('discount-stores.index'));
+
+    $response->assertSeeInOrder([
+        '可用優先店家',
+        '尚無確認店家',
+        '不可用最後店家',
+    ]);
+});
+
 it('displays the create discount store page', function () {
     $response = get(route('discount-stores.create'));
 
