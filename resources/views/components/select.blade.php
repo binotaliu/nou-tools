@@ -1,4 +1,5 @@
-<div class="relative">
+@props(['wrapperClass' => ''])
+<div @class(['relative', $wrapperClass])>
     <select
         {{ $attributes->merge(['class' => 'w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 appearance-none']) }}
     >

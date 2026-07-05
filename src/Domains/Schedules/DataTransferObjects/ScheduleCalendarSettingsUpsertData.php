@@ -28,7 +28,7 @@ final class ScheduleCalendarSettingsUpsertData extends Data
             'include_exams' => ['sometimes', 'boolean'],
             'class_reminders_enabled' => ['sometimes', 'boolean'],
             'reminder_offsets' => ['nullable', 'array', 'max:2'],
-            'reminder_offsets.*' => ['integer', 'in:5,10,15,30,60,120,180,1440'],
+            'reminder_offsets.*' => ['nullable', 'integer', 'in:5,10,15,30,60,120,180,1440'],
         ];
     }
 

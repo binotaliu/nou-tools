@@ -154,6 +154,42 @@ it('saves calendar subscription settings as schedule defaults', function () {
     ]);
 });
 
+it('saves calendar subscription settings with form post and flashes success', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Calendar Form Settings',
+        'display_options' => [
+            'show_greeting' => true,
+            'show_schedule_items' => true,
+            'show_common_links' => true,
+            'show_class_dates' => true,
+            'show_school_calendar' => true,
+            'show_exam_info' => true,
+            'show_share_section' => true,
+            'show_print_button' => true,
+        ],
+    ]);
+
+    $response = $this->put(route('schedules.calendar-settings.update', $schedule), [
+        'include_school_calendar' => '0',
+        'include_exams' => '1',
+        'class_reminders_enabled' => '1',
+        'reminder_offsets' => ['60', ''],
+    ]);
+
+    $response->assertRedirect(route('schedules.subscribe', $schedule))
+        ->assertSessionHas('success', '訂閱設定已儲存！');
+
+    $schedule->refresh();
+
+    expect($schedule->display_options['calendar_settings'])->toBe([
+        'include_school_calendar' => false,
+        'include_exams' => true,
+        'class_reminders_enabled' => true,
+        'reminder_offsets' => [60],
+    ]);
+});
+
 it('calendar output includes school events exams and reminders when defaults are enabled', function () {
     config()->set('app.current_semester', '2026A');
     config()->set('school-schedules.2026A', [
@@ -698,4 +734,57 @@ it('schedule show page hides disabled sections and shows custom links', function
         ->assertDontSee('列印')
         ->assertSee('我的自訂連結')
         ->assertSee('https://example.com/help');
+});
+
+it('can view the schedule subscribe page', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Test Schedule',
+        'display_options' => [],
+        'custom_links' => [],
+    ]);
+
+    $response = $this->get(route('schedules.subscribe', $schedule));
+
+    $response->assertStatus(200)
+        ->assertViewIs('schedule.subscribe')
+        ->assertViewHas('viewModel');
+});
+
+it('subscribe page contains calendar subscription options', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Test Schedule',
+        'display_options' => [],
+        'custom_links' => [],
+    ]);
+
+    $response = $this->get(route('schedules.subscribe', $schedule));
+
+    $response->assertStatus(200)
+        ->assertSee('Apple 日曆')
+        ->assertSee('Google 日曆')
+        ->assertSee('Windows 日曆')
+        ->assertSee('訂閱行事曆')
+        ->assertSee('訂閱設定');
+});
+
+it('schedule show page includes link to subscribe page', function () {
+    $courseClass = CourseClass::factory()->create();
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Test Schedule',
+        'display_options' => [],
+        'custom_links' => [],
+    ]);
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $courseClass->id,
+    ]);
+
+    $response = $this->get(route('schedules.show', $schedule));
+
+    $response->assertStatus(200)
+        ->assertSee(route('schedules.subscribe', $schedule))
+        ->assertSee('訂閱行事曆');
 });
