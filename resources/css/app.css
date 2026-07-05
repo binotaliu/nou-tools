@@ -46,6 +46,10 @@
   th {
     @apply text-left;
   }
+
+  .prose img {
+    @apply max-h-[32rem] w-auto rounded-lg;
+  }
 }
 
 @utility prose-warm {

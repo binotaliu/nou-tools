@@ -24,7 +24,7 @@
                             class="inline-flex items-center gap-1 text-sm text-warm-600 transition-colors hover:text-warm-900"
                         >
                             <x-heroicon-o-chevron-left class="size-3" />
-                            回到列表
+                            回到{{ $article->type->label() }}首頁
                         </a>
                     </div>
                 </div>

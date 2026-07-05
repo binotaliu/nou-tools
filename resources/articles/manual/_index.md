@@ -1,10 +1,12 @@
-# 操作手冊
+# NOU 小幫手操作手冊
 
 歡迎來到 NOU 小幫手操作手冊。這裡會教你如何使用本站的各項功能。
 
 ## 文章列表
 
 - [歡迎使用 NOU 小幫手](/manual/welcome)
+- 使用說明
+  - [如何訂閱行事曆](/manual/calendar-subscription)
 
 ## 需要協助？
 

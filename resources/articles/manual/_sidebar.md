@@ -1,5 +1,3 @@
 - [歡迎使用 NOU 小幫手](/manual/welcome)
-
----
-
-需要更多協助？檢視[知識庫](/kb)。
+- 使用說明
+  - [如何訂閱行事曆](/manual/calendar-subscription)
