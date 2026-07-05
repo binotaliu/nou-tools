@@ -178,7 +178,7 @@ it('saves calendar subscription settings with form post and flashes success', fu
     ]);
 
     $response->assertRedirect(route('schedules.subscribe', $schedule))
-        ->assertSessionHas('success', '訂閱設定已儲存！');
+        ->assertSessionHas('success', '已儲存訂閱設定！');
 
     $schedule->refresh();
 
