@@ -21,6 +21,15 @@
                 <x-heroicon-o-arrow-left class="size-4" />
                 回到課表
             </x-link-button>
+            <x-link-button
+                :href="route('articles.show', ['type' => 'manual', 'slug' => 'calendar-subscription'])"
+                variant="secondary"
+                class="w-full sm:w-auto"
+                target="_blank"
+            >
+                <x-heroicon-o-question-mark-circle class="size-4" />
+                說明
+            </x-link-button>
         </div>
 
         @php
