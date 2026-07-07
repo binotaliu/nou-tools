@@ -432,6 +432,11 @@
             </x-card>
         @endif
 
+        {{-- Announcements --}}
+        @if ($viewModel->displayOptions['show_announcements'])
+            <x-announcements-widget :schedule="$schedule" class="mb-8" />
+        @endif
+
         {{-- Share Section --}}
         @if ($viewModel->displayOptions['show_share_section'])
             <x-card>

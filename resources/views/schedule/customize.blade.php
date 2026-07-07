@@ -56,6 +56,7 @@
                         'show_class_dates' => '面授日期',
                         'show_school_calendar' => '學校行事曆',
                         'show_exam_info' => '考試資訊',
+                        'show_announcements' => '最新公告',
                         'show_share_section' => '分享連結與 QRCode',
                         'show_print_button' => '列印按鈕',
                     ];
@@ -84,6 +85,17 @@
                         </label>
                     @endforeach
                 </div>
+
+                <p class="mt-4 text-sm text-warm-600">
+                    想調整「最新公告」要顯示哪些分類？前往
+                    <a
+                        href="{{ route('schedules.announcement-preferences', $viewModel->schedule) }}"
+                        class="font-medium text-orange-700 hover:underline"
+                    >
+                        公告分類設定
+                    </a>
+                    。
+                </p>
             </x-card>
 
             <x-card

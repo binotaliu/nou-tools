@@ -31,6 +31,7 @@ final readonly class ScheduleCustomizationPageViewModel
             'show_class_dates' => true,
             'show_school_calendar' => true,
             'show_exam_info' => true,
+            'show_announcements' => true,
             'show_share_section' => true,
             'show_print_button' => true,
         ];

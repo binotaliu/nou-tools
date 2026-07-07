@@ -16,6 +16,7 @@ class StudentSchedule extends Model
         'name',
         'display_options',
         'custom_links',
+        'announcement_categories',
         'last_calendar_sync_at',
     ];
 
@@ -67,6 +68,7 @@ class StudentSchedule extends Model
     protected $casts = [
         'display_options' => 'json',
         'custom_links' => 'json',
+        'announcement_categories' => 'json',
         'last_calendar_sync_at' => 'datetime',
     ];
 

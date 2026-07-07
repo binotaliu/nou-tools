@@ -618,6 +618,7 @@ it('customize page can update display options and custom links', function () {
             'show_class_dates' => 1,
             'show_school_calendar' => 0,
             'show_exam_info' => 1,
+            'show_announcements' => 1,
             'show_share_section' => 1,
             'show_print_button' => 0,
         ],
@@ -638,6 +639,7 @@ it('customize page can update display options and custom links', function () {
         'show_class_dates' => true,
         'show_school_calendar' => false,
         'show_exam_info' => true,
+        'show_announcements' => true,
         'show_share_section' => true,
         'show_print_button' => false,
     ]);

@@ -38,6 +38,8 @@ Route::get('/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->n
 Route::put('/schedules/{schedule}', [ScheduleController::class, 'update'])->name('schedules.update');
 Route::get('/schedules/{schedule}/customize', [ScheduleController::class, 'customize'])->name('schedules.customize');
 Route::put('/schedules/{schedule}/customize', [ScheduleController::class, 'updateCustomization'])->name('schedules.customize.update');
+Route::get('/schedules/{schedule}/announcement-preferences', [ScheduleController::class, 'announcementPreferences'])->name('schedules.announcement-preferences');
+Route::put('/schedules/{schedule}/announcement-preferences', [ScheduleController::class, 'updateAnnouncementPreferences'])->name('schedules.announcement-preferences.update');
 Route::get('/schedules/{schedule}/subscribe', [ScheduleController::class, 'showSubscribe'])->name('schedules.subscribe');
 Route::put('/schedules/{schedule}/calendar-settings', [ScheduleController::class, 'updateCalendarSettings'])->name('schedules.calendar-settings.update');
 Route::get('/schedules/{schedule}/calendar', ScheduleCalendarController::class)->name('schedules.calendar');

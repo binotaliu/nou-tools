@@ -9,26 +9,20 @@ use NouTools\Domains\Announcements\ViewModels\AnnouncementIndexPageViewModel;
 
 final readonly class ShowAnnouncementIndexPage
 {
+    public function __construct(
+        private ListAnnouncementSourceCategories $listAnnouncementSourceCategories,
+        private FilterAnnouncementsBySourceCategories $filterAnnouncementsBySourceCategories,
+    ) {}
+
     public function __invoke(ShowAnnouncementIndexPageData $input): AnnouncementIndexPageViewModel
     {
-        $configuredSourceCategories = $this->configuredSourceCategories();
+        $configuredSourceCategories = ($this->listAnnouncementSourceCategories)();
         $availableSources = $configuredSourceCategories->keys()->sort()->values();
         $selectedSourceCategories = $this->selectedSourceCategoriesFromInput($input, $configuredSourceCategories);
         $selectedSources = collect(array_keys($selectedSourceCategories))->sort()->values()->all();
         $availableCategories = $this->availableCategoriesForSources($selectedSources, $configuredSourceCategories);
 
-        $announcements = Announcement::query()
-            ->when($selectedSourceCategories !== [], function ($query) use ($selectedSourceCategories) {
-                $query->where(function ($subQuery) use ($selectedSourceCategories) {
-                    foreach ($selectedSourceCategories as $source => $categories) {
-                        $subQuery->orWhere(function ($sourceCategoryQuery) use ($source, $categories) {
-                            $sourceCategoryQuery
-                                ->where('source_name', $source)
-                                ->whereIn('category', $categories);
-                        });
-                    }
-                });
-            })
+        $announcements = ($this->filterAnnouncementsBySourceCategories)(Announcement::query(), $selectedSourceCategories)
             ->orderByDesc('published_at')
             ->orderByDesc('fetched_at')
             ->orderByDesc('id')
@@ -44,26 +38,6 @@ final readonly class ShowAnnouncementIndexPage
             selectedSourceCategories: $selectedSourceCategories,
             totalAnnouncements: Announcement::query()->count(),
         );
-    }
-
-    /**
-     * @return Collection<string, Collection<int, string>>
-     */
-    private function configuredSourceCategories(): Collection
-    {
-        return collect(config('announcements.sources', []))
-            ->filter(fn (array $source): bool => (bool) ($source['is_active'] ?? false))
-            ->map(function (array $source): array {
-                return [
-                    'name' => trim((string) ($source['name'] ?? '')),
-                    'category' => trim((string) ($source['category'] ?? '')),
-                ];
-            })
-            ->filter(fn (array $source): bool => $source['name'] !== '' && $source['category'] !== '')
-            ->groupBy('name')
-            ->map(function (Collection $sources): Collection {
-                return $sources->pluck('category')->unique()->sort()->values();
-            });
     }
 
     /**

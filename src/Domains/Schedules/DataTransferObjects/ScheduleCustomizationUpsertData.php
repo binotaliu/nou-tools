@@ -28,6 +28,7 @@ final class ScheduleCustomizationUpsertData extends Data
             'display_options.show_class_dates' => ['sometimes', 'boolean'],
             'display_options.show_school_calendar' => ['sometimes', 'boolean'],
             'display_options.show_exam_info' => ['sometimes', 'boolean'],
+            'display_options.show_announcements' => ['sometimes', 'boolean'],
             'display_options.show_share_section' => ['sometimes', 'boolean'],
             'display_options.show_print_button' => ['sometimes', 'boolean'],
             'custom_links' => ['nullable', 'array', 'max:20'],

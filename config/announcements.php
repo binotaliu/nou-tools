@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\AnnouncementFetcherType;
+use App\Enums\AnnouncementSourceGroup;
 
 return [
     'sources' => [
@@ -1313,5 +1314,44 @@ return [
             'is_active' => true,
         ],
         // endregion
+    ],
+
+    // Maps each `sources.*.name` value to its display group, mirroring the
+    // // region blocks above (各處室 / 學系 / 學習指導中心).
+    'source_groups' => [
+        '學校首頁' => AnnouncementSourceGroup::Administrative->value,
+        '教務處' => AnnouncementSourceGroup::Administrative->value,
+        '教務處招生專區' => AnnouncementSourceGroup::Administrative->value,
+        '學務處' => AnnouncementSourceGroup::Administrative->value,
+        '出版中心' => AnnouncementSourceGroup::Administrative->value,
+        '推廣教育處' => AnnouncementSourceGroup::Administrative->value,
+        '國際事務處' => AnnouncementSourceGroup::Administrative->value,
+
+        '人文學系' => AnnouncementSourceGroup::Department->value,
+        '社會科學系' => AnnouncementSourceGroup::Department->value,
+        '商學系' => AnnouncementSourceGroup::Department->value,
+        '公共行政學系' => AnnouncementSourceGroup::Department->value,
+        '生活科學系' => AnnouncementSourceGroup::Department->value,
+        '管理與資訊學系' => AnnouncementSourceGroup::Department->value,
+        '通識博雅教育中心' => AnnouncementSourceGroup::Department->value,
+
+        '基隆中心' => AnnouncementSourceGroup::Center->value,
+        '台北中心' => AnnouncementSourceGroup::Center->value,
+        '馬祖辦公室' => AnnouncementSourceGroup::Center->value,
+        '桃園中心' => AnnouncementSourceGroup::Center->value,
+        '新竹中心' => AnnouncementSourceGroup::Center->value,
+        '台中中心' => AnnouncementSourceGroup::Center->value,
+        '彰化辦公室' => AnnouncementSourceGroup::Center->value,
+        '南投辦公室' => AnnouncementSourceGroup::Center->value,
+        '嘉義中心' => AnnouncementSourceGroup::Center->value,
+        '雲林辦公室' => AnnouncementSourceGroup::Center->value,
+        '台南中心' => AnnouncementSourceGroup::Center->value,
+        '高雄中心' => AnnouncementSourceGroup::Center->value,
+        '宜蘭中心' => AnnouncementSourceGroup::Center->value,
+        '花蓮中心' => AnnouncementSourceGroup::Center->value,
+        '台東中心' => AnnouncementSourceGroup::Center->value,
+        '澎湖中心' => AnnouncementSourceGroup::Center->value,
+        '金門中心' => AnnouncementSourceGroup::Center->value,
+        '海外學生服務組' => AnnouncementSourceGroup::Center->value,
     ],
 ];
