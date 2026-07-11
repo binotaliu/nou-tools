@@ -1,11 +1,9 @@
 import { execFileSync } from 'node:child_process';
-import { dirname, extname, resolve } from 'node:path';
+import { readFile, writeFile } from 'node:fs/promises';
+import { extname, resolve } from 'node:path';
 
-import imagemin from 'imagemin';
-import imageminGifsicle from 'imagemin-gifsicle';
-import imageminMozjpeg from 'imagemin-mozjpeg';
-import imageminPngquant from 'imagemin-pngquant';
 import imageminSvgo from 'imagemin-svgo';
+import sharp from 'sharp';
 
 const supportedExtensions = new Set(['.png', '.jpg', '.jpeg', '.gif', '.svg']);
 
@@ -27,26 +25,27 @@ function getAddedStagedImagePaths() {
     .filter((path) => supportedExtensions.has(extname(path).toLowerCase()));
 }
 
-function getPluginsForFile(filePath) {
-  const extension = extname(filePath).toLowerCase();
+async function optimizeImage(absolutePath) {
+  const extension = extname(absolutePath).toLowerCase();
+  const original = await readFile(absolutePath);
 
   if (extension === '.png') {
-    return [imageminPngquant({ quality: [0.65, 0.8], strip: true })];
+    return sharp(original).png({ quality: 80, palette: true }).toBuffer();
   }
 
   if (extension === '.jpg' || extension === '.jpeg') {
-    return [imageminMozjpeg({ quality: 75 })];
+    return sharp(original).jpeg({ quality: 75, mozjpeg: true }).toBuffer();
   }
 
   if (extension === '.gif') {
-    return [imageminGifsicle({ optimizationLevel: 2 })];
+    return sharp(original, { animated: true }).gif().toBuffer();
   }
 
   if (extension === '.svg') {
-    return [imageminSvgo({ multipass: true })];
+    return imageminSvgo({ multipass: true })(original);
   }
 
-  return [];
+  return null;
 }
 
 async function optimizeImages() {
@@ -60,16 +59,13 @@ async function optimizeImages() {
   const absolutePaths = relativePaths.map((relativePath) => resolve(process.cwd(), relativePath));
 
   for (const absolutePath of absolutePaths) {
-    const plugins = getPluginsForFile(absolutePath);
+    const optimized = await optimizeImage(absolutePath);
 
-    if (plugins.length === 0) {
+    if (!optimized) {
       continue;
     }
 
-    await imagemin([absolutePath], {
-      destination: dirname(absolutePath),
-      plugins,
-    });
+    await writeFile(absolutePath, optimized);
   }
 
   execFileSync('git', ['add', '--', ...relativePaths], { stdio: 'inherit' });
