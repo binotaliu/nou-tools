@@ -7,8 +7,10 @@
             class="mb-8 flex flex-col items-start justify-between gap-3 sm:flex-row"
         >
             <div>
-                <h2 class="text-3xl font-bold text-warm-900">訂閱行事曆</h2>
-                <p class="mt-2 text-sm text-warm-600">
+                <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+                    訂閱行事曆
+                </h2>
+                <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">
                     將你的課表訂閱到行事曆應用程式，以自動同步課表更新與接收提醒。
                 </p>
             </div>
@@ -143,12 +145,12 @@
                     subtitle="保存設定後，已訂閱的行事曆會在同步時自動更新。"
                 >
                     <div class="space-y-4">
-                        <p class="text-sm text-warm-700">
+                        <p class="text-sm text-warm-700 dark:text-zinc-300">
                             修改設定後可能需要數小時才會更新訂閱內容。
                         </p>
 
                         <label
-                            class="flex cursor-pointer items-center gap-3 rounded-lg border border-warm-200 bg-white px-3 py-2"
+                            class="flex cursor-pointer items-center gap-3 rounded-lg border border-warm-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
                         >
                             <input
                                 type="hidden"
@@ -160,15 +162,17 @@
                                 name="include_school_calendar"
                                 value="1"
                                 @checked(old('include_school_calendar', $calendarSettings['include_school_calendar']))
-                                class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500"
+                                class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500 dark:border-zinc-600 dark:text-zinc-300"
                             />
-                            <span class="text-sm font-medium text-warm-800">
+                            <span
+                                class="text-sm font-medium text-warm-800 dark:text-zinc-200"
+                            >
                                 包含學校行事曆
                             </span>
                         </label>
 
                         <label
-                            class="flex cursor-pointer items-center gap-3 rounded-lg border border-warm-200 bg-white px-3 py-2"
+                            class="flex cursor-pointer items-center gap-3 rounded-lg border border-warm-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
                         >
                             <input
                                 type="hidden"
@@ -180,15 +184,17 @@
                                 name="include_exams"
                                 value="1"
                                 @checked(old('include_exams', $calendarSettings['include_exams']))
-                                class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500"
+                                class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500 dark:border-zinc-600 dark:text-zinc-300"
                             />
-                            <span class="text-sm font-medium text-warm-800">
+                            <span
+                                class="text-sm font-medium text-warm-800 dark:text-zinc-200"
+                            >
                                 包含考試時段
                             </span>
                         </label>
 
                         <div
-                            class="rounded-lg border border-warm-200 bg-white p-3"
+                            class="rounded-lg border border-warm-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900"
                         >
                             <label
                                 class="flex cursor-pointer items-center gap-3"
@@ -203,14 +209,18 @@
                                     name="class_reminders_enabled"
                                     value="1"
                                     @checked(old('class_reminders_enabled', $calendarSettings['class_reminders_enabled']))
-                                    class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500"
+                                    class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500 dark:border-zinc-600 dark:text-zinc-300"
                                 />
-                                <span class="text-sm font-medium text-warm-800">
+                                <span
+                                    class="text-sm font-medium text-warm-800 dark:text-zinc-200"
+                                >
                                     面授課程提醒
                                 </span>
                             </label>
 
-                            <span class="mt-1 block text-sm text-warm-600">
+                            <span
+                                class="mt-1 block text-sm text-warm-600 dark:text-zinc-400"
+                            >
                                 註：此設定僅支援 Apple
                                 日曆與其他相容的行事曆應用程式，
                                 <strong>Google 日曆需要手動設定提醒</strong>
@@ -220,14 +230,14 @@
                             <div class="mt-3 grid gap-3 sm:grid-cols-2">
                                 <div>
                                     <label
-                                        class="mb-1 block text-xs font-semibold text-warm-700"
+                                        class="mb-1 block text-xs font-semibold text-warm-700 dark:text-zinc-300"
                                     >
                                         第一次提醒
                                     </label>
 
                                     <x-select
                                         name="reminder_offsets[]"
-                                        class="bg-white"
+                                        class="bg-white dark:bg-zinc-900"
                                     >
                                         @foreach ($reminderOptions as $value => $label)
                                             <option
@@ -242,14 +252,14 @@
 
                                 <div>
                                     <label
-                                        class="mb-1 block text-xs font-semibold text-warm-700"
+                                        class="mb-1 block text-xs font-semibold text-warm-700 dark:text-zinc-300"
                                     >
                                         第二次提醒（可留空）
                                     </label>
 
                                     <x-select
                                         name="reminder_offsets[]"
-                                        class="bg-white"
+                                        class="bg-white dark:bg-zinc-900"
                                         wrapper-class="w-full"
                                     >
                                         <option value="">

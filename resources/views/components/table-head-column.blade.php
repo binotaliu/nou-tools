@@ -1,6 +1,6 @@
 @php
     // default classes for table header column
-    $attrs = $attributes->class('px-4 py-3 font-bold text-warm-900');
+    $attrs = $attributes->class('px-4 py-3 font-bold text-warm-900 dark:text-zinc-100');
 
     if (! $attrs->has('scope')) {
         $attrs = $attrs->merge(['scope' => 'col']);

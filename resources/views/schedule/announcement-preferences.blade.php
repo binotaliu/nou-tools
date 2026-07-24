@@ -7,8 +7,10 @@
             class="mb-8 flex flex-col items-start justify-between gap-3 sm:flex-row"
         >
             <div>
-                <h2 class="text-3xl font-bold text-warm-900">公告分類設定</h2>
-                <p class="mt-2 text-sm text-warm-600">
+                <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+                    公告分類設定
+                </h2>
+                <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">
                     選擇要在課表頁顯示的公告分類。未選擇任何分類時，課表頁的公告區塊將不顯示任何公告。
                 </p>
             </div>
@@ -141,20 +143,20 @@
                 <x-card :title="$groupLabel">
                     <div class="space-y-2">
                         <div
-                            class="flex items-center justify-between gap-2 rounded-lg border border-warm-200 bg-warm-50 px-2"
+                            class="flex items-center justify-between gap-2 rounded-lg border border-warm-200 bg-warm-50 px-2 dark:border-zinc-700 dark:bg-zinc-950"
                         >
                             <label
                                 class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md px-2 py-2"
                             >
                                 <input
                                     type="checkbox"
-                                    class="size-4 rounded border-warm-300 text-warm-700 focus:ring-warm-300"
+                                    class="size-4 rounded border-warm-300 text-warm-700 focus:ring-warm-300 dark:border-zinc-600 dark:text-zinc-300"
                                     :checked="isGroupChecked(@js($groupValue))"
                                     :indeterminate="isGroupIndeterminate(@js($groupValue))"
                                     @change="toggleGroup(@js($groupValue), $event.target.checked)"
                                 />
                                 <span
-                                    class="min-w-0 truncate text-sm font-semibold text-warm-900"
+                                    class="min-w-0 truncate text-sm font-semibold text-warm-900 dark:text-zinc-100"
                                 >
                                     {{ $groupLabel }}（全選）
                                 </span>
@@ -163,7 +165,7 @@
                             <button
                                 type="button"
                                 @click="toggleGroupExpansion(@js($groupValue))"
-                                class="inline-flex items-center rounded-md p-2 text-warm-600 transition hover:bg-warm-100 hover:text-warm-800"
+                                class="inline-flex items-center rounded-md p-2 text-warm-600 transition hover:bg-warm-100 hover:text-warm-800 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-200"
                                 :aria-expanded="isGroupExpanded(@js($groupValue))"
                                 aria-label="展開或收合 {{ $groupLabel }} 分類"
                             >
@@ -183,23 +185,23 @@
                         >
                             @foreach ($groupedCatalogTree[$groupValue] ?? [] as $source => $categories)
                                 <section
-                                    class="overflow-hidden rounded-lg border border-warm-200 p-1"
+                                    class="overflow-hidden rounded-lg border border-warm-200 p-1 dark:border-zinc-700"
                                 >
                                     <div
                                         class="flex items-center justify-between gap-2"
                                     >
                                         <label
-                                            class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition hover:bg-warm-50"
+                                            class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition hover:bg-warm-50 dark:hover:bg-zinc-950"
                                         >
                                             <input
                                                 type="checkbox"
-                                                class="size-4 rounded border-warm-300 text-warm-700 focus:ring-warm-300"
+                                                class="size-4 rounded border-warm-300 text-warm-700 focus:ring-warm-300 dark:border-zinc-600 dark:text-zinc-300"
                                                 :checked="isSourceChecked(@js($source))"
                                                 :indeterminate="isSourceIndeterminate(@js($source))"
                                                 @change="toggleSource(@js($source), $event.target.checked)"
                                             />
                                             <span
-                                                class="min-w-0 truncate text-sm font-semibold text-warm-900"
+                                                class="min-w-0 truncate text-sm font-semibold text-warm-900 dark:text-zinc-100"
                                             >
                                                 {{ $source }}
                                             </span>
@@ -209,7 +211,7 @@
                                             <button
                                                 type="button"
                                                 @click="toggleSourceExpansion(@js($source))"
-                                                class="inline-flex items-center rounded-md p-2 text-warm-600 transition hover:bg-warm-100 hover:text-warm-800"
+                                                class="inline-flex items-center rounded-md p-2 text-warm-600 transition hover:bg-warm-100 hover:text-warm-800 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-200"
                                                 :aria-expanded="isSourceExpanded(@js($source))"
                                                 aria-label="展開或收合 {{ $source }} 分類"
                                             >
@@ -232,13 +234,13 @@
                                     >
                                         @foreach ($categories as $category)
                                             <label
-                                                class="flex min-w-0 cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 text-sm text-warm-700 transition hover:bg-warm-50"
+                                                class="flex min-w-0 cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 text-sm text-warm-700 transition hover:bg-warm-50 dark:text-zinc-300 dark:hover:bg-zinc-950"
                                             >
                                                 <input
                                                     type="checkbox"
                                                     name="announcement_categories[{{ $source }}][]"
                                                     value="{{ $category }}"
-                                                    class="size-4 rounded border-warm-300 text-orange-600 focus:ring-orange-300"
+                                                    class="size-4 rounded border-warm-300 text-orange-600 focus:ring-orange-300 dark:border-zinc-600"
                                                     :checked="isCategoryChecked(@js($source), @js($category))"
                                                     @change="toggleCategory(@js($source), @js($category), $event.target.checked)"
                                                 />

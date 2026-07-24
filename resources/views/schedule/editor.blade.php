@@ -9,10 +9,10 @@
 <x-layout title="{{ $pageTitle }} - NOU 小幫手" :noindex="true">
     <div x-data="scheduleEditor()" class="mx-auto max-w-5xl">
         <div class="mb-6 flex items-center justify-between">
-            <h2 class="text-3xl font-bold text-warm-900">
+            <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
                 {{ $headingText }}
             </h2>
-            <div class="text-lg font-semibold text-warm-500">
+            <div class="text-lg font-semibold text-warm-500 dark:text-zinc-400">
                 {{ \Illuminate\Support\Str::toSemesterDisplay(config('app.current_semester')) }}
             </div>
         </div>
@@ -22,7 +22,7 @@
                 <div>
                     <div class="font-medium">
                         你曾建立過課表：
-                        <span class="text-warm-900">
+                        <span class="text-warm-900 dark:text-zinc-100">
                             {{ $previousSchedule->name ?? '（未命名）' }}
                         </span>
                         ，確定要繼續新增新課表嗎？
@@ -31,7 +31,7 @@
                 <div class="flex gap-2">
                     <a
                         href="{{ route('schedules.show', $previousSchedule->token) }}"
-                        class="rounded bg-yellow-400 px-4 py-2 font-semibold text-yellow-900 hover:bg-yellow-500"
+                        class="rounded bg-yellow-400 px-4 py-2 font-semibold text-yellow-900 hover:bg-yellow-500 dark:bg-yellow-600 dark:text-yellow-100 dark:hover:bg-yellow-500"
                         data-analytics-event="schedule_open_previous"
                         data-analytics-feature="schedule"
                     >
@@ -44,7 +44,7 @@
         {{-- Search Section --}}
         <x-card class="mb-8">
             <label
-                class="mb-1 block text-xl font-semibold text-warm-900"
+                class="mb-1 block text-xl font-semibold text-warm-900 dark:text-zinc-100"
                 for="course-search"
             >
                 搜尋課程
@@ -56,7 +56,7 @@
                     x-model="searchQuery"
                     @input="filterCourses()"
                     placeholder="輸入課程名稱..."
-                    class="w-full rounded-lg border-2 border-warm-300 px-4 py-3 text-lg focus:border-orange-500 focus:outline-none"
+                    class="w-full rounded-lg border-2 border-warm-300 px-4 py-3 text-lg focus:border-orange-500 focus:outline-none dark:border-zinc-600"
                     autocomplete="off"
                     :disabled="selectedItems.length >= 10"
                 />
@@ -65,15 +65,15 @@
             {{-- Search Results Dropdown --}}
             <div
                 x-show="showResults && filteredCourses.length > 0"
-                class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-warm-200 bg-white shadow-lg"
+                class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-warm-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
             >
                 <template x-for="course in filteredCourses" :key="course.id">
                     <div
                         @click="selectCourse(course)"
-                        class="cursor-pointer border-b border-warm-100 p-4 hover:bg-warm-50"
+                        class="cursor-pointer border-b border-warm-100 p-4 hover:bg-warm-50 dark:border-zinc-800 dark:hover:bg-zinc-950"
                     >
                         <div
-                            class="font-semibold text-warm-900"
+                            class="font-semibold text-warm-900 dark:text-zinc-100"
                             x-text="course.name"
                         ></div>
                     </div>
@@ -84,7 +84,7 @@
                 x-if="showResults && filteredCourses.length === 0 && searchQuery.trim()"
             >
                 <div
-                    class="mt-2 rounded-lg border border-warm-200 bg-warm-50 p-4 text-warm-700"
+                    class="mt-2 rounded-lg border border-warm-200 bg-warm-50 p-4 text-warm-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300"
                 >
                     找不到符合的課程。請試試其他關鍵字。
                 </div>
@@ -95,7 +95,7 @@
         <x-card class="mb-8" title="您的課表">
             <template x-if="selectedItems.length === 0">
                 <div
-                    class="rounded-lg border-2 border-dashed border-warm-300 bg-warm-50 p-6 text-center text-warm-700"
+                    class="rounded-lg border-2 border-dashed border-warm-300 bg-warm-50 p-6 text-center text-warm-700 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-300"
                 >
                     <p class="text-lg">
                         還沒有選擇任何課程。請在上方搜尋並選擇課程。
@@ -109,12 +109,12 @@
                     :key="index"
                 >
                     <div
-                        class="rounded-lg border-2 border-warm-300 bg-warm-50 p-4"
+                        class="rounded-lg border-2 border-warm-300 bg-warm-50 p-4 dark:border-zinc-600 dark:bg-zinc-950"
                     >
                         <div class="mb-3 flex items-start justify-between">
                             <div>
                                 <div
-                                    class="text-lg font-bold text-warm-900"
+                                    class="text-lg font-bold text-warm-900 dark:text-zinc-100"
                                     x-text="item.course.name"
                                 ></div>
                             </div>
@@ -135,7 +135,7 @@
                                 <div>
                                     <fieldset class="mb-4">
                                         <legend
-                                            class="mb-2 text-sm font-semibold text-warm-800"
+                                            class="mb-2 text-sm font-semibold text-warm-800 dark:text-zinc-200"
                                         >
                                             選擇班級：
                                         </legend>
@@ -145,7 +145,7 @@
                                         >
                                             <fieldset :key="type" class="mb-4">
                                                 <legend
-                                                    class="mb-2 text-sm font-semibold text-warm-700"
+                                                    class="mb-2 text-sm font-semibold text-warm-700 dark:text-zinc-300"
                                                     x-text="getTypeLabel(type)"
                                                 ></legend>
                                                 <div
@@ -156,8 +156,8 @@
                                                         :key="courseClass.id"
                                                     >
                                                         <label
-                                                            class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300"
-                                                            :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200'"
+                                                            class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300 dark:bg-zinc-900"
+                                                            :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200 dark:border-zinc-700'"
                                                         >
                                                             <input
                                                                 type="radio"
@@ -170,11 +170,11 @@
                                                                 class="min-w-0 flex-1"
                                                             >
                                                                 <div
-                                                                    class="font-semibold text-warm-900"
+                                                                    class="font-semibold text-warm-900 dark:text-zinc-100"
                                                                     x-text="courseClass.code"
                                                                 ></div>
                                                                 <div
-                                                                    class="text-sm text-warm-600"
+                                                                    class="text-sm text-warm-600 dark:text-zinc-400"
                                                                     x-show="courseClass.start_time"
                                                                 >
                                                                     <span
@@ -182,7 +182,7 @@
                                                                     ></span>
                                                                 </div>
                                                                 <div
-                                                                    class="truncate text-sm text-warm-600"
+                                                                    class="truncate text-sm text-warm-600 dark:text-zinc-400"
                                                                     x-show="courseClass.teacher_name"
                                                                     x-text="`${courseClass.teacher_name}`"
                                                                 ></div>
@@ -202,7 +202,7 @@
                                 <div>
                                     <fieldset>
                                         <legend
-                                            class="mb-2 text-sm font-semibold text-warm-800"
+                                            class="mb-2 text-sm font-semibold text-warm-800 dark:text-zinc-200"
                                         >
                                             班級：
                                         </legend>
@@ -214,8 +214,8 @@
                                                 :key="courseClass.id"
                                             >
                                                 <label
-                                                    class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300"
-                                                    :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200'"
+                                                    class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300 dark:bg-zinc-900"
+                                                    :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200 dark:border-zinc-700'"
                                                 >
                                                     <input
                                                         type="radio"
@@ -226,11 +226,11 @@
                                                     />
                                                     <div class="min-w-0 flex-1">
                                                         <div
-                                                            class="font-semibold text-warm-900"
+                                                            class="font-semibold text-warm-900 dark:text-zinc-100"
                                                             x-text="courseClass.code"
                                                         ></div>
                                                         <div
-                                                            class="text-sm text-warm-600"
+                                                            class="text-sm text-warm-600 dark:text-zinc-400"
                                                             x-show="courseClass.start_time"
                                                         >
                                                             <span
@@ -238,7 +238,7 @@
                                                             ></span>
                                                         </div>
                                                         <div
-                                                            class="truncate text-sm text-warm-600"
+                                                            class="truncate text-sm text-warm-600 dark:text-zinc-400"
                                                             x-show="courseClass.teacher_name"
                                                             x-text="`${courseClass.teacher_name}`"
                                                         ></div>
@@ -261,7 +261,7 @@
             method="POST"
             x-ref="form"
             @submit.prevent="submitForm"
-            class="rounded-lg border border-warm-200 bg-white p-6"
+            class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         >
             @csrf
             @if (isset($schedule))
@@ -270,7 +270,7 @@
 
             <div class="mb-4">
                 <label
-                    class="mb-1 block text-xl font-semibold text-warm-900"
+                    class="mb-1 block text-xl font-semibold text-warm-900 dark:text-zinc-100"
                     for="schedule-name"
                 >
                     課表名稱（可選）
@@ -281,7 +281,7 @@
                     name="name"
                     x-model="scheduleName"
                     placeholder="例如：浣熊的課表"
-                    class="w-full rounded-lg border-2 border-warm-300 px-4 py-3 focus:border-orange-500 focus:outline-none"
+                    class="w-full rounded-lg border-2 border-warm-300 px-4 py-3 focus:border-orange-500 focus:outline-none dark:border-zinc-600"
                 />
             </div>
 

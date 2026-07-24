@@ -9,12 +9,14 @@
                 <x-heroicon-o-chevron-left class="size-4" />
                 回到我的課表
             </x-link-button>
-            <h2 class="mb-2 text-3xl font-bold text-warm-900">
+            <h2
+                class="mb-2 text-3xl font-bold text-warm-900 dark:text-zinc-100"
+            >
                 {{ $course->name }}
             </h2>
 
             @if (! empty($course->term))
-                <div class="mb-4 text-sm text-warm-600">
+                <div class="mb-4 text-sm text-warm-600 dark:text-zinc-400">
                     {{ \Illuminate\Support\Str::toSemesterDisplay($course->term) }}
                 </div>
             @endif
@@ -26,10 +28,12 @@
                 {{-- 科目內容 --}}
                 @if ($course->description_url)
                     <div>
-                        <dt class="mb-2 font-semibold text-warm-900">
+                        <dt
+                            class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                        >
                             科目內容
                         </dt>
-                        <dd class="text-warm-700">
+                        <dd class="text-warm-700 dark:text-zinc-300">
                             <x-link-button
                                 :href="$course->description_url"
                                 variant="link"
@@ -50,10 +54,12 @@
                 {{-- 必/選修 --}}
                 @if ($course->credit_type)
                     <div>
-                        <dt class="mb-2 font-semibold text-warm-900">
+                        <dt
+                            class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                        >
                             必/選修
                         </dt>
-                        <dd class="text-warm-700">
+                        <dd class="text-warm-700 dark:text-zinc-300">
                             {{ $course->credit_type }}
                         </dd>
                     </div>
@@ -62,8 +68,12 @@
                 {{-- 學分 --}}
                 @if ($course->credits)
                     <div>
-                        <dt class="mb-2 font-semibold text-warm-900">學分</dt>
-                        <dd class="text-warm-700">
+                        <dt
+                            class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                        >
+                            學分
+                        </dt>
+                        <dd class="text-warm-700 dark:text-zinc-300">
                             <div class="flex items-center gap-3">
                                 <div
                                     class="flex items-center gap-1 text-orange-500"
@@ -79,13 +89,17 @@
                                     @endfor
 
                                     @if ($starCount > $displayStars)
-                                        <span class="text-xs text-warm-600">
+                                        <span
+                                            class="text-xs text-warm-600 dark:text-zinc-400"
+                                        >
                                             +{{ $starCount - $displayStars }}
                                         </span>
                                     @endif
                                 </div>
 
-                                <div class="text-sm text-warm-600">
+                                <div
+                                    class="text-sm text-warm-600 dark:text-zinc-400"
+                                >
                                     {{ $course->credits }} 學分
                                 </div>
                             </div>
@@ -96,8 +110,12 @@
                 {{-- 學系 --}}
                 @if ($course->department)
                     <div>
-                        <dt class="mb-2 font-semibold text-warm-900">學系</dt>
-                        <dd class="text-warm-700">
+                        <dt
+                            class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                        >
+                            學系
+                        </dt>
+                        <dd class="text-warm-700 dark:text-zinc-300">
                             {{ $course->department }}
                         </dd>
                     </div>
@@ -106,10 +124,12 @@
                 {{-- 面授類別 --}}
                 @if ($course->in_person_class_type)
                     <div>
-                        <dt class="mb-2 font-semibold text-warm-900">
+                        <dt
+                            class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                        >
                             面授類別
                         </dt>
-                        <dd class="text-warm-700">
+                        <dd class="text-warm-700 dark:text-zinc-300">
                             {{ $course->in_person_class_type }}
                         </dd>
                     </div>
@@ -118,18 +138,26 @@
                 {{-- 媒體 --}}
                 @if ($course->media)
                     <div>
-                        <dt class="mb-2 font-semibold text-warm-900">媒體</dt>
-                        <dd class="text-warm-700">{{ $course->media }}</dd>
+                        <dt
+                            class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                        >
+                            媒體
+                        </dt>
+                        <dd class="text-warm-700 dark:text-zinc-300">
+                            {{ $course->media }}
+                        </dd>
                     </div>
                 @endif
 
                 {{-- 多媒體簡介 --}}
                 @if ($course->multimedia_url)
                     <div>
-                        <dt class="mb-2 font-semibold text-warm-900">
+                        <dt
+                            class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                        >
                             多媒體簡介
                         </dt>
-                        <dd class="text-warm-700">
+                        <dd class="text-warm-700 dark:text-zinc-300">
                             <x-link-button
                                 :href="$course->multimedia_url"
                                 variant="link"
@@ -148,24 +176,30 @@
                 {{-- 課程性質 --}}
                 @if ($course->nature)
                     <div>
-                        <dt class="mb-2 font-semibold text-warm-900">
+                        <dt
+                            class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                        >
                             課程性質
                         </dt>
-                        <dd class="text-warm-700">{{ $course->nature }}</dd>
+                        <dd class="text-warm-700 dark:text-zinc-300">
+                            {{ $course->nature }}
+                        </dd>
                     </div>
                 @endif
 
                 @if ($course->midterm_date || $course->final_date || $course->exam_time_start || $course->exam_time_end)
                     <div>
-                        <dt class="mb-2 font-semibold text-warm-900">
+                        <dt
+                            class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                        >
                             考試資訊
                         </dt>
-                        <dd class="text-warm-700">
+                        <dd class="text-warm-700 dark:text-zinc-300">
                             @if ($course->midterm_date)
                                 <div class="mb-2">
                                     <div class="font-semibold">期中考</div>
                                     <div
-                                        class="flex items-center justify-start gap-x-2 text-sm text-warm-700 tabular-nums"
+                                        class="flex items-center justify-start gap-x-2 text-sm text-warm-700 tabular-nums dark:text-zinc-300"
                                     >
                                         <div>
                                             {{ Date::parse($course->midterm_date)->isoFormat('M/D (dd)') }}
@@ -173,7 +207,7 @@
 
                                         @if ($course->exam_time_start || $course->exam_time_end)
                                             <div
-                                                class="text-sm whitespace-nowrap text-warm-600"
+                                                class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
                                             >
                                                 @if ($course->exam_time_start && $course->exam_time_end)
                                                     {{ $course->exam_time_start }}
@@ -192,7 +226,7 @@
                                 <div>
                                     <div class="font-semibold">期末考</div>
                                     <div
-                                        class="flex items-center justify-start gap-x-2 text-sm text-warm-700 tabular-nums"
+                                        class="flex items-center justify-start gap-x-2 text-sm text-warm-700 tabular-nums dark:text-zinc-300"
                                     >
                                         <div>
                                             {{ Date::parse($course->final_date)->isoFormat('M/D (dd)') }}
@@ -200,7 +234,7 @@
 
                                         @if ($course->exam_time_start || $course->exam_time_end)
                                             <div
-                                                class="text-sm whitespace-nowrap text-warm-600"
+                                                class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
                                             >
                                                 @if ($course->exam_time_start && $course->exam_time_end)
                                                     {{ $course->exam_time_start }}
@@ -224,20 +258,28 @@
         {{-- 教科書資訊 --}}
         @if ($course->textbook !== null)
             <x-card class="mb-6" title="教科書資訊">
-                <dl class="grid grid-cols-1 gap-6 text-warm-700 md:grid-cols-2">
+                <dl
+                    class="grid grid-cols-1 gap-6 text-warm-700 md:grid-cols-2 dark:text-zinc-300"
+                >
                     <div>
-                        <dt class="mb-2 font-semibold text-warm-900">書名</dt>
-                        <dd class="text-warm-700">
+                        <dt
+                            class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                        >
+                            書名
+                        </dt>
+                        <dd class="text-warm-700 dark:text-zinc-300">
                             {{ $course->textbook->book_title }}
                         </dd>
                     </div>
 
                     @if ($course->textbook->edition)
                         <div>
-                            <dt class="mb-2 font-semibold text-warm-900">
+                            <dt
+                                class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                            >
                                 版本
                             </dt>
-                            <dd class="text-warm-700">
+                            <dd class="text-warm-700 dark:text-zinc-300">
                                 {{ $course->textbook->edition }}
                             </dd>
                         </div>
@@ -245,19 +287,23 @@
 
                     @if ($course->textbook->price_info && is_numeric($course->textbook->price_info))
                         <div>
-                            <dt class="mb-2 font-semibold text-warm-900">
+                            <dt
+                                class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                            >
                                 價格
                             </dt>
-                            <dd class="text-warm-700">
+                            <dd class="text-warm-700 dark:text-zinc-300">
                                 ${{ number_format($course->textbook->price_info) }}
                             </dd>
                         </div>
                     @else($course->textbook->price_info)
                         <div>
-                            <dt class="mb-2 font-semibold text-warm-900">
+                            <dt
+                                class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                            >
                                 坊間教科書資訊
                             </dt>
-                            <dd class="text-warm-700">
+                            <dd class="text-warm-700 dark:text-zinc-300">
                                 {{ $course->textbook->price_info }}
                             </dd>
                         </div>
@@ -265,10 +311,12 @@
 
                     @if ($course->textbook->reference_url)
                         <div>
-                            <dt class="mb-2 font-semibold text-warm-900">
+                            <dt
+                                class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
+                            >
                                 參考連結
                             </dt>
-                            <dd class="text-warm-700">
+                            <dd class="text-warm-700 dark:text-zinc-300">
                                 <x-link-button
                                     :href="$course->textbook->reference_url"
                                     variant="link"
@@ -298,7 +346,9 @@
                     @foreach ($typeOrder as $type)
                         @if (isset($grouped[$type]) && $grouped[$type]->isNotEmpty())
                             <div>
-                                <div class="mb-3 font-semibold text-warm-900">
+                                <div
+                                    class="mb-3 font-semibold text-warm-900 dark:text-zinc-100"
+                                >
                                     {{ \App\Enums\CourseClassType::tryFrom($type)?->label() ?? $type }}
                                 </div>
 
@@ -307,7 +357,7 @@
                                 >
                                     @foreach ($grouped[$type] as $class)
                                         <div
-                                            class="rounded-lg border-2 border-warm-200 bg-warm-50 p-4"
+                                            class="rounded-lg border-2 border-warm-200 bg-warm-50 p-4 dark:border-zinc-700 dark:bg-zinc-950"
                                         >
                                             <div class="mb-3">
                                                 <div
@@ -315,13 +365,13 @@
                                                 >
                                                     <div>
                                                         <div
-                                                            class="font-semibold text-warm-900"
+                                                            class="font-semibold text-warm-900 dark:text-zinc-100"
                                                         >
                                                             {{ $class->code }}
                                                         </div>
                                                         @if ($class->teacher_name)
                                                             <div
-                                                                class="mt-1 truncate text-sm text-warm-700"
+                                                                class="mt-1 truncate text-sm text-warm-700 dark:text-zinc-300"
                                                             >
                                                                 @php
                                                                     $teacher = $class->teacher_name;
@@ -349,7 +399,7 @@
                                                         @endif
                                                     </div>
                                                     <div
-                                                        class="text-sm whitespace-nowrap text-warm-600"
+                                                        class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
                                                     >
                                                         @if ($class->start_time)
                                                             <div>
@@ -371,7 +421,7 @@
                                                             href="{{ $class->link }}"
                                                             target="_blank"
                                                             rel="noopener"
-                                                            class="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-700 transition hover:bg-orange-100"
+                                                            class="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-700 transition hover:bg-orange-100 dark:border-orange-800/60 dark:bg-orange-950/60 dark:text-orange-300 dark:hover:bg-orange-950"
                                                         >
                                                             <x-heroicon-o-video-camera
                                                                 class="size-4"
@@ -385,7 +435,7 @@
                                                             href="{{ $class->backup_classroom_url }}"
                                                             target="_blank"
                                                             rel="noopener"
-                                                            class="inline-flex items-center gap-1 rounded-full border border-warm-200 bg-white px-3 py-1.5 text-sm font-semibold text-warm-700 transition hover:bg-warm-100"
+                                                            class="inline-flex items-center gap-1 rounded-full border border-warm-200 bg-white px-3 py-1.5 text-sm font-semibold text-warm-700 transition hover:bg-warm-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900"
                                                         >
                                                             <x-heroicon-o-squares-plus
                                                                 class="size-4"
@@ -398,17 +448,17 @@
 
                                             @if ($class->schedules->isNotEmpty())
                                                 <div
-                                                    class="mt-2 rounded bg-white p-3"
+                                                    class="mt-2 rounded bg-white p-3 dark:bg-zinc-900"
                                                 >
                                                     <p
-                                                        class="mb-2 text-sm font-semibold text-warm-900"
+                                                        class="mb-2 text-sm font-semibold text-warm-900 dark:text-zinc-100"
                                                     >
                                                         視訊面授日期：
                                                     </p>
 
                                                     {{-- 列出每一天；只有 schedule 本身有 start_time/end_time (override) 時，才在該日期旁顯示覆寫時間 --}}
                                                     <div
-                                                        class="space-y-1 text-sm text-warm-700"
+                                                        class="space-y-1 text-sm text-warm-700 dark:text-zinc-300"
                                                     >
                                                         @php
                                                             $schedulesByDate = $class->schedules->sortBy('date')->groupBy(function ($s) {
@@ -433,7 +483,7 @@
 
                                                                 @if ($s->start_time || $s->end_time)
                                                                     <div
-                                                                        class="text-sm whitespace-nowrap text-warm-600"
+                                                                        class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
                                                                     >
                                                                         @if ($s->start_time && $s->end_time)
                                                                             {{ $s->start_time }}
@@ -452,7 +502,7 @@
                                                 </div>
                                             @else
                                                 <p
-                                                    class="mt-2 text-sm text-warm-600"
+                                                    class="mt-2 text-sm text-warm-600 dark:text-zinc-400"
                                                 >
                                                     未設定上課時間
                                                 </p>
@@ -478,15 +528,19 @@
                 <div class="space-y-3 md:hidden">
                     @foreach ($previousExams as $exam)
                         <div
-                            class="rounded-lg border border-warm-200 bg-white p-4"
+                            class="rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
                         >
-                            <div class="mb-3 font-semibold text-warm-900">
+                            <div
+                                class="mb-3 font-semibold text-warm-900 dark:text-zinc-100"
+                            >
                                 {{ $exam->term ?? '-' }}
                             </div>
 
                             <div class="grid grid-cols-2 gap-3 text-sm">
                                 <div>
-                                    <p class="mb-1 font-semibold text-warm-600">
+                                    <p
+                                        class="mb-1 font-semibold text-warm-600 dark:text-zinc-400"
+                                    >
                                         期中考正參
                                     </p>
                                     @if ($exam->midterm_reference_primary)
@@ -503,12 +557,18 @@
                                             />
                                         </x-link-button>
                                     @else
-                                        <span class="text-warm-500">—</span>
+                                        <span
+                                            class="text-warm-500 dark:text-zinc-400"
+                                        >
+                                            —
+                                        </span>
                                     @endif
                                 </div>
 
                                 <div>
-                                    <p class="mb-1 font-semibold text-warm-600">
+                                    <p
+                                        class="mb-1 font-semibold text-warm-600 dark:text-zinc-400"
+                                    >
                                         期中考副參
                                     </p>
                                     @if ($exam->midterm_reference_secondary)
@@ -525,12 +585,18 @@
                                             />
                                         </x-link-button>
                                     @else
-                                        <span class="text-warm-500">—</span>
+                                        <span
+                                            class="text-warm-500 dark:text-zinc-400"
+                                        >
+                                            —
+                                        </span>
                                     @endif
                                 </div>
 
                                 <div>
-                                    <p class="mb-1 font-semibold text-warm-600">
+                                    <p
+                                        class="mb-1 font-semibold text-warm-600 dark:text-zinc-400"
+                                    >
                                         期末考正參
                                     </p>
                                     @if ($exam->final_reference_primary)
@@ -547,12 +613,18 @@
                                             />
                                         </x-link-button>
                                     @else
-                                        <span class="text-warm-500">—</span>
+                                        <span
+                                            class="text-warm-500 dark:text-zinc-400"
+                                        >
+                                            —
+                                        </span>
                                     @endif
                                 </div>
 
                                 <div>
-                                    <p class="mb-1 font-semibold text-warm-600">
+                                    <p
+                                        class="mb-1 font-semibold text-warm-600 dark:text-zinc-400"
+                                    >
                                         期末考副參
                                     </p>
                                     @if ($exam->final_reference_secondary)
@@ -569,7 +641,11 @@
                                             />
                                         </x-link-button>
                                     @else
-                                        <span class="text-warm-500">—</span>
+                                        <span
+                                            class="text-warm-500 dark:text-zinc-400"
+                                        >
+                                            —
+                                        </span>
                                     @endif
                                 </div>
                             </div>
@@ -692,7 +768,7 @@
         <x-common-links class="mb-6" />
 
         <x-card title="免責聲明">
-            <p class="text-sm text-warm-600">
+            <p class="text-sm text-warm-600 dark:text-zinc-400">
                 課程資料來自國立空中大學之公開資料，基於合理使用原則，以非商用、公開的方式供其他上課同學參考使用，資料版權屬於國立空中大學所有。本站只搜集課程之詮釋資料（Metadata），例如課程名稱、教師、學分數、上課時間等，不保存其他資料。
             </p>
         </x-card>

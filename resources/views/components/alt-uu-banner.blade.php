@@ -19,23 +19,23 @@
         <button
             type="button"
             @click="dismiss()"
-            class="absolute top-4 right-4 inline-flex items-center justify-center rounded-md border border-warm-600 bg-white p-1.5 text-warm-700 transition hover:bg-warm-100 hover:text-warm-900 focus:ring-2 focus:ring-warm-500 focus:outline-none"
+            class="absolute top-4 right-4 inline-flex items-center justify-center rounded-md border border-warm-600 bg-white p-1.5 text-warm-700 transition hover:bg-warm-100 hover:text-warm-900 focus:ring-2 focus:ring-warm-500 focus:outline-none dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
             aria-label="關閉 Alt UU 宣傳"
         >
             <x-heroicon-o-x-mark class="size-4" />
         </button>
 
         <div
-            class="flex flex-col overflow-hidden rounded-lg bg-white sm:flex-row"
+            class="flex flex-col overflow-hidden rounded-lg bg-white sm:flex-row dark:bg-zinc-900"
         >
             <div
-                class="flex h-24 min-h-24 items-center justify-center bg-amber-500/10 px-4 text-amber-800 sm:h-auto sm:w-24 sm:px-3"
+                class="flex h-24 min-h-24 items-center justify-center bg-amber-500/10 px-4 text-amber-800 sm:h-auto sm:w-24 sm:px-3 dark:bg-amber-500/15 dark:text-amber-400"
             >
                 <x-heroicon-o-gift class="size-6" />
             </div>
 
             <div
-                class="flex flex-1 flex-col justify-between gap-4 px-4 py-4 text-amber-900 sm:pr-12 md:px-5 md:py-5 md:pr-12"
+                class="flex flex-1 flex-col justify-between gap-4 px-4 py-4 text-amber-900 sm:pr-12 md:px-5 md:py-5 md:pr-12 dark:text-amber-200"
             >
                 <p class="text-sm leading-6 md:text-base">
                     全新 App「Alt UU」現已在 iOS 上全面推出。使用 Alt UU

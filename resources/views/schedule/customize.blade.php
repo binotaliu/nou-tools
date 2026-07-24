@@ -7,8 +7,10 @@
             class="mb-8 flex flex-col items-start justify-between gap-3 sm:flex-row"
         >
             <div>
-                <h2 class="text-3xl font-bold text-warm-900">自訂課表顯示</h2>
-                <p class="mt-2 text-sm text-warm-600">
+                <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+                    自訂課表顯示
+                </h2>
+                <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">
                     調整課表頁顯示區塊，並在「常用連結」加入你的自訂連結。
                 </p>
             </div>
@@ -65,7 +67,7 @@
                 <div class="grid gap-3 sm:grid-cols-2">
                     @foreach ($displayOptionLabels as $key => $label)
                         <label
-                            class="flex cursor-pointer items-center gap-3 rounded-lg border border-warm-200 bg-white px-3 py-2"
+                            class="flex cursor-pointer items-center gap-3 rounded-lg border border-warm-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
                         >
                             <input
                                 type="hidden"
@@ -77,20 +79,22 @@
                                 name="display_options[{{ $key }}]"
                                 value="1"
                                 @checked((bool) old('display_options.' . $key, $viewModel->displayOptions[$key] ?? false))
-                                class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500"
+                                class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500 dark:border-zinc-600 dark:text-zinc-300"
                             />
-                            <span class="text-sm font-medium text-warm-800">
+                            <span
+                                class="text-sm font-medium text-warm-800 dark:text-zinc-200"
+                            >
                                 {{ $label }}
                             </span>
                         </label>
                     @endforeach
                 </div>
 
-                <p class="mt-4 text-sm text-warm-600">
+                <p class="mt-4 text-sm text-warm-600 dark:text-zinc-400">
                     想調整「最新公告」要顯示哪些分類？前往
                     <a
                         href="{{ route('schedules.announcement-preferences', $viewModel->schedule) }}"
-                        class="font-medium text-orange-700 hover:underline"
+                        class="font-medium text-orange-700 hover:underline dark:text-orange-400"
                     >
                         公告分類設定
                     </a>
@@ -117,14 +121,14 @@
                 <div class="space-y-3">
                     <template x-for="(link, index) in links" :key="index">
                         <div
-                            class="rounded-lg border border-warm-200 bg-white p-3"
+                            class="rounded-lg border border-warm-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900"
                         >
                             <div
                                 class="grid gap-3 md:grid-cols-[1fr_2fr_auto] md:items-end"
                             >
                                 <div>
                                     <label
-                                        class="mb-1 block text-sm font-semibold text-warm-800"
+                                        class="mb-1 block text-sm font-semibold text-warm-800 dark:text-zinc-200"
                                     >
                                         連結名稱
                                     </label>
@@ -134,13 +138,13 @@
                                         x-model="link.title"
                                         maxlength="50"
                                         placeholder="例如：我的課程群組"
-                                        class="w-full rounded-lg border border-warm-300 px-3 py-2 text-sm focus:border-warm-500 focus:outline-none"
+                                        class="w-full rounded-lg border border-warm-300 px-3 py-2 text-sm focus:border-warm-500 focus:outline-none dark:border-zinc-600"
                                     />
                                 </div>
 
                                 <div>
                                     <label
-                                        class="mb-1 block text-sm font-semibold text-warm-800"
+                                        class="mb-1 block text-sm font-semibold text-warm-800 dark:text-zinc-200"
                                     >
                                         網址
                                     </label>
@@ -150,7 +154,7 @@
                                         x-model="link.url"
                                         maxlength="2048"
                                         placeholder="https://example.com"
-                                        class="w-full rounded-lg border border-warm-300 px-3 py-2 text-sm focus:border-warm-500 focus:outline-none"
+                                        class="w-full rounded-lg border border-warm-300 px-3 py-2 text-sm focus:border-warm-500 focus:outline-none dark:border-zinc-600"
                                     />
                                 </div>
 
@@ -168,7 +172,7 @@
 
                     <template x-if="links.length === 0">
                         <div
-                            class="rounded-lg border border-dashed border-warm-300 bg-warm-50 px-4 py-6 text-center text-sm text-warm-600"
+                            class="rounded-lg border border-dashed border-warm-300 bg-warm-50 px-4 py-6 text-center text-sm text-warm-600 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
                         >
                             尚未新增自訂連結。
                         </div>

@@ -11,11 +11,13 @@
             class="mb-8 flex flex-col items-start justify-between gap-y-4 lg:flex-row"
         >
             <div>
-                <h2 class="mb-2 text-3xl font-bold text-warm-900">
+                <h2
+                    class="mb-2 text-3xl font-bold text-warm-900 dark:text-zinc-100"
+                >
                     {{ $viewModel->name ?: '我的課表' }}
                 </h2>
                 <p
-                    class="mt-1 flex items-center gap-1 text-sm text-warm-600 print:hidden"
+                    class="mt-1 flex items-center gap-1 text-sm text-warm-600 dark:text-zinc-400 print:hidden"
                 >
                     <x-heroicon-o-information-circle class="inline size-4" />
                     小提示：將此頁加入瀏覽器書籤，下次即可快速開啟課表。
@@ -84,7 +86,7 @@
                         name="term"
                         onchange="this.form.submit()"
                         aria-label="選擇學期"
-                        class="bg-white"
+                        class="bg-white dark:bg-zinc-900"
                     >
                         @foreach ($viewModel->availableTerms as $term)
                             <option
@@ -97,7 +99,9 @@
                     </x-select>
                 </form>
 
-                <span class="hidden text-sm text-warm-600 print:inline">
+                <span
+                    class="hidden text-sm text-warm-600 dark:text-zinc-400 print:inline"
+                >
                     {{ \Illuminate\Support\Str::toSemesterDisplay($viewModel->selectedTerm) }}
                 </span>
             </div>
@@ -111,20 +115,22 @@
 
         @if (! $hasCourses)
             <x-card class="mb-8" title="此學期尚無課程">
-                <div class="space-y-3 text-warm-700">
+                <div class="space-y-3 text-warm-700 dark:text-zinc-300">
                     <p>
                         目前選擇的學期
-                        <span class="font-semibold text-warm-900">
+                        <span
+                            class="font-semibold text-warm-900 dark:text-zinc-100"
+                        >
                             {{ \Illuminate\Support\Str::toSemesterDisplay($viewModel->selectedTerm) }}
                         </span>
                         沒有課程。
                     </p>
 
-                    <p class="text-sm text-warm-600">
+                    <p class="text-sm text-warm-600 dark:text-zinc-400">
                         您可以切換其他學期，或前往
                         <a
                             href="{{ route('schedules.edit', $viewModel->uuid) }}"
-                            class="font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline"
+                            class="font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
                         >
                             編輯課表
                         </a>
@@ -153,10 +159,14 @@
         {{-- Schedule Calendar View --}}
         @if ($viewModel->displayOptions['show_class_dates'] && count($viewModel->items) > 0)
             <div class="mb-8">
-                <h3 class="mb-4 text-2xl font-bold text-warm-900">面授日期</h3>
+                <h3
+                    class="mb-4 text-2xl font-bold text-warm-900 dark:text-zinc-100"
+                >
+                    面授日期
+                </h3>
                 @if ($viewModel->hasAnyOverride)
                     <p
-                        class="mb-4 flex items-center gap-1 text-sm text-warm-600"
+                        class="mb-4 flex items-center gap-1 text-sm text-warm-600 dark:text-zinc-400"
                     >
                         <x-heroicon-o-exclamation-triangle
                             class="size-4 text-orange-600"
@@ -178,14 +188,14 @@
                                         class="break-inside-avoid-page border-l-4 border-warm-500 py-2 pl-4"
                                     >
                                         <div
-                                            class="mb-1 font-semibold text-warm-900"
+                                            class="mb-1 font-semibold text-warm-900 dark:text-zinc-100"
                                         >
                                             {{ $date->formattedDate() }}
                                         </div>
                                         <div class="space-y-1">
                                             @foreach ($date->courses as $course)
                                                 <div
-                                                    class="text-sm text-warm-700"
+                                                    class="text-sm text-warm-700 dark:text-zinc-300"
                                                 >
                                                     <span class="font-semibold">
                                                         {{ $course->courseName }}
@@ -195,12 +205,12 @@
                                                     </x-class-code>
                                                     <br />
                                                     <span
-                                                        class="inline-flex items-center gap-1 text-warm-600"
+                                                        class="inline-flex items-center gap-1 text-warm-600 dark:text-zinc-400"
                                                     >
                                                         {{ $course->time }}
                                                         @if ($course->hasOverride)
                                                             <x-heroicon-o-exclamation-triangle
-                                                                class="size-4 text-warm-500"
+                                                                class="size-4 text-warm-500 dark:text-zinc-400"
                                                                 title="該次課程時間與一般時間不同"
                                                             />
                                                         @endif
@@ -232,11 +242,13 @@
                 <div class="space-y-3 md:hidden">
                     @forelse ($viewModel->exams as $exam)
                         <div
-                            class="rounded-lg border border-warm-200 bg-white p-4"
+                            class="rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
                         >
                             <div class="flex items-start justify-between gap-3">
                                 <div class="flex-1">
-                                    <div class="font-semibold text-warm-900">
+                                    <div
+                                        class="font-semibold text-warm-900 dark:text-zinc-100"
+                                    >
                                         {{ $exam->courseName }}
                                     </div>
                                     @if ($exam->classCode)
@@ -249,7 +261,7 @@
 
                                             <a
                                                 href="{{ route('course.show', $exam->courseId) }}#previous-exams"
-                                                class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline print:hidden"
+                                                class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100 print:hidden"
                                                 aria-label="{{ $exam->courseName }} 的課程資訊"
                                             >
                                                 <x-heroicon-o-information-circle
@@ -267,58 +279,68 @@
                                 @if (! str_ends_with($viewModel->selectedTerm, 'C'))
                                     <div>
                                         <p
-                                            class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase"
+                                            class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase dark:text-zinc-400"
                                         >
                                             期中考
                                         </p>
                                         @if ($exam->midtermDate)
                                             <div
-                                                class="font-semibold text-warm-900"
+                                                class="font-semibold text-warm-900 dark:text-zinc-100"
                                             >
                                                 {{ $exam->formattedMidtermDate() }}
                                             </div>
 
                                             @if ($exam->formattedExamTime())
                                                 <div
-                                                    class="mt-1 text-sm text-warm-600"
+                                                    class="mt-1 text-sm text-warm-600 dark:text-zinc-400"
                                                 >
                                                     {{ $exam->formattedExamTime() }}
                                                 </div>
                                             @endif
                                         @else
-                                            <div class="text-warm-500">—</div>
+                                            <div
+                                                class="text-warm-500 dark:text-zinc-400"
+                                            >
+                                                —
+                                            </div>
                                         @endif
                                     </div>
                                 @endif
 
                                 <div>
                                     <p
-                                        class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase"
+                                        class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase dark:text-zinc-400"
                                     >
                                         期末考
                                     </p>
                                     @if ($exam->finalDate)
                                         <div
-                                            class="font-semibold text-warm-900"
+                                            class="font-semibold text-warm-900 dark:text-zinc-100"
                                         >
                                             {{ $exam->formattedFinalDate() }}
                                         </div>
 
                                         @if ($exam->formattedExamTime())
                                             <div
-                                                class="mt-1 text-sm text-warm-600"
+                                                class="mt-1 text-sm text-warm-600 dark:text-zinc-400"
                                             >
                                                 {{ $exam->formattedExamTime() }}
                                             </div>
                                         @endif
                                     @else
-                                        <div class="text-warm-500">—</div>
+                                        <div
+                                            class="text-warm-500 dark:text-zinc-400"
+                                        >
+                                            —
+                                        </div>
                                     @endif
                                 </div>
                             </div>
                         </div>
                     @empty
-                        <div class="px-4 py-16 text-center text-warm-500">
+                        <div
+                            class="px-4 py-16 text-center text-warm-500 dark:text-zinc-400"
+                        >
                             您的課表中沒有任何科目有設定考試日期。
                         </div>
                     @endforelse
@@ -329,7 +351,7 @@
                     <x-table class="border-collapse overflow-hidden rounded">
                         <x-table-head>
                             <x-table-row
-                                class="rounded-t border-b-2 border-warm-300 bg-warm-100"
+                                class="rounded-t border-b-2 border-warm-300 bg-warm-100 dark:border-zinc-600 dark:bg-zinc-900"
                             >
                                 <x-table-head-column>課程</x-table-head-column>
                                 @if (! str_ends_with($viewModel->selectedTerm, 'C'))
@@ -347,10 +369,10 @@
                         <x-table-body>
                             @forelse ($viewModel->exams as $exam)
                                 <x-table-row
-                                    class="border-b border-warm-200 hover:bg-warm-50"
+                                    class="border-b border-warm-200 hover:bg-warm-50 dark:border-zinc-700 dark:hover:bg-zinc-950"
                                 >
                                     <x-table-column
-                                        class="font-semibold text-warm-900"
+                                        class="font-semibold text-warm-900 dark:text-zinc-100"
                                     >
                                         {{ $exam->courseName }}
                                         @if ($exam->classCode)
@@ -363,7 +385,7 @@
 
                                                 <a
                                                     href="{{ route('course.show', $exam->courseId) }}#previous-exams"
-                                                    class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline print:hidden"
+                                                    class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100 print:hidden"
                                                     aria-label="{{ $exam->courseName }} 的課程資訊"
                                                 >
                                                     <x-heroicon-o-information-circle
@@ -383,14 +405,16 @@
                                                     {{ $exam->formattedMidtermDate() }}
                                                 </div>
                                             @else
-                                                <div class="text-warm-500">
+                                                <div
+                                                    class="text-warm-500 dark:text-zinc-400"
+                                                >
                                                     —
                                                 </div>
                                             @endif
 
                                             @if ($exam->formattedExamTime())
                                                 <div
-                                                    class="mt-1 text-sm text-warm-600"
+                                                    class="mt-1 text-sm text-warm-600 dark:text-zinc-400"
                                                 >
                                                     {{ $exam->formattedExamTime() }}
                                                 </div>
@@ -404,12 +428,16 @@
                                                 {{ $exam->formattedFinalDate() }}
                                             </div>
                                         @else
-                                            <div class="text-warm-500">—</div>
+                                            <div
+                                                class="text-warm-500 dark:text-zinc-400"
+                                            >
+                                                —
+                                            </div>
                                         @endif
 
                                         @if ($exam->formattedExamTime())
                                             <div
-                                                class="mt-1 text-sm text-warm-600"
+                                                class="mt-1 text-sm text-warm-600 dark:text-zinc-400"
                                             >
                                                 {{ $exam->formattedExamTime() }}
                                             </div>
@@ -420,7 +448,7 @@
                                 <x-table-row>
                                     <x-table-column
                                         colspan="3"
-                                        class="px-4 py-16 text-center text-warm-500"
+                                        class="px-4 py-16 text-center text-warm-500 dark:text-zinc-400"
                                     >
                                         您的課表中沒有任何科目有設定考試日期。
                                     </x-table-column>
@@ -442,7 +470,7 @@
             <x-card>
                 <div class="flex items-center justify-between gap-4 print:flex">
                     <div class="w-full md:w-auto md:flex-1 print:flex-1">
-                        <p class="mb-3 text-warm-700">
+                        <p class="mb-3 text-warm-700 dark:text-zinc-300">
                             您可以使用以下連結來編輯或檢視此課表，請妥善保管此連結。
                             <br />
                             <span
@@ -471,11 +499,11 @@
                                     setTimeout(() => (this.copied = false), 2000)
                                 },
                             }"
-                            class="rounded border border-warm-300 bg-white text-sm text-warm-600"
+                            class="rounded border border-warm-300 bg-white text-sm text-warm-600 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
                         >
                             <div class="flex items-stretch gap-3">
                                 <input
-                                    class="flex-1 px-3 py-2 font-mono break-all text-warm-600 print:hidden"
+                                    class="flex-1 px-3 py-2 font-mono break-all text-warm-600 dark:text-zinc-400 print:hidden"
                                     :value="shareUrl"
                                     readonly
                                     @click="$event.target.select()"
@@ -483,7 +511,7 @@
                                     aria-label="我的課表連結"
                                 />
                                 <div
-                                    class="hidden items-center px-3 py-2 font-mono break-all text-warm-600 print:flex"
+                                    class="hidden items-center px-3 py-2 font-mono break-all text-warm-600 dark:text-zinc-400 print:flex"
                                     x-text="shareUrl"
                                 ></div>
 

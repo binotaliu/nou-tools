@@ -4,7 +4,9 @@
             class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
             <div class="space-y-2">
-                <h2 class="text-3xl font-bold text-warm-900">學校公告</h2>
+                <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+                    學校公告
+                </h2>
             </div>
         </div>
 
@@ -29,7 +31,7 @@
         >
             <button
                 type="button"
-                class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-200 bg-white px-4 py-2 text-sm font-medium text-warm-800 shadow-sm transition hover:border-warm-300 hover:bg-warm-50 lg:hidden"
+                class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-200 bg-white px-4 py-2 text-sm font-medium text-warm-800 shadow-sm transition hover:border-warm-300 hover:bg-warm-50 lg:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
                 @click="isFilterPanelOpen = ! isFilterPanelOpen"
                 :aria-expanded="isFilterPanelOpen"
                 aria-controls="announcement-filter-panel"
@@ -124,7 +126,7 @@
                         >
                             <button
                                 type="button"
-                                class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-700 transition hover:border-warm-300 hover:bg-warm-50 lg:hidden"
+                                class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-700 transition hover:border-warm-300 hover:bg-warm-50 lg:hidden dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
                                 @click="isFilterPanelOpen = false"
                             >
                                 <x-heroicon-o-eye-slash class="size-4" />
@@ -132,27 +134,27 @@
                             </button>
 
                             <div
-                                class="max-h-[60vh] space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-warm-200 p-2"
+                                class="max-h-[60vh] space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-warm-200 p-2 dark:border-zinc-700"
                             >
                                 @foreach ($sourceCategoryTree as $source => $categories)
                                     <section
-                                        class="overflow-hidden rounded-lg border border-warm-200 p-1"
+                                        class="overflow-hidden rounded-lg border border-warm-200 p-1 dark:border-zinc-700"
                                     >
                                         <div
                                             class="flex items-center justify-between gap-2"
                                         >
                                             <label
-                                                class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition hover:bg-warm-50"
+                                                class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition hover:bg-warm-50 dark:hover:bg-zinc-950"
                                             >
                                                 <input
                                                     type="checkbox"
-                                                    class="size-4 rounded border-warm-300 text-warm-700 focus:ring-warm-300"
+                                                    class="size-4 rounded border-warm-300 text-warm-700 focus:ring-warm-300 dark:border-zinc-600 dark:text-zinc-300"
                                                     :checked="isSourceChecked(@js($source))"
                                                     :indeterminate="isSourceIndeterminate(@js($source))"
                                                     @change="toggleSource(@js($source), $event.target.checked)"
                                                 />
                                                 <span
-                                                    class="min-w-0 truncate text-sm font-semibold text-warm-900"
+                                                    class="min-w-0 truncate text-sm font-semibold text-warm-900 dark:text-zinc-100"
                                                 >
                                                     {{ $source }}
                                                 </span>
@@ -162,7 +164,7 @@
                                                 <button
                                                     type="button"
                                                     @click="toggleSourceExpansion(@js($source))"
-                                                    class="inline-flex items-center rounded-md p-2 text-warm-600 transition hover:bg-warm-100 hover:text-warm-800"
+                                                    class="inline-flex items-center rounded-md p-2 text-warm-600 transition hover:bg-warm-100 hover:text-warm-800 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-200"
                                                     :aria-expanded="isSourceExpanded(@js($source))"
                                                     aria-label="展開或收合 {{ $source }} 分類"
                                                 >
@@ -185,13 +187,13 @@
                                         >
                                             @foreach ($categories as $category)
                                                 <label
-                                                    class="flex min-w-0 cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 text-sm text-warm-700 transition hover:bg-warm-50"
+                                                    class="flex min-w-0 cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 text-sm text-warm-700 transition hover:bg-warm-50 dark:text-zinc-300 dark:hover:bg-zinc-950"
                                                 >
                                                     <input
                                                         type="checkbox"
                                                         name="source_categories[{{ $source }}][]"
                                                         value="{{ $category }}"
-                                                        class="size-4 rounded border-warm-300 text-orange-600 focus:ring-orange-300"
+                                                        class="size-4 rounded border-warm-300 text-orange-600 focus:ring-orange-300 dark:border-zinc-600"
                                                         :checked="isCategoryChecked(@js($source), @js($category))"
                                                         @change="toggleCategory(@js($source), @js($category), $event.target.checked)"
                                                     />
@@ -230,7 +232,7 @@
                                 <button
                                     type="button"
                                     @click="selected = {}"
-                                    class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-700 transition hover:border-warm-300 hover:bg-warm-50"
+                                    class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-700 transition hover:border-warm-300 hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
                                 >
                                     <x-heroicon-o-x-mark class="size-4" />
                                     取消目前勾選
@@ -242,27 +244,29 @@
             </aside>
 
             <section class="space-y-4 lg:col-span-8 xl:col-span-9">
-                <h3 class="text-lg font-semibold text-warm-800">
+                <h3
+                    class="text-lg font-semibold text-warm-800 dark:text-zinc-200"
+                >
                     所選來源公告
                 </h3>
 
                 @if ($selectedSourceCategories !== [])
                     <div
-                        class="mt-4 flex flex-col gap-y-1 text-sm text-warm-600"
+                        class="mt-4 flex flex-col gap-y-1 text-sm text-warm-600 dark:text-zinc-400"
                     >
                         <span class="font-medium">目前條件：</span>
 
                         <div class="flex flex-wrap items-center gap-2">
                             @foreach ($displaySelectedSourceCategories as $selectedSource => $selectedCategories)
                                 <span
-                                    class="rounded-full border border-warm-200 bg-warm-100 px-3 py-1 font-medium text-warm-800"
+                                    class="rounded-full border border-warm-200 bg-warm-100 px-3 py-1 font-medium text-warm-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
                                 >
                                     {{ $selectedSource }}
                                 </span>
 
                                 @foreach ($selectedCategories as $selectedCategory)
                                     <span
-                                        class="rounded-full bg-orange-100 px-3 py-1 font-medium text-orange-700"
+                                        class="rounded-full bg-orange-100 px-3 py-1 font-medium text-orange-700 dark:bg-orange-950/60 dark:text-orange-300"
                                     >
                                         {{ $selectedCategory }}
                                     </span>
@@ -271,7 +275,7 @@
                         </div>
                     </div>
                 @elseif ($totalSelectedCategories > 0)
-                    <div class="mt-4 text-sm text-warm-600">
+                    <div class="mt-4 text-sm text-warm-600 dark:text-zinc-400">
                         目前條件：已勾選 {{ $totalSelectedCategories }} 個分類
                     </div>
                 @endif
@@ -279,7 +283,7 @@
                 <div class="space-y-4">
                     @forelse ($announcements as $announcement)
                         <article
-                            class="rounded-lg border border-warm-200 bg-white p-5 transition hover:border-warm-300"
+                            class="rounded-lg border border-warm-200 bg-white p-5 transition hover:border-warm-300 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600"
                         >
                             <div
                                 class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
@@ -289,20 +293,20 @@
                                         class="flex flex-wrap items-center gap-2 text-sm"
                                     >
                                         <span
-                                            class="rounded-full bg-warm-100 px-3 py-1 font-medium text-warm-800"
+                                            class="rounded-full bg-warm-100 px-3 py-1 font-medium text-warm-800 dark:bg-zinc-800 dark:text-zinc-200"
                                         >
                                             {{ $announcement->source_name }}
                                         </span>
 
                                         <span
-                                            class="rounded-full bg-orange-100 px-3 py-1 font-medium text-orange-700"
+                                            class="rounded-full bg-orange-100 px-3 py-1 font-medium text-orange-700 dark:bg-orange-950/60 dark:text-orange-300"
                                         >
                                             {{ $announcement->category }}
                                         </span>
 
                                         @if ($announcement->expired_at?->isPast())
                                             <span
-                                                class="rounded-full bg-slate-200 px-3 py-1 font-medium text-slate-700"
+                                                class="rounded-full bg-slate-200 px-3 py-1 font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300"
                                             >
                                                 已過期
                                             </span>
@@ -310,17 +314,17 @@
                                     </div>
 
                                     <h3
-                                        class="min-w-0 text-xl leading-8 font-semibold text-warm-900"
+                                        class="min-w-0 text-xl leading-8 font-semibold text-warm-900 dark:text-zinc-100"
                                     >
                                         <a
                                             href="{{ $announcement->url }}"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            class="line-clamp-2! block max-w-full align-middle break-all transition hover:text-orange-700"
+                                            class="line-clamp-2! block max-w-full align-middle break-all transition hover:text-orange-700 dark:hover:text-orange-400"
                                         >
                                             @foreach ($announcement->tags ?? [] as $tag)
                                                 <!-- prettier-ignore -->
-                                                <span class="mr-1 truncate rounded border border-warm-200 px-1 py-0.5 text-sm text-warm-600">{{ $tag }}</span>
+                                                <span class="mr-1 truncate rounded border border-warm-200 dark:border-zinc-700 px-1 py-0.5 text-sm text-warm-600 dark:text-zinc-400">{{ $tag }}</span>
                                             @endforeach
 
                                             {{ $announcement->title }}
@@ -331,7 +335,9 @@
                                 <div
                                     class="flex shrink-0 flex-col items-start gap-3 lg:items-end"
                                 >
-                                    <p class="text-xs text-warm-500">
+                                    <p
+                                        class="text-xs text-warm-500 dark:text-zinc-400"
+                                    >
                                         <span class="sr-only">發布時間：</span>
                                         {{ $announcement->published_at?->format('Y/m/d') ?? '未提供' }}
                                     </p>
@@ -344,15 +350,17 @@
                                 class="flex min-h-56 flex-col items-center justify-center gap-3 text-center"
                             >
                                 <x-heroicon-o-inbox
-                                    class="size-10 text-warm-400"
+                                    class="size-10 text-warm-400 dark:text-zinc-500"
                                 />
                                 <div class="space-y-1">
                                     <h3
-                                        class="text-xl font-semibold text-warm-800"
+                                        class="text-xl font-semibold text-warm-800 dark:text-zinc-200"
                                     >
                                         目前沒有符合條件的公告
                                     </h3>
-                                    <p class="text-sm text-warm-500">
+                                    <p
+                                        class="text-sm text-warm-500 dark:text-zinc-400"
+                                    >
                                         可以調整來源或分類，或稍後再回來檢視。
                                     </p>
                                 </div>
@@ -366,7 +374,7 @@
                         <div
                             class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
                         >
-                            <p class="text-sm text-warm-600">
+                            <p class="text-sm text-warm-600 dark:text-zinc-400">
                                 第 {{ $announcements->currentPage() }} /
                                 {{ $announcements->lastPage() }} 頁，共
                                 {{ number_format($announcements->total()) }}
@@ -376,7 +384,7 @@
                             <div class="flex items-center gap-3">
                                 @if ($announcements->onFirstPage())
                                     <span
-                                        class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-400"
+                                        class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-400 dark:border-zinc-700 dark:text-zinc-500"
                                     >
                                         <x-heroicon-o-chevron-left
                                             class="size-4"
@@ -407,7 +415,7 @@
                                     </x-link-button>
                                 @else
                                     <span
-                                        class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-400"
+                                        class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-400 dark:border-zinc-700 dark:text-zinc-500"
                                     >
                                         下一頁
                                         <x-heroicon-o-chevron-right

@@ -27,7 +27,7 @@
     <div class="flex w-full flex-col items-center space-y-4 sm:items-end">
         <!-- Notification panel, dynamically inserted when needed -->
         <div
-            {{ $attributes->merge(['class' => 'pointer-events-auto w-full max-w-sm translate-y-0 transform rounded-lg bg-white opacity-100 border border-warm-200 shadow outline-1 -outline-offset-1 outline-white/10 transition duration-300 ease-out sm:translate-x-0 starting:translate-y-2 starting:opacity-0 starting:sm:translate-x-2 starting:sm:translate-y-0 z-50']) }}
+            {{ $attributes->merge(['class' => 'pointer-events-auto w-full max-w-sm translate-y-0 transform rounded-lg bg-white dark:bg-zinc-900 opacity-100 border border-warm-200 dark:border-zinc-700 shadow outline-1 -outline-offset-1 outline-white/10 transition duration-300 ease-out sm:translate-x-0 starting:translate-y-2 starting:opacity-0 starting:sm:translate-x-2 starting:sm:translate-y-0 z-50']) }}
             x-data="{ show: true }"
             x-init="setTimeout(() => (show = false), 4000)"
             x-show="show"
@@ -61,12 +61,16 @@
                         @endif
                     </div>
                     <div class="ml-3 w-0 flex-1 pt-0.5">
-                        <p class="text-sm font-medium text-gray-900">
+                        <p
+                            class="text-sm font-medium text-gray-900 dark:text-zinc-100"
+                        >
                             {{ $message }}
                         </p>
                         <!-- optional description could be passed via slot if needed -->
                         @if (isset($slot) && trim($slot))
-                            <p class="mt-1 text-sm text-gray-500">
+                            <p
+                                class="mt-1 text-sm text-gray-500 dark:text-zinc-400"
+                            >
                                 {{ $slot }}
                             </p>
                         @endif
@@ -74,7 +78,7 @@
                     <div class="ml-4 flex shrink-0">
                         <button
                             type="button"
-                            class="inline-flex rounded-md text-gray-400 hover:text-black focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500"
+                            class="inline-flex rounded-md text-gray-400 hover:text-black focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500 dark:hover:text-white"
                             x-on:click="show = false"
                         >
                             <span class="sr-only">Close</span>

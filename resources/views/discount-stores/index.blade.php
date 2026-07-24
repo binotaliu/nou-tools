@@ -27,8 +27,10 @@
             class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
             <div class="space-y-2">
-                <h2 class="text-3xl font-bold text-warm-900">優惠店家</h2>
-                <p class="text-sm text-warm-600">
+                <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+                    優惠店家
+                </h2>
+                <p class="text-sm text-warm-600 dark:text-zinc-400">
                     學生優惠店家列表，歡迎回報或新增店家資訊。
                     <br />
                     此區資料由
@@ -54,7 +56,7 @@
                 <div>
                     <label
                         for="search"
-                        class="mb-1 block text-sm font-medium text-warm-700"
+                        class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                     >
                         搜尋
                     </label>
@@ -65,13 +67,13 @@
                         x-model.debounce.500ms="search"
                         placeholder="店家名稱..."
                         @input.debounce.500ms="applyFilters()"
-                        class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300"
+                        class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                     />
                 </div>
                 <div>
                     <label
                         for="category"
-                        class="mb-1 block text-sm font-medium text-warm-700"
+                        class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                     >
                         分類
                     </label>
@@ -95,7 +97,7 @@
                 <div>
                     <label
                         for="type"
-                        class="mb-1 block text-sm font-medium text-warm-700"
+                        class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                     >
                         類型
                     </label>
@@ -119,7 +121,7 @@
                 <div>
                     <label
                         for="city"
-                        class="mb-1 block text-sm font-medium text-warm-700"
+                        class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                     >
                         縣市
                     </label>
@@ -171,7 +173,7 @@
                                 class="flex flex-wrap items-center gap-2 text-sm"
                             >
                                 <span
-                                    class="inline-flex items-center gap-1 rounded-full bg-warm-100 px-3 py-1 font-medium text-warm-800"
+                                    class="inline-flex items-center gap-1 rounded-full bg-warm-100 px-3 py-1 font-medium text-warm-800 dark:bg-zinc-800 dark:text-zinc-200"
                                 >
                                     @if ($store->category)
                                         <x-dynamic-component
@@ -184,13 +186,15 @@
                                     @endif
                                 </span>
                                 <span
-                                    class="rounded-full bg-orange-100 px-3 py-1 font-medium text-orange-700"
+                                    class="rounded-full bg-orange-100 px-3 py-1 font-medium text-orange-700 dark:bg-orange-950/60 dark:text-orange-300"
                                 >
                                     {{ $store->type->label() }}
                                 </span>
 
                                 @if ($store->city)
-                                    <span class="text-warm-500">
+                                    <span
+                                        class="text-warm-500 dark:text-zinc-400"
+                                    >
                                         {{ $store->city }}
                                         {{ $store->district }}
                                     </span>
@@ -202,7 +206,7 @@
                             >
                                 <div class="min-w-0 flex-1 flex-col">
                                     <h3
-                                        class="truncate text-xl font-semibold text-warm-900"
+                                        class="truncate text-xl font-semibold text-warm-900 dark:text-zinc-100"
                                     >
                                         <a
                                             href="{{ route('discount-stores.show', $store) }}"
@@ -213,7 +217,7 @@
                                     </h3>
 
                                     <p
-                                        class="line-clamp-2 text-sm text-warm-600"
+                                        class="line-clamp-2 text-sm text-warm-600 dark:text-zinc-400"
                                     >
                                         <a
                                             href="{{ route('discount-stores.show', $store) }}"
@@ -238,7 +242,7 @@
                         <div class="mb-4 md:mb-0">
                             @if ($store->latestReport === null)
                                 <span
-                                    class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800"
+                                    class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800 dark:bg-zinc-800 dark:text-zinc-300"
                                 >
                                     <x-heroicon-o-question-mark-circle
                                         class="size-4"
@@ -247,7 +251,7 @@
                                 </span>
                             @elseif ($store->latestReport->is_valid)
                                 <span
-                                    class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800"
+                                    class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800 dark:bg-green-950/60 dark:text-green-300"
                                 >
                                     <x-heroicon-o-check-circle class="size-4" />
                                     有效 –
@@ -259,7 +263,7 @@
                                 </span>
                             @else
                                 <span
-                                    class="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800"
+                                    class="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800 dark:bg-red-950/60 dark:text-red-300"
                                 >
                                     <x-heroicon-o-x-circle class="size-4" />
                                     此優惠似乎無法使用
@@ -283,13 +287,15 @@
                         class="flex min-h-56 flex-col items-center justify-center gap-3 text-center"
                     >
                         <x-heroicon-o-building-storefront
-                            class="size-10 text-warm-400"
+                            class="size-10 text-warm-400 dark:text-zinc-500"
                         />
                         <div class="space-y-1">
-                            <h3 class="text-xl font-semibold text-warm-800">
+                            <h3
+                                class="text-xl font-semibold text-warm-800 dark:text-zinc-200"
+                            >
                                 目前沒有符合條件的優惠店家
                             </h3>
-                            <p class="text-sm text-warm-500">
+                            <p class="text-sm text-warm-500 dark:text-zinc-400">
                                 可以調整篩選條件，或新增一個優惠店家！
                             </p>
                         </div>
@@ -305,13 +311,15 @@
                         class="flex min-h-56 flex-col items-center justify-center gap-3 text-center"
                     >
                         <x-heroicon-o-building-storefront
-                            class="size-10 text-warm-400"
+                            class="size-10 text-warm-400 dark:text-zinc-500"
                         />
                         <div class="space-y-1">
-                            <h3 class="text-xl font-semibold text-warm-800">
+                            <h3
+                                class="text-xl font-semibold text-warm-800 dark:text-zinc-200"
+                            >
                                 目前沒有符合條件的優惠店家
                             </h3>
-                            <p class="text-sm text-warm-500">
+                            <p class="text-sm text-warm-500 dark:text-zinc-400">
                                 可以調整篩選條件，或新增一個優惠店家！
                             </p>
                         </div>
@@ -325,7 +333,7 @@
             <div
                 class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
             >
-                <p class="text-sm text-warm-600">
+                <p class="text-sm text-warm-600 dark:text-zinc-400">
                     第
                     <span x-text="page"></span>
                     /
@@ -340,7 +348,7 @@
                 <div class="flex items-center gap-3">
                     <button
                         type="button"
-                        class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400"
                         :disabled="page === 1"
                         @click.prevent="goToPage(page - 1)"
                     >
@@ -350,7 +358,7 @@
 
                     <button
                         type="button"
-                        class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-500 disabled:cursor-not-allowed disabled:opacity-50"
+                        class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400"
                         :disabled="page === totalPages"
                         @click.prevent="goToPage(page + 1)"
                     >

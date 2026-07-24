@@ -30,17 +30,19 @@
                 </x-link-button>
 
                 @if (isset($previousSchedule))
-                    <div class="mt-3 w-full text-sm text-warm-600">
+                    <div
+                        class="mt-3 w-full text-sm text-warm-600 dark:text-zinc-400"
+                    >
                         <x-link-button
                             :href="route('schedules.show', $previousSchedule->token)"
                             variant="secondary"
                             full-width
-                            class="text-center text-warm-700"
+                            class="text-center text-warm-700 dark:text-zinc-300"
                             data-analytics-event="schedule_open_previous"
                             data-analytics-feature="schedule"
                         >
                             <div
-                                class="max-w-xs truncate font-medium text-warm-800"
+                                class="max-w-xs truncate font-medium text-warm-800 dark:text-zinc-200"
                             >
                                 {{ $previousSchedule->name ?? '（未命名）' }}
                             </div>
@@ -61,7 +63,7 @@
                 <div class="flex items-center gap-3">
                     <label
                         for="video-course-date"
-                        class="text-sm text-warm-500"
+                        class="text-sm text-warm-500 dark:text-zinc-400"
                     >
                         選擇日期
                     </label>
@@ -79,7 +81,7 @@
             <div class="mt-4 space-y-6">
                 @if ($courses->isEmpty())
                     <div
-                        class="flex min-h-64 items-center justify-center gap-x-2 text-2xl text-warm-500"
+                        class="flex min-h-64 items-center justify-center gap-x-2 text-2xl text-warm-500 dark:text-zinc-400"
                     >
                         <x-heroicon-o-face-smile class="size-8" />
                         今日無面授課程
@@ -87,7 +89,9 @@
                 @else
                     @foreach ($courses as $course)
                         <div>
-                            <h4 class="mb-3 font-semibold text-warm-800">
+                            <h4
+                                class="mb-3 font-semibold text-warm-800 dark:text-zinc-200"
+                            >
                                 {{ $course->name }}
                             </h4>
                             <div
@@ -111,7 +115,7 @@
                                             class="flex flex-col items-stretch gap-2"
                                         >
                                             <div
-                                                class="text-sm font-semibold text-warm-700"
+                                                class="text-sm font-semibold text-warm-700 dark:text-zinc-300"
                                             >
                                                 {{ $label }}
                                             </div>
@@ -133,10 +137,10 @@
                                             >
                                                 @foreach ($timeGroups as $timeLabel => $classesAtTime)
                                                     <div
-                                                        class="w-full rounded border border-warm-800 bg-white p-3"
+                                                        class="w-full rounded border border-warm-800 bg-white p-3 dark:border-zinc-600 dark:bg-zinc-900"
                                                     >
                                                         <div
-                                                            class="mb-3 text-sm font-medium text-warm-600"
+                                                            class="mb-3 text-sm font-medium text-warm-600 dark:text-zinc-400"
                                                         >
                                                             {{ $timeLabel }}
                                                         </div>
@@ -153,7 +157,7 @@
                                                                             href="{{ $courseClass->link }}"
                                                                             target="_blank"
                                                                             rel="noopener noreferrer"
-                                                                            class="block w-full rounded border border-orange-200 bg-orange-50 px-4 py-3 text-left text-orange-700 transition hover:bg-orange-100"
+                                                                            class="block w-full rounded border border-orange-200 bg-orange-50 px-4 py-3 text-left text-orange-700 transition hover:bg-orange-100 dark:border-orange-800/60 dark:bg-orange-950/60 dark:text-orange-300 dark:hover:bg-orange-950"
                                                                         >
                                                                             <div
                                                                                 class="text-lg font-semibold"
@@ -162,7 +166,7 @@
                                                                             </div>
                                                                             @if ($courseClass->teacher_name)
                                                                                 <div
-                                                                                    class="mt-1 truncate text-sm text-warm-600"
+                                                                                    class="mt-1 truncate text-sm text-warm-600 dark:text-zinc-400"
                                                                                 >
                                                                                     {{ $courseClass->teacher_name }}
                                                                                 </div>
@@ -170,7 +174,7 @@
                                                                         </a>
                                                                     @else
                                                                         <div
-                                                                            class="block w-full rounded border bg-gray-50 px-4 py-3 text-left text-warm-500"
+                                                                            class="block w-full rounded border bg-gray-50 px-4 py-3 text-left text-warm-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
                                                                         >
                                                                             <div
                                                                                 class="text-lg font-semibold"
@@ -179,7 +183,7 @@
                                                                             </div>
                                                                             @if ($courseClass->teacher_name)
                                                                                 <div
-                                                                                    class="mt-1 truncate text-sm text-warm-600"
+                                                                                    class="mt-1 truncate text-sm text-warm-600 dark:text-zinc-400"
                                                                                 >
                                                                                     {{ $courseClass->teacher_name }}
                                                                                 </div>
@@ -192,7 +196,7 @@
                                                                             href="{{ $courseClass->backup_classroom_url }}"
                                                                             target="_blank"
                                                                             rel="noopener noreferrer"
-                                                                            class="inline-flex items-center justify-center gap-1 rounded border border-warm-200 bg-warm-50 px-3 py-2 text-sm font-semibold text-warm-700 transition hover:bg-warm-100"
+                                                                            class="inline-flex items-center justify-center gap-1 rounded border border-warm-200 bg-warm-50 px-3 py-2 text-sm font-semibold text-warm-700 transition hover:bg-warm-100 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900"
                                                                         >
                                                                             <x-heroicon-o-squares-plus
                                                                                 class="size-4"

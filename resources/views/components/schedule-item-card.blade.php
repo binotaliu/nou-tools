@@ -20,10 +20,10 @@
     @endphp
 
     <div
-        {{ $attributes->merge(['class' => 'bg-white rounded-lg border border-warm-200 border-b-0 p-4 hover:shadow-md transition']) }}
+        {{ $attributes->merge(['class' => 'bg-white dark:bg-zinc-900 rounded-lg border border-warm-200 dark:border-zinc-700 border-b-0 p-4 hover:shadow-md transition']) }}
     >
         {{-- 課程名稱 --}}
-        <h3 class="mb-2 text-lg font-semibold text-warm-900">
+        <h3 class="mb-2 text-lg font-semibold text-warm-900 dark:text-zinc-100">
             {{ $item->courseClass->course->name }}
         </h3>
 
@@ -41,17 +41,21 @@
                 @endphp
 
                 @if ($suffix === '老師')
-                    <p class="inline-flex items-baseline gap-1 text-warm-900">
+                    <p
+                        class="inline-flex items-baseline gap-1 text-warm-900 dark:text-zinc-100"
+                    >
                         @if ($base !== '')
                             <span class="text-sm">{{ $base }}</span>
                         @endif
 
-                        <span class="text-xs text-warm-700">
+                        <span class="text-xs text-warm-700 dark:text-zinc-300">
                             {{ $suffix }}
                         </span>
                     </p>
                 @else
-                    <p class="text-sm text-warm-900">{{ $teacher }}</p>
+                    <p class="text-sm text-warm-900 dark:text-zinc-100">
+                        {{ $teacher }}
+                    </p>
                 @endif
             @endif
         </div>
@@ -61,7 +65,7 @@
             {{-- 下次上課 --}}
             <div>
                 <p
-                    class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase"
+                    class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase dark:text-zinc-400"
                 >
                     下次上課
                 </p>
@@ -72,30 +76,34 @@
                     @endphp
 
                     <p
-                        class="inline-flex items-center gap-1 font-semibold text-warm-900"
+                        class="inline-flex items-center gap-1 font-semibold text-warm-900 dark:text-zinc-100"
                     >
                         {{ $d->format('n/j') }} ({{ $weekdayZh }})
                         @if ($displayStartTime)
                             {{ $displayStartTime }} ~ {{ $displayEndTime }}
                             @if ($nextSchedule && $nextSchedule->start_time)
                                 <x-heroicon-o-exclamation-triangle
-                                    class="size-4 text-warm-500"
+                                    class="size-4 text-warm-500 dark:text-zinc-400"
                                     title="該次課程時間與一般時間不同"
                                 />
                             @endif
                         @endif
                     </p>
                 @else
-                    <p class="font-semibold text-warm-500">無未來課程</p>
+                    <p class="font-semibold text-warm-500 dark:text-zinc-400">
+                        無未來課程
+                    </p>
                 @endif
             </div>
         </div>
 
         {{-- 操作按鈕 --}}
-        <div class="flex gap-2 border-t border-warm-100 pt-3">
+        <div
+            class="flex gap-2 border-t border-warm-100 pt-3 dark:border-zinc-800"
+        >
             <a
                 href="{{ route('course.show', $item->courseClass->course) }}"
-                class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-warm-800 underline underline-offset-4 transition hover:bg-warm-50 hover:text-warm-900"
+                class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-warm-800 underline underline-offset-4 transition hover:bg-warm-50 hover:text-warm-900 dark:text-zinc-200 dark:hover:bg-zinc-950 dark:hover:text-zinc-100"
             >
                 <x-heroicon-o-information-circle class="mr-1 inline size-4" />
                 課程資訊
@@ -106,7 +114,7 @@
                     href="{{ $item->courseClass->link }}"
                     target="_blank"
                     rel="noopener"
-                    class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-warm-500 underline underline-offset-4 transition hover:bg-orange-50 hover:text-warm-400"
+                    class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-warm-500 underline underline-offset-4 transition hover:bg-orange-50 hover:text-warm-400 dark:text-zinc-400 dark:hover:text-zinc-500"
                 >
                     <x-heroicon-o-video-camera class="mr-1 inline size-4" />
                     視訊上課
@@ -118,7 +126,7 @@
                     href="{{ $item->courseClass->backup_classroom_url }}"
                     target="_blank"
                     rel="noopener"
-                    class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-warm-600 underline underline-offset-4 transition hover:bg-warm-50 hover:text-warm-500"
+                    class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-warm-600 underline underline-offset-4 transition hover:bg-warm-50 hover:text-warm-500 dark:text-zinc-400 dark:hover:bg-zinc-950 dark:hover:text-zinc-400"
                 >
                     <x-heroicon-o-squares-plus class="mr-1 inline size-4" />
                     備用教室

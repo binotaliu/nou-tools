@@ -4,7 +4,7 @@
             {{ $greetingText }}，歡迎回來！
         </heading>
 
-        <p class="text-warm-500">
+        <p class="text-warm-500 dark:text-zinc-400">
             今天是 {{ $dateString }}，{{ $semesterInfo }}
         </p>
     </div>

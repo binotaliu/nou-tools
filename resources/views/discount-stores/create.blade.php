@@ -7,8 +7,10 @@
         class="mx-auto max-w-3xl space-y-6"
     >
         <div class="space-y-2">
-            <h2 class="text-3xl font-bold text-warm-900">新增優惠店家</h2>
-            <p class="text-sm text-warm-600">
+            <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+                新增優惠店家
+            </h2>
+            <p class="text-sm text-warm-600 dark:text-zinc-400">
                 填寫下方表單來送出新的學生優惠店家。送出後需經管理員審核才會顯示在前台。
             </p>
         </div>
@@ -22,14 +24,16 @@
                 @csrf
 
                 <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-warm-900">
+                    <h3
+                        class="text-lg font-semibold text-warm-900 dark:text-zinc-100"
+                    >
                         基本資料
                     </h3>
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div>
                             <label
                                 for="name"
-                                class="mb-1 block text-sm font-medium text-warm-700"
+                                class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                             >
                                 店家名稱
                                 <span class="text-red-500">*</span>
@@ -39,7 +43,7 @@
                                 id="name"
                                 name="name"
                                 value="{{ old('name') }}"
-                                class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300"
+                                class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                                 placeholder="店家名稱或網站名稱"
                             />
                             @error('name')
@@ -52,7 +56,7 @@
                         <div>
                             <label
                                 for="type"
-                                class="mb-1 block text-sm font-medium text-warm-700"
+                                class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                             >
                                 類型
                                 <span class="text-red-500">*</span>
@@ -83,7 +87,7 @@
                         <div>
                             <label
                                 for="category_id"
-                                class="mb-1 block text-sm font-medium text-warm-700"
+                                class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                             >
                                 分類
                                 <span class="text-red-500">*</span>
@@ -109,14 +113,16 @@
                 </div>
 
                 <div x-show="type && type !== 'online'" class="space-y-4">
-                    <h3 class="text-lg font-semibold text-warm-900">
+                    <h3
+                        class="text-lg font-semibold text-warm-900 dark:text-zinc-100"
+                    >
                         地點資訊
                     </h3>
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div>
                             <label
                                 for="city"
-                                class="mb-1 block text-sm font-medium text-warm-700"
+                                class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                             >
                                 縣市
                                 <span
@@ -152,7 +158,7 @@
                         <div>
                             <label
                                 for="district"
-                                class="mb-1 block text-sm font-medium text-warm-700"
+                                class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                             >
                                 鄉鎮市區
                                 <span
@@ -190,7 +196,7 @@
                 <div>
                     <label
                         for="address"
-                        class="mb-1 block text-sm font-medium text-warm-700"
+                        class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                         x-text="type === 'online' ? '網址' : '詳細地址'"
                     ></label>
                     <input
@@ -198,7 +204,7 @@
                         id="address"
                         name="address"
                         value="{{ old('address') }}"
-                        class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300"
+                        class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                         :placeholder="type === 'online' ? 'https://...' : '詳細地址'"
                     />
                     @error('address')
@@ -207,13 +213,15 @@
                 </div>
 
                 <div class="space-y-4">
-                    <h3 class="text-lg font-semibold text-warm-900">
+                    <h3
+                        class="text-lg font-semibold text-warm-900 dark:text-zinc-100"
+                    >
                         優惠資訊
                     </h3>
                     <div>
                         <label
                             for="verification_method"
-                            class="mb-1 block text-sm font-medium text-warm-700"
+                            class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                         >
                             驗證方式
                         </label>
@@ -222,7 +230,7 @@
                             id="verification_method"
                             name="verification_method"
                             value="{{ old('verification_method') }}"
-                            class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300"
+                            class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                             placeholder="例如：學生信箱、學生證、學生證+選課卡"
                         />
                         @error('verification_method')
@@ -235,7 +243,7 @@
                     <div>
                         <label
                             for="discount_details"
-                            class="mb-1 block text-sm font-medium text-warm-700"
+                            class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                         >
                             優惠內容
                             <span class="text-red-500">*</span>
@@ -244,7 +252,7 @@
                             id="discount_details"
                             name="discount_details"
                             rows="3"
-                            class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300"
+                            class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                             placeholder="描述詳細的優惠內容..."
                         >
 {{ old('discount_details') }}</textarea
@@ -259,7 +267,7 @@
                     <div>
                         <label
                             for="notes"
-                            class="mb-1 block text-sm font-medium text-warm-700"
+                            class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
                         >
                             備註
                         </label>
@@ -267,7 +275,7 @@
                             id="notes"
                             name="notes"
                             rows="2"
-                            class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300"
+                            class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                             placeholder="其他補充說明（選填）"
                         >
 {{ old('notes') }}</textarea

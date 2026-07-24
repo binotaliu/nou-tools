@@ -46,7 +46,7 @@
             <x-table-row>
                 <x-table-head-column
                     scope="row"
-                    class="font-semibold text-warm-900"
+                    class="font-semibold text-warm-900 dark:text-zinc-100"
                 >
                     {{ $item->courseClass->course->name }}
                 </x-table-head-column>
@@ -59,7 +59,9 @@
                     @if ($nextSchedule)
                         {!! str_replace(' ', '&nbsp;', e(Date::parse($nextSchedule->date)->isoFormat('M/D (dd)'))) !!}
                     @else
-                        <span class="text-sm text-warm-500">無未來課程</span>
+                        <span class="text-sm text-warm-500 dark:text-zinc-400">
+                            無未來課程
+                        </span>
                     @endif
                 </x-table-column>
 
@@ -68,7 +70,7 @@
                         {{ $displayStartTime }}&nbsp;~ {{ $displayEndTime }}
                         @if ($nextSchedule && $nextSchedule->start_time)
                             <x-heroicon-o-exclamation-triangle
-                                class="size-4 text-warm-500"
+                                class="size-4 text-warm-500 dark:text-zinc-400"
                                 title="該次課程時間與一般時間不同"
                                 aria-hidden="true"
                             />
@@ -77,7 +79,9 @@
                             </span>
                         @endif
                     @else
-                        <span class="text-sm text-warm-400">未設定</span>
+                        <span class="text-sm text-warm-400 dark:text-zinc-500">
+                            未設定
+                        </span>
                     @endif
                 </x-table-column>
 
@@ -113,7 +117,7 @@
                 <x-table-column class="print:hidden">
                     <a
                         href="{{ route('course.show', $item->courseClass->course) }}"
-                        class="mr-3 inline-flex items-center gap-1 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline"
+                        class="mr-3 inline-flex items-center gap-1 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
                         aria-label="{{ $item->courseClass->course->name }} 的課程資訊"
                     >
                         <x-heroicon-o-information-circle
@@ -128,7 +132,7 @@
                             href="{{ $item->courseClass->link }}"
                             target="_blank"
                             rel="noopener"
-                            class="inline-flex items-center gap-1 font-semibold text-warm-500 underline underline-offset-4 hover:text-warm-400 hover:no-underline"
+                            class="inline-flex items-center gap-1 font-semibold text-warm-500 underline underline-offset-4 hover:text-warm-400 hover:no-underline dark:text-zinc-400 dark:hover:text-zinc-500"
                             aria-label="前往 {{ $item->courseClass->course->name }} 的視訊上課連結"
                         >
                             <x-heroicon-o-video-camera
@@ -144,7 +148,7 @@
                             href="{{ $item->courseClass->backup_classroom_url }}"
                             target="_blank"
                             rel="noopener"
-                            class="inline-flex items-center gap-1 font-semibold text-warm-700 underline underline-offset-4 hover:text-warm-900 hover:no-underline"
+                            class="inline-flex items-center gap-1 font-semibold text-warm-700 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-300 dark:hover:text-zinc-100"
                             aria-label="前往 {{ $item->courseClass->course->name }} 的備用教室連結"
                         >
                             <x-heroicon-o-squares-plus
@@ -160,7 +164,7 @@
             <x-table-row>
                 <x-table-column
                     colspan="6"
-                    class="px-4 py-6 text-center text-warm-600"
+                    class="px-4 py-6 text-center text-warm-600 dark:text-zinc-400"
                 >
                     沒有課程。
                     <a

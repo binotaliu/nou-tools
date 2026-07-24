@@ -25,16 +25,20 @@
         role="dialog"
         aria-modal="true"
         @click.outside="{{ $name }} = false"
-        {{ $attributes->merge(['class' => "relative w-full {$maxWidth} max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-lg bg-white p-6 shadow-lg sm:max-h-[calc(100vh-2rem)]"]) }}
+        {{ $attributes->merge(['class' => "relative w-full {$maxWidth} max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-lg bg-white dark:bg-zinc-900 p-6 shadow-lg sm:max-h-[calc(100vh-2rem)]"]) }}
     >
         @if ($title)
-            <h3 class="mb-2 text-lg font-semibold text-warm-900">
+            <h3
+                class="mb-2 text-lg font-semibold text-warm-900 dark:text-zinc-100"
+            >
                 {{ $title }}
             </h3>
         @endif
 
         @if ($description)
-            <p class="mb-4 text-sm text-warm-600">{{ $description }}</p>
+            <p class="mb-4 text-sm text-warm-600 dark:text-zinc-400">
+                {{ $description }}
+            </p>
         @endif
 
         {{ $slot }}

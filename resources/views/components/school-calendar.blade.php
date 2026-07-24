@@ -12,15 +12,17 @@
                     ])
                 >
                     <div
-                        class="mb-4 rounded-lg border border-warm-200 bg-warm-50 p-4"
+                        class="mb-4 rounded-lg border border-warm-200 bg-warm-50 p-4 dark:border-zinc-700 dark:bg-zinc-950"
                     >
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="font-semibold text-warm-800">
+                                <div
+                                    class="font-semibold text-warm-800 dark:text-zinc-200"
+                                >
                                     {{ $countdownEvent['name'] }}
                                 </div>
                                 <p
-                                    class="mt-1 text-sm text-warm-600 tabular-nums"
+                                    class="mt-1 text-sm text-warm-600 tabular-nums dark:text-zinc-400"
                                 >
                                     {{ $countdownEvent['start']->format('Y 年 n 月 j 日') }}
                                     @if ($countdownEvent['start']->format('Y-m-d') !== $countdownEvent['end']->format('Y-m-d'))
@@ -38,11 +40,13 @@
                                     </div>
                                 @else
                                     <div
-                                        class="text-3xl font-bold text-warm-700"
+                                        class="text-3xl font-bold text-warm-700 dark:text-zinc-300"
                                     >
                                         {{ $countdownEvent['daysUntil'] }}
                                     </div>
-                                    <div class="text-sm text-warm-500">
+                                    <div
+                                        class="text-sm text-warm-500 dark:text-zinc-400"
+                                    >
                                         天後
                                     </div>
                                 @endif
@@ -79,16 +83,18 @@
 
                             <div
                                 @class([
-                                    'flex-col-reverse items-start justify-between gap-x-2 gap-y-1 border-b border-warm-100 py-2 last:border-0 sm:flex-row sm:items-center',
+                                    'flex-col-reverse items-start justify-between gap-x-2 gap-y-1 border-b border-warm-100 py-2 last:border-0 sm:flex-row sm:items-center dark:border-zinc-800',
                                     'hidden print:flex' => $isCountdownMatch,
                                     'flex' => ! $isCountdownMatch,
                                 ])
                             >
-                                <span class="font-medium text-warm-800">
+                                <span
+                                    class="font-medium text-warm-800 dark:text-zinc-200"
+                                >
                                     {{ $event['name'] }}
                                 </span>
                                 <div
-                                    class="flex flex-col-reverse items-start gap-x-2 text-sm text-warm-600 tabular-nums sm:flex-row sm:items-center"
+                                    class="flex flex-col-reverse items-start gap-x-2 text-sm text-warm-600 tabular-nums sm:flex-row sm:items-center dark:text-zinc-400"
                                 >
                                     @if ($event['status'] === 'ongoing')
                                         <span

@@ -24,6 +24,20 @@
 <!DOCTYPE html>
 <html lang="zh-hant">
     <head>
+        {{-- Anti-flash-of-wrong-theme: must run synchronously before any CSS/paint --}}
+        <script>
+            ;(() => {
+                const stored = localStorage.getItem('theme') || 'system'
+                const prefersDark = window.matchMedia(
+                    '(prefers-color-scheme: dark)'
+                ).matches
+                const isDark =
+                    stored === 'dark' || (stored === 'system' && prefersDark)
+
+                document.documentElement.classList.toggle('dark', isDark)
+            })()
+        </script>
+
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="noindex, nofollow" />
@@ -63,6 +77,12 @@
                 --color-warm-600: oklch(0.65 0.15 35);
                 --color-warm-700: oklch(0.55 0.13 35);
                 --color-warm-900: oklch(0.35 0.08 35);
+                --color-zinc-100: oklch(0.967 0.001 286.375);
+                --color-zinc-300: oklch(0.871 0.006 286.286);
+                --color-zinc-400: oklch(0.705 0.015 286.067);
+                --color-zinc-700: oklch(0.37 0.013 285.805);
+                --color-zinc-900: oklch(0.21 0.006 285.885);
+                --color-zinc-950: oklch(0.141 0.005 285.823);
               }
             }
             @layer base {
@@ -420,6 +440,32 @@
                 display: none!important;
               }
             }
+            /* Manually authored dark-mode overrides (this page is a static,
+               pre-built CSS snapshot, not processed by the Tailwind CLI, so
+               `dark:` utilities are hand-rolled here instead of generated). */
+            .dark .dark\:border-zinc-700 {
+              border-color: var(--color-zinc-700);
+            }
+            .dark .dark\:bg-zinc-900 {
+              background-color: var(--color-zinc-900);
+            }
+            .dark .dark\:bg-zinc-950 {
+              background-color: var(--color-zinc-950);
+            }
+            .dark .dark\:text-zinc-300 {
+              color: var(--color-zinc-300);
+            }
+            .dark .dark\:text-zinc-400 {
+              color: var(--color-zinc-400);
+            }
+            .dark .dark\:text-zinc-100 {
+              color: var(--color-zinc-100);
+            }
+            .dark .dark\:hover\:bg-zinc-950:hover {
+              @media (hover: hover) {
+                background-color: var(--color-zinc-950);
+              }
+            }
             @property --tw-border-style {
               syntax: "*";
               inherits: false;
@@ -439,14 +485,16 @@
             }
         </style>
     </head>
-    <body class="bg-warm-50 text-warm-900">
-        <header class="sticky top-0 z-40 border-b border-warm-200 bg-white">
+    <body class="bg-warm-50 text-warm-900 dark:bg-zinc-950 dark:text-zinc-100">
+        <header
+            class="sticky top-0 z-40 border-b border-warm-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+        >
             <div class="mx-auto max-w-7xl px-3 py-2 md:px-6 md:py-4">
                 <h1
-                    class="inline-flex items-center gap-2 text-lg font-bold text-warm-700 md:gap-4 md:text-2xl"
+                    class="inline-flex items-center gap-2 text-lg font-bold text-warm-700 md:gap-4 md:text-2xl dark:text-zinc-300"
                 >
                     <x-heroicon-o-book-open
-                        class="size-5 shrink-0 text-warm-700 md:size-6"
+                        class="size-5 shrink-0 text-warm-700 md:size-6 dark:text-zinc-300"
                     />
                     <a href="{{ url('/') }}" class="shrink-0">NOU 小幫手</a>
                 </h1>
@@ -456,20 +504,24 @@
         <main class="mx-auto max-w-7xl px-6 py-8">
             <div class="flex min-h-[60vh] items-center justify-center">
                 <div class="w-full max-w-md">
-                    <div class="rounded-lg border border-warm-200 bg-white p-8">
+                    <div
+                        class="rounded-lg border border-warm-200 bg-white p-8 dark:border-zinc-700 dark:bg-zinc-900"
+                    >
                         <div class="mb-6 text-center">
-                            <h2 class="mb-2 text-4xl font-bold text-warm-600">
+                            <h2
+                                class="mb-2 text-4xl font-bold text-warm-600 dark:text-zinc-400"
+                            >
                                 @yield('code')
                             </h2>
                             <p
-                                class="mb-4 text-2xl font-semibold text-warm-900"
+                                class="mb-4 text-2xl font-semibold text-warm-900 dark:text-zinc-100"
                             >
                                 @yield('message')
                             </p>
-                            <p class="text-warm-900">
+                            <p class="text-warm-900 dark:text-zinc-100">
                                 抱歉，發生了一些問題。如果問題持續，請
                                 <a
-                                    class="text-warm-600 underline hover:no-underline"
+                                    class="text-warm-600 underline hover:no-underline dark:text-zinc-400"
                                     href="{{ $mailtoLink }}"
                                 >
                                     點擊此連結寫信聯絡網站作者
@@ -481,7 +533,7 @@
                         <div class="flex gap-3">
                             <button
                                 onclick="history.back()"
-                                class="flex-1 rounded-md border border-warm-200 px-4 py-2 text-center font-medium text-warm-700 transition-colors hover:bg-warm-50"
+                                class="flex-1 rounded-md border border-warm-200 px-4 py-2 text-center font-medium text-warm-700 transition-colors hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                             >
                                 回到上一頁
                             </button>
