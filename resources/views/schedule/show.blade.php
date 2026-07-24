@@ -462,7 +462,10 @@
 
         {{-- Announcements --}}
         @if ($viewModel->displayOptions['show_announcements'])
-            <x-announcements-widget :schedule="$schedule" class="mb-8" />
+            <x-announcements-widget
+                :schedule="$schedule"
+                class="mb-8 print:hidden"
+            />
         @endif
 
         {{-- Share Section --}}
