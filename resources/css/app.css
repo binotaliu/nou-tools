@@ -1,7 +1,13 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark {
+  @media not print {
+    &:where(.dark, .dark *) {
+      @slot;
+    }
+  }
+}
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -35,6 +41,12 @@
 
   html.dark {
     color-scheme: dark;
+  }
+
+  @media print {
+    html {
+      color-scheme: light;
+    }
   }
 
   @media (prefers-contrast: more) {
