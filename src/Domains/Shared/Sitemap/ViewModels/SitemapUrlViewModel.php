@@ -1,10 +1,11 @@
 <?php
 
-namespace NouTools\Domains\Sitemap\ViewModels;
+namespace NouTools\Domains\Shared\Sitemap\ViewModels;
 
 use Carbon\CarbonInterface;
+use Spatie\LaravelData\Data;
 
-final readonly class SitemapUrlViewModel
+final class SitemapUrlViewModel extends Data
 {
     public function __construct(
         public string $url,

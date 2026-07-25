@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use NouTools\Domains\SchoolCalendar\Actions\GetCurrentSchoolCalendar;
-use NouTools\Domains\SchoolCalendar\ViewModels\SchoolCalendarEventViewModel;
+use NouTools\Domains\Shared\SchoolCalendar\Actions\GetCurrentSchoolCalendar;
+use NouTools\Domains\Shared\SchoolCalendar\ViewModels\SchoolCalendarEventViewModel;
 use Spatie\LaravelData\DataCollection;
 
 final class SchoolCalendarController extends Controller

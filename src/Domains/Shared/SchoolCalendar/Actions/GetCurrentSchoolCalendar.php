@@ -1,8 +1,8 @@
 <?php
 
-namespace NouTools\Domains\SchoolCalendar\Actions;
+namespace NouTools\Domains\Shared\SchoolCalendar\Actions;
 
-use NouTools\Domains\SchoolCalendar\ViewModels\SchoolCalendarEventViewModel;
+use NouTools\Domains\Shared\SchoolCalendar\ViewModels\SchoolCalendarEventViewModel;
 use Spatie\LaravelData\DataCollection;
 
 /**

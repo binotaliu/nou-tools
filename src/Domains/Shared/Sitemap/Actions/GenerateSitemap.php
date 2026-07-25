@@ -1,13 +1,13 @@
 <?php
 
-namespace NouTools\Domains\Sitemap\Actions;
+namespace NouTools\Domains\Shared\Sitemap\Actions;
 
 use App\Enums\ArticleType;
 use App\Models\Course;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use NouTools\Domains\Articles\Actions\ShowArticlePage;
-use NouTools\Domains\Sitemap\ViewModels\SitemapUrlViewModel;
+use NouTools\Domains\Shared\Sitemap\ViewModels\SitemapUrlViewModel;
 
 final readonly class GenerateSitemap
 {

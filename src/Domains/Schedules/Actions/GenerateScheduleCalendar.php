@@ -8,7 +8,7 @@ use App\Models\StudentSchedule;
 use Carbon\Carbon;
 use DateTimeInterface;
 use NouTools\Domains\Schedules\ViewModels\ScheduleCustomizationPageViewModel;
-use NouTools\Domains\SchoolCalendar\Actions\GetCurrentSchoolCalendar;
+use NouTools\Domains\Shared\SchoolCalendar\Actions\GetCurrentSchoolCalendar;
 
 final readonly class GenerateScheduleCalendar
 {

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Response;
-use NouTools\Domains\Sitemap\Actions\GenerateSitemap;
+use NouTools\Domains\Shared\Sitemap\Actions\GenerateSitemap;
 
 class SitemapController extends Controller
 {

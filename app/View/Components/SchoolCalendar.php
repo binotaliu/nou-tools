@@ -4,7 +4,7 @@ namespace App\View\Components;
 
 use Illuminate\View\Component;
 use Illuminate\View\View;
-use NouTools\Domains\SchoolCalendar\Actions\ListUpcomingSchoolEvents;
+use NouTools\Domains\Shared\SchoolCalendar\Actions\ListUpcomingSchoolEvents;
 
 class SchoolCalendar extends Component
 {

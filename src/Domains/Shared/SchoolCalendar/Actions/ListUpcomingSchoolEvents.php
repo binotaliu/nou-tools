@@ -1,6 +1,6 @@
 <?php
 
-namespace NouTools\Domains\SchoolCalendar\Actions;
+namespace NouTools\Domains\Shared\SchoolCalendar\Actions;
 
 use Carbon\Carbon;
 
