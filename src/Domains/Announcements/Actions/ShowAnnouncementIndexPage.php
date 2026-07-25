@@ -5,7 +5,7 @@ namespace NouTools\Domains\Announcements\Actions;
 use App\Models\Announcement;
 use Illuminate\Support\Collection;
 use NouTools\Domains\Announcements\DataTransferObjects\ShowAnnouncementIndexPageData;
-use NouTools\Domains\Announcements\ViewModels\AnnouncementIndexPageViewModel;
+use NouTools\Domains\Announcements\PageData\AnnouncementIndexPageData;
 use NouTools\Domains\Announcements\ViewModels\SourceCategorySelectionViewModel;
 use Spatie\LaravelData\DataCollection;
 
@@ -16,7 +16,7 @@ final readonly class ShowAnnouncementIndexPage
         private FilterAnnouncementsBySourceCategories $filterAnnouncementsBySourceCategories,
     ) {}
 
-    public function __invoke(ShowAnnouncementIndexPageData $input): AnnouncementIndexPageViewModel
+    public function __invoke(ShowAnnouncementIndexPageData $input): AnnouncementIndexPageData
     {
         $configuredSourceCategories = ($this->listAnnouncementSourceCategories)();
         $availableSources = $configuredSourceCategories->keys()->sort()->values();
@@ -31,7 +31,7 @@ final readonly class ShowAnnouncementIndexPage
             ->paginate(30)
             ->withQueryString();
 
-        return new AnnouncementIndexPageViewModel(
+        return new AnnouncementIndexPageData(
             announcements: $announcements,
             availableSources: $availableSources,
             availableCategories: $availableCategories,

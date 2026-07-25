@@ -9,11 +9,11 @@ use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\FrontMatter\FrontMatterExtension;
 use League\CommonMark\MarkdownConverter;
-use NouTools\Domains\Articles\ViewModels\ArticleIndexPageViewModel;
+use NouTools\Domains\Articles\PageData\ArticleIndexPageData;
 
 final class ShowArticleIndexPage
 {
-    public function __invoke(ArticleType $type): ?ArticleIndexPageViewModel
+    public function __invoke(ArticleType $type): ?ArticleIndexPageData
     {
         $path = resource_path("articles/{$type->directory()}/_index.md");
 
@@ -23,7 +23,7 @@ final class ShowArticleIndexPage
 
         $content = new HtmlString($this->buildConverter()->convert(File::get($path))->getContent());
 
-        return new ArticleIndexPageViewModel(
+        return new ArticleIndexPageData(
             type: $type,
             indexContent: $content,
         );

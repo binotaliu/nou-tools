@@ -5,19 +5,19 @@ namespace NouTools\Domains\Schedules\Actions;
 use App\Models\StudentSchedule;
 use Illuminate\Support\Facades\DB;
 use NouTools\Domains\Schedules\DataTransferObjects\ScheduleCalendarSettingsUpsertData;
+use NouTools\Domains\Schedules\PageData\ScheduleCustomizationPageData;
 use NouTools\Domains\Schedules\ViewModels\ScheduleCalendarSettingsViewModel;
-use NouTools\Domains\Schedules\ViewModels\ScheduleCustomizationPageViewModel;
 
 final class UpdateScheduleCalendarSettings
 {
     public function __invoke(StudentSchedule $schedule, ScheduleCalendarSettingsUpsertData $input): StudentSchedule
     {
         return DB::transaction(function () use ($schedule, $input) {
-            $displayOptions = ScheduleCustomizationPageViewModel::normalizeDisplayOptions(
+            $displayOptions = ScheduleCustomizationPageData::normalizeDisplayOptions(
                 is_array($schedule->display_options) ? $schedule->display_options : null,
             )->toArray();
 
-            $calendarSettings = ScheduleCustomizationPageViewModel::normalizeCalendarSettings([
+            $calendarSettings = ScheduleCustomizationPageData::normalizeCalendarSettings([
                 'include_school_calendar' => $input->includeSchoolCalendar,
                 'include_exams' => $input->includeExams,
                 'class_reminders_enabled' => $input->classRemindersEnabled,
@@ -29,7 +29,7 @@ final class UpdateScheduleCalendarSettings
                     includeSchoolCalendar: $calendarSettings->includeSchoolCalendar,
                     includeExams: $calendarSettings->includeExams,
                     classRemindersEnabled: $calendarSettings->classRemindersEnabled,
-                    reminderOffsets: ScheduleCustomizationPageViewModel::defaultCalendarSettings()->reminderOffsets,
+                    reminderOffsets: ScheduleCustomizationPageData::defaultCalendarSettings()->reminderOffsets,
                 );
             }
 

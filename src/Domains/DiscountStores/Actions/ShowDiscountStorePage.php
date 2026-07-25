@@ -6,8 +6,8 @@ use App\Enums\DiscountStoreStatus;
 use App\Models\DiscountStore;
 use App\Models\DiscountStoreCategory;
 use NouTools\Domains\DiscountStores\DataTransferObjects\ShowDiscountStorePageData;
+use NouTools\Domains\DiscountStores\PageData\DiscountStoreIndexPageData;
 use NouTools\Domains\DiscountStores\ViewModels\DiscountStoreCategoryViewModel;
-use NouTools\Domains\DiscountStores\ViewModels\DiscountStoreIndexPageViewModel;
 use NouTools\Domains\DiscountStores\ViewModels\DiscountStoreViewModel;
 use Spatie\LaravelData\DataCollection;
 
@@ -17,7 +17,7 @@ final readonly class ShowDiscountStorePage
         private LoadTaiwanRegions $loadTaiwanRegions,
     ) {}
 
-    public function __invoke(ShowDiscountStorePageData $input): DiscountStoreIndexPageViewModel
+    public function __invoke(ShowDiscountStorePageData $input): DiscountStoreIndexPageData
     {
         $stores = DiscountStore::query()
             ->where('status', DiscountStoreStatus::Online)
@@ -59,7 +59,7 @@ final readonly class ShowDiscountStorePage
             ->pluck('name')
             ->values();
 
-        return new DiscountStoreIndexPageViewModel(
+        return new DiscountStoreIndexPageData(
             stores: DiscountStoreViewModel::collect(
                 $stores->map(fn (DiscountStore $store) => DiscountStoreViewModel::fromModel($store)),
                 DataCollection::class,

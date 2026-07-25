@@ -5,8 +5,8 @@ namespace NouTools\Domains\Schedules\Actions;
 use App\Models\Course;
 use App\Models\StudentSchedule;
 use Illuminate\Http\Request;
+use NouTools\Domains\Schedules\PageData\ScheduleEditorPageData;
 use NouTools\Domains\Schedules\ViewModels\ScheduleEditorCourseViewModel;
-use NouTools\Domains\Schedules\ViewModels\ScheduleEditorPageViewModel;
 use Spatie\LaravelData\DataCollection;
 
 final readonly class BuildScheduleEditorPage
@@ -15,7 +15,7 @@ final readonly class BuildScheduleEditorPage
         private ReadStudentScheduleCookie $readStudentScheduleCookie,
     ) {}
 
-    public function __invoke(Request $request, ?StudentSchedule $schedule = null): ScheduleEditorPageViewModel
+    public function __invoke(Request $request, ?StudentSchedule $schedule = null): ScheduleEditorPageData
     {
         if ($schedule) {
             $schedule->load(['items.courseClass.course']);
@@ -41,7 +41,7 @@ final readonly class BuildScheduleEditorPage
             $previousSchedule = ($this->readStudentScheduleCookie)($request);
         }
 
-        return new ScheduleEditorPageViewModel(
+        return new ScheduleEditorPageData(
             courses: $courses,
             currentSemester: $currentSemester,
             schedule: $schedule,

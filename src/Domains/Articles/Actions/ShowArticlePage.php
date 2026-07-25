@@ -11,12 +11,12 @@ use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\FrontMatter\FrontMatterExtension;
 use League\CommonMark\Extension\FrontMatter\Output\RenderedContentWithFrontMatter;
 use League\CommonMark\MarkdownConverter;
-use NouTools\Domains\Articles\ViewModels\ArticleShowPageViewModel;
+use NouTools\Domains\Articles\PageData\ArticleShowPageData;
 use NouTools\Domains\Articles\ViewModels\ArticleViewModel;
 
 final class ShowArticlePage
 {
-    public function __invoke(ArticleType $type, string $slug): ?ArticleShowPageViewModel
+    public function __invoke(ArticleType $type, string $slug): ?ArticleShowPageData
     {
         if (! $this->isValidSlug($slug)) {
             return null;
@@ -38,7 +38,7 @@ final class ShowArticlePage
         $frontMatter = $result->getFrontMatter();
         $sidebarPath = resource_path("articles/{$type->directory()}/_sidebar.md");
 
-        return new ArticleShowPageViewModel(
+        return new ArticleShowPageData(
             article: new ArticleViewModel(
                 slug: $slug,
                 type: $type,

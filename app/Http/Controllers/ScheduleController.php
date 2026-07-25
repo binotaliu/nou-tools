@@ -22,7 +22,7 @@ use NouTools\Domains\Schedules\DataTransferObjects\AnnouncementPreferencesUpsert
 use NouTools\Domains\Schedules\DataTransferObjects\ScheduleCalendarSettingsUpsertData;
 use NouTools\Domains\Schedules\DataTransferObjects\ScheduleCustomizationUpsertData;
 use NouTools\Domains\Schedules\DataTransferObjects\StudentScheduleUpsertData;
-use NouTools\Domains\Schedules\ViewModels\ScheduleCustomizationPageViewModel;
+use NouTools\Domains\Schedules\PageData\ScheduleCustomizationPageData;
 
 class ScheduleController extends Controller
 {
@@ -131,7 +131,7 @@ class ScheduleController extends Controller
     {
         $schedule = $updateScheduleCalendarSettings($schedule, $input);
 
-        $calendarSettings = ScheduleCustomizationPageViewModel::normalizeCalendarSettings(
+        $calendarSettings = ScheduleCustomizationPageData::normalizeCalendarSettings(
             is_array($schedule->display_options['calendar_settings'] ?? null) ? $schedule->display_options['calendar_settings'] : null,
         );
 

@@ -1,13 +1,16 @@
 <?php
 
-namespace NouTools\Domains\Schedules\ViewModels;
+namespace NouTools\Domains\Schedules\PageData;
 
 use App\Models\StudentSchedule;
+use NouTools\Domains\Schedules\ViewModels\ScheduleCalendarSettingsViewModel;
+use NouTools\Domains\Schedules\ViewModels\ScheduleCustomLinkViewModel;
+use NouTools\Domains\Schedules\ViewModels\ScheduleDisplayOptionsViewModel;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Resource;
 
-final class ScheduleCustomizationPageViewModel extends Data
+final class ScheduleCustomizationPageData extends Resource
 {
     /** @var array<int, int> */
     public const REMINDER_OFFSET_OPTIONS = [5, 10, 15, 30, 60, 120, 180, 1440];

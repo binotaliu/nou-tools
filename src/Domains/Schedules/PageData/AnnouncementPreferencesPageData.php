@@ -1,15 +1,17 @@
 <?php
 
-namespace NouTools\Domains\Schedules\ViewModels;
+namespace NouTools\Domains\Schedules\PageData;
 
 use App\Enums\AnnouncementSourceGroup;
 use App\Models\StudentSchedule;
 use Illuminate\Support\Collection;
+use NouTools\Domains\Schedules\ViewModels\AnnouncementSourceGroupViewModel;
+use NouTools\Domains\Schedules\ViewModels\AnnouncementSourceViewModel;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Resource;
 
-final class AnnouncementPreferencesPageViewModel extends Data
+final class AnnouncementPreferencesPageData extends Resource
 {
     public function __construct(
         public StudentSchedule $schedule,

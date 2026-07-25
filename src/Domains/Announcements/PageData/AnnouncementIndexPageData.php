@@ -1,14 +1,15 @@
 <?php
 
-namespace NouTools\Domains\Announcements\ViewModels;
+namespace NouTools\Domains\Announcements\PageData;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use NouTools\Domains\Announcements\ViewModels\SourceCategorySelectionViewModel;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Resource;
 
-final class AnnouncementIndexPageViewModel extends Data
+final class AnnouncementIndexPageData extends Resource
 {
     /**
      * @param  Collection<int, string>  $availableSources

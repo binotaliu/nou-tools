@@ -4,8 +4,8 @@ use App\Enums\ArticleType;
 use Illuminate\Support\Facades\File;
 use NouTools\Domains\Articles\Actions\ShowArticleIndexPage;
 use NouTools\Domains\Articles\Actions\ShowArticlePage;
-use NouTools\Domains\Articles\ViewModels\ArticleIndexPageViewModel;
-use NouTools\Domains\Articles\ViewModels\ArticleShowPageViewModel;
+use NouTools\Domains\Articles\PageData\ArticleIndexPageData;
+use NouTools\Domains\Articles\PageData\ArticleShowPageData;
 use NouTools\Domains\Articles\ViewModels\ArticleViewModel;
 
 beforeEach(function () {
@@ -45,7 +45,7 @@ test('can get an article from markdown file', function () {
     $page = ($this->showArticlePage)($type, $slug);
 
     expect($page)
-        ->toBeInstanceOf(ArticleShowPageViewModel::class)
+        ->toBeInstanceOf(ArticleShowPageData::class)
         ->and($page->article)->toBeInstanceOf(ArticleViewModel::class)
         ->and($page->article->title)->toBe('My Test Article')
         ->and($page->article->author)->toBe('Test Author')
@@ -149,7 +149,7 @@ test('can get index content', function () {
     $indexContent = ($this->showArticleIndexPage)($type);
 
     expect($indexContent)
-        ->toBeInstanceOf(ArticleIndexPageViewModel::class)
+        ->toBeInstanceOf(ArticleIndexPageData::class)
         ->and((string) $indexContent->indexContent)
         ->toContain('<h1>操作手冊</h1>')
         ->toContain('歡迎使用 NOU 小幫手');
@@ -188,7 +188,7 @@ MD;
     $sidebarContent = ($this->showArticlePage)($type, 'foo');
 
     expect($sidebarContent)
-        ->toBeInstanceOf(ArticleShowPageViewModel::class)
+        ->toBeInstanceOf(ArticleShowPageData::class)
         ->and((string) $sidebarContent->sidebarContent)
         ->toContain('<h2>文章列表</h2>')
         ->toContain('歡迎使用 NOU 小幫手');
@@ -214,7 +214,7 @@ MD;
     $sidebar = ($this->showArticlePage)($type, 'foo');
 
     expect($sidebar)
-        ->toBeInstanceOf(ArticleShowPageViewModel::class)
+        ->toBeInstanceOf(ArticleShowPageData::class)
         ->and($sidebar->sidebarContent)->toBeNull();
 });
 

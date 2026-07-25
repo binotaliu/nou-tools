@@ -1,13 +1,14 @@
 <?php
 
-namespace NouTools\Domains\Home\ViewModels;
+namespace NouTools\Domains\Home\PageData;
 
+use NouTools\Domains\Home\ViewModels\HomeCourseViewModel;
 use NouTools\Domains\Schedules\ViewModels\StudentScheduleCookieViewModel;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Resource;
 
-final class HomePageViewModel extends Data
+final class HomePageData extends Resource
 {
     public function __construct(
         public string $selectedDate,

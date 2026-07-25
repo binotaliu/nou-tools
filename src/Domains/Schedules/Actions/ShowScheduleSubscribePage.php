@@ -3,12 +3,12 @@
 namespace NouTools\Domains\Schedules\Actions;
 
 use App\Models\StudentSchedule;
-use NouTools\Domains\Schedules\ViewModels\ScheduleSubscribePageViewModel;
+use NouTools\Domains\Schedules\PageData\ScheduleSubscribePageData;
 
 final class ShowScheduleSubscribePage
 {
-    public function __invoke(StudentSchedule $schedule): ScheduleSubscribePageViewModel
+    public function __invoke(StudentSchedule $schedule): ScheduleSubscribePageData
     {
-        return ScheduleSubscribePageViewModel::fromModel($schedule);
+        return ScheduleSubscribePageData::fromModel($schedule);
     }
 }

@@ -1,12 +1,12 @@
 <?php
 
-namespace NouTools\Domains\Articles\ViewModels;
+namespace NouTools\Domains\Articles\PageData;
 
 use App\Enums\ArticleType;
 use Illuminate\Support\HtmlString;
-use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Resource;
 
-final class ArticleIndexPageViewModel extends Data
+final class ArticleIndexPageData extends Resource
 {
     public function __construct(
         public ArticleType $type,

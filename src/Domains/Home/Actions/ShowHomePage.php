@@ -6,8 +6,8 @@ use App\Models\Course;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use NouTools\Domains\Home\DataTransferObjects\ShowHomePageData;
+use NouTools\Domains\Home\PageData\HomePageData;
 use NouTools\Domains\Home\ViewModels\HomeCourseViewModel;
-use NouTools\Domains\Home\ViewModels\HomePageViewModel;
 use NouTools\Domains\Schedules\Actions\ReadStudentScheduleCookie;
 use Spatie\LaravelData\DataCollection;
 
@@ -17,7 +17,7 @@ final readonly class ShowHomePage
         private ReadStudentScheduleCookie $readStudentScheduleCookie,
     ) {}
 
-    public function __invoke(ShowHomePageData $input, Request $request): HomePageViewModel
+    public function __invoke(ShowHomePageData $input, Request $request): HomePageData
     {
         $selectedDate = $this->resolveSelectedDate($input->date);
 
@@ -33,7 +33,7 @@ final readonly class ShowHomePage
             })
             ->get();
 
-        return new HomePageViewModel(
+        return new HomePageData(
             selectedDate: $selectedDate,
             courses: HomeCourseViewModel::collect(
                 $courses->map(fn (Course $course) => HomeCourseViewModel::fromModel($course)),

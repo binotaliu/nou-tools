@@ -10,7 +10,7 @@ use Illuminate\View\View;
 use NouTools\Domains\Announcements\Actions\GroupAnnouncementSourceCategories;
 use NouTools\Domains\Announcements\Actions\ListAnnouncementSourceCategories;
 use NouTools\Domains\Announcements\Actions\ListLatestAnnouncementsForSourceCategories;
-use NouTools\Domains\Schedules\ViewModels\AnnouncementPreferencesPageViewModel;
+use NouTools\Domains\Schedules\PageData\AnnouncementPreferencesPageData;
 
 class AnnouncementsWidget extends Component
 {
@@ -32,7 +32,7 @@ class AnnouncementsWidget extends Component
     ) {
         $this->schedule = $schedule;
 
-        $selectedSourceCategories = AnnouncementPreferencesPageViewModel::normalizeSelectedSourceCategories(
+        $selectedSourceCategories = AnnouncementPreferencesPageData::normalizeSelectedSourceCategories(
             $schedule->announcement_categories,
             $listAnnouncementSourceCategories(),
             $groupAnnouncementSourceCategories(),

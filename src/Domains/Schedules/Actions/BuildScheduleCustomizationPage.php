@@ -3,16 +3,16 @@
 namespace NouTools\Domains\Schedules\Actions;
 
 use App\Models\StudentSchedule;
-use NouTools\Domains\Schedules\ViewModels\ScheduleCustomizationPageViewModel;
+use NouTools\Domains\Schedules\PageData\ScheduleCustomizationPageData;
 
 final class BuildScheduleCustomizationPage
 {
-    public function __invoke(StudentSchedule $schedule): ScheduleCustomizationPageViewModel
+    public function __invoke(StudentSchedule $schedule): ScheduleCustomizationPageData
     {
-        return new ScheduleCustomizationPageViewModel(
+        return new ScheduleCustomizationPageData(
             schedule: $schedule,
-            displayOptions: ScheduleCustomizationPageViewModel::normalizeDisplayOptions($schedule->display_options),
-            customLinks: ScheduleCustomizationPageViewModel::normalizeCustomLinks($schedule->custom_links),
+            displayOptions: ScheduleCustomizationPageData::normalizeDisplayOptions($schedule->display_options),
+            customLinks: ScheduleCustomizationPageData::normalizeCustomLinks($schedule->custom_links),
         );
     }
 }

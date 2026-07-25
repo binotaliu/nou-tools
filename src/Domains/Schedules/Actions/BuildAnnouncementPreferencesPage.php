@@ -5,7 +5,7 @@ namespace NouTools\Domains\Schedules\Actions;
 use App\Models\StudentSchedule;
 use NouTools\Domains\Announcements\Actions\GroupAnnouncementSourceCategories;
 use NouTools\Domains\Announcements\Actions\ListAnnouncementSourceCategories;
-use NouTools\Domains\Schedules\ViewModels\AnnouncementPreferencesPageViewModel;
+use NouTools\Domains\Schedules\PageData\AnnouncementPreferencesPageData;
 
 final readonly class BuildAnnouncementPreferencesPage
 {
@@ -14,17 +14,17 @@ final readonly class BuildAnnouncementPreferencesPage
         private GroupAnnouncementSourceCategories $groupAnnouncementSourceCategories,
     ) {}
 
-    public function __invoke(StudentSchedule $schedule): AnnouncementPreferencesPageViewModel
+    public function __invoke(StudentSchedule $schedule): AnnouncementPreferencesPageData
     {
         $flatCatalog = ($this->listAnnouncementSourceCategories)();
         $groupedCatalog = ($this->groupAnnouncementSourceCategories)();
 
-        $selectedSourceCategories = AnnouncementPreferencesPageViewModel::normalizeSelectedSourceCategories(
+        $selectedSourceCategories = AnnouncementPreferencesPageData::normalizeSelectedSourceCategories(
             $schedule->announcement_categories,
             $flatCatalog,
             $groupedCatalog,
         );
 
-        return AnnouncementPreferencesPageViewModel::fromCatalog($schedule, $groupedCatalog, $selectedSourceCategories);
+        return AnnouncementPreferencesPageData::fromCatalog($schedule, $groupedCatalog, $selectedSourceCategories);
     }
 }

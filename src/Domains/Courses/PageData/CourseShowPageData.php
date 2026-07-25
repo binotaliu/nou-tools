@@ -1,13 +1,13 @@
 <?php
 
-namespace NouTools\Domains\Courses\ViewModels;
+namespace NouTools\Domains\Courses\PageData;
 
 use App\Models\Course;
 use NouTools\Domains\Courses\ViewModels\Api\CourseDetailViewModel;
 use NouTools\Domains\Schedules\ViewModels\StudentScheduleCookieViewModel;
-use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Resource;
 
-final class CourseShowPageViewModel extends Data
+final class CourseShowPageData extends Resource
 {
     public function __construct(
         public CourseDetailViewModel $course,

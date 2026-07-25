@@ -4,6 +4,7 @@ namespace NouTools\Domains\Schedules\ViewModels;
 
 use App\Models\StudentSchedule;
 use Illuminate\Support\Carbon;
+use NouTools\Domains\Schedules\PageData\ScheduleCustomizationPageData;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -42,11 +43,11 @@ final class ScheduleViewModel extends Data
             name: $schedule->name,
             selectedTerm: $selectedTerm,
             availableTerms: $availableTerms,
-            displayOptions: ScheduleCustomizationPageViewModel::normalizeDisplayOptions($schedule->display_options),
-            calendarSettings: ScheduleCustomizationPageViewModel::normalizeCalendarSettings(
+            displayOptions: ScheduleCustomizationPageData::normalizeDisplayOptions($schedule->display_options),
+            calendarSettings: ScheduleCustomizationPageData::normalizeCalendarSettings(
                 is_array($schedule->display_options['calendar_settings'] ?? null) ? $schedule->display_options['calendar_settings'] : null,
             ),
-            customLinks: ScheduleCustomizationPageViewModel::normalizeCustomLinks($schedule->custom_links),
+            customLinks: ScheduleCustomizationPageData::normalizeCustomLinks($schedule->custom_links),
             items: StudentScheduleItemViewModel::collect(
                 $schedule->items->map(fn ($item) => StudentScheduleItemViewModel::fromModel($item)),
                 DataCollection::class,

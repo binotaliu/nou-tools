@@ -1,13 +1,15 @@
 <?php
 
-namespace NouTools\Domains\DiscountStores\ViewModels;
+namespace NouTools\Domains\DiscountStores\PageData;
 
 use Illuminate\Support\Collection;
+use NouTools\Domains\DiscountStores\ViewModels\DiscountStoreCategoryViewModel;
+use NouTools\Domains\DiscountStores\ViewModels\DiscountStoreViewModel;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
-use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
+use Spatie\LaravelData\Resource;
 
-final class DiscountStoreIndexPageViewModel extends Data
+final class DiscountStoreIndexPageData extends Resource
 {
     /**
      * @param  Collection<int, string>  $cities

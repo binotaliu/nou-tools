@@ -7,7 +7,7 @@ use App\Models\CourseClass;
 use App\Models\StudentSchedule;
 use Carbon\Carbon;
 use DateTimeInterface;
-use NouTools\Domains\Schedules\ViewModels\ScheduleCustomizationPageViewModel;
+use NouTools\Domains\Schedules\PageData\ScheduleCustomizationPageData;
 use NouTools\Domains\Shared\SchoolCalendar\Actions\GetCurrentSchoolCalendar;
 
 final readonly class GenerateScheduleCalendar
@@ -20,7 +20,7 @@ final readonly class GenerateScheduleCalendar
     {
         $schedule->load(['items.courseClass.schedules', 'items.courseClass.course']);
 
-        $calendarSettings = ScheduleCustomizationPageViewModel::normalizeCalendarSettings(
+        $calendarSettings = ScheduleCustomizationPageData::normalizeCalendarSettings(
             is_array($schedule->display_options['calendar_settings'] ?? null) ? $schedule->display_options['calendar_settings'] : null,
         );
 
