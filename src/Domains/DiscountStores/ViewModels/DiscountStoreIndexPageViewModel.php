@@ -2,18 +2,21 @@
 
 namespace NouTools\Domains\DiscountStores\ViewModels;
 
-use App\Models\DiscountStoreCategory;
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 
-final readonly class DiscountStoreIndexPageViewModel
+final class DiscountStoreIndexPageViewModel extends Data
 {
     /**
-     * @param  Collection<int, DiscountStoreCategory>  $categories
      * @param  Collection<int, string>  $cities
      */
     public function __construct(
-        public Collection $stores,
-        public Collection $categories,
+        #[DataCollectionOf(DiscountStoreViewModel::class)]
+        public DataCollection $stores,
+        #[DataCollectionOf(DiscountStoreCategoryViewModel::class)]
+        public DataCollection $categories,
         public Collection $cities,
         public ?int $selectedCategoryId,
         public ?string $selectedType,

@@ -1,10 +1,10 @@
 <x-layout title="優惠店家 - NOU 小幫手" description="學生優惠店家列表。">
     @php
-        $discountStoreFrontEndData = $stores->map(
+        $discountStoreFrontEndData = $stores->toCollection()->map(
             fn ($store) => [
                 'id' => $store->id,
                 'name' => $store->name,
-                'categoryId' => $store->category_id,
+                'categoryId' => $store->categoryId,
                 'type' => $store->type->value,
                 'typeLabel' => $store->type->label(),
                 'city' => $store->city,
@@ -209,7 +209,7 @@
                                         class="truncate text-xl font-semibold text-warm-900 dark:text-zinc-100"
                                     >
                                         <a
-                                            href="{{ route('discount-stores.show', $store) }}"
+                                            href="{{ route('discount-stores.show', $store->id) }}"
                                             class="hover:underline"
                                         >
                                             {{ $store->name }}
@@ -220,17 +220,17 @@
                                         class="line-clamp-2 text-sm text-warm-600 dark:text-zinc-400"
                                     >
                                         <a
-                                            href="{{ route('discount-stores.show', $store) }}"
+                                            href="{{ route('discount-stores.show', $store->id) }}"
                                             class="hover:underline"
                                         >
-                                            {{ $store->discount_details }}
+                                            {{ $store->discountDetails }}
                                         </a>
                                     </p>
                                 </div>
 
                                 <x-link-button
                                     class="hidden! md:inline-flex!"
-                                    :href="route('discount-stores.show', $store)"
+                                    :href="route('discount-stores.show', $store->id)"
                                     variant="secondary"
                                 >
                                     <x-heroicon-o-eye class="size-4" />
@@ -240,7 +240,7 @@
                         </div>
 
                         <div class="mb-4 md:mb-0">
-                            @if ($store->latestReport === null)
+                            @if ($store->latestReportIsValid === null)
                                 <span
                                     class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800 dark:bg-zinc-800 dark:text-zinc-300"
                                 >
@@ -249,16 +249,16 @@
                                     />
                                     尚無回報
                                 </span>
-                            @elseif ($store->latestReport->is_valid)
+                            @elseif ($store->latestReportIsValid)
                                 <span
                                     class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800 dark:bg-green-950/60 dark:text-green-300"
                                 >
                                     <x-heroicon-o-check-circle class="size-4" />
                                     有效 –
                                     <span
-                                        title="{{ $store->latestReport->created_at->format('Y-m-d H:i') }}"
+                                        title="{{ $store->latestReportCreatedAtDateTime }}"
                                     >
-                                        {{ $store->latestReport->created_at->format('Y/m/d') }}
+                                        {{ $store->latestReportCreatedAtDate }}
                                     </span>
                                 </span>
                             @else
@@ -273,7 +273,7 @@
 
                         <x-link-button
                             class="flex! md:hidden!"
-                            :href="route('discount-stores.show', $store)"
+                            :href="route('discount-stores.show', $store->id)"
                             variant="secondary"
                         >
                             <x-heroicon-o-eye class="size-4" />

@@ -6,7 +6,10 @@ use App\Enums\DiscountStoreStatus;
 use App\Models\DiscountStore;
 use App\Models\DiscountStoreCategory;
 use NouTools\Domains\DiscountStores\DataTransferObjects\ShowDiscountStorePageData;
+use NouTools\Domains\DiscountStores\ViewModels\DiscountStoreCategoryViewModel;
 use NouTools\Domains\DiscountStores\ViewModels\DiscountStoreIndexPageViewModel;
+use NouTools\Domains\DiscountStores\ViewModels\DiscountStoreViewModel;
+use Spatie\LaravelData\DataCollection;
 
 final readonly class ShowDiscountStorePage
 {
@@ -57,8 +60,14 @@ final readonly class ShowDiscountStorePage
             ->values();
 
         return new DiscountStoreIndexPageViewModel(
-            stores: $stores,
-            categories: $categories,
+            stores: DiscountStoreViewModel::collect(
+                $stores->map(fn (DiscountStore $store) => DiscountStoreViewModel::fromModel($store)),
+                DataCollection::class,
+            ),
+            categories: DiscountStoreCategoryViewModel::collect(
+                $categories->map(fn (DiscountStoreCategory $category) => DiscountStoreCategoryViewModel::fromModel($category)),
+                DataCollection::class,
+            ),
             cities: $cities,
             selectedCategoryId: $input->categoryId,
             selectedType: $input->type,

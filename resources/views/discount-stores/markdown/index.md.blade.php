@@ -14,17 +14,17 @@
   @if ($store->address)
 - 地址：{{ $store->address }}
   @endif
-- 優惠內容：{{ $store->discount_details }}
-  @if ($store->verification_method)
-- 驗證方式：{{ $store->verification_method }}
+- 優惠內容：{{ $store->discountDetails }}
+  @if ($store->verificationMethod)
+- 驗證方式：{{ $store->verificationMethod }}
   @endif
-  @if ($store->latestReport === null)
+  @if ($store->latestReportIsValid === null)
 - 有效性：尚無回報
-  @elseif ($store->latestReport->is_valid)
-- 有效性：有效（{{ $store->latestReport->created_at->format('Y/m/d') }}）
+  @elseif ($store->latestReportIsValid)
+- 有效性：有效（{{ $store->latestReportCreatedAtDate }}）
   @else
 - 有效性：此優惠似乎無法使用
   @endif
-- 詳情頁面：{{ route('discount-stores.show', $store) }}（Markdown 版本：{{ route('discount-stores.show.md', $store) }}）
+- 詳情頁面：{{ route('discount-stores.show', $store->id) }}（Markdown 版本：{{ route('discount-stores.show.md', $store->id) }}）
 
 @endforeach
