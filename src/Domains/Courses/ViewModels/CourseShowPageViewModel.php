@@ -3,14 +3,28 @@
 namespace NouTools\Domains\Courses\ViewModels;
 
 use App\Models\Course;
-use Illuminate\Support\Collection;
+use NouTools\Domains\Courses\ViewModels\Api\CourseDetailViewModel;
 use NouTools\Domains\Schedules\ViewModels\StudentScheduleCookieViewModel;
+use Spatie\LaravelData\Data;
 
-final readonly class CourseShowPageViewModel
+final class CourseShowPageViewModel extends Data
 {
     public function __construct(
-        public Course $course,
+        public CourseDetailViewModel $course,
+        public ?string $inPersonClassType,
+        public ?string $media,
+        public ?string $multimediaUrl,
         public ?StudentScheduleCookieViewModel $previousSchedule,
-        public Collection $previousExams,
     ) {}
+
+    public static function fromModel(Course $course, CourseDetailViewModel $courseDetail, ?StudentScheduleCookieViewModel $previousSchedule): self
+    {
+        return new self(
+            course: $courseDetail,
+            inPersonClassType: $course->in_person_class_type,
+            media: $course->media,
+            multimediaUrl: $course->multimedia_url,
+            previousSchedule: $previousSchedule,
+        );
+    }
 }

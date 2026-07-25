@@ -1,5 +1,4 @@
 @php
-use App\Enums\CourseClassType;
 use Illuminate\Support\Str;
 @endphp
 
@@ -15,8 +14,8 @@ use Illuminate\Support\Str;
 | 項目 | 內容 |
 | ---- | ---- |
 
-@if ($course->credit_type)
-| 必/選修 | {{ $course->credit_type }} |
+@if ($course->creditType)
+| 必/選修 | {{ $course->creditType }} |
 @endif
 @if ($course->credits)
 | 學分 | {{ $course->credits }} 學分 |
@@ -24,37 +23,37 @@ use Illuminate\Support\Str;
 @if ($course->department)
 | 學系 | {{ $course->department }} |
 @endif
-@if ($course->in_person_class_type)
-| 面授類別 | {{ $course->in_person_class_type }} |
+@if ($inPersonClassType)
+| 面授類別 | {{ $inPersonClassType }} |
 @endif
-@if ($course->media)
-| 媒體 | {{ $course->media }} |
+@if ($media)
+| 媒體 | {{ $media }} |
 @endif
 @if ($course->nature)
 | 課程性質 | {{ $course->nature }} |
 @endif
-@if ($course->description_url)
-| 科目內容 | [檢視詳細內容]({{ $course->description_url }}) |
+@if ($course->descriptionUrl)
+| 科目內容 | [檢視詳細內容]({{ $course->descriptionUrl }}) |
 @endif
-@if ($course->multimedia_url)
-| 多媒體簡介 | [檢視簡介]({{ $course->multimedia_url }}) |
+@if ($multimediaUrl)
+| 多媒體簡介 | [檢視簡介]({{ $multimediaUrl }}) |
 @endif
 
-@if ($course->midterm_date || $course->final_date || $course->exam_time_start || $course->exam_time_end)
+@if ($course->midtermDate || $course->finalDate || $course->examTimeStart || $course->examTimeEnd)
 
 ## 考試資訊
 
-@if ($course->midterm_date)
+@if ($course->midtermDate)
 
-- 期中考：{{ Date::parse($course->midterm_date)->isoFormat('M/D (dd)') }}
-  @if ($course->exam_time_start || $course->exam_time_end)
-  {{ $course->exam_time_start ?? '' }}{{ $course->exam_time_start && $course->exam_time_end ? ' - ' : '' }}{{ $course->exam_time_end ?? '' }}
+- 期中考：{{ Date::parse($course->midtermDate)->isoFormat('M/D (dd)') }}
+  @if ($course->examTimeStart || $course->examTimeEnd)
+  {{ $course->examTimeStart ?? '' }}{{ $course->examTimeStart && $course->examTimeEnd ? ' - ' : '' }}{{ $course->examTimeEnd ?? '' }}
 @endif
 @endif
-@if ($course->final_date)
-- 期末考：{{ Date::parse($course->final_date)->isoFormat('M/D (dd)') }}
-  @if ($course->exam_time_start || $course->exam_time_end)
-  {{ $course->exam_time_start ?? '' }}{{ $course->exam_time_start && $course->exam_time_end ? ' - ' : '' }}{{ $course->exam_time_end ?? '' }}
+@if ($course->finalDate)
+- 期末考：{{ Date::parse($course->finalDate)->isoFormat('M/D (dd)') }}
+  @if ($course->examTimeStart || $course->examTimeEnd)
+  {{ $course->examTimeStart ?? '' }}{{ $course->examTimeStart && $course->examTimeEnd ? ' - ' : '' }}{{ $course->examTimeEnd ?? '' }}
   @endif
   @endif
   @endif
@@ -63,22 +62,22 @@ use Illuminate\Support\Str;
 
 ## 教科書資訊
 
-| 項目 | 內容                                |
-| ---- | ----------------------------------- |
-| 書名 | {{ $course->textbook->book_title }} |
+| 項目 | 內容                               |
+| ---- | ---------------------------------- |
+| 書名 | {{ $course->textbook->bookTitle }} |
 
 @if ($course->textbook->edition)
 | 版本 | {{ $course->textbook->edition }} |
 @endif
-@if ($course->textbook->price_info)
-| 價格 | {{ $course->textbook->price_info }} |
+@if ($course->textbook->priceInfo)
+| 價格 | {{ $course->textbook->priceInfo }} |
 @endif
-@if ($course->textbook->reference_url)
-| 參考連結 | [開啟]({{ $course->textbook->reference_url }}) |
+@if ($course->textbook->referenceUrl)
+| 參考連結 | [開啟]({{ $course->textbook->referenceUrl }}) |
 @endif
 @endif
 
-@if ($course->classes->isNotEmpty())
+@if ($course->classes->count() > 0)
 
 ## 視訊面授班級與上課時間
 
@@ -86,38 +85,38 @@ use Illuminate\Support\Str;
 | -------- | ---- | ---- | -------- | -------- | ------------ |
 
 @foreach ($course->classes as $class)
-| {{ $class->code }} | {{ $class->type instanceof CourseClassType ? $class->type->label() : $class->type }} | {{ $class->teacher_name ?: '未提供' }} | @if ($class->start_time){{ $class->start_time }} - {{ $class->end_time }}@else 未提供 @endif | {{ $class->link ?: '未提供' }} | {{ $class->backup_classroom_url ?: '未提供' }} |
+| {{ $class->code }} | {{ $class->typeLabel }} | {{ $class->teacherName ?: '未提供' }} | @if ($class->startTime){{ $class->startTime }} - {{ $class->endTime }}@else 未提供 @endif | {{ $class->link ?: '未提供' }} | {{ $class->backupClassroomUrl ?: '未提供' }} |
 @endforeach
 
 @foreach ($course->classes as $class)
-@if ($class->schedules->isNotEmpty())
+@if ($class->sessions->count() > 0)
 
 ### {{ $class->code }} 視訊面授日期
 
-@foreach ($class->schedules->sortBy('date') as $schedule)
+@foreach ($class->sessions->toCollection()->sortBy('date') as $session)
 
-- {{ Date::parse($schedule->date)->isoFormat('M/D (dd)') }}@if ($schedule->start_time || $schedule->end_time) {{ $schedule->start_time }} - {{ $schedule->end_time }}@endif
+- {{ Date::parse($session->date)->isoFormat('M/D (dd)') }}@if ($session->startTime || $session->endTime) {{ $session->startTime }} - {{ $session->endTime }}@endif
   @endforeach
 
 @endif
 @endforeach
 @endif
 
-@if ($previousExams->isNotEmpty())
+@if ($previousSchedule && $course->previousExams->count() > 0)
 
 ## 考古題
 
 | 學期 | 期中考正參 | 期中考副參 | 期末考正參 | 期末考副參 |
 | ---- | ---------- | ---------- | ---------- | ---------- |
 
-@foreach ($previousExams as $exam)
-| {{ $exam->term ?? '-' }} | {{ $exam->midterm_reference_primary ?: '-' }} | {{ $exam->midterm_reference_secondary ?: '-' }} | {{ $exam->final_reference_primary ?: '-' }} | {{ $exam->final_reference_secondary ?: '-' }} |
+@foreach ($course->previousExams as $exam)
+| {{ $exam->term ?? '-' }} | {{ $exam->midtermReferencePrimary ?: '-' }} | {{ $exam->midtermReferenceSecondary ?: '-' }} | {{ $exam->finalReferencePrimary ?: '-' }} | {{ $exam->finalReferenceSecondary ?: '-' }} |
 @endforeach
 @endif
 
 ## 連結
 
-- [完整檢視]({{ route('course.show', $course) }}): 以網頁方式完整檢視課程
+- [完整檢視]({{ route('course.show', $course->id) }}): 以網頁方式完整檢視課程
 
 ## 備註
 

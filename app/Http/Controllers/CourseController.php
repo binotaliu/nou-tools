@@ -15,8 +15,10 @@ class CourseController extends Controller
 
         return view('course.show', [
             'course' => $page->course,
+            'inPersonClassType' => $page->inPersonClassType,
+            'media' => $page->media,
+            'multimediaUrl' => $page->multimediaUrl,
             'previousSchedule' => $page->previousSchedule,
-            'previousExams' => $page->previousExams,
         ]);
     }
 }

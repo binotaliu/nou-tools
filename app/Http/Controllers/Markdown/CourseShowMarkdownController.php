@@ -17,8 +17,10 @@ class CourseShowMarkdownController extends Controller
         return response()
             ->view('course.markdown.show', [
                 'course' => $page->course,
+                'inPersonClassType' => $page->inPersonClassType,
+                'media' => $page->media,
+                'multimediaUrl' => $page->multimediaUrl,
                 'previousSchedule' => $page->previousSchedule,
-                'previousExams' => $page->previousExams,
             ])
             ->header('Content-Type', 'text/markdown; charset=utf-8');
     }

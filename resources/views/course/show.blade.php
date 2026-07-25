@@ -26,7 +26,7 @@
         <x-card class="mb-6" title="課程資訊">
             <dl class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {{-- 科目內容 --}}
-                @if ($course->description_url)
+                @if ($course->descriptionUrl)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -35,7 +35,7 @@
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
                             <x-link-button
-                                :href="$course->description_url"
+                                :href="$course->descriptionUrl"
                                 variant="link"
                                 target="_blank"
                                 rel="noopener"
@@ -52,7 +52,7 @@
                 @endif
 
                 {{-- 必/選修 --}}
-                @if ($course->credit_type)
+                @if ($course->creditType)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -60,7 +60,7 @@
                             必/選修
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            {{ $course->credit_type }}
+                            {{ $course->creditType }}
                         </dd>
                     </div>
                 @endif
@@ -122,7 +122,7 @@
                 @endif
 
                 {{-- 面授類別 --}}
-                @if ($course->in_person_class_type)
+                @if ($inPersonClassType)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -130,13 +130,13 @@
                             面授類別
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            {{ $course->in_person_class_type }}
+                            {{ $inPersonClassType }}
                         </dd>
                     </div>
                 @endif
 
                 {{-- 媒體 --}}
-                @if ($course->media)
+                @if ($media)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -144,13 +144,13 @@
                             媒體
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            {{ $course->media }}
+                            {{ $media }}
                         </dd>
                     </div>
                 @endif
 
                 {{-- 多媒體簡介 --}}
-                @if ($course->multimedia_url)
+                @if ($multimediaUrl)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -159,7 +159,7 @@
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
                             <x-link-button
-                                :href="$course->multimedia_url"
+                                :href="$multimediaUrl"
                                 variant="link"
                                 target="_blank"
                                 rel="noopener"
@@ -187,7 +187,7 @@
                     </div>
                 @endif
 
-                @if ($course->midterm_date || $course->final_date || $course->exam_time_start || $course->exam_time_end)
+                @if ($course->midtermDate || $course->finalDate || $course->examTimeStart || $course->examTimeEnd)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -195,26 +195,26 @@
                             考試資訊
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            @if ($course->midterm_date)
+                            @if ($course->midtermDate)
                                 <div class="mb-2">
                                     <div class="font-semibold">期中考</div>
                                     <div
                                         class="flex items-center justify-start gap-x-2 text-sm text-warm-700 tabular-nums dark:text-zinc-300"
                                     >
                                         <div>
-                                            {{ Date::parse($course->midterm_date)->isoFormat('M/D (dd)') }}
+                                            {{ Date::parse($course->midtermDate)->isoFormat('M/D (dd)') }}
                                         </div>
 
-                                        @if ($course->exam_time_start || $course->exam_time_end)
+                                        @if ($course->examTimeStart || $course->examTimeEnd)
                                             <div
                                                 class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
                                             >
-                                                @if ($course->exam_time_start && $course->exam_time_end)
-                                                    {{ $course->exam_time_start }}
+                                                @if ($course->examTimeStart && $course->examTimeEnd)
+                                                    {{ $course->examTimeStart }}
                                                     -
-                                                    {{ $course->exam_time_end }}
+                                                    {{ $course->examTimeEnd }}
                                                 @else
-                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                                    {{ $course->examTimeStart ?? $course->examTimeEnd }}
                                                 @endif
                                             </div>
                                         @endif
@@ -222,26 +222,26 @@
                                 </div>
                             @endif
 
-                            @if ($course->final_date)
+                            @if ($course->finalDate)
                                 <div>
                                     <div class="font-semibold">期末考</div>
                                     <div
                                         class="flex items-center justify-start gap-x-2 text-sm text-warm-700 tabular-nums dark:text-zinc-300"
                                     >
                                         <div>
-                                            {{ Date::parse($course->final_date)->isoFormat('M/D (dd)') }}
+                                            {{ Date::parse($course->finalDate)->isoFormat('M/D (dd)') }}
                                         </div>
 
-                                        @if ($course->exam_time_start || $course->exam_time_end)
+                                        @if ($course->examTimeStart || $course->examTimeEnd)
                                             <div
                                                 class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
                                             >
-                                                @if ($course->exam_time_start && $course->exam_time_end)
-                                                    {{ $course->exam_time_start }}
+                                                @if ($course->examTimeStart && $course->examTimeEnd)
+                                                    {{ $course->examTimeStart }}
                                                     -
-                                                    {{ $course->exam_time_end }}
+                                                    {{ $course->examTimeEnd }}
                                                 @else
-                                                    {{ $course->exam_time_start ?? $course->exam_time_end }}
+                                                    {{ $course->examTimeStart ?? $course->examTimeEnd }}
                                                 @endif
                                             </div>
                                         @endif
@@ -268,7 +268,7 @@
                             書名
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            {{ $course->textbook->book_title }}
+                            {{ $course->textbook->bookTitle }}
                         </dd>
                     </div>
 
@@ -285,7 +285,7 @@
                         </div>
                     @endif
 
-                    @if ($course->textbook->price_info && is_numeric($course->textbook->price_info))
+                    @if ($course->textbook->priceInfo && is_numeric($course->textbook->priceInfo))
                         <div>
                             <dt
                                 class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -293,10 +293,10 @@
                                 價格
                             </dt>
                             <dd class="text-warm-700 dark:text-zinc-300">
-                                ${{ number_format($course->textbook->price_info) }}
+                                ${{ number_format($course->textbook->priceInfo) }}
                             </dd>
                         </div>
-                    @else($course->textbook->price_info)
+                    @else($course->textbook->priceInfo)
                         <div>
                             <dt
                                 class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -304,12 +304,12 @@
                                 坊間教科書資訊
                             </dt>
                             <dd class="text-warm-700 dark:text-zinc-300">
-                                {{ $course->textbook->price_info }}
+                                {{ $course->textbook->priceInfo }}
                             </dd>
                         </div>
                     @endif
 
-                    @if ($course->textbook->reference_url)
+                    @if ($course->textbook->referenceUrl)
                         <div>
                             <dt
                                 class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -318,7 +318,7 @@
                             </dt>
                             <dd class="text-warm-700 dark:text-zinc-300">
                                 <x-link-button
-                                    :href="$course->textbook->reference_url"
+                                    :href="$course->textbook->referenceUrl"
                                     variant="link"
                                     target="_blank"
                                     rel="noopener"
@@ -335,11 +335,11 @@
             </x-card>
         @endif
 
-        @if ($course->classes->isNotEmpty())
+        @if ($course->classes->count() > 0)
             <x-card class="mb-6" title="視訊面授班級與上課時間">
                 @php
                     $typeOrder = ['morning', 'afternoon', 'evening', 'full_remote', 'micro_credit', 'computer_lab'];
-                    $grouped = $course->classes->groupBy(fn ($c) => $c->type->value);
+                    $grouped = $course->classes->toCollection()->groupBy(fn ($c) => $c->type->value);
                 @endphp
 
                 <div class="space-y-6">
@@ -369,12 +369,12 @@
                                                         >
                                                             {{ $class->code }}
                                                         </div>
-                                                        @if ($class->teacher_name)
+                                                        @if ($class->teacherName)
                                                             <div
                                                                 class="mt-1 truncate text-sm text-warm-700 dark:text-zinc-300"
                                                             >
                                                                 @php
-                                                                    $teacher = $class->teacher_name;
+                                                                    $teacher = $class->teacherName;
                                                                     $suffix = mb_substr($teacher, -2, null, 'UTF-8');
                                                                     $base = mb_substr($teacher, 0, mb_strlen($teacher, 'UTF-8') - 2, 'UTF-8');
                                                                 @endphp
@@ -401,18 +401,18 @@
                                                     <div
                                                         class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
                                                     >
-                                                        @if ($class->start_time)
+                                                        @if ($class->startTime)
                                                             <div>
-                                                                {{ $class->start_time }}
+                                                                {{ $class->startTime }}
                                                                 -
-                                                                {{ $class->end_time }}
+                                                                {{ $class->endTime }}
                                                             </div>
                                                         @endif
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            @if ($class->link || $class->backup_classroom_url)
+                                            @if ($class->link || $class->backupClassroomUrl)
                                                 <div
                                                     class="mb-3 flex flex-wrap gap-2"
                                                 >
@@ -430,9 +430,9 @@
                                                         </a>
                                                     @endif
 
-                                                    @if ($class->backup_classroom_url)
+                                                    @if ($class->backupClassroomUrl)
                                                         <a
-                                                            href="{{ $class->backup_classroom_url }}"
+                                                            href="{{ $class->backupClassroomUrl }}"
                                                             target="_blank"
                                                             rel="noopener"
                                                             class="inline-flex items-center gap-1 rounded-full border border-warm-200 bg-white px-3 py-1.5 text-sm font-semibold text-warm-700 transition hover:bg-warm-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900"
@@ -446,7 +446,7 @@
                                                 </div>
                                             @endif
 
-                                            @if ($class->schedules->isNotEmpty())
+                                            @if ($class->sessions->count() > 0)
                                                 <div
                                                     class="mt-2 rounded bg-white p-3 dark:bg-zinc-900"
                                                 >
@@ -456,19 +456,20 @@
                                                         視訊面授日期：
                                                     </p>
 
-                                                    {{-- 列出每一天；只有 schedule 本身有 start_time/end_time (override) 時，才在該日期旁顯示覆寫時間 --}}
+                                                    {{-- 列出每一天；只有 session 本身有 startTime/endTime (override) 時，才在該日期旁顯示覆寫時間 --}}
                                                     <div
                                                         class="space-y-1 text-sm text-warm-700 dark:text-zinc-300"
                                                     >
                                                         @php
-                                                            $schedulesByDate = $class->schedules->sortBy('date')->groupBy(function ($s) {
-                                                                return $s->date->format('Y-m-d');
-                                                            });
+                                                            $sessionsByDate = $class->sessions
+                                                                ->toCollection()
+                                                                ->sortBy('date')
+                                                                ->groupBy(fn ($s) => $s->date);
                                                         @endphp
 
-                                                        @foreach ($schedulesByDate as $dateKey => $schedules)
+                                                        @foreach ($sessionsByDate as $dateKey => $sessions)
                                                             @php
-                                                                $s = $schedules->first();
+                                                                $s = $sessions->first();
                                                                 $d = $s->date;
                                                             @endphp
 
@@ -481,18 +482,18 @@
                                                                     {{ Date::parse($d)->isoFormat('M/D (dd)') }}
                                                                 </div>
 
-                                                                @if ($s->start_time || $s->end_time)
+                                                                @if ($s->startTime || $s->endTime)
                                                                     <div
                                                                         class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
                                                                     >
-                                                                        @if ($s->start_time && $s->end_time)
-                                                                            {{ $s->start_time }}
+                                                                        @if ($s->startTime && $s->endTime)
+                                                                            {{ $s->startTime }}
                                                                             -
-                                                                            {{ $s->end_time }}
-                                                                        @elseif ($s->start_time)
-                                                                            {{ $s->start_time }}
+                                                                            {{ $s->endTime }}
+                                                                        @elseif ($s->startTime)
+                                                                            {{ $s->startTime }}
                                                                         @else
-                                                                            {{ $s->end_time }}
+                                                                            {{ $s->endTime }}
                                                                         @endif
                                                                     </div>
                                                                 @endif
@@ -518,7 +519,7 @@
         @endif
 
         {{-- Previous Exams Section (only shown when user has a schedule cookie) --}}
-        @if ($previousExams->isNotEmpty())
+        @if ($previousSchedule && $course->previousExams->count() > 0)
             <x-card
                 class="mb-6 print:hidden"
                 title="考古題"
@@ -526,7 +527,7 @@
             >
                 {{-- 手機：卡片列表 --}}
                 <div class="space-y-3 md:hidden">
-                    @foreach ($previousExams as $exam)
+                    @foreach ($course->previousExams as $exam)
                         <div
                             class="rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
                         >
@@ -543,9 +544,9 @@
                                     >
                                         期中考正參
                                     </p>
-                                    @if ($exam->midterm_reference_primary)
+                                    @if ($exam->midtermReferencePrimary)
                                         <x-link-button
-                                            href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midterm_reference_primary }}"
+                                            href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midtermReferencePrimary }}"
                                             variant="link"
                                             target="_blank"
                                             rel="noopener"
@@ -571,9 +572,9 @@
                                     >
                                         期中考副參
                                     </p>
-                                    @if ($exam->midterm_reference_secondary)
+                                    @if ($exam->midtermReferenceSecondary)
                                         <x-link-button
-                                            href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midterm_reference_secondary }}"
+                                            href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midtermReferenceSecondary }}"
                                             variant="link"
                                             target="_blank"
                                             rel="noopener"
@@ -599,9 +600,9 @@
                                     >
                                         期末考正參
                                     </p>
-                                    @if ($exam->final_reference_primary)
+                                    @if ($exam->finalReferencePrimary)
                                         <x-link-button
-                                            href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->final_reference_primary }}"
+                                            href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->finalReferencePrimary }}"
                                             variant="link"
                                             target="_blank"
                                             rel="noopener"
@@ -627,9 +628,9 @@
                                     >
                                         期末考副參
                                     </p>
-                                    @if ($exam->final_reference_secondary)
+                                    @if ($exam->finalReferenceSecondary)
                                         <x-link-button
-                                            href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->final_reference_secondary }}"
+                                            href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->finalReferenceSecondary }}"
                                             variant="link"
                                             target="_blank"
                                             rel="noopener"
@@ -677,7 +678,7 @@
                         </x-table-head>
 
                         <x-table-body>
-                            @foreach ($previousExams as $exam)
+                            @foreach ($course->previousExams as $exam)
                                 <x-table-row>
                                     <x-table-head-column
                                         scope="row"
@@ -686,9 +687,9 @@
                                         {{ $exam->term ?? '-' }}
                                     </x-table-head-column>
                                     <x-table-column class="text-center">
-                                        @if ($exam->midterm_reference_primary)
+                                        @if ($exam->midtermReferencePrimary)
                                             <x-link-button
-                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midterm_reference_primary }}"
+                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midtermReferencePrimary }}"
                                                 variant="link"
                                                 target="_blank"
                                                 rel="noopener"
@@ -704,9 +705,9 @@
                                         @endif
                                     </x-table-column>
                                     <x-table-column class="text-center">
-                                        @if ($exam->midterm_reference_secondary)
+                                        @if ($exam->midtermReferenceSecondary)
                                             <x-link-button
-                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midterm_reference_secondary }}"
+                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midtermReferenceSecondary }}"
                                                 variant="link"
                                                 target="_blank"
                                                 rel="noopener"
@@ -722,9 +723,9 @@
                                         @endif
                                     </x-table-column>
                                     <x-table-column class="text-center">
-                                        @if ($exam->final_reference_primary)
+                                        @if ($exam->finalReferencePrimary)
                                             <x-link-button
-                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->final_reference_primary }}"
+                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->finalReferencePrimary }}"
                                                 variant="link"
                                                 target="_blank"
                                                 rel="noopener"
@@ -740,9 +741,9 @@
                                         @endif
                                     </x-table-column>
                                     <x-table-column class="text-center">
-                                        @if ($exam->final_reference_secondary)
+                                        @if ($exam->finalReferenceSecondary)
                                             <x-link-button
-                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->final_reference_secondary }}"
+                                                href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->finalReferenceSecondary }}"
                                                 variant="link"
                                                 target="_blank"
                                                 rel="noopener"
