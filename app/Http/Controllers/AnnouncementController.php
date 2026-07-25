@@ -12,15 +12,8 @@ class AnnouncementController extends Controller
         ShowAnnouncementIndexPage $showAnnouncementIndexPage,
         ShowAnnouncementIndexPageData $input,
     ): View {
-        $page = $showAnnouncementIndexPage($input);
-
         return view('announcements.index', [
-            'announcements' => $page->announcements,
-            'availableSources' => $page->availableSources,
-            'availableCategories' => $page->availableCategories,
-            'sourceCategorySelections' => $page->sourceCategorySelections,
-            'selectedSources' => $page->selectedSources,
-            'totalAnnouncements' => $page->totalAnnouncements,
+            'viewModel' => $showAnnouncementIndexPage($input),
         ]);
     }
 }

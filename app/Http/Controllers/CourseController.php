@@ -11,14 +11,8 @@ class CourseController extends Controller
 {
     public function show(Course $course, Request $request, ShowCoursePage $showCoursePage): View
     {
-        $page = $showCoursePage($course, $request);
-
         return view('course.show', [
-            'course' => $page->course,
-            'inPersonClassType' => $page->inPersonClassType,
-            'media' => $page->media,
-            'multimediaUrl' => $page->multimediaUrl,
-            'previousSchedule' => $page->previousSchedule,
+            'viewModel' => $showCoursePage($course, $request),
         ]);
     }
 }

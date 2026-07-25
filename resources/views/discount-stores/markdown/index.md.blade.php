@@ -2,7 +2,7 @@
 
 > 學生優惠店家列表，歡迎回報或新增店家資訊。此區資料由 112姍姍 同學維護。
 
-@foreach ($stores as $store)
+@foreach ($viewModel->stores as $store)
 
 ## {{ $store->name }}
 

@@ -13,10 +13,8 @@ class DiscountStoreIndexMarkdownController extends Controller
         ShowDiscountStorePage $showDiscountStorePage,
         ShowDiscountStorePageData $input,
     ): Response {
-        $page = $showDiscountStorePage($input);
-
         return response()
-            ->view('discount-stores.markdown.index', ['stores' => $page->stores])
+            ->view('discount-stores.markdown.index', ['viewModel' => $showDiscountStorePage($input)])
             ->header('Content-Type', 'text/markdown; charset=utf-8');
     }
 }

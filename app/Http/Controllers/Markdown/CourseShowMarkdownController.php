@@ -12,15 +12,9 @@ class CourseShowMarkdownController extends Controller
 {
     public function __invoke(Course $course, Request $request, ShowCoursePage $showCoursePage): Response
     {
-        $page = $showCoursePage($course, $request);
-
         return response()
             ->view('course.markdown.show', [
-                'course' => $page->course,
-                'inPersonClassType' => $page->inPersonClassType,
-                'media' => $page->media,
-                'multimediaUrl' => $page->multimediaUrl,
-                'previousSchedule' => $page->previousSchedule,
+                'viewModel' => $showCoursePage($course, $request),
             ])
             ->header('Content-Type', 'text/markdown; charset=utf-8');
     }

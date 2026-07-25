@@ -26,16 +26,8 @@ class DiscountStoreController extends Controller
         ShowDiscountStorePage $showDiscountStorePage,
         ShowDiscountStorePageData $input,
     ): View {
-        $page = $showDiscountStorePage($input);
-
         return view('discount-stores.index', [
-            'stores' => $page->stores,
-            'categories' => $page->categories,
-            'cities' => $page->cities,
-            'selectedCategoryId' => $page->selectedCategoryId,
-            'selectedType' => $page->selectedType,
-            'search' => $page->search,
-            'selectedCity' => $page->selectedCity,
+            'viewModel' => $showDiscountStorePage($input),
         ]);
     }
 

@@ -15,9 +15,7 @@ class HomeController extends Controller
 
         return response()
             ->view('home', [
-                'selectedDate' => $page->selectedDate,
-                'courses' => $page->courses,
-                'previousSchedule' => $page->previousSchedule,
+                'viewModel' => $page,
             ])
             ->header('Link', implode(', ', [
                 '<'.route('docs.api.view').'>; rel="service-doc"',

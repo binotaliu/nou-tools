@@ -1,5 +1,5 @@
 <x-layout
-    :title="$article->title . ' - ' . $article->type->label() . ' - NOU 小幫手'"
+    :title="$viewModel->article->title . ' - ' . $viewModel->article->type->label() . ' - NOU 小幫手'"
 >
     <div class="mx-auto max-w-7xl">
         <div class="flex flex-col gap-6 md:flex-row">
@@ -11,14 +11,14 @@
                     <h3
                         class="mb-3 font-semibold text-warm-900 dark:text-zinc-100"
                     >
-                        {{ $article->type->label() }}
+                        {{ $viewModel->article->type->label() }}
                     </h3>
 
-                    @if ($sidebarContent)
+                    @if ($viewModel->sidebarContent)
                         <nav
                             class="prose prose-sm max-w-none prose-warm dark:prose-invert"
                         >
-                            {{ $sidebarContent }}
+                            {{ $viewModel->sidebarContent }}
                         </nav>
                     @endif
 
@@ -26,11 +26,11 @@
                         class="mt-4 border-t border-warm-200 pt-4 dark:border-zinc-700"
                     >
                         <a
-                            href="{{ route('articles.index', ['type' => $article->type->value]) }}"
+                            href="{{ route('articles.index', ['type' => $viewModel->article->type->value]) }}"
                             class="inline-flex items-center gap-1 text-sm text-warm-600 transition-colors hover:text-warm-900 dark:text-zinc-400 dark:hover:text-zinc-100"
                         >
                             <x-heroicon-o-chevron-left class="size-3" />
-                            回到{{ $article->type->label() }}首頁
+                            回到{{ $viewModel->article->type->label() }}首頁
                         </a>
                     </div>
                 </div>
@@ -48,19 +48,21 @@
                         <h1
                             class="mb-3 text-3xl font-bold text-warm-900 dark:text-zinc-100"
                         >
-                            {{ $article->title }}
+                            {{ $viewModel->article->title }}
                         </h1>
 
                         <div
                             class="flex items-center gap-4 text-sm text-warm-500 dark:text-zinc-400"
                         >
-                            <span>作者：{{ $article->author }}</span>
                             <span>
-                                發表於：{{ $article->publishedAt->format('Y 年 m 月 d 日') }}
+                                作者：{{ $viewModel->article->author }}
                             </span>
-                            @if ($article->updatedAt)
+                            <span>
+                                發表於：{{ $viewModel->article->publishedAt->format('Y 年 m 月 d 日') }}
+                            </span>
+                            @if ($viewModel->article->updatedAt)
                                 <span>
-                                    更新於：{{ $article->updatedAt->format('Y 年 m 月 d 日') }}
+                                    更新於：{{ $viewModel->article->updatedAt->format('Y 年 m 月 d 日') }}
                                 </span>
                             @endif
                         </div>
@@ -68,7 +70,7 @@
 
                     {{-- Article Content --}}
                     <div class="prose max-w-none prose-warm dark:prose-invert">
-                        {{ $article->content }}
+                        {{ $viewModel->article->content }}
                     </div>
 
                     {{-- License Footer --}}

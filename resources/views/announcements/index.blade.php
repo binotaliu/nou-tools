@@ -11,11 +11,11 @@
         </div>
 
         @php
-            $sourceCategoryTree = $sourceCategorySelections
+            $sourceCategoryTree = $viewModel->sourceCategorySelections
                 ->toCollection()
                 ->mapWithKeys(fn ($selection): array => [$selection->source => $selection->availableCategories])
                 ->all();
-            $selectedSourceCategories = $sourceCategorySelections
+            $selectedSourceCategories = $viewModel->sourceCategorySelections
                 ->toCollection()
                 ->filter(fn ($selection): bool => $selection->selectedCategories !== [])
                 ->mapWithKeys(fn ($selection): array => [$selection->source => $selection->selectedCategories])
@@ -289,7 +289,7 @@
                 @endif
 
                 <div class="space-y-4">
-                    @forelse ($announcements as $announcement)
+                    @forelse ($viewModel->announcements as $announcement)
                         <article
                             class="rounded-lg border border-warm-200 bg-white p-5 transition hover:border-warm-300 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600"
                         >
@@ -377,20 +377,22 @@
                     @endforelse
                 </div>
 
-                @if ($announcements->hasPages())
+                @if ($viewModel->announcements->hasPages())
                     <x-card class="p-4">
                         <div
                             class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
                         >
                             <p class="text-sm text-warm-600 dark:text-zinc-400">
-                                第 {{ $announcements->currentPage() }} /
-                                {{ $announcements->lastPage() }} 頁，共
-                                {{ number_format($announcements->total()) }}
+                                第
+                                {{ $viewModel->announcements->currentPage() }}
+                                / {{ $viewModel->announcements->lastPage() }}
+                                頁，共
+                                {{ number_format($viewModel->announcements->total()) }}
                                 筆結果
                             </p>
 
                             <div class="flex items-center gap-3">
-                                @if ($announcements->onFirstPage())
+                                @if ($viewModel->announcements->onFirstPage())
                                     <span
                                         class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-400 dark:border-zinc-700 dark:text-zinc-500"
                                     >
@@ -401,7 +403,7 @@
                                     </span>
                                 @else
                                     <x-link-button
-                                        :href="$announcements->previousPageUrl()"
+                                        :href="$viewModel->announcements->previousPageUrl()"
                                         variant="secondary"
                                     >
                                         <x-heroicon-o-chevron-left
@@ -411,9 +413,9 @@
                                     </x-link-button>
                                 @endif
 
-                                @if ($announcements->hasMorePages())
+                                @if ($viewModel->announcements->hasMorePages())
                                     <x-link-button
-                                        :href="$announcements->nextPageUrl()"
+                                        :href="$viewModel->announcements->nextPageUrl()"
                                         variant="secondary"
                                     >
                                         下一頁

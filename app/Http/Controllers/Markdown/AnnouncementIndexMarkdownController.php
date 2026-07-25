@@ -13,10 +13,8 @@ class AnnouncementIndexMarkdownController extends Controller
         ShowAnnouncementIndexPage $showAnnouncementIndexPage,
         ShowAnnouncementIndexPageData $input,
     ): Response {
-        $page = $showAnnouncementIndexPage($input);
-
         return response()
-            ->view('announcements.markdown.index', ['announcements' => $page->announcements])
+            ->view('announcements.markdown.index', ['viewModel' => $showAnnouncementIndexPage($input)])
             ->header('Content-Type', 'text/markdown; charset=utf-8');
     }
 }

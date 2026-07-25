@@ -25,7 +25,7 @@ class ArticleShowMarkdownController extends Controller
 
         return response()
             ->view('articles.markdown.show', [
-                'article' => $page->article,
+                'viewModel' => $page,
                 'rawContent' => $rawContent,
             ])
             ->header('Content-Type', 'text/markdown; charset=utf-8');

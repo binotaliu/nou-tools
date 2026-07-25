@@ -16,8 +16,7 @@ class ArticleController extends Controller
         abort_if($page === null, 404);
 
         return view('articles.index', [
-            'type' => $page->type,
-            'indexContent' => $page->indexContent,
+            'viewModel' => $page,
         ]);
     }
 
@@ -28,8 +27,7 @@ class ArticleController extends Controller
         abort_if($page === null, 404);
 
         return view('articles.show', [
-            'article' => $page->article,
-            'sidebarContent' => $page->sidebarContent,
+            'viewModel' => $page,
         ]);
     }
 }

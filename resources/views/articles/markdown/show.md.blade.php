@@ -1,4 +1,4 @@
-> 分類：{{ $article->type->label() }}｜作者：{{ $article->author }}｜發表於：{{ $article->publishedAt->format('Y-m-d') }}@if ($article->updatedAt)｜更新於：{{ $article->updatedAt->format('Y-m-d') }}@endif
+> 分類：{{ $viewModel->article->type->label() }}｜作者：{{ $viewModel->article->author }}｜發表於：{{ $viewModel->article->publishedAt->format('Y-m-d') }}@if ($viewModel->article->updatedAt)｜更新於：{{ $viewModel->article->updatedAt->format('Y-m-d') }}@endif
 
 {!! $rawContent !!}
 

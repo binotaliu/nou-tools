@@ -29,12 +29,12 @@
                     檢視學校公告
                 </x-link-button>
 
-                @if (isset($previousSchedule))
+                @if (isset($viewModel->previousSchedule))
                     <div
                         class="mt-3 w-full text-sm text-warm-600 dark:text-zinc-400"
                     >
                         <x-link-button
-                            :href="route('schedules.show', $previousSchedule->token)"
+                            :href="route('schedules.show', $viewModel->previousSchedule->token)"
                             variant="secondary"
                             full-width
                             class="text-center text-warm-700 dark:text-zinc-300"
@@ -44,7 +44,7 @@
                             <div
                                 class="max-w-xs truncate font-medium text-warm-800 dark:text-zinc-200"
                             >
-                                {{ $previousSchedule->name ?? '（未命名）' }}
+                                {{ $viewModel->previousSchedule->name ?? '（未命名）' }}
                             </div>
                         </x-link-button>
                     </div>
@@ -58,7 +58,10 @@
         <x-school-calendar />
 
         {{-- 今日面授 --}}
-        <x-card x-data="{ date: '{{ $selectedDate }}' }" title="今日視訊面授">
+        <x-card
+            x-data="{ date: '{{ $viewModel->selectedDate }}' }"
+            title="今日視訊面授"
+        >
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <label
@@ -79,7 +82,7 @@
             </div>
 
             @php
-                $courses = $courses->toCollection();
+                $courses = $viewModel->courses->toCollection();
             @endphp
 
             <div class="mt-4 space-y-6">

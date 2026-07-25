@@ -1,8 +1,8 @@
-<x-layout :title="$course->name . ' - 檢視課程 - NOU 小幫手'">
+<x-layout :title="$viewModel->course->name . ' - 檢視課程 - NOU 小幫手'">
     <div class="mx-auto max-w-5xl">
         <div class="mb-8">
             <x-link-button
-                :href="isset($previousSchedule) ? route('schedules.show', $previousSchedule->token) : url()->previous()"
+                :href="isset($viewModel->previousSchedule) ? route('schedules.show', $viewModel->previousSchedule->token) : url()->previous()"
                 variant="text-link"
                 class="mb-4"
             >
@@ -12,12 +12,12 @@
             <h2
                 class="mb-2 text-3xl font-bold text-warm-900 dark:text-zinc-100"
             >
-                {{ $course->name }}
+                {{ $viewModel->course->name }}
             </h2>
 
-            @if (! empty($course->term))
+            @if (! empty($viewModel->course->term))
                 <div class="mb-4 text-sm text-warm-600 dark:text-zinc-400">
-                    {{ \Illuminate\Support\Str::toSemesterDisplay($course->term) }}
+                    {{ \Illuminate\Support\Str::toSemesterDisplay($viewModel->course->term) }}
                 </div>
             @endif
         </div>
@@ -26,7 +26,7 @@
         <x-card class="mb-6" title="課程資訊">
             <dl class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {{-- 科目內容 --}}
-                @if ($course->descriptionUrl)
+                @if ($viewModel->course->descriptionUrl)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -35,7 +35,7 @@
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
                             <x-link-button
-                                :href="$course->descriptionUrl"
+                                :href="$viewModel->course->descriptionUrl"
                                 variant="link"
                                 target="_blank"
                                 rel="noopener"
@@ -52,7 +52,7 @@
                 @endif
 
                 {{-- 必/選修 --}}
-                @if ($course->creditType)
+                @if ($viewModel->course->creditType)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -60,13 +60,13 @@
                             必/選修
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            {{ $course->creditType }}
+                            {{ $viewModel->course->creditType }}
                         </dd>
                     </div>
                 @endif
 
                 {{-- 學分 --}}
-                @if ($course->credits)
+                @if ($viewModel->course->credits)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -80,7 +80,7 @@
                                     aria-hidden="true"
                                 >
                                     @php
-                                        $starCount = (int) floor($course->credits);
+                                        $starCount = (int) floor($viewModel->course->credits);
                                         $displayStars = min($starCount, 6);
                                     @endphp
 
@@ -100,7 +100,7 @@
                                 <div
                                     class="text-sm text-warm-600 dark:text-zinc-400"
                                 >
-                                    {{ $course->credits }} 學分
+                                    {{ $viewModel->course->credits }} 學分
                                 </div>
                             </div>
                         </dd>
@@ -108,7 +108,7 @@
                 @endif
 
                 {{-- 學系 --}}
-                @if ($course->department)
+                @if ($viewModel->course->department)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -116,13 +116,13 @@
                             學系
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            {{ $course->department }}
+                            {{ $viewModel->course->department }}
                         </dd>
                     </div>
                 @endif
 
                 {{-- 面授類別 --}}
-                @if ($inPersonClassType)
+                @if ($viewModel->inPersonClassType)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -130,13 +130,13 @@
                             面授類別
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            {{ $inPersonClassType }}
+                            {{ $viewModel->inPersonClassType }}
                         </dd>
                     </div>
                 @endif
 
                 {{-- 媒體 --}}
-                @if ($media)
+                @if ($viewModel->media)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -144,13 +144,13 @@
                             媒體
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            {{ $media }}
+                            {{ $viewModel->media }}
                         </dd>
                     </div>
                 @endif
 
                 {{-- 多媒體簡介 --}}
-                @if ($multimediaUrl)
+                @if ($viewModel->multimediaUrl)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -159,7 +159,7 @@
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
                             <x-link-button
-                                :href="$multimediaUrl"
+                                :href="$viewModel->multimediaUrl"
                                 variant="link"
                                 target="_blank"
                                 rel="noopener"
@@ -174,7 +174,7 @@
                 @endif
 
                 {{-- 課程性質 --}}
-                @if ($course->nature)
+                @if ($viewModel->course->nature)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -182,12 +182,12 @@
                             課程性質
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            {{ $course->nature }}
+                            {{ $viewModel->course->nature }}
                         </dd>
                     </div>
                 @endif
 
-                @if ($course->midtermDate || $course->finalDate || $course->examTimeStart || $course->examTimeEnd)
+                @if ($viewModel->course->midtermDate || $viewModel->course->finalDate || $viewModel->course->examTimeStart || $viewModel->course->examTimeEnd)
                     <div>
                         <dt
                             class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -195,26 +195,26 @@
                             考試資訊
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            @if ($course->midtermDate)
+                            @if ($viewModel->course->midtermDate)
                                 <div class="mb-2">
                                     <div class="font-semibold">期中考</div>
                                     <div
                                         class="flex items-center justify-start gap-x-2 text-sm text-warm-700 tabular-nums dark:text-zinc-300"
                                     >
                                         <div>
-                                            {{ Date::parse($course->midtermDate)->isoFormat('M/D (dd)') }}
+                                            {{ Date::parse($viewModel->course->midtermDate)->isoFormat('M/D (dd)') }}
                                         </div>
 
-                                        @if ($course->examTimeStart || $course->examTimeEnd)
+                                        @if ($viewModel->course->examTimeStart || $viewModel->course->examTimeEnd)
                                             <div
                                                 class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
                                             >
-                                                @if ($course->examTimeStart && $course->examTimeEnd)
-                                                    {{ $course->examTimeStart }}
+                                                @if ($viewModel->course->examTimeStart && $viewModel->course->examTimeEnd)
+                                                    {{ $viewModel->course->examTimeStart }}
                                                     -
-                                                    {{ $course->examTimeEnd }}
+                                                    {{ $viewModel->course->examTimeEnd }}
                                                 @else
-                                                    {{ $course->examTimeStart ?? $course->examTimeEnd }}
+                                                    {{ $viewModel->course->examTimeStart ?? $viewModel->course->examTimeEnd }}
                                                 @endif
                                             </div>
                                         @endif
@@ -222,26 +222,26 @@
                                 </div>
                             @endif
 
-                            @if ($course->finalDate)
+                            @if ($viewModel->course->finalDate)
                                 <div>
                                     <div class="font-semibold">期末考</div>
                                     <div
                                         class="flex items-center justify-start gap-x-2 text-sm text-warm-700 tabular-nums dark:text-zinc-300"
                                     >
                                         <div>
-                                            {{ Date::parse($course->finalDate)->isoFormat('M/D (dd)') }}
+                                            {{ Date::parse($viewModel->course->finalDate)->isoFormat('M/D (dd)') }}
                                         </div>
 
-                                        @if ($course->examTimeStart || $course->examTimeEnd)
+                                        @if ($viewModel->course->examTimeStart || $viewModel->course->examTimeEnd)
                                             <div
                                                 class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
                                             >
-                                                @if ($course->examTimeStart && $course->examTimeEnd)
-                                                    {{ $course->examTimeStart }}
+                                                @if ($viewModel->course->examTimeStart && $viewModel->course->examTimeEnd)
+                                                    {{ $viewModel->course->examTimeStart }}
                                                     -
-                                                    {{ $course->examTimeEnd }}
+                                                    {{ $viewModel->course->examTimeEnd }}
                                                 @else
-                                                    {{ $course->examTimeStart ?? $course->examTimeEnd }}
+                                                    {{ $viewModel->course->examTimeStart ?? $viewModel->course->examTimeEnd }}
                                                 @endif
                                             </div>
                                         @endif
@@ -256,7 +256,7 @@
 
         {{-- Course Classes --}}
         {{-- 教科書資訊 --}}
-        @if ($course->textbook !== null)
+        @if ($viewModel->course->textbook !== null)
             <x-card class="mb-6" title="教科書資訊">
                 <dl
                     class="grid grid-cols-1 gap-6 text-warm-700 md:grid-cols-2 dark:text-zinc-300"
@@ -268,11 +268,11 @@
                             書名
                         </dt>
                         <dd class="text-warm-700 dark:text-zinc-300">
-                            {{ $course->textbook->bookTitle }}
+                            {{ $viewModel->course->textbook->bookTitle }}
                         </dd>
                     </div>
 
-                    @if ($course->textbook->edition)
+                    @if ($viewModel->course->textbook->edition)
                         <div>
                             <dt
                                 class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -280,12 +280,12 @@
                                 版本
                             </dt>
                             <dd class="text-warm-700 dark:text-zinc-300">
-                                {{ $course->textbook->edition }}
+                                {{ $viewModel->course->textbook->edition }}
                             </dd>
                         </div>
                     @endif
 
-                    @if ($course->textbook->priceInfo && is_numeric($course->textbook->priceInfo))
+                    @if ($viewModel->course->textbook->priceInfo && is_numeric($viewModel->course->textbook->priceInfo))
                         <div>
                             <dt
                                 class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -293,10 +293,10 @@
                                 價格
                             </dt>
                             <dd class="text-warm-700 dark:text-zinc-300">
-                                ${{ number_format($course->textbook->priceInfo) }}
+                                ${{ number_format($viewModel->course->textbook->priceInfo) }}
                             </dd>
                         </div>
-                    @else($course->textbook->priceInfo)
+                    @else($viewModel->course->textbook->priceInfo)
                         <div>
                             <dt
                                 class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -304,12 +304,12 @@
                                 坊間教科書資訊
                             </dt>
                             <dd class="text-warm-700 dark:text-zinc-300">
-                                {{ $course->textbook->priceInfo }}
+                                {{ $viewModel->course->textbook->priceInfo }}
                             </dd>
                         </div>
                     @endif
 
-                    @if ($course->textbook->referenceUrl)
+                    @if ($viewModel->course->textbook->referenceUrl)
                         <div>
                             <dt
                                 class="mb-2 font-semibold text-warm-900 dark:text-zinc-100"
@@ -318,7 +318,7 @@
                             </dt>
                             <dd class="text-warm-700 dark:text-zinc-300">
                                 <x-link-button
-                                    :href="$course->textbook->referenceUrl"
+                                    :href="$viewModel->course->textbook->referenceUrl"
                                     variant="link"
                                     target="_blank"
                                     rel="noopener"
@@ -335,11 +335,11 @@
             </x-card>
         @endif
 
-        @if ($course->classes->count() > 0)
+        @if ($viewModel->course->classes->count() > 0)
             <x-card class="mb-6" title="視訊面授班級與上課時間">
                 @php
                     $typeOrder = ['morning', 'afternoon', 'evening', 'full_remote', 'micro_credit', 'computer_lab'];
-                    $grouped = $course->classes->toCollection()->groupBy(fn ($c) => $c->type->value);
+                    $grouped = $viewModel->course->classes->toCollection()->groupBy(fn ($c) => $c->type->value);
                 @endphp
 
                 <div class="space-y-6">
@@ -519,7 +519,7 @@
         @endif
 
         {{-- Previous Exams Section (only shown when user has a schedule cookie) --}}
-        @if ($previousSchedule && $course->previousExams->count() > 0)
+        @if ($viewModel->previousSchedule && $viewModel->course->previousExams->count() > 0)
             <x-card
                 class="mb-6 print:hidden"
                 title="考古題"
@@ -527,7 +527,7 @@
             >
                 {{-- 手機：卡片列表 --}}
                 <div class="space-y-3 md:hidden">
-                    @foreach ($course->previousExams as $exam)
+                    @foreach ($viewModel->course->previousExams as $exam)
                         <div
                             class="rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
                         >
@@ -678,7 +678,7 @@
                         </x-table-head>
 
                         <x-table-body>
-                            @foreach ($course->previousExams as $exam)
+                            @foreach ($viewModel->course->previousExams as $exam)
                                 <x-table-row>
                                     <x-table-head-column
                                         scope="row"

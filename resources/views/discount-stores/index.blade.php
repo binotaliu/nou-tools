@@ -1,6 +1,6 @@
 <x-layout title="優惠店家 - NOU 小幫手" description="學生優惠店家列表。">
     @php
-        $discountStoreFrontEndData = $stores->toCollection()->map(
+        $discountStoreFrontEndData = $viewModel->stores->toCollection()->map(
             fn ($store) => [
                 'id' => $store->id,
                 'name' => $store->name,
@@ -15,10 +15,10 @@
     <div
         x-data="discountStoreIndex({
                     stores: {{ Js::from($discountStoreFrontEndData) }},
-                    initialSearch: {{ Js::from($search) }},
-                    initialCategory: {{ Js::from($selectedCategoryId) }},
-                    initialType: {{ Js::from($selectedType) }},
-                    initialCity: {{ Js::from($selectedCity) }},
+                    initialSearch: {{ Js::from($viewModel->search) }},
+                    initialCategory: {{ Js::from($viewModel->selectedCategoryId) }},
+                    initialType: {{ Js::from($viewModel->selectedType) }},
+                    initialCity: {{ Js::from($viewModel->selectedCity) }},
                 })"
         x-cloak
         class="mx-auto max-w-6xl space-y-6"
@@ -84,10 +84,10 @@
                         @change="applyFilters()"
                     >
                         <option value="">全部分類</option>
-                        @foreach ($categories as $category)
+                        @foreach ($viewModel->categories as $category)
                             <option
                                 value="{{ $category->id }}"
-                                {{ $selectedCategoryId == $category->id ? 'selected' : '' }}
+                                {{ $viewModel->selectedCategoryId == $category->id ? 'selected' : '' }}
                             >
                                 {{ $category->name }}
                             </option>
@@ -111,7 +111,7 @@
                         @foreach (\App\Enums\DiscountStoreType::cases() as $storeType)
                             <option
                                 value="{{ $storeType->value }}"
-                                {{ $selectedType === $storeType->value ? 'selected' : '' }}
+                                {{ $viewModel->selectedType === $storeType->value ? 'selected' : '' }}
                             >
                                 {{ $storeType->label() }}
                             </option>
@@ -132,10 +132,10 @@
                         @change="applyFilters()"
                     >
                         <option value="">全部縣市</option>
-                        @foreach ($cities as $cityName)
+                        @foreach ($viewModel->cities as $cityName)
                             <option
                                 value="{{ $cityName }}"
-                                {{ $selectedCity === $cityName ? 'selected' : '' }}
+                                {{ $viewModel->selectedCity === $cityName ? 'selected' : '' }}
                             >
                                 {{ $cityName }}
                             </option>
@@ -161,7 +161,7 @@
 
         {{-- Store List --}}
         <div class="space-y-4">
-            @forelse ($stores as $store)
+            @forelse ($viewModel->stores as $store)
                 <x-card
                     id="store-{{ $store->id }}"
                     data-index="{{ $loop->index }}"
