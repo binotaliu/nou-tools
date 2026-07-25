@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 /*
@@ -16,7 +17,7 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
-    ->in('Feature');
+    ->in('Feature', 'Browser');
 
 /*
 |--------------------------------------------------------------------------
@@ -47,4 +48,25 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/**
+ * Mirrors window.NouTime.gmtLabel() from resources/js/app.js, for asserting
+ * the client-rendered "your time" hint in browser tests.
+ */
+function gmtLabelForOffset(int $offsetMinutes): string
+{
+    $sign = $offsetMinutes >= 0 ? '+' : '-';
+    $hours = intdiv(abs($offsetMinutes), 60);
+    $minutes = abs($offsetMinutes) % 60;
+
+    return 'GMT'.$sign.$hours.($minutes ? ':'.str_pad((string) $minutes, 2, '0', STR_PAD_LEFT) : '');
+}
+
+/**
+ * Mirrors window.NouTime.WEEKDAYS, for asserting client-rendered dates.
+ */
+function chineseWeekdayChar(Carbon $date): string
+{
+    return ['日', '一', '二', '三', '四', '五', '六'][(int) $date->format('w')];
 }

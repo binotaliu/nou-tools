@@ -2,41 +2,31 @@
 
 use Illuminate\Support\Facades\Config;
 
-it('shows semester week during the semester on the home page', function () {
+it('embeds semester data for the client-rendered greeting on the home page', function () {
     Config::set('app.current_semester', '2025B');
     Config::set('app.current_semester_range', ['2026-02-23', '2026-07-05']);
 
-    $this->travelTo('2026-02-24');
-
     $response = $this->get('/');
 
+    // The greeting text, date, and semester week are now computed on the
+    // client from the viewer's local clock, so the server only needs to hand
+    // the semester facts to the Alpine component.
     $response->assertStatus(200)
-        ->assertSeeInOrder([
-            '今天是 2026 年 2 月 24 日 (二)',
-            '114 學年度下學期第一週',
-        ]);
+        ->assertSee('nouGreeting(', false)
+        ->assertSee('今天是')
+        ->assertSee('2025B', false)
+        ->assertSee('2026-02-23', false)
+        ->assertSee('2026-07-05', false);
 });
 
-it('shows "尚未開始" when today is before semester start', function () {
+it('omits the semester range when it is not configured', function () {
     Config::set('app.current_semester', '2025B');
-    Config::set('app.current_semester_range', ['2026-02-23', '2026-07-05']);
-
-    $this->travelTo('2026-02-22');
+    Config::set('app.current_semester_range', []);
 
     $response = $this->get('/');
 
     $response->assertStatus(200)
-        ->assertSee('114 學年度下學期尚未開始');
-});
-
-it('shows "已結束" when today is after semester end', function () {
-    Config::set('app.current_semester', '2025B');
-    Config::set('app.current_semester_range', ['2026-02-23', '2026-07-05']);
-
-    $this->travelTo('2026-07-06');
-
-    $response = $this->get('/');
-
-    $response->assertStatus(200)
-        ->assertSee('114 學年度下學期已結束');
+        ->assertSee('nouGreeting(', false)
+        ->assertSee('semesterStart: null', false)
+        ->assertSee('semesterEnd: null', false);
 });

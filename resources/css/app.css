@@ -28,6 +28,17 @@
   --color-warm-900: oklch(0.35 0.08 35);
 }
 
+@keyframes blink-colon {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
 @layer base {
   [x-cloak],
   [data-cloak],
@@ -72,6 +83,10 @@
   .prose img {
     @apply max-h-[32rem] w-auto rounded-lg;
   }
+}
+
+@utility blink-colon {
+  animation: blink-colon 1s step-end infinite;
 }
 
 @utility prose-warm {

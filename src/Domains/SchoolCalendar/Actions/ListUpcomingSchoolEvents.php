@@ -6,7 +6,16 @@ use Carbon\Carbon;
 
 final class ListUpcomingSchoolEvents
 {
-    public function getUpcomingAndOngoingEvents(?string $referenceDate = null): array
+    /**
+     * Raw upcoming/ongoing events for the current semester, keyed as plain
+     * Y-m-d strings. Status, days-until, and which event to show as the
+     * countdown are computed client-side (see window.nouSchoolCalendar in
+     * resources/js/app.js), anchored to the viewer's Taipei calendar date
+     * rather than the server clock.
+     *
+     * @return array<int, array{start: string, end: string, name: string, countdown: bool}>
+     */
+    public function getUpcomingEvents(?string $referenceDate = null): array
     {
         $semester = config('app.current_semester');
         $schedules = config('school-schedules.'.(string) $semester, []);
@@ -19,62 +28,25 @@ final class ListUpcomingSchoolEvents
             ? Carbon::parse($referenceDate, 'Asia/Taipei')
             : Carbon::now('Asia/Taipei');
 
+        $today = $now->copy()->startOfDay();
+
         $events = [];
 
         foreach ($schedules as $schedule) {
-            $start = Carbon::parse($schedule['start'], 'Asia/Taipei');
             $end = Carbon::parse($schedule['end'], 'Asia/Taipei');
 
-            if ($end->gte($now->copy()->startOfDay())) {
+            if ($end->gte($today)) {
                 $events[] = [
-                    'start' => $start,
-                    'end' => $end,
+                    'start' => Carbon::parse($schedule['start'], 'Asia/Taipei')->format('Y-m-d'),
+                    'end' => $end->format('Y-m-d'),
                     'name' => $schedule['name'],
                     'countdown' => $schedule['countdown'],
-                    'status' => $this->getEventStatus($start, $end, $now),
-                    'daysUntil' => $this->calculateDaysUntil($start, $now),
                 ];
             }
         }
 
-        usort($events, fn (array $left, array $right) => $left['start']->timestamp <=> $right['start']->timestamp);
+        usort($events, fn (array $left, array $right) => $left['start'] <=> $right['start']);
 
         return $events;
-    }
-
-    public function getCountdownEvent(?string $referenceDate = null): ?array
-    {
-        foreach ($this->getUpcomingAndOngoingEvents($referenceDate) as $event) {
-            if ($event['countdown'] && in_array($event['status'], ['upcoming', 'ongoing'], true)) {
-                return $event;
-            }
-        }
-
-        return null;
-    }
-
-    private function getEventStatus(Carbon $start, Carbon $end, Carbon $now): string
-    {
-        $nowDate = $now->copy()->startOfDay();
-        $startDate = $start->copy()->startOfDay();
-        $endDate = $end->copy()->startOfDay();
-
-        if ($nowDate->gte($startDate) && $nowDate->lte($endDate)) {
-            return 'ongoing';
-        }
-
-        return 'upcoming';
-    }
-
-    private function calculateDaysUntil(Carbon $start, Carbon $now): int
-    {
-        $nowDate = $now->copy()->startOfDay();
-        $startDate = $start->copy()->startOfDay();
-
-        if ($nowDate->gte($startDate)) {
-            return 0;
-        }
-
-        return (int) $nowDate->diffInDays($startDate);
     }
 }

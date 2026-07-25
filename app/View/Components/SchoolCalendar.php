@@ -9,36 +9,21 @@ use NouTools\Domains\SchoolCalendar\Actions\ListUpcomingSchoolEvents;
 class SchoolCalendar extends Component
 {
     /**
-     * Array of schedule events (each item uses Carbon instances for start/end).
+     * Raw upcoming/ongoing events (Y-m-d strings), rendered client-side —
+     * see resources/views/components/school-calendar.blade.php.
+     *
+     * @var array<int, array{start: string, end: string, name: string, countdown: bool}>
      */
-    public array $scheduleEvents = [];
+    public array $events;
 
     /**
-     * Optional countdown event (nearest upcoming/ongoing with countdown === true)
+     * Accept an optional override (keeps backwards compatibility when callers pass props).
+     *
+     * @param  array<int, array{start: string, end: string, name: string, countdown: bool}>|null  $events
      */
-    public ?array $countdownEvent = null;
-
-    private ListUpcomingSchoolEvents $scheduleEventsAction;
-
-    /**
-     * Accept optional overrides for events (keeps backwards compatibility when callers pass props).
-     */
-    public function __construct(?array $scheduleEvents = null, ?array $countdownEvent = null, ?ListUpcomingSchoolEvents $scheduleEventsAction = null)
+    public function __construct(?array $events = null, ?ListUpcomingSchoolEvents $eventsAction = null)
     {
-        $this->scheduleEventsAction = $scheduleEventsAction ?? app(ListUpcomingSchoolEvents::class);
-
-        $allEvents = $scheduleEvents ?? $this->scheduleEventsAction->getUpcomingAndOngoingEvents();
-        $this->countdownEvent = $countdownEvent ?? $this->scheduleEventsAction->getCountdownEvent();
-
-        // Filter out the countdown event from the schedule events list to avoid duplication
-        if ($this->countdownEvent && is_array($allEvents)) {
-            $this->scheduleEvents = array_filter($allEvents, fn ($event) => ! (
-                $event['name'] === $this->countdownEvent['name'] &&
-                $event['start']->format('Y-m-d') === $this->countdownEvent['start']->format('Y-m-d')
-            ));
-        } else {
-            $this->scheduleEvents = $allEvents;
-        }
+        $this->events = $events ?? ($eventsAction ?? app(ListUpcomingSchoolEvents::class))->getUpcomingEvents();
     }
 
     public function render(): View

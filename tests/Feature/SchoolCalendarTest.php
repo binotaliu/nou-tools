@@ -5,7 +5,14 @@ use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
 use Illuminate\Support\Str;
 
-it('displays school calendar on home page', function () {
+// Countdown days, status ("進行中"), and date formatting are computed on the
+// client from the viewer's Taipei calendar date (see window.nouSchoolCalendar
+// in resources/js/app.js), so those behaviours are only observable with a
+// real browser — see tests/Browser/SchoolCalendarTest.php. These Feature
+// tests only check that the server hands the client the right raw event
+// payload (filtered to still-relevant events, in chronological order).
+
+it('displays school calendar on home page with events embedded for the client', function () {
     config(['app.current_semester' => '2025B']);
     config(['school-schedules.2025B' => [
         [
@@ -29,49 +36,9 @@ it('displays school calendar on home page', function () {
 
     $response->assertStatus(200)
         ->assertSee('學校行事曆')
+        ->assertSee('nouSchoolCalendar(', false)
         ->assertSee('114下學期課程開播')
         ->assertSee('114下學期期中考');
-});
-
-it('displays countdown timer for upcoming countdown event on home page', function () {
-    config(['app.current_semester' => '2025B']);
-    config(['school-schedules.2025B' => [
-        [
-            'start' => '2026-02-25',
-            'end' => '2026-02-25',
-            'name' => '重要考試',
-            'countdown' => true,
-        ],
-    ]]);
-
-    $this->travelTo('2026-02-18');
-
-    $response = $this->get('/');
-
-    $response->assertStatus(200)
-        ->assertSee('重要考試')
-        ->assertSee('7') // days until
-        ->assertSee('天後');
-});
-
-it('displays ongoing status for current events on home page', function () {
-    config(['app.current_semester' => '2025B']);
-    config(['school-schedules.2025B' => [
-        [
-            'start' => '2026-02-15',
-            'end' => '2026-02-20',
-            'name' => '進行中的活動',
-            'countdown' => true,
-        ],
-    ]]);
-
-    $this->travelTo('2026-02-18');
-
-    $response = $this->get('/');
-
-    $response->assertStatus(200)
-        ->assertSee('進行中的活動')
-        ->assertSee('進行中');
 });
 
 it('does not display school calendar when no events configured', function () {
@@ -95,7 +62,6 @@ it('displays school calendar on schedule show page', function () {
         ],
     ]]);
 
-    // ensure events are treated as upcoming by moving time before start
     $this->travelTo('2026-02-22');
 
     $courseClass = CourseClass::factory()->create();
@@ -115,90 +81,7 @@ it('displays school calendar on schedule show page', function () {
         ->assertSee('課程開播');
 });
 
-it('displays events with date ranges correctly', function () {
-    config(['app.current_semester' => '2025B']);
-    config(['school-schedules.2025B' => [
-        [
-            'start' => '2026-05-01',
-            'end' => '2026-05-20',
-            'name' => '選課期間',
-            'countdown' => false,
-        ],
-    ]]);
-
-    $this->travelTo('2026-02-18');
-
-    $response = $this->get('/');
-
-    $response->assertStatus(200)
-        ->assertSee('選課期間')
-        ->assertSee('5 月 1 日')
-        ->assertSee('5 月 20 日');
-});
-
-it('does not display days until for non-countdown events', function () {
-    config(['app.current_semester' => '2025B']);
-    config(['school-schedules.2025B' => [
-        [
-            'start' => '2026-02-25',
-            'end' => '2026-02-25',
-            'name' => '普通活動',
-            'countdown' => false,
-        ],
-        [
-            'start' => '2026-02-26',
-            'end' => '2026-02-26',
-            'name' => '倒數活動',
-            'countdown' => true,
-        ],
-    ]]);
-
-    $this->travelTo('2026-02-18');
-
-    $response = $this->get('/');
-
-    $content = $response->content();
-
-    // The countdown event should be in the countdown section at the top
-    expect($content)->toContain('倒數活動')
-        ->toContain('天後');
-
-    // Regular events should just show dates, not "天後" in the event list
-    // This is tricky to test directly, but we can verify the structure
-    $response->assertSee('普通活動');
-});
-
-it('does not duplicate countdown event in the list', function () {
-    config(['app.current_semester' => '2025B']);
-    config(['school-schedules.2025B' => [
-        [
-            'start' => '2026-02-25',
-            'end' => '2026-02-25',
-            'name' => '倒數活動',
-            'countdown' => true,
-        ],
-        [
-            'start' => '2026-02-26',
-            'end' => '2026-02-26',
-            'name' => '一般活動',
-            'countdown' => false,
-        ],
-    ]]);
-
-    $this->travelTo('2026-02-18');
-
-    $response = $this->get('/');
-
-    $content = $response->content();
-
-    // countdown event should appear only once (countdown section only)
-    expect(substr_count($content, '倒數活動'))->toBe(1);
-
-    // other events still show
-    $response->assertSee('一般活動');
-});
-
-it('filters out past events from display', function () {
+it('filters out past events from the embedded payload', function () {
     config(['app.current_semester' => '2025B']);
     config(['school-schedules.2025B' => [
         [
@@ -224,7 +107,7 @@ it('filters out past events from display', function () {
         ->assertSee('未來的活動');
 });
 
-it('displays events in chronological order', function () {
+it('embeds events in chronological order for the client to render', function () {
     config(['app.current_semester' => '2025B']);
     config(['school-schedules.2025B' => [
         [
@@ -253,7 +136,6 @@ it('displays events in chronological order', function () {
 
     $content = $response->content();
 
-    // Verify order by checking positions
     $pos二月 = strpos($content, '二月活動');
     $pos三月 = strpos($content, '三月活動');
     $pos四月 = strpos($content, '四月活動');

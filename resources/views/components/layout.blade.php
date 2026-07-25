@@ -80,16 +80,22 @@
             href="{{ asset('favicon.svg') }}?v=2"
         />
 
+        {{--
+            Styles / Scripts. Loaded before the Alpine CDN bundle below: both
+            this module script and Alpine's deferred classic script execute
+            in document order after parsing, so app.js's window.NouTime /
+            window.nouGreeting are guaranteed to exist before Alpine
+            evaluates any x-data that references them.
+        --}}
+        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+            @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @endif
+
         {{-- Alpine.js --}}
         <script
             defer
             src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
         ></script>
-
-        {{-- Styles / Scripts --}}
-        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-            @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @endif
 
         @if (app()->environment('production'))
             {{-- Google Analytics --}}
