@@ -18,9 +18,8 @@ class AnnouncementController extends Controller
             'announcements' => $page->announcements,
             'availableSources' => $page->availableSources,
             'availableCategories' => $page->availableCategories,
-            'sourceCategories' => $page->sourceCategories,
+            'sourceCategorySelections' => $page->sourceCategorySelections,
             'selectedSources' => $page->selectedSources,
-            'selectedSourceCategories' => $page->selectedSourceCategories,
             'totalAnnouncements' => $page->totalAnnouncements,
         ]);
     }

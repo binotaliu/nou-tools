@@ -4,23 +4,25 @@ namespace NouTools\Domains\Announcements\ViewModels;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 
-final readonly class AnnouncementIndexPageViewModel
+final class AnnouncementIndexPageViewModel extends Data
 {
     /**
      * @param  Collection<int, string>  $availableSources
      * @param  Collection<int, string>  $availableCategories
-     * @param  Collection<string, Collection<int, string>>  $sourceCategories
-     * @param  array<string, array<int, string>>  $selectedSourceCategories
+     * @param  DataCollection<int, SourceCategorySelectionViewModel>  $sourceCategorySelections
+     * @param  array<int, string>  $selectedSources
      */
     public function __construct(
         public LengthAwarePaginator $announcements,
         public Collection $availableSources,
         public Collection $availableCategories,
-        public Collection $sourceCategories,
-        /** @var array<int, string> */
+        #[DataCollectionOf(SourceCategorySelectionViewModel::class)]
+        public DataCollection $sourceCategorySelections,
         public array $selectedSources,
-        public array $selectedSourceCategories,
         public int $totalAnnouncements,
     ) {}
 }

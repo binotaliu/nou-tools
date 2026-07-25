@@ -11,7 +11,15 @@
         </div>
 
         @php
-            $sourceCategoryTree = $sourceCategories->map(fn ($categories): array => $categories->values()->all())->toArray();
+            $sourceCategoryTree = $sourceCategorySelections
+                ->toCollection()
+                ->mapWithKeys(fn ($selection): array => [$selection->source => $selection->availableCategories])
+                ->all();
+            $selectedSourceCategories = $sourceCategorySelections
+                ->toCollection()
+                ->filter(fn ($selection): bool => $selection->selectedCategories !== [])
+                ->mapWithKeys(fn ($selection): array => [$selection->source => $selection->selectedCategories])
+                ->all();
             $displaySelectedSourceCategories = collect($selectedSourceCategories)
                 ->mapWithKeys(function (array $selectedCategories, string $source) use ($sourceCategoryTree): array {
                     $availableCategories = $sourceCategoryTree[$source] ?? [];

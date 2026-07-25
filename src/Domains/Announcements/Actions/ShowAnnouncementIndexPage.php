@@ -6,6 +6,8 @@ use App\Models\Announcement;
 use Illuminate\Support\Collection;
 use NouTools\Domains\Announcements\DataTransferObjects\ShowAnnouncementIndexPageData;
 use NouTools\Domains\Announcements\ViewModels\AnnouncementIndexPageViewModel;
+use NouTools\Domains\Announcements\ViewModels\SourceCategorySelectionViewModel;
+use Spatie\LaravelData\DataCollection;
 
 final readonly class ShowAnnouncementIndexPage
 {
@@ -33,10 +35,31 @@ final readonly class ShowAnnouncementIndexPage
             announcements: $announcements,
             availableSources: $availableSources,
             availableCategories: $availableCategories,
-            sourceCategories: $configuredSourceCategories,
+            sourceCategorySelections: $this->buildSourceCategorySelections($configuredSourceCategories, $selectedSourceCategories),
             selectedSources: $selectedSources,
-            selectedSourceCategories: $selectedSourceCategories,
             totalAnnouncements: Announcement::query()->count(),
+        );
+    }
+
+    /**
+     * @param  Collection<string, Collection<int, string>>  $configuredSourceCategories
+     * @param  array<string, array<int, string>>  $selectedSourceCategories
+     * @return DataCollection<int, SourceCategorySelectionViewModel>
+     */
+    private function buildSourceCategorySelections(Collection $configuredSourceCategories, array $selectedSourceCategories): DataCollection
+    {
+        $sources = $configuredSourceCategories->keys()
+            ->merge(array_keys($selectedSourceCategories))
+            ->unique()
+            ->values();
+
+        return SourceCategorySelectionViewModel::collect(
+            $sources->map(fn (string $source): SourceCategorySelectionViewModel => new SourceCategorySelectionViewModel(
+                source: $source,
+                availableCategories: $configuredSourceCategories->get($source, collect())->all(),
+                selectedCategories: $selectedSourceCategories[$source] ?? [],
+            ))->all(),
+            DataCollection::class,
         );
     }
 
