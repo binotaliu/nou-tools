@@ -3,8 +3,9 @@
 namespace NouTools\Domains\Articles\ViewModels;
 
 use Illuminate\Support\HtmlString;
+use Spatie\LaravelData\Data;
 
-final readonly class ArticleShowPageViewModel
+final class ArticleShowPageViewModel extends Data
 {
     public function __construct(
         public ArticleViewModel $article,
