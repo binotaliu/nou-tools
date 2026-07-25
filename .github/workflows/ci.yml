@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   tests:
-    name: PEST (tests)
+    name: PEST (unit / feature)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -34,6 +34,39 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-progress --no-suggest --prefer-dist --no-interaction
 
+      - name: Run PHPUnit tests
+        run: |
+          php artisan config:clear --ansi
+          php artisan test --testsuite=Unit,Feature --ansi --no-interaction
+        env:
+          APP_ENV: testing
+          APP_KEY: base64:AH6+ZyuL2jJTWgh+S15f8qCC4MGMC4Z3wq4VXUJMWpk=
+          DB_CONNECTION: sqlite
+
+  browser-tests:
+    name: PEST (browser)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite, xml, ctype, sockets
+          tools: composer:2
+
+      - name: Cache Composer packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist --no-interaction
+
       - name: Setup Node.js (for front-end assets)
         uses: actions/setup-node@v6
         with:
@@ -43,8 +76,16 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Run PHPUnit tests
-        run: composer test --ansi --no-interaction
+      - name: Build front-end assets
+        run: npm run build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run PEST browser tests
+        run: |
+          php artisan config:clear --ansi
+          php artisan test --testsuite=Browser --ansi --no-interaction
         env:
           APP_ENV: testing
           APP_KEY: base64:AH6+ZyuL2jJTWgh+S15f8qCC4MGMC4Z3wq4VXUJMWpk=
@@ -91,9 +132,10 @@ jobs:
   dispatch-deploy-repo:
     name: Trigger Deployment
     runs-on: ubuntu-latest
-    needs: [tests, linter]
+    needs: [tests, browser-tests, linter]
     if: >
       needs.tests.result == 'success' &&
+      needs.browser-tests.result == 'success' &&
       needs.linter.result == 'success' &&
       (
         github.event_name == 'push' ||
