@@ -157,15 +157,29 @@ describe('Compact mode', function () {
     it('shows the Taiwan time inline for a viewer outside Asia/Taipei', function () {
         // Fixed-offset zone (no DST) so the expected values below are stable.
         $timezone = 'Asia/Kolkata';
-        $taipeiNow = Carbon::now('Asia/Taipei');
+        $before = Carbon::now('Asia/Taipei');
 
-        visit('/')
+        $page = visit('/')
             ->withTimezone($timezone)
             ->click('[data-testid="greeting-widget"]')
             ->assertVisible('[data-testid="taiwan-clock-compact"]')
-            ->assertSeeIn('[data-testid="taiwan-clock-compact"]', '台灣時間')
-            ->assertSeeIn('[data-testid="taiwan-clock-compact"]', $taipeiNow->format('H').':'.$taipeiNow->format('i'))
-            ->screenshot();
+            ->assertSeeIn('[data-testid="taiwan-clock-compact"]', '台灣時間');
+
+        $after = Carbon::now('Asia/Taipei');
+
+        // The displayed clock is read from the browser's own wall clock, so
+        // allow for a minute to have ticked over between capturing $before
+        // and the assertion running, rather than asserting an exact value.
+        $acceptable = collect();
+        for ($minutes = 0; $minutes <= max(0, $before->diffInMinutes($after)); $minutes++) {
+            $acceptable->push($before->clone()->addMinutes($minutes)->format('H').':'.$before->clone()->addMinutes($minutes)->format('i'));
+        }
+
+        $text = preg_replace('/\s+/', '', (string) $page->text('[data-testid="taiwan-clock-compact"]'));
+
+        expect($acceptable->contains(fn (string $time) => str_contains($text, $time)))->toBeTrue();
+
+        $page->screenshot();
     });
 
     it('omits the Taiwan time for a viewer already in Asia/Taipei', function () {
