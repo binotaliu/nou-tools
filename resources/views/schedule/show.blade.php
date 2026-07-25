@@ -107,7 +107,7 @@
             </div>
         </div>
 
-        @if ($viewModel->displayOptions['show_greeting'])
+        @if ($viewModel->displayOptions->showGreeting)
             <x-greeting class="mb-4 print:hidden" />
         @endif
 
@@ -141,7 +141,7 @@
         @endif
 
         {{-- Schedule Items - Responsive Table/Cards --}}
-        @if ($viewModel->displayOptions['show_schedule_items'] && $hasCourses)
+        @if ($viewModel->displayOptions->showScheduleItems && $hasCourses)
             <x-schedule-items
                 :items="$viewModel->items"
                 :scheduleUuid="$viewModel->uuid"
@@ -149,7 +149,7 @@
             />
         @endif
 
-        @if ($viewModel->displayOptions['show_common_links'])
+        @if ($viewModel->displayOptions->showCommonLinks)
             <x-common-links
                 class="mb-8 print:hidden"
                 :customLinks="$viewModel->customLinks"
@@ -157,7 +157,7 @@
         @endif
 
         {{-- Schedule Calendar View --}}
-        @if ($viewModel->displayOptions['show_class_dates'] && count($viewModel->items) > 0)
+        @if ($viewModel->displayOptions->showClassDates && count($viewModel->items) > 0)
             <div class="mb-8">
                 <h3
                     class="mb-4 text-2xl font-bold text-warm-900 dark:text-zinc-100"
@@ -228,11 +228,11 @@
         @endif
 
         {{-- School Calendar --}}
-        @if ($viewModel->displayOptions['show_school_calendar'])
+        @if ($viewModel->displayOptions->showSchoolCalendar)
             <x-school-calendar class="mb-8" />
         @endif
 
-        @if ($viewModel->displayOptions['show_exam_info'])
+        @if ($viewModel->displayOptions->showExamInfo)
             <x-card
                 class="mb-8"
                 title="考試資訊"
@@ -461,7 +461,7 @@
         @endif
 
         {{-- Announcements --}}
-        @if ($viewModel->displayOptions['show_announcements'])
+        @if ($viewModel->displayOptions->showAnnouncements)
             <x-announcements-widget
                 :schedule="$schedule"
                 class="mb-8 print:hidden"
@@ -469,7 +469,7 @@
         @endif
 
         {{-- Share Section --}}
-        @if ($viewModel->displayOptions['show_share_section'])
+        @if ($viewModel->displayOptions->showShareSection)
             <x-card>
                 <div class="flex items-center justify-between gap-4 print:flex">
                     <div class="w-full md:w-auto md:flex-1 print:flex-1">
@@ -565,7 +565,7 @@
             </x-card>
         @endif
 
-        @if ($viewModel->displayOptions['show_print_button'])
+        @if ($viewModel->displayOptions->showPrintButton)
             <div class="mt-6 flex justify-end print:hidden">
                 <x-button
                     type="button"

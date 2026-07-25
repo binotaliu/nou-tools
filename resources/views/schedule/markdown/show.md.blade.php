@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
 | -------- | -------- | ---- | -------- | ------------ | -------- |
 
 @foreach ($viewModel->items as $item)
-| {{ $item->courseClass->course->name }} | {{ $item->courseClass->code }} | {{ $item->courseClass->teacher_name ?: '未提供' }} | {{ $item->courseClass->link ?: '未提供' }} | {{ $item->courseClass->backup_classroom_url ?: '未提供' }} | [Markdown]({{ route('course.show.md', $item->courseClass->course) }}) |
+| {{ $item->courseClass->courseName }} | {{ $item->courseClass->code }} | {{ $item->courseClass->teacherName ?: '未提供' }} | {{ $item->courseClass->link ?: '未提供' }} | {{ $item->courseClass->backupClassroomUrl ?: '未提供' }} | [Markdown]({{ route('course.show.md', $item->courseClass->courseId) }}) |
 @endforeach
 
 @foreach ($viewModel->months as $month)

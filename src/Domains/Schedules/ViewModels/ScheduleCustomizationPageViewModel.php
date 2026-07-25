@@ -3,45 +3,41 @@
 namespace NouTools\Domains\Schedules\ViewModels;
 
 use App\Models\StudentSchedule;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 
-final readonly class ScheduleCustomizationPageViewModel
+final class ScheduleCustomizationPageViewModel extends Data
 {
     /** @var array<int, int> */
     public const REMINDER_OFFSET_OPTIONS = [5, 10, 15, 30, 60, 120, 180, 1440];
 
-    /**
-     * @param  array<string, bool>  $displayOptions
-     * @param  array<int, array{title: string, url: string}>  $customLinks
-     */
     public function __construct(
         public StudentSchedule $schedule,
-        public array $displayOptions,
-        public array $customLinks,
+        public ScheduleDisplayOptionsViewModel $displayOptions,
+        #[DataCollectionOf(ScheduleCustomLinkViewModel::class)]
+        public DataCollection $customLinks,
     ) {}
 
-    /**
-     * @return array<string, bool>
-     */
-    public static function defaultDisplayOptions(): array
+    public static function defaultDisplayOptions(): ScheduleDisplayOptionsViewModel
     {
-        return [
-            'show_greeting' => true,
-            'show_schedule_items' => true,
-            'show_common_links' => true,
-            'show_class_dates' => true,
-            'show_school_calendar' => true,
-            'show_exam_info' => true,
-            'show_announcements' => true,
-            'show_share_section' => true,
-            'show_print_button' => true,
-        ];
+        return new ScheduleDisplayOptionsViewModel(
+            showGreeting: true,
+            showScheduleItems: true,
+            showCommonLinks: true,
+            showClassDates: true,
+            showSchoolCalendar: true,
+            showExamInfo: true,
+            showAnnouncements: true,
+            showShareSection: true,
+            showPrintButton: true,
+        );
     }
 
     /**
      * @param  array<string, bool|int|string|null>|null  $displayOptions
-     * @return array<string, bool>
      */
-    public static function normalizeDisplayOptions(?array $displayOptions): array
+    public static function normalizeDisplayOptions(?array $displayOptions): ScheduleDisplayOptionsViewModel
     {
         $defaults = self::defaultDisplayOptions();
 
@@ -49,32 +45,44 @@ final readonly class ScheduleCustomizationPageViewModel
             return $defaults;
         }
 
-        foreach ($defaults as $key => $defaultValue) {
+        /** @var array<string, string> $propertyToKey */
+        $propertyToKey = [
+            'showGreeting' => 'show_greeting',
+            'showScheduleItems' => 'show_schedule_items',
+            'showCommonLinks' => 'show_common_links',
+            'showClassDates' => 'show_class_dates',
+            'showSchoolCalendar' => 'show_school_calendar',
+            'showExamInfo' => 'show_exam_info',
+            'showAnnouncements' => 'show_announcements',
+            'showShareSection' => 'show_share_section',
+            'showPrintButton' => 'show_print_button',
+        ];
+
+        $values = [];
+
+        foreach ($propertyToKey as $property => $key) {
+            $defaultValue = $defaults->{$property};
             $rawValue = $displayOptions[$key] ?? $defaultValue;
-            $defaults[$key] = filter_var($rawValue, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaultValue;
+            $values[$property] = filter_var($rawValue, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaultValue;
         }
 
-        return $defaults;
+        return new ScheduleDisplayOptionsViewModel(...$values);
     }
 
-    /**
-     * @return array{include_school_calendar: bool, include_exams: bool, class_reminders_enabled: bool, reminder_offsets: array<int, int>}
-     */
-    public static function defaultCalendarSettings(): array
+    public static function defaultCalendarSettings(): ScheduleCalendarSettingsViewModel
     {
-        return [
-            'include_school_calendar' => true,
-            'include_exams' => true,
-            'class_reminders_enabled' => false,
-            'reminder_offsets' => [30],
-        ];
+        return new ScheduleCalendarSettingsViewModel(
+            includeSchoolCalendar: true,
+            includeExams: true,
+            classRemindersEnabled: false,
+            reminderOffsets: [30],
+        );
     }
 
     /**
      * @param  array<string, mixed>|null  $calendarSettings
-     * @return array{include_school_calendar: bool, include_exams: bool, class_reminders_enabled: bool, reminder_offsets: array<int, int>}
      */
-    public static function normalizeCalendarSettings(?array $calendarSettings): array
+    public static function normalizeCalendarSettings(?array $calendarSettings): ScheduleCalendarSettingsViewModel
     {
         $defaults = self::defaultCalendarSettings();
 
@@ -82,21 +90,21 @@ final readonly class ScheduleCustomizationPageViewModel
             return $defaults;
         }
 
-        $includeSchoolCalendar = filter_var($calendarSettings['include_school_calendar'] ?? $defaults['include_school_calendar'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaults['include_school_calendar'];
-        $includeExams = filter_var($calendarSettings['include_exams'] ?? $defaults['include_exams'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaults['include_exams'];
-        $classRemindersEnabled = filter_var($calendarSettings['class_reminders_enabled'] ?? $defaults['class_reminders_enabled'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaults['class_reminders_enabled'];
-        $reminderOffsets = self::normalizeReminderOffsets($calendarSettings['reminder_offsets'] ?? $defaults['reminder_offsets']);
+        $includeSchoolCalendar = filter_var($calendarSettings['include_school_calendar'] ?? $defaults->includeSchoolCalendar, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaults->includeSchoolCalendar;
+        $includeExams = filter_var($calendarSettings['include_exams'] ?? $defaults->includeExams, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaults->includeExams;
+        $classRemindersEnabled = filter_var($calendarSettings['class_reminders_enabled'] ?? $defaults->classRemindersEnabled, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaults->classRemindersEnabled;
+        $reminderOffsets = self::normalizeReminderOffsets($calendarSettings['reminder_offsets'] ?? $defaults->reminderOffsets);
 
         if ($reminderOffsets === []) {
-            $reminderOffsets = $defaults['reminder_offsets'];
+            $reminderOffsets = $defaults->reminderOffsets;
         }
 
-        return [
-            'include_school_calendar' => $includeSchoolCalendar,
-            'include_exams' => $includeExams,
-            'class_reminders_enabled' => $classRemindersEnabled,
-            'reminder_offsets' => $reminderOffsets,
-        ];
+        return new ScheduleCalendarSettingsViewModel(
+            includeSchoolCalendar: $includeSchoolCalendar,
+            includeExams: $includeExams,
+            classRemindersEnabled: $classRemindersEnabled,
+            reminderOffsets: $reminderOffsets,
+        );
     }
 
     /**
@@ -124,25 +132,25 @@ final readonly class ScheduleCustomizationPageViewModel
 
     /**
      * @param  array<int, array{title?: string|null, url?: string|null}>|null  $customLinks
-     * @return array<int, array{title: string, url: string}>
      */
-    public static function normalizeCustomLinks(?array $customLinks): array
+    public static function normalizeCustomLinks(?array $customLinks): DataCollection
     {
         if (! is_array($customLinks)) {
-            return [];
+            return ScheduleCustomLinkViewModel::collect([], DataCollection::class);
         }
 
-        return collect($customLinks)
+        $links = collect($customLinks)
             ->filter(fn ($link) => is_array($link))
-            ->map(function (array $link): array {
-                return [
-                    'title' => trim((string) ($link['title'] ?? '')),
-                    'url' => trim((string) ($link['url'] ?? '')),
-                ];
+            ->map(function (array $link): ScheduleCustomLinkViewModel {
+                return new ScheduleCustomLinkViewModel(
+                    title: trim((string) ($link['title'] ?? '')),
+                    url: trim((string) ($link['url'] ?? '')),
+                );
             })
-            ->filter(fn (array $link): bool => $link['title'] !== '' && $link['url'] !== '')
+            ->filter(fn (ScheduleCustomLinkViewModel $link): bool => $link->title !== '' && $link->url !== '')
             ->take(20)
-            ->values()
-            ->all();
+            ->values();
+
+        return ScheduleCustomLinkViewModel::collect($links, DataCollection::class);
     }
 }

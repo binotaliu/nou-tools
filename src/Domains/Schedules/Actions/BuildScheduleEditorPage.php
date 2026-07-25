@@ -5,7 +5,9 @@ namespace NouTools\Domains\Schedules\Actions;
 use App\Models\Course;
 use App\Models\StudentSchedule;
 use Illuminate\Http\Request;
+use NouTools\Domains\Schedules\ViewModels\ScheduleEditorCourseViewModel;
 use NouTools\Domains\Schedules\ViewModels\ScheduleEditorPageViewModel;
+use Spatie\LaravelData\DataCollection;
 
 final readonly class BuildScheduleEditorPage
 {
@@ -20,34 +22,18 @@ final readonly class BuildScheduleEditorPage
         }
 
         $currentSemester = config('app.current_semester');
-        $courses = Course::query()
-            ->where('term', $currentSemester)
-            ->whereHas('classes')
-            ->with(['classes' => function ($query) {
-                $query->orderBy('type');
-            }])
-            ->orderBy('name')
-            ->get()
-            ->map(function ($course) {
-                return [
-                    'id' => $course->id,
-                    'name' => $course->name,
-                    'term' => $course->term,
-                    'classes' => $course->classes->map(function ($class) {
-                        return [
-                            'id' => $class->id,
-                            'code' => $class->code,
-                            'type' => $class->type->value,
-                            'type_label' => $class->type->label(),
-                            'start_time' => $class->start_time,
-                            'end_time' => $class->end_time,
-                            'teacher_name' => $class->teacher_name,
-                        ];
-                    })->values()->all(),
-                ];
-            })
-            ->values()
-            ->all();
+        $courses = ScheduleEditorCourseViewModel::collect(
+            Course::query()
+                ->where('term', $currentSemester)
+                ->whereHas('classes')
+                ->with(['classes' => function ($query) {
+                    $query->orderBy('type');
+                }])
+                ->orderBy('name')
+                ->get()
+                ->map(fn (Course $course) => ScheduleEditorCourseViewModel::fromModel($course)),
+            DataCollection::class,
+        );
 
         $previousSchedule = null;
 

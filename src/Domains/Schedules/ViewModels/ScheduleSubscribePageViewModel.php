@@ -10,8 +10,7 @@ final class ScheduleSubscribePageViewModel extends Data
     public function __construct(
         public string $uuid,
         public ?string $name,
-        /** @var array{include_school_calendar: bool, include_exams: bool, class_reminders_enabled: bool, reminder_offsets: array<int, int>} */
-        public array $calendarSettings,
+        public ScheduleCalendarSettingsViewModel $calendarSettings,
         public ScheduleCalendarUrlsViewModel $calendarUrls,
     ) {}
 

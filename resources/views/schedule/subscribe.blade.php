@@ -42,11 +42,11 @@
             $calendarSettings = $viewModel->calendarSettings;
             $primaryReminder = old(
                 'reminder_offsets.0',
-                $calendarSettings['reminder_offsets'][0] ?? 30,
+                $calendarSettings->reminderOffsets[0] ?? 30,
             );
             $secondaryReminder = old(
                 'reminder_offsets.1',
-                $calendarSettings['reminder_offsets'][1] ?? '',
+                $calendarSettings->reminderOffsets[1] ?? '',
             );
             $reminderOptions = [
                 5 => '課前 5 分鐘',
@@ -161,7 +161,7 @@
                                 type="checkbox"
                                 name="include_school_calendar"
                                 value="1"
-                                @checked(old('include_school_calendar', $calendarSettings['include_school_calendar']))
+                                @checked(old('include_school_calendar', $calendarSettings->includeSchoolCalendar))
                                 class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500 dark:border-zinc-600 dark:text-zinc-300"
                             />
                             <span
@@ -183,7 +183,7 @@
                                 type="checkbox"
                                 name="include_exams"
                                 value="1"
-                                @checked(old('include_exams', $calendarSettings['include_exams']))
+                                @checked(old('include_exams', $calendarSettings->includeExams))
                                 class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500 dark:border-zinc-600 dark:text-zinc-300"
                             />
                             <span
@@ -208,7 +208,7 @@
                                     type="checkbox"
                                     name="class_reminders_enabled"
                                     value="1"
-                                    @checked(old('class_reminders_enabled', $calendarSettings['class_reminders_enabled']))
+                                    @checked(old('class_reminders_enabled', $calendarSettings->classRemindersEnabled))
                                     class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500 dark:border-zinc-600 dark:text-zinc-300"
                                 />
                                 <span

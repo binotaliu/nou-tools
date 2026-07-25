@@ -10,7 +10,7 @@ final class StudentScheduleItemViewModel extends Data
     public function __construct(
         public int $id,
         public int $courseClassId,
-        public object $courseClass,
+        public CourseClassViewModel $courseClass,
     ) {}
 
     public static function fromModel(StudentScheduleItem $item): self
@@ -18,7 +18,7 @@ final class StudentScheduleItemViewModel extends Data
         return new self(
             id: $item->id,
             courseClassId: $item->course_class_id,
-            courseClass: $item->courseClass,
+            courseClass: CourseClassViewModel::fromModel($item->courseClass),
         );
     }
 }

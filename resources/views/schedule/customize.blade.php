@@ -30,7 +30,7 @@
             action="{{ route('schedules.customize.update', $viewModel->schedule) }}"
             class="space-y-6"
             x-data="{
-                links: {{ Js::from(old('custom_links', $viewModel->customLinks)) }},
+                links: {{ Js::from(old('custom_links', $viewModel->customLinks->toArray())) }},
                 addLink() {
                     if (this.links.length >= 20) {
                         return
@@ -52,20 +52,20 @@
             >
                 @php
                     $displayOptionLabels = [
-                        'show_greeting' => '問候語區塊',
-                        'show_schedule_items' => '課程清單',
-                        'show_common_links' => '常用連結',
-                        'show_class_dates' => '面授日期',
-                        'show_school_calendar' => '學校行事曆',
-                        'show_exam_info' => '考試資訊',
-                        'show_announcements' => '最新公告',
-                        'show_share_section' => '分享連結與 QRCode',
-                        'show_print_button' => '列印按鈕',
+                        'show_greeting' => ['showGreeting', '問候語區塊'],
+                        'show_schedule_items' => ['showScheduleItems', '課程清單'],
+                        'show_common_links' => ['showCommonLinks', '常用連結'],
+                        'show_class_dates' => ['showClassDates', '面授日期'],
+                        'show_school_calendar' => ['showSchoolCalendar', '學校行事曆'],
+                        'show_exam_info' => ['showExamInfo', '考試資訊'],
+                        'show_announcements' => ['showAnnouncements', '最新公告'],
+                        'show_share_section' => ['showShareSection', '分享連結與 QRCode'],
+                        'show_print_button' => ['showPrintButton', '列印按鈕'],
                     ];
                 @endphp
 
                 <div class="grid gap-3 sm:grid-cols-2">
-                    @foreach ($displayOptionLabels as $key => $label)
+                    @foreach ($displayOptionLabels as $key => [$property, $label])
                         <label
                             class="flex cursor-pointer items-center gap-3 rounded-lg border border-warm-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
                         >
@@ -78,7 +78,7 @@
                                 type="checkbox"
                                 name="display_options[{{ $key }}]"
                                 value="1"
-                                @checked((bool) old('display_options.' . $key, $viewModel->displayOptions[$key] ?? false))
+                                @checked((bool) old('display_options.' . $key, $viewModel->displayOptions->{$property}))
                                 class="size-4 rounded border-warm-400 text-warm-700 focus:ring-warm-500 dark:border-zinc-600 dark:text-zinc-300"
                             />
                             <span

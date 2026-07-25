@@ -19,14 +19,12 @@ final readonly class BuildAnnouncementPreferencesPage
         $flatCatalog = ($this->listAnnouncementSourceCategories)();
         $groupedCatalog = ($this->groupAnnouncementSourceCategories)();
 
-        return new AnnouncementPreferencesPageViewModel(
-            schedule: $schedule,
-            groupedCatalog: $groupedCatalog,
-            selectedSourceCategories: AnnouncementPreferencesPageViewModel::normalizeSelectedSourceCategories(
-                $schedule->announcement_categories,
-                $flatCatalog,
-                $groupedCatalog,
-            ),
+        $selectedSourceCategories = AnnouncementPreferencesPageViewModel::normalizeSelectedSourceCategories(
+            $schedule->announcement_categories,
+            $flatCatalog,
+            $groupedCatalog,
         );
+
+        return AnnouncementPreferencesPageViewModel::fromCatalog($schedule, $groupedCatalog, $selectedSourceCategories);
     }
 }

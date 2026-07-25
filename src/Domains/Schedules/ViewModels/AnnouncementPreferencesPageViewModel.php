@@ -5,18 +5,49 @@ namespace NouTools\Domains\Schedules\ViewModels;
 use App\Enums\AnnouncementSourceGroup;
 use App\Models\StudentSchedule;
 use Illuminate\Support\Collection;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 
-final readonly class AnnouncementPreferencesPageViewModel
+final class AnnouncementPreferencesPageViewModel extends Data
 {
+    public function __construct(
+        public StudentSchedule $schedule,
+        #[DataCollectionOf(AnnouncementSourceGroupViewModel::class)]
+        public DataCollection $sourceGroups,
+    ) {}
+
     /**
      * @param  Collection<string, Collection<string, Collection<int, string>>>  $groupedCatalog
      * @param  array<string, array<int, string>>  $selectedSourceCategories
      */
-    public function __construct(
-        public StudentSchedule $schedule,
-        public Collection $groupedCatalog,
-        public array $selectedSourceCategories,
-    ) {}
+    public static function fromCatalog(StudentSchedule $schedule, Collection $groupedCatalog, array $selectedSourceCategories): self
+    {
+        $groups = $groupedCatalog
+            ->map(function (Collection $sources, string $group) use ($selectedSourceCategories): AnnouncementSourceGroupViewModel {
+                $sourceViewModels = $sources
+                    ->map(function (Collection $categories, string $source) use ($selectedSourceCategories): AnnouncementSourceViewModel {
+                        return new AnnouncementSourceViewModel(
+                            source: $source,
+                            availableCategories: $categories->values()->all(),
+                            selectedCategories: $selectedSourceCategories[$source] ?? [],
+                        );
+                    })
+                    ->values();
+
+                return new AnnouncementSourceGroupViewModel(
+                    group: $group,
+                    groupLabel: AnnouncementSourceGroup::from($group)->label(),
+                    sources: AnnouncementSourceViewModel::collect($sourceViewModels, DataCollection::class),
+                );
+            })
+            ->values();
+
+        return new self(
+            schedule: $schedule,
+            sourceGroups: AnnouncementSourceGroupViewModel::collect($groups, DataCollection::class),
+        );
+    }
 
     /**
      * @param  array<string, array<int, string>>|null  $stored

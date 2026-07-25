@@ -12,14 +12,14 @@ final class UpdateScheduleCustomization
     public function __invoke(StudentSchedule $schedule, ScheduleCustomizationUpsertData $input): StudentSchedule
     {
         return DB::transaction(function () use ($schedule, $input) {
-            $displayOptions = ScheduleCustomizationPageViewModel::normalizeDisplayOptions($input->displayOptions);
+            $displayOptions = ScheduleCustomizationPageViewModel::normalizeDisplayOptions($input->displayOptions)->toArray();
 
             $existingCalendarSettings = null;
 
             if (is_array($schedule->display_options) && array_key_exists('calendar_settings', $schedule->display_options)) {
                 $existingCalendarSettings = ScheduleCustomizationPageViewModel::normalizeCalendarSettings(
                     is_array($schedule->display_options['calendar_settings']) ? $schedule->display_options['calendar_settings'] : null,
-                );
+                )->toArray();
             }
 
             if ($existingCalendarSettings !== null) {
@@ -27,7 +27,7 @@ final class UpdateScheduleCustomization
             }
 
             $schedule->display_options = $displayOptions;
-            $schedule->custom_links = ScheduleCustomizationPageViewModel::normalizeCustomLinks($input->customLinks);
+            $schedule->custom_links = ScheduleCustomizationPageViewModel::normalizeCustomLinks($input->customLinks)->toArray();
             $schedule->saveOrFail();
 
             return $schedule;

@@ -138,7 +138,7 @@ class ScheduleController extends Controller
         if ($request->wantsJson() || $request->isJson()) {
             return response()->json([
                 'success' => true,
-                'calendar_settings' => $calendarSettings,
+                'calendar_settings' => $calendarSettings->toArray(),
             ]);
         }
 

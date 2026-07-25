@@ -15,10 +15,10 @@
         ->map(function ($item) {
             $courseClass = $item->courseClass;
 
-            $schedules = collect($courseClass->schedules)
+            $schedules = collect($courseClass->schedules->toCollection())
                 ->map(function ($schedule) use ($courseClass) {
-                    $effectiveStart = $schedule->start_time ?: $courseClass->start_time;
-                    $effectiveEnd = $schedule->end_time ?: $courseClass->end_time;
+                    $effectiveStart = $schedule->startTime ?: $courseClass->startTime;
+                    $effectiveEnd = $schedule->endTime ?: $courseClass->endTime;
                     $ymd = $schedule->date->format('Y-m-d');
 
                     $instantStart = Carbon::parse($ymd . ' ' . ($effectiveStart ?: '00:00'), 'Asia/Taipei')->toIso8601String();
@@ -28,7 +28,7 @@
                         'ymd' => $ymd,
                         'startTime' => $effectiveStart,
                         'endTime' => $effectiveEnd,
-                        'hasOverride' => $schedule->start_time !== null,
+                        'hasOverride' => $schedule->startTime !== null,
                         'instantStart' => $instantStart,
                         'instantEnd' => $instantEnd,
                     ];
@@ -37,12 +37,12 @@
                 ->all();
 
             return [
-                'courseName' => $courseClass->course->name,
+                'courseName' => $courseClass->courseName,
                 'code' => $courseClass->code,
-                'teacherName' => $courseClass->teacher_name,
-                'courseInfoUrl' => route('course.show', $courseClass->course),
+                'teacherName' => $courseClass->teacherName,
+                'courseInfoUrl' => route('course.show', $courseClass->courseId),
                 'videoLink' => $courseClass->link,
-                'backupClassroomUrl' => $courseClass->backup_classroom_url,
+                'backupClassroomUrl' => $courseClass->backupClassroomUrl,
                 'schedules' => $schedules,
             ];
         })

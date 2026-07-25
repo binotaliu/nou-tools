@@ -26,19 +26,31 @@
         </div>
 
         @php
-            $groupLabels = [
-                \App\Enums\AnnouncementSourceGroup::Administrative->value => '各處室',
-                \App\Enums\AnnouncementSourceGroup::Center->value => '學習指導中心',
-                \App\Enums\AnnouncementSourceGroup::Department->value => '學系',
-            ];
+            $groupLabels = collect($viewModel->sourceGroups->toCollection())
+                ->mapWithKeys(fn ($group) => [$group->group => $group->groupLabel])
+                ->all();
 
-            $groupedCatalogTree = $viewModel->groupedCatalog
-                ->map(fn ($sources) => $sources->map(fn ($categories) => $categories->values()->all())->toArray())
-                ->toArray();
+            $groupedCatalogTree = collect($viewModel->sourceGroups->toCollection())
+                ->mapWithKeys(
+                    fn ($group) => [
+                        $group->group => collect($group->sources->toCollection())
+                            ->mapWithKeys(fn ($source) => [$source->source => $source->availableCategories])
+                            ->all(),
+                    ],
+                )
+                ->all();
 
             $flatCatalogTree = collect($groupedCatalogTree)
                 ->flatMap(fn ($sources) => $sources)
                 ->toArray();
+
+            $selectedSourceCategories = collect($viewModel->sourceGroups->toCollection())
+                ->flatMap(
+                    fn ($group) => collect($group->sources->toCollection())
+                        ->filter(fn ($source) => $source->selectedCategories !== [])
+                        ->mapWithKeys(fn ($source) => [$source->source => $source->selectedCategories]),
+                )
+                ->all();
         @endphp
 
         <form
@@ -47,7 +59,7 @@
             x-data="{
                 catalog: @js($groupedCatalogTree),
                 flatCatalog: @js($flatCatalogTree),
-                selected: @js($viewModel->selectedSourceCategories),
+                selected: @js($selectedSourceCategories),
                 openGroups: {},
                 openSources: {},
                 sourcesFor(group) {

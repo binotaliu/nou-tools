@@ -17,12 +17,10 @@ final class ScheduleViewModel extends Data
         public string $selectedTerm,
         /** @var array<int, string> */
         public array $availableTerms,
-        /** @var array<string, bool> */
-        public array $displayOptions,
-        /** @var array{include_school_calendar: bool, include_exams: bool, class_reminders_enabled: bool, reminder_offsets: array<int, int>} */
-        public array $calendarSettings,
-        /** @var array<int, array{title: string, url: string}> */
-        public array $customLinks,
+        public ScheduleDisplayOptionsViewModel $displayOptions,
+        public ScheduleCalendarSettingsViewModel $calendarSettings,
+        #[DataCollectionOf(ScheduleCustomLinkViewModel::class)]
+        public DataCollection $customLinks,
         #[DataCollectionOf(StudentScheduleItemViewModel::class)]
         public DataCollection $items,
         public bool $hasAnyOverride,

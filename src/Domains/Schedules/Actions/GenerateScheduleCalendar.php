@@ -67,8 +67,8 @@ final readonly class GenerateScheduleCalendar
                     $lines[] = 'URL:'.$courseClass->link;
                 }
 
-                if ($calendarSettings['class_reminders_enabled']) {
-                    foreach ($calendarSettings['reminder_offsets'] as $offsetMinutes) {
+                if ($calendarSettings->classRemindersEnabled) {
+                    foreach ($calendarSettings->reminderOffsets as $offsetMinutes) {
                         $lines[] = 'BEGIN:VALARM';
                         $lines[] = 'TRIGGER:'.$this->convertMinutesToAlarmTrigger($offsetMinutes);
                         $lines[] = 'ACTION:DISPLAY';
@@ -81,11 +81,11 @@ final readonly class GenerateScheduleCalendar
             }
         }
 
-        if ($calendarSettings['include_exams']) {
+        if ($calendarSettings->includeExams) {
             $this->appendExamEvents($lines, $schedule);
         }
 
-        if ($calendarSettings['include_school_calendar']) {
+        if ($calendarSettings->includeSchoolCalendar) {
             $this->appendSchoolCalendarEvents($lines, $schedule);
         }
 

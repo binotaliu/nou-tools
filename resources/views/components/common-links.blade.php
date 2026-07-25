@@ -34,12 +34,12 @@
         >
             @foreach ($customLinks as $link)
                 <x-link-button
-                    :href="$link['url']"
+                    :href="$link->url"
                     variant="secondary"
                     class="mb-0"
                 >
                     <x-heroicon-o-link class="size-4" />
-                    {{ $link['title'] }}
+                    {{ $link->title }}
                 </x-link-button>
             @endforeach
         </div>
