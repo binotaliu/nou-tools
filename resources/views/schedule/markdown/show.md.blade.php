@@ -51,11 +51,22 @@ use Illuminate\Support\Str;
 @endforeach
 @endif
 
+## 訂閱行事曆
+
+將此課表訂閱到你的行事曆應用程式，可自動同步課表更新並接收提醒。各平台的訂閱方式請參閱〈[如何訂閱行事曆]({{ route('articles.show', ['type' => 'manual', 'slug' => 'calendar-subscription']) }})〉。
+
+- [Apple 日曆 (iOS / macOS)]({{ $viewModel->calendarUrls->webcal }})
+- [Google 日曆]({{ $viewModel->calendarUrls->google }})
+- [Windows 日曆 (Microsoft 365 / Outlook.com)]({{ $viewModel->calendarUrls->outlook }})
+- [Webcal 連結（其他支援 Webcal 的行事曆）]({{ $viewModel->calendarUrls->webcal }})
+- [下載 iCal（.ics）]({{ $viewModel->calendarUrls->ics }})
+
 ## 連結
 
 - [完整檢視]({{ route('schedules.show', $viewModel->uuid) }}): 以網頁方式完整檢視課表
 - [編輯課表]({{ route('schedules.edit', $viewModel->uuid) }}): 編輯課表資訊（網頁）
 - [學習進度表]({{ route('learning-progress.show', ['schedule' => $viewModel->uuid, 'term' => $viewModel->selectedTerm]) }}): 學習進度表，可用於管理自己的學習進度與課程完成狀態
+- [訂閱行事曆設定]({{ route('schedules.subscribe', $viewModel->uuid) }}): 調整訂閱通知與提醒設定（網頁）
 
 ## 備註
 
