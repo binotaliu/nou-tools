@@ -141,6 +141,63 @@ test('learning progress has correct structure', function () {
     $this->assertEquals('Sample note', $progress->notes[1][1]);
 });
 
+test('viewmodel reflects marked progress and note after update-then-reload', function () {
+    $schedule = StudentSchedule::factory()->create();
+
+    $courseClass = CourseClass::factory()
+        ->for(
+            Course::factory()->state(['term' => '2025B'])
+        )
+        ->create();
+    $schedule->items()->create(['course_class_id' => $courseClass->id]);
+    $courseId = $courseClass->course_id;
+
+    LearningProgress::factory()->create([
+        'student_schedule_id' => $schedule->id,
+        'term' => '2025B',
+        'progress' => [],
+        'notes' => [],
+    ]);
+
+    // mark video + textbook complete for week 1 and add a note
+    $updateData = [
+        'progress' => [
+            (string) $courseId => [
+                '1' => ['video' => '1', 'textbook' => '1'],
+            ],
+        ],
+        'notes' => [
+            (string) $courseId => [
+                '1' => 'Watched lecture and read chapter 1',
+            ],
+        ],
+    ];
+
+    $this->put(route('learning-progress.update', [
+        'schedule' => $schedule,
+        'term' => '2025B',
+    ]), $updateData)->assertRedirect();
+
+    $response = $this->get(route('learning-progress.show', [
+        'schedule' => $schedule,
+        'term' => '2025B',
+    ]));
+
+    $response->assertStatus(200);
+    $viewModel = $response->viewData('viewModel');
+
+    expect($viewModel->isProgressComplete($courseId, 1))->toBeTrue();
+    expect($viewModel->isVideoComplete($courseId, 1))->toBeTrue();
+    expect($viewModel->isTextbookComplete($courseId, 1))->toBeTrue();
+    expect($viewModel->getNote($courseId, 1))->toBe('Watched lecture and read chapter 1');
+
+    // an untouched week should remain incomplete with an empty note
+    expect($viewModel->isProgressComplete($courseId, 2))->toBeFalse();
+    expect($viewModel->getNote($courseId, 2))->toBe('');
+
+    $response->assertSee('Watched lecture and read chapter 1');
+});
+
 test('unique constraint on student_schedule_id and term', function () {
     $schedule = StudentSchedule::factory()->create();
 

@@ -143,7 +143,7 @@
                                     <div
                                         class="line-clamp-2 w-full overflow-hidden text-xs"
                                     >
-                                        {{ $course['name'] }}
+                                        {{ $course->name }}
                                     </div>
 
                                     <div
@@ -178,21 +178,11 @@
                                     @class([
                                         'sticky left-0 z-10 break-inside-avoid border border-b-0 border-l-0 border-warm-300 px-0 py-0 font-semibold text-warm-900 dark:border-zinc-600 dark:text-zinc-100 print:static print:bg-warm-50',
                                         match (true) {
-                                            $currentWeek === $week['num'] => 'bg-blue-50 dark:bg-blue-950/60',
-                                            collect($viewModel->courses)->every(
-                                                fn ($course) => $viewModel->isProgressComplete(
-                                                    $course['id'],
-                                                    $week['num'],
-                                                ),
-                                            )
+                                            $currentWeek === $week->num => 'bg-blue-50 dark:bg-blue-950/60',
+                                            $viewModel->isWeekFullyComplete($week->num)
                                                 => 'bg-white dark:bg-zinc-900 [&>div]:text-gray-400 dark:[&>div]:text-zinc-500',
-                                            $viewModel->isWeekPassed($week['num']) &&
-                                                collect($viewModel->courses)->contains(
-                                                    fn ($course) => ! $viewModel->isProgressComplete(
-                                                        $course['id'],
-                                                        $week['num'],
-                                                    ),
-                                                )
+                                            $viewModel->isWeekPassed($week->num) &&
+                                                $viewModel->hasIncompleteCourseInWeek($week->num)
                                                 => 'bg-red-50 dark:bg-red-950/60',
                                             default => 'bg-warm-50 dark:bg-zinc-950',
                                         },
@@ -202,13 +192,13 @@
                                     <div
                                         class="text-center text-xs font-semibold print:text-black!"
                                     >
-                                        第{{ Str::toChineseNumber($week['num']) }}週
+                                        第{{ Str::toChineseNumber($week->num) }}週
                                     </div>
                                     <div
                                         class="text-center text-xs text-warm-600 dark:text-zinc-400 print:text-warm-600!"
                                     >
-                                        {{ $week['start'] }} -
-                                        {{ $week['end'] }}
+                                        {{ $week->start }} -
+                                        {{ $week->end }}
                                     </div>
 
                                     {{-- we need this thing to mimic the border of the first column when the header is sticky --}}
@@ -221,9 +211,8 @@
                                         @class([
                                             'border border-warm-300 text-center last:border-r-0 dark:border-zinc-600 [&:has(input:checked)]:bg-white dark:[&:has(input:checked)]:bg-zinc-900',
                                             match (true) {
-                                                $currentWeek === $week['num'] => 'bg-blue-50 dark:bg-blue-950/60',
-                                                $viewModel->isWeekPassed($week['num'])
-                                                    => 'bg-red-50 dark:bg-red-950/60',
+                                                $currentWeek === $week->num => 'bg-blue-50 dark:bg-blue-950/60',
+                                                $viewModel->isWeekPassed($week->num) => 'bg-red-50 dark:bg-red-950/60',
                                                 default => 'bg-white dark:bg-zinc-900',
                                             },
                                         ])
@@ -232,9 +221,9 @@
                                             class="group flex h-full w-full cursor-pointer items-center justify-center gap-1 px-2 py-3"
                                         >
                                             <x-learning-progress-checkbox
-                                                :name="'progress[' . $course['id'] . '][' . $week['num'] . '][video]'"
-                                                :checked="$viewModel->progress[$course['id']][$week['num']]['video'] ?? false"
-                                                :aria-label="'第' . Str::toChineseNumber($week['num']) . '週 ' . $course['name'] . ' 的影音學習進度'"
+                                                :name="'progress[' . $course->id . '][' . $week->num . '][video]'"
+                                                :checked="$viewModel->isVideoComplete($course->id, $week->num)"
+                                                :aria-label="'第' . Str::toChineseNumber($week->num) . '週 ' . $course->name . ' 的影音學習進度'"
                                             />
                                             <span
                                                 class="text-xs group-has-checked:text-gray-400 print:hidden"
@@ -247,9 +236,8 @@
                                         @class([
                                             'border border-warm-300 text-center last:border-r-0 dark:border-zinc-600 [&:has(input:checked)]:bg-white dark:[&:has(input:checked)]:bg-zinc-900',
                                             match (true) {
-                                                $currentWeek === $week['num'] => 'bg-blue-50 dark:bg-blue-950/60',
-                                                $viewModel->isWeekPassed($week['num'])
-                                                    => 'bg-red-50 dark:bg-red-950/60',
+                                                $currentWeek === $week->num => 'bg-blue-50 dark:bg-blue-950/60',
+                                                $viewModel->isWeekPassed($week->num) => 'bg-red-50 dark:bg-red-950/60',
                                                 default => 'bg-white dark:bg-zinc-900',
                                             },
                                         ])
@@ -258,9 +246,9 @@
                                             class="group flex h-full w-full cursor-pointer items-center justify-center gap-1 px-2 py-3"
                                         >
                                             <x-learning-progress-checkbox
-                                                :name="'progress[' . $course['id'] . '][' . $week['num'] . '][textbook]'"
-                                                :checked="$viewModel->progress[$course['id']][$week['num']]['textbook'] ?? false"
-                                                :aria-label="'第' . Str::toChineseNumber($week['num']) . '週 ' . $course['name'] . ' 的課本學習進度'"
+                                                :name="'progress[' . $course->id . '][' . $week->num . '][textbook]'"
+                                                :checked="$viewModel->isTextbookComplete($course->id, $week->num)"
+                                                :aria-label="'第' . Str::toChineseNumber($week->num) . '週 ' . $course->name . ' 的課本學習進度'"
                                             />
                                             <span
                                                 class="text-xs group-has-checked:text-gray-400 print:hidden"
@@ -279,18 +267,18 @@
                                     >
                                         {{-- Note textarea --}}
                                         <textarea
-                                            name="notes[{{ $course['id'] }}][{{ $week['num'] }}]"
+                                            name="notes[{{ $course->id }}][{{ $week->num }}]"
                                             placeholder="（尚未設定目標）"
                                             @class([
                                                 'm-0 h-full w-full resize-none px-2 py-2 text-xs placeholder-gray-400 focus:border-blue-500 focus:outline-none print:text-black print:placeholder-transparent',
-                                                $viewModel->isProgressComplete($course['id'], $week['num'])
+                                                $viewModel->isProgressComplete($course->id, $week->num)
                                                     ? 'text-gray-400'
                                                     : 'text-warm-700 dark:text-zinc-300',
                                             ])
                                             rows="2"
-                                            aria-label="第{{ Str::toChineseNumber($week['num']) }}週 {{ $course['name'] }} 的學習目標與備註"
+                                            aria-label="第{{ Str::toChineseNumber($week->num) }}週 {{ $course->name }} 的學習目標與備註"
                                         >
-{{ $viewModel->getNote($course['id'], $week['num']) }}</textarea
+{{ $viewModel->getNote($course->id, $week->num) }}</textarea
                                         >
                                     </td>
                                 @endforeach
