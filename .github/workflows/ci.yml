@@ -37,7 +37,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           php artisan config:clear --ansi
-          php artisan test --testsuite=Unit,Feature --ansi --no-interaction
+          php artisan test --testsuite=Unit,Feature --ansi
         env:
           APP_ENV: testing
           APP_KEY: base64:AH6+ZyuL2jJTWgh+S15f8qCC4MGMC4Z3wq4VXUJMWpk=
@@ -85,7 +85,7 @@ jobs:
       - name: Run PEST browser tests
         run: |
           php artisan config:clear --ansi
-          php artisan test --testsuite=Browser --ansi --no-interaction
+          php artisan test --testsuite=Browser --ansi
         env:
           APP_ENV: testing
           APP_KEY: base64:AH6+ZyuL2jJTWgh+S15f8qCC4MGMC4Z3wq4VXUJMWpk=
