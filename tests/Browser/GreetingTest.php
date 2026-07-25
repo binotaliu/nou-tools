@@ -25,6 +25,11 @@ function expectedGreetingDateString(Carbon $now): string
     return $now->format('Y').' 年 '.$now->format('n').' 月 '.$now->format('j').' 日 ('.chineseWeekdayChar($now).')';
 }
 
+function expectedCompactDateString(Carbon $now): string
+{
+    return $now->format('Y').'/'.$now->format('m').'/'.$now->format('d').' ('.chineseWeekdayChar($now).')';
+}
+
 it('renders the client-computed greeting and semester week for a viewer in Asia/Taipei', function () {
     $semesterStart = now('Asia/Taipei')->subWeeks(3)->startOfDay();
 
@@ -108,6 +113,66 @@ describe('Taiwan clock', function () {
         visit('/')
             ->withTimezone('Asia/Shanghai')
             ->assertMissing('[data-testid="taiwan-clock"]')
+            ->screenshot();
+    });
+});
+
+describe('Compact mode', function () {
+    it('switches from the normal to the compact widget when clicked, and back again', function () {
+        visit('/')
+            ->withTimezone('Asia/Taipei')
+            ->assertVisible('[data-testid="greeting-normal"]')
+            ->assertMissing('[data-testid="greeting-compact"]')
+            ->click('[data-testid="greeting-widget"]')
+            ->assertMissing('[data-testid="greeting-normal"]')
+            ->assertVisible('[data-testid="greeting-compact"]')
+            ->click('[data-testid="greeting-widget"]')
+            ->assertVisible('[data-testid="greeting-normal"]')
+            ->assertMissing('[data-testid="greeting-compact"]')
+            ->screenshot();
+    });
+
+    it('renders the single-line date and semester week for a viewer in Asia/Taipei', function () {
+        $semesterStart = now('Asia/Taipei')->subWeeks(3)->startOfDay();
+
+        Config::set('app.current_semester', '2025B');
+        Config::set('app.current_semester_range', [
+            $semesterStart->toDateString(),
+            now('Asia/Taipei')->addWeeks(3)->toDateString(),
+        ]);
+
+        $now = Carbon::now('Asia/Taipei');
+        $daysSinceStart = intdiv($now->clone()->startOfDay()->getTimestamp() - $semesterStart->getTimestamp(), 86400);
+        $expectedWeek = intdiv($daysSinceStart, 7) + 1;
+
+        visit('/')
+            ->withTimezone('Asia/Taipei')
+            ->click('[data-testid="greeting-widget"]')
+            ->assertSeeIn('[data-testid="greeting-compact"]', expectedCompactDateString($now))
+            ->assertSeeIn('[data-testid="greeting-compact"]', '114 下 W'.$expectedWeek)
+            ->assertMissing('[data-testid="taiwan-clock-compact"]')
+            ->screenshot();
+    });
+
+    it('shows the Taiwan time inline for a viewer outside Asia/Taipei', function () {
+        // Fixed-offset zone (no DST) so the expected values below are stable.
+        $timezone = 'Asia/Kolkata';
+        $taipeiNow = Carbon::now('Asia/Taipei');
+
+        visit('/')
+            ->withTimezone($timezone)
+            ->click('[data-testid="greeting-widget"]')
+            ->assertVisible('[data-testid="taiwan-clock-compact"]')
+            ->assertSeeIn('[data-testid="taiwan-clock-compact"]', '台灣時間')
+            ->assertSeeIn('[data-testid="taiwan-clock-compact"]', $taipeiNow->format('H').':'.$taipeiNow->format('i'))
+            ->screenshot();
+    });
+
+    it('omits the Taiwan time for a viewer already in Asia/Taipei', function () {
+        visit('/')
+            ->withTimezone('Asia/Taipei')
+            ->click('[data-testid="greeting-widget"]')
+            ->assertMissing('[data-testid="taiwan-clock-compact"]')
             ->screenshot();
     });
 });

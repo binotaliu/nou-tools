@@ -198,10 +198,17 @@ window.NouTime =
 window.nouGreeting =
   window.nouGreeting ||
   function (config) {
+    // Persisted so the viewer's chosen widget style (normal vs. compact)
+    // survives reloads.
+    const compactStorageKey = 'nou_greeting_compact_v1'
+
     return {
       greetingText: '',
       dateString: '',
       semesterInfo: '',
+      compactMode: false,
+      compactDateString: '',
+      compactSemesterInfo: '',
       showTaiwanClock: false,
       taiwanHour: '',
       taiwanMinute: '',
@@ -211,6 +218,8 @@ window.nouGreeting =
         const T = window.NouTime
         const now = new Date()
         const hour = now.getHours()
+
+        this.compactMode = localStorage.getItem(compactStorageKey) === '1'
 
         this.greetingText =
           hour >= 5 && hour < 12
@@ -229,7 +238,18 @@ window.nouGreeting =
           T.WEEKDAYS[now.getDay()] +
           ')'
 
+        this.compactDateString =
+          now.getFullYear() +
+          '/' +
+          T.pad(now.getMonth() + 1) +
+          '/' +
+          T.pad(now.getDate()) +
+          ' (' +
+          T.WEEKDAYS[now.getDay()] +
+          ')'
+
         this.semesterInfo = this.buildSemesterInfo(config, now)
+        this.compactSemesterInfo = this.buildCompactSemesterInfo(config, now)
 
         this.showTaiwanClock = T.differsFromTaipei(now)
 
@@ -239,6 +259,11 @@ window.nouGreeting =
           // to keep the clock from drifting a minute behind.
           setInterval(() => this.refreshTaiwanClock(), 1000)
         }
+      },
+
+      toggleCompact() {
+        this.compactMode = !this.compactMode
+        localStorage.setItem(compactStorageKey, this.compactMode ? '1' : '0')
       },
 
       refreshTaiwanClock() {
@@ -278,6 +303,39 @@ window.nouGreeting =
         const weekNumber = Math.floor((current - start) / 86400000 / 7) + 1
 
         return config.semesterLabel + '第' + T.chineseNumber(weekNumber) + '週'
+      },
+
+      // Compact single-line rendering of the semester, e.g. "115 暑 W3".
+      // Uses a ROC year + single-character term abbreviation and an arabic
+      // week number, mirroring Str::toShortSemesterDisplay but terser still.
+      buildCompactSemesterInfo(config, now) {
+        const T = window.NouTime
+
+        const match = /^(\d{4})([ABC])$/.exec(config.semesterCode || '')
+
+        if (!match) {
+          return config.semesterCode || ''
+        }
+
+        const rocYear = Number(match[1]) - 1911
+        const termChar = { A: '上', B: '下', C: '暑' }[match[2]]
+        const shortLabel = rocYear + ' ' + termChar
+
+        if (!config.semesterStart || !config.semesterEnd) {
+          return shortLabel
+        }
+
+        const today = T.localYmd(now)
+
+        if (today < config.semesterStart || today > config.semesterEnd) {
+          return shortLabel
+        }
+
+        const start = Date.parse(config.semesterStart + 'T00:00:00Z')
+        const current = Date.parse(today + 'T00:00:00Z')
+        const weekNumber = Math.floor((current - start) / 86400000 / 7) + 1
+
+        return shortLabel + ' W' + weekNumber
       },
     }
   }
