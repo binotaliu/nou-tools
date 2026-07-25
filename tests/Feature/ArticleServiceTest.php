@@ -54,6 +54,48 @@ test('can get an article from markdown file', function () {
         ->and((string) $page->article->content)->toContain('<h1>Heading</h1>');
 });
 
+test('article updated_at is parsed from front matter when present', function () {
+    $type = ArticleType::MANUAL;
+    $slug = 'welcome';
+    $path = ($this->articlePath)($type, $slug);
+    $markdown = <<<'MD'
+---
+title: My Test Article
+author: Test Author
+published_at: 2020-01-01
+updated_at: 2020-06-15
+---
+
+# Heading
+
+Content paragraph.
+MD;
+
+    File::shouldReceive('exists')->once()->with($path)->andReturn(true);
+    File::shouldReceive('get')->once()->with($path)->andReturn($markdown);
+    File::shouldReceive('exists')->once()->with(resource_path("articles/{$type->directory()}/_sidebar.md"))->andReturn(false);
+
+    $page = ($this->showArticlePage)($type, $slug);
+
+    expect($page->article->updatedAt)
+        ->not->toBeNull()
+        ->and($page->article->updatedAt->toDateString())->toBe('2020-06-15');
+});
+
+test('article updated_at is null when absent from front matter', function () {
+    $type = ArticleType::MANUAL;
+    $slug = 'welcome';
+    $path = ($this->articlePath)($type, $slug);
+
+    File::shouldReceive('exists')->once()->with($path)->andReturn(true);
+    File::shouldReceive('get')->once()->with($path)->andReturn(($this->sampleMarkdown)());
+    File::shouldReceive('exists')->once()->with(resource_path("articles/{$type->directory()}/_sidebar.md"))->andReturn(false);
+
+    $page = ($this->showArticlePage)($type, $slug);
+
+    expect($page->article->updatedAt)->toBeNull();
+});
+
 test('returns null for non-existent article', function () {
     $type = ArticleType::MANUAL;
     $slug = 'non-existent';

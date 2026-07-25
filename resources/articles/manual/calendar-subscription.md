@@ -2,6 +2,7 @@
 title: 如何訂閱行事曆
 author: 浣熊站長
 published_at: 2026-07-05
+updated_at: 2026-07-25
 description: 瞭解如何在各平台訂閱 NOU 小幫手的課表行事曆，並設定提醒通知。
 ---
 

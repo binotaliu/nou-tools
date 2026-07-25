@@ -4,13 +4,17 @@ namespace NouTools\Domains\Sitemap\Actions;
 
 use App\Enums\ArticleType;
 use App\Models\Course;
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
+use NouTools\Domains\Articles\Actions\ShowArticlePage;
 use NouTools\Domains\Sitemap\ViewModels\SitemapUrlViewModel;
 
 final readonly class GenerateSitemap
 {
+    public function __construct(
+        private ShowArticlePage $showArticlePage,
+    ) {}
+
     /**
      * @return Collection<int, SitemapUrlViewModel>
      */
@@ -70,12 +74,22 @@ final readonly class GenerateSitemap
         return Collection::make(File::files($directory))
             ->filter(fn ($file): bool => $file->getExtension() === 'md'
                 && ! in_array($file->getFilenameWithoutExtension(), ['_index', '_sidebar'], true))
-            ->map(fn ($file): SitemapUrlViewModel => new SitemapUrlViewModel(
-                url: route('articles.show', [$type, $file->getFilenameWithoutExtension()]),
-                lastModified: Carbon::createFromTimestamp($file->getMTime()),
-                changeFrequency: 'monthly',
-                priority: 0.5,
-            ))
+            ->map(function ($file) use ($type): ?SitemapUrlViewModel {
+                $slug = $file->getFilenameWithoutExtension();
+                $page = ($this->showArticlePage)($type, $slug);
+
+                if (! $page) {
+                    return null;
+                }
+
+                return new SitemapUrlViewModel(
+                    url: route('articles.show', [$type, $slug]),
+                    lastModified: $page->article->updatedAt ?? $page->article->publishedAt,
+                    changeFrequency: 'monthly',
+                    priority: 0.5,
+                );
+            })
+            ->filter()
             ->values();
     }
 }

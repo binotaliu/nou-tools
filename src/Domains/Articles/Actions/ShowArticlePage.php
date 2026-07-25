@@ -47,6 +47,9 @@ final class ShowArticlePage
                 publishedAt: isset($frontMatter['published_at'])
                     ? Carbon::parse($frontMatter['published_at'])
                     : Carbon::now(),
+                updatedAt: isset($frontMatter['updated_at'])
+                    ? Carbon::parse($frontMatter['updated_at'])
+                    : null,
                 content: $result->getContent(),
                 description: $frontMatter['description'] ?? '',
             ),

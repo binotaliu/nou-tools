@@ -58,6 +58,11 @@
                             <span>
                                 發表於：{{ $article->publishedAt->format('Y 年 m 月 d 日') }}
                             </span>
+                            @if ($article->updatedAt)
+                                <span>
+                                    更新於：{{ $article->updatedAt->format('Y 年 m 月 d 日') }}
+                                </span>
+                            @endif
                         </div>
                     </header>
 

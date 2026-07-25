@@ -17,6 +17,7 @@ final class ArticleViewModel extends Data
         public string $title,
         public string $author,
         public Carbon $publishedAt,
+        public ?Carbon $updatedAt,
         string $content,
         public string $description,
     ) {
