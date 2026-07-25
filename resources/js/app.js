@@ -1,5 +1,121 @@
 import './bootstrap'
 
+// Registers the offline-support service worker (see public/sw.js). It caches
+// previously-visited home and /schedules/{schedule} pages (plus their assets)
+// and is registered site-wide since the worker's fetch handler scopes the
+// offline behavior to those routes.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {})
+  })
+}
+
+// A link is left alone while offline if it goes to the homepage, to a
+// schedule's own show page (the only pages that can actually work without a
+// connection), or if it opts out explicitly via data-offline-allow (used for
+// the video-call link on the schedule page, which doesn't need our server).
+function isOfflineAllowedLink(link) {
+  if (link.hasAttribute('data-offline-allow')) {
+    return true
+  }
+
+  let url
+
+  try {
+    url = new URL(link.href, window.location.href)
+  } catch (error) {
+    return true
+  }
+
+  if (url.origin !== window.location.origin) {
+    return false
+  }
+
+  if (url.pathname === '/') {
+    return true
+  }
+
+  const match = /^\/schedules\/([^/]+)$/.exec(url.pathname)
+
+  return !!match && match[1] !== 'create'
+}
+
+// Visually disables and blocks navigation on every other link while offline,
+// plus any other control opting in via data-offline-disable (e.g. the term
+// switcher — switching semesters means a fresh, uncached page load). Runs on
+// every DOM mutation (Alpine renders schedule rows client-side) so
+// dynamically-inserted elements are covered too, not just what's in the
+// initial HTML.
+function updateOfflineLinkStates() {
+  const offline = window.Alpine?.store('network')?.offline ?? false
+
+  document.querySelectorAll('a[href]').forEach(link => {
+    const disabled = offline && !isOfflineAllowedLink(link)
+
+    link.classList.toggle('pointer-events-none', disabled)
+    link.classList.toggle('opacity-50', disabled)
+
+    if (disabled) {
+      link.setAttribute('aria-disabled', 'true')
+    } else {
+      link.removeAttribute('aria-disabled')
+    }
+  })
+
+  document.querySelectorAll('[data-offline-disable]').forEach(el => {
+    el.disabled = offline
+    el.classList.toggle('opacity-50', offline)
+    el.classList.toggle('cursor-not-allowed', offline)
+  })
+}
+
+new MutationObserver(() => updateOfflineLinkStates()).observe(
+  document.documentElement,
+  {
+    childList: true,
+    subtree: true,
+  }
+)
+
+// Global online/offline flag, shared via Alpine.store so the schedule page's
+// offline banner and the (separately-scoped) schedule-items component can
+// both react to the same state. Registered on 'alpine:init' — app.js runs
+// before the deferred Alpine CDN bundle (see layout.blade.php), so this
+// listener is always in place before Alpine fires that event.
+document.addEventListener('alpine:init', () => {
+  window.Alpine.store('network', {
+    offline: typeof navigator !== 'undefined' && !navigator.onLine,
+
+    init() {
+      // navigator.onLine only reflects whether *a* network interface is up,
+      // not whether our server is actually reachable — so on top of the
+      // online/offline events, probe the app's own health-check route.
+      // This is what makes offline detection correct even when the page is
+      // opened fresh while already offline (onLine can lag or be wrong at
+      // that point, especially on a page restored from the service worker
+      // cache).
+      this.checkConnectivity()
+
+      window.addEventListener('online', () => this.checkConnectivity())
+      window.addEventListener('offline', () => this.setOffline(true))
+    },
+
+    setOffline(value) {
+      this.offline = value
+      updateOfflineLinkStates()
+    },
+
+    async checkConnectivity() {
+      try {
+        const response = await fetch('/up', { cache: 'no-store' })
+        this.setOffline(!response.ok)
+      } catch (error) {
+        this.setOffline(true)
+      }
+    },
+  })
+})
+
 const trackAnalyticsEvent = (eventName, params = {}) => {
   if (typeof window.gtag !== 'function' || !eventName) {
     return

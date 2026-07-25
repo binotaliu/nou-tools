@@ -15,7 +15,7 @@
             {{-- Countdown (mobile 上方，桌面右側 1/3) --}}
             <template x-if="countdownEvent">
                 <div
-                    :class="listEvents.length ? 'order-first md:order-last md:w-1/3' : 'order-first md:w-full'"
+                    :class="activeEvents.length ? 'order-first md:order-last md:w-1/3' : 'order-first md:w-full'"
                     class="w-full print:hidden"
                 >
                     <div

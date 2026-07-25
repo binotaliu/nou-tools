@@ -379,6 +379,7 @@
                                 :href="row.item.videoLink"
                                 target="_blank"
                                 rel="noopener"
+                                data-offline-allow
                                 class="inline-flex items-center gap-1 font-semibold text-warm-500 underline underline-offset-4 hover:text-warm-400 hover:no-underline dark:text-zinc-400 dark:hover:text-zinc-500"
                                 :aria-label="'前往 ' + row.item.courseName + ' 的視訊上課連結'"
                             >
@@ -526,6 +527,7 @@
                             :href="row.item.videoLink"
                             target="_blank"
                             rel="noopener"
+                            data-offline-allow
                             class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-warm-500 underline underline-offset-4 transition hover:bg-orange-50 hover:text-warm-400 dark:text-zinc-400 dark:hover:text-zinc-500"
                         >
                             <x-heroicon-o-video-camera

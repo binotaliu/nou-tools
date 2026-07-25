@@ -1,5 +1,22 @@
 <x-layout>
     <div class="space-y-8">
+        <div
+            x-data
+            x-show="$store.network.offline"
+            x-cloak
+            class="mb-6 flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200 print:hidden"
+            role="status"
+            aria-live="polite"
+        >
+            <x-heroicon-o-signal-slash class="mt-0.5 size-5 shrink-0" />
+            <div>
+                <p class="font-semibold">目前處於離線狀態</p>
+                <p class="mt-1">
+                    這是先前載入過的快取內容，可能不是最新資料。部分需要連線的功能已停用，例如今日視訊面授的日期切換。
+                </p>
+            </div>
+        </div>
+
         <x-greeting />
 
         <div
@@ -77,6 +94,7 @@
                         x-model="date"
                         @change="window.location = `?date=${date}`"
                         :value="date"
+                        data-offline-disable
                     />
                 </div>
             </div>

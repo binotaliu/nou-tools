@@ -8,6 +8,24 @@
 
     <div class="mx-auto max-w-5xl">
         <div
+            x-data
+            x-show="$store.network.offline"
+            x-cloak
+            class="mb-6 flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200 print:hidden"
+            role="status"
+            aria-live="polite"
+        >
+            <x-heroicon-o-signal-slash class="mt-0.5 size-5 shrink-0" />
+            <div>
+                <p class="font-semibold">目前處於離線狀態</p>
+                <p class="mt-1">
+                    這是先前載入過的快取內容，可能不是最新資料。可能是 NOU
+                    小幫手網站發生問題，或你的裝置目前連不上網路，因此有部分的功能無法使用。本頁視訊上課連結仍可正常使用。
+                </p>
+            </div>
+        </div>
+
+        <div
             class="mb-8 flex flex-col items-start justify-between gap-y-4 lg:flex-row"
         >
             <div>
@@ -87,6 +105,7 @@
                         onchange="this.form.submit()"
                         aria-label="選擇學期"
                         class="bg-white dark:bg-zinc-900"
+                        data-offline-disable
                     >
                         @foreach ($viewModel->availableTerms as $term)
                             <option
@@ -462,10 +481,12 @@
 
         {{-- Announcements --}}
         @if ($viewModel->displayOptions->showAnnouncements)
-            <x-announcements-widget
-                :schedule="$schedule"
-                class="mb-8 print:hidden"
-            />
+            <div x-data x-show="!$store.network.offline" x-cloak>
+                <x-announcements-widget
+                    :schedule="$schedule"
+                    class="mb-8 print:hidden"
+                />
+            </div>
         @endif
 
         {{-- Share Section --}}
