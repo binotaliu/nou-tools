@@ -71,3 +71,57 @@ test('article show page returns 404 for non-existent article', function () {
 
     $response->assertNotFound();
 });
+
+test('displays the article index markdown page', function () {
+    $response = $this->get(route('articles.index.md', ['type' => ArticleType::MANUAL->value]));
+
+    $response->assertSuccessful()
+        ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
+        ->assertSee('# NOU 小幫手操作手冊', false)
+        ->assertSee('歡迎使用 NOU 小幫手');
+});
+
+test('returns markdown from the article index when the client prefers it in the Accept header', function () {
+    $response = $this->get(route('articles.index', ['type' => ArticleType::MANUAL->value]), [
+        'Accept' => 'text/markdown, text/html;q=0.8',
+    ]);
+
+    $response->assertSuccessful()
+        ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
+        ->assertSee('# NOU 小幫手操作手冊', false);
+});
+
+test('displays the article show markdown page', function () {
+    $response = $this->get(route('articles.show.md', [
+        'type' => ArticleType::KNOWLEDGE_BASE->value,
+        'slug' => 'about-nou',
+    ]));
+
+    $response->assertSuccessful()
+        ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
+        ->assertSee('# 關於國立空中大學', false)
+        ->assertSee('作者：浣熊站長')
+        ->assertDontSee('title: 關於國立空中大學', false);
+});
+
+test('returns markdown from the article show page when the client prefers it in the Accept header', function () {
+    $response = $this->get(route('articles.show', [
+        'type' => ArticleType::KNOWLEDGE_BASE->value,
+        'slug' => 'about-nou',
+    ]), [
+        'Accept' => 'text/markdown, text/html;q=0.8',
+    ]);
+
+    $response->assertSuccessful()
+        ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
+        ->assertSee('# 關於國立空中大學', false);
+});
+
+test('article show markdown page returns 404 for non-existent article', function () {
+    $response = $this->get(route('articles.show.md', [
+        'type' => ArticleType::MANUAL->value,
+        'slug' => 'non-existent-article',
+    ]));
+
+    $response->assertNotFound();
+});

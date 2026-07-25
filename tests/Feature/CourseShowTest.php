@@ -235,3 +235,53 @@ test('course show page displays textbook information', function () {
         ->assertSee('200元')
         ->assertSee('https://example.com/book');
 });
+
+test('course show markdown page lists class and exam information', function () {
+    $course = Course::factory()->create([
+        'name' => 'Markdown Course',
+        'midterm_date' => '2025-04-25',
+        'final_date' => '2025-06-27',
+        'exam_time_start' => '13:30',
+        'exam_time_end' => '14:40',
+    ]);
+
+    $class = CourseClass::factory()->create([
+        'course_id' => $course->id,
+        'code' => 'MD101',
+        'start_time' => '09:00',
+        'end_time' => '10:00',
+        'teacher_name' => '王小明',
+        'link' => 'https://example.com/class-link',
+        'backup_classroom_url' => 'https://example.com/backup-link',
+    ]);
+
+    $textbook = Textbook::factory()->create([
+        'course_id' => $course->id,
+        'book_title' => 'Introduction to Testing',
+    ]);
+
+    $response = $this->get(route('course.show.md', $course));
+
+    $response->assertStatus(200)
+        ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
+        ->assertSee('# Markdown Course', false)
+        ->assertSee('| MD101 |', false)
+        ->assertSee('王小明')
+        ->assertSee('https://example.com/class-link')
+        ->assertSee('https://example.com/backup-link')
+        ->assertSee('Introduction to Testing')
+        ->assertSee('4/25')
+        ->assertSee('6/27');
+});
+
+test('course show page returns markdown when the client prefers it in the Accept header', function () {
+    $course = Course::factory()->create(['name' => 'Accept Header Course']);
+
+    $response = $this->get(route('course.show', $course), [
+        'Accept' => 'text/markdown, text/html;q=0.8',
+    ]);
+
+    $response->assertStatus(200)
+        ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
+        ->assertSee('# Accept Header Course', false);
+});

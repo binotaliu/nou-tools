@@ -402,3 +402,103 @@ it('shows empty state when no stores match', function () {
 
     $response->assertSee('目前沒有符合條件的優惠店家');
 });
+
+it('displays the discount store index markdown page', function () {
+    $store = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '測試優惠店家',
+            'status' => DiscountStoreStatus::Online,
+            'type' => DiscountStoreType::Online,
+            'discount_details' => '出示學生證享 9 折優惠',
+        ]);
+
+    $response = get(route('discount-stores.index.md'));
+
+    $response->assertSuccessful();
+    $response->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+    $response->assertSee('# 優惠店家', false);
+    $response->assertSee('測試優惠店家');
+    $response->assertSee('出示學生證享 9 折優惠');
+    $response->assertSee(route('discount-stores.show', $store), false);
+});
+
+it('returns markdown from the discount store index when the client prefers it in the Accept header', function () {
+    $store = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '測試優惠店家',
+            'status' => DiscountStoreStatus::Online,
+            'type' => DiscountStoreType::Online,
+            'discount_details' => '出示學生證享 9 折優惠',
+        ]);
+
+    $response = $this->get(route('discount-stores.index'), [
+        'Accept' => 'text/markdown, text/html;q=0.8',
+    ]);
+
+    $response->assertSuccessful();
+    $response->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+    $response->assertSee('# 優惠店家', false);
+    $response->assertSee(route('discount-stores.show', $store), false);
+});
+
+it('displays the discount store show markdown page', function () {
+    $store = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '測試優惠店家',
+            'status' => DiscountStoreStatus::Online,
+            'type' => DiscountStoreType::Online,
+            'discount_details' => '出示學生證享 9 折優惠',
+        ]);
+
+    DiscountStoreReport::factory()->for($store, 'store')->create([
+        'is_valid' => true,
+    ]);
+
+    DiscountStoreComment::factory()->for($store, 'store')->create([
+        'nickname' => '學生小芳',
+        'content' => '真的有折扣',
+        'is_approved' => true,
+    ]);
+
+    $response = get(route('discount-stores.show.md', $store));
+
+    $response->assertSuccessful();
+    $response->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+    $response->assertSee('# 測試優惠店家', false);
+    $response->assertSee('出示學生證享 9 折優惠');
+    $response->assertSee('學生小芳');
+    $response->assertSee('真的有折扣');
+});
+
+it('returns markdown from the discount store show page when the client prefers it in the Accept header', function () {
+    $store = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '測試優惠店家',
+            'status' => DiscountStoreStatus::Online,
+            'type' => DiscountStoreType::Online,
+            'discount_details' => '出示學生證享 9 折優惠',
+        ]);
+
+    $response = $this->get(route('discount-stores.show', $store), [
+        'Accept' => 'text/markdown, text/html;q=0.8',
+    ]);
+
+    $response->assertSuccessful();
+    $response->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+    $response->assertSee('# 測試優惠店家', false);
+});
+
+it('returns a 404 for the discount store show markdown page when the store is not online', function () {
+    $store = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '待審核店家',
+            'status' => DiscountStoreStatus::Pending,
+        ]);
+
+    get(route('discount-stores.show.md', $store))->assertNotFound();
+});

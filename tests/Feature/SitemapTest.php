@@ -34,3 +34,14 @@ test('sitemap does not include noindexed schedule or individual store pages', fu
         ->assertDontSee(route('schedules.show', $schedule), false)
         ->assertDontSee(route('discount-stores.show', $store), false);
 });
+
+test('llms.txt returns markdown with key links', function () {
+    $response = $this->get('/llms.txt');
+
+    $response->assertStatus(200)
+        ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
+        ->assertSee('# NOU 小幫手', false)
+        ->assertSee(route('home'), false)
+        ->assertSee(route('discount-stores.index'), false)
+        ->assertSee(route('discount-stores.index.md'), false);
+});

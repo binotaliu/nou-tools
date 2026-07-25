@@ -14,3 +14,13 @@ it('uses the standard header logo on error page', function () {
     // verify we have an SVG icon in the header (the standard book-open icon renders as SVG)
     $response->assertSee('<svg', false);
 });
+
+it('returns the llms.txt markdown content when the client prefers markdown on the home page', function () {
+    $response = $this->get('/', [
+        'Accept' => 'text/markdown, text/html;q=0.8',
+    ]);
+
+    $response->assertStatus(200)
+        ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
+        ->assertSee('# NOU 小幫手', false);
+});

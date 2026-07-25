@@ -14,8 +14,11 @@ use App\Policies\DiscountStorePolicy;
 use App\Policies\UserPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
@@ -36,6 +39,29 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register `.md.blade.php` as a Blade-compiled view extension. These views
+        // render raw Markdown; prettier-plugin-blade mangles their line breaks when
+        // treating them as `.blade.php`, so they're excluded from that override.
+        View::addExtension('md.blade.php', 'blade');
+
+        // Route macro: register a markdown counterpart for a route, served either at
+        // an explicit `.md` URI or transparently via `Accept: text/markdown` content
+        // negotiation on the original URI. Constrains the base route's trailing
+        // parameter so it can't swallow a literal `.md` suffix meant for the sibling.
+        RoutingRoute::macro('withMarkdown', function (string $controller, ?string $uri = null, ?string $name = null): RoutingRoute {
+            /** @var RoutingRoute $this */
+            $parameterNames = $this->parameterNames();
+
+            if ($parameterNames !== []) {
+                $this->where(end($parameterNames), '[^/]+(?<!\.md)');
+            }
+
+            Route::get($uri ?? $this->uri().'.md', $controller)
+                ->name($name ?? $this->getName().'.md');
+
+            return $this->middleware('markdown:'.$controller);
+        });
+
         Password::defaults(fn (): Password => Password::min(8)->uncompromised());
 
         Gate::policy(User::class, UserPolicy::class);

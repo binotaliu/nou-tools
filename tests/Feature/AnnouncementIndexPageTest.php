@@ -214,3 +214,38 @@ it('shows only the source when all categories under it are selected', function (
         expect($currentFilters)->not->toContain($category);
     });
 });
+
+it('displays the announcement index markdown page', function () {
+    $announcement = Announcement::factory()->create([
+        'source_name' => '教務處',
+        'category' => '考試資訊',
+        'title' => '期中考公告',
+        'published_at' => now()->subDay(),
+    ]);
+
+    $response = get(route('announcements.index.md'));
+
+    $response->assertSuccessful();
+    $response->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+    $response->assertSee('# 學校公告', false);
+    $response->assertSee('期中考公告');
+    $response->assertSee($announcement->url, false);
+});
+
+it('returns markdown from the announcement index when the client prefers it in the Accept header', function () {
+    $announcement = Announcement::factory()->create([
+        'source_name' => '教務處',
+        'category' => '考試資訊',
+        'title' => '期中考公告',
+        'published_at' => now()->subDay(),
+    ]);
+
+    $response = get(route('announcements.index'), [
+        'Accept' => 'text/markdown, text/html;q=0.8',
+    ]);
+
+    $response->assertSuccessful();
+    $response->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+    $response->assertSee('# 學校公告', false);
+    $response->assertSee($announcement->url, false);
+});

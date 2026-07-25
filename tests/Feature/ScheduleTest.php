@@ -361,6 +361,118 @@ it('schedule show page displays exam information for selected courses', function
     $this->assertMatchesRegularExpression('/13:30\s*-\s*14:40/', $response->getContent());
 });
 
+it('schedule show markdown page lists courses and exam information', function () {
+    config()->set('app.current_semester', '2025B');
+
+    $course = Course::factory()->create([
+        'name' => 'Markdown Course',
+        'midterm_date' => '2025-04-25',
+        'final_date' => '2025-06-27',
+        'exam_time_start' => '13:30',
+        'exam_time_end' => '14:40',
+    ]);
+
+    $class = CourseClass::factory()->create([
+        'course_id' => $course->id,
+        'code' => 'MD101',
+        'start_time' => '09:00',
+        'end_time' => '10:00',
+        'teacher_name' => '王小明',
+        'link' => 'https://example.com/class-link',
+        'backup_classroom_url' => 'https://example.com/backup-link',
+    ]);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Markdown Schedule',
+    ]);
+
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $class->id,
+    ]);
+
+    ClassSchedule::factory()->create([
+        'class_id' => $class->id,
+        'date' => '2025-03-12',
+    ]);
+
+    $response = $this->get(route('schedules.show.md', $schedule));
+
+    $response->assertStatus(200)
+        ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
+        ->assertSee('# Markdown Schedule', false)
+        ->assertSee('114 學年度下學期')
+        ->assertSee('| 課程名稱 | 班級代碼 | 老師 | 面授連結 | 備用教室連結 |', false)
+        ->assertSee('| Markdown Course | MD101 | 王小明 | https://example.com/class-link | https://example.com/backup-link |', false)
+        ->assertSee('考試資訊')
+        ->assertSee('4/25')
+        ->assertSee('6/27');
+});
+
+it('schedule show markdown page shows placeholders when teacher and link are missing', function () {
+    config()->set('app.current_semester', '2025B');
+
+    $course = Course::factory()->create(['name' => 'No Teacher Course']);
+
+    $class = CourseClass::factory()->create([
+        'course_id' => $course->id,
+        'code' => 'NT101',
+        'teacher_name' => '',
+        'link' => '',
+        'backup_classroom_url' => null,
+    ]);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'No Teacher Schedule',
+    ]);
+
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_class_id' => $class->id,
+    ]);
+
+    ClassSchedule::factory()->create([
+        'class_id' => $class->id,
+        'date' => '2025-03-12',
+    ]);
+
+    $response = $this->get(route('schedules.show.md', $schedule));
+
+    $response->assertStatus(200)
+        ->assertSee('| No Teacher Course | NT101 | 未提供 | 未提供 | 未提供 |', false);
+});
+
+it('schedule show page returns markdown when the client prefers it in the Accept header', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Accept Header Schedule',
+    ]);
+
+    $response = $this->get(route('schedules.show', $schedule), [
+        'Accept' => 'text/markdown, text/html;q=0.8',
+    ]);
+
+    $response->assertStatus(200)
+        ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
+        ->assertSee('# Accept Header Schedule', false);
+});
+
+it('schedule show page returns html when the client prefers it in the Accept header', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Accept Header Schedule',
+    ]);
+
+    $response = $this->get(route('schedules.show', $schedule), [
+        'Accept' => 'text/html, text/markdown;q=0.8',
+    ]);
+
+    $response->assertStatus(200)
+        ->assertHeader('Content-Type', 'text/html; charset=UTF-8');
+});
+
 it('schedule show page defaults to current semester courses and updates learning progress link', function () {
     config()->set('app.current_semester', '2026C');
 

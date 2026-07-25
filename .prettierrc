@@ -16,6 +16,10 @@
     {
       "files": ["*.blade.php"],
       "options": { "parser": "blade", "tabWidth": 4 }
+    },
+    {
+      "files": ["*.md.blade.php"],
+      "options": { "parser": "markdown", "proseWrap": "preserve" }
     }
   ]
 }
