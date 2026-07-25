@@ -2,14 +2,17 @@
 
 namespace NouTools\Domains\Home\ViewModels;
 
-use Illuminate\Support\Collection;
 use NouTools\Domains\Schedules\ViewModels\StudentScheduleCookieViewModel;
+use Spatie\LaravelData\Attributes\DataCollectionOf;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\DataCollection;
 
-final readonly class HomePageViewModel
+final class HomePageViewModel extends Data
 {
     public function __construct(
         public string $selectedDate,
-        public Collection $courses,
+        #[DataCollectionOf(HomeCourseViewModel::class)]
+        public DataCollection $courses,
         public ?StudentScheduleCookieViewModel $previousSchedule,
     ) {}
 }

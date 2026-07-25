@@ -78,6 +78,10 @@
                 </div>
             </div>
 
+            @php
+                $courses = $courses->toCollection();
+            @endphp
+
             <div class="mt-4 space-y-6">
                 @if ($courses->isEmpty())
                     <div
@@ -106,7 +110,7 @@
                                         'micro_credit' => '微學分',
                                         'other' => '其他',
                                     ];
-                                    $grouped = $course->classes->groupBy(fn ($class) => in_array($class->type->value, array_keys($typeLabels)) ? $class->type : 'other');
+                                    $grouped = $course->classes->toCollection()->groupBy(fn ($class) => in_array($class->type->value, array_keys($typeLabels)) ? $class->type : 'other');
                                 @endphp
 
                                 @foreach ($typeLabels as $typeKey => $label)
@@ -123,12 +127,12 @@
                                             @php
                                                 // group classes by start/end time so we show the time once per time slot
                                                 // If there's a schedule override for today, use that instead
-                                                $timeGroups = $grouped[$typeKey]->groupBy(function ($c) use ($selectedDate) {
-                                                    $todaySchedule = $c->schedules->first();
-                                                    if ($todaySchedule && $todaySchedule->start_time && $todaySchedule->end_time) {
-                                                        return $todaySchedule->start_time . ' - ' . $todaySchedule->end_time;
+                                                $timeGroups = $grouped[$typeKey]->groupBy(function ($c) {
+                                                    $todaySession = $c->sessions->first();
+                                                    if ($todaySession && $todaySession->startTime && $todaySession->endTime) {
+                                                        return $todaySession->startTime . ' - ' . $todaySession->endTime;
                                                     }
-                                                    return $c->start_time ? $c->start_time . ' - ' . $c->end_time : '時間未定';
+                                                    return $c->startTime ? $c->startTime . ' - ' . $c->endTime : '時間未定';
                                                 });
                                             @endphp
 
@@ -164,11 +168,11 @@
                                                                             >
                                                                                 {{ $courseClass->code }}
                                                                             </div>
-                                                                            @if ($courseClass->teacher_name)
+                                                                            @if ($courseClass->teacherName)
                                                                                 <div
                                                                                     class="mt-1 truncate text-sm text-warm-600 dark:text-zinc-400"
                                                                                 >
-                                                                                    {{ $courseClass->teacher_name }}
+                                                                                    {{ $courseClass->teacherName }}
                                                                                 </div>
                                                                             @endif
                                                                         </a>
@@ -181,19 +185,19 @@
                                                                             >
                                                                                 {{ $courseClass->code }}
                                                                             </div>
-                                                                            @if ($courseClass->teacher_name)
+                                                                            @if ($courseClass->teacherName)
                                                                                 <div
                                                                                     class="mt-1 truncate text-sm text-warm-600 dark:text-zinc-400"
                                                                                 >
-                                                                                    {{ $courseClass->teacher_name }}
+                                                                                    {{ $courseClass->teacherName }}
                                                                                 </div>
                                                                             @endif
                                                                         </div>
                                                                     @endif
 
-                                                                    @if ($courseClass->backup_classroom_url)
+                                                                    @if ($courseClass->backupClassroomUrl)
                                                                         <a
-                                                                            href="{{ $courseClass->backup_classroom_url }}"
+                                                                            href="{{ $courseClass->backupClassroomUrl }}"
                                                                             target="_blank"
                                                                             rel="noopener noreferrer"
                                                                             class="inline-flex items-center justify-center gap-1 rounded border border-warm-200 bg-warm-50 px-3 py-2 text-sm font-semibold text-warm-700 transition hover:bg-warm-100 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900"
