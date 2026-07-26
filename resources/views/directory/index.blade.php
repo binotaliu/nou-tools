@@ -112,12 +112,7 @@
                         ->values();
                 @endphp
 
-                <x-card
-                    :title="$centerGroup->label"
-                    x-data
-                    x-show="!$store.network.offline"
-                    x-cloak
-                >
+                <x-card :title="$centerGroup->label">
                     <div
                         x-data="linksCenterMap({
                                     centers: {{ Js::from($centersFrontEndData) }},
@@ -202,9 +197,22 @@
                                 >
                                     <div
                                         x-ref="mapContainer"
+                                        x-show="!$store.network.offline"
                                         data-testid="center-map"
                                         class="h-80 w-full rounded-lg border border-warm-100 dark:border-zinc-800"
                                     ></div>
+
+                                    <div
+                                        x-show="$store.network.offline"
+                                        x-cloak
+                                        data-testid="center-map-offline-notice"
+                                        class="flex h-80 w-full flex-col items-center justify-center gap-2 rounded-lg border border-warm-100 px-4 text-center text-sm text-warm-700 dark:border-zinc-800 dark:text-zinc-400"
+                                    >
+                                        <x-heroicon-o-signal-slash
+                                            class="size-6 shrink-0"
+                                        />
+                                        <p>目前處於離線狀態，學習指導中心地圖需要連線才能顯示。</p>
+                                    </div>
 
                                     <div
                                         class="space-y-2 text-sm text-warm-700 dark:text-zinc-300"
@@ -214,9 +222,10 @@
                                             x-text="selectedCenter.name"
                                         ></p>
 
-                                        <p x-show="
-                                                selectedCenter.address
-                                            " class="flex items-start gap-1">
+                                        <p
+                                            x-show="selectedCenter.address"
+                                            class="flex items-start gap-1"
+                                        >
                                             <x-heroicon-o-map-pin
                                                 class="mt-0.5 size-4 shrink-0"
                                             />
@@ -243,6 +252,7 @@
                                         >
                                             <a
                                                 :href="'tel:' + phone.link"
+                                                data-offline-allow
                                                 class="flex items-center gap-1 hover:underline"
                                             >
                                                 <x-heroicon-o-phone
