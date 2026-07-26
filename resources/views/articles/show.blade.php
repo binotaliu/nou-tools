@@ -24,7 +24,7 @@
             {{-- Sidebar --}}
             <aside class="shrink-0 md:w-64">
                 <div
-                    class="sticky top-4 rounded-lg border border-warm-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+                    class="sticky top-[6.45rem] rounded-lg border border-warm-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
                 >
                     <h3
                         class="mb-3 font-semibold text-warm-900 dark:text-zinc-100"
@@ -62,12 +62,61 @@
                     {{-- Article Header --}}
                     <header
                         class="mb-6 border-b border-warm-200 pb-6 dark:border-zinc-700"
+                        x-data="{
+                            showShareModal: false,
+                            copied: false,
+                            shareTitle: {{ Js::from($viewModel->article->title) }},
+                            shareUrl: {{ Js::from(url()->current()) }},
+                            async share() {
+                                if (navigator.share) {
+                                    try {
+                                        await navigator.share({
+                                            title: this.shareTitle,
+                                            url: this.shareUrl,
+                                        })
+                                    } catch (e) {
+                                        // User cancelled the share sheet; nothing to do.
+                                    }
+
+                                    return
+                                }
+
+                                this.showShareModal = true
+                            },
+                            async copy() {
+                                try {
+                                    await navigator.clipboard.writeText(this.shareUrl)
+                                } catch (e) {
+                                    this.$refs.shareInput.select()
+                                    document.execCommand('copy')
+                                }
+
+                                this.copied = true
+                                setTimeout(() => (this.copied = false), 2000)
+                            },
+                        }"
                     >
-                        <h1
-                            class="mb-3 text-3xl font-bold text-warm-900 dark:text-zinc-100"
+                        <div
+                            class="mb-3 flex items-start justify-between gap-4"
                         >
-                            {{ $viewModel->article->title }}
-                        </h1>
+                            <h1
+                                class="text-3xl font-bold text-warm-900 dark:text-zinc-100"
+                            >
+                                {{ $viewModel->article->title }}
+                            </h1>
+
+                            <x-button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                @click="share()"
+                                class="shrink-0"
+                                data-testid="article-share-button"
+                            >
+                                <x-heroicon-o-share class="size-4" />
+                                分享
+                            </x-button>
+                        </div>
 
                         <div
                             class="flex items-center gap-4 text-sm text-warm-500 dark:text-zinc-400"
@@ -84,6 +133,59 @@
                                 </span>
                             @endif
                         </div>
+
+                        <x-modal
+                            name="showShareModal"
+                            title="分享這篇文章"
+                            data-testid="article-share-modal"
+                        >
+                            <div
+                                class="flex items-stretch gap-3 rounded border border-warm-300 bg-white text-sm text-warm-600 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
+                            >
+                                <input
+                                    class="flex-1 px-3 py-2 font-mono break-all text-warm-600 dark:text-zinc-400"
+                                    :value="shareUrl"
+                                    readonly
+                                    @click="$event.target.select()"
+                                    x-ref="shareInput"
+                                    aria-label="文章連結"
+                                />
+
+                                <x-button
+                                    type="button"
+                                    variant="warm-subtle"
+                                    size="sm"
+                                    @click="copy()"
+                                    x-bind:aria-pressed="copied.toString()"
+                                    class="my-1 mr-1 shrink-0 whitespace-nowrap"
+                                    data-testid="article-share-copy"
+                                >
+                                    <span x-show="!copied">
+                                        <x-heroicon-o-clipboard-document
+                                            class="inline size-4"
+                                        />
+                                        複製連結
+                                    </span>
+                                    <span x-show="copied">
+                                        <x-heroicon-o-check
+                                            class="inline size-4"
+                                        />
+                                        已複製！
+                                    </span>
+                                </x-button>
+                            </div>
+
+                            <x-slot:footer>
+                                <x-button
+                                    type="button"
+                                    variant="secondary"
+                                    @click="showShareModal = false"
+                                    data-testid="article-share-close"
+                                >
+                                    關閉
+                                </x-button>
+                            </x-slot:footer>
+                        </x-modal>
                     </header>
 
                     {{-- Article Content --}}
