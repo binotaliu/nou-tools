@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace NouTools\Domains\Home\Actions;
 
 use App\Models\Course;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use NouTools\Domains\Home\DataTransferObjects\ShowHomePageData;
 use NouTools\Domains\Home\PageData\HomePageData;
 use NouTools\Domains\Home\ViewModels\HomeCourseViewModel;
@@ -49,10 +49,10 @@ final readonly class ShowHomePage
     {
         try {
             return $date
-                ? Carbon::createFromFormat('Y-m-d', $date, 'Asia/Taipei')->format('Y-m-d')
-                : Carbon::now('Asia/Taipei')->format('Y-m-d');
+                ? Date::createFromFormat('Y-m-d', $date, 'Asia/Taipei')->format('Y-m-d')
+                : Date::now('Asia/Taipei')->format('Y-m-d');
         } catch (\Exception) {
-            return Carbon::now('Asia/Taipei')->format('Y-m-d');
+            return Date::now('Asia/Taipei')->format('Y-m-d');
         }
     }
 }

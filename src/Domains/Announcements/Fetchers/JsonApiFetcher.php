@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Announcements\Fetchers;
 
-use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 use NouTools\Domains\Announcements\Contracts\AnnouncementFetcher;
 use NouTools\Domains\Announcements\DataTransferObjects\AnnouncementSourceConfigDTO;
@@ -38,10 +38,10 @@ final readonly class JsonApiFetcher implements AnnouncementFetcher
 
             $publishedAt = null;
             if (! empty($advert['CreateDateTime'])) {
-                $publishedAt = CarbonImmutable::parse($advert['CreateDateTime'], 'Asia/Taipei');
+                $publishedAt = Date::parse($advert['CreateDateTime'], 'Asia/Taipei');
             }
             if (! empty($advert['StartDateTime'])) {
-                $publishedAt = CarbonImmutable::parse($advert['StartDateTime'], 'Asia/Taipei');
+                $publishedAt = Date::parse($advert['StartDateTime'], 'Asia/Taipei');
             }
 
             return new FetchedAnnouncementDTO(

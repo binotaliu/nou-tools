@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Announcements\DataTransferObjects;
 
-use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Spatie\LaravelData\Data;
 
 final class FetchedAnnouncementDTO extends Data
@@ -15,6 +15,6 @@ final class FetchedAnnouncementDTO extends Data
         public string $url,
         /** @var string[]|null */
         public ?array $tags = null,
-        public ?CarbonImmutable $publishedAt = null,
+        public ?CarbonInterface $publishedAt = null,
     ) {}
 }

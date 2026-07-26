@@ -6,7 +6,8 @@ namespace NouTools\Domains\LearningProgress\ViewModels;
 
 use App\Models\LearningProgress;
 use App\Models\StudentSchedule;
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\Date;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -22,9 +23,9 @@ final class LearningProgressViewModel extends Data
         public DataCollection $courses,
         #[DataCollectionOf(LearningProgressWeekViewModel::class)]
         public DataCollection $weeks,
-        public Carbon $semesterStart,
-        public Carbon $semesterEnd,
-        public Carbon $now,
+        public CarbonInterface $semesterStart,
+        public CarbonInterface $semesterEnd,
+        public CarbonInterface $now,
         #[DataCollectionOf(LearningProgressEntryViewModel::class)]
         public DataCollection $entries,
         public int $completedCount = 0,
@@ -36,7 +37,7 @@ final class LearningProgressViewModel extends Data
      * @param  array<int, array{id: int, code?: ?string, name: string}>  $courses
      * @param  array<int, array{num: int, start: string, end: string}>  $weeks
      */
-    public static function fromModel(LearningProgress $learningProgress, StudentSchedule $schedule, array $courses, array $weeks, Carbon $semesterStart, Carbon $semesterEnd): self
+    public static function fromModel(LearningProgress $learningProgress, StudentSchedule $schedule, array $courses, array $weeks, CarbonInterface $semesterStart, CarbonInterface $semesterEnd): self
     {
         $progressData = $learningProgress->progress ?? [];
         $notesData = $learningProgress->notes ?? [];
@@ -84,7 +85,7 @@ final class LearningProgressViewModel extends Data
             ),
             semesterStart: $semesterStart,
             semesterEnd: $semesterEnd,
-            now: Carbon::now('Asia/Taipei'),
+            now: Date::now('Asia/Taipei'),
             entries: new DataCollection(LearningProgressEntryViewModel::class, $entries),
             completedCount: $completed,
             totalCount: $total,

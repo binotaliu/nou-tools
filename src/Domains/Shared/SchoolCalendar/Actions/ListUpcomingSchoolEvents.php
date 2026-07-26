@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Shared\SchoolCalendar\Actions;
 
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Date;
 
 final class ListUpcomingSchoolEvents
 {
@@ -27,19 +27,19 @@ final class ListUpcomingSchoolEvents
         }
 
         $now = $referenceDate
-            ? Carbon::parse($referenceDate, 'Asia/Taipei')
-            : Carbon::now('Asia/Taipei');
+            ? Date::parse($referenceDate, 'Asia/Taipei')
+            : Date::now('Asia/Taipei');
 
         $today = $now->copy()->startOfDay();
 
         $events = [];
 
         foreach ($schedules as $schedule) {
-            $end = Carbon::parse($schedule['end'], 'Asia/Taipei');
+            $end = Date::parse($schedule['end'], 'Asia/Taipei');
 
             if ($end->gte($today)) {
                 $events[] = [
-                    'start' => Carbon::parse($schedule['start'], 'Asia/Taipei')->format('Y-m-d'),
+                    'start' => Date::parse($schedule['start'], 'Asia/Taipei')->format('Y-m-d'),
                     'end' => $end->format('Y-m-d'),
                     'name' => $schedule['name'],
                     'countdown' => $schedule['countdown'],

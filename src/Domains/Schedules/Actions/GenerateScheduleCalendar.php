@@ -7,8 +7,8 @@ namespace NouTools\Domains\Schedules\Actions;
 use App\Models\Course;
 use App\Models\CourseClass;
 use App\Models\StudentSchedule;
-use Carbon\Carbon;
 use DateTimeInterface;
+use Illuminate\Support\Facades\Date;
 use NouTools\Domains\Schedules\PageData\ScheduleCustomizationPageData;
 use NouTools\Domains\Shared\SchoolCalendar\Actions\GetCurrentSchoolCalendar;
 
@@ -102,7 +102,7 @@ final readonly class GenerateScheduleCalendar
 
     private function convertToICSDateTime(DateTimeInterface $date, string $time): string
     {
-        $dateTime = Carbon::createFromFormat(
+        $dateTime = Date::createFromFormat(
             'Y-m-d H:i',
             $date->format('Y-m-d').' '.substr($time, 0, 5),
             new \DateTimeZone('Asia/Taipei'),
@@ -168,14 +168,14 @@ final readonly class GenerateScheduleCalendar
         $lines[] = 'DTSTAMP:'.now()->format('Ymd\THis\Z');
 
         if ($hasExamTime) {
-            $startDateTime = Carbon::createFromFormat(
+            $startDateTime = Date::createFromFormat(
                 'Y-m-d H:i',
                 $date->format('Y-m-d').' '.substr((string) $course->exam_time_start, 0, 5),
                 new \DateTimeZone('Asia/Taipei'),
             );
 
             $endDateTime = $course->exam_time_end
-                ? Carbon::createFromFormat(
+                ? Date::createFromFormat(
                     'Y-m-d H:i',
                     $date->format('Y-m-d').' '.substr((string) $course->exam_time_end, 0, 5),
                     new \DateTimeZone('Asia/Taipei'),
@@ -185,7 +185,7 @@ final readonly class GenerateScheduleCalendar
             $lines[] = 'DTSTART:'.$startDateTime->setTimezone('UTC')->format('Ymd\THis\Z');
             $lines[] = 'DTEND:'.$endDateTime->setTimezone('UTC')->format('Ymd\THis\Z');
         } else {
-            $start = Carbon::parse($date)->startOfDay();
+            $start = Date::parse($date)->startOfDay();
             $end = $start->copy()->addDay();
 
             $lines[] = 'DTSTART;VALUE=DATE:'.$start->format('Ymd');
@@ -207,8 +207,8 @@ final readonly class GenerateScheduleCalendar
         $events = ($this->getCurrentSchoolCalendar)();
 
         foreach ($events as $event) {
-            $start = Carbon::parse($event->startDate)->startOfDay();
-            $end = Carbon::parse($event->endDate)->startOfDay()->addDay();
+            $start = Date::parse($event->startDate)->startOfDay();
+            $end = Date::parse($event->endDate)->startOfDay()->addDay();
 
             if ($end->lessThanOrEqualTo($start)) {
                 $end = $start->copy()->addDay();

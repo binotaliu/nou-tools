@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Announcements\Fetchers;
 
-use Carbon\CarbonImmutable;
 use DOMDocument;
 use DOMXPath;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 use NouTools\Domains\Announcements\Contracts\AnnouncementFetcher;
 use NouTools\Domains\Announcements\DataTransferObjects\AnnouncementSourceConfigDTO;
@@ -71,7 +71,7 @@ final readonly class HtmlScrapeFetcher implements AnnouncementFetcher
             if ($dateNode !== null) {
                 $dateText = trim($dateNode->textContent);
                 if ($dateText !== '') {
-                    $publishedAt = CarbonImmutable::parse($dateText, 'Asia/Taipei');
+                    $publishedAt = Date::parse($dateText, 'Asia/Taipei');
                 }
             }
 

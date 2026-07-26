@@ -9,7 +9,7 @@ use App\Models\StudentSchedule;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use NouTools\Domains\LearningProgress\ViewModels\LearningProgressViewModel;
 
 final class ShowLearningProgressPage
@@ -75,8 +75,8 @@ final class ShowLearningProgressPage
             throw new \RuntimeException("學期 {$semesterCode} 時間範圍未設定");
         }
 
-        $semesterStart = Carbon::parse($range[0], 'Asia/Taipei')->startOfDay();
-        $semesterEnd = Carbon::parse($range[1], 'Asia/Taipei')->endOfDay();
+        $semesterStart = Date::parse($range[0], 'Asia/Taipei')->startOfDay();
+        $semesterEnd = Date::parse($range[1], 'Asia/Taipei')->endOfDay();
         $totalWeeks = intdiv((int) $semesterStart->diffInDays($semesterEnd), 7) + 1;
         $weeks = [];
 

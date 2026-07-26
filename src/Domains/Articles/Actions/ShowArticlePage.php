@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\Articles\Actions;
 
 use App\Enums\ArticleType;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\HtmlString;
 use League\CommonMark\Environment\Environment;
@@ -47,10 +47,10 @@ final class ShowArticlePage
                 title: $frontMatter['title'] ?? 'Untitled',
                 author: $frontMatter['author'] ?? 'Unknown',
                 publishedAt: isset($frontMatter['published_at'])
-                    ? Carbon::parse($frontMatter['published_at'])
-                    : Carbon::now(),
+                    ? Date::parse($frontMatter['published_at'])
+                    : Date::now(),
                 updatedAt: isset($frontMatter['updated_at'])
-                    ? Carbon::parse($frontMatter['updated_at'])
+                    ? Date::parse($frontMatter['updated_at'])
                     : null,
                 content: $result->getContent(),
                 description: $frontMatter['description'] ?? '',

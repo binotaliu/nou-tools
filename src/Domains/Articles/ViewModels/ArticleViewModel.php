@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\Articles\ViewModels;
 
 use App\Enums\ArticleType;
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\HtmlString;
 use Spatie\LaravelData\Data;
 
@@ -18,8 +18,8 @@ final class ArticleViewModel extends Data
         public ArticleType $type,
         public string $title,
         public string $author,
-        public Carbon $publishedAt,
-        public ?Carbon $updatedAt,
+        public CarbonInterface $publishedAt,
+        public ?CarbonInterface $updatedAt,
         string $content,
         public string $description,
     ) {

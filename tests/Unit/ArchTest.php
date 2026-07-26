@@ -9,8 +9,11 @@ use App\Models\DiscountStore;
 use App\Models\DiscountStoreComment;
 use App\Models\DiscountStoreReport;
 use App\Models\User;
+use App\Providers\AppServiceProvider;
 use App\View\Components\Button;
 use App\View\Components\LinkButton;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use NouTools\Domains\Schedules\Actions\GenerateScheduleCalendar;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Resource;
@@ -76,3 +79,11 @@ arch('DTOs')
 arch('No Directly File Read/Write: use the File facade or Storage facade instead')
     ->expect(['file_get_contents', 'file_put_contents'])
     ->not->toBeUsed();
+
+arch('No use of Carbon/CarbonImmutable directly: use the Date facade instead')
+    ->expect([Carbon::class, CarbonImmutable::class, Illuminate\Support\Carbon::class])
+    ->not->toBeUsed()
+    ->ignoring([
+        // Have `Date::use(CarbonImmutable::class)`
+        AppServiceProvider::class,
+    ]);

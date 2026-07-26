@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Announcements\Fetchers;
 
-use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
 use DOMXPath;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 use NouTools\Domains\Announcements\Contracts\AnnouncementFetcher;
 use NouTools\Domains\Announcements\DataTransferObjects\AnnouncementSourceConfigDTO;
@@ -146,10 +147,10 @@ final readonly class SchoolHpFetcher implements AnnouncementFetcher
         return rtrim($baseUrl, '/').'/'.ltrim($href, '/');
     }
 
-    private function parseDate(string $dateText): ?CarbonImmutable
+    private function parseDate(string $dateText): ?CarbonInterface
     {
         try {
-            $parsed = CarbonImmutable::createFromFormat('Y/m/d', $dateText, 'Asia/Taipei');
+            $parsed = Date::createFromFormat('Y/m/d', $dateText, 'Asia/Taipei');
 
             return $parsed === false ? null : $parsed;
         } catch (\Throwable) {

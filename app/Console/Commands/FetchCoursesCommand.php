@@ -7,8 +7,9 @@ namespace App\Console\Commands;
 use App\Enums\CourseClassType;
 use App\Models\Course;
 use App\Models\CourseClass;
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use NouTools\Domains\Courses\Actions\ParseNouCourses;
@@ -106,8 +107,8 @@ final class FetchCoursesCommand extends Command
                                     'date' => $dateStr,
                                     'start_time' => $override['start_time'] ?? null,
                                     'end_time' => $override['end_time'] ?? null,
-                                    'created_at' => Carbon::now(),
-                                    'updated_at' => Carbon::now(),
+                                    'created_at' => Date::now(),
+                                    'updated_at' => Date::now(),
                                 ],
                                 ['class_id', 'date'],
                                 ['start_time', 'end_time', 'updated_at'],
@@ -196,7 +197,7 @@ final class FetchCoursesCommand extends Command
     /**
      * Parse a date string like "03/09" into a Carbon date for the given year.
      */
-    private function parseDate(string $dateString, int $year): ?Carbon
+    private function parseDate(string $dateString, int $year): ?CarbonInterface
     {
         $parts = explode('/', $dateString);
 
@@ -211,6 +212,6 @@ final class FetchCoursesCommand extends Command
             return null;
         }
 
-        return Carbon::create($year, $month, $day);
+        return Date::create($year, $month, $day);
     }
 }

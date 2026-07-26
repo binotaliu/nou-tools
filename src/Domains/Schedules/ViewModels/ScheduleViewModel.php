@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\Schedules\ViewModels;
 
 use App\Models\StudentSchedule;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use NouTools\Domains\Schedules\PageData\ScheduleCustomizationPageData;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
@@ -77,7 +77,7 @@ final class ScheduleViewModel extends Data
         foreach ($schedule->items as $item) {
             foreach ($item->courseClass->schedules as $classSchedule) {
                 $monthKey = $classSchedule->date->format('Y-m');
-                $monthDisplay = Carbon::parse($classSchedule->date)->isoFormat('Y 年 M 月');
+                $monthDisplay = Date::parse($classSchedule->date)->isoFormat('Y 年 M 月');
 
                 if (! isset($coursesByMonth[$monthKey])) {
                     $coursesByMonth[$monthKey] = [
