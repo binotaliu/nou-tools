@@ -7,6 +7,4 @@
     }
 @endphp
 
-<th {{ $attrs }}>
-    {{ $slot }}
-</th>
+<th {{ $attrs }}>{{ $slot }}</th>

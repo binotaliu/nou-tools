@@ -18,11 +18,9 @@
             </h2>
             <p
                 class="mx-auto mt-4 max-w-xl text-lg text-warm-600 dark:text-zinc-400"
-            >
-                專為 NOU 同學打造的 UU 平台瀏覽器 App。
-                <br class="hidden sm:inline" />
-                隨時隨地在行動裝置上輕鬆學習。
-            </p>
+            >專為 NOU 同學打造的 UU 平台瀏覽器 App。
+            <br class="hidden sm:inline" />
+            隨時隨地在行動裝置上輕鬆學習。</p>
 
             <div
                 class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
@@ -57,10 +55,7 @@
                 </a>
             </div>
 
-            <p class="mt-3 text-xs text-warm-400 dark:text-zinc-500">
-                App Store 支援 iPhone、iPad 及 Mac（Apple
-                Silicon）&nbsp;·&nbsp;Android 版封閉測試中
-            </p>
+            <p class="mt-3 text-xs text-warm-400 dark:text-zinc-500">App Store 支援 iPhone、iPad 及 Mac（Apple Silicon）&nbsp;·&nbsp;Android 版封閉測試中</p>
         </div>
 
         {{-- Features --}}
@@ -83,10 +78,7 @@
                     >
                         瀏覽 UU 平台教材
                     </h4>
-                    <p class="text-sm text-warm-600 dark:text-zinc-400">
-                        以 App 瀏覽 UU
-                        平台，讓你在行動裝置上輕鬆存取所有課程教材，不需使用瀏覽器開啟電腦版網頁。
-                    </p>
+                    <p class="text-sm text-warm-600 dark:text-zinc-400">以 App 瀏覽 UU 平台，讓你在行動裝置上輕鬆存取所有課程教材，不需使用瀏覽器開啟電腦版網頁。</p>
                 </x-card>
 
                 <x-card>
@@ -100,9 +92,7 @@
                     >
                         保存學習時數
                     </h4>
-                    <p class="text-sm text-warm-600 dark:text-zinc-400">
-                        開啟教材後，畫面右上方會顯示本次學習計時器。觀看完畢後點擊返回按鈕，即可自動保存本次學習時數。
-                    </p>
+                    <p class="text-sm text-warm-600 dark:text-zinc-400">開啟教材後，畫面右上方會顯示本次學習計時器。觀看完畢後點擊返回按鈕，即可自動保存本次學習時數。</p>
                 </x-card>
 
                 <x-card>
@@ -116,10 +106,7 @@
                     >
                         繼續上次觀看進度
                     </h4>
-                    <p class="text-sm text-warm-600 dark:text-zinc-400">
-                        Alt UU
-                        會記住你上次觀看的位置，讓你再次開啟教材時能直接從上次離開的地方繼續學習。
-                    </p>
+                    <p class="text-sm text-warm-600 dark:text-zinc-400">Alt UU 會記住你上次觀看的位置，讓你再次開啟教材時能直接從上次離開的地方繼續學習。</p>
                 </x-card>
 
                 <x-card>
@@ -133,10 +120,7 @@
                     >
                         NOU 小幫手整合
                     </h4>
-                    <p class="text-sm text-warm-600 dark:text-zinc-400">
-                        支援整合「NOU 小幫手」，開啟後即可在 App
-                        內直接檢視學校行事曆、視訊面授資訊，以及考古題等。
-                    </p>
+                    <p class="text-sm text-warm-600 dark:text-zinc-400">支援整合「NOU 小幫手」，開啟後即可在 App 內直接檢視學校行事曆、視訊面授資訊，以及考古題等。</p>
                 </x-card>
             </div>
         </div>
@@ -146,17 +130,13 @@
                 <div>
                     <p
                         class="text-xs font-semibold text-warm-400 dark:text-zinc-500"
-                    >
-                        iPhone / iPad / Mac
-                    </p>
+                    >iPhone / iPad / Mac</p>
                     <h4
                         class="mt-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
                     >
                         App Store
                     </h4>
-                    <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">
-                        支援 iPhone、iPad，以及搭載 Apple Silicon 的 Mac。
-                    </p>
+                    <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">支援 iPhone、iPad，以及搭載 Apple Silicon 的 Mac。</p>
                 </div>
                 <x-link-button
                     href="https://apps.apple.com/tw/app/alt-uu/id6760690577"
@@ -173,19 +153,15 @@
                 <div>
                     <p
                         class="text-xs font-semibold text-warm-400 dark:text-zinc-500"
-                    >
-                        Android
-                    </p>
+                    >Android</p>
                     <h4
                         class="mt-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
                     >
                         Google Play 封測
                     </h4>
-                    <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">
-                        Android 版目前正在封測階段。
-                        <br />
-                        填寫申請表單後即可加入封測，搶先體驗 Android 版功能。
-                    </p>
+                    <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">Android 版目前正在封測階段。
+                    <br />
+                    填寫申請表單後即可加入封測，搶先體驗 Android 版功能。</p>
                 </div>
                 <x-link-button
                     href="https://docs.google.com/forms/d/e/1FAIpQLSe4TJ3vDrj2ohQBdGbzimj62W2rA-rQaKVJqymdvAkD_VVsSA/viewform?usp=header"
@@ -203,62 +179,22 @@
         <div
             class="flex flex-col gap-2 text-xs text-warm-400 dark:text-zinc-500"
         >
-            <p>
-                使用 Alt UU，你必須同意並遵守 Alt UU 的《
-                <a
-                    href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/usage-policy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"
-                >
-                    使用條款
-                </a>
-                》與 《
-                <a
-                    href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/privacy-policy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"
-                >
-                    隱私權政策
-                </a>
-                》。
-            </p>
-            <p>
-                Alt UU 並非 NOU 官方產品，僅為學生開發的第三方 App，與 NOU
-                官方無任何隸屬或合作關係。有關 Alt UU 之運作方式，請參閱《
-                <a
-                    href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/app-architecture"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"
-                >
-                    Alt UU 運作原理說明
-                </a>
-                》。
-            </p>
-            <p>
-                Alt UU 是自由且開放之軟體，原始碼以 AGPL-3.0-or-later
-                授權條款公開於
-                <a
-                    href="https://github.com/binotaliu/alt-uu"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"
-                >
-                    GitHub
-                </a>
-                ，歡迎任何人檢視、審閱、使用、修改或貢獻程式碼。
-            </p>
-            <p>
-                iPhone, iPad, Mac, and App Store are trademarks of Apple Inc.,
-                registered in the U.S. and other countries.
-                <br />
-                Android is a trademark of Google LLC.
-                <br />
-                This site is not endorsed by or affiliated with Apple Inc. or
-                Google LLC.
-            </p>
+            <p>使用 Alt UU，你必須同意並遵守 Alt UU 的《
+            <a href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/usage-policy" target="_blank" rel="noopener noreferrer" class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"> 使用條款 </a>
+            》與 《
+            <a href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/privacy-policy" target="_blank" rel="noopener noreferrer" class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"> 隱私權政策 </a>
+            》。</p>
+            <p>Alt UU 並非 NOU 官方產品，僅為學生開發的第三方 App，與 NOU 官方無任何隸屬或合作關係。有關 Alt UU 之運作方式，請參閱《
+            <a href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/app-architecture" target="_blank" rel="noopener noreferrer" class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"> Alt UU 運作原理說明 </a>
+            》。</p>
+            <p>Alt UU 是自由且開放之軟體，原始碼以 AGPL-3.0-or-later 授權條款公開於
+            <a href="https://github.com/binotaliu/alt-uu" target="_blank" rel="noopener noreferrer" class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"> GitHub </a>
+            ，歡迎任何人檢視、審閱、使用、修改或貢獻程式碼。</p>
+            <p>iPhone, iPad, Mac, and App Store are trademarks of Apple Inc., registered in the U.S. and other countries.
+            <br />
+            Android is a trademark of Google LLC.
+            <br />
+            This site is not endorsed by or affiliated with Apple Inc. or Google LLC.</p>
         </div>
     </div>
 </x-layout>

@@ -6,6 +6,7 @@ use Pest\Arch\Contracts\ArchExpectation;
 use Pest\Arch\Expectations\Targeted;
 use Pest\Arch\Objects\ObjectDescription;
 use Pest\Arch\Support\FileLineFinder;
+use Pest\Browser\Playwright\Playwright;
 use Pest\Support\Reflection;
 use Tests\TestCase;
 
@@ -23,6 +24,25 @@ use Tests\TestCase;
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
     ->in('Feature', 'Browser');
+
+/*
+|--------------------------------------------------------------------------
+| Browser Tests - Chrome Process Cleanup
+|--------------------------------------------------------------------------
+|
+| pest-plugin-browser doesn't close the underlying Chrome process between
+| tests, so it accumulates one Chrome process per test across a run. Under
+| --parallel this exhausts CPU/RAM within a few dozen tests, and the
+| resulting contention is what looks like a "hung" browser test rather than
+| a slow one. Force-closing after every test keeps exactly one Chrome
+| process alive per worker.
+| @see https://github.com/pestphp/pest/issues/1480
+|
+*/
+
+uses()->afterAll(function (): void {
+    Playwright::close();
+})->in('Browser');
 
 /*
 |--------------------------------------------------------------------------

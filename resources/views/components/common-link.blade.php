@@ -12,7 +12,5 @@
         {{ $icon }}
     @endisset
 
-    <span class="flex grow">
-        {{ $slot }}
-    </span>
+    <span class="flex grow"> {{ $slot }} </span>
 </a>

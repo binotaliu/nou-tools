@@ -81,7 +81,11 @@
             </div>
 
             <template
-                x-if="showResults && filteredCourses.length === 0 && searchQuery.trim()"
+                x-if="
+                    showResults &&
+                    filteredCourses.length === 0 &&
+                    searchQuery.trim()
+                "
             >
                 <div
                     class="mt-2 rounded-lg border border-warm-200 bg-warm-50 p-4 text-warm-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300"
@@ -97,17 +101,12 @@
                 <div
                     class="rounded-lg border-2 border-dashed border-warm-300 bg-warm-50 p-6 text-center text-warm-700 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-300"
                 >
-                    <p class="text-lg">
-                        還沒有選擇任何課程。請在上方搜尋並選擇課程。
-                    </p>
+                    <p class="text-lg">還沒有選擇任何課程。請在上方搜尋並選擇課程。</p>
                 </div>
             </template>
 
             <div class="space-y-4">
-                <template
-                    x-for="(item, index) in selectedItems"
-                    :key="index"
-                >
+                <template x-for="(item, index) in selectedItems" :key="index">
                     <div
                         class="rounded-lg border-2 border-warm-300 bg-warm-50 p-4 dark:border-zinc-600 dark:bg-zinc-950"
                     >
@@ -141,7 +140,10 @@
                                         </legend>
 
                                         <template
-                                            x-for="type in getClassTypes(item.course)"
+                                            x-for="
+                                                type in
+                                                getClassTypes(item.course)
+                                            "
                                         >
                                             <fieldset :key="type" class="mb-4">
                                                 <legend
@@ -152,18 +154,29 @@
                                                     class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3"
                                                 >
                                                     <template
-                                                        x-for="courseClass in getClassesByType(item.course, type)"
+                                                        x-for="
+                                                            courseClass in
+                                                            getClassesByType(
+                                                                item.course,
+                                                                type
+                                                            )
+                                                        "
                                                         :key="courseClass.id"
                                                     >
                                                         <label
                                                             class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300 dark:bg-zinc-900"
-                                                            :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200 dark:border-zinc-700'"
+                                                            :class="item.selectedClassId ===
+                                                            courseClass.id
+                                                                ? 'border-orange-500 bg-orange-50'
+                                                                : 'border-warm-200 dark:border-zinc-700'"
                                                         >
                                                             <input
                                                                 type="radio"
                                                                 :name="`class_${index}`"
                                                                 :value="courseClass.id"
-                                                                x-model.number="item.selectedClassId"
+                                                                x-model.number="
+                                                                    item.selectedClassId
+                                                                "
                                                                 class="mt-1 mr-3 h-5 w-5 cursor-pointer"
                                                             />
                                                             <div
@@ -171,20 +184,30 @@
                                                             >
                                                                 <div
                                                                     class="font-semibold text-warm-900 dark:text-zinc-100"
-                                                                    x-text="courseClass.code"
+                                                                    x-text="
+                                                                        courseClass.code
+                                                                    "
                                                                 ></div>
                                                                 <div
                                                                     class="text-sm text-warm-600 dark:text-zinc-400"
-                                                                    x-show="courseClass.start_time"
+                                                                    x-show="
+                                                                        courseClass.start_time
+                                                                    "
                                                                 >
                                                                     <span
-                                                                        x-text="`${courseClass.start_time} - ${courseClass.end_time}`"
+                                                                        x-text="
+                                                                            `${courseClass.start_time} - ${courseClass.end_time}`
+                                                                        "
                                                                     ></span>
                                                                 </div>
                                                                 <div
                                                                     class="truncate text-sm text-warm-600 dark:text-zinc-400"
-                                                                    x-show="courseClass.teacher_name"
-                                                                    x-text="`${courseClass.teacher_name}`"
+                                                                    x-show="
+                                                                        courseClass.teacher_name
+                                                                    "
+                                                                    x-text="
+                                                                        `${courseClass.teacher_name}`
+                                                                    "
                                                                 ></div>
                                                             </div>
                                                         </label>
@@ -210,37 +233,55 @@
                                             class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3"
                                         >
                                             <template
-                                                x-for="courseClass in item.course.classes"
+                                                x-for="
+                                                    courseClass in
+                                                    item.course.classes
+                                                "
                                                 :key="courseClass.id"
                                             >
                                                 <label
                                                     class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300 dark:bg-zinc-900"
-                                                    :class="item.selectedClassId === courseClass.id ? 'border-orange-500 bg-orange-50' : 'border-warm-200 dark:border-zinc-700'"
+                                                    :class="item.selectedClassId ===
+                                                    courseClass.id
+                                                        ? 'border-orange-500 bg-orange-50'
+                                                        : 'border-warm-200 dark:border-zinc-700'"
                                                 >
                                                     <input
                                                         type="radio"
                                                         :name="`class_${index}`"
                                                         :value="courseClass.id"
-                                                        x-model.number="item.selectedClassId"
+                                                        x-model.number="
+                                                            item.selectedClassId
+                                                        "
                                                         class="mt-1 mr-3 h-5 w-5 cursor-pointer"
                                                     />
                                                     <div class="min-w-0 flex-1">
                                                         <div
                                                             class="font-semibold text-warm-900 dark:text-zinc-100"
-                                                            x-text="courseClass.code"
+                                                            x-text="
+                                                                courseClass.code
+                                                            "
                                                         ></div>
                                                         <div
                                                             class="text-sm text-warm-600 dark:text-zinc-400"
-                                                            x-show="courseClass.start_time"
+                                                            x-show="
+                                                                courseClass.start_time
+                                                            "
                                                         >
                                                             <span
-                                                                x-text="`${courseClass.start_time} - ${courseClass.end_time}`"
+                                                                x-text="
+                                                                    `${courseClass.start_time} - ${courseClass.end_time}`
+                                                                "
                                                             ></span>
                                                         </div>
                                                         <div
                                                             class="truncate text-sm text-warm-600 dark:text-zinc-400"
-                                                            x-show="courseClass.teacher_name"
-                                                            x-text="`${courseClass.teacher_name}`"
+                                                            x-show="
+                                                                courseClass.teacher_name
+                                                            "
+                                                            x-text="
+                                                                `${courseClass.teacher_name}`
+                                                            "
                                                         ></div>
                                                     </div>
                                                 </label>
@@ -387,9 +428,7 @@
                     }
 
                     if (
-                        !this.selectedItems.some(
-                            item => item.course.id === course.id
-                        )
+                        !this.selectedItems.some(item => item.course.id === course.id)
                     ) {
                         const selectedClassId =
                             course.classes.length === 1

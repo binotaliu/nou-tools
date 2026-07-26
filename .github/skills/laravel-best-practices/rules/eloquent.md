@@ -108,8 +108,7 @@ protected function casts(): array
 ```
 
 ```blade
-{{ $order->ordered_at->toDateString() }}
-{{ $order->ordered_at->format('m-d') }}
+{{ $order->ordered_at->toDateString() }} {{ $order->ordered_at->format('m-d') }}
 ```
 
 ## Use `whereBelongsTo()` for Relationship Queries

@@ -12,6 +12,8 @@
 
   "tailwindStylesheet": "./resources/css/app.css",
 
+  "bladeDirectiveArgSpacing": "none",
+
   "overrides": [
     {
       "files": ["*.blade.php"],

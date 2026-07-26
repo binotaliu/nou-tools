@@ -37,11 +37,7 @@
             <div
                 class="flex flex-1 flex-col justify-between gap-4 px-4 py-4 text-amber-900 sm:pr-12 md:px-5 md:py-5 md:pr-12 dark:text-amber-200"
             >
-                <p class="text-sm leading-6 md:text-base">
-                    全新 App「Alt UU」現已在 iOS 上全面推出。使用 Alt UU
-                    可讓你在行動裝置上輕鬆存取 NOU 數位教材。另有 Android
-                    版本封測開放申請中。
-                </p>
+                <p class="text-sm leading-6 md:text-base">全新 App「Alt UU」現已在 iOS 上全面推出。使用 Alt UU 可讓你在行動裝置上輕鬆存取 NOU 數位教材。另有 Android 版本封測開放申請中。</p>
 
                 <div
                     class="flex flex-wrap items-center justify-end gap-2 sm:-mr-8"

@@ -5,7 +5,7 @@
             async () => {
                 do {
                     await new Promise(resolve => setTimeout(resolve, 100))
-                } while (! $refs.map && ! $refs.formRestorationInput)
+                } while (!$refs.map && !$refs.formRestorationInput)
                 attach($refs.map, $refs)
             }
         "

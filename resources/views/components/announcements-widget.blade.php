@@ -66,7 +66,7 @@
                             •
                             {{ $announcement->published_at->format('Y/m/d') }}
                         @else
-                                未提供
+                            未提供
                         @endif
                     </p>
                 </div>

@@ -105,22 +105,10 @@
                             <div>
                                 <p
                                     class="sr-only font-medium text-warm-700 dark:text-zinc-300"
-                                >
-                                    授權方式
-                                </p>
-                                <p>
-                                    本文採用
-                                    <a
-                                        href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="text-warm-700 underline transition hover:text-warm-900 hover:no-underline dark:text-zinc-300 dark:hover:text-zinc-100"
-                                    >
-                                        創用 CC 姓名標示─非商業性─相同方式分享
-                                        4.0 國際版授權條款 (CC BY-NC-SA 4.0)
-                                    </a>
-                                    釋出。
-                                </p>
+                                >授權方式</p>
+                                <p>本文採用
+                                <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant" target="_blank" rel="noopener noreferrer" class="text-warm-700 underline transition hover:text-warm-900 hover:no-underline dark:text-zinc-300 dark:hover:text-zinc-100"> 創用 CC 姓名標示─非商業性─相同方式分享 4.0 國際版授權條款 (CC BY-NC-SA 4.0) </a>
+                                釋出。</p>
                             </div>
                         </div>
                     </footer>

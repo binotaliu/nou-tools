@@ -64,8 +64,7 @@
 
                     @if ($store->city)
                         <span class="text-warm-500 dark:text-zinc-400">
-                            {{ $store->city }}
-                            {{ $store->district }}
+                            {{ $store->city }} {{ $store->district }}
                         </span>
                     @endif
                 </div>
@@ -99,7 +98,9 @@
                                 class="text-orange-600 hover:underline"
                                 @click="openMapSelectionModal()"
                                 :disabled="!hasCoordinates"
-                                :class="hasCoordinates ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'"
+                                :class="hasCoordinates
+                                    ? 'cursor-pointer'
+                                    : 'cursor-not-allowed opacity-50'"
                             >
                                 {{ $store->address }}
                             </button>
@@ -149,9 +150,7 @@
                     class="space-y-2 rounded-lg border border-warm-100 bg-warm-50 px-4 py-3 text-sm text-warm-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
                 >
                     <div class="flex flex-wrap items-center gap-2">
-                        <p class="font-medium text-warm-900 dark:text-zinc-100">
-                            最新回報
-                        </p>
+                        <p class="font-medium text-warm-900 dark:text-zinc-100">最新回報</p>
                         @if ($latestReport)
                             <span
                                 class="{{ $latestReport->is_valid ? 'text-green-700 dark:text-green-400' : 'text-red-600 dark:text-red-400' }} inline-flex items-center gap-1 font-medium"
@@ -227,18 +226,14 @@
                             </details>
                         @endif
                     @else
-                        <p class="text-sm text-warm-600 dark:text-zinc-400">
-                            目前還沒有回報資料。
-                        </p>
+                        <p class="text-sm text-warm-600 dark:text-zinc-400">目前還沒有回報資料。</p>
                     @endif
                 </div>
 
                 <div
                     class="flex flex-col gap-2 border-t border-warm-100 pt-3 dark:border-zinc-800"
                 >
-                    <p class="text-sm text-warm-600 dark:text-zinc-400">
-                        使用了本優惠嗎？請協助回報優惠的有效性，讓其他同學參考！
-                    </p>
+                    <p class="text-sm text-warm-600 dark:text-zinc-400">使用了本優惠嗎？請協助回報優惠的有效性，讓其他同學參考！</p>
                     <div class="flex items-center gap-2">
                         <button
                             type="button"
@@ -318,8 +313,10 @@
                                         <button
                                             type="submit"
                                             class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:bg-gray-400"
-                                            :class="isValid ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'"
-                                            :disabled="! reportFormTurnstileChallengeExecuted"
+                                            :class="isValid
+                                                ? 'bg-green-600 hover:bg-green-700'
+                                                : 'bg-red-600 hover:bg-red-700'"
+                                            :disabled="!reportFormTurnstileChallengeExecuted"
                                         >
                                             確認回報
                                         </button>
@@ -372,8 +369,7 @@
                             <span
                                 class="text-xs text-warm-400 dark:text-zinc-500"
                             >
-                                —
-                                {{ $comment->created_at->diffForHumans() }}
+                                — {{ $comment->created_at->diffForHumans() }}
                             </span>
                         </div>
                     @endforeach
@@ -388,9 +384,7 @@
                 >
                     新增留言
                 </h3>
-                <p class="text-sm text-warm-600 dark:text-zinc-400">
-                    歡迎分享使用經驗，留言會在審核後顯示。
-                </p>
+                <p class="text-sm text-warm-600 dark:text-zinc-400">歡迎分享使用經驗，留言會在審核後顯示。</p>
                 <button
                     type="button"
                     class="inline-flex items-center gap-1 rounded-lg bg-warm-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-warm-900"
@@ -441,8 +435,7 @@
                                     maxlength="1000"
                                     rows="5"
                                     required
-                                >
-{{ old('content') }}</textarea
+                                    >{{ old('content') }}</textarea
                                 >
                             </div>
                             <div>
@@ -452,14 +445,12 @@
                                     explicit
                                 />
                             </div>
-                            <p class="text-xs text-warm-500 dark:text-zinc-400">
-                                為避免垃圾留言，留言將由管理員審核後才會顯示出來。
-                            </p>
+                            <p class="text-xs text-warm-500 dark:text-zinc-400">為避免垃圾留言，留言將由管理員審核後才會顯示出來。</p>
                             <div class="flex items-center gap-2">
                                 <button
                                     type="submit"
                                     class="inline-flex items-center gap-1 rounded-lg bg-warm-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-warm-900 disabled:bg-gray-400"
-                                    :disabled="! commentFormTurnstileChallengeExecuted"
+                                    :disabled="!commentFormTurnstileChallengeExecuted"
                                 >
                                     <x-heroicon-o-chat-bubble-left
                                         class="size-4"
@@ -606,13 +597,8 @@
                         this.showReportModal = false
                         this.reportFormTurnstileChallengeExecuted = false
 
-                        if (
-                            window.turnstile &&
-                            this.reportTurnstileWidgetId !== null
-                        ) {
-                            window.turnstile.remove(
-                                this.reportTurnstileWidgetId
-                            )
+                        if (window.turnstile && this.reportTurnstileWidgetId !== null) {
+                            window.turnstile.remove(this.reportTurnstileWidgetId)
                             this.reportTurnstileWidgetId = null
                         }
                     },
@@ -628,13 +614,8 @@
                         this.showCommentModal = false
                         this.commentFormTurnstileChallengeExecuted = false
 
-                        if (
-                            window.turnstile &&
-                            this.commentTurnstileWidgetId !== null
-                        ) {
-                            window.turnstile.remove(
-                                this.commentTurnstileWidgetId
-                            )
+                        if (window.turnstile && this.commentTurnstileWidgetId !== null) {
+                            window.turnstile.remove(this.commentTurnstileWidgetId)
                             this.commentTurnstileWidgetId = null
                         }
                     },
@@ -693,24 +674,21 @@
                                 return
                             }
 
-                            const widgetId = window.turnstile.render(
-                                `#${containerId}`,
-                                {
-                                    sitekey: container.dataset.sitekey,
-                                    theme: container.dataset.theme,
-                                    language: container.dataset.language,
-                                    size: container.dataset.size,
-                                    callback: () => {
-                                        onSuccess()
-                                    },
-                                    'error-callback': () => {
-                                        onInvalid()
-                                    },
-                                    'expired-callback': () => {
-                                        onInvalid()
-                                    },
-                                }
-                            )
+                            const widgetId = window.turnstile.render(`#${containerId}`, {
+                                sitekey: container.dataset.sitekey,
+                                theme: container.dataset.theme,
+                                language: container.dataset.language,
+                                size: container.dataset.size,
+                                callback: () => {
+                                    onSuccess()
+                                },
+                                'error-callback': () => {
+                                    onInvalid()
+                                },
+                                'expired-callback': () => {
+                                    onInvalid()
+                                },
+                            })
 
                             onRendered(widgetId)
                         }

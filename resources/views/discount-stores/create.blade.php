@@ -10,9 +10,7 @@
             <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
                 新增優惠店家
             </h2>
-            <p class="text-sm text-warm-600 dark:text-zinc-400">
-                填寫下方表單來送出新的學生優惠店家。送出後需經管理員審核才會顯示在前台。
-            </p>
+            <p class="text-sm text-warm-600 dark:text-zinc-400">填寫下方表單來送出新的學生優惠店家。送出後需經管理員審核才會顯示在前台。</p>
         </div>
 
         <x-card>
@@ -205,7 +203,9 @@
                         name="address"
                         value="{{ old('address') }}"
                         class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
-                        :placeholder="type === 'online' ? 'https://...' : '詳細地址'"
+                        :placeholder="type === 'online'
+                            ? 'https://...'
+                            : '詳細地址'"
                     />
                     @error('address')
                         <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -254,8 +254,7 @@
                             rows="3"
                             class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                             placeholder="描述詳細的優惠內容..."
-                        >
-{{ old('discount_details') }}</textarea
+                            >{{ old('discount_details') }}</textarea
                         >
                         @error('discount_details')
                             <p class="mt-1 text-xs text-red-500">
@@ -277,8 +276,7 @@
                             rows="2"
                             class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                             placeholder="其他補充說明（選填）"
-                        >
-{{ old('notes') }}</textarea
+                            >{{ old('notes') }}</textarea
                         >
                         @error('notes')
                             <p class="mt-1 text-xs text-red-500">

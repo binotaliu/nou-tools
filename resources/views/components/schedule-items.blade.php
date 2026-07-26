@@ -292,9 +292,7 @@
                         <td
                             class="px-4 py-3 text-warm-800 tabular-nums dark:text-zinc-200 print:hidden"
                         >
-                            <template
-                                x-if="row.next && taipeiTime(row.next)"
-                            >
+                            <template x-if="row.next && taipeiTime(row.next)">
                                 <div>
                                     <span
                                         class="inline-flex items-center gap-1"
@@ -302,9 +300,7 @@
                                         <span
                                             x-text="taipeiTime(row.next)"
                                         ></span>
-                                        <template
-                                            x-if="row.next.hasOverride"
-                                        >
+                                        <template x-if="row.next.hasOverride">
                                             <span class="inline-flex">
                                                 <x-heroicon-o-exclamation-triangle
                                                     class="size-4 text-warm-500 dark:text-zinc-400"
@@ -325,9 +321,7 @@
                                     </template>
                                 </div>
                             </template>
-                            <template
-                                x-if="row.next && ! taipeiTime(row.next)"
-                            >
+                            <template x-if="row.next && !taipeiTime(row.next)">
                                 <span
                                     class="text-sm text-warm-400 dark:text-zinc-500"
                                 >
@@ -354,7 +348,7 @@
                                     ></span>
                                 </span>
                             </template>
-                            <template x-if="! teacher(row.item)">
+                            <template x-if="!teacher(row.item)">
                                 <span>−</span>
                             </template>
                         </td>
@@ -365,7 +359,8 @@
                             <a
                                 :href="row.item.courseInfoUrl"
                                 class="mr-3 inline-flex items-center gap-1 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
-                                :aria-label="row.item.courseName + ' 的課程資訊'"
+                                :aria-label="row.item.courseName +
+                                ' 的課程資訊'"
                             >
                                 <x-heroicon-o-information-circle
                                     class="inline size-4"
@@ -381,7 +376,9 @@
                                 rel="noopener"
                                 data-offline-allow
                                 class="inline-flex items-center gap-1 font-semibold text-warm-500 underline underline-offset-4 hover:text-warm-400 hover:no-underline dark:text-zinc-400 dark:hover:text-zinc-500"
-                                :aria-label="'前往 ' + row.item.courseName + ' 的視訊上課連結'"
+                                :aria-label="'前往 ' +
+                                row.item.courseName +
+                                ' 的視訊上課連結'"
                             >
                                 <x-heroicon-o-video-camera
                                     class="inline size-4"
@@ -396,7 +393,9 @@
                                 target="_blank"
                                 rel="noopener"
                                 class="inline-flex items-center gap-1 font-semibold text-warm-700 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-300 dark:hover:text-zinc-100"
-                                :aria-label="'前往 ' + row.item.courseName + ' 的備用教室連結'"
+                                :aria-label="'前往 ' +
+                                row.item.courseName +
+                                ' 的備用教室連結'"
                             >
                                 <x-heroicon-o-squares-plus
                                     class="inline size-4"
@@ -458,9 +457,7 @@
                         <div>
                             <p
                                 class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase dark:text-zinc-400"
-                            >
-                                下次上課
-                            </p>
+                            >下次上課</p>
 
                             <template x-if="row.next">
                                 <div>
@@ -470,14 +467,14 @@
                                         <span
                                             x-text="taipeiDate(row.next)"
                                         ></span>
-                                        <template
-                                            x-if="taipeiTime(row.next)"
-                                        >
+                                        <template x-if="taipeiTime(row.next)">
                                             <span
                                                 class="inline-flex items-center gap-1"
                                             >
                                                 <span
-                                                    x-text="taipeiTime(row.next)"
+                                                    x-text="
+                                                        taipeiTime(row.next)
+                                                    "
                                                 ></span>
                                                 <template
                                                     x-if="row.next.hasOverride"
@@ -501,9 +498,7 @@
                             <template x-if="!row.next">
                                 <p
                                     class="font-semibold text-warm-500 dark:text-zinc-400"
-                                >
-                                    無未來課程
-                                </p>
+                                >無未來課程</p>
                             </template>
                         </div>
                     </div>

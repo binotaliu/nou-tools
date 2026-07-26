@@ -10,9 +10,7 @@
                 <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
                     訂閱行事曆
                 </h2>
-                <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">
-                    將你的課表訂閱到行事曆應用程式，以自動同步課表更新與接收提醒。
-                </p>
+                <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">將你的課表訂閱到行事曆應用程式，以自動同步課表更新與接收提醒。</p>
             </div>
 
             <x-link-button
@@ -145,9 +143,7 @@
                     subtitle="保存設定後，已訂閱的行事曆會在同步時自動更新。"
                 >
                     <div class="space-y-4">
-                        <p class="text-sm text-warm-700 dark:text-zinc-300">
-                            修改設定後可能需要數小時才會更新訂閱內容。
-                        </p>
+                        <p class="text-sm text-warm-700 dark:text-zinc-300">修改設定後可能需要數小時才會更新訂閱內容。</p>
 
                         <label
                             class="flex cursor-pointer items-center gap-3 rounded-lg border border-warm-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"

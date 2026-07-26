@@ -13,13 +13,16 @@
             async () => {
                 do {
                     await new Promise(resolve => setTimeout(resolve, 100))
-                } while (! $refs.map)
+                } while (!$refs.map)
                 attach($refs.map)
             }
         "
         x-on:map-flyto.window="
             if (map) {
-                map.flyTo([$event.detail.lat, $event.detail.lng], config.controls.zoom)
+                map.flyTo(
+                    [$event.detail.lat, $event.detail.lng],
+                    config.controls.zoom
+                )
             }
             if (marker) {
                 marker.setLatLng([$event.detail.lat, $event.detail.lng])

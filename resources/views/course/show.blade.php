@@ -420,9 +420,7 @@
                                                     >
                                                         @if ($class->startTime)
                                                             <div>
-                                                                {{ $class->startTime }}
-                                                                -
-                                                                {{ $class->endTime }}
+                                                                {{ $class->startTime }} - {{ $class->endTime }}
                                                             </div>
                                                         @endif
                                                     </div>
@@ -469,9 +467,7 @@
                                                 >
                                                     <p
                                                         class="mb-2 text-sm font-semibold text-warm-900 dark:text-zinc-100"
-                                                    >
-                                                        視訊面授日期：
-                                                    </p>
+                                                    >視訊面授日期：</p>
 
                                                     {{-- 列出每一天；只有 session 本身有 startTime/endTime (override) 時，才在該日期旁顯示覆寫時間 --}}
                                                     <div
@@ -521,9 +517,7 @@
                                             @else
                                                 <p
                                                     class="mt-2 text-sm text-warm-600 dark:text-zinc-400"
-                                                >
-                                                    未設定上課時間
-                                                </p>
+                                                >未設定上課時間</p>
                                             @endif
                                         </div>
                                     @endforeach
@@ -558,9 +552,7 @@
                                 <div>
                                     <p
                                         class="mb-1 font-semibold text-warm-600 dark:text-zinc-400"
-                                    >
-                                        期中考正參
-                                    </p>
+                                    >期中考正參</p>
                                     @if ($exam->midtermReferencePrimary)
                                         <x-link-button
                                             href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midtermReferencePrimary }}"
@@ -586,9 +578,7 @@
                                 <div>
                                     <p
                                         class="mb-1 font-semibold text-warm-600 dark:text-zinc-400"
-                                    >
-                                        期中考副參
-                                    </p>
+                                    >期中考副參</p>
                                     @if ($exam->midtermReferenceSecondary)
                                         <x-link-button
                                             href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->midtermReferenceSecondary }}"
@@ -614,9 +604,7 @@
                                 <div>
                                     <p
                                         class="mb-1 font-semibold text-warm-600 dark:text-zinc-400"
-                                    >
-                                        期末考正參
-                                    </p>
+                                    >期末考正參</p>
                                     @if ($exam->finalReferencePrimary)
                                         <x-link-button
                                             href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->finalReferencePrimary }}"
@@ -642,9 +630,7 @@
                                 <div>
                                     <p
                                         class="mb-1 font-semibold text-warm-600 dark:text-zinc-400"
-                                    >
-                                        期末考副參
-                                    </p>
+                                    >期末考副參</p>
                                     @if ($exam->finalReferenceSecondary)
                                         <x-link-button
                                             href="https://noustud.nou.edu.tw/shared_tmp/work/exa/refans/{{ $exam->finalReferenceSecondary }}"
@@ -718,7 +704,7 @@
                                                 />
                                             </x-link-button>
                                         @else
-                                                —
+                                            —
                                         @endif
                                     </x-table-column>
                                     <x-table-column class="text-center">
@@ -736,7 +722,7 @@
                                                 />
                                             </x-link-button>
                                         @else
-                                                —
+                                            —
                                         @endif
                                     </x-table-column>
                                     <x-table-column class="text-center">
@@ -754,7 +740,7 @@
                                                 />
                                             </x-link-button>
                                         @else
-                                                —
+                                            —
                                         @endif
                                     </x-table-column>
                                     <x-table-column class="text-center">
@@ -772,7 +758,7 @@
                                                 />
                                             </x-link-button>
                                         @else
-                                                —
+                                            —
                                         @endif
                                     </x-table-column>
                                 </x-table-row>
@@ -786,9 +772,7 @@
         <x-common-links class="mb-6" />
 
         <x-card title="免責聲明">
-            <p class="text-sm text-warm-600 dark:text-zinc-400">
-                課程資料來自國立空中大學之公開資料，基於合理使用原則，以非商用、公開的方式供其他上課同學參考使用，資料版權屬於國立空中大學所有。本站只搜集課程之詮釋資料（Metadata），例如課程名稱、教師、學分數、上課時間等，不保存其他資料。
-            </p>
+            <p class="text-sm text-warm-600 dark:text-zinc-400">課程資料來自國立空中大學之公開資料，基於合理使用原則，以非商用、公開的方式供其他上課同學參考使用，資料版權屬於國立空中大學所有。本站只搜集課程之詮釋資料（Metadata），例如課程名稱、教師、學分數、上課時間等，不保存其他資料。</p>
         </x-card>
     </div>
 </x-layout>

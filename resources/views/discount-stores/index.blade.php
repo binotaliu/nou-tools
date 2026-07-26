@@ -49,13 +49,11 @@
                 <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
                     優惠店家
                 </h2>
-                <p class="text-sm text-warm-600 dark:text-zinc-400">
-                    學生優惠店家列表，歡迎回報或新增店家資訊。
-                    <br />
-                    此區資料由
-                    <strong>112姍姍</strong>
-                    同學維護。
-                </p>
+                <p class="text-sm text-warm-600 dark:text-zinc-400">學生優惠店家列表，歡迎回報或新增店家資訊。
+                <br />
+                此區資料由
+                <strong>112姍姍</strong>
+                同學維護。</p>
             </div>
             <x-link-button
                 :href="route('discount-stores.create')"
@@ -201,7 +199,7 @@
                                         />
                                         {{ $store->category->name }}
                                     @else
-                                            未分類
+                                        未分類
                                     @endif
                                 </span>
                                 <span
@@ -214,8 +212,7 @@
                                     <span
                                         class="text-warm-500 dark:text-zinc-400"
                                     >
-                                        {{ $store->city }}
-                                        {{ $store->district }}
+                                        {{ $store->city }} {{ $store->district }}
                                     </span>
                                 @endif
                             </div>
@@ -314,9 +311,7 @@
                             >
                                 目前沒有符合條件的優惠店家
                             </h3>
-                            <p class="text-sm text-warm-500 dark:text-zinc-400">
-                                可以調整篩選條件，或新增一個優惠店家！
-                            </p>
+                            <p class="text-sm text-warm-500 dark:text-zinc-400">可以調整篩選條件，或新增一個優惠店家！</p>
                         </div>
                     </div>
                 </x-card>
@@ -338,9 +333,7 @@
                             >
                                 目前沒有符合條件的優惠店家
                             </h3>
-                            <p class="text-sm text-warm-500 dark:text-zinc-400">
-                                可以調整篩選條件，或新增一個優惠店家！
-                            </p>
+                            <p class="text-sm text-warm-500 dark:text-zinc-400">可以調整篩選條件，或新增一個優惠店家！</p>
                         </div>
                     </div>
                 </x-card>
@@ -352,17 +345,13 @@
             <div
                 class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
             >
-                <p class="text-sm text-warm-600 dark:text-zinc-400">
-                    第
-                    <span x-text="page"></span>
-                    /
-                    <span x-text="totalPages"></span>
-                    頁，共
-                    <span
-                        x-text="filteredStoreIndices.length.toLocaleString()"
-                    ></span>
-                    筆結果
-                </p>
+                <p class="text-sm text-warm-600 dark:text-zinc-400">第
+                <span x-text="page"></span>
+                /
+                <span x-text="totalPages"></span>
+                頁，共
+                <span x-text="filteredStoreIndices.length.toLocaleString()"></span>
+                筆結果</p>
 
                 <div class="flex items-center gap-3">
                     <button

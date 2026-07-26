@@ -59,14 +59,12 @@
             <button
                 type="button"
                 class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-200 bg-white px-4 py-2 text-sm font-medium text-warm-800 shadow-sm transition hover:border-warm-300 hover:bg-warm-50 lg:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
-                @click="isFilterPanelOpen = ! isFilterPanelOpen"
+                @click="isFilterPanelOpen = !isFilterPanelOpen"
                 :aria-expanded="isFilterPanelOpen"
                 aria-controls="announcement-filter-panel"
             >
                 <x-heroicon-o-funnel class="size-4" />
-                <span x-show="! isFilterPanelOpen">
-                    自訂要顯示的公告來源
-                </span>
+                <span x-show="!isFilterPanelOpen"> 自訂要顯示的公告來源 </span>
                 <span x-show="isFilterPanelOpen">隱藏篩選</span>
             </button>
 
@@ -387,9 +385,7 @@
                                     </h3>
                                     <p
                                         class="text-sm text-warm-500 dark:text-zinc-400"
-                                    >
-                                        可以調整來源或分類，或稍後再回來檢視。
-                                    </p>
+                                    >可以調整來源或分類，或稍後再回來檢視。</p>
                                 </div>
                             </div>
                         </x-card>
@@ -401,14 +397,7 @@
                         <div
                             class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
                         >
-                            <p class="text-sm text-warm-600 dark:text-zinc-400">
-                                第
-                                {{ $viewModel->announcements->currentPage() }}
-                                / {{ $viewModel->announcements->lastPage() }}
-                                頁，共
-                                {{ number_format($viewModel->announcements->total()) }}
-                                筆結果
-                            </p>
+                            <p class="text-sm text-warm-600 dark:text-zinc-400">第 {{ $viewModel->announcements->currentPage() }} / {{ $viewModel->announcements->lastPage() }} 頁，共 {{ number_format($viewModel->announcements->total()) }} 筆結果</p>
 
                             <div class="flex items-center gap-3">
                                 @if ($viewModel->announcements->onFirstPage())

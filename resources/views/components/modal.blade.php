@@ -44,9 +44,7 @@
         {{ $slot }}
 
         @isset($footer)
-            <div class="mt-4 flex justify-end">
-                {{ $footer }}
-            </div>
+            <div class="mt-4 flex justify-end">{{ $footer }}</div>
         @endisset
     </div>
 </div>

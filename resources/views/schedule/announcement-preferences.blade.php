@@ -10,9 +10,7 @@
                 <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
                     公告分類設定
                 </h2>
-                <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">
-                    選擇要在課表頁顯示的公告分類。未選擇任何分類時，課表頁的公告區塊將不顯示任何公告。
-                </p>
+                <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">選擇要在課表頁顯示的公告分類。未選擇任何分類時，課表頁的公告區塊將不顯示任何公告。</p>
             </div>
 
             <x-link-button

@@ -18,16 +18,13 @@
             <x-heroicon-o-signal-slash class="mt-0.5 size-5 shrink-0" />
             <div>
                 <p class="font-semibold">目前處於離線狀態</p>
-                <p class="mt-1">
-                    這是先前載入過的快取內容，可能不是最新資料。可能是 NOU
-                    小幫手網站發生問題，或你的裝置目前連不上網路，因此有部分的功能無法使用。本頁視訊上課連結仍可正常使用。
-                </p>
+                <p class="mt-1">這是先前載入過的快取內容，可能不是最新資料。可能是 NOU 小幫手網站發生問題，或你的裝置目前連不上網路，因此有部分的功能無法使用。本頁視訊上課連結仍可正常使用。</p>
             </div>
         </div>
 
         @if ($shouldPromptRememberSchedule)
             <div
-                x-data="{ show: ! $store.network.offline }"
+                x-data="{ show: !$store.network.offline }"
                 x-cloak
                 data-testid="remember-schedule-modal-wrapper"
             >
@@ -177,26 +174,13 @@
         @if (! $hasCourses)
             <x-card class="mb-8" title="此學期尚無課程">
                 <div class="space-y-3 text-warm-700 dark:text-zinc-300">
-                    <p>
-                        目前選擇的學期
-                        <span
-                            class="font-semibold text-warm-900 dark:text-zinc-100"
-                        >
-                            {{ \Illuminate\Support\Str::toSemesterDisplay($viewModel->selectedTerm) }}
-                        </span>
-                        沒有課程。
-                    </p>
+                    <p>目前選擇的學期
+                    <span class="font-semibold text-warm-900 dark:text-zinc-100"> {{ \Illuminate\Support\Str::toSemesterDisplay($viewModel->selectedTerm) }} </span>
+                    沒有課程。</p>
 
-                    <p class="text-sm text-warm-600 dark:text-zinc-400">
-                        您可以切換其他學期，或前往
-                        <a
-                            href="{{ route('schedules.edit', $viewModel->uuid) }}"
-                            class="font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
-                        >
-                            編輯課表
-                        </a>
-                        新增課程。
-                    </p>
+                    <p class="text-sm text-warm-600 dark:text-zinc-400">您可以切換其他學期，或前往
+                    <a href="{{ route('schedules.edit', $viewModel->uuid) }}" class="font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"> 編輯課表 </a>
+                    新增課程。</p>
                 </div>
             </x-card>
         @endif
@@ -341,9 +325,7 @@
                                     <div>
                                         <p
                                             class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase dark:text-zinc-400"
-                                        >
-                                            期中考
-                                        </p>
+                                        >期中考</p>
                                         @if ($exam->midtermDate)
                                             <div
                                                 class="font-semibold text-warm-900 dark:text-zinc-100"
@@ -371,9 +353,7 @@
                                 <div>
                                     <p
                                         class="mb-1 text-xs font-semibold tracking-wide text-warm-600 uppercase dark:text-zinc-400"
-                                    >
-                                        期末考
-                                    </p>
+                                    >期末考</p>
                                     @if ($exam->finalDate)
                                         <div
                                             class="font-semibold text-warm-900 dark:text-zinc-100"

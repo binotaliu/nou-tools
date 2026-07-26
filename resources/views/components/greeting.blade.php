@@ -53,9 +53,7 @@
                             ></p>
                             <p
                                 class="text-[0.65rem] text-warm-400 dark:text-zinc-500"
-                            >
-                                台灣時間
-                            </p>
+                            >台灣時間</p>
                         </div>
                     </div>
                 </template>

@@ -10,9 +10,7 @@
                 <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
                     自訂課表顯示
                 </h2>
-                <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">
-                    調整課表頁顯示區塊，並在「常用連結」加入你的自訂連結。
-                </p>
+                <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">調整課表頁顯示區塊，並在「常用連結」加入你的自訂連結。</p>
             </div>
 
             <x-link-button
@@ -90,16 +88,9 @@
                     @endforeach
                 </div>
 
-                <p class="mt-4 text-sm text-warm-600 dark:text-zinc-400">
-                    想調整「最新公告」要顯示哪些分類？前往
-                    <a
-                        href="{{ route('schedules.announcement-preferences', $viewModel->schedule) }}"
-                        class="font-medium text-orange-700 hover:underline dark:text-orange-400"
-                    >
-                        公告分類設定
-                    </a>
-                    。
-                </p>
+                <p class="mt-4 text-sm text-warm-600 dark:text-zinc-400">想調整「最新公告」要顯示哪些分類？前往
+                <a href="{{ route('schedules.announcement-preferences', $viewModel->schedule) }}" class="font-medium text-orange-700 hover:underline dark:text-orange-400"> 公告分類設定 </a>
+                。</p>
             </x-card>
 
             <x-card

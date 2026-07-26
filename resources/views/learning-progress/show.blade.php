@@ -60,9 +60,7 @@
 
         {{-- overall completion progress bar --}}
         <div class="mb-4 w-full print:hidden">
-            <p class="mb-1 text-sm text-warm-700 dark:text-zinc-300">
-                本學期完成進度：{{ number_format($viewModel->percentage, 0) }}%
-            </p>
+            <p class="mb-1 text-sm text-warm-700 dark:text-zinc-300">本學期完成進度：{{ number_format($viewModel->percentage, 0) }}%</p>
             <div
                 class="relative h-2 w-full overflow-hidden rounded bg-warm-200 dark:bg-zinc-700"
                 aria-hidden="true"
@@ -197,8 +195,7 @@
                                     <div
                                         class="text-center text-xs text-warm-600 dark:text-zinc-400 print:text-warm-600!"
                                     >
-                                        {{ $week->start }} -
-                                        {{ $week->end }}
+                                        {{ $week->start }} - {{ $week->end }}
                                     </div>
 
                                     {{-- we need this thing to mimic the border of the first column when the header is sticky --}}
@@ -278,6 +275,8 @@
                                             rows="2"
                                             aria-label="第{{ Str::toChineseNumber($week->num) }}週 {{ $course->name }} 的學習目標與備註"
                                         >
+
+
 {{ $viewModel->getNote($course->id, $week->num) }}</textarea
                                         >
                                     </td>
@@ -311,9 +310,7 @@
             >
                 <p
                     class="mb-2 text-sm font-semibold text-warm-900 dark:text-zinc-100"
-                >
-                    圖例：
-                </p>
+                >圖例：</p>
                 <div class="flex items-center justify-start gap-4">
                     <div class="flex items-center gap-2">
                         <div
