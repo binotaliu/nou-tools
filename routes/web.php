@@ -34,6 +34,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home')
 
 Route::view('/alt-uu', 'alt-uu')->name('alt-uu');
 
+Route::view('/offline', 'offline')->name('offline');
+
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index')
     ->withMarkdown(AnnouncementIndexMarkdownController::class);
 
