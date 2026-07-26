@@ -676,3 +676,44 @@ window.nouSchoolCalendar =
       },
     }
   }
+
+// Alpine factory for the `:::countdown` article container. Mirrors
+// CountdownRenderer's server-side day count so the markup renders correctly
+// without JavaScript, then keeps it live against Asia/Taipei "today" (these
+// are academic dates, published on Taipei's calendar - see nouSchoolCalendar
+// above for the same reasoning).
+window.nouCountdown =
+  window.nouCountdown ||
+  function (config) {
+    const T = window.NouTime
+
+    return {
+      daysText: '',
+
+      init() {
+        this.refresh()
+        // Daily-granularity data, so an hourly refresh (plus on tab-return)
+        // is enough to keep the day count from going stale in a long-lived
+        // or offline-restored tab.
+        setInterval(() => this.refresh(), 60 * 60 * 1000)
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) {
+            this.refresh()
+          }
+        })
+      },
+
+      refresh() {
+        const today = T.taipeiYmd(new Date())
+
+        if (today < config.start) {
+          const days = T.diffInDaysYmd(today, config.start)
+          this.daysText = `倒數 ${days} 天`
+        } else if (today <= config.end) {
+          this.daysText = '進行中'
+        } else {
+          this.daysText = '已結束'
+        }
+      },
+    }
+  }

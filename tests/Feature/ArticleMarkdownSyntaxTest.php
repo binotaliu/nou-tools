@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\ArticleType;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use League\CommonMark\Extension\FrontMatter\Data\SymfonyYamlFrontMatterParser;
 use League\CommonMark\Extension\FrontMatter\FrontMatterParser;
@@ -420,6 +421,41 @@ test('checklist renders an alpine-powered task list', function () {
         ->toContain('<label><input checked="" type="checkbox"><span class="md-checklist-content"> 已完成</span></label>')
         ->not->toContain('disabled')
         ->toContain('checked');
+});
+
+// --- 2.11b countdown ---------------------------------------------------------
+
+test('countdown renders a live-updating card with the day count for an upcoming date', function () {
+    $this->travelTo(Carbon::parse('2026-08-27 00:00:00', 'Asia/Taipei'));
+
+    $html = ($this->convert)(":::countdown\n**115暑期期末考**: 2026-09-05 ~ 2026-09-06\n:::\n");
+
+    expect($html)
+        ->toContain('<div class="md-countdown">')
+        ->toContain('<div class="md-countdown-item" x-data="nouCountdown({&quot;start&quot;:&quot;2026-09-05&quot;,&quot;end&quot;:&quot;2026-09-06&quot;})">')
+        ->toContain('<p class="md-countdown-label">115暑期期末考</p>')
+        ->toContain('<p class="md-countdown-range">2026-09-05 ~ 2026-09-06</p>')
+        ->toContain('<span x-text="daysText">倒數 9 天</span>');
+});
+
+test('countdown marks a date range as in progress or ended', function () {
+    $this->travelTo(Carbon::parse('2026-09-05 12:00:00', 'Asia/Taipei'));
+    $ongoing = ($this->convert)(":::countdown\n**期末考**: 2026-09-05 ~ 2026-09-06\n:::\n");
+    expect($ongoing)->toContain('<span x-text="daysText">進行中</span>');
+
+    $this->travelTo(Carbon::parse('2026-09-10 00:00:00', 'Asia/Taipei'));
+    $ended = ($this->convert)(":::countdown\n**期末考**: 2026-09-05 ~ 2026-09-06\n:::\n");
+    expect($ended)->toContain('<span x-text="daysText">已結束</span>');
+});
+
+test('countdown accepts a single date with no range', function () {
+    $this->travelTo(Carbon::parse('2026-01-01 00:00:00', 'Asia/Taipei'));
+
+    $html = ($this->convert)(":::countdown\n**開學日**: 2026-01-02\n:::\n");
+
+    expect($html)
+        ->toContain('<p class="md-countdown-range">2026-01-02</p>')
+        ->toContain('<span x-text="daysText">倒數 1 天</span>');
 });
 
 // --- 2.12 inline / document level -------------------------------------------

@@ -18,6 +18,7 @@ use NouTools\Domains\Articles\Markdown\Container\ContainerRendererRegistry;
 use NouTools\Domains\Articles\Markdown\Container\ContainerStartParser;
 use NouTools\Domains\Articles\Markdown\Container\Renderers\CardsRenderer;
 use NouTools\Domains\Articles\Markdown\Container\Renderers\ChecklistRenderer;
+use NouTools\Domains\Articles\Markdown\Container\Renderers\CountdownRenderer;
 use NouTools\Domains\Articles\Markdown\Container\Renderers\CtaRenderer;
 use NouTools\Domains\Articles\Markdown\Container\Renderers\FaqRenderer;
 use NouTools\Domains\Articles\Markdown\Container\Renderers\FigureRenderer;
@@ -43,8 +44,8 @@ use NouTools\Domains\Articles\Markdown\Toc\TocPlaceholderStartParser;
 /**
  * Registers every NOU 小幫手 custom Markdown block/inline extension:
  * `:::` fenced containers (dialogue, callouts, steps, faq, tabs, cards,
- * timeline, summary, cta, figure, checklist), the GitHub-style `[!TYPE]`
- * alert callouts, `==mark==`, `[[toc]]`, and heading anchors.
+ * timeline, summary, cta, figure, checklist, countdown), the GitHub-style
+ * `[!TYPE]` alert callouts, `==mark==`, `[[toc]]`, and heading anchors.
  */
 final readonly class NouMarkdownExtension implements ExtensionInterface
 {
@@ -64,6 +65,7 @@ final readonly class NouMarkdownExtension implements ExtensionInterface
         $registry->register('cta', new CtaRenderer);
         $registry->register('figure', new FigureRenderer);
         $registry->register('checklist', new ChecklistRenderer);
+        $registry->register('countdown', new CountdownRenderer);
 
         foreach (\array_keys(config('markdown.callouts', [])) as $type) {
             $registry->register($type, new CalloutContainerRenderer($type, $calloutHtmlBuilder));

@@ -488,6 +488,27 @@
     @apply line-through opacity-80;
   }
 
+  /* Countdown */
+  .md-countdown {
+    @apply my-6 flex flex-wrap gap-4;
+  }
+
+  .md-countdown-item {
+    @apply flex-1 rounded-xl border border-warm-200 bg-warm-50/70 px-5 py-4 text-center dark:border-zinc-700 dark:bg-zinc-800/60;
+  }
+
+  .md-countdown-label {
+    @apply m-0! text-sm font-semibold text-warm-700 dark:text-zinc-300;
+  }
+
+  .md-countdown-range {
+    @apply m-0! text-xs text-warm-500 dark:text-zinc-400;
+  }
+
+  .md-countdown-days {
+    @apply m-0! text-2xl font-bold text-warm-900 dark:text-zinc-100;
+  }
+
   /* 2.12 Inline / document-level */
   .md-mark {
     @apply rounded bg-warm-200 px-1 py-0.5 text-warm-900 dark:bg-warm-700 dark:text-warm-50;
@@ -501,8 +522,8 @@
     @apply mt-0! mb-3! text-lg font-semibold text-warm-900 dark:text-zinc-50;
   }
 
-  .md-toc :where(ol) {
-    @apply my-0 flex list-decimal flex-col gap-1 pl-8;
+  .md-toc ol {
+    @apply my-0 flex list-decimal flex-col gap-1 pl-8!;
   }
 
   h1:has(.md-heading-anchor),
