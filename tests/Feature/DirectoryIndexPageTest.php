@@ -36,3 +36,27 @@ it('shows a directory entry point on the home page', function () {
     $response->assertSuccessful();
     $response->assertSee(route('directory.index'));
 });
+
+it('displays the directory index markdown page', function () {
+    $response = get(route('directory.index.md'));
+
+    $response->assertSuccessful();
+    $response->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+    $response->assertSee('# 連結 / 學習指導中心目錄', false);
+    $response->assertSee('教務處');
+    $response->assertSee('基隆中心');
+    $response->assertSee('https://www.nou.edu.tw', escape: false);
+    $response->assertSee('https://www.openstreetmap.org/?mlat=', escape: false);
+    $response->assertSee('google.com/maps', escape: false);
+    $response->assertSee('maps://maps.apple.com/?q=', escape: false);
+});
+
+it('returns markdown from the directory index when the client prefers it in the Accept header', function () {
+    $response = get(route('directory.index'), [
+        'Accept' => 'text/markdown, text/html;q=0.8',
+    ]);
+
+    $response->assertSuccessful();
+    $response->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
+    $response->assertSee('# 連結 / 學習指導中心目錄', false);
+});

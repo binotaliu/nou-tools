@@ -14,6 +14,7 @@ use App\Http\Controllers\Markdown\AnnouncementIndexMarkdownController;
 use App\Http\Controllers\Markdown\ArticleIndexMarkdownController;
 use App\Http\Controllers\Markdown\ArticleShowMarkdownController;
 use App\Http\Controllers\Markdown\CourseShowMarkdownController;
+use App\Http\Controllers\Markdown\DirectoryIndexMarkdownController;
 use App\Http\Controllers\Markdown\DiscountStoreIndexMarkdownController;
 use App\Http\Controllers\Markdown\DiscountStoreShowMarkdownController;
 use App\Http\Controllers\Markdown\HomeIndexMarkdownController;
@@ -48,7 +49,8 @@ Route::view('/offline', 'offline')->name('offline');
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index')
     ->withMarkdown(AnnouncementIndexMarkdownController::class);
 
-Route::get('/directory', [DirectoryController::class, 'index'])->name('directory.index');
+Route::get('/directory', [DirectoryController::class, 'index'])->name('directory.index')
+    ->withMarkdown(DirectoryIndexMarkdownController::class);
 
 Route::get('/courses/{course}', [CourseController::class, 'show'])->name('course.show')
     ->withMarkdown(CourseShowMarkdownController::class);
