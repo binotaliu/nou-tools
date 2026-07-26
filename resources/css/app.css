@@ -532,7 +532,7 @@
   h4:has(.md-heading-anchor),
   h5:has(.md-heading-anchor),
   h6:has(.md-heading-anchor) {
-    @apply -ml-6;
+    @apply -ml-6 scroll-mt-[6.45rem];
   }
 
   .md-heading-anchor {

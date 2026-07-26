@@ -33,6 +33,7 @@ use NouTools\Domains\Articles\Markdown\Dialogue\PersonaResolver;
 use NouTools\Domains\Articles\Markdown\Heading\HeadingAnchorNode;
 use NouTools\Domains\Articles\Markdown\Heading\HeadingAnchorRenderer;
 use NouTools\Domains\Articles\Markdown\Heading\HeadingSlugProcessor;
+use NouTools\Domains\Articles\Markdown\Image\ImageDimensionProcessor;
 use NouTools\Domains\Articles\Markdown\Inline\CjkAutolinkParser;
 use NouTools\Domains\Articles\Markdown\Inline\Mark;
 use NouTools\Domains\Articles\Markdown\Inline\MarkDelimiterProcessor;
@@ -113,5 +114,8 @@ final readonly class NouMarkdownExtension implements ExtensionInterface
         $environment->addEventListener(DocumentParsedEvent::class, new ExternalLinkProcessor(
             (string) parse_url((string) config('app.url'), PHP_URL_HOST),
         ), -50);
+
+        // Local images: intrinsic `width`/`height` + `loading="lazy"` to avoid CLS
+        $environment->addEventListener(DocumentParsedEvent::class, new ImageDimensionProcessor, -50);
     }
 }

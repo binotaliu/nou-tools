@@ -410,6 +410,33 @@ test('figure wraps an image with a caption', function () {
         ->toContain('<figcaption class="md-figcaption">手機上的訂閱畫面</figcaption>');
 });
 
+test('figure image carries intrinsic width/height when the file exists locally', function () {
+    $html = ($this->convert)(":::figure\n![說明](/manual-images/calendar-subscription-apple-ios-1.png)\n:::\n");
+
+    expect($html)
+        ->toContain('width="1170"')
+        ->toContain('height="1048"')
+        ->toContain('loading="lazy"');
+});
+
+test('a plain markdown image carries intrinsic width/height when the file exists locally', function () {
+    $html = ($this->convert)('![說明](/manual-images/calendar-subscription-apple-ios-1.png)');
+
+    expect($html)
+        ->toContain('width="1170"')
+        ->toContain('height="1048"')
+        ->toContain('loading="lazy"');
+});
+
+test('a plain markdown image without a local file is left without width/height', function () {
+    $html = ($this->convert)('![說明](https://example.com/remote.png)');
+
+    expect($html)
+        ->not->toContain('width=')
+        ->not->toContain('height=')
+        ->not->toContain('loading=');
+});
+
 // --- 2.11 checklist ----------------------------------------------------------
 
 test('checklist renders an alpine-powered task list', function () {

@@ -10,6 +10,7 @@ use League\CommonMark\Util\HtmlElement;
 use League\CommonMark\Util\Xml;
 use NouTools\Domains\Articles\Markdown\Container\ContainerNode;
 use NouTools\Domains\Articles\Markdown\Container\ContainerRendererInterface;
+use NouTools\Domains\Articles\Markdown\Image\ImageDimensionResolver;
 use NouTools\Domains\Articles\Markdown\Support\InlineTextExtractor;
 
 final class FigureRenderer implements ContainerRendererInterface
@@ -27,12 +28,16 @@ final class FigureRenderer implements ContainerRendererInterface
             }
         }
 
+        $dimensions = $image !== null ? ImageDimensionResolver::resolve($image->getUrl()) : null;
+
         $imageContent = $image !== null
-            ? new HtmlElement('img', [
+            ? new HtmlElement('img', \array_filter([
                 'src' => $image->getUrl(),
                 'alt' => InlineTextExtractor::plainText($image),
+                'width' => isset($dimensions['width']) ? (string) $dimensions['width'] : null,
+                'height' => isset($dimensions['height']) ? (string) $dimensions['height'] : null,
                 'loading' => 'lazy',
-            ], '', true)
+            ], static fn (mixed $value): bool => $value !== null), '', true)
             : $childRenderer->renderNodes($node->children());
 
         $contents = [$imageContent];
