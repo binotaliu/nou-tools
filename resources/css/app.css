@@ -378,7 +378,7 @@
   }
 
   .md-timeline-section-content :where(p) {
-    @apply my-0;
+    @apply my-0!;
   }
 
   /* Items list within a section */
@@ -388,7 +388,7 @@
 
   /* Individual item in a section */
   .md-timeline-section-item {
-    @apply relative;
+    @apply relative pl-0!;
   }
 
   /* Flat timeline item (backward compatibility) */
@@ -398,7 +398,7 @@
 
   /* Timeline dot */
   .md-timeline-dot {
-    @apply absolute top-1 -left-[1.65rem] size-3 rounded-full bg-warm-600 ring-4 ring-warm-50 dark:bg-warm-500 dark:ring-zinc-900;
+    @apply absolute top-1 -left-[1.95rem]! size-3 rounded-full bg-warm-600 ring-4 ring-warm-50 dark:bg-warm-500 dark:ring-zinc-900;
   }
 
   /* Timeline label (bold prefix) */
@@ -407,17 +407,21 @@
   }
 
   /* Timeline body content */
+  .md-timeline-body {
+    @apply -mt-1;
+  }
+
   .md-timeline-body :where(p) {
-    @apply my-0;
+    @apply my-0!;
   }
 
   /* Nested list (sub-items) */
   .md-timeline-body :where(ul) {
-    @apply mt-2 ml-4 list-disc space-y-1;
+    @apply mt-2! ml-4! list-disc! space-y-1!;
   }
 
   .md-timeline-body :where(ul li) {
-    @apply text-sm text-warm-700 dark:text-zinc-300;
+    @apply text-sm! text-warm-700! dark:text-zinc-300!;
   }
 
   /* 2.8 Summary */
