@@ -194,6 +194,7 @@
                                     })
                             },
                         }"
+                        x-cloak
                     >
                         <button
                             type="button"
