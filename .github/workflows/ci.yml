@@ -37,6 +37,7 @@ jobs:
       - name: Run PHPUnit tests
         run: |
           php artisan config:clear --ansi
+          php artisan storage:link --ansi
           php artisan test --testsuite=Unit,Feature --ansi
         env:
           APP_ENV: testing
