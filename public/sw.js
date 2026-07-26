@@ -1,6 +1,6 @@
-// Minimal offline support: keeps a previously-visited home/schedule page (and
-// the assets it needs) available when the network is down, and shows a
-// generic offline page for any other route that isn't cached.
+// Minimal offline support: keeps a previously-visited home/schedule/directory
+// page (and the assets it needs) available when the network is down, and
+// shows a generic offline page for any other route that isn't cached.
 const CACHE_VERSION = 'v2'
 const PAGE_CACHE = `nou-schedule-pages-${CACHE_VERSION}`
 const RUNTIME_CACHE = `nou-runtime-${CACHE_VERSION}`
@@ -16,6 +16,10 @@ const OFFLINE_URL = '/offline'
 
 function isHomeUrl(url) {
   return url.origin === self.location.origin && url.pathname === '/'
+}
+
+function isDirectoryUrl(url) {
+  return url.origin === self.location.origin && url.pathname === '/directory'
 }
 
 function isScheduleShowUrl(url) {
@@ -142,7 +146,7 @@ self.addEventListener('fetch', event => {
 
   // Navigations: home and schedule show pages are meant to work offline.
   if (request.mode === 'navigate') {
-    if (isHomeUrl(url) || isScheduleShowUrl(url)) {
+    if (isHomeUrl(url) || isScheduleShowUrl(url) || isDirectoryUrl(url)) {
       event.respondWith(networkFirst(request))
       return
     }

@@ -71,7 +71,19 @@
                 >
                     <x-heroicon-o-megaphone class="size-4" />
 
-                    檢視學校公告
+                    學校公告
+                </x-link-button>
+
+                <x-link-button
+                    :href="route('directory.index')"
+                    variant="secondary"
+                    full-width
+                    class="mt-3"
+                    data-offline-allow
+                >
+                    <x-heroicon-o-map class="size-4" />
+
+                    連結 / 學習指導中心目錄
                 </x-link-button>
 
                 @if (isset($viewModel->previousSchedule))

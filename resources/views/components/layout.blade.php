@@ -66,6 +66,7 @@
             :data="collect([
                     ['name' => '我的課表', 'url' => $scheduleNavHref],
                     ['name' => '學校公告', 'url' => route('announcements.index')],
+                    ['name' => '連結 / 學習指導中心目錄', 'url' => route('directory.index')],
                     ['name' => '優惠店家', 'url' => route('discount-stores.index')],
                     ['name' => 'Alt UU', 'url' => route('alt-uu')],
                 ])
@@ -268,6 +269,23 @@
                             </a>
 
                             <a
+                                href="{{ route('directory.index') }}"
+                                data-offline-allow
+                                @class([
+                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
+                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
+                                        $routeName === 'directory.index',
+                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
+                                        $routeName !== 'directory.index',
+                                ])
+                            >
+                                <x-heroicon-o-link class="size-4 shrink-0" />
+                                <span class="hidden sm:inline">
+                                    連結 / 指導中心
+                                </span>
+                            </a>
+
+                            <a
                                 href="{{ route('discount-stores.index') }}"
                                 @class([
                                     '-m-2 inline-flex items-center gap-1.5 rounded-md px-5 py-2 text-sm font-medium transition-colors md:px-3',
@@ -339,6 +357,21 @@
                     >
                         <x-heroicon-o-megaphone class="size-4 shrink-0" />
                         學校公告
+                    </a>
+
+                    <a
+                        href="{{ route('directory.index') }}"
+                        data-offline-allow
+                        @class([
+                            'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                            'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
+                                $routeName === 'directory.index',
+                            'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
+                                $routeName !== 'directory.index',
+                        ])
+                    >
+                        <x-heroicon-o-link class="size-4 shrink-0" />
+                        連結 / 指導中心
                     </a>
 
                     <a

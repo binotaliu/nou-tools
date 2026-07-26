@@ -4,6 +4,7 @@ use App\Enums\ArticleType;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\DirectoryController;
 use App\Http\Controllers\DiscountStoreCommentController;
 use App\Http\Controllers\DiscountStoreController;
 use App\Http\Controllers\DiscountStoreReportController;
@@ -46,6 +47,8 @@ Route::view('/offline', 'offline')->name('offline');
 
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index')
     ->withMarkdown(AnnouncementIndexMarkdownController::class);
+
+Route::get('/directory', [DirectoryController::class, 'index'])->name('directory.index');
 
 Route::get('/courses/{course}', [CourseController::class, 'show'])->name('course.show')
     ->withMarkdown(CourseShowMarkdownController::class);

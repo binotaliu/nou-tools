@@ -8,24 +8,35 @@
     >
         <x-common-link href="https://www.nou.edu.tw">
             <x-slot:icon>
-                <x-heroicon-o-academic-cap class="size-16" />
+                <x-heroicon-o-academic-cap class="size-8 md:size-16" />
             </x-slot>
             學校官網
         </x-common-link>
 
         <x-common-link href="https://noustud.nou.edu.tw/">
             <x-slot:icon>
-                <x-heroicon-o-computer-desktop class="size-16" />
+                <x-heroicon-o-computer-desktop class="size-8 md:size-16" />
             </x-slot>
             教務行政資訊系統
         </x-common-link>
 
         <x-common-link href="https://uu.nou.edu.tw/">
             <x-slot:icon>
-                <x-heroicon-o-globe-alt class="size-16" />
+                <x-heroicon-o-globe-alt class="size-8 md:size-16" />
             </x-slot>
             數位學習平台 (UU平台)
         </x-common-link>
+    </div>
+
+    <div class="mt-2 flex justify-end">
+        <x-link-button
+            size="sm"
+            variant="warm-dark"
+            :href="route('directory.index')"
+            data-offline-allow
+        >
+            連結 / 學習指導中心目錄
+        </x-link-button>
     </div>
 
     @if (count($customLinks) > 0)
