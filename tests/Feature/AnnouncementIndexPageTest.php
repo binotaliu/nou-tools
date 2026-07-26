@@ -245,6 +245,51 @@ it('displays the announcement index markdown page', function () {
     $response->assertSee('# 學校公告', false);
     $response->assertSee('期中考公告');
     $response->assertSee($announcement->url, false);
+    $response->assertSee('第 1 / 1 頁（共 1 筆）');
+});
+
+it('displays pagination links in the markdown page when there are multiple pages', function () {
+    Announcement::factory()->count(35)->create();
+
+    $response = get(route('announcements.index.md'));
+
+    $response->assertSuccessful();
+    $response->assertSee('第 1 / 2 頁（共 35 筆）');
+    $response->assertSee('下一頁：');
+    $response->assertDontSee('上一頁：');
+
+    $pageTwoResponse = get(route('announcements.index.md', ['page' => 2]));
+
+    $pageTwoResponse->assertSuccessful();
+    $pageTwoResponse->assertSee('第 2 / 2 頁（共 35 筆）');
+    $pageTwoResponse->assertSee('上一頁：');
+    $pageTwoResponse->assertDontSee('下一頁：');
+});
+
+it('describes active filters in the markdown page', function () {
+    Announcement::factory()->create([
+        'source_name' => '教務處',
+        'category' => '考試資訊',
+        'title' => '教務處考試公告',
+    ]);
+
+    Announcement::factory()->create([
+        'source_name' => '台北中心',
+        'category' => '學務訊息',
+        'title' => '台北中心公告',
+    ]);
+
+    $response = get(route('announcements.index.md', [
+        'source_categories' => [
+            '教務處' => ['考試資訊'],
+        ],
+    ]));
+
+    $response->assertSuccessful();
+    $response->assertSee('教務處考試公告');
+    $response->assertDontSee('台北中心公告');
+    $response->assertSee('目前篩選來源：教務處');
+    $response->assertSee('已篩選分類：考試資訊');
 });
 
 it('returns markdown from the announcement index when the client prefers it in the Accept header', function () {
