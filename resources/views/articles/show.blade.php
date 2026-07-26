@@ -87,7 +87,9 @@
                     </header>
 
                     {{-- Article Content --}}
-                    <div class="prose max-w-none prose-warm dark:prose-invert">
+                    <div
+                        class="prose max-w-none prose-warm dark:prose-zinc dark:prose-invert"
+                    >
                         {{ $viewModel->article->content }}
                     </div>
 
