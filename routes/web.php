@@ -41,6 +41,7 @@ Route::get('/docs/api.yaml', function () {
 
 Route::get('/', [HomeController::class, 'index'])->name('home')
     ->withMarkdown(HomeIndexMarkdownController::class, uri: '/llms.txt', name: 'llms-txt');
+Route::redirect('/ai.txt', '/llms.txt', 301);
 
 Route::view('/alt-uu', 'alt-uu')->name('alt-uu');
 
