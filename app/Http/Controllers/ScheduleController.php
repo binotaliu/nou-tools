@@ -25,6 +25,8 @@ final class ScheduleController extends Controller
         return view('schedule.editor', [
             'courses' => $page->courses,
             'currentSemester' => $page->currentSemester,
+            'selectedTerm' => $page->selectedTerm,
+            'availableTerms' => $page->availableTerms,
             'previousSchedule' => $page->previousSchedule,
         ]);
     }
@@ -37,6 +39,8 @@ final class ScheduleController extends Controller
             'schedule' => $page->schedule,
             'courses' => $page->courses,
             'currentSemester' => $page->currentSemester,
+            'selectedTerm' => $page->selectedTerm,
+            'availableTerms' => $page->availableTerms,
         ]);
     }
 

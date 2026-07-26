@@ -23,10 +23,13 @@ final readonly class BuildScheduleEditorPage
             $schedule->load(['items.courseClass.course']);
         }
 
-        $currentSemester = config('app.current_semester');
+        $currentSemester = (string) config('app.current_semester');
+        $selectedTerm = (string) ($request->query('term') ?: $currentSemester);
+        $availableTerms = $this->availableTerms($selectedTerm);
+
         $courses = ScheduleEditorCourseViewModel::collect(
             Course::query()
-                ->where('term', $currentSemester)
+                ->where('term', $selectedTerm)
                 ->whereHas('classes')
                 ->with(['classes' => function ($query) {
                     $query->orderBy('type');
@@ -46,8 +49,30 @@ final readonly class BuildScheduleEditorPage
         return new ScheduleEditorPageData(
             courses: $courses,
             currentSemester: $currentSemester,
+            selectedTerm: $selectedTerm,
+            availableTerms: $availableTerms,
             schedule: $schedule,
             previousSchedule: $previousSchedule,
         );
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function availableTerms(string $selectedTerm): array
+    {
+        $terms = Course::query()
+            ->select('term')
+            ->distinct()
+            ->orderByDesc('term')
+            ->pluck('term')
+            ->filter(fn (?string $value) => is_string($value) && $value !== '')
+            ->values();
+
+        if (! $terms->contains($selectedTerm)) {
+            $terms->prepend($selectedTerm);
+        }
+
+        return $terms->unique()->values()->all();
     }
 }

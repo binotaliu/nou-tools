@@ -15,13 +15,11 @@ final class UpdateSchedule
     public function __invoke(StudentSchedule $schedule, StudentScheduleUpsertData $input): StudentSchedule
     {
         return DB::transaction(function () use ($schedule, $input) {
-            $currentSemester = (string) config('app.current_semester');
-
             $schedule->name = $input->name;
             $schedule->saveOrFail();
 
             $schedule->items()
-                ->whereHas('courseClass.course', fn (Builder $query) => $query->where('term', $currentSemester))
+                ->whereHas('courseClass.course', fn (Builder $query) => $query->where('term', $input->term))
                 ->delete();
 
             foreach ($input->items as $courseClassId) {

@@ -17,6 +17,9 @@ final class ScheduleEditorPageData extends Resource
         #[DataCollectionOf(ScheduleEditorCourseViewModel::class)]
         public DataCollection $courses,
         public string $currentSemester,
+        public string $selectedTerm,
+        /** @var array<int, string> */
+        public array $availableTerms,
         public ?StudentSchedule $schedule,
         public ?StudentScheduleCookie $previousSchedule,
     ) {}

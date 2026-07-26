@@ -8,13 +8,32 @@
 
 <x-layout title="{{ $pageTitle }} - NOU 小幫手" :noindex="true">
     <div x-data="scheduleEditor()" class="mx-auto max-w-5xl">
-        <div class="mb-6 flex items-center justify-between">
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
                 {{ $headingText }}
             </h2>
-            <div class="text-lg font-semibold text-warm-500 dark:text-zinc-400">
-                {{ \Illuminate\Support\Str::toSemesterDisplay(config('app.current_semester')) }}
-            </div>
+            <form
+                method="GET"
+                action="{{ url()->current() }}"
+                class="w-full sm:w-auto sm:min-w-40"
+            >
+                <label for="term" class="sr-only">選擇學期</label>
+                <x-select
+                    id="term"
+                    name="term"
+                    onchange="this.form.submit()"
+                    aria-label="選擇學期"
+                >
+                    @foreach ($availableTerms as $term)
+                        <option
+                            value="{{ $term }}"
+                            @selected($term === $selectedTerm)
+                        >
+                            {{ \Illuminate\Support\Str::toSemesterDisplay($term) }}
+                        </option>
+                    @endforeach
+                </x-select>
+            </form>
         </div>
 
         @if (isset($previousSchedule) && ! isset($schedule))
@@ -308,6 +327,7 @@
             @if (isset($schedule))
                 @method('PUT')
             @endif
+            <input type="hidden" name="term" value="{{ $selectedTerm }}" />
 
             <div class="mb-4">
                 <label

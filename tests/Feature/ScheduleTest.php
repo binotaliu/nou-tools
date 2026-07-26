@@ -13,6 +13,7 @@ it('returns JSON and creates schedule on application/json POST', function () {
 
     $payload = [
         'name' => '測試課表',
+        'term' => '2025B',
         'items' => [$courseClass->id],
     ];
 
@@ -32,6 +33,7 @@ it('allows creating multiple schedules', function () {
 
     $payload = [
         'name' => '第一次',
+        'term' => '2025B',
         'items' => [$courseClass->id],
     ];
 
@@ -50,6 +52,7 @@ it('rejects schedules with more than ten items', function () {
 
     $payload = [
         'name' => 'Too Many',
+        'term' => '2025B',
         'items' => $classes->pluck('id')->all(),
     ];
 
@@ -553,6 +556,7 @@ it('stores schedule metadata in an encrypted cookie when saving', function () {
 
     $payload = [
         'name' => 'Cookie Test',
+        'term' => '2025B',
         'items' => [$courseClass->id],
     ];
 
@@ -646,6 +650,7 @@ it('updates the stored cookie when schedule is updated', function () {
 
     $payload = [
         'name' => 'New Name',
+        'term' => '2025B',
         'items' => [$courseClass->id],
     ];
 
@@ -686,6 +691,7 @@ it('updating schedule only replaces classes in current semester', function () {
 
     $response = $this->putJson(route('schedules.update', $schedule), [
         'name' => 'Cross Term Schedule Updated',
+        'term' => '2026C',
         'items' => [$currentClassB->id],
     ]);
 
