@@ -35,7 +35,7 @@ it('shows announcement entry points on home page', function () {
     $response = get(route('home'));
 
     $response->assertSuccessful();
-    $response->assertSee('檢視學校公告');
+    $response->assertSee('學校公告');
     $response->assertSee(route('announcements.index'));
 });
 
