@@ -615,6 +615,27 @@ it('shows prompt on schedule create page when cookie exists and can be ignored w
         ->assertDontSee('你曾建立過課表');
 });
 
+it('redirects /schedules/my to the remembered schedule when cookie exists', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'My Schedule',
+    ]);
+
+    $response = $this->withCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => $schedule->name,
+    ]))->get(route('schedules.my'));
+
+    $response->assertRedirect(route('schedules.show', $schedule));
+});
+
+it('redirects /schedules/my to the create page when no cookie exists', function () {
+    $response = $this->get(route('schedules.my'));
+
+    $response->assertRedirect(route('schedules.create'));
+});
+
 it('updates the stored cookie when schedule is updated', function () {
     $courseClass = CourseClass::factory()->create();
 

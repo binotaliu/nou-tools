@@ -4,17 +4,12 @@
     'noindex' => false,
 ])
 
-@inject('readScheduleCookie', 'NouTools\Domains\Schedules\Actions\ReadStudentScheduleCookie')
-
 @php
     $routeName = request()
         ->route()
         ?->getName();
 
-    $scheduleFromCookie = $readScheduleCookie(request());
-    $scheduleNavHref = $scheduleFromCookie
-        ? route('schedules.show', $scheduleFromCookie->token)
-        : route('schedules.create');
+    $scheduleNavHref = route('schedules.my');
 
     $analyticsPage = match ($routeName) {
         'schedules.show' => '/schedules/:schedule',
