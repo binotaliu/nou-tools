@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\View\Components;
 
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
-class Greeting extends Component
+final class Greeting extends Component
 {
     public string $semesterLabel;
 

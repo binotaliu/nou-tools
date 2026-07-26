@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\Course;
 use App\Models\User;
 
-class CoursePolicy
+final class CoursePolicy
 {
     public function viewAny(User $user): bool
     {

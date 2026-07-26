@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Markdown;
 
 use App\Enums\DiscountStoreStatus;
@@ -7,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DiscountStore;
 use Illuminate\Http\Response;
 
-class DiscountStoreShowMarkdownController extends Controller
+final class DiscountStoreShowMarkdownController extends Controller
 {
     public function __invoke(DiscountStore $store): Response
     {

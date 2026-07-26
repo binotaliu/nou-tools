@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Shared\SchoolCalendar\ViewModels;
 
 use Spatie\LaravelData\Data;

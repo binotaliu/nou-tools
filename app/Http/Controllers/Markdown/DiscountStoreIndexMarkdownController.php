@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Markdown;
 
 use App\Http\Controllers\Controller;
@@ -7,7 +9,7 @@ use Illuminate\Http\Response;
 use NouTools\Domains\DiscountStores\Actions\ShowDiscountStorePage;
 use NouTools\Domains\DiscountStores\DataTransferObjects\ShowDiscountStorePageData;
 
-class DiscountStoreIndexMarkdownController extends Controller
+final class DiscountStoreIndexMarkdownController extends Controller
 {
     public function __invoke(
         ShowDiscountStorePage $showDiscountStorePage,

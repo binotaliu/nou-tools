@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Enums\DiscountStoreStatus;
@@ -12,7 +14,7 @@ use Illuminate\Support\Facades\File;
 /**
  * @extends Factory<DiscountStore>
  */
-class DiscountStoreFactory extends Factory
+final class DiscountStoreFactory extends Factory
 {
     protected $model = DiscountStore::class;
 

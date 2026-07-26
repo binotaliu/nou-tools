@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Schedules\Actions;
 
 use App\Models\Course;

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\StudentSchedule;
 use Illuminate\Http\Response;
 use NouTools\Domains\Schedules\Actions\GenerateScheduleCalendar;
 
-class ScheduleCalendarController extends Controller
+final class ScheduleCalendarController extends Controller
 {
     public function __invoke(StudentSchedule $schedule, GenerateScheduleCalendar $generateScheduleCalendar): Response
     {

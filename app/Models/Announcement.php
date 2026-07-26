@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\AnnouncementFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Announcement extends Model
+final class Announcement extends Model
 {
     /** @use HasFactory<AnnouncementFactory> */
     use HasFactory;

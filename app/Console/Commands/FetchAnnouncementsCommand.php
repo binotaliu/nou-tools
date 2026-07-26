@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use NouTools\Domains\Announcements\Actions\SyncAnnouncements;
 use NouTools\Domains\Announcements\DataTransferObjects\AnnouncementSourceConfigDTO;
 
-class FetchAnnouncementsCommand extends Command
+final class FetchAnnouncementsCommand extends Command
 {
     protected $signature = 'announcements:fetch
                             {--source= : Fetch only the specified source by config key}';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Home\DataTransferObjects;
 
 use Spatie\LaravelData\Data;

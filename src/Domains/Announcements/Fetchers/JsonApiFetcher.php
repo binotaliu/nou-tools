@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Announcements\Fetchers;
 
 use Carbon\CarbonImmutable;

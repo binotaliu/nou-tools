@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Courses\Resources\PreviousExams;
 
 use App\Filament\Resources\Courses\CourseResource;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Markdown;
 
 use App\Enums\ArticleType;
@@ -10,7 +12,7 @@ use League\CommonMark\Extension\FrontMatter\Data\SymfonyYamlFrontMatterParser;
 use League\CommonMark\Extension\FrontMatter\FrontMatterParser;
 use NouTools\Domains\Articles\Actions\ShowArticlePage;
 
-class ArticleShowMarkdownController extends Controller
+final class ArticleShowMarkdownController extends Controller
 {
     public function __invoke(ArticleType $type, string $slug, ShowArticlePage $showArticlePage): Response
     {

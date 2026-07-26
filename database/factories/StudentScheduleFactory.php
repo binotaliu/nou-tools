@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\StudentSchedule;
@@ -9,7 +11,7 @@ use Ramsey\Uuid\Uuid;
 /**
  * @extends Factory<StudentSchedule>
  */
-class StudentScheduleFactory extends Factory
+final class StudentScheduleFactory extends Factory
 {
     /**
      * Define the model's default state.

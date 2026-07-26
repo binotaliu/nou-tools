@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Enums\CourseClassType;
@@ -10,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends Factory<CourseClass>
  */
-class CourseClassFactory extends Factory
+final class CourseClassFactory extends Factory
 {
     protected $model = CourseClass::class;
 

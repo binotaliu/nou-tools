@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\DiscountStores\PageData;
 
 use Illuminate\Support\Collection;

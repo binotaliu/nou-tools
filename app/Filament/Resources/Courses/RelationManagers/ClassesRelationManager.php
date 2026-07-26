@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Courses\RelationManagers;
 
 use App\Filament\Resources\Courses\Resources\CourseClasses\CourseClassResource;

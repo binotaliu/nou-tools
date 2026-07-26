@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\DiscountStoreCategory;
 use App\Models\User;
 
-class DiscountStoreCategoryPolicy
+final class DiscountStoreCategoryPolicy
 {
     /**
      * Determine whether the user can view any models.

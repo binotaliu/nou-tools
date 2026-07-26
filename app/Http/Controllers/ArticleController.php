@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Enums\ArticleType;
@@ -7,7 +9,7 @@ use Illuminate\View\View;
 use NouTools\Domains\Articles\Actions\ShowArticleIndexPage;
 use NouTools\Domains\Articles\Actions\ShowArticlePage;
 
-class ArticleController extends Controller
+final class ArticleController extends Controller
 {
     public function index(ArticleType $type, ShowArticleIndexPage $showArticleIndexPage): View
     {

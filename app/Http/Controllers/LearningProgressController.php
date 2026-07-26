@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\StudentSchedule;
@@ -8,7 +10,7 @@ use NouTools\Domains\LearningProgress\Actions\ShowLearningProgressPage;
 use NouTools\Domains\LearningProgress\Actions\UpdateLearningProgress;
 use NouTools\Domains\LearningProgress\DataTransferObjects\UpdateLearningProgressData;
 
-class LearningProgressController extends Controller
+final class LearningProgressController extends Controller
 {
     public function show(StudentSchedule $schedule, string $term, ShowLearningProgressPage $showLearningProgressPage): View
     {

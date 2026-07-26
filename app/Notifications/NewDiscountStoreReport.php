@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
 use App\Models\DiscountStore;
@@ -11,7 +13,7 @@ use Revolution\Laravel\Notification\DiscordWebhook\DiscordChannel;
 use Revolution\Laravel\Notification\DiscordWebhook\DiscordEmbed;
 use Revolution\Laravel\Notification\DiscordWebhook\DiscordMessage;
 
-class NewDiscountStoreReport extends Notification
+final class NewDiscountStoreReport extends Notification
 {
     use Queueable;
 

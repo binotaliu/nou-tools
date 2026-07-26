@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\LearningProgress\Actions;
 
 use App\Models\StudentSchedule;

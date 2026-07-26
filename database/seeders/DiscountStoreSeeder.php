@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\DiscountStore;
@@ -7,7 +9,7 @@ use App\Models\DiscountStoreCategory;
 use App\Models\DiscountStoreComment;
 use Illuminate\Database\Seeder;
 
-class DiscountStoreSeeder extends Seeder
+final class DiscountStoreSeeder extends Seeder
 {
     public function run(): void
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Course;
@@ -7,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use NouTools\Domains\Courses\Actions\ShowCoursePage;
 
-class CourseController extends Controller
+final class CourseController extends Controller
 {
     public function show(Course $course, Request $request, ShowCoursePage $showCoursePage): View
     {

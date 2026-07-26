@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\Course;
@@ -7,7 +9,7 @@ use App\Models\Textbook;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
-class FetchTextbooksCommand extends Command
+final class FetchTextbooksCommand extends Command
 {
     /**
      * The name and signature of the console command.

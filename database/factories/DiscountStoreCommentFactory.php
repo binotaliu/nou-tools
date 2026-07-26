@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\DiscountStore;
@@ -9,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends Factory<DiscountStoreComment>
  */
-class DiscountStoreCommentFactory extends Factory
+final class DiscountStoreCommentFactory extends Factory
 {
     protected $model = DiscountStoreComment::class;
 

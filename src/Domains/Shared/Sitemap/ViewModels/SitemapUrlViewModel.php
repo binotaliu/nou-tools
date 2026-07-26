@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Shared\Sitemap\ViewModels;
 
 use Carbon\CarbonInterface;

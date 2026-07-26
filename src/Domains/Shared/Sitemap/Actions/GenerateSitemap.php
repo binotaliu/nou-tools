@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Shared\Sitemap\Actions;
 
 use App\Enums\ArticleType;

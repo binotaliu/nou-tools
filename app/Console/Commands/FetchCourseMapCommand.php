@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\Course;
@@ -7,7 +9,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use NouTools\Domains\Courses\Actions\ParseCourseMap;
 
-class FetchCourseMapCommand extends Command
+final class FetchCourseMapCommand extends Command
 {
     /**
      * The name and signature of the console command.

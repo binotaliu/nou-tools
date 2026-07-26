@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Markdown;
 
 use App\Http\Controllers\Controller;
@@ -7,7 +9,7 @@ use Illuminate\Http\Response;
 use NouTools\Domains\Announcements\Actions\ShowAnnouncementIndexPage;
 use NouTools\Domains\Announcements\DataTransferObjects\ShowAnnouncementIndexPageData;
 
-class AnnouncementIndexMarkdownController extends Controller
+final class AnnouncementIndexMarkdownController extends Controller
 {
     public function __invoke(
         ShowAnnouncementIndexPage $showAnnouncementIndexPage,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\View\Components;
 
 use App\Models\Announcement;
@@ -12,7 +14,7 @@ use NouTools\Domains\Announcements\Actions\ListAnnouncementSourceCategories;
 use NouTools\Domains\Announcements\Actions\ListLatestAnnouncementsForSourceCategories;
 use NouTools\Domains\Schedules\PageData\AnnouncementPreferencesPageData;
 
-class AnnouncementsWidget extends Component
+final class AnnouncementsWidget extends Component
 {
     public StudentSchedule $schedule;
 

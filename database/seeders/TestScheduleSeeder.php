@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\ClassSchedule;
@@ -7,7 +9,7 @@ use App\Models\Course;
 use App\Models\CourseClass;
 use Illuminate\Database\Seeder;
 
-class TestScheduleSeeder extends Seeder
+final class TestScheduleSeeder extends Seeder
 {
     public function run(): void
     {

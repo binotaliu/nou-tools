@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Markdown;
 
 use App\Http\Controllers\Controller;
@@ -8,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use NouTools\Domains\Schedules\Actions\ShowSchedulePage;
 
-class ScheduleShowMarkdownController extends Controller
+final class ScheduleShowMarkdownController extends Controller
 {
     public function __invoke(StudentSchedule $schedule, Request $request, ShowSchedulePage $showSchedulePage): Response
     {

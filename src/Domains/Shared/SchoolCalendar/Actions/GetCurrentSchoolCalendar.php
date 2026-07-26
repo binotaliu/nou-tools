@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Shared\SchoolCalendar\Actions;
 
 use NouTools\Domains\Shared\SchoolCalendar\ViewModels\SchoolCalendarEventViewModel;

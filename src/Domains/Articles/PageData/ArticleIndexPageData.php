@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Articles\PageData;
 
 use App\Enums\ArticleType;

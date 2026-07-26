@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\DiscountStoreCategory;
@@ -8,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends Factory<DiscountStoreCategory>
  */
-class DiscountStoreCategoryFactory extends Factory
+final class DiscountStoreCategoryFactory extends Factory
 {
     protected $model = DiscountStoreCategory::class;
 

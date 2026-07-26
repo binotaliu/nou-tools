@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Announcement;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /** @extends Factory<Announcement> */
-class AnnouncementFactory extends Factory
+final class AnnouncementFactory extends Factory
 {
     protected $model = Announcement::class;
 

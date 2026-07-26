@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Markdown;
 
 use App\Enums\ArticleType;
@@ -8,7 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use NouTools\Domains\Articles\Actions\ShowArticleIndexPage;
 
-class ArticleIndexMarkdownController extends Controller
+final class ArticleIndexMarkdownController extends Controller
 {
     public function __invoke(ArticleType $type, ShowArticleIndexPage $showArticleIndexPage): Response
     {
