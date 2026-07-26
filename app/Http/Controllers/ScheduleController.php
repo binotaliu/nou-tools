@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\StudentSchedule;
@@ -7,24 +9,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use NouTools\Domains\Schedules\Actions\BuildAnnouncementPreferencesPage;
-use NouTools\Domains\Schedules\Actions\BuildScheduleCustomizationPage;
 use NouTools\Domains\Schedules\Actions\BuildScheduleEditorPage;
 use NouTools\Domains\Schedules\Actions\BuildStudentScheduleCookie;
 use NouTools\Domains\Schedules\Actions\CreateSchedule;
 use NouTools\Domains\Schedules\Actions\ShowSchedulePage;
-use NouTools\Domains\Schedules\Actions\ShowScheduleSubscribePage;
-use NouTools\Domains\Schedules\Actions\UpdateAnnouncementPreferences;
 use NouTools\Domains\Schedules\Actions\UpdateSchedule;
-use NouTools\Domains\Schedules\Actions\UpdateScheduleCalendarSettings;
-use NouTools\Domains\Schedules\Actions\UpdateScheduleCustomization;
-use NouTools\Domains\Schedules\DataTransferObjects\AnnouncementPreferencesUpsertData;
-use NouTools\Domains\Schedules\DataTransferObjects\ScheduleCalendarSettingsUpsertData;
-use NouTools\Domains\Schedules\DataTransferObjects\ScheduleCustomizationUpsertData;
 use NouTools\Domains\Schedules\DataTransferObjects\StudentScheduleUpsertData;
-use NouTools\Domains\Schedules\PageData\ScheduleCustomizationPageData;
 
-class ScheduleController extends Controller
+final class ScheduleController extends Controller
 {
     public function create(Request $request, BuildScheduleEditorPage $buildScheduleEditorPage): View
     {
@@ -88,62 +80,5 @@ class ScheduleController extends Controller
             'schedule' => $schedule,
             'viewModel' => $showSchedulePage($schedule, $request->query('term')),
         ]);
-    }
-
-    public function customize(StudentSchedule $schedule, BuildScheduleCustomizationPage $buildScheduleCustomizationPage): View
-    {
-        return view('schedule.customize', [
-            'viewModel' => $buildScheduleCustomizationPage($schedule),
-        ]);
-    }
-
-    public function showSubscribe(StudentSchedule $schedule, ShowScheduleSubscribePage $showScheduleSubscribePage): View
-    {
-        return view('schedule.subscribe', [
-            'viewModel' => $showScheduleSubscribePage($schedule),
-        ]);
-    }
-
-    public function updateCustomization(StudentSchedule $schedule, ScheduleCustomizationUpsertData $input, UpdateScheduleCustomization $updateScheduleCustomization): RedirectResponse
-    {
-        $updateScheduleCustomization($schedule, $input);
-
-        return redirect()->route('schedules.show', $schedule)
-            ->with('success', '課表自訂設定已更新！');
-    }
-
-    public function announcementPreferences(StudentSchedule $schedule, BuildAnnouncementPreferencesPage $buildAnnouncementPreferencesPage): View
-    {
-        return view('schedule.announcement-preferences', [
-            'viewModel' => $buildAnnouncementPreferencesPage($schedule),
-        ]);
-    }
-
-    public function updateAnnouncementPreferences(StudentSchedule $schedule, AnnouncementPreferencesUpsertData $input, UpdateAnnouncementPreferences $updateAnnouncementPreferences): RedirectResponse
-    {
-        $updateAnnouncementPreferences($schedule, $input);
-
-        return redirect()->route('schedules.show', $schedule)
-            ->with('success', '公告分類設定已更新！');
-    }
-
-    public function updateCalendarSettings(StudentSchedule $schedule, ScheduleCalendarSettingsUpsertData $input, Request $request, UpdateScheduleCalendarSettings $updateScheduleCalendarSettings): JsonResponse|RedirectResponse
-    {
-        $schedule = $updateScheduleCalendarSettings($schedule, $input);
-
-        $calendarSettings = ScheduleCustomizationPageData::normalizeCalendarSettings(
-            is_array($schedule->display_options['calendar_settings'] ?? null) ? $schedule->display_options['calendar_settings'] : null,
-        );
-
-        if ($request->wantsJson() || $request->isJson()) {
-            return response()->json([
-                'success' => true,
-                'calendar_settings' => $calendarSettings->toArray(),
-            ]);
-        }
-
-        return redirect()
-            ->route('schedules.subscribe', $schedule)
-            ->with('success', '已儲存訂閱設定！');
     }
 }

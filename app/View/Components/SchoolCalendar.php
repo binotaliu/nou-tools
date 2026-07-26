@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\View\Components;
 
 use Illuminate\View\Component;
 use Illuminate\View\View;
 use NouTools\Domains\Shared\SchoolCalendar\Actions\ListUpcomingSchoolEvents;
 
-class SchoolCalendar extends Component
+final class SchoolCalendar extends Component
 {
     /**
      * Raw upcoming/ongoing events (Y-m-d strings), rendered client-side —
@@ -23,7 +25,7 @@ class SchoolCalendar extends Component
      */
     public function __construct(?array $events = null, ?ListUpcomingSchoolEvents $eventsAction = null)
     {
-        $this->events = $events ?? ($eventsAction ?? app(ListUpcomingSchoolEvents::class))->getUpcomingEvents();
+        $this->events = $events ?? ($eventsAction ?? app(ListUpcomingSchoolEvents::class))();
     }
 
     public function render(): View

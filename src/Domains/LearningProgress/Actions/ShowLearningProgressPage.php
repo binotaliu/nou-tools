@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\LearningProgress\Actions;
 
 use App\Models\LearningProgress;
@@ -75,7 +77,7 @@ final class ShowLearningProgressPage
 
         $semesterStart = Carbon::parse($range[0], 'Asia/Taipei')->startOfDay();
         $semesterEnd = Carbon::parse($range[1], 'Asia/Taipei')->endOfDay();
-        $totalWeeks = intdiv($semesterStart->diffInDays($semesterEnd), 7) + 1;
+        $totalWeeks = intdiv((int) $semesterStart->diffInDays($semesterEnd), 7) + 1;
         $weeks = [];
 
         for ($weekNumber = 1; $weekNumber <= $totalWeeks; $weekNumber++) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\DiscountStores\Actions;
 
 use App\Models\DiscountStore;
@@ -15,7 +17,7 @@ final readonly class ReportDiscountStore
     {
         $report = new DiscountStoreReport;
         $report->store_id = $store->id;
-        $report->is_valid = $data->is_valid;
+        $report->is_valid = $data->isValid;
         $report->comment = $data->comment;
         $report->saveOrFail();
 

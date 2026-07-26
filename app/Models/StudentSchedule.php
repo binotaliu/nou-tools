@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -7,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Ramsey\Uuid\Uuid;
 
-class StudentSchedule extends Model
+final class StudentSchedule extends Model
 {
     use HasFactory;
 
@@ -33,7 +35,7 @@ class StudentSchedule extends Model
      */
     public function getRouteKey(): string
     {
-        return base64_url_encode(Uuid::fromString($this->uuid)->getBytes());
+        return base64_url_encode(Uuid::fromString((string) $this->uuid)->getBytes());
     }
 
     /**

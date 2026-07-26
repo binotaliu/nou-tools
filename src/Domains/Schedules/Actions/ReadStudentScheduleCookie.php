@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Schedules\Actions;
 
 use App\Models\StudentSchedule;
 use Illuminate\Http\Request;
-use NouTools\Domains\Schedules\ViewModels\StudentScheduleCookieViewModel;
+use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 
 final class ReadStudentScheduleCookie
 {
-    public function __invoke(Request $request): ?StudentScheduleCookieViewModel
+    public function __invoke(Request $request): ?StudentScheduleCookie
     {
         $cookie = $request->cookie('student_schedule');
 
@@ -29,6 +31,6 @@ final class ReadStudentScheduleCookie
             return null;
         }
 
-        return StudentScheduleCookieViewModel::fromModel($model);
+        return StudentScheduleCookie::fromModel($model);
     }
 }

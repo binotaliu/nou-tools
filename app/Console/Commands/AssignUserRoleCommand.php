@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Enums\UserRole;
@@ -9,7 +11,7 @@ use Illuminate\Console\Command;
 use function Laravel\Prompts\search;
 use function Laravel\Prompts\select;
 
-class AssignUserRole extends Command
+final class AssignUserRoleCommand extends Command
 {
     protected $signature = 'user:assign-role
                             {email? : The email of the user}

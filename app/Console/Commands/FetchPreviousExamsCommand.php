@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\PreviousExam;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 
-class FetchPreviousExamsCommand extends Command
+final class FetchPreviousExamsCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -28,13 +31,13 @@ class FetchPreviousExamsCommand extends Command
     {
         $path = resource_path('data/previous-exams.json');
 
-        if (! file_exists($path)) {
+        if (! File::exists($path)) {
             $this->error("File not found: {$path}");
 
             return self::FAILURE;
         }
 
-        $json = file_get_contents($path);
+        $json = File::get($path);
         $data = json_decode($json, true);
 
         if ($data === null) {

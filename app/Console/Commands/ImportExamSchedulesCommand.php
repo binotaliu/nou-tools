@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use NouTools\Domains\Courses\Actions\ImportExamSchedulesFromJson;
 
-class ImportExamSchedules extends Command
+final class ImportExamSchedulesCommand extends Command
 {
     /**
      * The name and signature of the console command.

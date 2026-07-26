@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Shared\SchoolCalendar\Actions;
 
 use Carbon\Carbon;
@@ -15,7 +17,7 @@ final class ListUpcomingSchoolEvents
      *
      * @return array<int, array{start: string, end: string, name: string, countdown: bool}>
      */
-    public function getUpcomingEvents(?string $referenceDate = null): array
+    public function __invoke(?string $referenceDate = null): array
     {
         $semester = config('app.current_semester');
         $schedules = config('school-schedules.'.(string) $semester, []);

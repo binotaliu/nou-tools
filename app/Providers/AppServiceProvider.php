@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Models\Announcement;
@@ -24,7 +26,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use NouTools\Domains\Schedules\Actions\ReadStudentScheduleCookie;
 
-class AppServiceProvider extends ServiceProvider
+final class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
@@ -118,6 +120,12 @@ class AppServiceProvider extends ServiceProvider
             return app(ReadStudentScheduleCookie::class)($this);
         });
 
+        // Strips punctuation/whitespace variants (full-width and half-width)
+        // so course titles from different sources can be compared for equality.
+        Str::macro('withoutCourseTitlePunctuation', function (string $value): string {
+            return str_replace(['（', '）', '(', ')', '：', ':', '～', '~', '—', '－', '-', '–', '　', ' '], '', trim($value));
+        });
+
         Str::macro('toChineseNumber', function (int $n): string {
             if ($n > 99) {
                 return (string) " {$n} "; // Fallback to digits for large numbers
@@ -135,7 +143,7 @@ class AppServiceProvider extends ServiceProvider
 
             $tens = intdiv($n, 10);
             $ones = $n % 10;
-            $res = ($tens == 1 ? '十' : $digits[$tens].'十').($ones ? $digits[$ones] : '');
+            $res = ($tens === 1 ? '十' : $digits[$tens].'十').($ones ? $digits[$ones] : '');
 
             return $res;
         });

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Enums\CourseClassType;
@@ -11,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use NouTools\Domains\Courses\Actions\ParseNouCourses;
 
-class FetchCoursesCommand extends Command
+final class FetchCoursesCommand extends Command
 {
     protected $signature = 'course:fetch {term : The term to fetch (e.g. 2025B)}';
 
@@ -151,7 +153,7 @@ class FetchCoursesCommand extends Command
     /**
      * Fetch HTML content from a URL.
      */
-    protected function fetchHtml(string $url): ?string
+    private function fetchHtml(string $url): ?string
     {
         $response = Http::timeout(30)->get($url);
 

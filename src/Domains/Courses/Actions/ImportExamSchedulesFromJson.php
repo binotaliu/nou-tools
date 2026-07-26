@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Courses\Actions;
 
 use App\Models\Course;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 final class ImportExamSchedulesFromJson
 {
@@ -62,7 +65,7 @@ final class ImportExamSchedulesFromJson
 
     private function updateCourseExamSchedule(string $title, string $term, ?string $midtermDate, string $finalDate, string $startTime, string $endTime, int &$success, int &$failed): void
     {
-        $normalizedTitle = $this->normalizeName($title);
+        $normalizedTitle = Str::withoutCourseTitlePunctuation($title);
         $course = Course::query()
             ->where('term', $term)
             ->where(function ($query) use ($normalizedTitle) {
@@ -85,10 +88,5 @@ final class ImportExamSchedulesFromJson
         $course->exam_time_end = $endTime;
         $course->saveOrFail();
         $success++;
-    }
-
-    public function normalizeName(string $name): string
-    {
-        return str_replace(['（', '）', '(', ')', '：', ':', '～', '~', '—', '－', '-', '–', '　', ' '], '', trim($name));
     }
 }

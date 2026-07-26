@@ -16,7 +16,7 @@ it('returns empty array when no schedules configured', function () {
     config(['app.current_semester' => '2025A']);
     config(['school-schedules.2025A' => []]);
 
-    $events = $this->service->getUpcomingEvents();
+    $events = ($this->service)();
 
     expect($events)->toBeArray()->toBeEmpty();
 });
@@ -32,7 +32,7 @@ it('filters out past events', function () {
         ],
     ]]);
 
-    $events = $this->service->getUpcomingEvents('2026-02-18');
+    $events = ($this->service)('2026-02-18');
 
     expect($events)->toBeEmpty();
 });
@@ -48,7 +48,7 @@ it('includes an event ending today as plain Y-m-d strings', function () {
         ],
     ]]);
 
-    $events = $this->service->getUpcomingEvents('2026-02-18');
+    $events = ($this->service)('2026-02-18');
 
     expect($events)->toHaveCount(1)
         ->and($events[0]['name'])->toBe('進行中的活動')
@@ -68,7 +68,7 @@ it('includes upcoming events', function () {
         ],
     ]]);
 
-    $events = $this->service->getUpcomingEvents('2026-02-18');
+    $events = ($this->service)('2026-02-18');
 
     expect($events)->toHaveCount(1)
         ->and($events[0]['name'])->toBe('即將到來的活動')
@@ -99,7 +99,7 @@ it('sorts events by start date', function () {
         ],
     ]]);
 
-    $events = $this->service->getUpcomingEvents('2026-02-18');
+    $events = ($this->service)('2026-02-18');
 
     expect($events)->toHaveCount(3)
         ->and($events[0]['name'])->toBe('第一個活動')
@@ -124,7 +124,7 @@ it('preserves the countdown flag from config for the client to select', function
         ],
     ]]);
 
-    $events = $this->service->getUpcomingEvents('2026-02-18');
+    $events = ($this->service)('2026-02-18');
 
     expect($events)->toHaveCount(2)
         ->and($events[0]['countdown'])->toBeFalse()
@@ -142,7 +142,7 @@ it('handles multi-day events correctly', function () {
         ],
     ]]);
 
-    $events = $this->service->getUpcomingEvents('2026-02-18');
+    $events = ($this->service)('2026-02-18');
 
     expect($events)->toHaveCount(1)
         ->and($events[0]['name'])->toBe('多日活動')
@@ -161,7 +161,7 @@ it('uses current date when no reference date provided', function () {
         ],
     ]]);
 
-    $events = $this->service->getUpcomingEvents();
+    $events = ($this->service)();
 
     expect($events)->toHaveCount(1);
 });

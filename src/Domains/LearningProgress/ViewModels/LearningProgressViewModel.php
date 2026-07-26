@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\LearningProgress\ViewModels;
 
 use App\Models\LearningProgress;
@@ -98,7 +100,7 @@ final class LearningProgressViewModel extends Data
             return null;
         }
 
-        return intdiv($now->diffInDays($this->semesterStart, absolute: true), 7) + 1;
+        return intdiv((int) $now->diffInDays($this->semesterStart, absolute: true), 7) + 1;
     }
 
     public function isWeekPassed(int $weekNum): bool

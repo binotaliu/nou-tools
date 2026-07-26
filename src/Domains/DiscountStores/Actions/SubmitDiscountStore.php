@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\DiscountStores\Actions;
 
 use App\Enums\DiscountStoreStatus;
@@ -17,12 +19,12 @@ final readonly class SubmitDiscountStore
         $store->name = $data->name;
         $store->status = DiscountStoreStatus::Pending;
         $store->type = $data->type;
-        $store->category_id = $data->category_id;
+        $store->category_id = $data->categoryId;
         $store->city = $data->city;
         $store->district = $data->district;
         $store->address = $data->address;
-        $store->verification_method = $data->verification_method;
-        $store->discount_details = $data->discount_details;
+        $store->verification_method = $data->verificationMethod;
+        $store->discount_details = $data->discountDetails;
         $store->notes = $data->notes;
         $store->saveOrFail();
 

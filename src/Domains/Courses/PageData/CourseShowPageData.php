@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace NouTools\Domains\Courses\PageData;
 
 use App\Models\Course;
 use NouTools\Domains\Courses\ViewModels\Api\CourseDetailViewModel;
-use NouTools\Domains\Schedules\ViewModels\StudentScheduleCookieViewModel;
+use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 use Spatie\LaravelData\Resource;
 
 final class CourseShowPageData extends Resource
@@ -14,10 +16,10 @@ final class CourseShowPageData extends Resource
         public ?string $inPersonClassType,
         public ?string $media,
         public ?string $multimediaUrl,
-        public ?StudentScheduleCookieViewModel $previousSchedule,
+        public ?StudentScheduleCookie $previousSchedule,
     ) {}
 
-    public static function fromModel(Course $course, CourseDetailViewModel $courseDetail, ?StudentScheduleCookieViewModel $previousSchedule): self
+    public static function fromModel(Course $course, CourseDetailViewModel $courseDetail, ?StudentScheduleCookie $previousSchedule): self
     {
         return new self(
             course: $courseDetail,

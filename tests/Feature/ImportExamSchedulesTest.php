@@ -2,6 +2,7 @@
 
 use App\Models\Course;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use NouTools\Domains\Courses\Actions\ImportExamSchedulesFromJson;
 
 beforeEach(function () {
@@ -172,10 +173,8 @@ it('uses file facade for reading exam schedules', function () {
 });
 
 it('normalizes course names correctly', function () {
-    $service = new ImportExamSchedulesFromJson;
-
-    expect($service->normalizeName('做伙唱歌學台語'))->toBe('做伙唱歌學台語');
-    expect($service->normalizeName('當代治理新趨勢（二）：理論與個案'))->toBe('當代治理新趨勢二理論與個案');
-    expect($service->normalizeName('課程 名稱（test）：內容～資訊'))->toBe('課程名稱test內容資訊');
-    expect($service->normalizeName('  spaces  '))->toBe('spaces');
+    expect(Str::withoutCourseTitlePunctuation('做伙唱歌學台語'))->toBe('做伙唱歌學台語');
+    expect(Str::withoutCourseTitlePunctuation('當代治理新趨勢（二）：理論與個案'))->toBe('當代治理新趨勢二理論與個案');
+    expect(Str::withoutCourseTitlePunctuation('課程 名稱（test）：內容～資訊'))->toBe('課程名稱test內容資訊');
+    expect(Str::withoutCourseTitlePunctuation('  spaces  '))->toBe('spaces');
 });

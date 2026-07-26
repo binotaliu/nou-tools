@@ -1,10 +1,12 @@
 <?php
 
-namespace NouTools\Domains\Schedules\ViewModels;
+declare(strict_types=1);
+
+namespace NouTools\Domains\Schedules\ValueObjects;
 
 use App\Models\StudentSchedule;
 
-final readonly class StudentScheduleCookieViewModel
+final readonly class StudentScheduleCookie
 {
     public function __construct(
         public int $id,
