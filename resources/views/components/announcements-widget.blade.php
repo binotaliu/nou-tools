@@ -21,9 +21,9 @@
         @else
             @foreach ($announcements as $announcement)
                 <div
-                    class="flex items-start justify-between gap-3 border-b border-warm-100 py-2 last:border-0 dark:border-zinc-800"
+                    class="flex flex-col gap-1 border-b border-warm-100 py-2 last:border-0 dark:border-zinc-800"
                 >
-                    <div class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
                         <div
                             class="flex flex-wrap items-center gap-1.5 text-xs"
                         >
@@ -39,36 +39,38 @@
                             </span>
                         </div>
 
-                        <a
-                            href="{{ $announcement->url }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="mt-1 line-clamp-1! block max-w-full text-sm font-medium break-all text-warm-900 transition hover:text-orange-700 dark:text-zinc-100 dark:hover:text-orange-400"
+                        <div class="flex-1"></div>
+
+                        <p
+                            class="shrink-0 text-right text-xs whitespace-nowrap text-warm-500 dark:text-zinc-400"
                         >
-                            {{ $announcement->title }}
-                        </a>
+                            @if ($announcement->published_at)
+                                @php
+                                    $relativeLabel = match (true) {
+                                        $announcement->published_at->isToday() => '今天',
+                                        $announcement->published_at->isYesterday() => '昨天',
+                                        $announcement->published_at->isTomorrow() => '明天',
+                                        default => $announcement->published_at->diffForHumans(),
+                                    };
+                                @endphp
+
+                                {{ $relativeLabel }}
+                                •
+                                {{ $announcement->published_at->format('Y/m/d') }}
+                            @else
+                                未提供
+                            @endif
+                        </p>
                     </div>
 
-                    <p
-                        class="shrink-0 text-right text-xs whitespace-nowrap text-warm-500 dark:text-zinc-400"
+                    <a
+                        href="{{ $announcement->url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="line-clamp-1! block max-w-full text-sm font-medium break-all text-warm-900 transition hover:text-orange-700 dark:text-zinc-100 dark:hover:text-orange-400"
                     >
-                        @if ($announcement->published_at)
-                            @php
-                                $relativeLabel = match (true) {
-                                    $announcement->published_at->isToday() => '今天',
-                                    $announcement->published_at->isYesterday() => '昨天',
-                                    $announcement->published_at->isTomorrow() => '明天',
-                                    default => $announcement->published_at->diffForHumans(),
-                                };
-                            @endphp
-
-                            {{ $relativeLabel }}
-                            •
-                            {{ $announcement->published_at->format('Y/m/d') }}
-                        @else
-                            未提供
-                        @endif
-                    </p>
+                        {{ $announcement->title }}
+                    </a>
                 </div>
             @endforeach
         @endif
