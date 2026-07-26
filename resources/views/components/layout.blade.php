@@ -179,7 +179,7 @@
                     <a href="{{ url('/') }}" class="shrink-0"> NOU 小幫手 </a>
                 </h1>
 
-                <div class="flex items-center gap-2">
+                <div class="flex min-h-[38px] items-center gap-2">
                     <div
                         x-data="{
                             theme: localStorage.getItem('theme') || 'system',
