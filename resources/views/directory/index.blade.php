@@ -38,9 +38,7 @@
             <x-heroicon-o-signal-slash class="mt-0.5 size-5 shrink-0" />
             <div>
                 <p class="font-semibold">目前處於離線狀態</p>
-                <p class="mt-1">
-                    這是先前載入過的快取內容，可能不是最新資料。學習指導中心地圖需要連線才能顯示，暫時已隱藏。
-                </p>
+                <p class="mt-1">這是先前載入過的快取內容，可能不是最新資料。學習指導中心地圖需要連線才能顯示，暫時已隱藏。</p>
             </div>
         </div>
 
@@ -48,9 +46,7 @@
             <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
                 連結 / 學習指導中心目錄
             </h2>
-            <p class="text-sm text-warm-600 dark:text-zinc-400">
-                彙整校內各處室、學系與學習指導中心的官方網站連結。
-            </p>
+            <p class="text-sm text-warm-600 dark:text-zinc-400">彙整校內各處室、學系與學習指導中心的官方網站連結。</p>
         </div>
 
         <div class="space-y-6">
@@ -116,7 +112,12 @@
                         ->values();
                 @endphp
 
-                <x-card :title="$centerGroup->label">
+                <x-card
+                    :title="$centerGroup->label"
+                    x-data
+                    x-show="!$store.network.offline"
+                    x-cloak
+                >
                     <div
                         x-data="linksCenterMap({
                                     centers: {{ Js::from($centersFrontEndData) }},
@@ -132,88 +133,154 @@
                         <select
                             x-model="selectedKey"
                             @change="selectCenter($event.target.value)"
-                                   vent.target.value)"
-                                   ct"
-                                    border border-warm-200 bg-white px-3 py-2 text-sm font-medium text-warm-800 sm:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
-                                   中心</option>
-                                   0zu8NQB"
-                                   gion.label">
-                                   aLk5r4M5GlFOiXYU8Tkj6B"
-                                   .key"
-                                   center.key"
-                                   BdjNlaub7SbseB"
-                                   min gap-3 overflow-y-auto sm:grid lg:gap-2"
-                                   PZ4JibB"
-                                   1">
-                                   text-xs font-semibold tracking-wide text-warm-500 uppercase dark:text-zinc-500"
-                                   VMVwYOQEhYB"
-                                   grid-cols-3 gap-1 lg:grid-cols-1 lg:gap-0.5"
-                                   TurPHhY3jqoSizueMRxBa6AV5B"
-                                   nter.key"
-                                   ="button"
-                                   ck="selectCenter(center.key)"
-                                   ss="
-                                       selectedKey === center.key
-                                           ? 'bg-warm-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
-                                           : 'text-warm-700 hover:bg-warm-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
-                                   "
-                                   vent.target.value)"
-                                   ct"
-                                    border border-warm-200 bg-white px-3 py-2 text-sm font-medium text-warm-800 sm:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
-                                   中心</option>
-                                   0zu8NQB"
-                                   gion.label">
-                                   aLk5r4M5GlFOiXYU8Tkj6B"
-                                   .key"
-                                   center.key"
-                                   BdjNlaub7SbseB"
-                                   min gap-3 overflow-y-auto sm:grid lg:gap-2"
-                                   PZ4JibB"
-                                   1">
-                                   text-xs font-semibold tracking-wide text-warm-500 uppercase dark:text-zinc-500"
-                                   VMVwYOQEhYB"
-                                   grid-cols-3 gap-1 lg:grid-cols-1 lg:gap-0.5"
-                                   TurPHhY3jqoSizueMRxBa6AV5B"
-                                   nter.key"
-                                   ="button"
-                                   ck="selectCenter(center.key)"
-                                   ss="
-                                       selectedKey === center.key
-                                           ? 'bg-warm-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
-                                           : 'text-warm-700 hover:bg-warm-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
-                                   "
-                                   s="truncate rounded-lg px-3 py-2 text-left text-sm font-medium transition"
-                                   a-testid="'center-button-' + center.key"
-                                   xt="center.name"
-                                   n>
-                                   i3CXUhQOB">
-                                   "
-                                   ter-details"
-                                   ntainer"
-                                   "center-map"
-                                   8u5xmRJmbpYEGo49M7azGB"
-                                   w-full rounded-lg border border-warm-100 dark:border-zinc-800"
-                                   t9Mnptno0TmmE1BCY0lQB"
-                                   "center-map-offline-notice"
-                                   h-80 w-full items-center justify-center rounded-lg border border-warm-100 px-4 text-center text-sm text-warm-700 dark:border-zinc-800 dark:text-zinc-500"
-                                   線時已隱藏
-                                   -y-2 text-sm text-warm-700 dark:text-zinc-300"
-                                   ext-base font-semibold text-warm-900 dark:text-zinc-100"
-                                   BWmg281xnFa6340wHYPmDB"
-                                   BTWpQ5LlqzVbVcbuMgpBxAoMB"
-                                   lex items-start gap-1"
-                                   con-o-map-pin
-                                   s="mt-0.5 size-4 shrink-0"
-                                   ="button"
-                                   -testid="center-address-button"
-                                   s="text-left text-orange-600 hover:underline"
-                                   ck="openMapSelectionModal()"
-                                   abled="!selectedCenter.latitude || !selectedCenter.longitude"
-                                   ss="
-                                       selectedCenter.latitude && selectedCenter.longitude
-                                           ? 'cursor-pointer'
-                                           : 'cursor-not-allowed opacity-50'
-                                   "
+                            data-testid="center-select"
+                            class="w-full rounded-lg border border-warm-200 bg-white px-3 py-2 text-sm font-medium text-warm-800 sm:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+                        >
+                            <option value="">請選擇學習指導中心</option>
+                            <template
+                                x-for="region in regions"
+                                :key="region.label"
+                            >
+                                <optgroup :label="region.label">
+                                    <template
+                                        x-for="center in region.centers"
+                                        :key="center.key"
+                                    >
+                                        <option
+                                            :value="center.key"
+                                            x-text="center.name"
+                                        ></option>
+                                    </template>
+                                </optgroup>
+                            </template>
+                        </select>
+
+                        <div
+                            class="hidden auto-rows-min gap-3 overflow-y-auto sm:grid lg:gap-2"
+                        >
+                            <template
+                                x-for="region in regions"
+                                :key="region.label"
+                            >
+                                <div class="space-y-1">
+                                    <p
+                                        class="px-3 text-xs font-semibold tracking-wide text-warm-500 uppercase dark:text-zinc-500"
+                                        x-text="region.label"
+                                    ></p>
+                                    <div
+                                        class="grid grid-cols-3 gap-1 lg:grid-cols-1 lg:gap-0.5"
+                                    >
+                                        <template
+                                            x-for="center in region.centers"
+                                            :key="center.key"
+                                        >
+                                            <button
+                                                type="button"
+                                                @click="
+                                                    selectCenter(center.key)
+                                                "
+                                                :class="selectedKey ===
+                                                center.key
+                                                    ? 'bg-warm-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
+                                                    : 'text-warm-700 hover:bg-warm-100 dark:text-zinc-300 dark:hover:bg-zinc-800'"
+                                                class="truncate rounded-lg px-3 py-2 text-left text-sm font-medium transition"
+                                                :data-testid="'center-button-' +
+                                                center.key"
+                                                x-text="center.name"
+                                            ></button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="space-y-3">
+                            <template x-if="selectedCenter">
+                                <div
+                                    class="space-y-3"
+                                    data-testid="center-details"
+                                >
+                                    <div
+                                        x-ref="mapContainer"
+                                        data-testid="center-map"
+                                        class="h-80 w-full rounded-lg border border-warm-100 dark:border-zinc-800"
+                                    ></div>
+
+                                    <div
+                                        class="space-y-2 text-sm text-warm-700 dark:text-zinc-300"
+                                    >
+                                        <p
+                                            class="text-base font-semibold text-warm-900 dark:text-zinc-100"
+                                            x-text="selectedCenter.name"
+                                        ></p>
+
+                                        <p x-show="
+                                                selectedCenter.address
+                                            " class="flex items-start gap-1">
+                                            <x-heroicon-o-map-pin
+                                                class="mt-0.5 size-4 shrink-0"
+                                            />
+                                            <button
+                                                type="button"
+                                                data-testid="center-address-button"
+                                                class="text-left text-orange-600 hover:underline"
+                                                @click="openMapSelectionModal()"
+                                                :disabled="!selectedCenter.latitude ||
+                                                !selectedCenter.longitude"
+                                                :class="selectedCenter.latitude &&
+                                                selectedCenter.longitude
+                                                    ? 'cursor-pointer'
+                                                    : 'cursor-not-allowed opacity-50'"
+                                                x-text="selectedCenter.address"
+                                            ></button>
+                                        </p>
+
+                                        <template
+                                            x-for="
+                                                phone in selectedCenter.phones
+                                            "
+                                            :key="phone.link"
+                                        >
+                                            <a
+                                                :href="'tel:' + phone.link"
+                                                class="flex items-center gap-1 hover:underline"
+                                            >
+                                                <x-heroicon-o-phone
+                                                    class="size-4 shrink-0"
+                                                />
+                                                <span
+                                                    x-text="phone.display"
+                                                ></span>
+                                            </a>
+                                        </template>
+                                    </div>
+
+                                    <div class="grid gap-2 sm:grid-cols-2">
+                                        <a
+                                            :href="selectedCenter.url"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            data-testid="center-website-button"
+                                            data-offline-allow
+                                            class="flex items-center justify-between gap-2 rounded-lg border border-warm-200 bg-white px-4 py-3 text-sm font-medium text-warm-800 transition hover:border-warm-300 hover:bg-warm-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
+                                        >
+                                            <span class="truncate"
+                                                >開啟中心網站</span
+                                            >
+                                            <x-heroicon-o-arrow-top-right-on-square
+                                                class="size-4 shrink-0 text-warm-400 dark:text-zinc-500"
+                                            />
+                                        </a>
+
+                                        <a
+                                            x-show="selectedCenter.transportUrl"
+                                            :href="selectedCenter.transportUrl"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            data-testid="center-transport-button"
+                                            data-offline-allow
+                                            class="flex items-center justify-between gap-2 rounded-lg border border-warm-200 bg-white px-4 py-3 text-sm font-medium text-warm-800 transition hover:border-warm-300 hover:bg-warm-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
+                                        >
                                             <span class="truncate">
                                                 交通資訊
                                             </span>
