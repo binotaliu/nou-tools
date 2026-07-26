@@ -10,14 +10,13 @@ final readonly class PersonaResolver
 
     public function resolve(string $speakerName): ResolvedPersona
     {
-        /** @var array<string, array{names: array<int, string>, avatar?: string, image?: string, moods?: array<string, string>, side: string}> $personas */
+        /** @var array<string, array{names: array<int, string>, avatar?: string, image?: string, moods?: array<string, string>}> $personas */
         $personas = config('dialogue.personas', []);
 
         foreach ($personas as $slug => $persona) {
             if (\in_array($speakerName, $persona['names'] ?? [], true)) {
                 return new ResolvedPersona(
                     slug: $slug,
-                    side: $persona['side'] ?? (string) config('dialogue.default_side', 'start'),
                     avatar: $persona['avatar'] ?? null,
                     image: $persona['image'] ?? null,
                     moods: $persona['moods'] ?? [],
@@ -27,7 +26,6 @@ final readonly class PersonaResolver
 
         return new ResolvedPersona(
             slug: self::FALLBACK_SLUG,
-            side: (string) config('dialogue.default_side', 'start'),
             avatar: mb_substr($speakerName, 0, 1) ?: '💬',
             image: null,
             moods: [],

@@ -149,12 +149,7 @@
   }
 
   .md-dialogue-turn {
-    @apply relative flex w-full items-start gap-3 rounded-lg border-2 border-warm-700 bg-warm-50 p-4 dark:border-zinc-600 dark:bg-zinc-800;
-  }
-
-  .md-dialogue-turn[data-side='start'],
-  .md-dialogue-turn[data-side='end'] {
-    @apply flex-row;
+    @apply relative mb-4 flex w-full flex-row items-start gap-3 rounded-lg border-2 border-warm-700 bg-warm-50 p-4 dark:border-zinc-600 dark:bg-zinc-800;
   }
 
   .md-dialogue-avatar {
@@ -170,7 +165,7 @@
   }
 
   .md-dialogue-speaker {
-    @apply mt-0! mb-2! text-sm font-bold text-warm-900 dark:text-zinc-200;
+    @apply -mt-8! mb-2! w-24 rounded border border-warm-700 px-2 py-1 text-sm font-bold text-warm-900 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-200;
   }
 
   .md-dialogue-body {

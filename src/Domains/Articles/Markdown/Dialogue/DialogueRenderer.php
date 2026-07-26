@@ -58,7 +58,6 @@ final readonly class DialogueRenderer implements ContainerRendererInterface
 
         return new HtmlElement('div', [
             'class' => 'md-dialogue-turn',
-            'data-side' => $persona->side,
             'data-persona' => $persona->slug,
         ], [$avatar, $bubble]);
     }

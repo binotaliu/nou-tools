@@ -11,7 +11,6 @@ final class ResolvedPersona
      */
     public function __construct(
         public readonly string $slug,
-        public readonly string $side,
         public readonly ?string $avatar,
         public readonly ?string $image,
         public readonly array $moods,

@@ -12,7 +12,7 @@ beforeEach(function () {
 
 // --- 2.1 dialogue -----------------------------------------------------------
 
-test('dialogue renders turns with persona, side, and mood', function () {
+test('dialogue renders turns with persona and mood', function () {
     $html = ($this->convert)(<<<'MD'
 :::dialogue
 新生：我剛註冊了空大，接下來要怎麼辦？
@@ -27,10 +27,8 @@ MD);
 
     expect($html)
         ->toContain('<div class="md-dialogue" role="group" aria-label="對話">')
-        ->toContain('data-side="start"')
         ->toContain('data-persona="student"')
         ->toContain('data-persona="raccoon"')
-        ->toContain('data-side="end"')
         ->toContain('<p class="md-dialogue-speaker">新生</p>')
         ->toContain('<p class="md-dialogue-speaker">浣熊站長</p>')
         ->toContain('data-mood="緊張"')
@@ -83,7 +81,6 @@ MD);
 
     expect($html)
         ->toContain('data-persona="neutral"')
-        ->toContain('data-side="start"')
         ->toContain('<p class="md-dialogue-speaker">教務長</p>')
         ->toContain('>教<');
 });
