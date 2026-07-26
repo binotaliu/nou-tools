@@ -44,6 +44,10 @@ final readonly class JsonApiFetcher implements AnnouncementFetcher
                 $publishedAt = Date::parse($advert['StartDateTime'], 'Asia/Taipei');
             }
 
+            if ($publishedAt !== null && $publishedAt->isAfter(Date::now()->addDays(2))) {
+                $publishedAt = Date::now();
+            }
+
             return new FetchedAnnouncementDTO(
                 sourceId: (string) $advert['AdvertID'],
                 title: $advert['Title'],

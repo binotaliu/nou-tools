@@ -6,6 +6,8 @@ use NouTools\Domains\Announcements\Actions\SyncAnnouncements;
 use NouTools\Domains\Announcements\DataTransferObjects\AnnouncementSourceConfigDTO;
 use NouTools\Domains\Announcements\Fetchers\JsonApiFetcher;
 
+use function Pest\Laravel\freezeSecond;
+
 function jsonApiSourceConfig(array $overrides = []): AnnouncementSourceConfigDTO
 {
     return AnnouncementSourceConfigDTO::fromConfig(
@@ -64,6 +66,36 @@ it('parses JSON API response into fetched DTOs', function () {
         ->and($results[0]->publishedAt)->not->toBeNull()
         ->and($results[1]->sourceId)->toBe('7383')
         ->and($results[1]->title)->toBe('舊生選課注意事項');
+});
+
+it('caps far-future pinned dates to the discovery time', function () {
+    $frozenNow = freezeSecond();
+
+    $source = jsonApiSourceConfig([
+        'fetch_url' => 'https://studadm.nou.edu.tw/api/AdvertApi?CategoryId=12&Page=1&take=999',
+        'fetcher_config' => ['base_url' => 'https://studadm.nou.edu.tw'],
+    ]);
+
+    Http::fake([
+        'studadm.nou.edu.tw/*' => Http::response([
+            'Adverts' => [
+                [
+                    'AdvertID' => 9999,
+                    'Title' => '國立空中大學新生報名注意事項',
+                    'Tags' => null,
+                    'Url' => '/article/9999',
+                    'File' => null,
+                    'StartDateTime' => '2027-03-31 00:00:00',
+                ],
+            ],
+        ]),
+    ]);
+
+    $fetcher = new JsonApiFetcher;
+    $results = $fetcher->fetch($source);
+
+    expect($results[0]->publishedAt)->not->toBeNull()
+        ->and($results[0]->publishedAt->equalTo($frozenNow))->toBeTrue();
 });
 
 it('syncs new announcements from JSON API source', function () {
