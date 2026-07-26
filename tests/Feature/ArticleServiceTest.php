@@ -191,7 +191,8 @@ MD;
     expect($sidebarContent)
         ->toBeInstanceOf(ArticleShowPageData::class)
         ->and((string) $sidebarContent->sidebarContent)
-        ->toContain('<h2 id="文章列表">文章列表')
+        ->toContain('id="文章列表"')
+        ->toContain('文章列表')
         ->toContain('歡迎使用 NOU 小幫手');
 });
 

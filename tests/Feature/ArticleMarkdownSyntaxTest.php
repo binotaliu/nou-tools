@@ -312,9 +312,66 @@ test('timeline splits a bold label from its body', function () {
 MD);
 
     expect($html)
-        ->toContain('<ol class="md-timeline">')
+        ->toContain('<div class="md-timeline">')
+        ->toContain('<ol class="md-timeline-flat">')
         ->toContain('<span class="md-timeline-dot" aria-hidden="true"></span>')
         ->toContain('<span class="md-timeline-label"><strong>8 月</strong></span>註冊選課開始');
+});
+
+test('hierarchical timeline with sections and nested items', function () {
+    $html = ($this->convert)(<<<'MD'
+:::timeline MermaidChart 2023 Timeline
+
+## 2023 Q1
+Release Personal Tier
+
+- Bullet 1
+  - sub-point 1a
+  - sub-point 1b
+- Bullet 2
+  - sub-point 2a
+
+## 2023 Q2
+Release XYZ Tier
+
+- Bullet 3
+  - sub-point 3a
+:::
+MD);
+
+    expect($html)
+        ->toContain('<div class="md-timeline">')
+        ->toContain('<div class="md-timeline-title">MermaidChart 2023 Timeline</div>')
+        ->toContain('<div class="md-timeline-section">')
+        ->toContain('<div class="md-timeline-section-title">')
+        ->toContain('2023 Q1')
+        ->toContain('2023 Q2')
+        ->toContain('<ol class="md-timeline-section-items">')
+        ->toContain('<li class="md-timeline-section-item">')
+        ->toContain('Release Personal Tier')
+        ->toContain('Release XYZ Tier')
+        ->toContain('Bullet 1')
+        ->toContain('sub-point 1a')
+        ->toContain('sub-point 1b')
+        ->toContain('<ul>')
+        ->toContain('</ul>');
+});
+
+test('timeline without sections renders in flat mode', function () {
+    $html = ($this->convert)(<<<'MD'
+:::timeline
+
+- First item
+- Second item
+- Third item
+:::
+MD);
+
+    expect($html)
+        ->toContain('<div class="md-timeline">')
+        ->toContain('<ol class="md-timeline-flat">')
+        ->toContain('<li class="md-timeline-item">')
+        ->not->toContain('md-timeline-section');
 });
 
 // --- 2.8 summary -----------------------------------------------------------

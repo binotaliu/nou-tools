@@ -345,23 +345,79 @@
 
   /* 2.7 Timeline */
   .md-timeline {
-    @apply relative my-6 flex list-none flex-col gap-6 border-l-2 border-warm-300 pl-6 dark:border-zinc-700;
+    @apply relative my-6 flex flex-col gap-6;
   }
 
+  /* Timeline title (optional) */
+  .md-timeline-title {
+    @apply mb-2 text-xl font-bold text-warm-900 dark:text-zinc-100;
+  }
+
+  /* Flat timeline (backward compatibility) */
+  .md-timeline-flat {
+    @apply flex list-none flex-col gap-6 border-l-2 border-warm-300 pl-6 dark:border-zinc-700;
+  }
+
+  /* Section container */
+  .md-timeline-section {
+    @apply relative flex flex-col gap-4 border-l-2 border-warm-300 pl-6 dark:border-zinc-700;
+  }
+
+  /* Section title (heading) */
+  .md-timeline-section-title {
+    @apply mb-2 -ml-6 w-fit rounded-r-lg bg-warm-600 px-4 py-1.5 font-semibold text-white dark:bg-warm-500;
+  }
+
+  .md-timeline-section-title :where(h2, h3, h4) {
+    @apply m-0! text-base! font-semibold! text-white!;
+  }
+
+  /* Section content (between heading and items) */
+  .md-timeline-section-content {
+    @apply mb-4 text-sm text-warm-700 dark:text-zinc-300;
+  }
+
+  .md-timeline-section-content :where(p) {
+    @apply my-0;
+  }
+
+  /* Items list within a section */
+  .md-timeline-section-items {
+    @apply flex list-none flex-col gap-4;
+  }
+
+  /* Individual item in a section */
+  .md-timeline-section-item {
+    @apply relative;
+  }
+
+  /* Flat timeline item (backward compatibility) */
   .md-timeline-item {
     @apply relative;
   }
 
+  /* Timeline dot */
   .md-timeline-dot {
     @apply absolute top-1 -left-[1.65rem] size-3 rounded-full bg-warm-600 ring-4 ring-warm-50 dark:bg-warm-500 dark:ring-zinc-900;
   }
 
+  /* Timeline label (bold prefix) */
   .md-timeline-label {
     @apply mr-1 font-semibold text-warm-900 dark:text-zinc-100;
   }
 
+  /* Timeline body content */
   .md-timeline-body :where(p) {
     @apply my-0;
+  }
+
+  /* Nested list (sub-items) */
+  .md-timeline-body :where(ul) {
+    @apply mt-2 ml-4 list-disc space-y-1;
+  }
+
+  .md-timeline-body :where(ul li) {
+    @apply text-sm text-warm-700 dark:text-zinc-300;
   }
 
   /* 2.8 Summary */
@@ -525,18 +581,22 @@
 
   .md-steps,
   .md-timeline,
+  .md-timeline-flat,
+  .md-timeline-section-items,
   .md-checklist :where(ul) {
     @apply m-0! list-none! pl-0!;
   }
 
   .md-step,
   .md-timeline-item,
+  .md-timeline-section-item,
   .md-checklist :where(li) {
     @apply m-0!;
   }
 
   .md-step::marker,
   .md-timeline-item::marker,
+  .md-timeline-section-item::marker,
   .md-checklist :where(li)::marker {
     @apply content-none!;
   }
