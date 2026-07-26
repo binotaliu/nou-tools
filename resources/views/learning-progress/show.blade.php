@@ -277,6 +277,10 @@
                                         >
 
 
+
+
+
+
 {{ $viewModel->getNote($course->id, $week->num) }}</textarea
                                         >
                                     </td>
