@@ -18,6 +18,19 @@ function currentFilterSummaryHtml(TestResponse $response): string
     return $matches[1];
 }
 
+function currentPaginationSummaryText(TestResponse $response): string
+{
+    preg_match(
+        '/text-warm-600 dark:text-zinc-400">(.*?)<\/p>/su',
+        $response->getContent(),
+        $matches,
+    );
+
+    expect($matches[1] ?? null)->not->toBeNull();
+
+    return preg_replace('/\s+/u', ' ', trim($matches[1]));
+}
+
 it('shows announcement entry points on home page', function () {
     $response = get(route('home'));
 
@@ -106,8 +119,10 @@ it('keeps filtered results paginated', function () {
 
     $pageTwoResponse->assertSuccessful();
     $pageTwoResponse->assertDontSee('其他來源公告');
-    $pageTwoResponse->assertSee('第 2 /');
-    $pageTwoResponse->assertSee('2 頁，共');
+
+    $paginationSummary = currentPaginationSummaryText($pageTwoResponse);
+
+    expect($paginationSummary)->toContain('第 2 / 2 頁，共');
 });
 
 it('filters announcements by selected source categories tree', function () {
