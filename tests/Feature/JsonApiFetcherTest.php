@@ -321,3 +321,37 @@ it('updates existing announcement content on repeated sync', function () {
         ->and($announcement->url)->toBe('https://example.com/article/100')
         ->and($announcement->tags)->toBe(['新標籤']);
 });
+
+it('does not reset published_at on repeated sync of a far-future pinned announcement', function () {
+    $source = jsonApiSourceConfig();
+
+    Http::fake([
+        'example.com/*' => Http::response([
+            'Adverts' => [
+                [
+                    'AdvertID' => 200,
+                    'Title' => '置頂公告',
+                    'Tags' => null,
+                    'Url' => '/article/200',
+                    'File' => null,
+                    'StartDateTime' => '2027-03-31 00:00:00',
+                ],
+            ],
+        ]),
+    ]);
+
+    $syncAction = app(SyncAnnouncements::class);
+    $syncAction($source);
+
+    $originalPublishedAt = Announcement::where('source_key', $source->key)
+        ->where('source_id', '200')
+        ->first()
+        ->published_at;
+
+    $this->travel(1)->day();
+
+    $syncAction($source);
+
+    $announcement = Announcement::where('source_key', $source->key)->where('source_id', '200')->first();
+    expect($announcement->published_at->equalTo($originalPublishedAt))->toBeTrue();
+});

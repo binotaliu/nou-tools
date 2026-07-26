@@ -42,7 +42,9 @@ final readonly class SyncAnnouncements
                     $existing->title = $dto->title;
                     $existing->url = $dto->url;
                     $existing->tags = $dto->tags;
-                    $existing->published_at = $dto->publishedAt;
+                    if ($existing->published_at === null) {
+                        $existing->published_at = $dto->publishedAt;
+                    }
                     $existing->fetched_at = $now;
                     $existing->expired_at = null;
                     $existing->saveOrFail();
