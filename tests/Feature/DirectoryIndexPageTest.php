@@ -1,6 +1,11 @@
 <?php
 
 use function Pest\Laravel\get;
+use function Pest\Laravel\withoutVite;
+
+beforeEach(function () {
+    withoutVite();
+});
 
 it('shows link groups with entries grouped by 各處室、學系、學習指導中心', function () {
     $response = get(route('directory.index'));
