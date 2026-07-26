@@ -8,16 +8,15 @@ use App\Enums\ArticleType;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\HtmlString;
-use League\CommonMark\Environment\Environment;
-use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
-use League\CommonMark\Extension\FrontMatter\FrontMatterExtension;
 use League\CommonMark\Extension\FrontMatter\Output\RenderedContentWithFrontMatter;
-use League\CommonMark\MarkdownConverter;
+use NouTools\Domains\Articles\Markdown\ArticleMarkdownConverterFactory;
 use NouTools\Domains\Articles\PageData\ArticleShowPageData;
 use NouTools\Domains\Articles\ViewModels\ArticleViewModel;
 
-final class ShowArticlePage
+final readonly class ShowArticlePage
 {
+    public function __construct(private ArticleMarkdownConverterFactory $converterFactory) {}
+
     public function __invoke(ArticleType $type, string $slug): ?ArticleShowPageData
     {
         if (! $this->isValidSlug($slug)) {
@@ -30,7 +29,7 @@ final class ShowArticlePage
             return null;
         }
 
-        $converter = $this->buildConverter();
+        $converter = $this->converterFactory->make();
         $result = $converter->convert(File::get($articlePath));
 
         if (! $result instanceof RenderedContentWithFrontMatter) {
@@ -59,15 +58,6 @@ final class ShowArticlePage
                 ? new HtmlString($converter->convert(File::get($sidebarPath))->getContent())
                 : null,
         );
-    }
-
-    private function buildConverter(): MarkdownConverter
-    {
-        $environment = new Environment;
-        $environment->addExtension(new CommonMarkCoreExtension);
-        $environment->addExtension(new FrontMatterExtension);
-
-        return new MarkdownConverter($environment);
     }
 
     private function isValidSlug(string $slug): bool

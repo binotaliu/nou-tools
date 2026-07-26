@@ -4,13 +4,14 @@ use App\Enums\ArticleType;
 use Illuminate\Support\Facades\File;
 use NouTools\Domains\Articles\Actions\ShowArticleIndexPage;
 use NouTools\Domains\Articles\Actions\ShowArticlePage;
+use NouTools\Domains\Articles\Markdown\ArticleMarkdownConverterFactory;
 use NouTools\Domains\Articles\PageData\ArticleIndexPageData;
 use NouTools\Domains\Articles\PageData\ArticleShowPageData;
 use NouTools\Domains\Articles\ViewModels\ArticleViewModel;
 
 beforeEach(function () {
-    $this->showArticlePage = new ShowArticlePage;
-    $this->showArticleIndexPage = new ShowArticleIndexPage;
+    $this->showArticlePage = new ShowArticlePage(new ArticleMarkdownConverterFactory);
+    $this->showArticleIndexPage = new ShowArticleIndexPage(new ArticleMarkdownConverterFactory);
 
     // helpers stored on the test instance to avoid polluting global namespace
     $this->articlePath = fn (ArticleType $type, string $slug): string => resource_path("articles/{$type->directory()}/{$slug}.md");
@@ -190,7 +191,7 @@ MD;
     expect($sidebarContent)
         ->toBeInstanceOf(ArticleShowPageData::class)
         ->and((string) $sidebarContent->sidebarContent)
-        ->toContain('<h2>文章列表</h2>')
+        ->toContain('<h2 id="文章列表">文章列表')
         ->toContain('歡迎使用 NOU 小幫手');
 });
 
