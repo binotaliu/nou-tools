@@ -8,7 +8,7 @@ NOU 小幫手是給國立空中大學（NOU）學生使用的非官方工具，�
 
 - [首頁]({{ route('home') }}): 功能選單與快速入口
 - [建立課表]({{ route('schedules.create') }}): 依課程建立個人課表
-- [校園公告]({{ route('announcements.index') }}): 最新校園公告列表
+- [校園公告]({{ route('announcements.index') }}): 最新校園公告列表（Markdown 版本：[{{ route('announcements.index.md') }}]({{ route('announcements.index.md') }})）
 - [優惠店家列表]({{ route('discount-stores.index') }}): 學生優惠店家列表（Markdown 版本：[{{ route('discount-stores.index.md') }}]({{ route('discount-stores.index.md') }})）
 - [連結 / 學習指導中心目錄]({{ route('directory.index') }}): 校內各處室、學系與學習指導中心的官方網站連結（Markdown 版本：[{{ route('directory.index.md') }}]({{ route('directory.index.md') }})）
 - [新增優惠店家]({{ route('discount-stores.create') }}): 提交新的優惠店家資訊
