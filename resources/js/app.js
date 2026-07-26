@@ -331,11 +331,29 @@ window.nouGreeting =
       taiwanDateString: '',
 
       init() {
+        this.compactMode = localStorage.getItem(compactStorageKey) === '1'
+
+        this.refreshGreeting(config)
+        // Re-derive the greeting/date/week each minute so a page left open
+        // across a boundary (e.g. 11:59 -> 12:00, or midnight) doesn't stay
+        // stuck on a stale "早安"/date/semester week.
+        setInterval(() => this.refreshGreeting(config), 60 * 1000)
+
+        const T = window.NouTime
+        this.showTaiwanClock = T.differsFromTaipei(new Date())
+
+        if (this.showTaiwanClock) {
+          this.refreshTaiwanClock()
+          // Only the minute digits are shown, so a per-second tick is enough
+          // to keep the clock from drifting a minute behind.
+          setInterval(() => this.refreshTaiwanClock(), 1000)
+        }
+      },
+
+      refreshGreeting(config) {
         const T = window.NouTime
         const now = new Date()
         const hour = now.getHours()
-
-        this.compactMode = localStorage.getItem(compactStorageKey) === '1'
 
         this.greetingText =
           hour >= 5 && hour < 12
@@ -366,15 +384,6 @@ window.nouGreeting =
 
         this.semesterInfo = this.buildSemesterInfo(config, now)
         this.compactSemesterInfo = this.buildCompactSemesterInfo(config, now)
-
-        this.showTaiwanClock = T.differsFromTaipei(now)
-
-        if (this.showTaiwanClock) {
-          this.refreshTaiwanClock()
-          // Only the minute digits are shown, so a per-second tick is enough
-          // to keep the clock from drifting a minute behind.
-          setInterval(() => this.refreshTaiwanClock(), 1000)
-        }
       },
 
       toggleCompact() {
