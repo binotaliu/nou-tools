@@ -308,6 +308,107 @@ window.NouTime =
     }
   })()
 
+// Alpine factory for article checklists. It turns Markdown's read-only GFM
+// task-list checkboxes into interactive controls and stores each checklist's
+// state in localStorage, scoped by page path + checklist index.
+window.nouChecklist =
+  window.nouChecklist ||
+  function () {
+    return {
+      storageKey: '',
+
+      init() {
+        this.storageKey = this.resolveStorageKey()
+
+        const states = this.readStates()
+        const items = this.$el.querySelectorAll('li')
+
+        items.forEach((item, index) => {
+          const checkbox = item.querySelector('input[type="checkbox"]')
+
+          if (!checkbox) {
+            return
+          }
+
+          this.wrapItemContent(item, checkbox)
+
+          checkbox.removeAttribute('disabled')
+
+          if (typeof states[index] === 'boolean') {
+            checkbox.checked = states[index]
+          }
+
+          this.syncItemState(item, checkbox)
+
+          checkbox.addEventListener('change', () => {
+            this.syncItemState(item, checkbox)
+            this.writeStates()
+          })
+        })
+      },
+
+      resolveStorageKey() {
+        const allChecklists = Array.from(
+          document.querySelectorAll('.md-checklist')
+        )
+        const checklistIndex = allChecklists.indexOf(this.$el)
+        const path = window.location.pathname
+
+        return `nou:article-checklist:${path}:${checklistIndex >= 0 ? checklistIndex : 0}:v1`
+      },
+
+      readStates() {
+        try {
+          const raw = localStorage.getItem(this.storageKey)
+
+          if (!raw) {
+            return []
+          }
+
+          const parsed = JSON.parse(raw)
+
+          return Array.isArray(parsed) ? parsed.map(value => !!value) : []
+        } catch (error) {
+          return []
+        }
+      },
+
+      writeStates() {
+        const states = Array.from(
+          this.$el.querySelectorAll('input[type="checkbox"]')
+        ).map(checkbox => checkbox.checked)
+
+        try {
+          localStorage.setItem(this.storageKey, JSON.stringify(states))
+        } catch (error) {}
+      },
+
+      wrapItemContent(item, checkbox) {
+        if (item.querySelector(':scope > label > .md-checklist-content')) {
+          return
+        }
+
+        const label = item.querySelector(':scope > label') ?? item
+        const content = document.createElement('span')
+        content.className = 'md-checklist-content'
+
+        let node = checkbox.nextSibling
+
+        while (node) {
+          const next = node.nextSibling
+          content.appendChild(node)
+          node = next
+        }
+
+        label.appendChild(content)
+      },
+
+      syncItemState(item, checkbox) {
+        item.dataset.checked = checkbox.checked ? 'true' : 'false'
+      },
+    }
+  }
+
 // Alpine factory for the greeting card. Everything is derived from the
 // viewer's local clock so an overseas student sees the greeting that
 // matches their own time of day.

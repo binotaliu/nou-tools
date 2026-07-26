@@ -357,12 +357,14 @@ test('figure wraps an image with a caption', function () {
 
 // --- 2.11 checklist ----------------------------------------------------------
 
-test('checklist wraps a GFM task list with disabled checkboxes', function () {
+test('checklist renders an alpine-powered task list', function () {
     $html = ($this->convert)(":::checklist\n- [ ] 待辦一\n- [x] 已完成\n:::\n");
 
     expect($html)
-        ->toContain('<div class="md-checklist">')
-        ->toContain('disabled')
+        ->toContain('<div class="md-checklist" x-data="nouChecklist()">')
+        ->toContain('<label><input type="checkbox"><span class="md-checklist-content"> 待辦一</span></label>')
+        ->toContain('<label><input checked="" type="checkbox"><span class="md-checklist-content"> 已完成</span></label>')
+        ->not->toContain('disabled')
         ->toContain('checked');
 });
 
@@ -378,7 +380,7 @@ test('heading anchors get chinese-safe deduped slugs', function () {
     $html = ($this->convert)("## 第一段\n\n## 第一段\n");
 
     expect($html)
-        ->toContain('<h2 id="第一段">第一段<a class="md-heading-anchor" href="#第一段" aria-label="連結到此段落">#</a></h2>')
+        ->toContain('<h2 id="第一段"><a class="md-heading-anchor" href="#第一段" aria-label="連結到此段落">#</a>第一段</h2>')
         ->toContain('id="第一段-2"');
 });
 
@@ -405,7 +407,7 @@ test('[[toc]] excludes headings nested inside a blockquote, but they keep their 
 ## 第二段
 MD);
 
-    expect($html)->toContain('<h3 id="巢狀標題">巢狀標題<a class="md-heading-anchor" href="#巢狀標題" aria-label="連結到此段落">#</a></h3>');
+    expect($html)->toContain('<h3 id="巢狀標題"><a class="md-heading-anchor" href="#巢狀標題" aria-label="連結到此段落">#</a>巢狀標題</h3>');
 
     preg_match('/<nav class="md-toc"[^>]*>.*?<\/nav>/s', $html, $matches);
     expect($matches)->not->toBeEmpty();

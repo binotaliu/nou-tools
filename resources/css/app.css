@@ -145,23 +145,20 @@
   }
 
   .md-dialogue > p {
-    @apply text-sm text-warm-600 italic dark:text-zinc-400;
+    @apply mb-3 text-xs font-medium text-warm-600 dark:text-zinc-600;
   }
 
   .md-dialogue-turn {
-    @apply flex max-w-[85%] items-end gap-2;
+    @apply relative flex w-full items-start gap-3 rounded-lg border-2 border-warm-700 bg-warm-50 p-4 dark:border-zinc-600 dark:bg-zinc-800;
   }
 
-  .md-dialogue-turn[data-side='start'] {
-    @apply mr-auto flex-row;
-  }
-
+  .md-dialogue-turn[data-side='start'],
   .md-dialogue-turn[data-side='end'] {
-    @apply ml-auto flex-row-reverse;
+    @apply flex-row;
   }
 
   .md-dialogue-avatar {
-    @apply flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-100 text-lg leading-none dark:bg-zinc-800;
+    @apply relative z-10 flex size-16 shrink-0 items-center justify-center overflow-hidden rounded border border-warm-700 bg-warm-100 text-lg leading-none dark:border-zinc-800 dark:bg-zinc-700;
   }
 
   .md-dialogue-avatar-img {
@@ -169,31 +166,19 @@
   }
 
   .md-dialogue-bubble {
-    @apply relative min-w-0 rounded-2xl px-4 py-2;
-  }
-
-  .md-dialogue-turn[data-side='start'] .md-dialogue-bubble {
-    @apply rounded-bl-sm border border-warm-200 bg-white dark:border-zinc-700 dark:bg-zinc-800;
-  }
-
-  .md-dialogue-turn[data-side='end'] .md-dialogue-bubble {
-    @apply rounded-br-sm bg-warm-600 text-white dark:bg-warm-700;
+    @apply relative z-10 min-w-0 flex-1;
   }
 
   .md-dialogue-speaker {
-    @apply mb-0.5 text-xs font-semibold text-warm-500;
+    @apply mt-0! mb-2! text-sm font-bold text-warm-900 dark:text-zinc-200;
   }
 
-  .md-dialogue-turn[data-side='end'] .md-dialogue-speaker {
-    @apply text-warm-100;
+  .md-dialogue-body {
+    @apply rounded-md bg-white/60 px-3 py-2 dark:bg-zinc-900/40;
   }
 
   .md-dialogue-body :where(p, ul, ol) {
-    @apply my-1 first:mt-0 last:mb-0;
-  }
-
-  .md-dialogue-turn[data-side='end'] .md-dialogue-body :where(a) {
-    @apply text-white underline;
+    @apply my-1 text-sm leading-relaxed first:mt-0 last:mb-0;
   }
 
   /* 2.2 Callouts */
@@ -390,7 +375,7 @@
   }
 
   .md-summary-title {
-    @apply mt-0 mb-2 text-lg font-semibold text-warm-900 dark:text-zinc-100;
+    @apply mt-0! mb-2! text-lg font-semibold text-warm-900 dark:text-zinc-100;
   }
 
   .md-summary-body :where(p:last-child) {
@@ -416,16 +401,36 @@
   }
 
   /* 2.11 Checklist */
+  .md-checklist {
+    @apply my-6 rounded-2xl border border-warm-200 bg-warm-50/70 p-4 dark:border-zinc-700 dark:bg-zinc-800/60;
+  }
+
   .md-checklist :where(ul) {
-    @apply my-0 flex list-none flex-col gap-2 pl-0;
+    @apply my-0 flex list-none flex-col gap-3 pl-0;
   }
 
   .md-checklist :where(li) {
-    @apply flex items-start gap-2;
+    @apply flex w-full items-center gap-2 rounded-xl border border-warm-200 bg-white/80 px-4! py-2! text-warm-800 shadow-xs transition-colors dark:border-zinc-700 dark:bg-zinc-900/70 dark:text-zinc-100;
+  }
+
+  .md-checklist :where(li[data-checked='true']) {
+    @apply border-warm-300 bg-warm-100/80 py-0 text-warm-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400;
   }
 
   .md-checklist :where(li input[type='checkbox']) {
-    @apply mt-1 size-4 shrink-0 accent-warm-600;
+    @apply block size-4 shrink-0 rounded border-warm-400 accent-warm-600;
+  }
+
+  .md-checklist :where(li > label) {
+    @apply flex min-w-0 flex-1 items-center gap-2;
+  }
+
+  .md-checklist-content {
+    @apply block min-w-0 flex-1;
+  }
+
+  .md-checklist :where(li[data-checked='true'] .md-checklist-content) {
+    @apply line-through opacity-80;
   }
 
   /* 2.12 Inline / document-level */
@@ -445,8 +450,17 @@
     @apply my-0 flex list-decimal flex-col gap-1 pl-8;
   }
 
+  h1:has(.md-heading-anchor),
+  h2:has(.md-heading-anchor),
+  h3:has(.md-heading-anchor),
+  h4:has(.md-heading-anchor),
+  h5:has(.md-heading-anchor),
+  h6:has(.md-heading-anchor) {
+    @apply -ml-6;
+  }
+
   .md-heading-anchor {
-    @apply ml-2 text-warm-400 no-underline opacity-0 transition-opacity focus:opacity-100 dark:text-zinc-500;
+    @apply mr-2 text-warm-400 no-underline opacity-0 transition-opacity focus:opacity-100 dark:text-zinc-500;
   }
 
   :where(h2, h3, h4):hover .md-heading-anchor,
@@ -488,62 +502,55 @@
       transform: none;
     }
   }
-}
 
-/**
- * `.prose :where(a|ol|ul|li)` rules ship in `@layer utilities`, which always
- * outranks `@layer components` under Tailwind's fixed layer order regardless
- * of specificity or source order — so any reset that fights prose's link
- * decoration, list markers, or list/li spacing has to live here, unlayered,
- * to actually win the cascade. Scoped only to blocks that use a native
- * `<ol>`/`<ul>` as layout scaffolding (steps, timeline, checklist, toc);
- * freeform markdown lists inside dialogue/callout/faq/tabs/summary bodies
- * intentionally keep normal prose list styling.
- */
-.md-card,
-.md-faq-question,
-.md-faq-question a,
-.md-toc a {
-  text-decoration: none;
-}
+  /**
+    * `.prose :where(a|ol|ul|li)` rules ship in `@layer utilities`, which always
+    * outranks `@layer components` under Tailwind's fixed layer order regardless
+    * of specificity or source order — so any reset that fights prose's link
+    * decoration, list markers, or list/li spacing has to live here, unlayered,
+    * to actually win the cascade. Scoped only to blocks that use a native
+    * `<ol>`/`<ul>` as layout scaffolding (steps, timeline, checklist, toc);
+    * freeform markdown lists inside dialogue/callout/faq/tabs/summary bodies
+    * intentionally keep normal prose list styling.
+    */
+  .md-card,
+  .md-faq-question,
+  .md-faq-question a,
+  .md-toc a {
+    @apply no-underline!;
+  }
 
-.md-toc a:hover {
-  text-decoration: underline;
-}
+  .md-toc a:hover {
+    @apply underline!;
+  }
 
-.md-card:hover .md-card-title {
-  color: var(--color-warm-700);
-}
+  .md-card:hover .md-card-title {
+    @apply text-warm-700! dark:text-zinc-50!;
+  }
 
-.dark .md-card:hover .md-card-title {
-  color: var(--color-warm-50);
-}
+  .md-steps,
+  .md-timeline,
+  .md-checklist :where(ul) {
+    @apply m-0! list-none! pl-0!;
+  }
 
-.md-steps,
-.md-timeline,
-.md-checklist :where(ul) {
-  margin: 0;
-  padding-left: 0;
-  list-style: none;
-}
+  .md-step,
+  .md-timeline-item,
+  .md-checklist :where(li) {
+    @apply m-0!;
+  }
 
-.md-step,
-.md-timeline-item,
-.md-checklist :where(li) {
-  margin: 0;
-}
+  .md-step::marker,
+  .md-timeline-item::marker,
+  .md-checklist :where(li)::marker {
+    @apply content-none!;
+  }
 
-.md-step::marker,
-.md-timeline-item::marker,
-.md-checklist :where(li)::marker {
-  content: none;
-}
+  .md-toc :where(ol) {
+    @apply m-0! pl-3!;
+  }
 
-.md-toc :where(ol) {
-  margin: 0;
-  padding-left: 1.75rem;
-}
-
-.md-toc :where(li) {
-  margin: 0;
+  .md-toc :where(li) {
+    @apply m-0!;
+  }
 }

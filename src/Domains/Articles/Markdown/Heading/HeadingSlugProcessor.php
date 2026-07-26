@@ -32,7 +32,7 @@ final class HeadingSlugProcessor
             $slug = $slugger->slugify($text);
 
             $node->data->set('attributes/id', $slug);
-            $node->appendChild(new HeadingAnchorNode($slug));
+            $node->prependChild(new HeadingAnchorNode($slug));
         }
     }
 }
