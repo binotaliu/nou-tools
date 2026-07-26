@@ -23,17 +23,33 @@
             class="flex flex-col gap-4 md:flex-row md:items-stretch md:justify-between"
         >
             <x-card title="功能選單">
-                <x-link-button
-                    :href="route('schedules.create')"
-                    variant="warm-dark"
-                    full-width
-                    data-analytics-event="schedule_create_start"
-                    data-analytics-feature="schedule"
-                >
-                    <x-heroicon-o-table-cells class="size-4" />
+                @if (isset($viewModel->previousSchedule))
+                    <x-link-button
+                        :href="route('schedules.show', $viewModel->previousSchedule->token)"
+                        variant="warm-dark"
+                        full-width
+                        data-analytics-event="schedule_open_previous"
+                        data-analytics-feature="schedule"
+                    >
+                        <x-heroicon-o-table-cells class="size-4" />
 
-                    建立我的課表
-                </x-link-button>
+                        <span class="max-w-xs truncate">
+                            {{ $viewModel->previousSchedule->name ?? '（未命名）' }}
+                        </span>
+                    </x-link-button>
+                @else
+                    <x-link-button
+                        :href="route('schedules.create')"
+                        variant="warm-dark"
+                        full-width
+                        data-analytics-event="schedule_create_start"
+                        data-analytics-feature="schedule"
+                    >
+                        <x-heroicon-o-table-cells class="size-4" />
+
+                        建立我的課表
+                    </x-link-button>
+                @endif
 
                 <x-link-button
                     :href="route('announcements.index')"
@@ -47,23 +63,15 @@
                 </x-link-button>
 
                 @if (isset($viewModel->previousSchedule))
-                    <div
-                        class="mt-3 w-full text-sm text-warm-600 dark:text-zinc-400"
-                    >
-                        <x-link-button
-                            :href="route('schedules.show', $viewModel->previousSchedule->token)"
-                            variant="secondary"
-                            full-width
-                            class="text-center text-warm-700 dark:text-zinc-300"
-                            data-analytics-event="schedule_open_previous"
+                    <div class="mt-3 w-full text-center text-sm">
+                        <a
+                            href="{{ route('schedules.create') }}"
+                            class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+                            data-analytics-event="schedule_create_start"
                             data-analytics-feature="schedule"
                         >
-                            <div
-                                class="max-w-xs truncate font-medium text-warm-800 dark:text-zinc-200"
-                            >
-                                {{ $viewModel->previousSchedule->name ?? '（未命名）' }}
-                            </div>
-                        </x-link-button>
+                            建立新課表
+                        </a>
                     </div>
                 @endif
             </x-card>
