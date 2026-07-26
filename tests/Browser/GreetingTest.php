@@ -170,9 +170,17 @@ describe('Compact mode', function () {
         // The displayed clock is read from the browser's own wall clock, so
         // allow for a minute to have ticked over between capturing $before
         // and the assertion running, rather than asserting an exact value.
+        // Walk whole-minute boundaries rather than diffInMinutes($before,
+        // $after): that floors the raw elapsed time, so if $before sits near
+        // the end of a minute the browser's clock can already show the next
+        // minute even though less than 60s of wall time has passed, making
+        // the acceptable set miss the actually-rendered value.
         $acceptable = collect();
-        for ($minutes = 0; $minutes <= max(0, $before->diffInMinutes($after)); $minutes++) {
-            $acceptable->push($before->clone()->addMinutes($minutes)->format('H').':'.$before->clone()->addMinutes($minutes)->format('i'));
+        $cursor = $before->clone()->startOfMinute();
+        $end = $after->clone()->startOfMinute();
+        while ($cursor->lessThanOrEqualTo($end)) {
+            $acceptable->push($cursor->format('H:i'));
+            $cursor->addMinute();
         }
 
         $text = preg_replace('/\s+/', '', (string) $page->text('[data-testid="taiwan-clock-compact"]'));

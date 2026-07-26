@@ -81,9 +81,14 @@ it('keeps external links (link groups, website, transport, phone) clickable when
 
     // Scoped to the page's main content (not the site nav/footer, which are
     // correctly disabled offline) — these are the links this page needs
-    // clickable even when the app itself can't reach the network.
+    // clickable even when the app itself can't reach the network. Excludes
+    // the [data-testid="center-map"] subtree: that's the Leaflet widget's
+    // own internal chrome (zoom controls, tile-attribution links), which is
+    // hidden and correctly non-interactive while offline. Leaflet mounts
+    // those anchors asynchronously, so including them made this assertion
+    // race against whether Leaflet had rendered yet.
     $disabledLinkCount = $page->script(
-        "document.querySelectorAll('main a[href].pointer-events-none').length"
+        "document.querySelectorAll('main a[href].pointer-events-none:not([data-testid=\"center-map\"] *)').length"
     );
 
     expect($disabledLinkCount)->toBe(0);
