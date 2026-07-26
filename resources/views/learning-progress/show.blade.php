@@ -274,14 +274,9 @@
                                             ])
                                             rows="2"
                                             aria-label="第{{ Str::toChineseNumber($week->num) }}週 {{ $course->name }} 的學習目標與備註"
-                                        >
-
-
-
-
-
-
-{{ $viewModel->getNote($course->id, $week->num) }}</textarea
+                                            >{{
+                                            $viewModel->getNote($course->id, $week->num)
+                                        }}</textarea
                                         >
                                     </td>
                                 @endforeach
