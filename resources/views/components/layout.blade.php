@@ -67,6 +67,22 @@
 
         <meta property="og:image" content="{{ asset('og-image.png') }}" />
 
+        <x-json-ld
+            :data="collect([
+                    ['name' => '我的課表', 'url' => $scheduleNavHref],
+                    ['name' => '學校公告', 'url' => route('announcements.index')],
+                    ['name' => '優惠店家', 'url' => route('discount-stores.index')],
+                    ['name' => 'Alt UU', 'url' => route('alt-uu')],
+                ])
+                    ->map(fn ($item) => [
+                        '@context' => 'https://schema.org',
+                        '@type' => 'SiteNavigationElement',
+                        'name' => $item['name'],
+                        'url' => $item['url'],
+                    ])
+            ->all()"
+        />
+
         <link rel="icon" href="{{ asset('favicon.ico') }}?v=2" />
         <link
             rel="icon"

@@ -1,3 +1,22 @@
+@push('head')
+    <x-json-ld
+        :data="[
+            '@context' => 'https://schema.org',
+            '@type' => 'ItemList',
+            'name' => '優惠店家',
+            'itemListElement' => $viewModel->stores->toCollection()
+                ->values()
+                ->map(fn ($store, $index) => [
+                    '@type' => 'ListItem',
+                    'position' => $index + 1,
+                    'url' => route('discount-stores.show', $store->id),
+                    'name' => $store->name,
+                ])
+                ->all(),
+        ]"
+    />
+@endpush
+
 <x-layout title="優惠店家 - NOU 小幫手" description="學生優惠店家列表。">
     @php
         $discountStoreFrontEndData = $viewModel->stores->toCollection()->map(

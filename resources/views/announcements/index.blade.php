@@ -1,3 +1,22 @@
+@push('head')
+    <x-json-ld
+        :data="[
+            '@context' => 'https://schema.org',
+            '@type' => 'ItemList',
+            'name' => '學校公告',
+            'itemListElement' => collect($viewModel->announcements->items())
+                ->values()
+                ->map(fn ($announcement, $index) => array_filter([
+                    '@type' => 'ListItem',
+                    'position' => $index + 1,
+                    'url' => $announcement->url,
+                    'name' => $announcement->title,
+                ]))
+                ->all(),
+        ]"
+    />
+@endpush
+
 <x-layout title="學校公告 - NOU 小幫手" description="彙整校內公告。">
     <div class="mx-auto max-w-6xl space-y-6">
         <div

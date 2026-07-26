@@ -1,3 +1,20 @@
+@push('head')
+    <x-json-ld
+        :data="array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'Course',
+            'name' => $viewModel->course->name,
+            'courseCode' => (string) $viewModel->course->id,
+            'provider' => [
+                '@type' => 'CollegeOrUniversity',
+                'name' => '國立空中大學',
+            ],
+            'url' => url()->current(),
+            'inLanguage' => 'zh-Hant',
+        ])"
+    />
+@endpush
+
 <x-layout :title="$viewModel->course->name . ' - 檢視課程 - NOU 小幫手'">
     <div class="mx-auto max-w-5xl">
         <div class="mb-8">

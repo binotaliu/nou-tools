@@ -1,3 +1,21 @@
+@push('head')
+    <x-json-ld
+        :data="[
+            '@context' => 'https://schema.org',
+            '@type' => 'Article',
+            'headline' => $viewModel->article->title,
+            'description' => $viewModel->article->description,
+            'author' => [
+                '@type' => 'Organization',
+                'name' => $viewModel->article->author,
+            ],
+            'datePublished' => $viewModel->article->publishedAt->toIso8601String(),
+            'dateModified' => ($viewModel->article->updatedAt ?? $viewModel->article->publishedAt)->toIso8601String(),
+            'mainEntityOfPage' => url()->current(),
+        ]"
+    />
+@endpush
+
 <x-layout
     :title="$viewModel->article->title . ' - ' . $viewModel->article->type->label() . ' - NOU 小幫手'"
 >
