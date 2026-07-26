@@ -76,6 +76,7 @@ return [
     'links' => [
         public_path('storage') => storage_path('app/public'),
         public_path('manual-images') => resource_path('articles/manual/images'),
+        public_path('dialogue-face-images') => resource_path('faces'),
     ],
 
 ];

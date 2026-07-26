@@ -63,6 +63,17 @@ test('article show page displays license information', function () {
         ->assertSee('CC BY-NC-SA 4.0');
 });
 
+test('article show page displays a share button', function () {
+    $response = $this->get(route('articles.show', [
+        'type' => ArticleType::MANUAL->value,
+        'slug' => 'welcome',
+    ]));
+
+    $response->assertSuccessful()
+        ->assertSee('data-testid="article-share-button"', false)
+        ->assertSee('data-testid="article-share-modal"', false);
+});
+
 test('article show page returns 404 for non-existent article', function () {
     $response = $this->get(route('articles.show', [
         'type' => ArticleType::MANUAL->value,

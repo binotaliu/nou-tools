@@ -34,9 +34,9 @@ MD);
         ->toContain('data-mood="緊張"')
         ->toContain('<div class="md-dialogue-body"><p>我剛註冊了空大，接下來要怎麼辦？</p></div>')
         ->toContain('<p>註冊完成後，第一件事是確認自己的<strong>選課清單</strong>。</p>')
-        ->not->toContain('<pre>')
-        ->toContain('🙋')
-        ->toContain('🦝');
+        ->not->toContain('<pre>');
+
+    expect(substr_count($html, 'src="'.asset('dialogue-face-images/student-neutral.png').'"'))->toBe(3);
 });
 
 test('an indented continuation paragraph inside a dialogue turn stays a normal paragraph', function () {

@@ -41,14 +41,17 @@ final readonly class DialogueRenderer implements ContainerRendererInterface
             $avatarAttributes['data-mood'] = $mood;
         }
 
-        $avatarContents = $persona->image !== null
+        $avatar = $persona->moodAvatar($mood);
+        $isImage = $avatar !== null && preg_match('/\.(png|jpe?g|gif|webp)$/i', $avatar) === 1;
+
+        $avatarContents = $isImage
             ? new HtmlElement('img', [
                 'class' => 'md-dialogue-avatar-img',
-                'src' => $persona->image,
+                'src' => asset('dialogue-face-images/'.$avatar),
                 'alt' => '',
                 'loading' => 'lazy',
             ], '', true)
-            : Xml::escape((string) $persona->moodEmoji($mood));
+            : Xml::escape((string) $avatar);
 
         $avatar = new HtmlElement('div', $avatarAttributes, $avatarContents);
 

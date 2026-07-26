@@ -12,11 +12,10 @@ final class ResolvedPersona
     public function __construct(
         public readonly string $slug,
         public readonly ?string $avatar,
-        public readonly ?string $image,
         public readonly array $moods,
     ) {}
 
-    public function moodEmoji(?string $mood): ?string
+    public function moodAvatar(?string $mood): ?string
     {
         if ($mood === null) {
             return $this->avatar;

@@ -29,5 +29,6 @@ Homestead.yaml
 Thumbs.db
 
 /public/manual-images
+/public/dialogue-face-images
 
 CLAUDE.local.md
