@@ -25,6 +25,48 @@
             </div>
         </div>
 
+        @if ($shouldPromptRememberSchedule)
+            <div
+                x-data="{ show: ! $store.network.offline }"
+                x-cloak
+                data-testid="remember-schedule-modal-wrapper"
+            >
+                <x-modal
+                    name="show"
+                    title="要記住這個課表嗎？"
+                    description="看樣子這個課表不是在此瀏覽器上建立的。要將此課表記住在此瀏覽器上嗎？記住後仍可使用其他瀏覽器或裝置開啟課表。"
+                    data-testid="remember-schedule-modal"
+                >
+                    <form
+                        method="POST"
+                        action="{{ route('schedules.remember', $viewModel->uuid) }}"
+                        class="flex justify-end gap-2"
+                    >
+                        @csrf
+                        <x-button
+                            type="button"
+                            variant="secondary"
+                            @click="show = false"
+                            data-testid="remember-schedule-dismiss"
+                            data-analytics-event="remember_schedule_dismiss"
+                            data-analytics-feature="schedule"
+                        >
+                            不用了
+                        </x-button>
+                        <x-button
+                            type="submit"
+                            variant="primary"
+                            data-testid="remember-schedule-confirm"
+                            data-analytics-event="remember_schedule_confirm"
+                            data-analytics-feature="schedule"
+                        >
+                            記住課表
+                        </x-button>
+                    </form>
+                </x-modal>
+            </div>
+        @endif
+
         <div
             class="mb-8 flex flex-col items-start justify-between gap-y-4 lg:flex-row"
         >

@@ -22,6 +22,7 @@ use App\Http\Controllers\ScheduleCalendarController;
 use App\Http\Controllers\ScheduleCalendarSettingsUpdateController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ScheduleCustomizationController;
+use App\Http\Controllers\ScheduleRememberController;
 use App\Http\Controllers\ScheduleSubscribeController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +60,7 @@ Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('
     ->withMarkdown(ScheduleShowMarkdownController::class);
 Route::get('/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('schedules.edit');
 Route::put('/schedules/{schedule}', [ScheduleController::class, 'update'])->name('schedules.update');
+Route::post('/schedules/{schedule}/remember', ScheduleRememberController::class)->name('schedules.remember');
 Route::get('/schedules/{schedule}/customize', [ScheduleCustomizationController::class, 'edit'])->name('schedules.customize');
 Route::put('/schedules/{schedule}/customize', [ScheduleCustomizationController::class, 'update'])->name('schedules.customize.update');
 Route::get('/schedules/{schedule}/announcement-preferences', [ScheduleAnnouncementPreferencesController::class, 'edit'])->name('schedules.announcement-preferences');

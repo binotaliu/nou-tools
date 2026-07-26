@@ -79,6 +79,7 @@ final class ScheduleController extends Controller
         return view('schedule.show', [
             'schedule' => $schedule,
             'viewModel' => $showSchedulePage($schedule, $request->query('term')),
+            'shouldPromptRememberSchedule' => $request->studentScheduleFromCookie() === null,
         ]);
     }
 }

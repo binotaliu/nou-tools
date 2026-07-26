@@ -883,6 +883,51 @@ it('subscribe page contains calendar subscription options', function () {
         ->assertSee('訂閱設定');
 });
 
+it('shows a modal prompting to remember the schedule when no cookie is set', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'No Cookie Schedule',
+    ]);
+
+    $response = $this->get(route('schedules.show', $schedule));
+
+    $response->assertStatus(200)
+        ->assertSee('要記住這個課表嗎？')
+        ->assertSee(route('schedules.remember', $schedule));
+});
+
+it('does not show the remember-schedule modal when a schedule cookie already exists', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Already Remembered',
+    ]);
+
+    $response = $this->withCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => $schedule->name,
+    ]))->get(route('schedules.show', $schedule));
+
+    $response->assertStatus(200)
+        ->assertDontSee('要記住這個課表嗎？');
+});
+
+it('remembering a schedule sets the student_schedule cookie and redirects back', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Remember Me',
+    ]);
+
+    $response = $this->post(route('schedules.remember', $schedule));
+
+    $response->assertRedirect(route('schedules.show', $schedule));
+    $response->assertCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => 'Remember Me',
+    ]));
+});
+
 it('schedule show page includes link to subscribe page', function () {
     $courseClass = CourseClass::factory()->create();
     $schedule = StudentSchedule::create([
