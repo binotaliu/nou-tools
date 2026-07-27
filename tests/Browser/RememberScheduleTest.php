@@ -48,7 +48,7 @@ it('does not prompt again once the schedule has already been remembered', functi
     $page = visit(route('schedules.show', $schedule))
         ->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load')
+        ->waitForEvent('networkidle')
         ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('schedules.show', $schedule))
