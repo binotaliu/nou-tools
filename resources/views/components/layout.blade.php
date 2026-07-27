@@ -244,7 +244,7 @@
                         type="button"
                         @click="open = !open"
                         :aria-expanded="open.toString()"
-                        class="inline-flex items-center justify-center rounded-md border border-warm-200 bg-white p-2 text-warm-700 transition hover:bg-warm-50 focus:ring-2 focus:ring-warm-500 focus:outline-none md:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                        class="inline-flex items-center justify-center rounded-md border border-warm-200 bg-white p-2 text-warm-700 transition hover:bg-warm-50 focus:ring-2 focus:ring-warm-500 focus:outline-none lg:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
                     >
                         <span class="sr-only">切換選單</span>
 
@@ -253,7 +253,7 @@
                         <x-heroicon-o-x-mark x-show="open" class="size-5" />
                     </button>
 
-                    <nav class="hidden items-center gap-1 gap-x-6 md:flex">
+                    <nav class="hidden items-center gap-1 gap-x-6 lg:flex">
                         <a
                             href="{{ $scheduleNavHref }}"
                             @class([
@@ -359,7 +359,7 @@
             <div
                 x-show="open"
                 @click.outside="open = false"
-                class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-warm-200 bg-white p-3 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900"
+                class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-warm-200 bg-white p-3 shadow-lg lg:hidden dark:border-zinc-700 dark:bg-zinc-900"
                 x-cloak
             >
                 <a
