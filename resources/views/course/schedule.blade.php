@@ -223,16 +223,16 @@
                                 <x-table :caption="$group->label">
                                     <x-table-head>
                                         <x-table-row>
-                                            <x-table-head-column
-                                                class="w-16 text-center"
-                                            >
-                                                學分
+                                            <x-table-head-column>
+                                                課程名稱
                                             </x-table-head-column>
                                             <x-table-head-column class="w-42">
                                                 學系
                                             </x-table-head-column>
-                                            <x-table-head-column>
-                                                課程名稱
+                                            <x-table-head-column
+                                                class="w-16 text-center"
+                                            >
+                                                學分
                                             </x-table-head-column>
                                         </x-table-row>
                                     </x-table-head>
@@ -242,14 +242,6 @@
                                             <x-table-row
                                                 x-show="isCourseVisible({{ $course->id }})"
                                             >
-                                                <x-table-column
-                                                    class="text-center tabular-nums"
-                                                >
-                                                    {{ $course->credits ?? '—' }}
-                                                </x-table-column>
-                                                <x-table-column>
-                                                    {{ $course->department ?? '—' }}
-                                                </x-table-column>
                                                 <x-table-head-column
                                                     scope="row"
                                                 >
@@ -260,6 +252,14 @@
                                                         {{ $course->name }}
                                                     </x-link-button>
                                                 </x-table-head-column>
+                                                <x-table-column>
+                                                    {{ $course->department ?? '—' }}
+                                                </x-table-column>
+                                                <x-table-column
+                                                    class="text-center tabular-nums"
+                                                >
+                                                    {{ $course->credits ?? '—' }}
+                                                </x-table-column>
                                             </x-table-row>
                                         @endforeach
                                     </x-table-body>
@@ -314,14 +314,14 @@
                     <x-table caption="微學分與全遠距">
                         <x-table-head>
                             <x-table-row>
-                                <x-table-head-column class="w-16 text-center">
-                                    學分
+                                <x-table-head-column>
+                                    課程名稱
                                 </x-table-head-column>
                                 <x-table-head-column class="w-42">
                                     學系
                                 </x-table-head-column>
-                                <x-table-head-column>
-                                    課程名稱
+                                <x-table-head-column class="w-16 text-center">
+                                    學分
                                 </x-table-head-column>
                             </x-table-row>
                         </x-table-head>
@@ -331,14 +331,6 @@
                                 <x-table-row
                                     x-show="isCourseVisible({{ $course->id }})"
                                 >
-                                    <x-table-column
-                                        class="text-center tabular-nums"
-                                    >
-                                        {{ $course->credits ?? '—' }}
-                                    </x-table-column>
-                                    <x-table-column>
-                                        {{ $course->department ?? '—' }}
-                                    </x-table-column>
                                     <x-table-head-column scope="row">
                                         <x-link-button
                                             :href="route('course.show', $course->id)"
@@ -347,6 +339,14 @@
                                             {{ $course->name }}
                                         </x-link-button>
                                     </x-table-head-column>
+                                    <x-table-column>
+                                        {{ $course->department ?? '—' }}
+                                    </x-table-column>
+                                    <x-table-column
+                                        class="text-center tabular-nums"
+                                    >
+                                        {{ $course->credits ?? '—' }}
+                                    </x-table-column>
                                 </x-table-row>
                             @endforeach
                         </x-table-body>
