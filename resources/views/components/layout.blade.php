@@ -273,6 +273,22 @@
                         </a>
 
                         <a
+                            href="{{ route('course.schedule') }}"
+                            @class([
+                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
+                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
+                                        $routeName === 'course.schedule',
+                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
+                                        $routeName !== 'course.schedule',
+                                ])
+                        >
+                            <x-heroicon-o-calendar-days
+                                class="size-4 shrink-0"
+                            />
+                            <span class="hidden sm:inline">本學期開課表</span>
+                        </a>
+
+                        <a
                             href="{{ route('announcements.index') }}"
                             @class([
                                     '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
@@ -361,6 +377,20 @@
                 >
                     <x-heroicon-o-table-cells class="size-4 shrink-0" />
                     我的課表
+                </a>
+
+                <a
+                    href="{{ route('course.schedule') }}"
+                    @class([
+                            'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                            'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
+                                $routeName === 'course.schedule',
+                            'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
+                                $routeName !== 'course.schedule',
+                        ])
+                >
+                    <x-heroicon-o-calendar-days class="size-4 shrink-0" />
+                    本學期開課表
                 </a>
 
                 <a

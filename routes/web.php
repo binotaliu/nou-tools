@@ -4,6 +4,7 @@ use App\Enums\ArticleType;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseScheduleController;
 use App\Http\Controllers\DirectoryController;
 use App\Http\Controllers\DiscountStoreCommentController;
 use App\Http\Controllers\DiscountStoreController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\LearningProgressController;
 use App\Http\Controllers\Markdown\AnnouncementIndexMarkdownController;
 use App\Http\Controllers\Markdown\ArticleIndexMarkdownController;
 use App\Http\Controllers\Markdown\ArticleShowMarkdownController;
+use App\Http\Controllers\Markdown\CourseScheduleMarkdownController;
 use App\Http\Controllers\Markdown\CourseShowMarkdownController;
 use App\Http\Controllers\Markdown\DirectoryIndexMarkdownController;
 use App\Http\Controllers\Markdown\DiscountStoreIndexMarkdownController;
@@ -52,6 +54,9 @@ Route::get('/announcements', [AnnouncementController::class, 'index'])->name('an
 
 Route::get('/directory', [DirectoryController::class, 'index'])->name('directory.index')
     ->withMarkdown(DirectoryIndexMarkdownController::class);
+
+Route::get('/courses/schedule', CourseScheduleController::class)->name('course.schedule')
+    ->withMarkdown(CourseScheduleMarkdownController::class);
 
 Route::get('/courses/{course}', [CourseController::class, 'show'])->name('course.show')
     ->withMarkdown(CourseShowMarkdownController::class);
