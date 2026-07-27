@@ -26,6 +26,8 @@ final readonly class GenerateSitemap
             new SitemapUrlViewModel(url: route('home'), changeFrequency: 'daily', priority: 1.0),
             new SitemapUrlViewModel(url: route('alt-uu'), changeFrequency: 'monthly', priority: 0.5),
             new SitemapUrlViewModel(url: route('announcements.index'), changeFrequency: 'hourly', priority: 0.8),
+            new SitemapUrlViewModel(url: route('directory.index'), changeFrequency: 'monthly', priority: 0.6),
+            new SitemapUrlViewModel(url: route('course.schedule'), changeFrequency: 'weekly', priority: 0.7),
             new SitemapUrlViewModel(url: route('discount-stores.index'), changeFrequency: 'daily', priority: 0.7),
             new SitemapUrlViewModel(url: route('discount-stores.create'), changeFrequency: 'yearly', priority: 0.3),
         ])
