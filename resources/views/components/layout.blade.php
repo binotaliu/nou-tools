@@ -179,7 +179,141 @@
                     <a href="{{ url('/') }}" class="shrink-0"> NOU 小幫手 </a>
                 </h1>
 
-                <div class="flex min-h-[38px] items-center gap-2">
+                <div class="flex min-h-9.5 items-center gap-2">
+                    <nav class="hidden items-center gap-1 gap-x-6 lg:flex">
+                        <a
+                            href="{{ $scheduleNavHref }}"
+                            @class([
+                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
+                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' => str_starts_with(
+                                        $routeName ?? '',
+                                        'schedules',
+                                    ),
+                                    'text-white bg-warm-700 hover:bg-warm-600' => ! str_starts_with(
+                                        $routeName ?? '',
+                                        'schedules',
+                                    ),
+                                ])
+                        >
+                            <x-heroicon-o-table-cells class="size-4 shrink-0" />
+                            <span class="hidden sm:inline">我的課表</span>
+                        </a>
+
+                        <a
+                            href="{{ route('announcements.index') }}"
+                            @class([
+                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
+                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
+                                        $routeName === 'announcements.index',
+                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
+                                        $routeName !== 'announcements.index',
+                                ])
+                        >
+                            <x-heroicon-o-megaphone class="size-4 shrink-0" />
+                            <span class="hidden sm:inline">學校公告</span>
+                        </a>
+
+                        <a
+                            href="{{ route('discount-stores.index') }}"
+                            @class([
+                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-5 py-2 text-sm font-medium transition-colors md:px-3',
+                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' => str_starts_with(
+                                        $routeName ?? '',
+                                        'discount-stores',
+                                    ),
+                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' => ! str_starts_with(
+                                        $routeName ?? '',
+                                        'discount-stores',
+                                    ),
+                                ])
+                        >
+                            <x-heroicon-o-tag class="size-4 shrink-0" />
+                            <span class="hidden sm:inline">優惠店家</span>
+                        </a>
+
+                        <a
+                            href="{{ route('alt-uu') }}"
+                            @class([
+                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-5 py-2 text-sm font-medium transition-colors md:px-3',
+                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
+                                        $routeName === 'alt-uu',
+                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
+                                        $routeName !== 'alt-uu',
+                                ])
+                        >
+                            <x-heroicon-o-device-phone-mobile
+                                class="size-4 shrink-0"
+                            />
+                            <span class="hidden sm:inline">Alt UU</span>
+                        </a>
+
+                        <div
+                            x-data="{ moreOpen: false }"
+                            @click.outside="moreOpen = false"
+                            class="relative -mt-px"
+                        >
+                            <button
+                                type="button"
+                                @click="moreOpen = !moreOpen"
+                                :aria-expanded="moreOpen.toString()"
+                                @class([
+                                        '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
+                                        'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' => in_array(
+                                            $routeName,
+                                            ['course.schedule', 'directory.index'],
+                                        ),
+                                        'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' => ! in_array(
+                                            $routeName,
+                                            ['course.schedule', 'directory.index'],
+                                        ),
+                                    ])
+                            >
+                                <span class="hidden sm:inline">更多</span>
+                                <x-heroicon-o-chevron-down
+                                    class="size-4 shrink-0 transition-transform"
+                                    x-bind:class="moreOpen ? 'rotate-180' : ''"
+                                />
+                            </button>
+
+                            <div
+                                x-show="moreOpen"
+                                x-cloak
+                                class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-md border border-warm-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+                            >
+                                <a
+                                    href="{{ route('course.schedule') }}"
+                                    @class([
+                                            'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                                            'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
+                                                $routeName === 'course.schedule',
+                                            'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
+                                                $routeName !== 'course.schedule',
+                                        ])
+                                >
+                                    <x-heroicon-o-calendar-days
+                                        class="size-4 shrink-0"
+                                    />
+                                    本學期開課表
+                                </a>
+
+                                <a
+                                    href="{{ route('directory.index') }}"
+                                    data-offline-allow
+                                    @class([
+                                            'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                                            'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
+                                                $routeName === 'directory.index',
+                                            'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
+                                                $routeName !== 'directory.index',
+                                        ])
+                                >
+                                    <x-heroicon-o-map class="size-4 shrink-0" />
+                                    連結 / 學習指導中心目錄
+                                </a>
+                            </div>
+                        </div>
+                    </nav>
+
                     <div
                         x-data="{
                             theme: localStorage.getItem('theme') || 'system',
@@ -216,7 +350,7 @@
                                     })
                             },
                         }"
-                        x-cloak
+                        class="pl-2"
                     >
                         <button
                             type="button"
@@ -228,10 +362,12 @@
                             <x-heroicon-o-sun
                                 x-show="theme === 'light'"
                                 class="size-5"
+                                x-cloak
                             />
                             <x-heroicon-o-moon
                                 x-show="theme === 'dark'"
                                 class="size-5"
+                                x-cloak
                             />
                             <x-heroicon-o-computer-desktop
                                 x-show="theme === 'system'"
@@ -252,107 +388,6 @@
 
                         <x-heroicon-o-x-mark x-show="open" class="size-5" />
                     </button>
-
-                    <nav class="hidden items-center gap-1 gap-x-6 lg:flex">
-                        <a
-                            href="{{ $scheduleNavHref }}"
-                            @class([
-                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
-                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' => str_starts_with(
-                                        $routeName ?? '',
-                                        'schedules',
-                                    ),
-                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' => ! str_starts_with(
-                                        $routeName ?? '',
-                                        'schedules',
-                                    ),
-                                ])
-                        >
-                            <x-heroicon-o-table-cells class="size-4 shrink-0" />
-                            <span class="hidden sm:inline">我的課表</span>
-                        </a>
-
-                        <a
-                            href="{{ route('course.schedule') }}"
-                            @class([
-                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
-                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
-                                        $routeName === 'course.schedule',
-                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
-                                        $routeName !== 'course.schedule',
-                                ])
-                        >
-                            <x-heroicon-o-calendar-days
-                                class="size-4 shrink-0"
-                            />
-                            <span class="hidden sm:inline">本學期開課表</span>
-                        </a>
-
-                        <a
-                            href="{{ route('announcements.index') }}"
-                            @class([
-                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
-                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
-                                        $routeName === 'announcements.index',
-                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
-                                        $routeName !== 'announcements.index',
-                                ])
-                        >
-                            <x-heroicon-o-megaphone class="size-4 shrink-0" />
-                            <span class="hidden sm:inline">學校公告</span>
-                        </a>
-
-                        <a
-                            href="{{ route('directory.index') }}"
-                            data-offline-allow
-                            @class([
-                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
-                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
-                                        $routeName === 'directory.index',
-                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
-                                        $routeName !== 'directory.index',
-                                ])
-                        >
-                            <x-heroicon-o-link class="size-4 shrink-0" />
-                            <span class="hidden sm:inline">
-                                連結 / 指導中心
-                            </span>
-                        </a>
-
-                        <a
-                            href="{{ route('discount-stores.index') }}"
-                            @class([
-                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-5 py-2 text-sm font-medium transition-colors md:px-3',
-                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' => str_starts_with(
-                                        $routeName ?? '',
-                                        'discount-stores',
-                                    ),
-                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' => ! str_starts_with(
-                                        $routeName ?? '',
-                                        'discount-stores',
-                                    ),
-                                ])
-                        >
-                            <x-heroicon-o-tag class="size-4 shrink-0" />
-                            <span class="hidden sm:inline">優惠店家</span>
-                        </a>
-
-                        <a
-                            href="{{ route('alt-uu') }}"
-                            @class([
-                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-5 py-2 text-sm font-medium transition-colors md:px-3',
-                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' =>
-                                        $routeName === 'alt-uu',
-                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' =>
-                                        $routeName !== 'alt-uu',
-                                ])
-                        >
-                            <x-heroicon-o-device-phone-mobile
-                                class="size-4 shrink-0"
-                            />
-                            <span class="hidden sm:inline">Alt UU</span>
-                        </a>
-                    </nav>
                 </div>
             </div>
 
