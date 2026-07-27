@@ -360,6 +360,7 @@
                 x-show="open"
                 @click.outside="open = false"
                 class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-warm-200 bg-white p-3 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900"
+                x-cloak
             >
                 <a
                     href="{{ $scheduleNavHref }}"
