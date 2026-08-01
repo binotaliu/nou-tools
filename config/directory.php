@@ -97,6 +97,11 @@ return [
             'url' => 'https://noustud.nou.edu.tw/',
             'group' => LinkGroup::Services->value,
         ],
+        'webmail' => [
+            'name' => '學生電子信箱',
+            'url' => 'https://webmail.nou.edu.tw/',
+            'group' => LinkGroup::Services->value,
+        ],
         'coursemap' => [
             'name' => '全校課程地圖查詢',
             'url' => 'https://coursemap.nou.edu.tw/',
