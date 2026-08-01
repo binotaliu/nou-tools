@@ -1,7 +1,7 @@
 @props(['wrapperClass' => ''])
 <div @class(['relative', $wrapperClass])>
     <select
-        {{ $attributes->merge(['class' => 'w-full rounded-lg border border-warm-200 dark:border-zinc-700 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 appearance-none']) }}
+        {{ $attributes->merge(['class' => 'w-full rounded-lg border border-warm-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 appearance-none']) }}
     >
         {{ $slot }}
     </select>
