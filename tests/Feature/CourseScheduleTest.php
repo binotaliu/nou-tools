@@ -1,12 +1,25 @@
 <?php
 
 use App\Models\Course;
+use Illuminate\Support\Str;
 
 test('course schedule page loads successfully', function () {
     $response = $this->get(route('course.schedule'));
 
     $response->assertStatus(200)
         ->assertSee('本學期開課表');
+});
+
+test('course schedule page includes seo meta description for the selected term', function () {
+    $term = config('app.current_semester');
+
+    $response = $this->get(route('course.schedule'));
+
+    $response->assertStatus(200)
+        ->assertSee(
+            '<meta name="description" content="國立空中大學 '.Str::toSemesterDisplay($term).'開課表，查詢各學系課程的學分數與考試時間。" />',
+            false
+        );
 });
 
 // Course grouping (by exam time / department / credits) and the split

@@ -1,4 +1,8 @@
-<x-layout title="本學期開課表 - NOU 小幫手">
+@php
+    $seoDescription = '國立空中大學 '.\Illuminate\Support\Str::toSemesterDisplay($page->selectedTerm).'開課表，查詢各學系課程的學分數與考試時間。';
+@endphp
+
+<x-layout title="本學期開課表 - NOU 小幫手" :description="$seoDescription">
     @php
         $courseFrontEndData = $page->groups->toCollection()
             ->flatMap(fn ($group) => $group->courses->toCollection()->map(fn ($course) => [

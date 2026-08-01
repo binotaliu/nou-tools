@@ -21,6 +21,23 @@ test('course show page loads successfully', function () {
         ->assertSee('Test Department');
 });
 
+test('course show page includes seo meta description', function () {
+    $course = Course::factory()->create([
+        'name' => 'Test Course',
+        'credits' => 3,
+        'department' => 'Test Department',
+        'term' => '11401',
+    ]);
+
+    $response = $this->get(route('course.show', $course));
+
+    $response->assertStatus(200)
+        ->assertSee(
+            'Test Course 是國立空中大學 Test Department 在 '.Str::toSemesterDisplay('11401').' 開設的 3 學分課程',
+            false
+        );
+});
+
 test('course show page displays course information', function () {
     $course = Course::factory()->create([
         'name' => 'Advanced Testing',

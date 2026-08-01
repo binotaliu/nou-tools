@@ -1,9 +1,18 @@
+@php
+    $seoDescription = "{$viewModel->course->name} 是國立空中大學"
+        .($viewModel->course->department ? " {$viewModel->course->department}" : '')
+        .(! empty($viewModel->course->term) ? ' 在 '.\Illuminate\Support\Str::toSemesterDisplay($viewModel->course->term) : '')
+        .' 開設的'
+        .($viewModel->course->credits ? " {$viewModel->course->credits} 學分課程" : '課程');
+@endphp
+
 @push('head')
     <x-json-ld
         :data="array_filter([
             '@context' => 'https://schema.org',
             '@type' => 'Course',
             'name' => $viewModel->course->name,
+            'description' => $seoDescription,
             'courseCode' => (string) $viewModel->course->id,
             'provider' => [
                 '@type' => 'CollegeOrUniversity',
@@ -15,7 +24,10 @@
     />
 @endpush
 
-<x-layout :title="$viewModel->course->name . ' - 檢視課程 - NOU 小幫手'">
+<x-layout
+    :title="$viewModel->course->name . ' - 檢視課程 - NOU 小幫手'"
+    :description="$seoDescription"
+>
     <div class="mx-auto max-w-5xl">
         <div class="mb-8">
             <x-link-button
