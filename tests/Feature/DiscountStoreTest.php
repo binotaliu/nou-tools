@@ -41,7 +41,7 @@ it('displays the discount store index page', function () {
     $response->assertDontSee('留言（確認後顯示）');
 });
 
-it('displays the discount store detail page and adds noindex robots meta', function () {
+it('displays the discount store detail page', function () {
     $store = DiscountStore::factory()
         ->for($this->category, 'category')
         ->create([
@@ -80,7 +80,8 @@ it('displays the discount store detail page and adds noindex robots meta', funct
     $response->assertSee('這個優惠很棒');
     $response->assertDontSee('這是未確認留言');
     $response->assertSee('x-ref="mapContainer"', false);
-    $response->assertSee('<meta name="robots" content="noindex, nofollow" />', false);
+    $response->assertDontSee('<meta name="robots" content="noindex, nofollow" />', false);
+    $response->assertSee('<meta name="description" content="國立空中大學學生是否可享有 詳細頁店家 優惠？', false);
 });
 
 it('does not render map block on online discount store detail page', function () {

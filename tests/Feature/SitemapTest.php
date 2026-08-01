@@ -21,18 +21,20 @@ test('sitemap returns xml with static and dynamic pages', function () {
         ->assertSee(route('articles.show', ['kb', 'about-nou']), false);
 });
 
-test('sitemap does not include noindexed schedule or individual store pages', function () {
+test('sitemap does not include noindexed schedule pages but does include online store pages', function () {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
         'name' => 'My Schedule',
     ]);
-    $store = DiscountStore::factory()->create(['status' => DiscountStoreStatus::Online]);
+    $onlineStore = DiscountStore::factory()->create(['status' => DiscountStoreStatus::Online]);
+    $pendingStore = DiscountStore::factory()->create(['status' => DiscountStoreStatus::Pending]);
 
     $response = $this->get(route('sitemap'));
 
     $response->assertStatus(200)
         ->assertDontSee(route('schedules.show', $schedule), false)
-        ->assertDontSee(route('discount-stores.show', $store), false);
+        ->assertSee(route('discount-stores.show', $onlineStore), false)
+        ->assertDontSee(route('discount-stores.show', $pendingStore), false);
 });
 
 test('llms.txt returns markdown with key links', function () {

@@ -2,10 +2,17 @@
     @vite(['resources/js/leaflet.js'])
 @endpush
 
+@php
+    $seoDate = $store->updated_at->format('Y/m/d');
+    $seoDiscountSummary = \Illuminate\Support\Str::of($store->discount_details)
+        ->squish()
+        ->limit(40);
+    $seoDescription = "國立空中大學學生是否可享有 {$store->name} 優惠？{$seoDate} 空大學生可享有 {$seoDiscountSummary}。更多優惠請看 NOU 小幫手。";
+@endphp
+
 <x-layout
     title="{{ $store->name }} - 優惠店家 - NOU 小幫手"
-    description="{{ $store->name }} 的學生優惠與使用資訊。"
-    :noindex="true"
+    :description="$seoDescription"
 >
     <div
         class="mx-auto max-w-4xl space-y-6"

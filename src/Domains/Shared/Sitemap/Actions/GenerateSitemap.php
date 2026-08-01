@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace NouTools\Domains\Shared\Sitemap\Actions;
 
 use App\Enums\ArticleType;
+use App\Enums\DiscountStoreStatus;
 use App\Models\Course;
+use App\Models\DiscountStore;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use NouTools\Domains\Articles\Actions\ShowArticlePage;
@@ -32,6 +34,7 @@ final readonly class GenerateSitemap
             new SitemapUrlViewModel(url: route('discount-stores.create'), changeFrequency: 'yearly', priority: 0.3),
         ])
             ->merge($this->courseUrls())
+            ->merge($this->discountStoreUrls())
             ->merge($this->articleUrls());
     }
 
@@ -46,6 +49,22 @@ final readonly class GenerateSitemap
                 lastModified: $course->updated_at,
                 changeFrequency: 'weekly',
                 priority: 0.6,
+            ));
+    }
+
+    /**
+     * @return Collection<int, SitemapUrlViewModel>
+     */
+    private function discountStoreUrls(): Collection
+    {
+        return DiscountStore::query()
+            ->where('status', DiscountStoreStatus::Online)
+            ->get(['id', 'updated_at'])
+            ->map(fn (DiscountStore $store): SitemapUrlViewModel => new SitemapUrlViewModel(
+                url: route('discount-stores.show', $store),
+                lastModified: $store->updated_at,
+                changeFrequency: 'weekly',
+                priority: 0.5,
             ));
     }
 
