@@ -90,6 +90,7 @@ Route::put('/schedules/{schedule}/{term}/learning-progress', [LearningProgressCo
 Route::get('/discount-stores', [DiscountStoreController::class, 'index'])->name('discount-stores.index')
     ->withMarkdown(DiscountStoreIndexMarkdownController::class);
 Route::get('/discount-stores/create', [DiscountStoreController::class, 'create'])->name('discount-stores.create');
+Route::get('/discount-stores/submitted', [DiscountStoreController::class, 'submitted'])->name('discount-stores.submitted');
 Route::get('/discount-stores/{store}', [DiscountStoreController::class, 'show'])->name('discount-stores.show')
     ->withMarkdown(DiscountStoreShowMarkdownController::class);
 Route::post('/discount-stores', [DiscountStoreController::class, 'store'])->name('discount-stores.store');

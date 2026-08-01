@@ -52,6 +52,13 @@ final class DiscountStoreController extends Controller
         ]);
     }
 
+    public function submitted(Request $request): View
+    {
+        return view('discount-stores.submitted', [
+            'storeName' => $request->session()->get('submitted_store_name'),
+        ]);
+    }
+
     public function show(DiscountStore $store): View
     {
         abort_unless($store->status === DiscountStoreStatus::Online, 404);
@@ -103,7 +110,7 @@ final class DiscountStoreController extends Controller
         $submitDiscountStore($dto, $request);
 
         return redirect()
-            ->route('discount-stores.create')
-            ->with('success', '已成功送出！您送出的店家資訊將在管理員審核後顯示在列表中。');
+            ->route('discount-stores.submitted')
+            ->with('submitted_store_name', $dto->name);
     }
 }

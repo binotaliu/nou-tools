@@ -249,6 +249,23 @@ it('displays the create discount store page', function () {
     $response->assertDontSee('livewire:submit-discount-store-form');
 });
 
+it('displays the submitted confirmation page with the store name', function () {
+    $response = $this->withSession(['submitted_store_name' => '測試新店家'])
+        ->get(route('discount-stores.submitted'));
+
+    $response->assertSuccessful();
+    $response->assertSee('已收到您送出的資料');
+    $response->assertSee('測試新店家');
+});
+
+it('displays the submitted confirmation page without a store name', function () {
+    $response = get(route('discount-stores.submitted'));
+
+    $response->assertSuccessful();
+    $response->assertSee('已收到您送出的資料');
+    $response->assertSee('感謝您提供的優惠店家資訊！');
+});
+
 it('submits a new discount store with the web form', function () {
     Notification::fake();
 
@@ -269,8 +286,8 @@ it('submits a new discount store with the web form', function () {
         'cf-turnstile-response' => 'test-token',
     ]);
 
-    $response->assertRedirect(route('discount-stores.create'));
-    $response->assertSessionHas('success');
+    $response->assertRedirect(route('discount-stores.submitted'));
+    $response->assertSessionHas('submitted_store_name', '測試新店家');
 
     $store = DiscountStore::query()->where('name', '測試新店家')->first();
 
@@ -305,7 +322,7 @@ it('creates an initial discount store report when the submitter confirms it was 
         'cf-turnstile-response' => 'test-token',
     ]);
 
-    $response->assertRedirect(route('discount-stores.create'));
+    $response->assertRedirect(route('discount-stores.submitted'));
 
     $store = DiscountStore::query()->where('name', '已測試新店家')->first();
 
@@ -335,7 +352,7 @@ it('does not create a discount store report when the submitter does not confirm 
         'cf-turnstile-response' => 'test-token',
     ]);
 
-    $response->assertRedirect(route('discount-stores.create'));
+    $response->assertRedirect(route('discount-stores.submitted'));
 
     $store = DiscountStore::query()->where('name', '未測試新店家')->first();
 
