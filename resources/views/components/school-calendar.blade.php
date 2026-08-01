@@ -9,7 +9,7 @@
 @if (! empty($events))
     <x-card
         {{ $attributes->merge(['title' => '學校行事曆']) }}
-        x-data="nouSchoolCalendar({{ Js::from($events) }})"
+        x-data="nouSchoolCalendar({{ Js::from($events) }}, {{ Js::from($showPastEvents) }})"
     >
         <div class="flex flex-col md:flex-row md:items-start md:gap-6">
             {{-- Countdown (mobile 上方，桌面右側 1/3) --}}

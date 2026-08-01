@@ -320,7 +320,7 @@
 
         {{-- School Calendar --}}
         @if ($viewModel->displayOptions->showSchoolCalendar)
-            <x-school-calendar class="mb-8" />
+            <x-school-calendar class="mb-8" :term="$viewModel->selectedTerm" />
         @endif
 
         @if ($viewModel->displayOptions->showExamInfo)

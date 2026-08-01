@@ -82,6 +82,45 @@ it('displays school calendar on schedule show page', function () {
         ->assertSee('課程開播');
 });
 
+it('shows the full calendar including past events when a non-current semester is selected', function () {
+    config(['app.current_semester' => '2025B']);
+    config(['school-schedules.2025A' => [
+        [
+            'start' => '2025-09-01',
+            'end' => '2025-09-01',
+            'name' => '114上學期開始',
+            'countdown' => false,
+        ],
+        [
+            'start' => '2025-11-01',
+            'end' => '2025-11-01',
+            'name' => '114上學期期中考',
+            'countdown' => false,
+        ],
+    ]]);
+
+    $this->travelTo('2026-02-22');
+
+    $courseClass = CourseClass::factory()->create();
+    $courseClass->course()->update(['term' => '2025A']);
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => '我的課表',
+    ]);
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_id' => $courseClass->course_id,
+        'course_class_id' => $courseClass->id,
+    ]);
+
+    $response = $this->get(route('schedules.show', $schedule).'?term=2025A');
+
+    $response->assertStatus(200)
+        ->assertSee('學校行事曆')
+        ->assertSee('114上學期開始')
+        ->assertSee('114上學期期中考');
+});
+
 it('filters out past events from the embedded payload', function () {
     config(['app.current_semester' => '2025B']);
     config(['school-schedules.2025B' => [

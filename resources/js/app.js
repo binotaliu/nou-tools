@@ -573,11 +573,12 @@ window.nouGreeting =
 // a small hint instead, telling them the dates are in Taiwan time.
 window.nouSchoolCalendar =
   window.nouSchoolCalendar ||
-  function (events) {
+  function (events, showPastEvents = false) {
     const T = window.NouTime
 
     return {
       events,
+      showPastEvents,
       today: T.taipeiYmd(new Date()),
       showTaipeiHint: T.differsFromTaipei(new Date()),
 
@@ -611,11 +612,14 @@ window.nouSchoolCalendar =
           : T.diffInDaysYmd(this.today, event.start)
       },
 
-      // Events that have not fully ended yet, decorated with the status/count
-      // that used to be computed server-side, sorted by start date.
+      // Events to display: for the current semester, only ones that have
+      // not fully ended yet; for a specific non-current semester
+      // (showPastEvents), the semester's whole calendar. Decorated with the
+      // status/count that used to be computed server-side, sorted by start
+      // date.
       get activeEvents() {
         return this.events
-          .filter(event => event.end >= this.today)
+          .filter(event => this.showPastEvents || event.end >= this.today)
           .map(event => ({
             ...event,
             status: this.statusOf(event),
@@ -625,7 +629,12 @@ window.nouSchoolCalendar =
       },
 
       // Nearest countdown-flagged event that is still upcoming or ongoing.
+      // Never shown when browsing a past semester's full calendar.
       get countdownEvent() {
+        if (this.showPastEvents) {
+          return null
+        }
+
         return this.activeEvents.find(event => event.countdown) ?? null
       },
 

@@ -9,18 +9,26 @@ use Illuminate\Support\Facades\Date;
 final class ListUpcomingSchoolEvents
 {
     /**
-     * Raw upcoming/ongoing events for the current semester, keyed as plain
-     * Y-m-d strings. Status, days-until, and which event to show as the
-     * countdown are computed client-side (see window.nouSchoolCalendar in
-     * resources/js/app.js), anchored to the viewer's Taipei calendar date
-     * rather than the server clock.
+     * Raw events for a semester, keyed as plain Y-m-d strings. Status,
+     * days-until, and which event to show as the countdown are computed
+     * client-side (see window.nouSchoolCalendar in resources/js/app.js),
+     * anchored to the viewer's Taipei calendar date rather than the server
+     * clock.
+     *
+     * For the current semester (the default), only still-relevant events
+     * (not yet ended) are returned. For any other semester explicitly
+     * requested via $term, all of that semester's events are returned,
+     * since a past semester's calendar has no "upcoming" events to hide.
      *
      * @return array<int, array{start: string, end: string, name: string, countdown: bool}>
      */
-    public function __invoke(?string $referenceDate = null): array
+    public function __invoke(?string $referenceDate = null, ?string $term = null): array
     {
-        $semester = config('app.current_semester');
-        $schedules = config('school-schedules.'.(string) $semester, []);
+        $currentSemester = (string) config('app.current_semester');
+        $semester = $term ?: $currentSemester;
+        $showAllEvents = $term !== null && $term !== $currentSemester;
+
+        $schedules = config('school-schedules.'.$semester, []);
 
         if (empty($schedules)) {
             return [];
@@ -37,7 +45,7 @@ final class ListUpcomingSchoolEvents
         foreach ($schedules as $schedule) {
             $end = Date::parse($schedule['end'], 'Asia/Taipei');
 
-            if ($end->gte($today)) {
+            if ($showAllEvents || $end->gte($today)) {
                 $events[] = [
                     'start' => Date::parse($schedule['start'], 'Asia/Taipei')->format('Y-m-d'),
                     'end' => $end->format('Y-m-d'),

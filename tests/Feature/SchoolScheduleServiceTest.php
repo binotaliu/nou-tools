@@ -165,3 +165,50 @@ it('uses current date when no reference date provided', function () {
 
     expect($events)->toHaveCount(1);
 });
+
+it('includes past events when a non-current semester is explicitly requested', function () {
+    config(['app.current_semester' => '2025B']);
+    config(['school-schedules.2025A' => [
+        [
+            'start' => '2025-09-01',
+            'end' => '2025-09-01',
+            'name' => '已結束的活動',
+            'countdown' => false,
+        ],
+        [
+            'start' => '2026-01-05',
+            'end' => '2026-01-06',
+            'name' => '也已結束的活動',
+            'countdown' => true,
+        ],
+    ]]);
+
+    $events = ($this->service)('2026-02-18', '2025A');
+
+    expect($events)->toHaveCount(2)
+        ->and($events[0]['name'])->toBe('已結束的活動')
+        ->and($events[1]['name'])->toBe('也已結束的活動');
+});
+
+it('still filters out past events when the requested term is the current semester', function () {
+    config(['app.current_semester' => '2025B']);
+    config(['school-schedules.2025B' => [
+        [
+            'start' => '2026-01-01',
+            'end' => '2026-01-01',
+            'name' => '過去的活動',
+            'countdown' => false,
+        ],
+        [
+            'start' => '2026-03-01',
+            'end' => '2026-03-01',
+            'name' => '未來的活動',
+            'countdown' => false,
+        ],
+    ]]);
+
+    $events = ($this->service)('2026-02-18', '2025B');
+
+    expect($events)->toHaveCount(1)
+        ->and($events[0]['name'])->toBe('未來的活動');
+});
