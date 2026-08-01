@@ -579,6 +579,17 @@
                 <div class="flex items-center gap-x-8 gap-y-2">
                     <div class="text-xs">
                         <a
+                            href="https://kuma.binota.org/status/nou"
+                            class="inline-flex items-center gap-1 text-warm-500 hover:text-warm-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <x-heroicon-o-computer-desktop class="size-3" />
+                            學校網站狀態
+                        </a>
+                    </div>
+                    <div class="text-xs">
+                        <a
                             href="https://github.com/binotaliu/nou-tools"
                             class="inline-flex items-center gap-1 text-warm-500 hover:text-warm-600 dark:text-zinc-400 dark:hover:text-zinc-300"
                             target="_blank"
