@@ -83,6 +83,7 @@ final class DiscountStoreController extends Controller
             'verification_method' => ['nullable', 'string', 'max:255'],
             'discount_details' => ['required', 'string'],
             'notes' => ['nullable', 'string'],
+            'tested_valid' => ['nullable', 'boolean'],
             'cf-turnstile-response' => ['required', new TurnstileCheck],
         ]);
 
@@ -96,6 +97,7 @@ final class DiscountStoreController extends Controller
             verificationMethod: $validated['verification_method'] ?? '',
             discountDetails: $validated['discount_details'],
             notes: ($validated['notes'] ?? '') !== '' ? $validated['notes'] : null,
+            testedValid: (bool) ($validated['tested_valid'] ?? false),
         );
 
         $submitDiscountStore($dto, $request);

@@ -29,5 +29,7 @@ final class SubmitDiscountStoreDTO extends Data
         #[Required, MapInputName('discount_details')]
         public string $discountDetails = '',
         public ?string $notes = null,
+        #[MapInputName('tested_valid')]
+        public bool $testedValid = false,
     ) {}
 }

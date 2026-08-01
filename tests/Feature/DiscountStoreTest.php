@@ -286,6 +286,63 @@ it('submits a new discount store with the web form', function () {
     );
 });
 
+it('creates an initial discount store report when the submitter confirms it was tested and valid', function () {
+    Notification::fake();
+
+    LaravelTurnstile::shouldReceive('validate')
+        ->once()
+        ->andReturn(['success' => true]);
+
+    $response = post(route('discount-stores.store'), [
+        'name' => '已測試新店家',
+        'type' => DiscountStoreType::Online->value,
+        'category_id' => $this->category->id,
+        'city' => '',
+        'district' => '',
+        'address' => 'https://example.com',
+        'discount_details' => '9 折優惠',
+        'tested_valid' => '1',
+        'cf-turnstile-response' => 'test-token',
+    ]);
+
+    $response->assertRedirect(route('discount-stores.create'));
+
+    $store = DiscountStore::query()->where('name', '已測試新店家')->first();
+
+    expect($store)->not->toBeNull();
+
+    $report = DiscountStoreReport::query()->where('store_id', $store->id)->first();
+
+    expect($report)->not->toBeNull();
+    expect($report?->is_valid)->toBeTrue();
+});
+
+it('does not create a discount store report when the submitter does not confirm it was tested', function () {
+    Notification::fake();
+
+    LaravelTurnstile::shouldReceive('validate')
+        ->once()
+        ->andReturn(['success' => true]);
+
+    $response = post(route('discount-stores.store'), [
+        'name' => '未測試新店家',
+        'type' => DiscountStoreType::Online->value,
+        'category_id' => $this->category->id,
+        'city' => '',
+        'district' => '',
+        'address' => 'https://example.com',
+        'discount_details' => '9 折優惠',
+        'cf-turnstile-response' => 'test-token',
+    ]);
+
+    $response->assertRedirect(route('discount-stores.create'));
+
+    $store = DiscountStore::query()->where('name', '未測試新店家')->first();
+
+    expect($store)->not->toBeNull();
+    expect(DiscountStoreReport::query()->where('store_id', $store->id)->exists())->toBeFalse();
+});
+
 it('submits a discount store report with the web form', function () {
     Notification::fake();
 

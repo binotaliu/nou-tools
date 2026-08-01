@@ -287,6 +287,25 @@
                 </div>
 
                 <div>
+                    <label class="flex items-start gap-2">
+                        <input
+                            type="checkbox"
+                            id="tested_valid"
+                            name="tested_valid"
+                            value="1"
+                            @checked(old('tested_valid'))
+                            class="mt-0.5 rounded border-warm-300 text-orange-500 focus:ring-orange-300 dark:border-zinc-700"
+                        />
+                        <span class="text-sm text-warm-700 dark:text-zinc-300">
+                            我已實際測試過，確認此優惠資訊正確有效
+                        </span>
+                    </label>
+                    @error('tested_valid')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
                     <x-turnstile-widget language="zh-tw" />
                     @error('cf-turnstile-response')
                         <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
