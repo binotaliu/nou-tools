@@ -20,10 +20,11 @@ final class ShowSchedulePage
 
         $schedule->load([
             'items' => fn (HasMany $query) => $query->whereHas(
-                'courseClass.course',
+                'course',
                 fn (Builder $courseQuery) => $courseQuery->where('term', $selectedTerm),
             ),
             'items.courseClass.course' => fn (BelongsTo $query) => $query->where('term', $selectedTerm),
+            'items.course' => fn (BelongsTo $query) => $query->where('term', $selectedTerm),
             'items.courseClass.schedules',
         ]);
 
@@ -40,8 +41,7 @@ final class ShowSchedulePage
     private function availableTerms(StudentSchedule $schedule, string $selectedTerm): array
     {
         $terms = $schedule->items()
-            ->join('course_classes', 'student_schedule_items.course_class_id', '=', 'course_classes.id')
-            ->join('courses', 'course_classes.course_id', '=', 'courses.id')
+            ->join('courses', 'student_schedule_items.course_id', '=', 'courses.id')
             ->select('courses.term')
             ->distinct()
             ->orderByDesc('courses.term')

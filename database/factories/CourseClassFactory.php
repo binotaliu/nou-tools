@@ -35,6 +35,7 @@ final class CourseClassFactory extends Factory
             'teacher_name' => fake()->name().'老師',
             'link' => fake()->url(),
             'backup_classroom_url' => null,
+            'is_tentative' => false,
         ];
     }
 }

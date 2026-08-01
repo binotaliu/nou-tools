@@ -194,6 +194,46 @@
             />
         @endif
 
+        @php
+            $hasTentative = $viewModel->items->toCollection()->contains(fn ($item) => $item->courseClass?->isTentative);
+            $pendingItems = $viewModel->items->toCollection()->filter(fn ($item) => $item->courseClassId === null);
+            $hasPending = $pendingItems->isNotEmpty();
+        @endphp
+
+        @if ($hasTentative)
+            <div
+                class="mb-8 flex items-start justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200 print:hidden"
+                role="status"
+            >
+                <div class="flex items-start gap-3">
+                    <x-heroicon-o-exclamation-triangle
+                        class="mt-0.5 size-5 shrink-0"
+                    />
+                    <p>尚有未選擇班級的課程，開學分班後記得回來選擇班級，才能看到視訊面授連結喔！</p>
+                </div>
+            </div>
+        @endif
+
+        @if ($hasPending)
+            <x-card class="mb-8" title="尚有未選擇班級的課程">
+                <ul class="space-y-2">
+                    @foreach ($pendingItems as $item)
+                        <li
+                            class="flex items-center justify-between gap-3 text-warm-700 dark:text-zinc-300"
+                        >
+                            <span>{{ $item->courseName }}</span>
+                            <a
+                                href="{{ route('schedules.edit', $viewModel->uuid) }}"
+                                class="shrink-0 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
+                            >
+                                前往選擇班級
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </x-card>
+        @endif
+
         @if ($viewModel->displayOptions->showCommonLinks)
             <x-common-links
                 class="mb-8 print:hidden"
@@ -245,9 +285,15 @@
                                                     <span class="font-semibold">
                                                         {{ $course->courseName }}
                                                     </span>
-                                                    <x-class-code>
-                                                        {{ $course->code }}
-                                                    </x-class-code>
+                                                    @if ($course->isTentative)
+                                                        <x-class-code>
+                                                            尚未分班
+                                                        </x-class-code>
+                                                    @else
+                                                        <x-class-code>
+                                                            {{ $course->code }}
+                                                        </x-class-code>
+                                                    @endif
                                                     <br />
                                                     <span
                                                         class="inline-flex items-center gap-1 text-warm-600 dark:text-zinc-400"
@@ -296,27 +342,25 @@
                                     >
                                         {{ $exam->courseName }}
                                     </div>
-                                    @if ($exam->classCode)
-                                        <div
-                                            class="mt-1 flex items-center gap-2"
-                                        >
+                                    <div class="mt-1 flex items-center gap-2">
+                                        @if ($exam->classCode)
                                             <x-class-code>
                                                 {{ $exam->classCode }}
                                             </x-class-code>
+                                        @endif
 
-                                            <a
-                                                href="{{ route('course.show', $exam->courseId) }}#previous-exams"
-                                                class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100 print:hidden"
-                                                aria-label="{{ $exam->courseName }} 的課程資訊"
-                                            >
-                                                <x-heroicon-o-information-circle
-                                                    class="inline size-4"
-                                                    aria-hidden="true"
-                                                />
-                                                考古題
-                                            </a>
-                                        </div>
-                                    @endif
+                                        <a
+                                            href="{{ route('course.show', $exam->courseId) }}#previous-exams"
+                                            class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100 print:hidden"
+                                            aria-label="{{ $exam->courseName }} 的課程資訊"
+                                        >
+                                            <x-heroicon-o-information-circle
+                                                class="inline size-4"
+                                                aria-hidden="true"
+                                            />
+                                            考古題
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
 
@@ -416,27 +460,31 @@
                                         class="font-semibold text-warm-900 dark:text-zinc-100"
                                     >
                                         {{ $exam->courseName }}
-                                        @if ($exam->classCode)
-                                            <div
-                                                class="mt-1 flex items-center gap-2"
-                                            >
+                                        <div
+                                            class="mt-1 flex items-center gap-2"
+                                        >
+                                            @if ($exam->isTentative)
+                                                <x-class-code>
+                                                    尚未分班
+                                                </x-class-code>
+                                            @elseif ($exam->classCode)
                                                 <x-class-code>
                                                     {{ $exam->classCode }}
                                                 </x-class-code>
+                                            @endif
 
-                                                <a
-                                                    href="{{ route('course.show', $exam->courseId) }}#previous-exams"
-                                                    class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100 print:hidden"
-                                                    aria-label="{{ $exam->courseName }} 的課程資訊"
-                                                >
-                                                    <x-heroicon-o-information-circle
-                                                        class="inline size-4"
-                                                        aria-hidden="true"
-                                                    />
-                                                    考古題
-                                                </a>
-                                            </div>
-                                        @endif
+                                            <a
+                                                href="{{ route('course.show', $exam->courseId) }}#previous-exams"
+                                                class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100 print:hidden"
+                                                aria-label="{{ $exam->courseName }} 的課程資訊"
+                                            >
+                                                <x-heroicon-o-information-circle
+                                                    class="inline size-4"
+                                                    aria-hidden="true"
+                                                />
+                                                考古題
+                                            </a>
+                                        </div>
                                     </x-table-column>
 
                                     @if (! str_ends_with($viewModel->selectedTerm, 'C'))

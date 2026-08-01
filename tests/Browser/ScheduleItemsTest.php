@@ -37,6 +37,7 @@ function createScheduleWithClass(string $date, string $startTime, string $endTim
 
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $courseClass->course_id,
         'course_class_id' => $courseClass->id,
     ]);
 
@@ -129,6 +130,7 @@ it('shows "無未來課程" when a course only has past class occurrences', func
 
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $courseClass->course_id,
         'course_class_id' => $courseClass->id,
     ]);
 

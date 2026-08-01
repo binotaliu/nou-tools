@@ -64,9 +64,9 @@ final class ScheduleViewModel extends Data
     private static function hasAnyOverride(StudentSchedule $schedule): bool
     {
         return $schedule->items->contains(function ($item) {
-            return $item->courseClass->schedules->contains(function ($schedule) {
+            return $item->courseClass?->schedules->contains(function ($schedule) {
                 return $schedule->start_time !== null;
-            });
+            }) ?? false;
         });
     }
 
@@ -75,6 +75,10 @@ final class ScheduleViewModel extends Data
         $coursesByMonth = [];
 
         foreach ($schedule->items as $item) {
+            if ($item->courseClass === null) {
+                continue;
+            }
+
             foreach ($item->courseClass->schedules as $classSchedule) {
                 $monthKey = $classSchedule->date->format('Y-m');
                 $monthDisplay = Date::parse($classSchedule->date)->isoFormat('Y 年 M 月');
@@ -99,13 +103,16 @@ final class ScheduleViewModel extends Data
 
                 $displayStartTime = $classSchedule->start_time ?? $item->courseClass->start_time;
                 $displayEndTime = $classSchedule->end_time ?? $item->courseClass->end_time;
+                $isTentative = $item->courseClass->is_tentative;
 
                 $coursesByMonth[$monthKey]['dates'][$dateKey]['courses'][] = new ScheduleCourseItemViewModel(
                     courseName: $item->courseClass->course->name,
-                    code: $item->courseClass->code,
+                    code: $isTentative ? '選課注意事項' : $item->courseClass->code,
                     time: $displayStartTime ? $displayStartTime.' - '.$displayEndTime : '未設定',
                     hasOverride: $classSchedule->start_time !== null,
                     date: $classSchedule->date,
+                    isTentative: $isTentative,
+                    preferredSessionLabel: $isTentative ? $item->courseClass->type->label() : null,
                 );
             }
         }
@@ -139,7 +146,7 @@ final class ScheduleViewModel extends Data
     private static function buildExams(StudentSchedule $schedule): DataCollection
     {
         $courses = $schedule->items
-            ->map(fn ($item) => $item->courseClass->course)
+            ->map(fn ($item) => $item->course)
             ->unique('id')
             ->values();
 
@@ -147,7 +154,7 @@ final class ScheduleViewModel extends Data
             ->filter(fn ($course) => $course->midterm_date || $course->final_date || $course->exam_time_start || $course->exam_time_end)
             ->map(function ($course) use ($schedule) {
                 $firstClass = $schedule->items->first(
-                    fn ($item) => $item->courseClass->course->id === $course->id,
+                    fn ($item) => $item->course->id === $course->id,
                 )?->courseClass;
 
                 return ScheduleExamViewModel::fromCourse($course, $firstClass);

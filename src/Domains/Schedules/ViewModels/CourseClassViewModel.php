@@ -25,6 +25,7 @@ final class CourseClassViewModel extends Data
         public ?string $backupClassroomUrl,
         #[DataCollectionOf(CourseClassScheduleViewModel::class)]
         public DataCollection $schedules,
+        public bool $isTentative,
     ) {}
 
     public static function fromModel(CourseClass $class): self
@@ -44,6 +45,7 @@ final class CourseClassViewModel extends Data
                 $class->schedules->map(fn ($s) => CourseClassScheduleViewModel::fromModel($s)),
                 DataCollection::class,
             ),
+            isTentative: $class->is_tentative,
         );
     }
 }

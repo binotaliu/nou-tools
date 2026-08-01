@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Schedules\DataTransferObjects;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -24,16 +25,30 @@ final class StudentScheduleUpsertData extends Data
             'name' => ['nullable', 'string', 'max:255'],
             'term' => ['required', 'string', 'regex:/^\d{4}[ABC]$/'],
             'items' => ['required', 'array', 'min:1', 'max:10'],
-            'items.*' => [
+            'items.*.course_id' => [
                 'required',
-                Rule::exists('course_classes', 'id')->where(
-                    fn ($query) => $query->whereExists(
-                        fn ($sub) => $sub->selectRaw('1')
-                            ->from('courses')
-                            ->whereColumn('courses.id', 'course_classes.course_id')
-                            ->where('courses.term', $term)
-                    )
-                ),
+                'integer',
+                Rule::exists('courses', 'id')->where('term', $term),
+            ],
+            'items.*.class_id' => [
+                'nullable',
+                'integer',
+                function (string $attribute, mixed $value, \Closure $fail) use ($context) {
+                    if (! preg_match('/^items\.(\d+)\.class_id$/', $attribute, $matches)) {
+                        return;
+                    }
+
+                    $courseId = $context->payload['items'][(int) $matches[1]]['course_id'] ?? null;
+
+                    $belongsToCourse = DB::table('course_classes')
+                        ->where('id', $value)
+                        ->where('course_id', $courseId)
+                        ->exists();
+
+                    if (! $belongsToCourse) {
+                        $fail(__('選擇的班級不屬於此課程。'));
+                    }
+                },
             ],
         ];
     }

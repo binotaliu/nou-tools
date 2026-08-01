@@ -12,6 +12,7 @@
     // frontend can pick the "next" class and sort against the viewer's real
     // clock, correctly for any timezone and even from an offline cache.
     $itemsPayload = collect($items->toCollection())
+        ->filter(fn ($item) => $item->courseClass !== null)
         ->map(function ($item) {
             $courseClass = $item->courseClass;
 
@@ -38,7 +39,8 @@
 
             return [
                 'courseName' => $courseClass->courseName,
-                'code' => $courseClass->code,
+                'code' => $courseClass->isTentative ? '尚未分班' : $courseClass->code,
+                'isTentative' => $courseClass->isTentative,
                 'teacherName' => $courseClass->teacherName,
                 'courseInfoUrl' => route('course.show', $courseClass->courseId),
                 'videoLink' => $courseClass->link,
@@ -268,9 +270,16 @@
                         >
                             <span
                                 class="inline-block rounded bg-warm-100 px-2 py-1 font-mono text-xs font-normal text-warm-800 dark:bg-zinc-800 dark:text-zinc-200 print:bg-transparent print:p-0"
+                                x-show="!row.item.isTentative"
                             >
                                 <span class="sr-only">班級代碼：</span>
                                 <span x-text="row.item.code"></span>
+                            </span>
+                            <span
+                                x-show="row.item.isTentative"
+                                class="ml-1 inline-block rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-200 print:bg-transparent print:p-0"
+                            >
+                                尚未分班
                             </span>
                         </td>
 
@@ -429,9 +438,16 @@
                     <div class="mb-3 flex items-center gap-2">
                         <span
                             class="inline-block rounded bg-warm-100 px-2 py-1 font-mono text-xs font-normal text-warm-800 dark:bg-zinc-800 dark:text-zinc-200"
+                            x-show="!row.item.isTentative"
                         >
                             <span class="sr-only">班級代碼：</span>
                             <span x-text="row.item.code"></span>
+                        </span>
+                        <span
+                            x-show="row.item.isTentative"
+                            class="inline-block rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+                        >
+                            尚未分班
                         </span>
 
                         <template x-if="teacher(row.item)">

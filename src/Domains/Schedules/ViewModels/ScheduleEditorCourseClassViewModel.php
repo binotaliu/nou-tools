@@ -26,6 +26,7 @@ final class ScheduleEditorCourseClassViewModel extends Data
         public ?string $startTime,
         public ?string $endTime,
         public ?string $teacherName,
+        public bool $isTentative,
     ) {}
 
     public static function fromModel(CourseClass $class): self
@@ -38,6 +39,7 @@ final class ScheduleEditorCourseClassViewModel extends Data
             startTime: $class->start_time,
             endTime: $class->end_time,
             teacherName: $class->teacher_name,
+            isTentative: $class->is_tentative,
         );
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 > 學期：{{ Str::toSemesterDisplay($viewModel->selectedTerm) }}
 
-@if (count($viewModel->months) === 0)
+@if (count($viewModel->items) === 0)
 本學期尚無課程資料。
 @else
 
@@ -16,7 +16,10 @@ use Illuminate\Support\Str;
 | -------- | -------- | ---- | -------- | ------------ | -------- |
 
 @foreach ($viewModel->items as $item)
-| {{ $item->courseClass->courseName }} | {{ $item->courseClass->code }} | {{ $item->courseClass->teacherName ?: '未提供' }} | {{ $item->courseClass->link ?: '未提供' }} | {{ $item->courseClass->backupClassroomUrl ?: '未提供' }} | [Markdown]({{ route('course.show.md', $item->courseClass->courseId) }}) |
+@php
+    $classCode = ($item->courseClass === null || $item->courseClass->isTentative) ? '尚未分班' : $item->courseClass->code;
+@endphp
+| {{ $item->courseName }} | {{ $classCode }} | {{ $item->courseClass?->teacherName ?: '未提供' }} | {{ $item->courseClass?->link ?: '未提供' }} | {{ $item->courseClass?->backupClassroomUrl ?: '未提供' }} | [Markdown]({{ route('course.show.md', $item->courseId) }}) |
 @endforeach
 
 @foreach ($viewModel->months as $month)
@@ -29,7 +32,7 @@ use Illuminate\Support\Str;
 
 @foreach ($date->courses as $course)
 
-- {{ $course->time }} {{ $course->courseName }}（{{ $course->code }}）@if ($course->hasOverride)（時間異動）@endif
+- {{ $course->time }} {{ $course->courseName }}（{{ $course->isTentative ? '選課注意事項：'.$course->preferredSessionLabel : $course->code }}）@if ($course->hasOverride)（時間異動）@endif
 
 @endforeach
 

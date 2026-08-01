@@ -14,7 +14,9 @@ it('returns JSON and creates schedule on application/json POST', function () {
     $payload = [
         'name' => '測試課表',
         'term' => '2025B',
-        'items' => [$courseClass->id],
+        'items' => [
+            ['course_id' => $courseClass->course_id, 'class_id' => $courseClass->id],
+        ],
     ];
 
     $response = $this->postJson(route('schedules.store'), $payload);
@@ -34,7 +36,9 @@ it('allows creating multiple schedules', function () {
     $payload = [
         'name' => '第一次',
         'term' => '2025B',
-        'items' => [$courseClass->id],
+        'items' => [
+            ['course_id' => $courseClass->course_id, 'class_id' => $courseClass->id],
+        ],
     ];
 
     $this->postJson(route('schedules.store'), $payload)->assertStatus(200);
@@ -53,7 +57,7 @@ it('rejects schedules with more than ten items', function () {
     $payload = [
         'name' => 'Too Many',
         'term' => '2025B',
-        'items' => $classes->pluck('id')->all(),
+        'items' => $classes->map(fn ($class) => ['course_id' => $class->course_id, 'class_id' => $class->id])->all(),
     ];
 
     $this->postJson(route('schedules.store'), $payload)
@@ -84,6 +88,7 @@ it('returns an .ics calendar for a saved schedule and converts UTC+8 times to UT
 
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $courseClass->course_id,
         'course_class_id' => $courseClass->id,
     ]);
 
@@ -242,6 +247,7 @@ it('calendar output includes school events exams and reminders when defaults are
 
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $courseClass->course_id,
         'course_class_id' => $courseClass->id,
     ]);
 
@@ -309,6 +315,7 @@ it('calendar output excludes school events exams and reminders when defaults are
 
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $courseClass->course_id,
         'course_class_id' => $courseClass->id,
     ]);
 
@@ -348,6 +355,7 @@ it('schedule show page displays exam information for selected courses', function
 
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $course->id,
         'course_class_id' => $class->id,
     ]);
 
@@ -392,6 +400,7 @@ it('schedule show markdown page lists courses and exam information', function ()
 
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $course->id,
         'course_class_id' => $class->id,
     ]);
 
@@ -433,6 +442,7 @@ it('schedule show markdown page shows placeholders when teacher and link are mis
 
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $course->id,
         'course_class_id' => $class->id,
     ]);
 
@@ -504,10 +514,12 @@ it('schedule show page defaults to current semester courses and updates learning
 
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $currentCourse->id,
         'course_class_id' => $currentClass->id,
     ]);
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $otherCourse->id,
         'course_class_id' => $otherClass->id,
     ]);
 
@@ -541,6 +553,7 @@ it('schedule show page shows empty state for selected semester without courses',
 
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $otherCourse->id,
         'course_class_id' => $otherClass->id,
     ]);
 
@@ -557,7 +570,9 @@ it('stores schedule metadata in an encrypted cookie when saving', function () {
     $payload = [
         'name' => 'Cookie Test',
         'term' => '2025B',
-        'items' => [$courseClass->id],
+        'items' => [
+            ['course_id' => $courseClass->course_id, 'class_id' => $courseClass->id],
+        ],
     ];
 
     $response = $this->postJson(route('schedules.store'), $payload);
@@ -651,7 +666,9 @@ it('updates the stored cookie when schedule is updated', function () {
     $payload = [
         'name' => 'New Name',
         'term' => '2025B',
-        'items' => [$courseClass->id],
+        'items' => [
+            ['course_id' => $courseClass->course_id, 'class_id' => $courseClass->id],
+        ],
     ];
 
     $response = $this->put(route('schedules.update', $schedule), $payload);
@@ -682,17 +699,21 @@ it('updating schedule only replaces classes in current semester', function () {
 
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $currentCourseA->id,
         'course_class_id' => $currentClassA->id,
     ]);
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $otherTermCourse->id,
         'course_class_id' => $otherTermClass->id,
     ]);
 
     $response = $this->putJson(route('schedules.update', $schedule), [
         'name' => 'Cross Term Schedule Updated',
         'term' => '2026C',
-        'items' => [$currentClassB->id],
+        'items' => [
+            ['course_id' => $currentCourseB->id, 'class_id' => $currentClassB->id],
+        ],
     ]);
 
     $response->assertSuccessful();
@@ -739,7 +760,7 @@ it('create page form posts to store route and does not include method spoofing',
         ->assertSee('建立您的課表')
         ->assertSee('建立課表')
         // the form uses Alpine to render hidden inputs for selected course classes
-        ->assertSee('template x-for="item in selectedItems"', false)
+        ->assertSee('template x-for="(item, index) in selectedItems"', false)
         ->assertSee('name="name"', false); // schedule name field should have a name attribute
 });
 
@@ -965,6 +986,7 @@ it('schedule show page includes link to subscribe page', function () {
     ]);
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $courseClass->course_id,
         'course_class_id' => $courseClass->id,
     ]);
 

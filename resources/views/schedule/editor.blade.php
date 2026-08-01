@@ -89,6 +89,7 @@
                 <template x-for="course in filteredCourses" :key="course.id">
                     <div
                         @click="selectCourse(course)"
+                        :data-testid="`course-option-${course.id}`"
                         class="cursor-pointer border-b border-warm-100 p-4 hover:bg-warm-50 dark:border-zinc-800 dark:hover:bg-zinc-950"
                     >
                         <div
@@ -127,6 +128,7 @@
             <div class="space-y-4">
                 <template x-for="(item, index) in selectedItems" :key="index">
                     <div
+                        :data-testid="`selected-item-${item.course.id}`"
                         class="rounded-lg border-2 border-warm-300 bg-warm-50 p-4 dark:border-zinc-600 dark:bg-zinc-950"
                     >
                         <div class="mb-3 flex items-start justify-between">
@@ -147,8 +149,20 @@
 
                         {{-- Class Selection --}}
                         <div class="mt-3">
+                            <template x-if="!item.course.has_classes">
+                                <div
+                                    data-testid="pending-class-note"
+                                    class="rounded-lg border-2 border-dashed border-warm-300 bg-warm-100 p-3 text-sm text-warm-700 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-300"
+                                >
+                                    尚未開課，選課後將自動列入課表，開課後請記得回來選擇班級。
+                                </div>
+                            </template>
+
                             <template
-                                x-if="getClassTypes(item.course).length > 1"
+                                x-if="
+                                    item.course.has_classes &&
+                                    getClassTypes(item.course).length > 1
+                                "
                             >
                                 <div>
                                     <fieldset class="mb-4">
@@ -183,6 +197,9 @@
                                                         :key="courseClass.id"
                                                     >
                                                         <label
+                                                            :data-testid="courseClass.is_tentative
+                                                                ? `tentative-session-${courseClass.type}`
+                                                                : null"
                                                             class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300 dark:bg-zinc-900"
                                                             :class="item.selectedClassId ===
                                                             courseClass.id
@@ -204,9 +221,19 @@
                                                                 <div
                                                                     class="font-semibold text-warm-900 dark:text-zinc-100"
                                                                     x-text="
-                                                                        courseClass.code
+                                                                        courseClass.is_tentative
+                                                                            ? courseClass.type_label
+                                                                            : courseClass.code
                                                                     "
                                                                 ></div>
+                                                                <div
+                                                                    class="text-xs font-semibold text-amber-700 dark:text-amber-400"
+                                                                    x-show="
+                                                                        courseClass.is_tentative
+                                                                    "
+                                                                >
+                                                                    尚未正式分班
+                                                                </div>
                                                                 <div
                                                                     class="text-sm text-warm-600 dark:text-zinc-400"
                                                                     x-show="
@@ -239,7 +266,10 @@
                             </template>
 
                             <template
-                                x-if="getClassTypes(item.course).length === 1"
+                                x-if="
+                                    item.course.has_classes &&
+                                    getClassTypes(item.course).length === 1
+                                "
                             >
                                 <div>
                                     <fieldset>
@@ -259,6 +289,9 @@
                                                 :key="courseClass.id"
                                             >
                                                 <label
+                                                    :data-testid="courseClass.is_tentative
+                                                        ? `tentative-session-${courseClass.type}`
+                                                        : null"
                                                     class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300 dark:bg-zinc-900"
                                                     :class="item.selectedClassId ===
                                                     courseClass.id
@@ -278,9 +311,19 @@
                                                         <div
                                                             class="font-semibold text-warm-900 dark:text-zinc-100"
                                                             x-text="
-                                                                courseClass.code
+                                                                courseClass.is_tentative
+                                                                    ? courseClass.type_label
+                                                                    : courseClass.code
                                                             "
                                                         ></div>
+                                                        <div
+                                                            class="text-xs font-semibold text-amber-700 dark:text-amber-400"
+                                                            x-show="
+                                                                courseClass.is_tentative
+                                                            "
+                                                        >
+                                                            尚未正式分班
+                                                        </div>
                                                         <div
                                                             class="text-sm text-warm-600 dark:text-zinc-400"
                                                             x-show="
@@ -347,12 +390,24 @@
             </div>
 
             {{-- hidden fields for selected items --}}
-            <template x-for="item in selectedItems" :key="item.course.id">
-                <input
-                    type="hidden"
-                    name="items[]"
-                    :value="item.selectedClassId"
-                />
+            <template
+                x-for="(item, index) in selectedItems"
+                :key="item.course.id"
+            >
+                <span>
+                    <input
+                        type="hidden"
+                        :name="`items[${index}][course_id]`"
+                        :value="item.course.id"
+                    />
+                    <template x-if="item.selectedClassId">
+                        <input
+                            type="hidden"
+                            :name="`items[${index}][class_id]`"
+                            :value="item.selectedClassId"
+                        />
+                    </template>
+                </span>
             </template>
 
             <div class="flex gap-4">
@@ -361,6 +416,7 @@
                     variant="primary"
                     size="lg"
                     full-width
+                    data-testid="schedule-submit"
                     ::disabled="selectedItems.length === 0 || submitting"
                 >
                     <span x-show="!submitting">{{ $submitLabel }}</span>
@@ -401,17 +457,20 @@
 
                         // 為每個項目建立 selectedItem
                         this.schedule.items.forEach(item => {
-                            const courseClass = item.course_class
-                            const course = courseClass.course
+                            const courseId = item.course_class
+                                ? item.course_class.course.id
+                                : item.course.id
 
                             // 從 allCourses 中找到對應的課程
                             const fullCourse = this.allCourses.find(
-                                c => c.id === course.id
+                                c => c.id === courseId
                             )
                             if (fullCourse) {
                                 this.selectedItems.push({
                                     course: fullCourse,
-                                    selectedClassId: courseClass.id,
+                                    selectedClassId: item.course_class
+                                        ? item.course_class.id
+                                        : null,
                                 })
                             }
                         })
@@ -510,7 +569,7 @@
                     }
 
                     const invalidItems = this.selectedItems.filter(
-                        item => !item.selectedClassId
+                        item => item.course.has_classes && !item.selectedClassId
                     )
                     if (invalidItems.length > 0) {
                         alert('請為所有課程選擇班級')

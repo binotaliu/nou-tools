@@ -71,6 +71,7 @@ it('displays school calendar on schedule show page', function () {
     ]);
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
+        'course_id' => $courseClass->course_id,
         'course_class_id' => $courseClass->id,
     ]);
 

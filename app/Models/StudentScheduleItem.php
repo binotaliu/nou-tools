@@ -11,6 +11,7 @@ final class StudentScheduleItem extends Model
 {
     protected $fillable = [
         'student_schedule_id',
+        'course_id',
         'course_class_id',
     ];
 
@@ -20,6 +21,14 @@ final class StudentScheduleItem extends Model
     public function schedule(): BelongsTo
     {
         return $this->belongsTo(StudentSchedule::class, 'student_schedule_id');
+    }
+
+    /**
+     * @return BelongsTo<Course, $this>
+     */
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class);
     }
 
     /**

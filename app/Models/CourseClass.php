@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\CourseClassType;
 use Database\Factories\CourseClassFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +26,7 @@ final class CourseClass extends Model
         'teacher_name',
         'link',
         'backup_classroom_url',
+        'is_tentative',
     ];
 
     /**
@@ -42,6 +44,7 @@ final class CourseClass extends Model
     {
         return [
             'type' => CourseClassType::class,
+            'is_tentative' => 'bool',
         ];
     }
 
@@ -59,5 +62,14 @@ final class CourseClass extends Model
     public function schedules(): HasMany
     {
         return $this->hasMany(ClassSchedule::class, 'class_id');
+    }
+
+    /**
+     * @param  Builder<CourseClass>  $query
+     * @return Builder<CourseClass>
+     */
+    public function scopeOfficial(Builder $query): Builder
+    {
+        return $query->where('is_tentative', false);
     }
 }

@@ -20,7 +20,7 @@ final readonly class GenerateScheduleCalendar
 
     public function __invoke(StudentSchedule $schedule): string
     {
-        $schedule->load(['items.courseClass.schedules', 'items.courseClass.course']);
+        $schedule->load(['items.courseClass.schedules', 'items.courseClass.course', 'items.course']);
 
         $calendarSettings = ScheduleCustomizationPageData::normalizeCalendarSettings(
             is_array($schedule->display_options['calendar_settings'] ?? null) ? $schedule->display_options['calendar_settings'] : null,
@@ -37,12 +37,21 @@ final readonly class GenerateScheduleCalendar
 
         foreach ($schedule->items as $item) {
             $courseClass = $item->courseClass;
+
+            if ($courseClass === null) {
+                continue;
+            }
+
             $course = $courseClass->course;
 
             foreach ($courseClass->schedules as $classSchedule) {
                 $startTime = $courseClass->start_time ? substr($courseClass->start_time, 0, 5) : '09:00';
                 $endTime = $courseClass->end_time ? substr($courseClass->end_time, 0, 5) : '10:00';
                 $descriptionParts = [];
+
+                if ($courseClass->is_tentative) {
+                    $descriptionParts[] = '選課注意事項中提供之視訊面授日期，尚未正式分班，請以正式分班結果為準。';
+                }
 
                 if ($courseClass->teacher_name) {
                     $descriptionParts[] = '老師: '.$courseClass->teacher_name;
@@ -55,12 +64,16 @@ final readonly class GenerateScheduleCalendar
                 $descriptionParts[] = '-----';
                 $descriptionParts[] = '編輯課表: '.route('schedules.show', $schedule);
 
+                $summary = $courseClass->is_tentative
+                    ? '[選課注意事項] '.$course->name.' ('.$courseClass->type->label().')'
+                    : $course->name.' ('.$courseClass->code.')';
+
                 $lines[] = 'BEGIN:VEVENT';
                 $lines[] = 'UID:course-'.$schedule->uuid.'-'.$item->id.'-'.$classSchedule->id.'@noutools.binota.org';
                 $lines[] = 'DTSTAMP:'.now()->format('Ymd\THis\Z');
                 $lines[] = 'DTSTART:'.$this->convertToICSDateTime($classSchedule->date, $startTime);
                 $lines[] = 'DTEND:'.$this->convertToICSDateTime($classSchedule->date, $endTime);
-                $lines[] = 'SUMMARY:'.$this->escapeICSString($course->name.' ('.$courseClass->code.')');
+                $lines[] = 'SUMMARY:'.$this->escapeICSString($summary);
                 $lines[] = 'DESCRIPTION:'.collect($descriptionParts)
                     ->map(fn (string $part) => $this->escapeICSString($part))
                     ->implode('\n');
@@ -74,7 +87,7 @@ final readonly class GenerateScheduleCalendar
                         $lines[] = 'BEGIN:VALARM';
                         $lines[] = 'TRIGGER:'.$this->convertMinutesToAlarmTrigger($offsetMinutes);
                         $lines[] = 'ACTION:DISPLAY';
-                        $lines[] = 'DESCRIPTION:'.$this->escapeICSString('提醒: '.$course->name.' ('.$courseClass->code.')');
+                        $lines[] = 'DESCRIPTION:'.$this->escapeICSString('提醒: '.$summary);
                         $lines[] = 'END:VALARM';
                     }
                 }
@@ -122,13 +135,13 @@ final readonly class GenerateScheduleCalendar
     private function appendExamEvents(array &$lines, StudentSchedule $schedule): void
     {
         $courses = $schedule->items
-            ->map(fn ($item) => $item->courseClass->course)
+            ->map(fn ($item) => $item->course)
             ->unique('id')
             ->values();
 
         foreach ($courses as $course) {
             $firstClass = $schedule->items->first(
-                fn ($item) => $item->courseClass->course->id === $course->id,
+                fn ($item) => $item->course->id === $course->id,
             )?->courseClass;
 
             $this->appendExamEvent($lines, $schedule, $course, $firstClass, 'midterm');

@@ -21,6 +21,7 @@ final class ScheduleExamViewModel extends Data
         public ?string $examTimeStart,
         public ?string $examTimeEnd,
         public ?CarbonInterface $earliestExamAt,
+        public bool $isTentative,
     ) {}
 
     public static function fromCourse(Course $course, ?CourseClass $firstClass): self
@@ -56,6 +57,7 @@ final class ScheduleExamViewModel extends Data
             examTimeStart: $course->exam_time_start,
             examTimeEnd: $course->exam_time_end,
             earliestExamAt: $dates->count() > 0 ? $dates->min() : null,
+            isTentative: $firstClass === null || $firstClass->is_tentative,
         );
     }
 

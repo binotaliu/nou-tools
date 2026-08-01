@@ -19,7 +19,7 @@ test('can view learning progress page', function () {
         )
         ->create();
 
-    $schedule->items()->create(['course_class_id' => $courseClass->id]);
+    $schedule->items()->create(['course_id' => $courseClass->course_id, 'course_class_id' => $courseClass->id]);
 
     $response = $this->get(route('learning-progress.show', [
         'schedule' => $schedule,
@@ -61,7 +61,7 @@ test('creates learning progress record if not exists', function () {
             Course::factory()->state(['term' => '2025B'])
         )
         ->create();
-    $schedule->items()->create(['course_class_id' => $courseClass->id]);
+    $schedule->items()->create(['course_id' => $courseClass->course_id, 'course_class_id' => $courseClass->id]);
 
     // Ensure no learning progress exists
     $this->assertDatabaseMissing('learning_progresses', [
@@ -149,7 +149,7 @@ test('viewmodel reflects marked progress and note after update-then-reload', fun
             Course::factory()->state(['term' => '2025B'])
         )
         ->create();
-    $schedule->items()->create(['course_class_id' => $courseClass->id]);
+    $schedule->items()->create(['course_id' => $courseClass->course_id, 'course_class_id' => $courseClass->id]);
     $courseId = $courseClass->course_id;
 
     LearningProgress::factory()->create([

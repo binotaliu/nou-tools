@@ -8,6 +8,7 @@ use App\Models\CourseClass;
 use App\Models\DiscountStore;
 use App\Models\DiscountStoreComment;
 use App\Models\DiscountStoreReport;
+use App\Models\StudentScheduleItem;
 use App\Models\User;
 use App\Providers\AppServiceProvider;
 use App\View\Components\Button;
@@ -42,6 +43,7 @@ arch()->preset()->strict()
         DiscountStore::class,
         DiscountStoreComment::class,
         DiscountStoreReport::class,
+        StudentScheduleItem::class,
         User::class,
 
         // Filament resource/page/relation-manager classes are built around

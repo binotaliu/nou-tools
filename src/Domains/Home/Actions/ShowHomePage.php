@@ -24,14 +24,16 @@ final readonly class ShowHomePage
         $selectedDate = $this->resolveSelectedDate($input->date);
 
         $courses = Course::with(['classes' => function ($query) use ($selectedDate) {
-            $query->with(['schedules' => function ($scheduleQuery) use ($selectedDate) {
+            $query->official()->with(['schedules' => function ($scheduleQuery) use ($selectedDate) {
                 $scheduleQuery->whereDate('date', $selectedDate);
             }])->whereHas('schedules', function ($scheduleQuery) use ($selectedDate) {
                 $scheduleQuery->whereDate('date', $selectedDate);
             });
         }])
-            ->whereHas('classes.schedules', function ($query) use ($selectedDate) {
-                $query->whereDate('date', $selectedDate);
+            ->whereHas('classes', function ($query) use ($selectedDate) {
+                $query->official()->whereHas('schedules', function ($scheduleQuery) use ($selectedDate) {
+                    $scheduleQuery->whereDate('date', $selectedDate);
+                });
             })
             ->get();
 

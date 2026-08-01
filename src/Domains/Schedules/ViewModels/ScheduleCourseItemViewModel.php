@@ -15,5 +15,7 @@ final class ScheduleCourseItemViewModel extends Data
         public string $time,
         public bool $hasOverride,
         public DateTimeInterface $date,
+        public bool $isTentative = false,
+        public ?string $preferredSessionLabel = null,
     ) {}
 }

@@ -20,7 +20,7 @@ final readonly class BuildScheduleEditorPage
     public function __invoke(Request $request, ?StudentSchedule $schedule = null): ScheduleEditorPageData
     {
         if ($schedule) {
-            $schedule->load(['items.courseClass.course']);
+            $schedule->load(['items.courseClass.course', 'items.course']);
         }
 
         $currentSemester = (string) config('app.current_semester');
@@ -30,9 +30,8 @@ final readonly class BuildScheduleEditorPage
         $courses = ScheduleEditorCourseViewModel::collect(
             Course::query()
                 ->where('term', $selectedTerm)
-                ->whereHas('classes')
                 ->with(['classes' => function ($query) {
-                    $query->orderBy('type');
+                    $query->orderBy('is_tentative')->orderBy('type');
                 }])
                 ->orderBy('name')
                 ->get()

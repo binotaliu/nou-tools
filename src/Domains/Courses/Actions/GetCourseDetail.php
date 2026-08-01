@@ -18,7 +18,7 @@ final readonly class GetCourseDetail
     {
         $course->load([
             'textbook',
-            'classes' => fn ($q) => $q->orderBy('type')->orderBy('code'),
+            'classes' => fn ($q) => $q->official()->orderBy('type')->orderBy('code'),
             'classes.schedules' => fn ($q) => $q->orderBy('date'),
         ]);
 

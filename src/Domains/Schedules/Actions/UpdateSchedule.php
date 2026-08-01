@@ -19,13 +19,14 @@ final class UpdateSchedule
             $schedule->saveOrFail();
 
             $schedule->items()
-                ->whereHas('courseClass.course', fn (Builder $query) => $query->where('term', $input->term))
+                ->whereHas('course', fn (Builder $query) => $query->where('term', $input->term))
                 ->delete();
 
-            foreach ($input->items as $courseClassId) {
+            foreach ($input->items as $itemData) {
                 $item = new StudentScheduleItem;
                 $item->student_schedule_id = $schedule->id;
-                $item->course_class_id = $courseClassId;
+                $item->course_id = $itemData['course_id'];
+                $item->course_class_id = $itemData['class_id'] ?? null;
                 $item->saveOrFail();
             }
 

@@ -20,10 +20,11 @@ final class CreateSchedule
             $schedule->name = $input->name;
             $schedule->saveOrFail();
 
-            foreach ($input->items as $courseClassId) {
+            foreach ($input->items as $itemData) {
                 $item = new StudentScheduleItem;
                 $item->student_schedule_id = $schedule->id;
-                $item->course_class_id = $courseClassId;
+                $item->course_id = $itemData['course_id'];
+                $item->course_class_id = $itemData['class_id'] ?? null;
                 $item->saveOrFail();
             }
 
