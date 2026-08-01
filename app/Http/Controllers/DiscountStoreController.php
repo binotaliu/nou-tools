@@ -52,13 +52,6 @@ final class DiscountStoreController extends Controller
         ]);
     }
 
-    public function submitted(Request $request): View
-    {
-        return view('discount-stores.submitted', [
-            'storeName' => $request->session()->get('submitted_store_name'),
-        ]);
-    }
-
     public function show(DiscountStore $store): View
     {
         abort_unless($store->status === DiscountStoreStatus::Online, 404);

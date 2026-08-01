@@ -42,6 +42,33 @@ final class DiscountStoreFactory extends Factory
         ];
     }
 
+    /**
+     * Backfill city/district/address when the final `type` is Local, since
+     * `create(['type' => ...])` overrides are applied after `definition()`
+     * has already picked its own random type for those fields — leaving a
+     * Local store with blank city/district about two-thirds of the time.
+     */
+    public function configure(): static
+    {
+        return $this->afterMaking(function (DiscountStore $store): void {
+            if ($store->type !== DiscountStoreType::Local) {
+                return;
+            }
+
+            if (blank($store->city) || blank($store->district)) {
+                $taiwanRegionsData = File::json(resource_path('data/taiwan-regions.json'));
+                $randomCityData = fake()->randomElement($taiwanRegionsData);
+
+                $store->city = filled($store->city) ? $store->city : $randomCityData['name'];
+                $store->district = filled($store->district) ? $store->district : fake()->randomElement($randomCityData['districts'])['name'];
+            }
+
+            if (blank($store->address)) {
+                $store->address = fake()->address();
+            }
+        });
+    }
+
     public function online(): static
     {
         return $this->state(fn (): array => ['status' => DiscountStoreStatus::Online]);
