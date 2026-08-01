@@ -38,7 +38,7 @@ it('displays the discount store index page', function () {
     $response->assertSee('測試優惠店家');
     $response->assertSee(route('discount-stores.show', $store), false);
     $response->assertDontSee('回報有效');
-    $response->assertDontSee('留言（審核後顯示）');
+    $response->assertDontSee('留言（確認後顯示）');
 });
 
 it('displays the discount store detail page and adds noindex robots meta', function () {
@@ -64,7 +64,7 @@ it('displays the discount store detail page and adds noindex robots meta', funct
 
     DiscountStoreComment::factory()->for($store, 'store')->create([
         'nickname' => '匿名',
-        'content' => '這是未審核留言',
+        'content' => '這是未確認留言',
         'is_approved' => false,
     ]);
 
@@ -75,10 +75,10 @@ it('displays the discount store detail page and adds noindex robots meta', funct
     $response->assertSee('詳細優惠內容');
     $response->assertSee('最新回報');
     $response->assertSee('目前還沒有回報資料。');
-    $response->assertSee('留言（審核後顯示）');
+    $response->assertSee('留言（確認後顯示）');
     $response->assertSee('學生小芳');
     $response->assertSee('這個優惠很棒');
-    $response->assertDontSee('這是未審核留言');
+    $response->assertDontSee('這是未確認留言');
     $response->assertSee('x-ref="mapContainer"', false);
     $response->assertSee('<meta name="robots" content="noindex, nofollow" />', false);
 });
@@ -154,7 +154,7 @@ it('only shows online stores', function () {
     DiscountStore::factory()
         ->for($this->category, 'category')
         ->create([
-            'name' => '待審核店家',
+            'name' => '待確認店家',
             'status' => DiscountStoreStatus::Pending,
         ]);
 
@@ -168,7 +168,7 @@ it('only shows online stores', function () {
     $response = get(route('discount-stores.index'));
 
     $response->assertSee('上線店家');
-    $response->assertDontSee('待審核店家');
+    $response->assertDontSee('待確認店家');
     $response->assertDontSee('已過期店家');
 });
 
@@ -460,7 +460,7 @@ it('shows approved comments on store detail page', function () {
 
     DiscountStoreComment::factory()->for($store, 'store')->create([
         'nickname' => '匿名',
-        'content' => '這是未審核留言',
+        'content' => '這是未確認留言',
         'is_approved' => false,
     ]);
 
@@ -468,7 +468,7 @@ it('shows approved comments on store detail page', function () {
 
     $response->assertSee('學生小芳');
     $response->assertSee('這個優惠很棒');
-    $response->assertDontSee('這是未審核留言');
+    $response->assertDontSee('這是未確認留言');
 });
 
 it('shows empty state when no stores match', function () {
@@ -570,7 +570,7 @@ it('returns a 404 for the discount store show markdown page when the store is no
     $store = DiscountStore::factory()
         ->for($this->category, 'category')
         ->create([
-            'name' => '待審核店家',
+            'name' => '待確認店家',
             'status' => DiscountStoreStatus::Pending,
         ]);
 

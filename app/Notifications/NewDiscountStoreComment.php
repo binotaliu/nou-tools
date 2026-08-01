@@ -33,8 +33,8 @@ final class NewDiscountStoreComment extends Notification
         return DiscordMessage::create()
             ->embed(
                 DiscordEmbed::make(
-                    title: '新留言待審核',
-                    description: '**'.$this->store->name.'** 收到新的留言，請前往管理後台審核。',
+                    title: '新留言待確認',
+                    description: '**'.$this->store->name.'** 收到新的留言，請前往管理後台確認。',
                     url: url("/admin/discount-stores/{$this->store->id}/edit"),
                 )->with([
                     'color' => '16426522',

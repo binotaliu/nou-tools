@@ -13,7 +13,7 @@ enum DiscountStoreStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Pending => '待審核',
+            self::Pending => '待確認',
             self::Online => '上架中',
             self::Expired => '已失效',
         };

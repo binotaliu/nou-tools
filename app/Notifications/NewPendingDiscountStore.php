@@ -31,8 +31,8 @@ final class NewPendingDiscountStore extends Notification
         return DiscordMessage::create()
             ->embed(
                 DiscordEmbed::make(
-                    title: '新店家待審核',
-                    description: $this->store->name.' 等待審核中',
+                    title: '新店家待確認',
+                    description: $this->store->name.' 等待確認中',
                     url: url("/admin/discount-stores/{$this->store->id}/edit"),
                 )->with([
                     'color' => '16426522',

@@ -30,7 +30,7 @@ class CommentsRelationManager extends RelationManager
                     ->label('內容')
                     ->limit(80),
                 IconColumn::make('is_approved')
-                    ->label('已審核')
+                    ->label('已確認')
                     ->boolean(),
                 TextColumn::make('created_at')
                     ->label('留言時間')
@@ -39,10 +39,10 @@ class CommentsRelationManager extends RelationManager
             ])
             ->filters([
                 SelectFilter::make('is_approved')
-                    ->label('審核狀態')
+                    ->label('確認狀態')
                     ->options([
-                        '1' => '已審核',
-                        '0' => '未審核',
+                        '1' => '已確認',
+                        '0' => '未確認',
                     ]),
             ])
             ->defaultSort('created_at', 'desc')

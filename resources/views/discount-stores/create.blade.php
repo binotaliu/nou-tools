@@ -10,7 +10,7 @@
             <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
                 新增優惠店家
             </h2>
-            <p class="text-sm text-warm-600 dark:text-zinc-400">填寫下方表單來送出新的學生優惠店家。送出後需經管理員審核才會顯示在前台。</p>
+            <p class="text-sm text-warm-600 dark:text-zinc-400">填寫下方表單來送出新的學生優惠店家。送出後需經管理員確認才會顯示在前台。</p>
         </div>
 
         <x-card>

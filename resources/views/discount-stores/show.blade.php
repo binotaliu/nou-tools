@@ -384,7 +384,7 @@
                 >
                     新增留言
                 </h3>
-                <p class="text-sm text-warm-600 dark:text-zinc-400">歡迎分享使用經驗，留言會在審核後顯示。</p>
+                <p class="text-sm text-warm-600 dark:text-zinc-400">歡迎分享使用經驗，留言會在確認後顯示。</p>
                 <button
                     type="button"
                     class="inline-flex items-center gap-1 rounded-lg bg-warm-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-warm-900"
@@ -431,7 +431,7 @@
                                     type="text"
                                     name="content"
                                     class="flex-1 rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
-                                    placeholder="留言（審核後顯示）..."
+                                    placeholder="留言（確認後顯示）..."
                                     maxlength="1000"
                                     rows="5"
                                     required
@@ -445,7 +445,7 @@
                                     explicit
                                 />
                             </div>
-                            <p class="text-xs text-warm-500 dark:text-zinc-400">為避免垃圾留言，留言將由管理員審核後才會顯示出來。</p>
+                            <p class="text-xs text-warm-500 dark:text-zinc-400">為避免垃圾留言，留言將由管理員確認後才會顯示出來。</p>
                             <div class="flex items-center gap-2">
                                 <button
                                     type="submit"

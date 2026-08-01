@@ -33,6 +33,6 @@ final class DiscountStoreCommentController extends Controller
 
         return redirect()
             ->route('discount-stores.show', $store)
-            ->with('success', '留言已送出，將在審核通過後顯示。');
+            ->with('success', '留言已送出，將在確認通過後顯示。');
     }
 }
