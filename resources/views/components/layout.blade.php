@@ -180,7 +180,9 @@
                 </h1>
 
                 <div class="flex min-h-9.5 items-center gap-2">
-                    <nav class="hidden items-center gap-1 gap-x-6 md:flex">
+                    <nav
+                        class="hidden items-center gap-1 gap-x-6 md:flex print:hidden"
+                    >
                         <a
                             href="{{ $scheduleNavHref }}"
                             @class([
@@ -350,7 +352,7 @@
                                     })
                             },
                         }"
-                        class="pl-2"
+                        class="pl-2 print:hidden"
                     >
                         <button
                             type="button"
@@ -394,7 +396,7 @@
             <div
                 x-show="open"
                 @click.outside="open = false"
-                class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-warm-200 bg-white p-3 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900"
+                class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-warm-200 bg-white p-3 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900 print:hidden"
                 x-cloak
             >
                 <a
