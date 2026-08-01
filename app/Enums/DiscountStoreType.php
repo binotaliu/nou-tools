@@ -18,4 +18,13 @@ enum DiscountStoreType: string
             self::Local => '地區性',
         };
     }
+
+    public static function getLabels(): array
+    {
+        return array_reduce(self::cases(), function (array $carry, self $case): array {
+            $carry[$case->value] = $case->label();
+
+            return $carry;
+        }, []);
+    }
 }

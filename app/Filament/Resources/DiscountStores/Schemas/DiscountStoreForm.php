@@ -30,12 +30,12 @@ class DiscountStoreForm
                             ->maxLength(255),
                         Select::make('status')
                             ->label('狀態')
-                            ->options(DiscountStoreStatus::class)
+                            ->options(DiscountStoreStatus::getLabels())
                             ->required()
                             ->default(DiscountStoreStatus::Pending),
                         Select::make('type')
                             ->label('類型')
-                            ->options(DiscountStoreType::class)
+                            ->options(DiscountStoreType::getLabels())
                             ->required()
                             ->live(),
                         Select::make('category_id')

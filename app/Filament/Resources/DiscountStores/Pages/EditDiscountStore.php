@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountStores\Pages;
 
+use App\Enums\DiscountStoreStatus;
 use App\Filament\Resources\DiscountStores\DiscountStoreResource;
 use App\Models\DiscountStore;
 use Filament\Actions\Action;
@@ -52,9 +53,51 @@ class EditDiscountStore extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            $this->getPublishAction(),
+            $this->getUnpublishAction(),
             $this->getGeoCodeAction(),
             DeleteAction::make(),
         ];
+    }
+
+    private function getPublishAction(): Action
+    {
+        return Action::make('publish')
+            ->label('上架')
+            ->icon('heroicon-o-arrow-up-circle')
+            ->color('success')
+            ->requiresConfirmation()
+            ->visible(fn (DiscountStore $record): bool => $record->status === DiscountStoreStatus::Pending)
+            ->action(function (DiscountStore $record): void {
+                $record->update(['status' => DiscountStoreStatus::Online]);
+
+                $this->form->fillPartially(['status' => DiscountStoreStatus::Online], ['status']);
+
+                Notification::make()
+                    ->success()
+                    ->title('已上架')
+                    ->send();
+            });
+    }
+
+    private function getUnpublishAction(): Action
+    {
+        return Action::make('unpublish')
+            ->label('下架')
+            ->icon('heroicon-o-arrow-down-circle')
+            ->color('danger')
+            ->requiresConfirmation()
+            ->visible(fn (DiscountStore $record): bool => $record->status === DiscountStoreStatus::Online)
+            ->action(function (DiscountStore $record): void {
+                $record->update(['status' => DiscountStoreStatus::Expired]);
+
+                $this->form->fillPartially(['status' => DiscountStoreStatus::Expired], ['status']);
+
+                Notification::make()
+                    ->success()
+                    ->title('已下架')
+                    ->send();
+            });
     }
 
     private function getGeoCodeAction(): Action
