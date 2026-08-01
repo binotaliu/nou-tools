@@ -1,8 +1,6 @@
 <?php
 
-use App\Enums\CourseClassType;
 use App\Models\Course;
-use App\Models\CourseClass;
 
 test('course schedule page loads successfully', function () {
     $response = $this->get(route('course.schedule'));
@@ -11,60 +9,11 @@ test('course schedule page loads successfully', function () {
         ->assertSee('本學期開課表');
 });
 
-test('courses with the same final exam weekday and time are grouped together', function () {
-    $term = config('app.current_semester');
-    $finalDate = now()->next('Saturday');
-
-    $courseA = Course::factory()->create([
-        'name' => 'Course A',
-        'term' => $term,
-        'final_date' => $finalDate,
-        'exam_time_start' => '15:00',
-        'exam_time_end' => '16:10',
-    ]);
-    $courseB = Course::factory()->create([
-        'name' => 'Course B',
-        'term' => $term,
-        'final_date' => $finalDate,
-        'exam_time_start' => '15:00',
-        'exam_time_end' => '16:10',
-    ]);
-
-    $response = $this->get(route('course.schedule'));
-
-    $response->assertStatus(200)
-        ->assertSeeInOrder(['15:00 - 16:10', 'Course A', 'Course B']);
-});
-
-test('courses with a full remote or micro credit class are shown together in one section, not general', function () {
-    $term = config('app.current_semester');
-
-    $remoteCourse = Course::factory()->create([
-        'name' => 'Remote Course',
-        'term' => $term,
-        'final_date' => now()->next('Saturday'),
-        'exam_time_start' => '09:00',
-        'exam_time_end' => '10:10',
-    ]);
-    CourseClass::factory()->create([
-        'course_id' => $remoteCourse->id,
-        'type' => CourseClassType::FullRemote,
-    ]);
-
-    $microCreditCourse = Course::factory()->create([
-        'name' => 'Micro Credit Course',
-        'term' => $term,
-    ]);
-    CourseClass::factory()->create([
-        'course_id' => $microCreditCourse->id,
-        'type' => CourseClassType::MicroCredit,
-    ]);
-
-    $response = $this->get(route('course.schedule'));
-
-    $response->assertStatus(200)
-        ->assertSeeInOrder(['微學分與全遠距', 'Micro Credit Course', 'Remote Course']);
-});
+// Course grouping (by exam time / department / credits) and the split
+// between 一般課程 and 微學分與全遠距 are rendered entirely client-side by
+// Alpine from the JSON payload embedded in the page, so ordering and
+// grouping are only observable with a real browser. See
+// tests/Browser/CourseScheduleTest.php.
 
 test('courses without a final exam time are excluded from the general section', function () {
     $term = config('app.current_semester');

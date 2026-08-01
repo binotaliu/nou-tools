@@ -7,6 +7,10 @@
                 'department' => $course->department,
                 'credits' => $course->credits,
                 'section' => 'general',
+                'examLabel' => $group->label,
+                'examWeekdayOrder' => $group->weekdayOrder,
+                'examTimeStart' => $group->examTimeStart,
+                'url' => route('course.show', $course->id),
             ]))
             ->concat(
                 $page->microCreditOrRemoteCourses->toCollection()->map(fn ($course) => [
@@ -15,6 +19,10 @@
                     'department' => $course->department,
                     'credits' => $course->credits,
                     'section' => 'micro',
+                    'examLabel' => null,
+                    'examWeekdayOrder' => null,
+                    'examTimeStart' => null,
+                    'url' => route('course.show', $course->id),
                 ])
             )
             ->values();
@@ -88,6 +96,24 @@
                         placeholder="課程名稱..."
                         class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                     />
+                </div>
+                <div>
+                    <label
+                        for="groupBy"
+                        class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+                    >
+                        分組方式
+                    </label>
+                    <x-select
+                        id="groupBy"
+                        x-model="groupBy"
+                        aria-label="分組方式"
+                        data-testid="group-by-select"
+                    >
+                        <option value="exam">考試時間</option>
+                        <option value="department">學系</option>
+                        <option value="credits">學分數</option>
+                    </x-select>
                 </div>
                 <div>
                     <label
@@ -200,192 +226,169 @@
             </form>
         </x-card>
 
-        <x-card class="mb-6" title="一般課程">
-            @if ($page->groups->count() === 0)
-                <p class="text-sm text-warm-600 dark:text-zinc-400">目前查無考試時間資料。</p>
-            @else
-                <div class="space-y-6">
-                    @foreach ($page->groups as $group)
-                        @php
-                            $groupCourseIds = $group->courses->toCollection()->pluck('id')->implode(',');
-                        @endphp
-                        <div
-                            x-show="groupHasVisibleCourses('{{ $groupCourseIds }}')"
-                        >
+        <template x-for="section in sections" :key="section.key">
+            <x-card
+                class="mb-6"
+                x-bind:data-testid="'schedule-section-' + section.key"
+            >
+                <h2
+                    class="mb-4 text-xl font-semibold text-warm-900 dark:text-zinc-100"
+                    x-text="section.title"
+                ></h2>
+
+                <template x-if="section.groups.length === 0">
+                    <p
+                        class="text-sm text-warm-600 dark:text-zinc-400"
+                        x-text="section.emptyMessage"
+                    ></p>
+                </template>
+
+                <div class="space-y-6" x-show="section.groups.length > 0">
+                    <template x-for="group in section.groups" :key="group.key">
+                        <div>
                             <div
+                                x-show="group.label"
                                 class="mb-3 font-semibold text-warm-900 dark:text-zinc-100"
-                            >
-                                {{ $group->label }}
-                            </div>
+                                x-text="group.label"
+                            ></div>
 
                             {{-- 桌面版表格 --}}
-                            <div class="hidden overflow-x-auto md:block">
-                                <x-table :caption="$group->label">
-                                    <x-table-head>
-                                        <x-table-row>
-                                            <x-table-head-column>
+                            <div
+                                class="hidden overflow-x-auto md:block"
+                                data-testid="schedule-desktop-table"
+                            >
+                                <table
+                                    class="w-full border-collapse overflow-hidden rounded text-left text-warm-700 dark:text-zinc-300"
+                                >
+                                    <caption class="sr-only">
+                                        課程列表
+                                    </caption>
+                                    <thead
+                                        class="border-b-2 border-warm-300 bg-warm-100 dark:border-zinc-600 dark:bg-zinc-900"
+                                    >
+                                        <tr>
+                                            <th
+                                                scope="col"
+                                                class="px-4 py-3 font-bold text-warm-900 dark:text-zinc-100"
+                                            >
                                                 課程名稱
-                                            </x-table-head-column>
-                                            <x-table-head-column class="w-42">
-                                                學系
-                                            </x-table-head-column>
-                                            <x-table-head-column
-                                                class="w-16 text-center"
-                                            >
-                                                學分
-                                            </x-table-head-column>
-                                        </x-table-row>
-                                    </x-table-head>
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                class="px-4 py-3 font-bold text-warm-900 dark:text-zinc-100"
+                                                :class="fieldMeta[columns[0]]
+                                                    .thClass"
+                                                x-text="
+                                                    fieldMeta[columns[0]].title
+                                                "
+                                            ></th>
+                                            <th
+                                                scope="col"
+                                                class="px-4 py-3 font-bold text-warm-900 dark:text-zinc-100"
+                                                :class="fieldMeta[columns[1]]
+                                                    .thClass"
+                                                x-text="
+                                                    fieldMeta[columns[1]].title
+                                                "
+                                            ></th>
+                                        </tr>
+                                    </thead>
 
-                                    <x-table-body>
-                                        @foreach ($group->courses as $course)
-                                            <x-table-row
-                                                x-show="isCourseVisible({{ $course->id }})"
+                                    <tbody>
+                                        <template
+                                            x-for="course in group.courses"
+                                            :key="course.id"
+                                        >
+                                            <tr
+                                                class="border-b border-warm-200 hover:bg-warm-50 dark:border-zinc-700 dark:hover:bg-zinc-950"
                                             >
-                                                <x-table-head-column
+                                                <th
                                                     scope="row"
+                                                    class="px-4 py-3 font-normal text-warm-800 dark:text-zinc-200"
                                                 >
-                                                    <x-link-button
-                                                        :href="route('course.show', $course->id)"
-                                                        variant="link"
-                                                    >
-                                                        {{ $course->name }}
-                                                    </x-link-button>
-                                                </x-table-head-column>
-                                                <x-table-column>
-                                                    {{ $course->department ?? '—' }}
-                                                </x-table-column>
-                                                <x-table-column
-                                                    class="text-center tabular-nums"
-                                                >
-                                                    {{ $course->credits ?? '—' }}
-                                                </x-table-column>
-                                            </x-table-row>
-                                        @endforeach
-                                    </x-table-body>
-                                </x-table>
+                                                    <a
+                                                        :href="course.url"
+                                                        class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                                                        x-text="course.name"
+                                                    ></a>
+                                                </th>
+                                                <td
+                                                    class="px-4 py-3 text-warm-800 dark:text-zinc-200"
+                                                    :class="fieldMeta[
+                                                        columns[0]
+                                                    ].tdClass"
+                                                    x-text="
+                                                        columnValue(
+                                                            course,
+                                                            columns[0]
+                                                        )
+                                                    "
+                                                ></td>
+                                                <td
+                                                    class="px-4 py-3 text-warm-800 dark:text-zinc-200"
+                                                    :class="fieldMeta[
+                                                        columns[1]
+                                                    ].tdClass"
+                                                    x-text="
+                                                        columnValue(
+                                                            course,
+                                                            columns[1]
+                                                        )
+                                                    "
+                                                ></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
                             </div>
 
                             {{-- 手機版卡片列表 --}}
-                            <div class="space-y-3 md:hidden">
-                                @foreach ($group->courses as $course)
+                            <div
+                                class="space-y-3 md:hidden"
+                                data-testid="schedule-mobile-cards"
+                            >
+                                <template
+                                    x-for="course in group.courses"
+                                    :key="course.id"
+                                >
                                     <div
-                                        x-show="isCourseVisible({{ $course->id }})"
                                         class="rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
                                     >
-                                        <x-link-button
-                                            :href="route('course.show', $course->id)"
-                                            variant="link"
-                                            class="text-base font-semibold"
-                                        >
-                                            {{ $course->name }}
-                                        </x-link-button>
+                                        <a
+                                            :href="course.url"
+                                            class="text-base font-semibold text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                                            x-text="course.name"
+                                        ></a>
                                         <div
                                             class="mt-1 flex items-center gap-2 text-sm text-warm-600 dark:text-zinc-400"
                                         >
                                             <span
-                                                >{{ $course->department ?? '—' }}</span
-                                            >
+                                                x-text="
+                                                    mobileColumnValue(
+                                                        course,
+                                                        columns[0]
+                                                    )
+                                                "
+                                            ></span>
                                             <span>·</span>
-                                            <span class="tabular-nums"
-                                                >{{ $course->credits ?? '—' }} 學分</span
-                                            >
+                                            <span
+                                                class="tabular-nums"
+                                                x-text="
+                                                    mobileColumnValue(
+                                                        course,
+                                                        columns[1]
+                                                    )
+                                                "
+                                            ></span>
                                         </div>
                                     </div>
-                                @endforeach
+                                </template>
                             </div>
                         </div>
-                    @endforeach
+                    </template>
                 </div>
-
-                <p
-                    class="text-sm text-warm-600 dark:text-zinc-400"
-                    x-show="generalVisibleCount === 0"
-                >目前沒有符合篩選條件的課程。</p>
-            @endif
-        </x-card>
-
-        <x-card class="mb-6" title="微學分與全遠距">
-            @if ($page->microCreditOrRemoteCourses->count() === 0)
-                <p class="text-sm text-warm-600 dark:text-zinc-400">目前查無微學分或全遠距課程。</p>
-            @else
-                {{-- 桌面版表格 --}}
-                <div class="hidden overflow-x-auto md:block">
-                    <x-table caption="微學分與全遠距">
-                        <x-table-head>
-                            <x-table-row>
-                                <x-table-head-column>
-                                    課程名稱
-                                </x-table-head-column>
-                                <x-table-head-column class="w-42">
-                                    學系
-                                </x-table-head-column>
-                                <x-table-head-column class="w-16 text-center">
-                                    學分
-                                </x-table-head-column>
-                            </x-table-row>
-                        </x-table-head>
-
-                        <x-table-body>
-                            @foreach ($page->microCreditOrRemoteCourses as $course)
-                                <x-table-row
-                                    x-show="isCourseVisible({{ $course->id }})"
-                                >
-                                    <x-table-head-column scope="row">
-                                        <x-link-button
-                                            :href="route('course.show', $course->id)"
-                                            variant="link"
-                                        >
-                                            {{ $course->name }}
-                                        </x-link-button>
-                                    </x-table-head-column>
-                                    <x-table-column>
-                                        {{ $course->department ?? '—' }}
-                                    </x-table-column>
-                                    <x-table-column
-                                        class="text-center tabular-nums"
-                                    >
-                                        {{ $course->credits ?? '—' }}
-                                    </x-table-column>
-                                </x-table-row>
-                            @endforeach
-                        </x-table-body>
-                    </x-table>
-                </div>
-
-                {{-- 手機版卡片列表 --}}
-                <div class="space-y-3 md:hidden">
-                    @foreach ($page->microCreditOrRemoteCourses as $course)
-                        <div
-                            x-show="isCourseVisible({{ $course->id }})"
-                            class="rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
-                        >
-                            <x-link-button
-                                :href="route('course.show', $course->id)"
-                                variant="link"
-                                class="text-base font-semibold"
-                            >
-                                {{ $course->name }}
-                            </x-link-button>
-                            <div
-                                class="mt-1 flex items-center gap-2 text-sm text-warm-600 dark:text-zinc-400"
-                            >
-                                <span>{{ $course->department ?? '—' }}</span>
-                                <span>·</span>
-                                <span class="tabular-nums"
-                                    >{{ $course->credits ?? '—' }} 學分</span
-                                >
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                <p
-                    class="text-sm text-warm-600 dark:text-zinc-400"
-                    x-show="microVisibleCount === 0"
-                >目前沒有符合篩選條件的課程。</p>
-            @endif
-        </x-card>
+            </x-card>
+        </template>
     </div>
 
     <script>
@@ -395,53 +398,235 @@
                 search: '',
                 department: [],
                 credits: [],
+                groupBy: 'exam',
+
+                fieldMeta: {
+                    department: { title: '學系', thClass: 'w-42', tdClass: '' },
+                    credits: {
+                        title: '學分',
+                        thClass: 'w-16 text-center',
+                        tdClass: 'text-center tabular-nums',
+                    },
+                    examLabel: {
+                        title: '考試時間',
+                        thClass: 'w-56',
+                        tdClass: '',
+                    },
+                },
 
                 get normalizedSearch() {
                     return this.search.trim().toLowerCase()
                 },
 
-                get filteredCourseIds() {
-                    return new Set(
-                        this.courses
-                            .filter(course => {
-                                const matchesSearch =
-                                    this.normalizedSearch === '' ||
-                                    course.name
-                                        .toLowerCase()
-                                        .includes(this.normalizedSearch)
-                                const matchesDepartment =
-                                    this.department.length === 0 ||
-                                    this.department.includes(course.department)
-                                const matchesCredits =
-                                    this.credits.length === 0 ||
-                                    this.credits.includes(
-                                        String(course.credits)
-                                    )
+                get filteredCourses() {
+                    return this.courses.filter(course => {
+                        const matchesSearch =
+                            this.normalizedSearch === '' ||
+                            course.name
+                                .toLowerCase()
+                                .includes(this.normalizedSearch)
+                        const matchesDepartment =
+                            this.department.length === 0 ||
+                            this.department.includes(course.department)
+                        const matchesCredits =
+                            this.credits.length === 0 ||
+                            this.credits.includes(String(course.credits))
 
-                                return (
-                                    matchesSearch &&
-                                    matchesDepartment &&
-                                    matchesCredits
-                                )
+                        return (
+                            matchesSearch && matchesDepartment && matchesCredits
+                        )
+                    })
+                },
+
+                get columns() {
+                    return {
+                        exam: ['department', 'credits'],
+                        department: ['examLabel', 'credits'],
+                        credits: ['department', 'examLabel'],
+                    }[this.groupBy]
+                },
+
+                get sections() {
+                    if (this.groupBy === 'exam') {
+                        const filtered = this.filteredCourses
+                        const general = filtered.filter(
+                            course => course.section === 'general'
+                        )
+                        const micro = filtered.filter(
+                            course => course.section === 'micro'
+                        )
+
+                        return [
+                            {
+                                key: 'general',
+                                title: '一般課程',
+                                groups: this.groupByExamTime(general),
+                                emptyMessage:
+                                    this.courses.filter(
+                                        course => course.section === 'general'
+                                    ).length === 0
+                                        ? '目前查無考試時間資料。'
+                                        : '目前沒有符合篩選條件的課程。',
+                            },
+                            {
+                                key: 'micro',
+                                title: '微學分與全遠距',
+                                groups: micro.length
+                                    ? [
+                                          {
+                                              key: 'micro',
+                                              label: null,
+                                              courses: this.sortByName(micro),
+                                          },
+                                      ]
+                                    : [],
+                                emptyMessage:
+                                    this.courses.filter(
+                                        course => course.section === 'micro'
+                                    ).length === 0
+                                        ? '目前查無微學分或全遠距課程。'
+                                        : '目前沒有符合篩選條件的課程。',
+                            },
+                        ]
+                    }
+
+                    const filtered = this.filteredCourses
+                    const groups =
+                        this.groupBy === 'department'
+                            ? this.groupByField(
+                                  filtered,
+                                  course => course.department,
+                                  '未分類學系',
+                                  (a, b) => a.localeCompare(b, 'zh-Hant')
+                              )
+                            : this.groupByField(
+                                  filtered,
+                                  course =>
+                                      course.credits === null ||
+                                      course.credits === undefined
+                                          ? null
+                                          : String(course.credits),
+                                  '未標示學分',
+                                  (a, b) => Number(a) - Number(b)
+                              )
+
+                    return [
+                        {
+                            key: this.groupBy,
+                            title:
+                                this.groupBy === 'department'
+                                    ? '依學系分組'
+                                    : '依學分數分組',
+                            groups,
+                            emptyMessage:
+                                this.courses.length === 0
+                                    ? '目前查無課程資料。'
+                                    : '目前沒有符合篩選條件的課程。',
+                        },
+                    ]
+                },
+
+                sortByName(courses) {
+                    return courses
+                        .slice()
+                        .sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant'))
+                },
+
+                groupByExamTime(courses) {
+                    const map = new Map()
+
+                    courses.forEach(course => {
+                        const key = course.examLabel ?? '未排定考試時間'
+
+                        if (!map.has(key)) {
+                            map.set(key, {
+                                key,
+                                label: key,
+                                weekdayOrder: course.examWeekdayOrder ?? 99,
+                                examTimeStart: course.examTimeStart ?? '',
+                                courses: [],
                             })
-                            .map(course => course.id)
+                        }
+
+                        map.get(key).courses.push(course)
+                    })
+
+                    return Array.from(map.values())
+                        .map(group => ({
+                            ...group,
+                            courses: this.sortByName(group.courses),
+                        }))
+                        .sort(
+                            (a, b) =>
+                                a.weekdayOrder - b.weekdayOrder ||
+                                a.examTimeStart.localeCompare(b.examTimeStart)
+                        )
+                },
+
+                groupByField(courses, keyFn, fallbackLabel, compare) {
+                    const map = new Map()
+
+                    courses.forEach(course => {
+                        const value = keyFn(course)
+                        const key =
+                            value === null ||
+                            value === undefined ||
+                            value === ''
+                                ? '__none__'
+                                : value
+                        const label = key === '__none__' ? fallbackLabel : value
+
+                        if (!map.has(key)) {
+                            map.set(key, {
+                                key,
+                                label,
+                                sortValue: value,
+                                courses: [],
+                            })
+                        }
+
+                        map.get(key).courses.push(course)
+                    })
+
+                    return Array.from(map.values())
+                        .map(group => ({
+                            ...group,
+                            courses: this.sortByName(group.courses),
+                        }))
+                        .sort((a, b) => {
+                            if (a.key === '__none__') {
+                                return 1
+                            }
+                            if (b.key === '__none__') {
+                                return -1
+                            }
+
+                            return compare(a.sortValue, b.sortValue)
+                        })
+                },
+
+                columnValue(course, key) {
+                    if (key === 'department') {
+                        return course.department ?? '—'
+                    }
+                    if (key === 'credits') {
+                        return course.credits ?? '—'
+                    }
+
+                    return (
+                        course.examLabel ??
+                        (course.section === 'micro' ? '微學分/全遠距' : '—')
                     )
                 },
 
-                get generalVisibleCount() {
-                    return this.courses.filter(
-                        course =>
-                            course.section === 'general' &&
-                            this.filteredCourseIds.has(course.id)
-                    ).length
-                },
+                mobileColumnValue(course, key) {
+                    const value = this.columnValue(course, key)
 
-                get microVisibleCount() {
-                    return this.courses.filter(
-                        course =>
-                            course.section === 'micro' &&
-                            this.filteredCourseIds.has(course.id)
-                    ).length
+                    return key === 'credits' &&
+                        course.credits !== null &&
+                        course.credits !== undefined
+                        ? `${value} 學分`
+                        : value
                 },
 
                 get hasFilters() {
@@ -450,17 +635,6 @@
                         this.department.length ||
                         this.credits.length
                     )
-                },
-
-                isCourseVisible(courseId) {
-                    return this.filteredCourseIds.has(Number(courseId))
-                },
-
-                groupHasVisibleCourses(courseIds) {
-                    return courseIds
-                        .split(',')
-                        .filter(Boolean)
-                        .some(id => this.filteredCourseIds.has(Number(id)))
                 },
 
                 clearFilters() {
