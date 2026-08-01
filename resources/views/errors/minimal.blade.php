@@ -25,7 +25,7 @@
 <html lang="zh-hant">
 <head>
     {{-- Anti-flash-of-wrong-theme: must run synchronously before any CSS/paint --}}
-    <script>
+    <script @cspNonce>
         ;(() => {
             const stored = localStorage.getItem('theme') || 'system'
             const prefersDark = window.matchMedia(
@@ -525,7 +525,7 @@
 
                     <div class="flex gap-3">
                         <button
-                            onclick="history.back()"
+                            id="back-button"
                             class="flex-1 rounded-md border border-warm-200 px-4 py-2 text-center font-medium text-warm-700 transition-colors hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                         >
                             回到上一頁
@@ -541,5 +541,11 @@
             </div>
         </div>
     </main>
+
+    <script @cspNonce>
+        document
+            .getElementById('back-button')
+            .addEventListener('click', () => history.back())
+    </script>
 </body>
 </html>

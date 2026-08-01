@@ -62,39 +62,10 @@
                     {{-- Article Header --}}
                     <header
                         class="mb-6 border-b border-warm-200 pb-6 dark:border-zinc-700"
-                        x-data="{
-                            showShareModal: false,
-                            copied: false,
+                        x-data="nouArticleShare({
                             shareTitle: {{ Js::from($viewModel->article->title) }},
                             shareUrl: {{ Js::from(url()->current()) }},
-                            async share() {
-                                if (navigator.share) {
-                                    try {
-                                        await navigator.share({
-                                            title: this.shareTitle,
-                                            url: this.shareUrl,
-                                        })
-                                    } catch (e) {
-                                        // User cancelled the share sheet; nothing to do.
-                                    }
-
-                                    return
-                                }
-
-                                this.showShareModal = true
-                            },
-                            async copy() {
-                                try {
-                                    await navigator.clipboard.writeText(this.shareUrl)
-                                } catch (e) {
-                                    this.$refs.shareInput.select()
-                                    document.execCommand('copy')
-                                }
-
-                                this.copied = true
-                                setTimeout(() => (this.copied = false), 2000)
-                            },
-                        }"
+                        })"
                     >
                         <div
                             class="mb-3 flex items-start justify-between gap-4"

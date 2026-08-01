@@ -132,7 +132,7 @@ it('editor page lists courses without any classes yet', function () {
 
     $response->assertStatus(200)
         ->assertSee('Map Only Course')
-        ->assertSee('"has_classes":false', false);
+        ->assertSee('&quot;has_classes&quot;:false', false);
 });
 
 it('updating a schedule replaces pending items scoped to the current term only', function () {
@@ -286,9 +286,9 @@ it('editor page shows a tentative class option for a pending course after import
     $response = $this->get(route('schedules.create', ['term' => '2025B']));
 
     $response->assertStatus(200)
-        ->assertSee('"has_classes":true', false)
-        ->assertSee('"is_tentative":true', false)
-        ->assertSee('"type":"morning"', false);
+        ->assertSee('&quot;has_classes&quot;:true', false)
+        ->assertSee('&quot;is_tentative&quot;:true', false)
+        ->assertSee('&quot;type&quot;:&quot;morning&quot;', false);
 });
 
 it('shows the chosen tentative class and notice disclaimer on the schedule show page', function () {

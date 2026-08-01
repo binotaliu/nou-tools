@@ -22,7 +22,7 @@ final class Greeting extends Component
     {
         // The greeting text, current date, and semester week are rendered on
         // the client from the viewer's local clock (see resources/js/app.js,
-        // window.nouGreeting), so overseas students get a greeting that
+        // window.nouToolsGreeting), so overseas students get a greeting that
         // matches their own time and the page stays correct when served from
         // an offline cache. Here we only expose the static, timezone-independent
         // semester facts.

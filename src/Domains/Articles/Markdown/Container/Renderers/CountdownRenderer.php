@@ -20,7 +20,7 @@ use NouTools\Domains\Articles\Markdown\Support\InlineTextExtractor;
  * count is rendered server-side against "today" in Asia/Taipei (matching
  * how school-calendar dates are anchored elsewhere in the app, see
  * `ListUpcomingSchoolEvents`) and then kept live client-side by
- * `window.nouCountdown` in app.js, so it still works without JavaScript.
+ * `window.nouToolsCountdown` in app.js, so it still works without JavaScript.
  */
 final class CountdownRenderer implements ContainerRendererInterface
 {
@@ -72,7 +72,7 @@ final class CountdownRenderer implements ContainerRendererInterface
 
         return new HtmlElement('div', [
             'class' => 'md-countdown-item',
-            'x-data' => 'nouCountdown('.$config.')',
+            'x-data' => 'nouToolsCountdown('.$config.')',
         ], [
             new HtmlElement('p', ['class' => 'md-countdown-label'], Xml::escape($label)),
             new HtmlElement('p', ['class' => 'md-countdown-range'], Xml::escape($rangeText)),

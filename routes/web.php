@@ -1,5 +1,6 @@
 <?php
 
+use App\Csp\DocsApiPolicy;
 use App\Enums\ArticleType;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
@@ -32,10 +33,13 @@ use App\Http\Controllers\ScheduleRememberController;
 use App\Http\Controllers\ScheduleSubscribeController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
+use Spatie\Csp\AddCspHeaders;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
-Route::view('/docs/api', 'redocly')->name('docs.api.view');
+Route::view('/docs/api', 'redocly')
+    ->middleware(AddCspHeaders::class.':'.DocsApiPolicy::class)
+    ->name('docs.api.view');
 Route::get('/docs/api.yaml', function () {
     return response()->file(base_path('docs/openapi.yaml'), [
         'Content-Type' => 'application/yaml; charset=utf-8',

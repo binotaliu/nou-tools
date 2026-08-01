@@ -1,5 +1,5 @@
 <div
-    x-data="nouGreeting({
+    x-data="nouToolsGreeting({
                 semesterLabel: {{ Js::from($semesterLabel) }},
                 semesterCode: {{ Js::from($semesterCode) }},
                 semesterStart: {{ Js::from($semesterStart) }},

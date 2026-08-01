@@ -11,7 +11,7 @@ final class ListUpcomingSchoolEvents
     /**
      * Raw events for a semester, keyed as plain Y-m-d strings. Status,
      * days-until, and which event to show as the countdown are computed
-     * client-side (see window.nouSchoolCalendar in resources/js/app.js),
+     * client-side (see window.nouToolsSchoolCalendar in resources/js/app.js),
      * anchored to the viewer's Taipei calendar date rather than the server
      * clock.
      *

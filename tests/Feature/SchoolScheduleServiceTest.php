@@ -3,7 +3,7 @@
 use NouTools\Domains\Shared\SchoolCalendar\Actions\ListUpcomingSchoolEvents;
 
 // Status/daysUntil/which-event-is-the-countdown used to be computed here,
-// but now happen client-side (see window.nouSchoolCalendar in
+// but now happen client-side (see window.nouToolsSchoolCalendar in
 // resources/js/app.js) so the calendar stays anchored to Asia/Taipei from
 // the viewer's own clock. This action's only remaining job is handing the
 // client raw, still-relevant events.

@@ -27,19 +27,9 @@
             method="POST"
             action="{{ route('schedules.customize.update', $viewModel->schedule) }}"
             class="space-y-6"
-            x-data="{
-                links: {{ Js::from(old('custom_links', $viewModel->customLinks->toArray())) }},
-                addLink() {
-                    if (this.links.length >= 20) {
-                        return
-                    }
-
-                    this.links.push({ title: '', url: '' })
-                },
-                removeLink(index) {
-                    this.links.splice(index, 1)
-                },
-            }"
+            x-data="nouScheduleCustomize({
+                links: {{ Js::encode(old('custom_links', $viewModel->customLinks->toArray())) }},
+            })"
         >
             @csrf
             @method('PUT')
@@ -125,7 +115,9 @@
                                     </label>
                                     <input
                                         type="text"
-                                        :name="`custom_links[${index}][title]`"
+                                        :name="'custom_links[' +
+                                        index +
+                                        '][title]'"
                                         x-model="link.title"
                                         maxlength="50"
                                         placeholder="例如：我的課程群組"
@@ -141,7 +133,9 @@
                                     </label>
                                     <input
                                         type="url"
-                                        :name="`custom_links[${index}][url]`"
+                                        :name="'custom_links[' +
+                                        index +
+                                        '][url]'"
                                         x-model="link.url"
                                         maxlength="2048"
                                         placeholder="https://example.com"

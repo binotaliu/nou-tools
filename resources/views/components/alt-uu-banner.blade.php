@@ -1,16 +1,6 @@
 <div
     {{ $attributes->merge(['class' => 'mb-6']) }}
-    x-data="{
-        storageKey: 'alt_uu_promo_banner_dismissed_v1',
-        visible: true,
-        init() {
-            this.visible = localStorage.getItem(this.storageKey) !== '1'
-        },
-        dismiss() {
-            this.visible = false
-            localStorage.setItem(this.storageKey, '1')
-        },
-    }"
+    x-data="nouAltUuBanner"
     x-show="visible"
     x-transition.opacity.duration.200ms
     x-cloak

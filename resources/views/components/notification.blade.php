@@ -28,8 +28,7 @@
         <!-- Notification panel, dynamically inserted when needed -->
         <div
             {{ $attributes->merge(['class' => 'pointer-events-auto w-full max-w-sm translate-y-0 transform rounded-lg bg-white dark:bg-zinc-900 opacity-100 border border-warm-200 dark:border-zinc-700 shadow outline-1 -outline-offset-1 outline-white/10 transition duration-300 ease-out sm:translate-x-0 starting:translate-y-2 starting:opacity-0 starting:sm:translate-x-2 starting:sm:translate-y-0 z-50']) }}
-            x-data="{ show: true }"
-            x-init="setTimeout(() => (show = false), 4000)"
+            x-data="nouNotification"
             x-show="show"
             x-cloak
             x-transition:enter="transform transition duration-300 ease-out"

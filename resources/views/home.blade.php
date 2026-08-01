@@ -106,7 +106,7 @@
 
         {{-- 今日面授 --}}
         <x-card
-            x-data="{ date: '{{ $viewModel->selectedDate }}' }"
+            x-data="nouDatePicker({ date: '{{ $viewModel->selectedDate }}' })"
             title="今日視訊面授"
         >
             <div class="flex items-center justify-between">
@@ -122,7 +122,7 @@
                         id="video-course-date"
                         class="rounded border px-3 py-1 text-sm"
                         x-model="date"
-                        @change="window.location = `?date=${date}`"
+                        @change="navigate()"
                         :value="date"
                         data-offline-disable
                     />

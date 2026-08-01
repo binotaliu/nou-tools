@@ -3,13 +3,13 @@
     countdown and "still active" filtering must track the viewer's own
     clock (offline caching, long-lived tabs) — but the calendar itself is
     Taipei's academic calendar, so status/days-until stay anchored to
-    Asia/Taipei rather than the viewer's local date (see nouSchoolCalendar
+    Asia/Taipei rather than the viewer's local date (see nouToolsSchoolCalendar
     in resources/js/app.js).
 --}}
 @if (! empty($events))
     <x-card
         {{ $attributes->merge(['title' => '學校行事曆']) }}
-        x-data="nouSchoolCalendar({{ Js::from($events) }}, {{ Js::from($showPastEvents) }})"
+        x-data="nouToolsSchoolCalendar({{ Js::encode($events) }}, {{ Js::from($showPastEvents) }})"
     >
         <div class="flex flex-col md:flex-row md:items-start md:gap-6">
             {{-- Countdown (mobile 上方，桌面右側 1/3) --}}

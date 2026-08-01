@@ -3,7 +3,12 @@
     description="送出新的學生優惠店家資訊。"
 >
     <div
-        x-data="discountStoreCreateForm({ districtsByCity: @js($districtsByCity) })"
+        x-data="discountStoreCreateForm({
+                    type: @js(old('type', '')),
+                    city: @js(old('city', '')),
+                    district: @js(old('district', '')),
+                    districtsByCity: {{ Js::encode($districtsByCity) }},
+                })"
         class="mx-auto max-w-3xl space-y-6"
     >
         <div class="space-y-2">
@@ -326,29 +331,5 @@
                 </div>
             </form>
         </x-card>
-
-        <script>
-            function discountStoreCreateForm(config) {
-                return {
-                    type: @js(old('type', '')),
-                    city: @js(old('city', '')),
-                    district: @js(old('district', '')),
-                    districtsByCity: config.districtsByCity ?? {},
-
-                    get districts() {
-                        return this.districtsByCity[this.city] ?? []
-                    },
-
-                    handleTypeChange() {
-                        this.city = ''
-                        this.district = ''
-                    },
-
-                    handleCityChange() {
-                        this.district = ''
-                    },
-                }
-            }
-        </script>
     </div>
 </x-layout>

@@ -5,7 +5,7 @@ use Illuminate\Support\Carbon;
 // Countdown days, status ("進行中"), date formatting, and the "Taiwan time"
 // hint are computed in the browser from the viewer's own clock, anchored to
 // the Asia/Taipei calendar date rather than the viewer's local date (see
-// window.nouSchoolCalendar in resources/js/app.js). These behaviours are
+// window.nouToolsSchoolCalendar in resources/js/app.js). These behaviours are
 // only observable with a real browser, not the Feature tests that merely
 // assert the raw event payload is embedded.
 

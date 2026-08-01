@@ -53,7 +53,7 @@
     -->
 
     {{-- Anti-flash-of-wrong-theme: must run synchronously before any CSS/paint --}}
-    <script>
+    <script @cspNonce>
         ;(() => {
             const stored = localStorage.getItem('theme') || 'system'
             const prefersDark = window.matchMedia(
@@ -115,29 +115,23 @@
     />
 
     {{--
-            Styles / Scripts. Loaded before the Alpine CDN bundle below: both
-            this module script and Alpine's deferred classic script execute
-            in document order after parsing, so app.js's window.NouTime /
-            window.nouGreeting are guaranteed to exist before Alpine
-            evaluates any x-data that references them.
+            Alpine (CSP build) is bundled into app.js and started at the
+            bottom of that file, after window.NouTime / window.nouToolsGreeting
+            and friends are defined — so any x-data referencing them is
+            always safe by the time Alpine evaluates it.
         --}}
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
-
-    {{-- Alpine.js --}}
-    <script
-        defer
-        src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-    ></script>
 
     @if (app()->environment('production'))
         {{-- Google Analytics --}}
         <script
             async
             src="https://www.googletagmanager.com/gtag/js?id=G-1B65SQ4673"
+            @cspNonce
         ></script>
-        <script>
+        <script @cspNonce>
             window.dataLayer = window.dataLayer || []
             function gtag() {
                 dataLayer.push(arguments)
@@ -316,44 +310,7 @@
                         </div>
                     </nav>
 
-                    <div
-                        x-data="{
-                            theme: localStorage.getItem('theme') || 'system',
-                            apply() {
-                                const prefersDark = window.matchMedia(
-                                    '(prefers-color-scheme: dark)'
-                                ).matches
-                                const isDark =
-                                    this.theme === 'dark' ||
-                                    (this.theme === 'system' && prefersDark)
-                                document.documentElement.classList.toggle(
-                                    'dark',
-                                    isDark
-                                )
-                            },
-                            cycle() {
-                                this.theme =
-                                    this.theme === 'system'
-                                        ? 'light'
-                                        : this.theme === 'light'
-                                          ? 'dark'
-                                          : 'system'
-                                localStorage.setItem('theme', this.theme)
-                                this.apply()
-                            },
-                            init() {
-                                this.apply()
-                                window
-                                    .matchMedia('(prefers-color-scheme: dark)')
-                                    .addEventListener('change', () => {
-                                        if (this.theme === 'system') {
-                                            this.apply()
-                                        }
-                                    })
-                            },
-                        }"
-                        class="pl-2 print:hidden"
-                    >
+                    <div x-data="nouThemeSwitcher" class="pl-2 print:hidden">
                         <button
                             type="button"
                             @click="cycle()"
@@ -614,7 +571,7 @@
     </footer>
 
     @if (app()->environment('production'))
-        <script>
+        <script @cspNonce>
             ;(() => {
                 if (typeof window.gtag !== 'function') {
                     return

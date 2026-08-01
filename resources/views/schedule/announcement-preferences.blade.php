@@ -54,96 +54,11 @@
         <form
             method="POST"
             action="{{ route('schedules.announcement-preferences.update', $viewModel->schedule) }}"
-            x-data="{
-                catalog: @js($groupedCatalogTree),
-                flatCatalog: @js($flatCatalogTree),
-                selected: @js($selectedSourceCategories),
-                openGroups: {},
-                openSources: {},
-                sourcesFor(group) {
-                    return Object.keys(this.catalog[group] ?? {})
-                },
-                categoriesFor(source) {
-                    return this.flatCatalog[source] ?? []
-                },
-                selectedFor(source) {
-                    return this.selected[source] ?? []
-                },
-                isCategoryChecked(source, category) {
-                    return this.selectedFor(source).includes(category)
-                },
-                isSourceChecked(source) {
-                    const total = this.categoriesFor(source).length
-                    return total > 0 && this.selectedFor(source).length === total
-                },
-                isSourceIndeterminate(source) {
-                    const selectedCount = this.selectedFor(source).length
-                    return selectedCount > 0 && ! this.isSourceChecked(source)
-                },
-                isGroupChecked(group) {
-                    const sources = this.sourcesFor(group)
-                    return (
-                        sources.length > 0 &&
-                        sources.every(source => this.isSourceChecked(source))
-                    )
-                },
-                isGroupIndeterminate(group) {
-                    if (this.isGroupChecked(group)) {
-                        return false
-                    }
-
-                    return this.sourcesFor(group).some(
-                        source => this.selectedFor(source).length > 0,
-                    )
-                },
-                isSourceExpanded(source) {
-                    return this.openSources[source] ?? false
-                },
-                toggleSourceExpansion(source) {
-                    this.openSources[source] = ! this.isSourceExpanded(source)
-                },
-                isGroupExpanded(group) {
-                    return this.openGroups[group] ?? true
-                },
-                toggleGroupExpansion(group) {
-                    this.openGroups[group] = ! this.isGroupExpanded(group)
-                },
-                toggleSource(source, checked) {
-                    if (checked) {
-                        this.selected[source] = [...this.categoriesFor(source)]
-                        return
-                    }
-
-                    delete this.selected[source]
-                },
-                toggleGroup(group, checked) {
-                    this.sourcesFor(group).forEach(source =>
-                        this.toggleSource(source, checked),
-                    )
-                },
-                toggleCategory(source, category, checked) {
-                    const selectedCategories = [...this.selectedFor(source)]
-
-                    if (checked && ! selectedCategories.includes(category)) {
-                        selectedCategories.push(category)
-                    }
-
-                    if (! checked) {
-                        const index = selectedCategories.indexOf(category)
-
-                        if (index !== -1) {
-                            selectedCategories.splice(index, 1)
-                        }
-                    }
-
-                    if (selectedCategories.length === 0) {
-                        delete this.selected[source]
-                        return
-                    }
-
-                    this.selected[source] = selectedCategories
-                },
-            }"
+            x-data="nouAnnouncementPreferences({
+                catalog: {{ Js::encode($groupedCatalogTree) }},
+                flatCatalog: {{ Js::encode($flatCatalogTree) }},
+                selected: {{ Js::encode($selectedSourceCategories) }},
+            })"
             class="space-y-6"
         >
             @csrf

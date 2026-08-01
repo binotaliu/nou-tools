@@ -18,6 +18,7 @@
     "league/commonmark": "^2.8.3",
     "milon/barcode": "^13.1",
     "revolution/laravel-notification-discord-webhook": "^1.4.2",
+    "spatie/laravel-csp": "^3.26",
     "spatie/laravel-data": "^4.23.0",
     "spatie/laravel-ray": "^1.43.9",
     "symfony/yaml": "^8.1.1",

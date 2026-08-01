@@ -23,7 +23,7 @@ final class ChecklistRenderer implements ContainerRendererInterface
 
         return new HtmlElement('div', [
             'class' => 'md-checklist',
-            'x-data' => 'nouChecklist()',
+            'x-data' => 'nouToolsChecklist()',
         ], $content);
     }
 }

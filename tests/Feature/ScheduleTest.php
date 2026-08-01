@@ -864,7 +864,7 @@ it('customize page preserves old input after validation failure', function () {
         ]);
 
     $response->assertStatus(200)
-        ->assertSee('links: JSON.parse')
+        ->assertSee('nouScheduleCustomize({')
         ->assertSee('example.com');
 });
 

@@ -17,8 +17,11 @@
 </head>
 <body>
     <div id="redoc-container"></div>
-    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
-    <script>
+    <script
+        src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"
+        @cspNonce
+    ></script>
+    <script @cspNonce>
         Redoc.init(
             '{{ url('docs/api.yaml') }}',
             {

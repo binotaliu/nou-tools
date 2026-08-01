@@ -6,7 +6,7 @@ use App\Models\StudentScheduleItem;
 use Illuminate\Support\Str;
 
 // Countdown days, status ("進行中"), and date formatting are computed on the
-// client from the viewer's Taipei calendar date (see window.nouSchoolCalendar
+// client from the viewer's Taipei calendar date (see window.nouToolsSchoolCalendar
 // in resources/js/app.js), so those behaviours are only observable with a
 // real browser — see tests/Browser/SchoolCalendarTest.php. These Feature
 // tests only check that the server hands the client the right raw event
@@ -36,7 +36,7 @@ it('displays school calendar on home page with events embedded for the client', 
 
     $response->assertStatus(200)
         ->assertSee('學校行事曆')
-        ->assertSee('nouSchoolCalendar(', false)
+        ->assertSee('nouToolsSchoolCalendar(', false)
         ->assertSee('114下學期課程開播')
         ->assertSee('114下學期期中考');
 });

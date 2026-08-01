@@ -75,73 +75,10 @@
             >
                 <x-card title="選擇來源" class="lg:sticky lg:top-6">
                     <div
-                        x-data="{
-                            sourceCategories: @js($sourceCategoryTree),
-                            selected: @js($selectedSourceCategories),
-                            openSources: {},
-                            categoriesFor(source) {
-                                return this.sourceCategories[source] ?? []
-                            },
-                            selectedFor(source) {
-                                return this.selected[source] ?? []
-                            },
-                            isCategoryChecked(source, category) {
-                                return this.selectedFor(source).includes(category)
-                            },
-                            isSourceChecked(source) {
-                                const total = this.categoriesFor(source).length
-                                return total > 0 && this.selectedFor(source).length === total
-                            },
-                            isSourceIndeterminate(source) {
-                                const selectedCount = this.selectedFor(source).length
-                                return selectedCount > 0 && ! this.isSourceChecked(source)
-                            },
-                            isSourceExpanded(source) {
-                                return this.openSources[source] ?? false
-                            },
-                            toggleSourceExpansion(source) {
-                                this.openSources[source] = ! this.isSourceExpanded(source)
-                            },
-                            toggleSource(source, checked) {
-                                if (checked) {
-                                    this.selected[source] = [...this.categoriesFor(source)]
-                                    return
-                                }
-
-                                delete this.selected[source]
-                            },
-                            toggleCategory(source, category, checked) {
-                                const selectedCategories = [...this.selectedFor(source)]
-
-                                if (checked && ! selectedCategories.includes(category)) {
-                                    selectedCategories.push(category)
-                                }
-
-                                if (! checked) {
-                                    const index = selectedCategories.indexOf(category)
-
-                                    if (index !== -1) {
-                                        selectedCategories.splice(index, 1)
-                                    }
-                                }
-
-                                if (selectedCategories.length === 0) {
-                                    delete this.selected[source]
-                                    return
-                                }
-
-                                this.selected[source] = selectedCategories
-                            },
-                            selectedCategoryCount() {
-                                return Object.values(this.selected).reduce(
-                                    (sum, categories) => sum + categories.length,
-                                    0,
-                                )
-                            },
-                            selectedSourceCount() {
-                                return Object.keys(this.selected).length
-                            },
-                        }"
+                        x-data="nouAnnouncementFilter({
+                            sourceCategories: {{ Js::encode($sourceCategoryTree) }},
+                            selected: {{ Js::encode($selectedSourceCategories) }},
+                        })"
                         class="space-y-4 overflow-x-hidden"
                     >
                         <form

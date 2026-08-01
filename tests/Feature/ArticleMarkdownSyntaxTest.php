@@ -443,7 +443,7 @@ test('checklist renders an alpine-powered task list', function () {
     $html = ($this->convert)(":::checklist\n- [ ] 待辦一\n- [x] 已完成\n:::\n");
 
     expect($html)
-        ->toContain('<div class="md-checklist" x-data="nouChecklist()">')
+        ->toContain('<div class="md-checklist" x-data="nouToolsChecklist()">')
         ->toContain('<label><input type="checkbox"><span class="md-checklist-content"> 待辦一</span></label>')
         ->toContain('<label><input checked="" type="checkbox"><span class="md-checklist-content"> 已完成</span></label>')
         ->not->toContain('disabled')
@@ -459,7 +459,7 @@ test('countdown renders a live-updating card with the day count for an upcoming 
 
     expect($html)
         ->toContain('<div class="md-countdown">')
-        ->toContain('<div class="md-countdown-item" x-data="nouCountdown({&quot;start&quot;:&quot;2026-09-05&quot;,&quot;end&quot;:&quot;2026-09-06&quot;})">')
+        ->toContain('<div class="md-countdown-item" x-data="nouToolsCountdown({&quot;start&quot;:&quot;2026-09-05&quot;,&quot;end&quot;:&quot;2026-09-06&quot;})">')
         ->toContain('<p class="md-countdown-label">115暑期期末考</p>')
         ->toContain('<p class="md-countdown-range">2026-09-05 ~ 2026-09-06</p>')
         ->toContain('<span x-text="daysText">倒數 9 天</span>');

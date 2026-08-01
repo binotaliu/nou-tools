@@ -9,7 +9,7 @@
     :title="'學習進度表 - ' . $semesterLabel . (empty($viewModel->scheduleName) ? (' - ' . $viewModel->scheduleName) : '') . '- NOU 小幫手'"
     :noindex="true"
 >
-    <div class="mx-auto max-w-7xl">
+    <div class="mx-auto max-w-7xl" x-data="nouLearningProgress">
         {{-- Header --}}
         <div
             class="mb-8 flex flex-col items-start justify-between gap-y-4 md:flex-row"
@@ -43,7 +43,7 @@
                 <x-button
                     type="button"
                     variant="primary"
-                    onclick="document.getElementById('progress-form').submit()"
+                    @click="submitProgressForm()"
                     class="w-1/2 md:w-auto"
                     data-analytics-event="learning_progress_save"
                     data-analytics-feature="learning_progress"
@@ -75,31 +75,8 @@
         {{-- Learning Progress Table --}}
         <div
             class="relative rounded border border-warm-300 dark:border-zinc-600"
-            x-data="{
-                showHorizontalGradient: false,
-                showVerticalGradient: false,
-                dirty: false,
-                unloadListener: null,
-
-                init() {
-                    this.checkGradientVisibility()
-                },
-
-                checkGradientVisibility() {
-                    const progressForm = this.$refs.progressForm
-                    this.showHorizontalGradient =
-                        progressForm.scrollHeight > progressForm.clientHeight &&
-                        progressForm.scrollTop + progressForm.clientHeight <
-                            progressForm.scrollHeight
-                    this.showVerticalGradient =
-                        progressForm.scrollWidth > progressForm.clientWidth &&
-                        progressForm.scrollLeft + progressForm.clientWidth <
-                            progressForm.scrollWidth
-                },
-            }"
             x-cloak
             x-on:resize.window="checkGradientVisibility()"
-            x-init="$nextTick(() => checkGradientVisibility())"
         >
             <form
                 id="progress-form"
@@ -111,7 +88,7 @@
                     --weeks-count: {{ count($viewModel->weeks) }};
                 "
                 x-ref="progressForm"
-                x-on:scroll.decounce="checkGradientVisibility()"
+                x-on:scroll.debounce="checkGradientVisibility()"
             >
                 @csrf
                 @method('PUT')
@@ -332,7 +309,7 @@
             <x-button
                 type="button"
                 variant="warm-subtle"
-                onclick="window.print()"
+                @click="window.print()"
                 class="print:hidden"
             >
                 <x-heroicon-o-printer class="inline size-4" />

@@ -12,7 +12,7 @@ it('embeds semester data for the client-rendered greeting on the home page', fun
     // client from the viewer's local clock, so the server only needs to hand
     // the semester facts to the Alpine component.
     $response->assertStatus(200)
-        ->assertSee('nouGreeting(', false)
+        ->assertSee('nouToolsGreeting(', false)
         ->assertSee('今天是')
         ->assertSee('2025B', false)
         ->assertSee('2026-02-23', false)
@@ -26,7 +26,7 @@ it('omits the semester range when it is not configured', function () {
     $response = $this->get('/');
 
     $response->assertStatus(200)
-        ->assertSee('nouGreeting(', false)
+        ->assertSee('nouToolsGreeting(', false)
         ->assertSee('semesterStart: null', false)
         ->assertSee('semesterEnd: null', false);
 });

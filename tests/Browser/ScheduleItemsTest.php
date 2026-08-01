@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 // "下次上課" and the row order are computed in the browser from the viewer's
-// local clock (see window.nouScheduleItems in resources/js/app.js), so this
+// local clock (see window.nouToolsScheduleItems in resources/js/app.js), so this
 // behaviour, and the "你的時間" hint shown to overseas students, are only
 // observable with a real browser.
 

@@ -2,7 +2,7 @@
 <html lang="zh-hant">
 <head>
     {{-- Anti-flash-of-wrong-theme: must run synchronously before any CSS/paint --}}
-    <script>
+    <script @cspNonce>
         ;(() => {
             const stored = localStorage.getItem('theme') || 'system'
             const prefersDark = window.matchMedia(
@@ -248,13 +248,17 @@
             <ul id="schedule-links" class="schedule-links" hidden></ul>
 
             <div class="actions">
-                <button onclick="history.back()">回到上一頁</button>
+                <button id="back-button">回到上一頁</button>
                 <a href="{{ url('/') }}">回到首頁</a>
             </div>
         </div>
     </main>
 
-    <script>
+    <script @cspNonce>
+        document
+            .getElementById('back-button')
+            .addEventListener('click', () => history.back())
+
         // Looks through the Cache API (populated by /sw.js) for any
         // previously-visited /schedules/{token} pages, so this fallback
         // can tell the visitor whether they actually have anything

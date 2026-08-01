@@ -141,7 +141,7 @@
                     <x-select
                         id="term"
                         name="term"
-                        onchange="this.form.submit()"
+                        @change="$event.target.form.submit()"
                         aria-label="選擇學期"
                         class="bg-white dark:bg-zinc-900"
                         data-offline-disable
@@ -578,21 +578,9 @@
                         </p>
 
                         <div
-                            x-data="{
+                            x-data="nouCopyLink({
                                 shareUrl: {{ Js::from(url(route('schedules.show', $viewModel->uuid))) }},
-                                copied: false,
-                                async copy() {
-                                    try {
-                                        await navigator.clipboard.writeText(this.shareUrl)
-                                    } catch (e) {
-                                        this.$refs.shareInput.select()
-                                        document.execCommand('copy')
-                                    }
-
-                                    this.copied = true
-                                    setTimeout(() => (this.copied = false), 2000)
-                                },
-                            }"
+                            })"
                             class="rounded border border-warm-300 bg-white text-sm text-warm-600 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
                         >
                             <div class="flex items-stretch gap-3">
@@ -661,7 +649,7 @@
                 <x-button
                     type="button"
                     variant="warm-subtle"
-                    onclick="window.print()"
+                    @click="window.print()"
                 >
                     <x-heroicon-o-printer class="inline size-4" />
                     列印

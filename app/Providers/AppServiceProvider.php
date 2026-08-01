@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
@@ -45,6 +46,18 @@ final class AppServiceProvider extends ServiceProvider
         // render raw Markdown; prettier-plugin-blade mangles their line breaks when
         // treating them as `.blade.php`, so they're excluded from that override.
         View::addExtension('md.blade.php', 'blade');
+
+        // Share spatie/laravel-csp's per-request nonce with Vite, so every
+        // @vite(...) tag (and Livewire's own inline scripts, which read the
+        // same Vite nonce) carries the value the CSP header allows. Deferred
+        // to `booted()` since it depends on the 'csp-nonce' binding, which
+        // spatie/laravel-csp registers during its own boot() — this provider
+        // isn't guaranteed to boot after it.
+        $this->app->booted(function (): void {
+            if (config('csp.nonce_enabled', true)) {
+                Vite::useCspNonce(app('csp-nonce'));
+            }
+        });
 
         // Route macro: register a markdown counterpart for a route, served either at
         // an explicit `.md` URI or transparently via `Accept: text/markdown` content

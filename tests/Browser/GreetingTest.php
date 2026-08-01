@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
 // The greeting text, date, and semester week are computed in the browser
-// from the viewer's local clock (see window.nouGreeting in resources/js/app.js),
+// from the viewer's local clock (see window.nouToolsGreeting in resources/js/app.js),
 // so these behaviours are only observable with a real browser, not the
 // Feature tests that merely assert the config payload is embedded.
 
