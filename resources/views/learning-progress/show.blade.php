@@ -65,12 +65,15 @@
                 class="relative h-2 w-full overflow-hidden rounded bg-warm-200 dark:bg-zinc-700"
                 aria-hidden="true"
             >
-                <div
-                    class="h-full bg-warm-500"
-                    style="width: {{ $viewModel->percentage }}%"
-                ></div>
+                <div id="overall-progress-bar" class="h-full bg-warm-500"></div>
             </div>
         </div>
+
+        <style @cspNonce>
+            #overall-progress-bar {
+                width: {{ $viewModel->percentage }}%;
+            }
+        </style>
 
         {{-- Learning Progress Table --}}
         <div
@@ -83,15 +86,18 @@
                 method="POST"
                 action="{{ route('learning-progress.update', [$viewModel->scheduleUuid, $viewModel->term]) }}"
                 class="max-h-[min(45rem,90vh)] max-w-full overflow-x-auto rounded bg-linear-to-b from-warm-100 to-white dark:from-zinc-900 dark:to-zinc-950 print:max-h-full"
-                style="
-                    --courses-count: {{ count($viewModel->courses) }};
-                    --weeks-count: {{ count($viewModel->weeks) }};
-                "
                 x-ref="progressForm"
                 x-on:scroll.debounce="checkGradientVisibility()"
             >
                 @csrf
                 @method('PUT')
+
+                <style @cspNonce>
+                    #progress-form {
+                        --courses-count: {{ count($viewModel->courses) }};
+                        --weeks-count: {{ count($viewModel->weeks) }};
+                    }
+                </style>
 
                 <table
                     class="w-full min-w-4xl table-fixed border-collapse rounded print:min-w-0"
