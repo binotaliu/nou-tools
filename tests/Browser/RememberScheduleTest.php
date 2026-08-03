@@ -49,8 +49,13 @@ it('does not prompt again once the schedule has already been remembered', functi
         ->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
         ->waitForEvent('networkidle')
-        ->assertMissing('[data-testid="remember-schedule-modal"]');
+        ->assertMissing('[data-testid="remember-schedule-modal"]')
+        // The form-submit redirect lands back on this exact URL, so give any
+        // trailing async work (e.g. service worker registration) triggered by
+        // the previous navigation a moment to settle before reloading it —
+        // otherwise the reload can race and abort it (net::ERR_ABORTED).
+        ->wait(0.5);
 
-    $page->navigate(route('schedules.show', $schedule))
+    $page->refresh()
         ->assertMissing('[data-testid="remember-schedule-modal"]');
 });
