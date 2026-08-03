@@ -22,7 +22,7 @@ final readonly class BuildCourseSchedulePage
 
         $courses = Course::query()
             ->where('term', $selectedTerm)
-            ->with(['classes' => fn ($query) => $query->official()])
+            ->with('classes')
             ->orderBy('name')
             ->get();
 

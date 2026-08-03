@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\CourseClassType;
 use App\Models\Course;
+use App\Models\CourseClass;
 use Illuminate\Support\Str;
 
 test('course schedule page loads successfully', function () {
@@ -40,6 +42,22 @@ test('courses without a final exam time are excluded from the general section', 
 
     $response->assertStatus(200)
         ->assertDontSee('No Exam Course');
+});
+
+test('courses with only a tentative full_remote or micro_credit class are still included on the page', function () {
+    $term = config('app.current_semester');
+
+    $remoteCourse = Course::factory()->create(['name' => 'Tentative Remote Course', 'term' => $term]);
+    CourseClass::factory()->create([
+        'course_id' => $remoteCourse->id,
+        'type' => CourseClassType::FullRemote,
+        'is_tentative' => true,
+    ]);
+
+    $response = $this->get(route('course.schedule'));
+
+    $response->assertStatus(200)
+        ->assertSee('Tentative Remote Course');
 });
 
 test('term query parameter selects a different semester', function () {
