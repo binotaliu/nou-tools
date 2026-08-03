@@ -213,6 +213,37 @@ test('course show page displays all previous exams for course when cookie exists
         ->assertSee('fin2b.pdf');
 });
 
+test('course show page sets download attribute with subject name and term for exam links', function () {
+    $course = Course::factory()->create(['name' => 'History/101: Intro']);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'My Schedule',
+    ]);
+
+    PreviousExam::create([
+        'course_name' => $course->name,
+        'course_no' => 'HIST101',
+        'term' => '114上學期',
+        'midterm_reference_primary' => 'mid1.pdf',
+        'midterm_reference_secondary' => 'mid1b.pdf',
+        'final_reference_primary' => 'fin1.pdf',
+        'final_reference_secondary' => 'fin1b.pdf',
+    ]);
+
+    $response = $this->withCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => $schedule->name,
+    ]))->get(route('course.show', $course));
+
+    $response->assertStatus(200)
+        ->assertSee('download="History101 Intro_114上學期_期中考正參.pdf"', false)
+        ->assertSee('download="History101 Intro_114上學期_期中考副參.pdf"', false)
+        ->assertSee('download="History101 Intro_114上學期_期末考正參.pdf"', false)
+        ->assertSee('download="History101 Intro_114上學期_期末考副參.pdf"', false);
+});
+
 test('course show page displays exam information', function () {
     $course = Course::factory()->create([
         'name' => 'Exam Course',

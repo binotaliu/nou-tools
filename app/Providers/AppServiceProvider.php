@@ -139,6 +139,12 @@ final class AppServiceProvider extends ServiceProvider
             return str_replace(['（', '）', '(', ')', '：', ':', '～', '~', '—', '－', '-', '–', '　', ' '], '', trim($value));
         });
 
+        // Strips characters that are illegal in filenames on common filesystems,
+        // so course names can be used in a `download` attribute filename.
+        Str::macro('toFilenameSafe', function (string $value): string {
+            return trim(str_replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], '', $value));
+        });
+
         Str::macro('toChineseNumber', function (int $n): string {
             if ($n > 99) {
                 return (string) " {$n} "; // Fallback to digits for large numbers

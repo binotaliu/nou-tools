@@ -1,4 +1,5 @@
 @php
+    $examSubjectName = \Illuminate\Support\Str::toFilenameSafe($viewModel->course->name);
     $seoDescription = "{$viewModel->course->name} 是國立空中大學"
         .($viewModel->course->department ? " {$viewModel->course->department}" : '')
         .(! empty($viewModel->course->term) ? ' 在 '.\Illuminate\Support\Str::toSemesterDisplay($viewModel->course->term) : '')
@@ -572,6 +573,7 @@
                                             target="_blank"
                                             rel="noopener"
                                             aria-label="{{ $exam->term }}的期中考正參"
+                                            :download="$examSubjectName.'_'.$exam->term.'_期中考正參.'.pathinfo($exam->midtermReferencePrimary, PATHINFO_EXTENSION)"
                                         >
                                             正參
                                             <x-heroicon-o-arrow-top-right-on-square
@@ -598,6 +600,7 @@
                                             target="_blank"
                                             rel="noopener"
                                             aria-label="{{ $exam->term }}的期中考副參"
+                                            :download="$examSubjectName.'_'.$exam->term.'_期中考副參.'.pathinfo($exam->midtermReferenceSecondary, PATHINFO_EXTENSION)"
                                         >
                                             副參
                                             <x-heroicon-o-arrow-top-right-on-square
@@ -624,6 +627,7 @@
                                             target="_blank"
                                             rel="noopener"
                                             aria-label="{{ $exam->term }}的期末考正參"
+                                            :download="$examSubjectName.'_'.$exam->term.'_期末考正參.'.pathinfo($exam->finalReferencePrimary, PATHINFO_EXTENSION)"
                                         >
                                             正參
                                             <x-heroicon-o-arrow-top-right-on-square
@@ -650,6 +654,7 @@
                                             target="_blank"
                                             rel="noopener"
                                             aria-label="{{ $exam->term }}的期末考副參"
+                                            :download="$examSubjectName.'_'.$exam->term.'_期末考副參.'.pathinfo($exam->finalReferenceSecondary, PATHINFO_EXTENSION)"
                                         >
                                             副參
                                             <x-heroicon-o-arrow-top-right-on-square
@@ -709,6 +714,7 @@
                                                 target="_blank"
                                                 rel="noopener"
                                                 aria-label="{{ $exam->term }}的期中考正參"
+                                                :download="$examSubjectName.'_'.$exam->term.'_期中考正參.'.pathinfo($exam->midtermReferencePrimary, PATHINFO_EXTENSION)"
                                             >
                                                 正參
                                                 <x-heroicon-o-arrow-top-right-on-square
@@ -727,6 +733,7 @@
                                                 target="_blank"
                                                 rel="noopener"
                                                 aria-label="{{ $exam->term }}的期中考副參"
+                                                :download="$examSubjectName.'_'.$exam->term.'_期中考副參.'.pathinfo($exam->midtermReferenceSecondary, PATHINFO_EXTENSION)"
                                             >
                                                 副參
                                                 <x-heroicon-o-arrow-top-right-on-square
@@ -745,6 +752,7 @@
                                                 target="_blank"
                                                 rel="noopener"
                                                 aria-label="{{ $exam->term }}的期末考正參"
+                                                :download="$examSubjectName.'_'.$exam->term.'_期末考正參.'.pathinfo($exam->finalReferencePrimary, PATHINFO_EXTENSION)"
                                             >
                                                 正參
                                                 <x-heroicon-o-arrow-top-right-on-square
@@ -763,6 +771,7 @@
                                                 target="_blank"
                                                 rel="noopener"
                                                 aria-label="{{ $exam->term }}的期末考副參"
+                                                :download="$examSubjectName.'_'.$exam->term.'_期末考副參.'.pathinfo($exam->finalReferenceSecondary, PATHINFO_EXTENSION)"
                                             >
                                                 副參
                                                 <x-heroicon-o-arrow-top-right-on-square

@@ -12,7 +12,7 @@ class LinkButton extends Button
         public string $href = '',
         public ?string $target = null,
         public ?string $rel = null,
-        public bool $download = false,
+        public bool|string $download = false,
         string $variant = 'primary',
         string $size = 'md',
         bool $disabled = false,

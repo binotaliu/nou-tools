@@ -6,7 +6,9 @@
     @if ($rel)
         rel="{{ $rel }}"
     @endif
-    @if ($download)
+    @if (is_string($download))
+        download="{{ $download }}"
+    @elseif ($download)
         download
     @endif
     {{ $attributes->class($getClasses()) }}
