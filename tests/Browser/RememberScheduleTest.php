@@ -27,8 +27,13 @@ it('dismisses the remember-schedule modal without saving a cookie when declined'
         'name' => 'Browser Dismiss Schedule',
     ]);
 
-    $page = visit(route('schedules.show', $schedule))
-        ->assertVisible('[data-testid="remember-schedule-modal"]')
+    $page = visit(route('schedules.show', $schedule));
+
+    // See the comment in the "already remembered" test below for why this
+    // wait matters before a second navigation to the same schedule URL.
+    $page->script('navigator.serviceWorker.ready');
+
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-dismiss"]')
         ->assertMissing('[data-testid="remember-schedule-modal"]');
 
@@ -45,17 +50,20 @@ it('does not prompt again once the schedule has already been remembered', functi
         'name' => 'Browser Already Remembered',
     ]);
 
-    $page = visit(route('schedules.show', $schedule))
-        ->assertVisible('[data-testid="remember-schedule-modal"]')
-        ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('networkidle')
-        ->assertMissing('[data-testid="remember-schedule-modal"]')
-        // The form-submit redirect lands back on this exact URL, so give any
-        // trailing async work (e.g. service worker registration) triggered by
-        // the previous navigation a moment to settle before reloading it —
-        // otherwise the reload can race and abort it (net::ERR_ABORTED).
-        ->wait(0.5);
+    $page = visit(route('schedules.show', $schedule));
 
-    $page->refresh()
+    // Wait for the offline-support service worker (public/sw.js) to finish
+    // installing/activating on this first load before triggering the
+    // form-submit redirect below. Otherwise the worker's activation can land
+    // mid-navigation on the redirected page and abort the following reload
+    // (net::ERR_ABORTED; maybe frame was detached) — see
+    // Tests\Browser\OfflineServiceWorkerTest, which waits the same way.
+    $page->script('navigator.serviceWorker.ready');
+
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
+
+    $page->navigate(route('schedules.show', $schedule))
         ->assertMissing('[data-testid="remember-schedule-modal"]');
 });
