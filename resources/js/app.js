@@ -96,6 +96,11 @@ new MutationObserver(() => updateOfflineLinkStates()).observe(
 document.addEventListener('alpine:init', () => {
   registerAlpineComponents(window.Alpine)
 
+  // The CSP build's expression parser rejects bare global references (e.g.
+  // `window.print()` in @click), so global calls needed from templates are
+  // exposed as magics instead.
+  window.Alpine.magic('print', () => () => window.print())
+
   window.Alpine.data('scheduleEditor', scheduleEditor)
   window.Alpine.data('courseSchedule', courseSchedule)
   window.Alpine.data('linksCenterMap', linksCenterMap)

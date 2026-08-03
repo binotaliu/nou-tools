@@ -315,7 +315,7 @@
             <x-button
                 type="button"
                 variant="warm-subtle"
-                @click="window.print()"
+                @click="$print()"
                 class="print:hidden"
             >
                 <x-heroicon-o-printer class="inline size-4" />
