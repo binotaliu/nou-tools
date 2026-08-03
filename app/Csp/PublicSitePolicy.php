@@ -9,6 +9,7 @@ use Spatie\Csp\Policy;
 use Spatie\Csp\Preset;
 use Spatie\Csp\Presets\Basic;
 use Spatie\Csp\Presets\CloudflareTurnstile;
+use Spatie\Csp\Presets\CloudflareWebAnalytics;
 use Spatie\Csp\Presets\GoogleAnalytics;
 use Spatie\Csp\Presets\GoogleTagManager;
 
@@ -20,6 +21,7 @@ final class PublicSitePolicy implements Preset
         (new GoogleTagManager)->configure($policy);
         (new GoogleAnalytics)->configure($policy);
         (new CloudflareTurnstile)->configure($policy);
+        (new CloudflareWebAnalytics)->configure($policy);
 
         $policy->add(Directive::IMG, '*.tile.openstreetmap.org');
     }
