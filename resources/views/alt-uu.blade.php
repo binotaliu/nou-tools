@@ -25,37 +25,32 @@
             <div
                 class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
             >
-                <a
-                    href="https://apps.apple.com/tw/app/alt-uu/id6760690577"
-                    variant="warm-dark"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    size="lg"
-                >
-                    <x-icon-app-store-download
-                        class="h-14"
-                        aria-label="在 App Store 上下載"
-                    />
-                </a>
+                <div class="flex w-47.25 justify-center sm:justify-end">
+                    <a
+                        href="https://apps.apple.com/tw/app/alt-uu/id6760690577"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <x-icon-app-store-download
+                            class="h-14"
+                            aria-label="在 App Store 上下載"
+                        />
+                    </a>
+                </div>
 
                 <a
-                    class="inline-flex h-14 w-38 items-center justify-start gap-2 rounded-lg border border-warm-500 bg-white px-2 py-1 font-semibold text-warm-900 transition hover:bg-warm-50 disabled:border-warm-200 disabled:bg-warm-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-950 dark:disabled:border-zinc-700 dark:disabled:bg-zinc-950"
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSe4TJ3vDrj2ohQBdGbzimj62W2rA-rQaKVJqymdvAkD_VVsSA/viewform?usp=header"
+                    href="https://play.google.com/store/apps/details?id=org.binota.alt_uu"
                     target="_blank"
                     rel="noopener noreferrer"
-                    size="lg"
                 >
-                    <x-heroicon-o-device-phone-mobile class="size-8" />
-                    <span
-                        class="flex flex-col justify-center text-left leading-0"
-                    >
-                        <span class="text-xl leading-4">Android</span>
-                        <span class="text-sm leading-4">封測申請</span>
-                    </span>
+                    <x-icon-google-play-download
+                        class="h-14"
+                        aria-label="在 Google Play 上下載"
+                    />
                 </a>
             </div>
 
-            <p class="mt-3 text-xs text-warm-400 dark:text-zinc-500">App Store 支援 iPhone、iPad 及 Mac（Apple Silicon）&nbsp;·&nbsp;Android 版封閉測試中</p>
+            <p class="mt-3 text-xs text-warm-400 dark:text-zinc-500">App Store 支援 iPhone、iPad 及 Mac（Apple Silicon）</p>
         </div>
 
         {{-- Features --}}
@@ -157,20 +152,18 @@
                     <h4
                         class="mt-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
                     >
-                        Google Play 封測
+                        Google Play
                     </h4>
-                    <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">Android 版目前正在封測階段。
-                    <br />
-                    填寫申請表單後即可加入封測，搶先體驗 Android 版功能。</p>
+
+                    <p class="mt-2 text-sm text-warm-600 dark:text-zinc-400">支援 Android 手機、平板。</p>
                 </div>
                 <x-link-button
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSe4TJ3vDrj2ohQBdGbzimj62W2rA-rQaKVJqymdvAkD_VVsSA/viewform?usp=header"
-                    variant="secondary"
+                    href="https://play.google.com/store/apps/details?id=org.binota.alt_uu"
+                    variant="warm-dark"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="mt-auto"
                 >
-                    申請加入封測
+                    前往 Google Play
                 </x-link-button>
             </x-card>
         </div>
