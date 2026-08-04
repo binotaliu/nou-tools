@@ -177,7 +177,7 @@
             》與 《
             <a href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/privacy-policy" target="_blank" rel="noopener noreferrer" class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"> 隱私權政策 </a>
             》。</p>
-            <p>Alt UU 並非 NOU 官方產品，僅為學生開發的第三方 App，與 NOU 官方無任何隸屬或合作關係。有關 Alt UU 之運作方式，請參閱《
+            <p>Alt UU 並非國立空中大學官方產品，僅為學生開發的第三方 App，與國立空中大學官方無任何隸屬或合作關係。有關 Alt UU 之運作方式，請參閱《
             <a href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/app-architecture" target="_blank" rel="noopener noreferrer" class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"> Alt UU 運作原理說明 </a>
             》。</p>
             <p>Alt UU 是自由且開放之軟體，原始碼以 AGPL-3.0-or-later 授權條款公開於
