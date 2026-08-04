@@ -117,10 +117,9 @@
                         x-data="linksCenterMap({
                                     centers: {{ Js::encode($centersFrontEndData) }},
                                     regions: {{ Js::encode($centersByRegion) }},
-                                    mapTileLayer: {{ Js::from(config('services.map.tileLayer')) }},
-                                    mapTileLayerAttribution:
-                                        {{ Js::from(config('services.map.tileLayerAttribution')) }},
                                 })"
+                        data-map-tile-layer="{{ config('services.map.tileLayer') }}"
+                        data-map-tile-layer-attribution="{{ config('services.map.tileLayerAttribution') }}"
                         x-on:leaflet-loaded.window.camel="initMap()"
                         x-init="init()"
                         class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_2fr]"

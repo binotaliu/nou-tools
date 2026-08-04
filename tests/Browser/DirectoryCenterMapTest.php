@@ -29,6 +29,23 @@ it('shows a placeholder until a 學習指導中心 is selected, then reveals its
         ->assertNoJavaScriptErrors();
 });
 
+it('renders the leaflet tile attribution as a real OpenStreetMap link, not an escaped string', function () {
+    $page = visit(route('directory.index'));
+
+    $page->click('[data-testid="center-button-0"]')
+        ->assertVisible('[data-testid="center-map"]')
+        ->assertVisible('.leaflet-control-attribution');
+
+    $attributionHtml = $page->script(
+        "document.querySelector('.leaflet-control-attribution')?.innerHTML"
+    );
+
+    expect($attributionHtml)->toBeString();
+    expect($attributionHtml)->toContain('<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>');
+    expect($attributionHtml)->not->toContain('u0026');
+    expect($attributionHtml)->not->toContain('u003C');
+});
+
 it('updates the details and map when switching between 學習指導中心 entries', function () {
     $page = visit(route('directory.index'));
 

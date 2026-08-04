@@ -2,8 +2,8 @@ export default function linksCenterMap(config) {
   return {
     centers: config.centers,
     regions: config.regions,
-    mapTileLayer: config.mapTileLayer,
-    mapTileLayerAttribution: config.mapTileLayerAttribution,
+    mapTileLayer: null,
+    mapTileLayerAttribution: null,
     selectedKey: null,
     map: null,
     marker: null,
@@ -17,6 +17,16 @@ export default function linksCenterMap(config) {
     },
 
     init() {
+      // Read via data-* attributes rather than the x-data expression: Alpine's
+      // CSP build parses string literals with a hand-rolled tokenizer that
+      // doesn't decode \uXXXX escapes, which is what Blade's @js() directive
+      // uses to keep HTML-bearing strings (e.g. this attribution's <a> tag)
+      // safe inside an HTML attribute. The browser's own HTML parser decodes
+      // entities in data-* attributes correctly, so we read the raw string
+      // there instead.
+      this.mapTileLayer = this.$el.dataset.mapTileLayer
+      this.mapTileLayerAttribution = this.$el.dataset.mapTileLayerAttribution
+
       if (window.leaflet) {
         this.initMap()
       }

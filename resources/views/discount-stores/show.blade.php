@@ -23,10 +23,10 @@
                     longitude: @js((float) $store->longitude),
                     address: @js($store->address),
                     shouldShowMap: @js($store->type !== \App\Enums\DiscountStoreType::Online && filled($store->address) && $store->latitude !== null && $store->longitude !== null),
-                    mapTileLayer: @js(config('services.map.tileLayer')),
-                    mapTileLayerAttribution: @js(config('services.map.tileLayerAttribution')),
                     hasPendingComment: @js((bool) old('nickname') || (bool) old('content')),
                 })"
+        data-map-tile-layer="{{ config('services.map.tileLayer') }}"
+        data-map-tile-layer-attribution="{{ config('services.map.tileLayerAttribution') }}"
         x-on:leaflet-loaded.window.camel="shouldShowMap && initMap()"
         x-init="init()"
     >
