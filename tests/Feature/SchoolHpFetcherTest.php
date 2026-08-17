@@ -13,7 +13,7 @@ function schoolHpSourceConfig(array $overrides = []): AnnouncementSourceConfigDT
         array_merge([
             'name' => '學校首頁',
             'category' => '最新消息',
-            'fetch_url' => 'https://www.nou.edu.tw/news_idx1.aspx?id=K3JOsteln/k=',
+            'fetch_url' => 'https://www.nou.edu.tw/',
             'fetcher_type' => 'school_hp',
             'fetcher_config' => ['base_url' => 'https://www.nou.edu.tw'],
             'tracks_expiry' => false,
@@ -22,28 +22,42 @@ function schoolHpSourceConfig(array $overrides = []): AnnouncementSourceConfigDT
     );
 }
 
-it('parses list-group items across tab 0 to 6 and strips tag text', function () {
+it('parses tab list items across every news tab', function () {
     $source = schoolHpSourceConfig();
 
     $html = <<<'HTML'
     <html><body>
-    <div id="cph_Content_rt_Content_dv_Name_0" class="tab-pane fade in active">
-        <div class="list-group">
-            <a class="list-group-item" href="/news_cont.aspx?id=A1=">2026/03/11 <span class="w3-tag w3-teal">Top</span> 校本部配合每半年高壓電用電設備保養維護停電公告 / 總務處營繕組</a>
-            <a class="list-group-item" href="/news_cont.aspx?id=A2=">2026/05/02  數位學習平台伺服(uu.nou.edu.tw)異常</a>
-        </div>
-    </div>
+    <div id="news-content">
+        <ul id="tab-2">
+            <li>
+                <div>
+                    <div>
+                        <span class="inline-block text-xs text-white bg-nou-red">置頂</span>
+                        <a href="/Home/NewsDetails/9406" title="本校校慶40週年－環台雲端接力GO連結網址">本校校慶40週年－環台雲端接力GO連結網址</a>
+                    </div>
+                    <span class="text-xs text-gray-500 whitespace-nowrap font-mono">2026/08/10</span>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <div>
+                        <a href="/Home/NewsDetails/9288" title="數位學習平台伺服(uu.nou.edu.tw)異常">數位學習平台伺服(uu.nou.edu.tw)異常</a>
+                    </div>
+                    <span class="text-xs text-gray-500 whitespace-nowrap font-mono">2025/12/23</span>
+                </div>
+            </li>
+        </ul>
 
-    <div id="cph_Content_rt_Content_dv_Name_6" class="tab-pane fade">
-        <div class="list-group">
-            <a class="list-group-item" href="/news_cont.aspx?id=A3=">2026/04/27  國立空中大學教學媒體處行政組員(大學級)徵才公告 / 人事室</a>
-        </div>
-    </div>
-
-    <div id="cph_Content_rt_Content_dv_Name_7" class="tab-pane fade">
-        <div class="list-group">
-            <a class="list-group-item" href="/news_cont.aspx?id=OUT=">2026/01/01  這筆不該被抓到</a>
-        </div>
+        <ul id="tab-6">
+            <li>
+                <div>
+                    <div>
+                        <a href="https://studadm.nou.edu.tw/FileManage/download?categoryId=12" title="國立空中大學教學媒體處行政組員(大學級)徵才公告">國立空中大學教學媒體處行政組員(大學級)徵才公告</a>
+                    </div>
+                    <span class="text-xs text-gray-500 whitespace-nowrap font-mono">2026/04/27</span>
+                </div>
+            </li>
+        </ul>
     </div>
     </body></html>
     HTML;
@@ -56,30 +70,50 @@ it('parses list-group items across tab 0 to 6 and strips tag text', function () 
     $results = $fetcher->fetch($source);
 
     expect($results)->toHaveCount(3)
-        ->and($results[0]->sourceId)->toBe('/news_cont.aspx?id=A1=')
-        ->and($results[0]->title)->toBe('校本部配合每半年高壓電用電設備保養維護停電公告 / 總務處營繕組')
-        ->and($results[0]->url)->toBe('https://www.nou.edu.tw/news_cont.aspx?id=A1=')
+        ->and($results[0]->sourceId)->toBe('/Home/NewsDetails/9406')
+        ->and($results[0]->title)->toBe('本校校慶40週年－環台雲端接力GO連結網址')
+        ->and($results[0]->url)->toBe('https://www.nou.edu.tw/Home/NewsDetails/9406')
         ->and($results[0]->tags)->toBeNull()
-        ->and($results[0]->publishedAt?->format('Y-m-d'))->toBe('2026-03-11')
+        ->and($results[0]->publishedAt?->format('Y-m-d'))->toBe('2026-08-10')
         ->and($results[1]->title)->toBe('數位學習平台伺服(uu.nou.edu.tw)異常')
-        ->and($results[2]->sourceId)->toBe('/news_cont.aspx?id=A3=');
+        ->and($results[2]->sourceId)->toBe('https://studadm.nou.edu.tw/FileManage/download?categoryId=12')
+        ->and($results[2]->url)->toBe('https://studadm.nou.edu.tw/FileManage/download?categoryId=12');
 });
 
-it('skips list-group items without date prefix, href, or usable title', function () {
+it('skips tab items without href, title, or date', function () {
     $source = schoolHpSourceConfig([
-        'fetch_url' => 'https://example.com/news_idx1.aspx',
+        'fetch_url' => 'https://example.com/',
         'fetcher_config' => ['base_url' => 'https://example.com'],
     ]);
 
     $html = <<<'HTML'
     <html><body>
-    <div id="cph_Content_rt_Content_dv_Name_0">
-        <div class="list-group">
-            <a class="list-group-item" href="">2026/05/02 沒有連結</a>
-            <a class="list-group-item" href="/news_cont.aspx?id=1">這筆沒有日期前綴</a>
-            <a class="list-group-item" href="/news_cont.aspx?id=2">2026/05/02 <span class="w3-tag w3-teal">Top</span></a>
-            <a class="list-group-item" href="/news_cont.aspx?id=3">2026/05/02 有效公告</a>
-        </div>
+    <div id="news-content">
+        <ul id="tab-1">
+            <li>
+                <div>
+                    <div><a href="" title="沒有連結">沒有連結</a></div>
+                    <span class="font-mono">2026/05/02</span>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <div><a href="/news/1">這筆沒有日期</a></div>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <div><a href="/news/2"></a></div>
+                    <span class="font-mono">2026/05/02</span>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <div><a href="/news/3" title="有效公告">有效公告</a></div>
+                    <span class="font-mono">2026/05/02</span>
+                </div>
+            </li>
+        </ul>
     </div>
     </body></html>
     HTML;
@@ -92,9 +126,9 @@ it('skips list-group items without date prefix, href, or usable title', function
     $results = $fetcher->fetch($source);
 
     expect($results)->toHaveCount(1)
-        ->and($results[0]->sourceId)->toBe('/news_cont.aspx?id=3')
+        ->and($results[0]->sourceId)->toBe('/news/3')
         ->and($results[0]->title)->toBe('有效公告')
-        ->and($results[0]->url)->toBe('https://example.com/news_cont.aspx?id=3');
+        ->and($results[0]->url)->toBe('https://example.com/news/3');
 });
 
 it('syncs school homepage announcements', function () {
@@ -102,10 +136,18 @@ it('syncs school homepage announcements', function () {
 
     $html = <<<'HTML'
     <html><body>
-    <div id="cph_Content_rt_Content_dv_Name_2">
-        <div class="list-group">
-            <a class="list-group-item" href="/news_cont.aspx?id=SYNC=">2026/04/28 <span class="w3-tag w3-teal">Top</span> 115年國立空中大學徵聘特殊教育資源中心輔導人員</a>
-        </div>
+    <div id="news-content">
+        <ul id="tab-2">
+            <li>
+                <div>
+                    <div>
+                        <span class="inline-block text-xs text-white bg-nou-red">置頂</span>
+                        <a href="/Home/NewsDetails/SYNC" title="115年國立空中大學徵聘特殊教育資源中心輔導人員">115年國立空中大學徵聘特殊教育資源中心輔導人員</a>
+                    </div>
+                    <span class="text-xs text-gray-500 whitespace-nowrap font-mono">2026/04/28</span>
+                </div>
+            </li>
+        </ul>
     </div>
     </body></html>
     HTML;
@@ -125,9 +167,9 @@ it('syncs school homepage announcements', function () {
         ->and($announcement->source_key)->toBe($source->key)
         ->and($announcement->source_name)->toBe($source->name)
         ->and($announcement->category)->toBe($source->category)
-        ->and($announcement->source_id)->toBe('/news_cont.aspx?id=SYNC=')
+        ->and($announcement->source_id)->toBe('/Home/NewsDetails/SYNC')
         ->and($announcement->title)->toBe('115年國立空中大學徵聘特殊教育資源中心輔導人員')
-        ->and($announcement->url)->toBe('https://www.nou.edu.tw/news_cont.aspx?id=SYNC=')
+        ->and($announcement->url)->toBe('https://www.nou.edu.tw/Home/NewsDetails/SYNC')
         ->and($announcement->tags)->toBeNull()
         ->and($announcement->published_at?->format('Y-m-d'))->toBe('2026-04-28');
 });

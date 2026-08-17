@@ -7,7 +7,6 @@ namespace NouTools\Domains\Announcements\Fetchers;
 use Carbon\CarbonInterface;
 use DOMDocument;
 use DOMElement;
-use DOMNode;
 use DOMXPath;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
@@ -43,7 +42,7 @@ final readonly class SchoolHpFetcher implements AnnouncementFetcher
         libxml_clear_errors();
 
         $xpath = new DOMXPath($dom);
-        $tabs = $xpath->query('//div[starts-with(@id, "cph_Content_rt_Content_dv_Name_")]');
+        $tabs = $xpath->query('//ul[starts-with(@id, "tab-")]');
 
         if ($tabs === false || $tabs->length === 0) {
             return collect();
@@ -56,12 +55,7 @@ final readonly class SchoolHpFetcher implements AnnouncementFetcher
                 continue;
             }
 
-            $tabId = $tab->getAttribute('id');
-            if (! preg_match('/^cph_Content_rt_Content_dv_Name_([0-6])$/', $tabId)) {
-                continue;
-            }
-
-            $items = $xpath->query('.//a[contains(concat(" ", normalize-space(@class), " "), " list-group-item ") and @href]', $tab);
+            $items = $xpath->query('.//li', $tab);
             if ($items === false || $items->length === 0) {
                 continue;
             }
@@ -85,23 +79,28 @@ final readonly class SchoolHpFetcher implements AnnouncementFetcher
 
     private function parseItem(DOMElement $item, DOMXPath $xpath, string $baseUrl): ?FetchedAnnouncementDTO
     {
-        $href = trim($item->getAttribute('href'));
+        $link = $xpath->query('.//a[@href]', $item)?->item(0);
+        if (! $link instanceof DOMElement) {
+            return null;
+        }
+
+        $href = trim($link->getAttribute('href'));
         if ($href === '') {
             return null;
         }
 
-        $text = $this->extractPlainTextWithoutTagSpans($item, $xpath);
-        if ($text === '') {
-            return null;
-        }
-
-        if (! preg_match('/^(\d{4}\/\d{2}\/\d{2})\s*(.+)$/u', $text, $matches)) {
-            return null;
-        }
-
-        $dateText = $matches[1];
-        $title = trim($matches[2]);
+        $title = trim($link->getAttribute('title'));
         if ($title === '') {
+            $title = preg_replace('/\s+/u', ' ', trim($link->textContent ?? '')) ?? '';
+            $title = trim($title);
+        }
+        if ($title === '') {
+            return null;
+        }
+
+        $dateNode = $xpath->query('.//span[contains(concat(" ", normalize-space(@class), " "), " font-mono ")]', $item)?->item(0);
+        $dateText = $dateNode !== null ? trim($dateNode->textContent ?? '') : '';
+        if ($dateText === '') {
             return null;
         }
 
@@ -114,28 +113,6 @@ final readonly class SchoolHpFetcher implements AnnouncementFetcher
             tags: null,
             publishedAt: $publishedAt,
         );
-    }
-
-    private function extractPlainTextWithoutTagSpans(DOMElement $item, DOMXPath $xpath): string
-    {
-        $clone = $item->cloneNode(true);
-        if (! $clone instanceof DOMNode) {
-            return '';
-        }
-
-        $tagNodes = $xpath->query('.//span[contains(concat(" ", normalize-space(@class), " "), " w3-tag ")]', $clone);
-        if ($tagNodes !== false) {
-            for ($index = $tagNodes->length - 1; $index >= 0; $index--) {
-                $node = $tagNodes->item($index);
-                if ($node !== null && $node->parentNode !== null) {
-                    $node->parentNode->removeChild($node);
-                }
-            }
-        }
-
-        $text = preg_replace('/\s+/u', ' ', trim($clone->textContent ?? '')) ?? '';
-
-        return trim($text);
     }
 
     private function resolveUrl(string $href, string $baseUrl): string

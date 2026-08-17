@@ -8,7 +8,7 @@ return [
         'school-homepage-latest-news' => [
             'name' => '學校首頁',
             'category' => '最新消息',
-            'fetch_url' => 'https://www.nou.edu.tw/news1.aspx',
+            'fetch_url' => 'https://www.nou.edu.tw/',
             'fetcher_type' => AnnouncementFetcherType::SCHOOL_HP->value,
             'fetcher_config' => [
                 'base_url' => 'https://www.nou.edu.tw',
