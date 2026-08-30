@@ -199,6 +199,10 @@ final class ParseNouCourses
         $code = $this->extractClassCode($imgNode->getAttribute('alt'));
 
         if ($code === '') {
+            $code = $this->extractClassCode($imgNode->getAttribute('src'));
+        }
+
+        if ($code === '') {
             return null;
         }
 

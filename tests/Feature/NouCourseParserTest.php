@@ -135,6 +135,24 @@ it('parses real vc4 HTML file with varied time slots', function () {
     expect(count($times))->toBeGreaterThan(1);
 })->skip();
 
+it('parses unified in-person (統一面授) classes whose icon alt has no zzz code', function () {
+    $html = file_get_contents(__DIR__.'/../fixtures/vc_unified_sample.html');
+
+    $courses = ($this->parser)($html, CourseClassType::Evening);
+
+    expect($courses)->toHaveCount(1);
+    expect($courses[0]['name'])->toBe('測試科目概論');
+    expect($courses[0]['classes'])->toHaveCount(1);
+
+    $class = $courses[0]['classes'][0];
+    expect($class['code'])->toBe('zzz000');
+    expect($class['teacher_name'])->toBe('測試老師');
+    expect($class['start_time'])->toBe('19:00');
+    expect($class['end_time'])->toBe('20:50');
+    expect($class['link'])->toContain('webex.com');
+    expect($class['dates'])->toBe(['09/16', '10/14', '11/18', '12/09']);
+});
+
 it('returns empty array for empty HTML', function () {
     $courses = ($this->parser)('', CourseClassType::Morning);
 
