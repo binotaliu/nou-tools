@@ -773,6 +773,47 @@ it('edit page form posts to update route and includes method spoofing', function
         ->assertSee('更新課表');
 });
 
+it('edit page hides tentative classes for a course that also has an official class', function () {
+    config()->set('app.current_semester', '2025B');
+
+    $course = Course::factory()->create(['term' => '2025B']);
+
+    CourseClass::factory()->create([
+        'course_id' => $course->id,
+        'code' => 'OFFICIAL101',
+        'is_tentative' => false,
+    ]);
+
+    CourseClass::factory()->create([
+        'course_id' => $course->id,
+        'code' => 'NOTICE-TENTATIVE',
+        'is_tentative' => true,
+    ]);
+
+    $response = $this->get(route('schedules.create'));
+
+    $response->assertStatus(200)
+        ->assertSee('OFFICIAL101')
+        ->assertDontSee('NOTICE-TENTATIVE');
+});
+
+it('edit page shows tentative classes for a course that has no official class yet', function () {
+    config()->set('app.current_semester', '2025B');
+
+    $course = Course::factory()->create(['term' => '2025B']);
+
+    CourseClass::factory()->create([
+        'course_id' => $course->id,
+        'code' => 'NOTICE-ONLY',
+        'is_tentative' => true,
+    ]);
+
+    $response = $this->get(route('schedules.create'));
+
+    $response->assertStatus(200)
+        ->assertSee('NOTICE-ONLY');
+});
+
 it('create page form posts to store route and does not include method spoofing', function () {
     $response = $this->get(route('schedules.create'));
 

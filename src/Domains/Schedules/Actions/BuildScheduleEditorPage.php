@@ -31,7 +31,15 @@ final readonly class BuildScheduleEditorPage
             Course::query()
                 ->where('term', $selectedTerm)
                 ->with(['classes' => function ($query) {
-                    $query->orderBy('is_tentative')->orderBy('type');
+                    $query->where(function ($query) {
+                        $query->where('is_tentative', false)
+                            ->orWhereNotExists(function ($subQuery) {
+                                $subQuery->selectRaw('1')
+                                    ->from('course_classes as official_classes')
+                                    ->whereColumn('official_classes.course_id', 'course_classes.course_id')
+                                    ->where('official_classes.is_tentative', false);
+                            });
+                    })->orderBy('is_tentative')->orderBy('type');
                 }])
                 ->orderBy('name')
                 ->get()
