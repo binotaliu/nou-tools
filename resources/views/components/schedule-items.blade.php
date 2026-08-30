@@ -134,8 +134,18 @@
                                 class="inline-block rounded bg-warm-100 px-2 py-1 font-mono text-xs font-normal text-warm-800 dark:bg-zinc-800 dark:text-zinc-200 print:bg-transparent print:p-0"
                                 x-show="!row.item.isTentative"
                             >
-                                <span class="sr-only">班級代碼：</span>
-                                <span x-text="row.item.code"></span>
+                                <span x-show="row.item.code === 'ZZZ000'"
+                                    >統一面授</span
+                                >
+                                <span
+                                    class="sr-only"
+                                    x-show="row.item.code !== 'ZZZ000'"
+                                    >班級代碼：</span
+                                >
+                                <span
+                                    x-text="row.item.code"
+                                    x-show="row.item.code !== 'ZZZ000'"
+                                ></span>
                             </span>
                             <span
                                 x-show="row.item.isTentative"
@@ -302,8 +312,18 @@
                             class="inline-block rounded bg-warm-100 px-2 py-1 font-mono text-xs font-normal text-warm-800 dark:bg-zinc-800 dark:text-zinc-200"
                             x-show="!row.item.isTentative"
                         >
-                            <span class="sr-only">班級代碼：</span>
-                            <span x-text="row.item.code"></span>
+                            <span x-show="row.item.code === 'ZZZ000'"
+                                >統一面授</span
+                            >
+                            <span
+                                class="sr-only"
+                                x-show="row.item.code !== 'ZZZ000'"
+                                >班級代碼：</span
+                            >
+                            <span
+                                x-text="row.item.code"
+                                x-show="row.item.code !== 'ZZZ000'"
+                            ></span>
                         </span>
                         <span
                             x-show="row.item.isTentative"
