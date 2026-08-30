@@ -27,6 +27,7 @@ final class DiscountStoreViewModel extends Data
         public ?bool $latestReportIsValid,
         public ?string $latestReportCreatedAtDate,
         public ?string $latestReportCreatedAtDateTime,
+        public ?string $expiresAtDate,
     ) {}
 
     public static function fromModel(DiscountStore $store): self
@@ -45,6 +46,7 @@ final class DiscountStoreViewModel extends Data
             latestReportIsValid: $store->latestReport?->is_valid,
             latestReportCreatedAtDate: $store->latestReport?->created_at?->format('Y/m/d'),
             latestReportCreatedAtDateTime: $store->latestReport?->created_at?->format('Y-m-d H:i'),
+            expiresAtDate: $store->expires_at?->timezone('Asia/Taipei')->format('Y/m/d H:i'),
         );
     }
 }

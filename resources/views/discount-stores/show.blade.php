@@ -71,6 +71,14 @@
                             {{ $store->city }} {{ $store->district }}
                         </span>
                     @endif
+
+                    @if ($store->expires_at)
+                        <span
+                            class="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-700 dark:bg-amber-950/60 dark:text-amber-300"
+                        >
+                            將於 {{ $store->expires_at->timezone('Asia/Taipei')->format('Y/m/d H:i') }} 到期
+                        </span>
+                    @endif
                 </div>
 
                 <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">

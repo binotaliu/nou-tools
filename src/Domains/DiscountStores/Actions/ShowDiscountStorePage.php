@@ -23,6 +23,7 @@ final readonly class ShowDiscountStorePage
     {
         $stores = DiscountStore::query()
             ->where('status', DiscountStoreStatus::Online)
+            ->where(fn ($query) => $query->whereNull('expires_at')->orWhere('expires_at', '>', now()))
             ->with(['category', 'latestReport'])
             ->orderByDesc('id')
             ->get()

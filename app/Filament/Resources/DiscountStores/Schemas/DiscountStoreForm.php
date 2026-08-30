@@ -7,6 +7,7 @@ namespace App\Filament\Resources\DiscountStores\Schemas;
 use App\Enums\DiscountStoreStatus;
 use App\Enums\DiscountStoreType;
 use Dotswan\MapPicker\Fields\Map;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -131,6 +132,10 @@ class DiscountStoreForm
                         Textarea::make('notes')
                             ->label('備註')
                             ->rows(2),
+                        DateTimePicker::make('expires_at')
+                            ->label('過期時間')
+                            ->timezone('Asia/Taipei')
+                            ->nullable(),
                     ]),
             ]);
     }

@@ -39,6 +39,7 @@ final class DiscountStoreFactory extends Factory
             'verification_method' => '學生證',
             'discount_details' => fake()->sentence(),
             'notes' => fake()->optional()->sentence(),
+            'expires_at' => null,
         ];
     }
 

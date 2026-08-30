@@ -11,6 +11,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class DiscountStoresTable
@@ -45,6 +46,12 @@ class DiscountStoresTable
                     ->dateTime('Y-m-d H:i')
                     ->sortable()
                     ->toggleable(),
+                TextColumn::make('expires_at')
+                    ->label('過期時間')
+                    ->dateTime('Y-m-d H:i', timezone: 'Asia/Taipei')
+                    ->sortable()
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -56,6 +63,15 @@ class DiscountStoresTable
                 SelectFilter::make('category_id')
                     ->label('分類')
                     ->relationship('category', 'name'),
+                TernaryFilter::make('expired')
+                    ->label('過期狀態')
+                    ->nullable()
+                    ->trueLabel('已過期')
+                    ->falseLabel('未過期')
+                    ->queries(
+                        true: fn ($query) => $query->whereNotNull('expires_at')->where('expires_at', '<=', now()),
+                        false: fn ($query) => $query->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now())),
+                    ),
             ])
             ->defaultSort('created_at', 'desc')
             ->recordActions([

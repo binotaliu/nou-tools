@@ -173,6 +173,55 @@ it('only shows online stores', function () {
     $response->assertDontSee('已過期店家');
 });
 
+it('hides expired stores from the index page but keeps their detail page reachable', function () {
+    $expiredStore = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '已到期店家',
+            'status' => DiscountStoreStatus::Online,
+            'expires_at' => now()->subDay(),
+        ]);
+
+    DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '未到期店家',
+            'status' => DiscountStoreStatus::Online,
+            'expires_at' => now()->addDay(),
+        ]);
+
+    DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '無到期時間店家',
+            'status' => DiscountStoreStatus::Online,
+            'expires_at' => null,
+        ]);
+
+    $response = get(route('discount-stores.index'));
+
+    $response->assertDontSee('已到期店家');
+    $response->assertSee('未到期店家');
+    $response->assertSee('無到期時間店家');
+
+    get(route('discount-stores.show', $expiredStore))->assertSuccessful();
+});
+
+it('shows the expiry date on the index and detail pages when set', function () {
+    $store = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create([
+            'name' => '限時優惠店家',
+            'status' => DiscountStoreStatus::Online,
+            'expires_at' => now()->addDays(3)->setTimezone('Asia/Taipei'),
+        ]);
+
+    $expectedDate = $store->fresh()->expires_at->timezone('Asia/Taipei')->format('Y/m/d H:i');
+
+    get(route('discount-stores.index'))->assertSee($expectedDate);
+    get(route('discount-stores.show', $store))->assertSee($expectedDate);
+});
+
 it('initializes filter state from query parameters', function () {
     DiscountStore::factory()
         ->for($this->category, 'category')

@@ -31,6 +31,7 @@ final class DiscountStore extends Model
         'verification_method',
         'discount_details',
         'notes',
+        'expires_at',
     ];
 
     /**
@@ -43,6 +44,7 @@ final class DiscountStore extends Model
             'type' => DiscountStoreType::class,
             'latitude' => 'decimal:8',
             'longitude' => 'decimal:8',
+            'expires_at' => 'datetime',
         ];
     }
 

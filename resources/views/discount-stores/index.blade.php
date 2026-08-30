@@ -215,6 +215,14 @@
                                         {{ $store->city }} {{ $store->district }}
                                     </span>
                                 @endif
+
+                                @if ($store->expiresAtDate)
+                                    <span
+                                        class="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-700 dark:bg-amber-950/60 dark:text-amber-300"
+                                    >
+                                        將於 {{ $store->expiresAtDate }} 到期
+                                    </span>
+                                @endif
                             </div>
 
                             <div
