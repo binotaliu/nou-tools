@@ -86,7 +86,7 @@
                 >
                     <div class="flex w-full shrink-0 gap-2 sm:w-1/2 lg:w-auto">
                         <x-link-button
-                            :href="route('schedules.edit', $viewModel->uuid)"
+                            :href="route('schedules.edit', [$viewModel->uuid, 'term' => $viewModel->selectedTerm])"
                             variant="secondary"
                             class="w-full sm:w-1/2 lg:w-auto"
                             data-analytics-event="schedule_edit"
@@ -178,7 +178,7 @@
                     沒有課程。</p>
 
                     <p class="text-sm text-warm-600 dark:text-zinc-400">您可以切換其他學期，或前往
-                    <a href="{{ route('schedules.edit', $viewModel->uuid) }}" class="font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"> 編輯課表 </a>
+                    <a href="{{ route('schedules.edit', [$viewModel->uuid, 'term' => $viewModel->selectedTerm]) }}" class="font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"> 編輯課表 </a>
                     新增課程。</p>
                 </div>
             </x-card>
@@ -222,7 +222,7 @@
                         >
                             <span>{{ $item->courseName }}</span>
                             <a
-                                href="{{ route('schedules.edit', $viewModel->uuid) }}"
+                                href="{{ route('schedules.edit', [$viewModel->uuid, 'term' => $viewModel->selectedTerm]) }}"
                                 class="shrink-0 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
                             >
                                 前往選擇班級

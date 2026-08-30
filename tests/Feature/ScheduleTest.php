@@ -535,6 +535,29 @@ it('schedule show page defaults to current semester courses and updates learning
         ->assertSee('value="2026C"', false);
 });
 
+it('schedule show page carries the selected semester to the edit link', function () {
+    config()->set('app.current_semester', '2026C');
+
+    $course = Course::factory()->create(['term' => '2025B']);
+    $class = CourseClass::factory()->create(['course_id' => $course->id]);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Term Edit Link Schedule',
+    ]);
+
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_id' => $course->id,
+        'course_class_id' => $class->id,
+    ]);
+
+    $response = $this->get(route('schedules.show', ['schedule' => $schedule, 'term' => '2025B']));
+
+    $response->assertStatus(200)
+        ->assertSee(route('schedules.edit', [$schedule, 'term' => '2025B']), false);
+});
+
 it('schedule show page shows empty state for selected semester without courses', function () {
     config()->set('app.current_semester', '2026C');
 
