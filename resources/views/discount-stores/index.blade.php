@@ -49,7 +49,7 @@
                 <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
                     優惠店家
                 </h2>
-                <p class="text-sm text-warm-600 dark:text-zinc-400">學生優惠店家列表，歡迎回報或新增店家資訊。
+                <p class="text-sm text-warm-600 dark:text-zinc-400">適用於空大學生的優惠店家列表，歡迎回報或新增店家資訊。
                 <br />
                 此區資料由
                 <strong>112姍姍</strong>
