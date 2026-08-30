@@ -611,6 +611,7 @@
   },
   "2026A": {
     "label": "115 上學期",
+    "source": "https://studadm.nou.edu.tw/FileUploads/File/7741/3fbcc4ad-4384-4ec9-b806-230350d52969.pdf",
     "dates": {
       "saturday": {
         "midterm": "2026-11-07",
@@ -707,10 +708,6 @@
           {
             "code": "84",
             "title": "安全管理"
-          },
-          {
-            "code": "89",
-            "title": "生命意義與自我敘說"
           },
           {
             "code": "90",
@@ -982,10 +979,6 @@
             "title": "臺灣風情畫：地名篇"
           },
           {
-            "code": "15",
-            "title": "商業日語應對技巧"
-          },
-          {
             "code": "22",
             "title": "生死哲學概論"
           },
@@ -1023,10 +1016,6 @@
           }
         ],
         "sunday": [
-          {
-            "code": "2",
-            "title": "跨領域多元主題學習課程"
-          },
           {
             "code": "24",
             "title": "生活日語"
