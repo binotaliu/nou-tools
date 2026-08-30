@@ -221,6 +221,41 @@ it('parses session time overrides for micro-credit courses', function () {
     ]);
 });
 
+it('strips class-time-slot suffixes so cards for the same course share one name', function () {
+    $html = file_get_contents(__DIR__.'/../fixtures/vc4_split_time_slot_sample.html');
+
+    $courses = ($this->parser)($html, CourseClassType::FullRemote);
+
+    expect($courses)->toHaveCount(3);
+
+    foreach ($courses as $course) {
+        expect($course['name'])->toBe('測試分班課程');
+    }
+
+    expect($courses[0]['classes'])->toHaveCount(1);
+    expect($courses[0]['classes'][0]['code'])->toBe('zzz201');
+    expect($courses[0]['classes'][0]['start_time'])->toBe('09:00');
+
+    expect($courses[1]['classes'])->toHaveCount(1);
+    expect($courses[1]['classes'][0]['code'])->toBe('zzz101');
+    expect($courses[1]['classes'][0]['start_time'])->toBe('14:00');
+
+    expect($courses[2]['classes'])->toHaveCount(4);
+    expect($courses[2]['classes'][0]['code'])->toBe('zzz001');
+    expect($courses[2]['classes'][1]['code'])->toBe('zzz002');
+    expect($courses[2]['classes'][2]['code'])->toBe('zzz003');
+    expect($courses[2]['classes'][3]['code'])->toBe('zzz004');
+    expect($courses[2]['classes'][0]['start_time'])->toBe('19:00');
+});
+
+it('does not strip a full-width parenthetical suffix that is not a class-time slot', function () {
+    $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
+
+    $courses = ($this->parser)($html, CourseClassType::MicroCredit);
+
+    expect(collect($courses)->pluck('name'))->toContain('法學德文（三）', '法學德文（四）');
+});
+
 it('parses summer courses from vc0 sample and keeps backup classrooms on the same class', function () {
     $html = file_get_contents(__DIR__.'/../fixtures/vc0_sample.html');
 

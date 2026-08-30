@@ -142,10 +142,19 @@ final class ParseNouCourses
     private function extractCourseName(string $titleText): string
     {
         if (preg_match('/^\d+\.(.+)$/', $titleText, $matches)) {
-            return trim($matches[1]);
+            return $this->stripClassTimeSuffix(trim($matches[1]));
         }
 
         return '';
+    }
+
+    /**
+     * Strip a trailing class-time-slot suffix like "(上午班)" or "（夜間班）" so that
+     * the same course offered across multiple time slots is treated as one course.
+     */
+    private function stripClassTimeSuffix(string $courseName): string
+    {
+        return trim(preg_replace('/[（(][^（）()]*班[）)]$/u', '', $courseName) ?? $courseName);
     }
 
     private function extractTime(string $text): ?array
