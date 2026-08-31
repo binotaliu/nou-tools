@@ -69,11 +69,11 @@ final class ScheduleController extends Controller
         if ($request->wantsJson() || $request->isJson()) {
             return response()->json([
                 'success' => true,
-                'redirect_url' => route('schedules.show', $schedule),
+                'redirect_url' => route('schedules.show', [$schedule, 'term' => $input->term]),
             ])->cookie($cookie);
         }
 
-        return redirect()->route('schedules.show', $schedule)
+        return redirect()->route('schedules.show', [$schedule, 'term' => $input->term])
             ->with('success', '課表已更新！')
             ->cookie($cookie);
     }

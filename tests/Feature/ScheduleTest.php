@@ -696,12 +696,34 @@ it('updates the stored cookie when schedule is updated', function () {
 
     $response = $this->put(route('schedules.update', $schedule), $payload);
 
-    $response->assertRedirect(route('schedules.show', $schedule));
+    $response->assertRedirect(route('schedules.show', [$schedule, 'term' => '2025B']));
     $response->assertCookie('student_schedule', json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => 'New Name',
     ]));
+});
+
+it('updating schedule redirects back with the selected term carried over', function () {
+    config()->set('app.current_semester', '2026C');
+
+    $course = Course::factory()->create(['term' => '2025B']);
+    $class = CourseClass::factory()->create(['course_id' => $course->id]);
+
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Term Redirect Schedule',
+    ]);
+
+    $response = $this->put(route('schedules.update', $schedule), [
+        'name' => 'Term Redirect Schedule',
+        'term' => '2025B',
+        'items' => [
+            ['course_id' => $course->id, 'class_id' => $class->id],
+        ],
+    ]);
+
+    $response->assertRedirect(route('schedules.show', [$schedule, 'term' => '2025B']));
 });
 
 it('updating schedule only replaces classes in current semester', function () {
