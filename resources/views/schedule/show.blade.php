@@ -169,8 +169,6 @@
             <x-greeting class="mb-4 print:hidden" />
         @endif
 
-        <x-alt-uu-banner class="print:hidden" />
-
         @if (! $hasCourses)
             <x-card class="mb-8" title="此學期尚無課程">
                 <div class="space-y-3 text-warm-700 dark:text-zinc-300">

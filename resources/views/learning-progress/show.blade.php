@@ -56,8 +56,6 @@
 
         <x-greeting class="mb-6" />
 
-        <x-alt-uu-banner class="print:hidden" />
-
         {{-- overall completion progress bar --}}
         <div class="mb-4 w-full print:hidden">
             <p class="mb-1 text-sm text-warm-700 dark:text-zinc-300">本學期完成進度：{{ number_format($viewModel->percentage, 0) }}%</p>

@@ -38,20 +38,6 @@ export default function registerAlpineComponents(Alpine) {
     },
   }))
 
-  Alpine.data('nouAltUuBanner', () => ({
-    storageKey: 'alt_uu_promo_banner_dismissed_v1',
-    visible: true,
-
-    init() {
-      this.visible = localStorage.getItem(this.storageKey) !== '1'
-    },
-
-    dismiss() {
-      this.visible = false
-      localStorage.setItem(this.storageKey, '1')
-    },
-  }))
-
   Alpine.data('nouPwaInstallBanner', () => ({
     storageKey: 'pwa_install_banner_dismissed_v1',
     visible: false,
