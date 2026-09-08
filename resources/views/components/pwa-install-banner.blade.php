@@ -30,12 +30,16 @@
             <div
                 class="flex flex-1 flex-col justify-between gap-4 px-4 py-4 text-warm-900 sm:pr-12 md:px-5 md:py-5 md:pr-12 dark:text-warm-100"
             >
-                <p class="text-sm leading-6 md:text-base" x-cloak x-show="
-                        !isIos
-                    ">將「NOU 小幫手」安裝到裝置上，即可像一般 App 一樣從主畫面開啟，並支援離線檢視此課表。</p>
-                <p class="text-sm leading-6 md:text-base" x-cloak x-show="
-                        isIos
-                    ">將「NOU 小幫手」加入主畫面，即可像一般 App 一樣開啟：點選瀏覽器下方的
+                <p
+                    class="text-sm leading-6 md:text-base"
+                    x-cloak
+                    x-show="!isIos"
+                >將「NOU 小幫手」安裝到裝置上，即可像一般 App 一樣從主畫面開啟，並支援離線檢視此課表。</p>
+                <p
+                    class="text-sm leading-6 md:text-base"
+                    x-cloak
+                    x-show="isIos"
+                >將「NOU 小幫手」加入主畫面，即可像一般 App 一樣開啟：點選瀏覽器下方的
                 <x-heroicon-o-arrow-up-on-square class="inline size-4" />
                 分享圖示，再選擇「加入主畫面」。</p>
 
