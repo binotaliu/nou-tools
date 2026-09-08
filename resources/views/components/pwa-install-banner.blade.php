@@ -41,7 +41,8 @@
                     x-show="isIos"
                 >將「NOU 小幫手」加入主畫面，即可像一般 App 一樣開啟：點選瀏覽器下方的
                 <x-heroicon-o-arrow-up-on-square class="inline size-4" />
-                分享圖示，再選擇「加入主畫面」。</p>
+                分享圖示，再選擇「加入主畫面」。不確定怎麼操作？參考
+                <a href="https://support.apple.com/zh-tw/guide/iphone/iph42ab2f3a7/ios" target="_blank" rel="noopener noreferrer" class="underline hover:text-warm-700 dark:hover:text-warm-300">Apple 官方教學</a>（可在頁面中選擇你的 iOS 版本）。</p>
 
                 <div
                     class="flex flex-wrap items-center justify-end gap-2 sm:-mr-8"
