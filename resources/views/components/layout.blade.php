@@ -2,6 +2,7 @@
     'title' => 'NOU 小幫手',
     'description' => '給 NOU 同學的非官方小工具：管理個人課表與學習進度',
     'noindex' => false,
+    'pwaScheduleUuid' => null,
 ])
 
 @php
@@ -113,6 +114,17 @@
         type="image/svg+xml"
         href="{{ asset('favicon.svg') }}?v=2"
     />
+
+    {{-- PWA: installability + iOS "Add to Home Screen" support --}}
+    <link
+        rel="manifest"
+        href="{{ route('pwa.manifest', $pwaScheduleUuid ? ['schedule' => $pwaScheduleUuid] : []) }}"
+    />
+    <meta name="theme-color" content="#b05139" />
+    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.png') }}?v=1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="NOU 小幫手" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
     {{--
             Alpine (CSP build) is bundled into app.js and started at the

@@ -23,6 +23,7 @@ use App\Http\Controllers\Markdown\DiscountStoreIndexMarkdownController;
 use App\Http\Controllers\Markdown\DiscountStoreShowMarkdownController;
 use App\Http\Controllers\Markdown\HomeIndexMarkdownController;
 use App\Http\Controllers\Markdown\ScheduleShowMarkdownController;
+use App\Http\Controllers\PwaManifestController;
 use App\Http\Controllers\ScheduleAnnouncementPreferencesController;
 use App\Http\Controllers\ScheduleCalendarController;
 use App\Http\Controllers\ScheduleCalendarSettingsUpdateController;
@@ -45,6 +46,8 @@ Route::get('/docs/api.yaml', function () {
         'Content-Type' => 'application/yaml; charset=utf-8',
     ]);
 })->name('docs.api.yaml');
+
+Route::get('/manifest.webmanifest', PwaManifestController::class)->name('pwa.manifest');
 
 Route::get('/', [HomeController::class, 'index'])->name('home')
     ->withMarkdown(HomeIndexMarkdownController::class, uri: '/llms.txt', name: 'llms-txt');

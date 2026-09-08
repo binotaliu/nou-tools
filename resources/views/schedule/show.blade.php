@@ -1,6 +1,7 @@
 <x-layout
     :title="($viewModel->name ?: '我的課表') . ' - NOU 小幫手'"
     :noindex="true"
+    :pwaScheduleUuid="$viewModel->uuid"
 >
     @php
         $hasCourses = count($viewModel->items) > 0;
@@ -557,6 +558,8 @@
                 />
             </div>
         @endif
+
+        <x-pwa-install-banner />
 
         {{-- Share Section --}}
         @if ($viewModel->displayOptions->showShareSection)

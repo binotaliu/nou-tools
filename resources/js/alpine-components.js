@@ -52,6 +52,58 @@ export default function registerAlpineComponents(Alpine) {
     },
   }))
 
+  Alpine.data('nouPwaInstallBanner', () => ({
+    storageKey: 'pwa_install_banner_dismissed_v1',
+    visible: false,
+    isIos: false,
+
+    init() {
+      const dismissed = localStorage.getItem(this.storageKey) === '1'
+      const isStandalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true
+
+      if (dismissed || isStandalone) {
+        return
+      }
+
+      // iOS Safari never fires beforeinstallprompt, so it gets manual
+      // "Add to Home Screen" instructions instead of an install button.
+      this.isIos =
+        /iphone|ipad|ipod/i.test(window.navigator.userAgent) && !window.MSStream
+
+      if (window.__nouInstallPrompt || this.isIos) {
+        this.visible = true
+      }
+
+      window.addEventListener('nou:install-prompt-ready', () => {
+        this.visible = true
+      })
+    },
+
+    async install() {
+      const promptEvent = window.__nouInstallPrompt
+      if (!promptEvent) {
+        return
+      }
+
+      promptEvent.prompt()
+      const { outcome } = await promptEvent.userChoice
+      window.__nouInstallPrompt = null
+
+      if (outcome === 'accepted') {
+        this.dismiss()
+      } else {
+        this.visible = false
+      }
+    },
+
+    dismiss() {
+      this.visible = false
+      localStorage.setItem(this.storageKey, '1')
+    },
+  }))
+
   Alpine.data('nouScheduleCustomize', initial => ({
     links: initial.links,
 

@@ -21,6 +21,20 @@ if ('serviceWorker' in navigator) {
   })
 }
 
+// Chrome/Edge/Android fire this ahead of time and expect preventDefault() so
+// the browser's own mini-infobar is suppressed in favor of our own install
+// banner (see nouPwaInstallBanner in alpine-components.js), which re-triggers
+// the captured event's prompt() on click.
+window.__nouInstallPrompt = null
+window.addEventListener('beforeinstallprompt', event => {
+  event.preventDefault()
+  window.__nouInstallPrompt = event
+  window.dispatchEvent(new CustomEvent('nou:install-prompt-ready'))
+})
+window.addEventListener('appinstalled', () => {
+  window.__nouInstallPrompt = null
+})
+
 // A link is left alone while offline if it goes to the homepage, to a
 // schedule's own show page (the only pages that can actually work without a
 // connection), or if it opts out explicitly via data-offline-allow (used for
