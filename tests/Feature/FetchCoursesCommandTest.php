@@ -95,6 +95,56 @@ it('creates schedules with correct dates for A semester', function () {
     expect($schedules[0]->date->format('Y'))->toBe('2025');
 });
 
+it('rolls January dates into the following calendar year for A semester', function () {
+    $html = <<<'HTML'
+    <!DOCTYPE html>
+    <html>
+      <body>
+        <div class="container">
+          <div class="row">
+            <div class="col-xl-4 col-lg-6 mb-3">
+              <span class="anchor" id="01"></span>
+              <div class="card h-100">
+                <div class="card-body">
+                  <h4 class="card-title">01.測試課程</h4>
+                  <h6 class="card-subtitle mb-2">時間：09:00-10:50</h6>
+                </div>
+                <div class="card-footer">
+                  <class_icon><a href="https://example.com/class" target="_self"><img src="images/zzz201.png" width="90" height="60" alt="zzz201班按我進入教室" /></a></class_icon>
+                  <h5><c1text>測試老師</c1text></h5>
+                  <h6>
+                    <c2text>僅限上課時間<br />轉分機：5181</c2text><br /><c3text>09/07、11/09、12/07、01/11</c3text>
+                  </h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+    HTML;
+
+    Http::fake([
+        'vc.nou.edu.tw/vc1/*' => Http::response($html, 200),
+        'vc.nou.edu.tw/vc2/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc3/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc4/*' => Http::response('<html><body></body></html>', 200),
+        'vc.nou.edu.tw/vc5/*' => Http::response('<html><body></body></html>', 200),
+    ]);
+
+    $this->artisan('course:fetch', ['term' => '2026A'])
+        ->assertSuccessful();
+
+    $courseClass = CourseClass::query()->first();
+    $schedules = $courseClass->schedules()->orderBy('date')->get();
+
+    expect($schedules)->toHaveCount(4);
+    expect($schedules[0]->date->format('Y-m-d'))->toBe('2026-09-07');
+    expect($schedules[1]->date->format('Y-m-d'))->toBe('2026-11-09');
+    expect($schedules[2]->date->format('Y-m-d'))->toBe('2026-12-07');
+    expect($schedules[3]->date->format('Y-m-d'))->toBe('2027-01-11');
+});
+
 it('does not duplicate courses on re-run', function () {
     $vc1Html = file_get_contents(__DIR__.'/../fixtures/vc1_sample.html');
 

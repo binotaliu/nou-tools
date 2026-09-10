@@ -94,7 +94,7 @@ final class FetchCoursesCommand extends Command
                     ]);
 
                     foreach ($classData['dates'] as $index => $dateString) {
-                        $date = $this->parseDate($dateString, $year);
+                        $date = $this->parseDate($dateString, $year, $term);
 
                         if ($date !== null) {
                             $dateStr = $date->format('Y-m-d');
@@ -196,8 +196,11 @@ final class FetchCoursesCommand extends Command
 
     /**
      * Parse a date string like "03/09" into a Carbon date for the given year.
+     *
+     * Semester A runs from around September through January, crossing a
+     * calendar year boundary, so early-year months roll over to $year + 1.
      */
-    private function parseDate(string $dateString, int $year): ?CarbonInterface
+    private function parseDate(string $dateString, int $year, string $term): ?CarbonInterface
     {
         $parts = explode('/', $dateString);
 
@@ -212,6 +215,15 @@ final class FetchCoursesCommand extends Command
             return null;
         }
 
+        if ($this->isFallTerm($term) && $month <= 2) {
+            $year++;
+        }
+
         return Date::create($year, $month, $day);
+    }
+
+    private function isFallTerm(string $term): bool
+    {
+        return substr($term, 4, 1) === 'A';
     }
 }
