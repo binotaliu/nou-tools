@@ -21,12 +21,11 @@
 
     $scheduleNavHref = route('schedules.my');
 
-    $analyticsPage = match ($routeName) {
-        'schedules.show' => '/schedules/:schedule',
-        'schedules.edit' => '/schedules/:schedule/edit',
-        'learning-progress.show' => '/schedules/:schedule/learning-progress',
-        default => '/' . ltrim(request()->path(), '/'),
-    };
+    $currentRoute = request()->route();
+
+    $analyticsPage = $currentRoute
+        ? '/' . ltrim(preg_replace('/\{(\w+)\??\}/', ':$1', $currentRoute->uri()), '/')
+        : '/' . ltrim(request()->path(), '/');
 
     $analyticsTitle = match ($routeName) {
         'schedules.show' => '我的課表 - NOU 小幫手',
