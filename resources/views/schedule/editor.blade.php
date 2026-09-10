@@ -80,7 +80,7 @@
                     placeholder="輸入課程名稱..."
                     class="w-full rounded-lg border-2 border-warm-300 px-4 py-3 text-lg focus:border-orange-500 focus:outline-none dark:border-zinc-600"
                     autocomplete="off"
-                    :disabled="selectedItems.length >= 10"
+                    :disabled="selectedItems.length >= 14"
                 />
             </div>
 

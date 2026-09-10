@@ -51,8 +51,8 @@ it('allows creating multiple schedules', function () {
     $this->assertDatabaseHas('student_schedules', ['name' => '第二次']);
 });
 
-it('rejects schedules with more than ten items', function () {
-    $classes = CourseClass::factory()->count(11)->create();
+it('rejects schedules with more than fourteen items', function () {
+    $classes = CourseClass::factory()->count(15)->create();
 
     $payload = [
         'name' => 'Too Many',

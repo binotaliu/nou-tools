@@ -24,7 +24,7 @@ final class StudentScheduleUpsertData extends Data
         return [
             'name' => ['nullable', 'string', 'max:255'],
             'term' => ['required', 'string', 'regex:/^\d{4}[ABC]$/'],
-            'items' => ['required', 'array', 'min:1', 'max:10'],
+            'items' => ['required', 'array', 'min:1', 'max:14'],
             'items.*.course_id' => [
                 'required',
                 'integer',

@@ -60,8 +60,8 @@ export default function scheduleEditor(config) {
 
     selectCourse(course) {
       // enforce limit
-      if (this.selectedItems.length >= 10) {
-        alert('最多只能選擇 10 門課程')
+      if (this.selectedItems.length >= 14) {
+        alert('最多只能選擇 14 門課程')
         return
       }
 
@@ -118,8 +118,8 @@ export default function scheduleEditor(config) {
         return
       }
 
-      if (this.selectedItems.length > 10) {
-        alert('最多只能選擇 10 門課程')
+      if (this.selectedItems.length > 14) {
+        alert('最多只能選擇 14 門課程')
         return
       }
 
