@@ -48,9 +48,9 @@ use Illuminate\Support\Str;
 - 期中考：{{ Date::parse($viewModel->course->midtermDate)->isoFormat('M/D (dd)') }}
   @if ($viewModel->course->examTimeStart || $viewModel->course->examTimeEnd)
   {{ $viewModel->course->examTimeStart ?? '' }}{{ $viewModel->course->examTimeStart && $viewModel->course->examTimeEnd ? ' - ' : '' }}{{ $viewModel->course->examTimeEnd ?? '' }}
-@endif
-@endif
-@if ($viewModel->course->finalDate)
+  @endif
+  @endif
+  @if ($viewModel->course->finalDate)
 - 期末考：{{ Date::parse($viewModel->course->finalDate)->isoFormat('M/D (dd)') }}
   @if ($viewModel->course->examTimeStart || $viewModel->course->examTimeEnd)
   {{ $viewModel->course->examTimeStart ?? '' }}{{ $viewModel->course->examTimeStart && $viewModel->course->examTimeEnd ? ' - ' : '' }}{{ $viewModel->course->examTimeEnd ?? '' }}

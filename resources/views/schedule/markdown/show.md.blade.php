@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 
 @foreach ($viewModel->items as $item)
 @php
-    $classCode = ($item->courseClass === null || $item->courseClass->isTentative) ? '尚未分班' : $item->courseClass->code;
+$classCode = ($item->courseClass === null || $item->courseClass->isTentative) ? '尚未分班' : $item->courseClass->code;
 @endphp
 | {{ $item->courseName }} | {{ $classCode }} | {{ $item->courseClass?->teacherName ?: '未提供' }} | {{ $item->courseClass?->link ?: '未提供' }} | {{ $item->courseClass?->backupClassroomUrl ?: '未提供' }} | [Markdown]({{ route('course.show.md', $item->courseId) }}) |
 @endforeach

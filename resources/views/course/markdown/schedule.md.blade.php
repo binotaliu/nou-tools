@@ -31,6 +31,7 @@ use Illuminate\Support\Str;
 @if ($page->microCreditOrRemoteCourses->count() === 0)
 目前查無微學分或全遠距課程。
 @else
+
 | 課程名稱 | 學系 | 學分 |
 | -------- | ---- | ---- |
 

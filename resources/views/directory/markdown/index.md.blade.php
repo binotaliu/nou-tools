@@ -18,7 +18,7 @@
 
 @foreach ($viewModel->centerGroup->centers as $center)
 @php
-    $label = rawurlencode($center->name);
+$label = rawurlencode($center->name);
 $osmUrl = "https://www.openstreetmap.org/?mlat={$center->latitude}&mlon={$center->longitude}&zoom=16&layers=M";
     $appleMapsUrl = "maps://maps.apple.com/?q={$label}&ll={$center->latitude},{$center->longitude}&z=16";
 $googleMapsUrl = $center->googleMapsUrl ?? "https://maps.google.com/maps?q={$label}@{$center->latitude},{$center->longitude}&z=16";
