@@ -33,6 +33,7 @@ use App\Http\Controllers\ScheduleMyController;
 use App\Http\Controllers\ScheduleRememberController;
 use App\Http\Controllers\ScheduleSubscribeController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\StudyRoomStateController;
 use Illuminate\Support\Facades\Route;
 use Spatie\Csp\AddCspHeaders;
 
@@ -104,6 +105,10 @@ Route::get('/discount-stores/{store}', [DiscountStoreController::class, 'show'])
 Route::post('/discount-stores', [DiscountStoreController::class, 'store'])->name('discount-stores.store');
 Route::post('/discount-stores/{store}/reports', [DiscountStoreReportController::class, 'store'])->name('discount-stores.reports.store');
 Route::post('/discount-stores/{store}/comments', [DiscountStoreCommentController::class, 'store'])->name('discount-stores.comments.store');
+
+Route::prefix('study-room')->name('study-room.')->group(function (): void {
+    Route::get('/state', StudyRoomStateController::class)->name('state')->middleware('throttle:120,1');
+});
 
 Route::get('/{type}', [ArticleController::class, 'index'])->name('articles.index')
     ->whereIn('type', ArticleType::cases())
