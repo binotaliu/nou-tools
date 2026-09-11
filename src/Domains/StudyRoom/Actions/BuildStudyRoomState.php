@@ -115,12 +115,33 @@ final readonly class BuildStudyRoomState
     }
 
     /**
+     * A content hash of everything the client renders, not a timestamp.
+     *
+     * `updated_at` only has second resolution, so two seat changes landing
+     * in the same wall-clock second produce an identical value. A client
+     * that polled between them would then send a matching If-None-Match
+     * and be told 304 forever, leaving the room permanently stale on its
+     * screen. Hashing the state itself cannot collide that way.
+     *
      * @param  Collection<int, StudyRoomSeat>  $seats
      */
-    private function resolveVersion(Collection $seats): int
+    private function resolveVersion(Collection $seats): string
     {
-        $maxUpdatedAt = $seats->max('updated_at');
+        $signature = $seats
+            ->sortBy('id')
+            ->map(fn (StudyRoomSeat $seat): string => implode('|', [
+                $seat->id,
+                $seat->student_schedule_id ?? '',
+                $seat->activity_verb?->value ?? '',
+                $seat->subject_course_id ?? '',
+                $seat->subject_label ?? '',
+                $seat->timer_mode?->value ?? '',
+                $seat->timer_phase?->value ?? '',
+                $seat->timer_started_at?->getTimestamp() ?? '',
+                $seat->timer_ends_at?->getTimestamp() ?? '',
+            ]))
+            ->implode(';');
 
-        return $maxUpdatedAt === null ? 0 : $maxUpdatedAt->getTimestamp() * 1000;
+        return hash('xxh128', $signature);
     }
 }

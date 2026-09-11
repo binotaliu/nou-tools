@@ -396,18 +396,4 @@ export default function registerAlpineComponents(Alpine) {
       window.location = '?date=' + this.date
     },
   }))
-
-  // Stub for the 自習室 page root. Just hydrates the server-rendered config
-  // for now — the live seat grid, heartbeat, and pomodoro timer land in a
-  // later commit.
-  Alpine.data('nouStudyRoom', initial => ({
-    roomState: initial.roomState,
-    clientConfig: initial.clientConfig,
-    subjects: initial.subjects,
-    verbs: initial.verbs,
-    hasSchedule: initial.hasSchedule,
-    needsProfile: initial.needsProfile,
-
-    init() {},
-  }))
 }

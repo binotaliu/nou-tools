@@ -3,6 +3,8 @@
 use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
+use Illuminate\Support\Facades\Date;
+use NouTools\Domains\StudyRoom\Actions\BuildStudyRoomState;
 use NouTools\Domains\StudyRoom\Actions\SyncStudyRoomSeats;
 
 beforeEach(function () {
@@ -87,4 +89,26 @@ it('marks isYou true only for the seat matching the viewer cookie', function () 
 
     expect($yourSeat['isYou'])->toBeTrue();
     expect($otherSoloSeat['isYou'])->toBeFalse();
+});
+
+it('changes the version for two seat changes landing in the same second', function () {
+    $this->travelTo(Date::parse('2026-09-11 10:00:00'));
+
+    $buildState = app(BuildStudyRoomState::class);
+
+    $first = $buildState(null);
+
+    // Both writes land inside the same wall-clock second, so a version
+    // derived from updated_at would be identical and the client would 304
+    // past the second change forever.
+    StudyRoomSeat::query()->where('code', '1-S01')
+        ->update(['student_schedule_id' => StudentSchedule::factory()->create()->id]);
+    $second = $buildState(null);
+
+    StudyRoomSeat::query()->where('code', '1-S02')
+        ->update(['student_schedule_id' => StudentSchedule::factory()->create()->id]);
+    $third = $buildState(null);
+
+    expect($second->version)->not->toBe($first->version)
+        ->and($third->version)->not->toBe($second->version);
 });

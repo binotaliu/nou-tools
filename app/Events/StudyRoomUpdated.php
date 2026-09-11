@@ -34,7 +34,7 @@ final class StudyRoomUpdated implements ShouldBroadcastNow
         public ?StudyRoomSeat $seat,
         public int $openFloors,
         public StudyRoomTotalsViewModel $totals,
-        public int $version,
+        public string $version,
     ) {}
 
     /**

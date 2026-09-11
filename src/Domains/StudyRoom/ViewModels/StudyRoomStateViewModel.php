@@ -16,6 +16,6 @@ final class StudyRoomStateViewModel extends Data
         public int $openFloors,
         public StudyRoomTotalsViewModel $totals,
         public string $serverTime,
-        public int $version,
+        public string $version,
     ) {}
 }
