@@ -11,6 +11,7 @@
     "coderflex/laravel-turnstile": "^2.2.1",
     "dotswan/filament-map-picker": "^2.3.3",
     "filament/filament": "^5.8.1",
+    "filament/spatie-laravel-settings-plugin": "^5.8",
     "genealabs/laravel-caffeine": "^13.0",
     "laravel/framework": "^13.31",
     "laravel/prompts": "^0.3.24",
@@ -22,6 +23,7 @@
     "spatie/laravel-csp": "^3.29",
     "spatie/laravel-data": "^4.23.0",
     "spatie/laravel-ray": "^1.43.9",
+    "spatie/laravel-settings": "^3.9",
     "symfony/yaml": "^8.1.6",
     "terpomoj/base64-url-helpers": "^0.1.0"
   },
