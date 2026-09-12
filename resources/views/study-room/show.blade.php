@@ -288,23 +288,360 @@
                                 </span>
                             </div>
 
-                            {{-- 房間：厚牆 + 木地板 --}}
+                            {{-- 一樓窗外的花園：天空、太陽與月亮跟著校園（台灣）的真實日夜變化 --}}
+                            <template x-if="isGroundFloor(floor)">
+                                <div
+                                    class="relative h-32 overflow-hidden rounded-t-2xl sm:h-36"
+                                    role="img"
+                                    :aria-label="gardenAriaLabel()"
+                                    :data-sky-phase="sky.phase"
+                                    :style="gardenVars()"
+                                    data-testid="study-room-garden"
+                                >
+                                    {{-- 天空 --}}
+                                    <div
+                                        class="absolute inset-0"
+                                        :style="gardenSkyStyle()"
+                                    ></div>
+
+                                    {{-- 星星：暮色漸深時浮現 --}}
+                                    <div
+                                        class="absolute inset-0 transition-opacity duration-1000"
+                                        :style="starsStyle()"
+                                        data-testid="study-room-stars"
+                                        aria-hidden="true"
+                                    >
+                                        <template
+                                            x-for="star in skyStars"
+                                            :key="star.id"
+                                        >
+                                            <span
+                                                class="absolute animate-twinkle rounded-full bg-white"
+                                                :style="starStyle(star)"
+                                            ></span>
+                                        </template>
+                                    </div>
+
+                                    {{-- 日出日落時貼近地平線的霞光 --}}
+                                    <div
+                                        class="absolute inset-0 transition-opacity duration-1000"
+                                        :style="sunGlowStyle()"
+                                        aria-hidden="true"
+                                    ></div>
+
+                                    {{-- 月亮：用一片天空色的圓盤蓋出月相 --}}
+                                    <span
+                                        x-show="sky.moonVisible"
+                                        class="absolute size-5 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full bg-[radial-gradient(circle_at_38%_35%,#fffdf0_0%,#f3edd0_60%,#d9d2ae_100%)] shadow-[0_0_16px_6px_rgba(255,250,220,0.3)] transition-[top,left] duration-1000"
+                                        :style="moonStyle()"
+                                        data-testid="study-room-moon"
+                                        aria-hidden="true"
+                                    >
+                                        <span
+                                            class="absolute top-[30%] left-[55%] size-1.5 rounded-full bg-black/10"
+                                        ></span>
+                                        <span
+                                            class="absolute top-[58%] left-[28%] size-1 rounded-full bg-black/10"
+                                        ></span>
+                                        <span
+                                            class="absolute inset-0 rounded-full"
+                                            :style="moonShadowStyle()"
+                                        ></span>
+                                    </span>
+
+                                    {{-- 太陽 --}}
+                                    <span
+                                        x-show="sky.sunVisible"
+                                        class="absolute size-7 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#fff8c9_0%,#ffd84a_55%,#ffb03a_100%)] shadow-[0_0_28px_12px_rgba(255,214,90,0.45)] transition-[top,left] duration-1000"
+                                        :style="sunStyle()"
+                                        data-testid="study-room-sun"
+                                        aria-hidden="true"
+                                    ></span>
+
+                                    {{-- 雲：慢慢飄過 --}}
+                                    <div
+                                        class="absolute inset-x-0 top-0 h-[55%] opacity-(--g-cloud-opacity) transition-opacity duration-1000"
+                                        aria-hidden="true"
+                                    >
+                                        <div
+                                            class="absolute top-[18%] left-[12%] h-3 w-16 animate-drift"
+                                            style="animation-duration: 150s"
+                                        >
+                                            <span
+                                                class="absolute right-0 bottom-0 left-0 h-2.5 rounded-full bg-(--g-cloud)"
+                                            ></span>
+                                            <span
+                                                class="absolute bottom-0.5 left-3 size-4 rounded-full bg-(--g-cloud)"
+                                            ></span>
+                                            <span
+                                                class="absolute bottom-0.5 left-7 size-3 rounded-full bg-(--g-cloud)"
+                                            ></span>
+                                        </div>
+                                        <div
+                                            class="absolute top-[42%] left-[58%] h-2.5 w-12 animate-drift"
+                                            style="
+                                                animation-duration: 210s;
+                                                animation-delay: -90s;
+                                            "
+                                        >
+                                            <span
+                                                class="absolute right-0 bottom-0 left-0 h-2 rounded-full bg-(--g-cloud)"
+                                            ></span>
+                                            <span
+                                                class="absolute bottom-0.5 left-2 size-3 rounded-full bg-(--g-cloud)"
+                                            ></span>
+                                            <span
+                                                class="absolute bottom-0.5 left-5 size-2.5 rounded-full bg-(--g-cloud)"
+                                            ></span>
+                                        </div>
+                                        <div
+                                            class="absolute top-[8%] left-[78%] h-3.5 w-20 animate-drift"
+                                            style="
+                                                animation-duration: 180s;
+                                                animation-delay: -140s;
+                                            "
+                                        >
+                                            <span
+                                                class="absolute right-0 bottom-0 left-0 h-3 rounded-full bg-(--g-cloud)"
+                                            ></span>
+                                            <span
+                                                class="absolute bottom-0.5 left-4 size-5 rounded-full bg-(--g-cloud)"
+                                            ></span>
+                                            <span
+                                                class="absolute bottom-0.5 left-10 size-4 rounded-full bg-(--g-cloud)"
+                                            ></span>
+                                        </div>
+                                    </div>
+
+                                    {{-- 遠處的城市天際線：窗戶到了晚上會亮起來 --}}
+                                    <svg
+                                        class="absolute inset-x-0 bottom-[30%] h-[46%] w-full"
+                                        viewBox="0 0 1000 100"
+                                        preserveAspectRatio="none"
+                                        aria-hidden="true"
+                                    >
+                                        <defs>
+                                            <pattern id="study-room-city-windows-far" width="12" height="14" patternUnits="userSpaceOnUse">
+                                                <rect x="3" y="3" width="4" height="5" fill="var(--g-windowDim)" />
+                                            </pattern>
+                                            <pattern id="study-room-city-windows-near" width="16" height="16" patternUnits="userSpaceOnUse">
+                                                <rect x="2" y="3" width="5" height="6" fill="var(--g-windowLit)" />
+                                                <rect x="10" y="3" width="4" height="6" fill="var(--g-windowDim)" />
+                                            </pattern>
+                                        </defs>
+                                        {{-- 最遠的一排，中間是城裡最高的那座塔 --}}
+                                        <g fill="var(--g-buildingFar)">
+                                            <rect x="0" y="52" width="60" height="60" />
+                                            <rect x="70" y="36" width="34" height="80" />
+                                            <rect x="112" y="58" width="50" height="60" />
+                                            <rect x="170" y="44" width="28" height="70" />
+                                            <rect x="206" y="30" width="44" height="90" />
+                                            <rect x="258" y="56" width="36" height="60" />
+                                            <rect x="302" y="40" width="26" height="80" />
+                                            <rect x="336" y="62" width="60" height="50" />
+                                            <rect x="404" y="34" width="30" height="80" />
+                                            <rect x="442" y="50" width="44" height="70" />
+                                            <rect x="530" y="46" width="40" height="70" />
+                                            <rect x="578" y="60" width="34" height="60" />
+                                            <rect x="620" y="38" width="30" height="80" />
+                                            <rect x="658" y="54" width="56" height="60" />
+                                            <rect x="722" y="42" width="26" height="80" />
+                                            <rect x="756" y="58" width="44" height="60" />
+                                            <rect x="808" y="32" width="36" height="90" />
+                                            <rect x="852" y="50" width="30" height="70" />
+                                            <rect x="890" y="60" width="52" height="60" />
+                                            <rect x="950" y="44" width="50" height="70" />
+                                            <path d="M498 100 L498 30 L504 30 L504 12 L512 12 L512 30 L518 30 L518 100 Z" />
+                                        </g>
+                                        <g fill="url(#study-room-city-windows-far)" opacity="0.7">
+                                            <rect x="70" y="36" width="34" height="80" />
+                                            <rect x="206" y="30" width="44" height="90" />
+                                            <rect x="302" y="40" width="26" height="80" />
+                                            <rect x="404" y="34" width="30" height="80" />
+                                            <rect x="620" y="38" width="30" height="80" />
+                                            <rect x="722" y="42" width="26" height="80" />
+                                            <rect x="808" y="32" width="36" height="90" />
+                                        </g>
+                                        {{-- 近一點的樓房 --}}
+                                        <g fill="var(--g-buildingNear)">
+                                            <rect x="20" y="66" width="70" height="50" />
+                                            <rect x="130" y="72" width="50" height="40" />
+                                            <rect x="230" y="60" width="40" height="60" />
+                                            <rect x="320" y="70" width="80" height="50" />
+                                            <rect x="450" y="64" width="36" height="60" />
+                                            <rect x="540" y="74" width="60" height="40" />
+                                            <rect x="640" y="62" width="44" height="60" />
+                                            <rect x="730" y="70" width="70" height="50" />
+                                            <rect x="850" y="66" width="46" height="60" />
+                                            <rect x="930" y="74" width="70" height="40" />
+                                        </g>
+                                        <g fill="url(#study-room-city-windows-near)">
+                                            <rect x="20" y="66" width="70" height="50" />
+                                            <rect x="130" y="72" width="50" height="40" />
+                                            <rect x="230" y="60" width="40" height="60" />
+                                            <rect x="320" y="70" width="80" height="50" />
+                                            <rect x="450" y="64" width="36" height="60" />
+                                            <rect x="540" y="74" width="60" height="40" />
+                                            <rect x="640" y="62" width="44" height="60" />
+                                            <rect x="730" y="70" width="70" height="50" />
+                                            <rect x="850" y="66" width="46" height="60" />
+                                            <rect x="930" y="74" width="70" height="40" />
+                                        </g>
+                                    </svg>
+
+                                    {{-- 校園圍籬邊的樹籬 --}}
+                                    <svg
+                                        class="absolute inset-x-0 bottom-[27%] h-[10%] w-full"
+                                        viewBox="0 0 1000 100"
+                                        preserveAspectRatio="none"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M0 100 L0 50 C25 10 55 10 80 50 C105 10 135 10 160 50 C185 10 215 10 240 50 C265 10 295 10 320 50 C345 10 375 10 400 50 C425 10 455 10 480 50 C505 10 535 10 560 50 C585 10 615 10 640 50 C665 10 695 10 720 50 C745 10 775 10 800 50 C825 10 855 10 880 50 C905 10 935 10 960 50 C975 25 990 25 1000 50 L1000 100 Z"
+                                            fill="var(--g-hedge)"
+                                        />
+                                    </svg>
+
+                                    {{-- 草地與小徑 --}}
+                                    <div
+                                        class="absolute inset-x-0 bottom-0 h-[30%] bg-[linear-gradient(to_bottom,var(--g-lawnTop),var(--g-lawnBottom))]"
+                                        aria-hidden="true"
+                                    ></div>
+                                    <svg
+                                        class="absolute inset-x-0 bottom-0 h-[30%] w-full"
+                                        viewBox="0 0 1000 100"
+                                        preserveAspectRatio="none"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M470 0 C480 30 430 55 400 100 L560 100 C520 60 520 30 528 0 Z"
+                                            fill="var(--g-path)"
+                                            opacity="0.85"
+                                        />
+                                    </svg>
+
+                                    {{-- 前景的樹 --}}
+                                    <svg class="absolute bottom-[16%] left-[6%] h-[48%] w-auto" viewBox="0 0 60 100" aria-hidden="true">
+                                        <rect x="27" y="60" width="6" height="40" rx="2" fill="var(--g-trunk)" />
+                                        <circle cx="30" cy="42" r="26" fill="var(--g-canopyDark)" />
+                                        <circle cx="22" cy="36" r="20" fill="var(--g-canopy)" />
+                                        <circle cx="40" cy="30" r="17" fill="var(--g-canopy)" />
+                                    </svg>
+                                    <svg class="absolute bottom-[20%] left-[22%] h-[40%] w-auto" viewBox="0 0 60 100" aria-hidden="true">
+                                        <rect x="27" y="78" width="6" height="22" rx="2" fill="var(--g-trunk)" />
+                                        <path d="M30 0 L56 44 L42 44 L58 82 L2 82 L18 44 L4 44 Z" fill="var(--g-pine)" />
+                                    </svg>
+                                    <svg class="absolute right-[24%] bottom-[19%] h-[34%] w-auto" viewBox="0 0 60 100" aria-hidden="true">
+                                        <rect x="27" y="70" width="6" height="30" rx="2" fill="var(--g-trunk)" />
+                                        <circle cx="30" cy="48" r="24" fill="var(--g-canopyDark)" />
+                                        <circle cx="24" cy="40" r="18" fill="var(--g-canopy)" />
+                                    </svg>
+                                    <svg class="absolute right-[5%] bottom-[14%] h-[52%] w-auto" viewBox="0 0 60 100" aria-hidden="true">
+                                        <rect x="27" y="58" width="6" height="42" rx="2" fill="var(--g-trunk)" />
+                                        <circle cx="30" cy="40" r="28" fill="var(--g-canopyDark)" />
+                                        <circle cx="38" cy="34" r="20" fill="var(--g-canopy)" />
+                                        <circle cx="18" cy="30" r="15" fill="var(--g-canopy)" />
+                                    </svg>
+
+                                    {{-- 長椅 --}}
+                                    <svg class="absolute bottom-[17%] left-[40%] h-[14%] w-auto" viewBox="0 0 80 40" aria-hidden="true">
+                                        <rect x="4" y="4" width="72" height="8" rx="2" fill="var(--g-trunk)" />
+                                        <rect x="2" y="18" width="76" height="7" rx="2" fill="var(--g-trunk)" />
+                                        <rect x="8" y="12" width="4" height="28" fill="var(--g-trunk)" />
+                                        <rect x="68" y="12" width="4" height="28" fill="var(--g-trunk)" />
+                                    </svg>
+
+                                    {{-- 路燈：天黑後亮起 --}}
+                                    <svg class="absolute bottom-[14%] left-[60%] h-[42%] w-auto overflow-visible" viewBox="0 0 40 100" aria-hidden="true">
+                                        <circle cx="20" cy="10" r="26" fill="rgba(255,214,130,0.35)" style="opacity: var(--g-lamp)" />
+                                        <rect x="18" y="14" width="4" height="86" rx="1" fill="var(--g-trunk)" />
+                                        <path d="M10 14 L30 14 L26 4 L14 4 Z" fill="var(--g-buildingNear)" />
+                                        <circle cx="20" cy="12" r="5" fill="#ffe08a" style="opacity: var(--g-lamp)" />
+                                    </svg>
+
+                                    {{-- 花叢 --}}
+                                    <div
+                                        class="absolute inset-x-0 bottom-0 h-[30%] opacity-(--g-cloud-opacity)"
+                                        aria-hidden="true"
+                                    >
+                                        <span
+                                            class="absolute bottom-[40%] left-[14%] size-1.5 rounded-full bg-rose-300"
+                                        ></span>
+                                        <span
+                                            class="absolute bottom-[28%] left-[17%] size-1 rounded-full bg-amber-200"
+                                        ></span>
+                                        <span
+                                            class="absolute bottom-[20%] left-[30%] size-1.5 rounded-full bg-yellow-200"
+                                        ></span>
+                                        <span
+                                            class="absolute bottom-[55%] left-[35%] size-1 rounded-full bg-rose-200"
+                                        ></span>
+                                        <span
+                                            class="absolute bottom-[30%] left-[63%] size-1.5 rounded-full bg-fuchsia-300"
+                                        ></span>
+                                        <span
+                                            class="absolute bottom-[50%] left-[68%] size-1 rounded-full bg-amber-200"
+                                        ></span>
+                                        <span
+                                            class="absolute bottom-[18%] left-[80%] size-1.5 rounded-full bg-rose-300"
+                                        ></span>
+                                        <span
+                                            class="absolute bottom-[45%] left-[88%] size-1 rounded-full bg-yellow-200"
+                                        ></span>
+                                    </div>
+
+                                    {{-- 螢火蟲：天全黑後才出來 --}}
+                                    <div
+                                        class="absolute inset-x-0 bottom-0 h-[45%] opacity-(--g-firefly) transition-opacity duration-1000"
+                                        aria-hidden="true"
+                                    >
+                                        <span
+                                            class="absolute bottom-[30%] left-[12%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
+                                        ></span>
+                                        <span
+                                            class="absolute bottom-[55%] left-[31%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
+                                            style="animation-delay: -2.3s"
+                                        ></span>
+                                        <span
+                                            class="absolute bottom-[40%] left-[52%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
+                                            style="animation-delay: -4.1s"
+                                        ></span>
+                                        <span
+                                            class="absolute bottom-[62%] left-[70%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
+                                            style="animation-delay: -1.2s"
+                                        ></span>
+                                        <span
+                                            class="absolute bottom-[25%] left-[86%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
+                                            style="animation-delay: -5.6s"
+                                        ></span>
+                                    </div>
+                                </div>
+                            </template>
+
+                            {{-- 房間：厚牆 + 木地板。一樓緊貼在花園下方，頂上的牆就是有窗的那面牆 --}}
                             <div
-                                class="relative rounded-2xl border-[6px] border-warm-300 bg-warm-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
+                                class="relative border-[6px] border-warm-300 bg-warm-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
+                                :class="isGroundFloor(floor)
+                                    ? 'rounded-b-2xl'
+                                    : 'rounded-2xl'"
                             >
-                                {{-- 上方牆面的窗戶：一排透光的窗格 --}}
+                                {{-- 上方牆面的窗戶：一排窗格，透出此刻窗外的天色 --}}
                                 <div
                                     class="pointer-events-none absolute inset-x-10 -top-[6px] z-10 flex h-[6px] gap-3 sm:inset-x-20"
+                                    data-testid="study-room-windows"
                                     aria-hidden="true"
                                 >
                                     <template x-for="pane in 4" :key="pane">
                                         <span
-                                            class="flex-1 bg-sky-200 dark:bg-sky-900"
+                                            class="flex-1 bg-sky-200 transition-[background] duration-1000 dark:bg-sky-900"
+                                            :style="windowPaneStyle()"
                                         ></span>
                                     </template>
                                 </div>
+                                {{-- 窗光灑進房裡：白天是天色，夜裡只剩淡淡月光 --}}
                                 <div
-                                    class="pointer-events-none absolute inset-x-10 top-0 h-12 rounded-t-[10px] bg-gradient-to-b from-sky-100/60 to-transparent sm:inset-x-20 dark:from-sky-900/20"
+                                    class="pointer-events-none absolute inset-x-10 top-0 h-12 transition-[background] duration-1000 sm:inset-x-20"
+                                    :style="windowLightStyle()"
                                     aria-hidden="true"
                                 ></div>
 
@@ -327,7 +664,10 @@
                                 </template>
                                 {{-- 木地板紋理 --}}
                                 <div
-                                    class="relative space-y-6 rounded-[10px] bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(0,0,0,0.04)_5.5rem_calc(5.5rem+1px))] px-4 pt-6 pb-16 sm:px-8 dark:bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(255,255,255,0.05)_5.5rem_calc(5.5rem+1px))]"
+                                    :class="isGroundFloor(floor)
+                                        ? 'rounded-b-[10px]'
+                                        : 'rounded-[10px]'"
+                                    class="relative space-y-6 bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(0,0,0,0.04)_5.5rem_calc(5.5rem+1px))] px-4 pt-6 pb-16 sm:px-8 dark:bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(255,255,255,0.05)_5.5rem_calc(5.5rem+1px))]"
                                 >
                                     {{-- 靠牆的單人閱覽桌 --}}
                                     <div

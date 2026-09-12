@@ -100,3 +100,19 @@ it('passes the maximum floor count to the client so the stairs can explain when 
         ->assertSee('data-testid="study-room-stairs"', false)
         ->assertSee('&quot;maxFloors&quot;:5', false);
 });
+
+it('passes the campus coordinates to the client so the windows can follow the real sun and moon', function () {
+    config(['study-room.location' => ['latitude' => 25.0847, 'longitude' => 121.4737]]);
+
+    $schedule = StudentSchedule::factory()->create();
+    StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
+
+    $response = $this->withCredentials()
+        ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
+        ->get(route('study-room.show'));
+
+    $response->assertOk()
+        ->assertSee('data-testid="study-room-garden"', false)
+        ->assertSee('&quot;latitude&quot;:25.0847', false)
+        ->assertSee('&quot;longitude&quot;:121.4737', false);
+});

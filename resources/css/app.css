@@ -48,6 +48,47 @@
   }
 }
 
+@keyframes drift {
+  from {
+    left: -12%;
+  }
+  to {
+    left: 104%;
+  }
+}
+
+@keyframes firefly {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(10px, -14px);
+    opacity: 0.3;
+  }
+  70% {
+    opacity: 1;
+  }
+  85% {
+    transform: translate(-6px, -6px);
+    opacity: 0.1;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 @layer base {
   [x-cloak],
   [data-cloak],
@@ -100,6 +141,18 @@
 
 @utility animate-marquee {
   animation: marquee 12s linear infinite;
+}
+
+@utility animate-twinkle {
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+@utility animate-drift {
+  animation: drift 180s linear infinite;
+}
+
+@utility animate-firefly {
+  animation: firefly 7s ease-in-out infinite;
 }
 
 @utility prose-warm {

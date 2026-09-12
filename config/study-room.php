@@ -118,6 +118,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Location
+    |--------------------------------------------------------------------------
+    |
+    | Where the (virtual) building stands. The floor map's windows and the
+    | ground-floor garden follow the real sun and moon at these coordinates
+    | and in Asia/Taipei time, so the room looks like daytime or night the
+    | way it would on campus — regardless of where the viewer is. Defaults
+    | to National Open University's campus in Luzhou, New Taipei.
+    |
+    */
+
+    'location' => [
+        'latitude' => 25.0847,
+        'longitude' => 121.4737,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Emoji Allowlist
     |--------------------------------------------------------------------------
     |

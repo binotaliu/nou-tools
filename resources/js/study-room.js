@@ -1,3 +1,5 @@
+import { buildStarField, computeSky, SKY_PHASE_LABELS } from './study-room-sky'
+
 // Alpine factory for the 自習室 (study room) page root. All interactive
 // logic lives here rather than in x-* attributes: the project ships
 // @alpinejs/csp, whose expression evaluator rejects arrow functions,
@@ -10,6 +12,27 @@
 // the Reverb connection itself can fail. Either way, if a connection isn't
 // confirmed live within `realtimeConnectTimeoutSeconds`, this component
 // gives up and surfaces `connectionFailed` instead of retrying forever.
+// `?sky-at=<ISO 8601>` freezes the windows/garden at that instant (the
+// clock itself keeps running) — handy for eyeballing dusk or a full moon
+// without waiting for one. Ignored unless it parses.
+function readSkyOverrideFromUrl() {
+  const raw = new URLSearchParams(window.location.search).get('sky-at')
+
+  if (!raw) {
+    return null
+  }
+
+  // URLSearchParams decodes a literal '+' in the query string as a space
+  // (the application/x-www-form-urlencoded convention), so an unencoded
+  // offset like '...T18:40:00+08:00' comes back as '...T18:40:00 08:00'.
+  // Restore it so plain, copy-pasted ISO strings work without the caller
+  // having to remember to percent-encode the '+' as %2B.
+  const normalized = raw.replace(/ (\d{2}:\d{2})$/, '+$1')
+  const ms = Date.parse(normalized)
+
+  return Number.isNaN(ms) ? null : ms
+}
+
 export default function nouStudyRoom(initial) {
   return {
     state: initial.roomState,
@@ -32,6 +55,17 @@ export default function nouStudyRoom(initial) {
 
     now: Date.now(),
     clockNow: Date.now(),
+    // Sun/moon/sky snapshot the windows and garden are drawn from. Only
+    // replaced when the minute changes (see refreshSky) so the many
+    // :style bindings reading it don't re-run on every clock tick.
+    sky: computeSky(
+      Date.now(),
+      initial.clientConfig.latitude,
+      initial.clientConfig.longitude
+    ),
+    skyMinute: null,
+    skyOverrideMs: readSkyOverrideFromUrl(),
+    skyStars: buildStarField(),
     heldSeatCode: null,
     busySeatCode: null,
     // Table seat whose hover/tap popover is open.
@@ -69,8 +103,11 @@ export default function nouStudyRoom(initial) {
         this.personalInfoOpen = true
       }
 
+      this.refreshSky()
+
       this.clockHandle = setInterval(() => {
         this.clockNow = Date.now()
+        this.refreshSky()
       }, 1000)
 
       this.restartTickIfNeeded()
@@ -473,6 +510,185 @@ export default function nouStudyRoom(initial) {
         ' 週' +
         window.NouTime.weekdayFromYmd(ymd)
       )
+    },
+
+    // --- sky: windows & garden ---------------------------------------------
+    // The floor map's windows (every floor) and the garden outside the
+    // ground floor follow the real sun and moon over the campus, in
+    // Taiwan — see study-room-sky.js for the model.
+
+    refreshSky() {
+      const ms =
+        this.skyOverrideMs === null ? this.clockNow : this.skyOverrideMs
+      const minute = Math.floor(ms / 60000)
+
+      if (minute === this.skyMinute) {
+        return
+      }
+
+      this.skyMinute = minute
+      this.sky = computeSky(ms, this.config.latitude, this.config.longitude)
+    },
+
+    // Freeze the sky at an instant (ms since epoch), or null to follow the
+    // clock again. Used by browser tests and the ?sky-at= URL parameter.
+    previewSky(ms) {
+      this.skyOverrideMs = ms
+      this.skyMinute = null
+      this.refreshSky()
+    },
+
+    rgb(triplet, alpha = 1) {
+      return (
+        'rgba(' +
+        triplet[0] +
+        ',' +
+        triplet[1] +
+        ',' +
+        triplet[2] +
+        ',' +
+        alpha +
+        ')'
+      )
+    },
+
+    skyPhaseLabel() {
+      return SKY_PHASE_LABELS[this.sky.phase]
+    },
+
+    gardenAriaLabel() {
+      const moon = this.sky.moonVisible
+        ? '，月亮' + Math.round(this.sky.moonFraction * 100) + '% 亮'
+        : ''
+
+      return '窗外的校園花園與城市，現在是' + this.skyPhaseLabel() + moon
+    },
+
+    // Every colour the garden scene uses, as CSS custom properties on its
+    // root, so the SVG hills, trees and lawn below all shift together
+    // through dusk and night from one palette (see scenePalette).
+    gardenVars() {
+      const sky = this.sky
+      const vars = {
+        '--g-sky-top': this.rgb(sky.top),
+        '--g-sky-mid': this.rgb(sky.mid),
+        '--g-sky-horizon': this.rgb(sky.horizon),
+        '--g-cloud-opacity': 0.25 + 0.7 * sky.daylight,
+        '--g-firefly': sky.fireflyOpacity,
+        '--g-lamp': sky.lampOpacity,
+      }
+
+      for (const [name, color] of Object.entries(sky.scene)) {
+        vars['--g-' + name] = this.rgb(color)
+      }
+
+      return vars
+    },
+
+    gardenSkyStyle() {
+      return {
+        background:
+          'linear-gradient(to bottom, var(--g-sky-top) 0%, var(--g-sky-mid) 55%, var(--g-sky-horizon) 100%)',
+      }
+    },
+
+    // Warm haze around a low sun, anchored to where the sun is drawn.
+    sunGlowStyle() {
+      const position = this.bodyStyle(this.sky.sunX, this.sky.sunY)
+
+      return {
+        opacity: this.sky.sunGlow * 0.85,
+        background:
+          'radial-gradient(ellipse 55% 70% at ' +
+          position.left +
+          ' ' +
+          position.top +
+          ', ' +
+          this.rgb([255, 190, 110], 0.75) +
+          ' 0%, ' +
+          this.rgb([255, 140, 90], 0.3) +
+          ' 40%, transparent 75%)',
+      }
+    },
+
+    starsStyle() {
+      return { opacity: this.sky.starOpacity }
+    },
+
+    starStyle(star) {
+      return {
+        left: star.left + '%',
+        top: star.top + '%',
+        width: star.size + 'px',
+        height: star.size + 'px',
+        animationDelay: star.twinkleDelay + 's',
+      }
+    },
+
+    // Bodies are placed in the sky area above the hills: x across the
+    // view (east on the left), y from resting on the far hills' ridge
+    // (~40% down) to near the top when overhead.
+    bodyStyle(x, y) {
+      return {
+        left: x * 100 + '%',
+        top: 6 + (1 - y) * 34 + '%',
+      }
+    },
+
+    sunStyle() {
+      return this.bodyStyle(this.sky.sunX, this.sky.sunY)
+    },
+
+    moonStyle() {
+      const style = this.bodyStyle(this.sky.moonX, this.sky.moonY)
+
+      // The moon is up in daylight too, just washed out by the sky.
+      style.opacity = 0.3 + 0.7 * (1 - this.sky.daylight)
+
+      return style
+    },
+
+    // Phase drawn as a sky-coloured disc slid across the lit moon: fully
+    // covering it at new moon, fully clear at full moon. Waxing moons are
+    // lit on the right (as seen from the northern hemisphere), so the
+    // shadow slides off to the left.
+    moonShadowStyle() {
+      const direction = this.sky.moonPhase < 0.5 ? -1 : 1
+      const offset = direction * this.sky.moonFraction * 100
+
+      return {
+        transform: 'translateX(' + offset + '%)',
+        background: 'var(--g-sky-mid)',
+      }
+    },
+
+    // The window panes on every floor's back wall show the sky's horizon
+    // colour — the same light the garden is under.
+    windowPaneStyle() {
+      return { background: this.rgb(this.sky.horizon) }
+    },
+
+    // Light spilling through the windows onto the floor: sky-coloured in
+    // daytime, and at night a cool moonlight wash that grows with how
+    // full and how high the moon is (nothing but a faint city glow when
+    // the moon is down).
+    windowLightStyle() {
+      const sky = this.sky
+      let color
+
+      if (sky.daylight > 0.05) {
+        color = this.rgb(sky.horizon, 0.15 + 0.45 * sky.daylight)
+      } else if (sky.moonVisible) {
+        const strength = sky.moonFraction * Math.sqrt(sky.moonY)
+
+        color = this.rgb([214, 226, 255], 0.18 + 0.4 * strength)
+      } else {
+        color = this.rgb([255, 214, 150], 0.1)
+      }
+
+      return {
+        background: 'linear-gradient(to bottom, ' + color + ', transparent)',
+      }
     },
 
     // --- display helpers --------------------------------------------------

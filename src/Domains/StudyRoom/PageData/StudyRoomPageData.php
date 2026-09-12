@@ -17,7 +17,7 @@ final class StudyRoomPageData extends Resource
 {
     /**
      * @param  array<int, string>  $emojiChoices
-     * @param  array<string, int>  $clientConfig
+     * @param  array<string, int|float>  $clientConfig
      */
     public function __construct(
         public StudyRoomStateViewModel $roomState,

@@ -3,6 +3,7 @@
 use App\Models\Course;
 use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use NouTools\Domains\StudyRoom\Actions\FillFloorWithTestStudents;
 
@@ -255,4 +256,57 @@ it('updates a floor\'s occupied count live and closes it once its last occupant 
     );
 
     $page->assertMissing('[data-testid="study-room-floor-2"]');
+});
+
+it('draws the garden and windows from the real Taiwan sky, day and night', function () {
+    // The sky is computed client-side from the campus coordinates (see
+    // study-room-sky.js); previewSky() freezes it at a chosen instant so
+    // the test doesn't depend on when it runs.
+    $schedule = createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->waitForEvent('load');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]')
+        ->waitForEvent('load');
+
+    $page->assertVisible('[data-testid="study-room-floor-1"] [data-testid="study-room-garden"]')
+        ->assertVisible('[data-testid="study-room-floor-1"] [data-testid="study-room-windows"]');
+
+    $previewSky = static fn (string $iso): string => 'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0].previewSky('.
+        (CarbonImmutable::parse($iso)->getTimestampMs()).')';
+
+    // Solstice noon over Luzhou: the sun is almost overhead.
+    $page->script($previewSky('2026-06-21T12:00:00+08:00'));
+    $page->wait(1);
+
+    $page->assertAttribute('[data-testid="study-room-garden"]', 'data-sky-phase', 'day')
+        ->assertAttributeContains('[data-testid="study-room-garden"]', 'aria-label', '白天')
+        ->assertVisible('[data-testid="study-room-sun"]');
+
+    expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"study-room-stars\"]')).opacity"))
+        ->toBe('0');
+
+    // The night of the June 2026 full moon: no sun, stars out, moon full.
+    $page->script($previewSky('2026-06-29T23:00:00+08:00'));
+    $page->wait(2);
+
+    $page->assertAttribute('[data-testid="study-room-garden"]', 'data-sky-phase', 'night')
+        ->assertAttributeContains('[data-testid="study-room-garden"]', 'aria-label', '月亮100% 亮')
+        ->assertMissing('[data-testid="study-room-sun"]')
+        ->assertVisible('[data-testid="study-room-moon"]');
+
+    expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"study-room-stars\"]')).opacity"))
+        ->toBe('1');
+
+    // The window panes carry the sky's horizon colour rather than a fixed tint.
+    expect($page->script("document.querySelector('[data-testid=\"study-room-windows\"] span').style.background"))
+        ->toContain('rgb');
 });

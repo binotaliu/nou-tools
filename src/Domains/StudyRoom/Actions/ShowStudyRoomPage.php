@@ -86,7 +86,7 @@ final readonly class ShowStudyRoomPage
     }
 
     /**
-     * @return array<string, int>
+     * @return array<string, int|float>
      */
     private function buildClientConfig(): array
     {
@@ -100,6 +100,8 @@ final readonly class ShowStudyRoomPage
             'timerCustomMaxMinutes' => (int) config('study-room.timer.custom.max_minutes'),
             'timerMaxSessionSeconds' => (int) config('study-room.timer.max_session_seconds'),
             'maxFloors' => (int) config('study-room.floors.max'),
+            'latitude' => (float) config('study-room.location.latitude'),
+            'longitude' => (float) config('study-room.location.longitude'),
         ];
     }
 }
