@@ -5,7 +5,9 @@ use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
+use NouTools\Domains\StudyRoom\Actions\FillFloorWithTestStudents;
 
 // The live seat map, countdown, and realtime sync are all driven
 // client-side by resources/js/study-room.js (registered as the nouStudyRoom
@@ -499,9 +501,9 @@ it('draws the garden and windows from the real Taiwan sky, day and night', funct
         ->click('[data-testid="study-room-profile-submit"]')
         ->waitForEvent('load');
 
-    $page->assertVisible('[data-testid="study-room-floor-1"] [data-testid="study-room-garden"]')
-        ->assertVisible('[data-testid="study-room-floor-1"] [data-testid="study-room-windows"]')
-        ->assertVisible('[data-testid="study-room-floor-1"] [data-testid="study-room-sky-canvas"]');
+    $page->assertVisible('[data-testid="study-room-wall"] [data-testid="study-room-garden"]')
+        ->assertVisible('[data-testid="study-room-wall"] [data-testid="study-room-sky-canvas"]')
+        ->assertVisible('[data-testid="study-room-floor-1"] [data-testid="study-room-windows"]');
 
     $component = 'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0]';
 
@@ -559,4 +561,21 @@ it('draws the garden and windows from the real Taiwan sky, day and night', funct
     // The window panes carry the sky's horizon colour rather than a fixed tint.
     expect($page->script("document.querySelector('[data-testid=\"study-room-windows\"] span').style.background"))
         ->toContain('rgb');
+
+    // The clock hanging beside the window reads Taipei time on its hands,
+    // not the viewer's own zone. Stopping the tick first pins the clock, so
+    // the hands can't move between setting the time and reading the DOM.
+    $page->script('clearInterval('.$component.'.clockHandle); '.$component.'.clockNow = '.
+        CarbonImmutable::parse('2026-06-21T15:20:30+08:00')->getTimestampMs());
+    $page->wait(1);
+
+    $hand = static fn (string $name): string => 'document.querySelector(\'[data-testid="study-room-clock-'.
+        $name.'-hand"]\').style.transform';
+
+    // 15:20:30 in Taipei: the minute hand half past the 4, the hour hand a
+    // third of the way from 3 to 4.
+    expect($page->script($hand('minute')))->toBe('translateX(-50%) rotate(123deg)')
+        ->and($page->script($hand('hour')))->toBe('translateX(-50%) rotate(100.25deg)');
+
+    expect($page->script($component.'.clockTimeLabel()'))->toBe('15:20');
 });

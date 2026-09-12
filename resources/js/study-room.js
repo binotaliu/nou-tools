@@ -826,6 +826,41 @@ export default function nouStudyRoom(initial) {
       )
     },
 
+    // The wall clock's hands, in degrees clockwise from twelve. The hour
+    // and minute come from Taipei's wall clock (like the digital label
+    // under the dial); seconds are the same in every zone.
+    clockHandAngles() {
+      const date = new Date(this.clockNow)
+      const { hour, minute } = window.NouTime.taipeiHM(date)
+      const minutes = Number(minute) + date.getSeconds() / 60
+      const hours = (Number(hour) % 12) + minutes / 60
+
+      return {
+        hour: hours * 30,
+        minute: minutes * 6,
+        second: date.getSeconds() * 6,
+      }
+    },
+
+    // Hands and hour marks both pivot on the centre of the dial: they hang
+    // from it, so centring them horizontally is part of the transform.
+    clockHandStyle(hand) {
+      return this.clockRotation(this.clockHandAngles()[hand])
+    },
+
+    clockTickStyle(tick) {
+      return this.clockRotation(tick * 30)
+    },
+
+    // 12, 3, 6 and 9 get a longer mark than the hours between them.
+    clockTickClass(tick) {
+      return tick % 3 === 0 ? 'mt-1 h-1.5' : 'mt-1.5 h-1 opacity-60'
+    },
+
+    clockRotation(degrees) {
+      return { transform: 'translateX(-50%) rotate(' + degrees + 'deg)' }
+    },
+
     // --- sky: windows & garden ---------------------------------------------
     // The floor map's windows (every floor) and the garden outside the
     // ground floor follow the real sun and moon over the campus, in
