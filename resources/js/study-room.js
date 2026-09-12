@@ -34,6 +34,32 @@ function readSkyOverrideFromUrl() {
   return Number.isNaN(ms) ? null : ms
 }
 
+// Where the sky's bodies are drawn in each place the sky appears, as
+// fractions of that canvas's height from the top edge: `zenith` for a body
+// straight overhead, `horizon` for one resting on the skyline. `shader` is
+// the matching geometry handed to the WebGL renderer (which places the
+// horizon a touch lower than the discs do, so the glow sits behind the
+// skyline rather than on top of it).
+const SKY_LAYOUTS = {
+  // The garden strip above the ground floor.
+  garden: {
+    zenith: 0.06,
+    horizon: 0.4,
+    shader: { horizonY: 0.42, zenithY: 0.02 },
+  },
+  // The window in the focus view: a little garden fills its bottom, so
+  // bodies come to rest just above it.
+  focus: {
+    zenith: 0.1,
+    horizon: 0.7,
+    shader: { horizonY: 0.72, zenithY: 0.05 },
+  },
+}
+
+function clamp01(value) {
+  return Math.min(1, Math.max(0, value))
+}
+
 export default function nouStudyRoom(initial) {
   return {
     state: initial.roomState,
@@ -67,12 +93,21 @@ export default function nouStudyRoom(initial) {
     skyMinute: null,
     skyOverrideMs: readSkyOverrideFromUrl(),
     skyStars: buildStarField(),
-    // WebGL renderer for the garden sky, or null when the browser can't
-    // give us a context — in which case the CSS gradient underneath it is
-    // what everyone sees, and skyCanvasActive keeps the CSS sun haze that
-    // goes with it on screen.
+    // A denser field for the fullscreen focus view, where the sky is the
+    // whole screen rather than a strip.
+    focusStars: buildStarField(90),
+    // WebGL renderers for the garden sky and the fullscreen focus sky, or
+    // null when the browser can't give us a context — in which case the
+    // CSS gradient underneath is what everyone sees, and the matching
+    // *CanvasActive flag keeps the CSS sun haze that goes with it on
+    // screen. The garden pair keeps its unqualified name because browser
+    // tests reach in for it.
     skyRenderer: null,
     skyCanvasActive: false,
+    focusSkyRenderer: null,
+    focusSkyCanvasActive: false,
+    // Fullscreen focus mode: the action banner taken over the whole page.
+    focusMode: false,
     heldSeatCode: null,
     busySeatCode: null,
     // Table seat whose hover/tap popover is open.
@@ -86,6 +121,15 @@ export default function nouStudyRoom(initial) {
     customMinutes: 25,
     selectedVerb: null,
     selectedSubjectCourseId: null,
+    // The student's own pomodoro cycle, prefilled from their profile and
+    // sent along with every pomodoro start so the server saves it.
+    cycle: {
+      focusMinutes: initial.profile.pomodoroCycle.focusMinutes,
+      shortBreakMinutes: initial.profile.pomodoroCycle.shortBreakMinutes,
+      longBreakMinutes: initial.profile.pomodoroCycle.longBreakMinutes,
+      roundsPerCycle: initial.profile.pomodoroCycle.roundsPerCycle,
+    },
+    cycleSettingsOpen: false,
 
     tickHandle: null,
     heartbeatHandle: null,
@@ -245,6 +289,12 @@ export default function nouStudyRoom(initial) {
       this.state = state
       this.heldSeatCode = this.deriveHeldSeatCode(state)
       this.restartTickIfNeeded()
+
+      // Focus mode is a view of a running timer; without one (stopped,
+      // or the seat released underneath us) there's nothing to show.
+      if (this.focusMode && !this.hasTimer()) {
+        this.closeFocusMode()
+      }
     },
 
     async refresh() {
@@ -383,15 +433,23 @@ export default function nouStudyRoom(initial) {
       this.panelBusy = true
 
       try {
+        const isPomodoro = this.timerMode === 'pomodoro'
+        const cycle = this.normalizedCycle()
+
         const response = await window.axios.post('/study-room/timer', {
           mode: this.timerMode,
-          minutes: this.timerMode === 'custom' ? this.customMinutes : null,
+          minutes: isPomodoro ? null : this.customMinutes,
           verb: this.selectedVerb,
           subjectCourseId:
             this.selectedSubjectCourseId === ''
               ? null
               : Number(this.selectedSubjectCourseId),
+          focusMinutes: isPomodoro ? cycle.focusMinutes : null,
+          shortBreakMinutes: isPomodoro ? cycle.shortBreakMinutes : null,
+          longBreakMinutes: isPomodoro ? cycle.longBreakMinutes : null,
+          roundsPerCycle: isPomodoro ? cycle.roundsPerCycle : null,
         })
+        this.cycle = cycle
         this.setState(response.data.state)
         this.errorMessage = null
       } catch (error) {
@@ -428,6 +486,24 @@ export default function nouStudyRoom(initial) {
 
       try {
         const response = await window.axios.post('/study-room/timer/break')
+        this.setState(response.data.state)
+        this.errorMessage = null
+      } catch (error) {
+        this.errorMessage = this.resolveErrorMessage(error)
+      } finally {
+        this.panelBusy = false
+      }
+    },
+
+    async startNextRound() {
+      if (this.panelBusy) {
+        return
+      }
+
+      this.panelBusy = true
+
+      try {
+        const response = await window.axios.post('/study-room/timer/next')
         this.setState(response.data.state)
         this.errorMessage = null
       } catch (error) {
@@ -544,46 +620,90 @@ export default function nouStudyRoom(initial) {
     // richer rendering of the same sky, not a second one — and it draws the
     // sky only. The clouds, skyline and trees in front of it stay the flat
     // SVG and CSS scenery they were.
-    mountSkyCanvas(canvas) {
-      if (this.skyRenderer) {
-        this.skyRenderer.destroy()
-        this.skyRenderer = null
-        this.skyCanvasActive = false
-      }
+    //
+    // The same sky is drawn twice: on the garden strip ('garden') and, in
+    // focus mode, across the whole screen ('focus'). Each has its own
+    // canvas, renderer and layout (see SKY_LAYOUTS).
+    mountSkyCanvas(canvas, layout = 'garden') {
+      this.unmountSkyCanvas(layout)
 
       // Only flipped on once a frame is really on the canvas, and off
       // again if the context goes away: either way the CSS gradient
       // underneath is what's on show.
-      const renderer = createSkyRenderer(canvas, {
-        onFirstPaint: () => {
-          this.skyCanvasActive = true
+      const renderer = createSkyRenderer(
+        canvas,
+        {
+          onFirstPaint: () => {
+            this.setSkyCanvasActive(layout, true)
+          },
+          onContextLost: () => {
+            this.setSkyCanvasActive(layout, false)
+          },
         },
-        onContextLost: () => {
-          this.skyCanvasActive = false
-        },
-      })
+        SKY_LAYOUTS[layout].shader
+      )
 
       if (!renderer) {
         return
       }
 
-      this.skyRenderer = renderer
+      if (layout === 'focus') {
+        this.focusSkyRenderer = renderer
+      } else {
+        this.skyRenderer = renderer
+      }
+
       this.pushSkyToCanvas()
+    },
+
+    unmountSkyCanvas(layout) {
+      const renderer =
+        layout === 'focus' ? this.focusSkyRenderer : this.skyRenderer
+
+      if (renderer) {
+        renderer.destroy()
+      }
+
+      if (layout === 'focus') {
+        this.focusSkyRenderer = null
+      } else {
+        this.skyRenderer = null
+      }
+
+      this.setSkyCanvasActive(layout, false)
+    },
+
+    setSkyCanvasActive(layout, active) {
+      if (layout === 'focus') {
+        this.focusSkyCanvasActive = active
+      } else {
+        this.skyCanvasActive = active
+      }
+    },
+
+    isSkyCanvasActive(layout = 'garden') {
+      return layout === 'focus'
+        ? this.focusSkyCanvasActive
+        : this.skyCanvasActive
     },
 
     pushSkyToCanvas() {
       if (this.skyRenderer) {
-        this.skyRenderer.update(this.skyShaderInputs())
+        this.skyRenderer.update(this.skyShaderInputs('garden'))
+      }
+
+      if (this.focusSkyRenderer) {
+        this.focusSkyRenderer.update(this.skyShaderInputs('focus'))
       }
     },
 
     // Colours as 0..1 triplets, positions in the same viewport coordinates
     // the sun and moon discs are placed at, so the shader's glow lands
     // exactly where the disc is drawn.
-    skyShaderInputs() {
+    skyShaderInputs(layout = 'garden') {
       const sky = this.sky
-      const sun = this.bodyPoint(sky.sunX, sky.sunY)
-      const moon = this.bodyPoint(sky.moonX, sky.moonY)
+      const sun = this.bodyPoint(sky.sunX, sky.sunY, layout)
+      const moon = this.bodyPoint(sky.moonX, sky.moonY, layout)
 
       return {
         top: this.unitRgb(sky.top),
@@ -606,8 +726,8 @@ export default function nouStudyRoom(initial) {
 
     // Held at 0 until the shader has a context and has painted a frame, so
     // a browser without WebGL never shows an empty canvas over the gradient.
-    skyCanvasStyle() {
-      return { opacity: this.skyCanvasActive ? 1 : 0 }
+    skyCanvasStyle(layout = 'garden') {
+      return { opacity: this.isSkyCanvasActive(layout) ? 1 : 0 }
     },
 
     // Freeze the sky at an instant (ms since epoch), or null to follow the
@@ -673,8 +793,8 @@ export default function nouStudyRoom(initial) {
     },
 
     // Warm haze around a low sun, anchored to where the sun is drawn.
-    sunGlowStyle() {
-      const position = this.bodyStyle(this.sky.sunX, this.sky.sunY)
+    sunGlowStyle(layout = 'garden') {
+      const position = this.bodyStyle(this.sky.sunX, this.sky.sunY, layout)
 
       return {
         opacity: this.sky.sunGlow * 0.85,
@@ -695,25 +815,29 @@ export default function nouStudyRoom(initial) {
       return { opacity: this.sky.starOpacity }
     },
 
-    starStyle(star) {
+    starStyle(star, layout = 'garden') {
+      const size = layout === 'focus' ? star.size * 1.6 : star.size
+
       return {
         left: star.left + '%',
         top: star.top + '%',
-        width: star.size + 'px',
-        height: star.size + 'px',
+        width: size + 'px',
+        height: size + 'px',
         animationDelay: star.twinkleDelay + 's',
       }
     },
 
-    // Bodies are placed in the sky area above the hills: x across the
-    // view (east on the left), y from resting on the far hills' ridge
-    // (~40% down) to near the top when overhead.
-    bodyPoint(x, y) {
-      return { x, y: 0.06 + (1 - y) * 0.34 }
+    // Bodies are placed in the sky area above the skyline: x across the
+    // view (east on the left), y from resting on the skyline's ridge to
+    // near the top when overhead — where exactly depends on the layout.
+    bodyPoint(x, y, layout = 'garden') {
+      const { zenith, horizon } = SKY_LAYOUTS[layout]
+
+      return { x, y: zenith + (1 - y) * (horizon - zenith) }
     },
 
-    bodyStyle(x, y) {
-      const point = this.bodyPoint(x, y)
+    bodyStyle(x, y, layout = 'garden') {
+      const point = this.bodyPoint(x, y, layout)
 
       return {
         left: point.x * 100 + '%',
@@ -721,12 +845,16 @@ export default function nouStudyRoom(initial) {
       }
     },
 
-    sunStyle() {
-      return this.bodyStyle(this.sky.sunX, this.sky.sunY)
+    sunStyle(layout = 'garden') {
+      return this.bodyStyle(this.sky.sunX, this.sky.sunY, layout)
     },
 
-    moonStyle() {
-      const style = this.bodyStyle(this.sky.moonX, this.sky.moonY)
+    starsFor(layout = 'garden') {
+      return layout === 'focus' ? this.focusStars : this.skyStars
+    },
+
+    moonStyle(layout = 'garden') {
+      const style = this.bodyStyle(this.sky.moonX, this.sky.moonY, layout)
 
       // The moon is up in daylight too, just washed out by the sky.
       style.opacity = 0.3 + 0.7 * (1 - this.sky.daylight)
@@ -1016,16 +1144,422 @@ export default function nouStudyRoom(initial) {
       )
     },
 
+    mySeatLabel() {
+      const seat = this.mySeat()
+
+      return seat ? seat.label : ''
+    },
+
+    myActivityLabel() {
+      const seat = this.mySeat()
+
+      return seat && seat.activity ? seat.activity : '專注'
+    },
+
+    myRemainingLabel() {
+      const seat = this.mySeat()
+
+      return seat ? this.remainingLabel(seat) : ''
+    },
+
+    // --- action banner: timer state -----------------------------------------
+    // Everything the banner (and focus mode) shows is derived from the held
+    // seat's timer columns plus the ticking clock, never stored separately.
+
+    // Any timer at all, in any phase — the banner shows its countdown view
+    // rather than the start form.
+    hasTimer() {
+      const seat = this.mySeat()
+
+      return !!seat && !!seat.timerMode
+    },
+
+    isPomodoro() {
+      const seat = this.mySeat()
+
+      return !!seat && seat.timerMode === 'pomodoro'
+    },
+
+    isOnBreak() {
+      const seat = this.mySeat()
+
+      return !!seat && seat.timerPhase === 'break'
+    },
+
+    isBreakFinished() {
+      const seat = this.mySeat()
+
+      return (
+        this.isOnBreak() &&
+        seat.timerEndsAt !== null &&
+        Date.parse(seat.timerEndsAt) <= this.now
+      )
+    },
+
     canStartBreak() {
       const seat = this.mySeat()
 
       return !!seat && this.isSeatFinishedFocus(seat)
     },
 
+    // The next round only ever follows a pomodoro break — but can cut it
+    // short, so this is true for the whole of the break, not just its end.
+    canStartNextRound() {
+      return this.isPomodoro() && this.isOnBreak()
+    },
+
     hasRunningTimer() {
       const seat = this.mySeat()
 
       return !!seat && !!seat.timerMode && !this.isSeatFinishedFocus(seat)
+    },
+
+    // 1-based round of the running pomodoro, or 0 for a custom timer.
+    currentRound() {
+      const seat = this.mySeat()
+
+      return seat && seat.timerRound ? seat.timerRound : 0
+    },
+
+    roundsPerCycle() {
+      const seat = this.mySeat()
+
+      return seat && seat.roundsPerCycle
+        ? seat.roundsPerCycle
+        : this.cycle.roundsPerCycle
+    },
+
+    // Whether the break after the current round is the long one.
+    isLongBreakRound() {
+      const round = this.currentRound()
+
+      return round > 0 && round % this.roundsPerCycle() === 0
+    },
+
+    // Elapsed fraction of the running phase, 0..1. A focus timer the
+    // heartbeat has already finalised has no timerStartedAt any more, and
+    // is by definition over.
+    timerProgress() {
+      const seat = this.mySeat()
+
+      if (!seat || !seat.timerEndsAt) {
+        return 0
+      }
+
+      if (!seat.timerStartedAt) {
+        return 1
+      }
+
+      const startedAt = Date.parse(seat.timerStartedAt)
+      const endsAt = Date.parse(seat.timerEndsAt)
+
+      if (endsAt <= startedAt) {
+        return 1
+      }
+
+      return clamp01((this.now - startedAt) / (endsAt - startedAt))
+    },
+
+    progressStyle() {
+      return { width: this.timerProgress() * 100 + '%' }
+    },
+
+    progressPercent() {
+      return Math.round(this.timerProgress() * 100)
+    },
+
+    progressBarClass() {
+      return this.isOnBreak() ? 'bg-emerald-500' : 'bg-amber-500'
+    },
+
+    timerPhaseLabel() {
+      if (this.isOnBreak()) {
+        if (this.isBreakFinished()) {
+          return '休息結束'
+        }
+
+        return this.isLongBreakRound() ? '長休息' : '休息一下'
+      }
+
+      if (this.canStartBreak()) {
+        return '這一輪完成了'
+      }
+
+      return '專注中'
+    },
+
+    timerPhaseClass() {
+      return this.isOnBreak()
+        ? 'text-emerald-700 dark:text-emerald-400'
+        : 'text-amber-700 dark:text-amber-400'
+    },
+
+    roundLabel() {
+      const round = this.currentRound()
+
+      if (!round) {
+        return '自訂計時'
+      }
+
+      return '第 ' + round + ' 輪'
+    },
+
+    // "預計 14:55 結束" for the running phase.
+    timerEndsAtLabel() {
+      const seat = this.mySeat()
+
+      if (!seat || !seat.timerEndsAt) {
+        return ''
+      }
+
+      const { hour, minute } = window.NouTime.taipeiHM(
+        new Date(Date.parse(seat.timerEndsAt))
+      )
+
+      return (this.isOnBreak() ? '休息到 ' : '預計 ') + hour + ':' + minute
+    },
+
+    nextRoundLabel() {
+      const next = this.currentRound() + 1
+
+      return (
+        (this.isBreakFinished() ? '開始第 ' : '跳過休息，開始第 ') +
+        next +
+        ' 輪'
+      )
+    },
+
+    // One dot per round of the cycle, so a student can see where in it
+    // they are: rounds before this one are done, this one is lit while its
+    // focus runs (and done once on its break), the rest are still to come.
+    cycleDots() {
+      const perCycle = this.roundsPerCycle()
+      const round = this.currentRound()
+      const position = round ? (round - 1) % perCycle : -1
+      const dots = []
+
+      for (let index = 0; index < perCycle; index++) {
+        let state = 'todo'
+
+        if (index < position || (index === position && this.isOnBreak())) {
+          state = 'done'
+        } else if (index === position) {
+          state = 'current'
+        }
+
+        dots.push({ id: index, state })
+      }
+
+      return dots
+    },
+
+    cycleDotClass(dot) {
+      if (dot.state === 'done') {
+        return 'bg-amber-500'
+      }
+
+      if (dot.state === 'current') {
+        return 'bg-amber-500 ring-2 ring-amber-300 dark:ring-amber-700'
+      }
+
+      return 'bg-warm-300 dark:bg-zinc-600'
+    },
+
+    // --- action banner: pomodoro cycle settings ---------------------------------
+
+    // The cycle as it'll be sent: whole minutes, inside the server's
+    // bounds, so a half-typed field never turns into a 422 on 開始.
+    normalizedCycle() {
+      const config = this.config
+      const bound = (value, [min, max], fallback) => {
+        const number = Math.round(Number(value))
+
+        if (!Number.isFinite(number)) {
+          return fallback
+        }
+
+        return Math.min(max, Math.max(min, number))
+      }
+
+      return {
+        focusMinutes: bound(
+          this.cycle.focusMinutes,
+          config.timerPomodoroFocusBounds,
+          config.timerPomodoroFocusMinutes
+        ),
+        shortBreakMinutes: bound(
+          this.cycle.shortBreakMinutes,
+          config.timerPomodoroBreakBounds,
+          config.timerPomodoroShortBreakMinutes
+        ),
+        longBreakMinutes: bound(
+          this.cycle.longBreakMinutes,
+          config.timerPomodoroBreakBounds,
+          config.timerPomodoroLongBreakMinutes
+        ),
+        roundsPerCycle: bound(
+          this.cycle.roundsPerCycle,
+          config.timerPomodoroRoundsBounds,
+          config.timerPomodoroRoundsPerCycle
+        ),
+      }
+    },
+
+    // Lower (0) or upper (1) bound of a cycle field, for the inputs' min/max.
+    cycleBound(field, index) {
+      const bounds = {
+        focus: this.config.timerPomodoroFocusBounds,
+        break: this.config.timerPomodoroBreakBounds,
+        rounds: this.config.timerPomodoroRoundsBounds,
+      }
+
+      return bounds[field][index]
+    },
+
+    openCycleSettings() {
+      this.cycleSettingsOpen = true
+    },
+
+    closeCycleSettings() {
+      this.cycle = this.normalizedCycle()
+      this.cycleSettingsOpen = false
+    },
+
+    resetCycle() {
+      this.cycle = {
+        focusMinutes: this.config.timerPomodoroFocusMinutes,
+        shortBreakMinutes: this.config.timerPomodoroShortBreakMinutes,
+        longBreakMinutes: this.config.timerPomodoroLongBreakMinutes,
+        roundsPerCycle: this.config.timerPomodoroRoundsPerCycle,
+      }
+    },
+
+    // The banner's compact form: "25 / 5 / 30 分 · 4 輪"
+    cycleChipLabel() {
+      const cycle = this.normalizedCycle()
+
+      return (
+        cycle.focusMinutes +
+        ' / ' +
+        cycle.shortBreakMinutes +
+        ' / ' +
+        cycle.longBreakMinutes +
+        ' 分 · ' +
+        cycle.roundsPerCycle +
+        ' 輪'
+      )
+    },
+
+    // "25 分專注 · 5 分休息 · 每 4 輪長休 30 分"
+    cycleSummaryLabel() {
+      const cycle = this.normalizedCycle()
+
+      return (
+        cycle.focusMinutes +
+        ' 分專注 · ' +
+        cycle.shortBreakMinutes +
+        ' 分休息 · 每 ' +
+        cycle.roundsPerCycle +
+        ' 輪長休 ' +
+        cycle.longBreakMinutes +
+        ' 分'
+      )
+    },
+
+    // --- focus mode ----------------------------------------------------------
+    // The banner taken over the whole window: what you see from your
+    // carrel. The partition wall in front of you with the countdown on
+    // it, the window above it with the same sky the garden is under, and
+    // your desk with its lamp below. Fills the browser window only — it
+    // never asks for the browser's own fullscreen.
+
+    openFocusMode() {
+      if (!this.hasTimer()) {
+        return
+      }
+
+      this.focusMode = true
+    },
+
+    closeFocusMode() {
+      this.focusMode = false
+      this.unmountSkyCanvas('focus')
+    },
+
+    // How lit the carrel is, 0 (night: dark wall, desk lamp doing the
+    // work) to 1 (a bright day through the window). Every colour in the
+    // carrel crossfades on this one number so the wall and the ink on it
+    // always contrast — a wider, gentler crossfade lands them both on a
+    // muddy mid-tone through dusk.
+    focusInk() {
+      return clamp01((this.sky.daylight - 0.5) / 0.15)
+    },
+
+    // Night → day blend of two colours on the carrel's lighting.
+    carrelColor(night, day) {
+      const light = this.focusInk()
+
+      return this.rgb(
+        night.map((channel, index) =>
+          Math.round(channel + (day[index] - channel) * light)
+        )
+      )
+    },
+
+    // The garden's palette plus the carrel's own surfaces, so the window
+    // scene and the room around it are lit by the same sky.
+    carrelVars() {
+      const vars = this.gardenVars()
+
+      vars['--c-wall'] = this.carrelColor([74, 58, 50], [246, 236, 226])
+      vars['--c-wall-deep'] = this.carrelColor([56, 43, 37], [236, 222, 208])
+      vars['--c-frame'] = this.carrelColor([104, 78, 62], [222, 196, 178])
+      vars['--c-desk-top'] = this.carrelColor([96, 66, 48], [226, 184, 146])
+      vars['--c-desk-bottom'] = this.carrelColor([58, 40, 30], [196, 142, 100])
+      // The desk lamp is on whenever a timer runs, and matters more the
+      // darker it is.
+      vars['--c-lamp'] = this.hasTimer()
+        ? 0.35 + 0.65 * (1 - this.focusInk())
+        : 0
+
+      return vars
+    },
+
+    // The window frame, its mullions and the sill. Set as an inline colour
+    // rather than read from --c-frame: Chrome doesn't always repaint a
+    // transitioning background that only changed through a custom property.
+    frameStyle() {
+      return {
+        backgroundColor: this.carrelColor([104, 78, 62], [222, 196, 178]),
+      }
+    },
+
+    focusInkStyle() {
+      return {
+        color: this.carrelColor([255, 247, 232], [58, 42, 30]),
+      }
+    },
+
+    // Buttons and chips on the wall.
+    focusChromeClass() {
+      return this.focusInk() > 0.5
+        ? 'border-black/10 bg-white/50 text-warm-900 hover:bg-white/80'
+        : 'border-white/20 bg-white/10 text-white hover:bg-white/20'
+    },
+
+    focusProgressTrackClass() {
+      return this.focusInk() > 0.5 ? 'bg-black/10' : 'bg-white/15'
+    },
+
+    focusDotClass(dot) {
+      const lit = this.focusInk() > 0.5 ? 'bg-warm-900' : 'bg-white'
+      const dim = this.focusInk() > 0.5 ? 'bg-black/15' : 'bg-white/25'
+
+      if (dot.state === 'todo') {
+        return dim
+      }
+
+      return dot.state === 'current' ? lit + ' scale-125' : lit
     },
 
     formatDurationLabel(totalSeconds) {

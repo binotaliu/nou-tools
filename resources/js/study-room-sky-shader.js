@@ -61,11 +61,13 @@ varying vec2 vUv;
 const float PI = 3.141592653589793;
 const float HALF_PI = 1.5707963267948966;
 
-// Where the ground meets the sky in the garden, and where a body drawn
-// straight overhead sits — both measured from the top edge. Kept in step
-// with bodyPoint() in study-room.js.
-const float HORIZON_Y = 0.42;
-const float ZENITH_Y = 0.02;
+// Where the ground meets the sky, and where a body drawn straight overhead
+// sits — both measured from the top edge. Set per canvas (see the geometry
+// argument to createSkyRenderer) and kept in step with bodyPoint() in
+// study-room.js, since the garden strip and the fullscreen focus view lay
+// their ground out at different heights.
+uniform float uHorizonY;
+uniform float uZenithY;
 
 // Perez distribution coefficients for luminance at turbidity 3 — a clear
 // but not bone-dry day, which is about right for the Taipei basin.
@@ -127,7 +129,7 @@ float hash(vec2 p) {
 float angleTo(vec2 point, vec2 body) {
   vec2 delta = vec2(
     (point.x - body.x) * PI,
-    (point.y - body.y) / (HORIZON_Y - ZENITH_Y) * HALF_PI
+    (point.y - body.y) / (uHorizonY - uZenithY) * HALF_PI
   );
 
   return min(length(delta), PI);
@@ -154,12 +156,12 @@ void main() {
     : mix(uMidColor, uHorizonColor, (yTop - 0.55) / 0.45);
 
   float elevation = clamp(
-    (HORIZON_Y - yTop) / (HORIZON_Y - ZENITH_Y),
+    (uHorizonY - yTop) / (uHorizonY - uZenithY),
     0.0,
     1.0
   );
   float sunElevation = clamp(
-    (HORIZON_Y - uSun.y) / (HORIZON_Y - ZENITH_Y),
+    (uHorizonY - uSun.y) / (uHorizonY - uZenithY),
     0.0,
     1.0
   );
@@ -222,7 +224,12 @@ const UNIFORM_NAMES = [
   'uSunStrength',
   'uMoonGlow',
   'uDaylight',
+  'uHorizonY',
+  'uZenithY',
 ]
+
+// The garden strip's geometry, used when none is given.
+const DEFAULT_GEOMETRY = { horizonY: 0.42, zenithY: 0.02 }
 
 // A cap, not the real device ratio: the sky is all soft gradients and the
 // dither hides the rest, so rendering it at full retina resolution buys
@@ -277,10 +284,17 @@ function buildProgram(gl) {
  *        opaque, so the canvas has to stay hidden outside that window or it
  *        covers the CSS sky with a black rectangle — which is exactly what
  *        would happen when it mounts at zero size, behind the profile modal.
+ * @param {{horizonY: number, zenithY: number}} [geometry]
+ *        Where the horizon and the zenith sit, as fractions of the canvas
+ *        height from the top edge.
  * @return {{update: function, sample: function, destroy: function}|null}
  *         null when WebGL isn't usable, so the caller can keep the CSS sky.
  */
-export function createSkyRenderer(canvas, callbacks = {}) {
+export function createSkyRenderer(
+  canvas,
+  callbacks = {},
+  geometry = DEFAULT_GEOMETRY
+) {
   const options = {
     alpha: false,
     antialias: false,
@@ -371,6 +385,8 @@ export function createSkyRenderer(canvas, callbacks = {}) {
     gl.uniform1f(uniforms.uSunStrength, sky.sunStrength)
     gl.uniform1f(uniforms.uMoonGlow, sky.moonGlow)
     gl.uniform1f(uniforms.uDaylight, sky.daylight)
+    gl.uniform1f(uniforms.uHorizonY, geometry.horizonY)
+    gl.uniform1f(uniforms.uZenithY, geometry.zenithY)
 
     gl.drawArrays(gl.TRIANGLES, 0, 3)
 
