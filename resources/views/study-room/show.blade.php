@@ -344,19 +344,50 @@
                                                                 class="pointer-events-none absolute -top-6 left-1/2 z-10 flex w-24 -translate-x-1/2 overflow-hidden rounded-full border border-warm-200 bg-white px-2 py-0.5 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
                                                                 data-testid="study-room-seat-bubble"
                                                             >
-                                                                <span
-                                                                    class="text-[9px] whitespace-nowrap text-warm-700 dark:text-zinc-200"
-                                                                    :class="needsMarquee(
-                                                                        seat
-                                                                    )
-                                                                        ? 'inline-block animate-marquee'
-                                                                        : 'block truncate'"
-                                                                    x-text="
-                                                                        thoughtBubbleText(
+                                                                <template
+                                                                    x-if="
+                                                                        needsMarquee(
                                                                             seat
                                                                         )
                                                                     "
-                                                                ></span>
+                                                                >
+                                                                    <span
+                                                                        class="flex animate-marquee text-[9px] whitespace-nowrap text-warm-700 dark:text-zinc-200"
+                                                                    >
+                                                                        <span
+                                                                            class="pr-4"
+                                                                            x-text="
+                                                                                thoughtBubbleText(
+                                                                                    seat
+                                                                                )
+                                                                            "
+                                                                        ></span>
+                                                                        <span
+                                                                            class="pr-4"
+                                                                            x-text="
+                                                                                thoughtBubbleText(
+                                                                                    seat
+                                                                                )
+                                                                            "
+                                                                        ></span>
+                                                                    </span>
+                                                                </template>
+                                                                <template
+                                                                    x-if="
+                                                                        !needsMarquee(
+                                                                            seat
+                                                                        )
+                                                                    "
+                                                                >
+                                                                    <span
+                                                                        class="block truncate text-[9px] whitespace-nowrap text-warm-700 dark:text-zinc-200"
+                                                                        x-text="
+                                                                            thoughtBubbleText(
+                                                                                seat
+                                                                            )
+                                                                        "
+                                                                    ></span>
+                                                                </template>
                                                             </div>
                                                         </template>
 

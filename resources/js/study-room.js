@@ -1243,18 +1243,17 @@ export default function nouStudyRoom(initial) {
     },
 
     // Thought-bubble text floating above the timer: what the occupant is
-    // doing, with no duration in it (the timer line already covers that).
+    // doing, with no duration or status suffix in it (the timer line
+    // already covers timing, and the seat's own visuals cover phase).
+    // No timer running yet means nothing to say, so the bubble is hidden
+    // entirely (see the x-if wrapping it in the template).
     thoughtBubbleText(seat) {
       if (!seat.timerMode) {
-        return '剛坐下，還沒開始計時'
+        return ''
       }
 
       if (seat.timerPhase === 'break') {
         return '休息中'
-      }
-
-      if (this.isSeatFinishedFocus(seat)) {
-        return (seat.activity || '專注') + '（已完成，準備休息）'
       }
 
       return seat.activity || '專注中'
