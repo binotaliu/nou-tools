@@ -23,6 +23,7 @@ use App\Http\Controllers\Markdown\DiscountStoreIndexMarkdownController;
 use App\Http\Controllers\Markdown\DiscountStoreShowMarkdownController;
 use App\Http\Controllers\Markdown\HomeIndexMarkdownController;
 use App\Http\Controllers\Markdown\ScheduleShowMarkdownController;
+use App\Http\Controllers\Markdown\StudyRoomMarkdownController;
 use App\Http\Controllers\PwaManifestController;
 use App\Http\Controllers\ScheduleAnnouncementPreferencesController;
 use App\Http\Controllers\ScheduleCalendarController;
@@ -33,6 +34,15 @@ use App\Http\Controllers\ScheduleMyController;
 use App\Http\Controllers\ScheduleRememberController;
 use App\Http\Controllers\ScheduleSubscribeController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\StudyRoomBreakController;
+use App\Http\Controllers\StudyRoomController;
+use App\Http\Controllers\StudyRoomHeartbeatController;
+use App\Http\Controllers\StudyRoomNextRoundController;
+use App\Http\Controllers\StudyRoomProfileController;
+use App\Http\Controllers\StudyRoomSeatController;
+use App\Http\Controllers\StudyRoomSessionController;
+use App\Http\Controllers\StudyRoomStateController;
+use App\Http\Controllers\StudyRoomTimerController;
 use Illuminate\Support\Facades\Route;
 use Spatie\Csp\AddCspHeaders;
 
@@ -104,6 +114,25 @@ Route::get('/discount-stores/{store}', [DiscountStoreController::class, 'show'])
 Route::post('/discount-stores', [DiscountStoreController::class, 'store'])->name('discount-stores.store');
 Route::post('/discount-stores/{store}/reports', [DiscountStoreReportController::class, 'store'])->name('discount-stores.reports.store');
 Route::post('/discount-stores/{store}/comments', [DiscountStoreCommentController::class, 'store'])->name('discount-stores.comments.store');
+
+// Registered outside the study-room group: withMarkdown() registers its
+// sibling route from inside the current group, so a prefixed group would
+// apply the prefix twice (/study-room/study-room.md).
+Route::get('/study-room', [StudyRoomController::class, 'show'])->name('study-room.show')
+    ->withMarkdown(StudyRoomMarkdownController::class);
+
+Route::prefix('study-room')->name('study-room.')->group(function (): void {
+    Route::get('/state', StudyRoomStateController::class)->name('state')->middleware('throttle:120,1');
+    Route::get('/sessions', StudyRoomSessionController::class)->name('sessions')->middleware('throttle:60,1');
+    Route::post('/profile', StudyRoomProfileController::class)->name('profile.update')->middleware('throttle:5,1');
+    Route::post('/seats/{seat}/take', [StudyRoomSeatController::class, 'store'])->name('seats.take')->middleware('throttle:60,1');
+    Route::post('/seat/leave', [StudyRoomSeatController::class, 'destroy'])->name('seat.leave')->middleware('throttle:60,1');
+    Route::post('/timer', [StudyRoomTimerController::class, 'store'])->name('timer.start')->middleware('throttle:60,1');
+    Route::delete('/timer', [StudyRoomTimerController::class, 'destroy'])->name('timer.stop')->middleware('throttle:60,1');
+    Route::post('/timer/break', StudyRoomBreakController::class)->name('timer.break')->middleware('throttle:60,1');
+    Route::post('/timer/next', StudyRoomNextRoundController::class)->name('timer.next')->middleware('throttle:60,1');
+    Route::post('/heartbeat', StudyRoomHeartbeatController::class)->name('heartbeat')->middleware('throttle:60,1');
+});
 
 Route::get('/{type}', [ArticleController::class, 'index'])->name('articles.index')
     ->whereIn('type', ArticleType::cases())

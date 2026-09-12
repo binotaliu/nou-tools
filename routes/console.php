@@ -1,9 +1,14 @@
 <?php
 
 use App\Console\Commands\FetchAnnouncementsCommand;
+use App\Console\Commands\ReleaseIdleStudyRoomSeatsCommand;
+use App\Console\Commands\ReleaseStudyRoomSeatsWithoutTimerCommand;
 use Illuminate\Support\Facades\Schedule;
 
 // NOTE: schedule_timezone is set to Asia/Taipei in config/app.php.
+
+Schedule::command(ReleaseIdleStudyRoomSeatsCommand::class)->everyMinute();
+Schedule::command(ReleaseStudyRoomSeatsWithoutTimerCommand::class)->everyMinute();
 
 Schedule::command(FetchAnnouncementsCommand::class)
     ->weekdays()

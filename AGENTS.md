@@ -37,6 +37,13 @@ src/Domains/{Domain}/
 | ViewModel   | Endpoint returns structured data            |
 | QueryFilter | List endpoint has multiple optional filters |
 
+## 自習室 (Study Room)
+
+Lives in `src/Domains/StudyRoom/` (Actions, DTOs, ViewModels, PageData) plus `App\Models\StudyRoomSeat`/`StudyRoomProfile`/`StudyRoomSession`. Two design decisions are load-bearing — breaking either reintroduces race conditions or drift:
+
+1. **Seats co-locate definition and occupancy.** A `study_room_seats` row is both "this seat exists" and "who's sitting in it right now" — there's no separate occupancy table. That means claiming a seat is one conditional `UPDATE ... WHERE student_schedule_id IS NULL`, not a read-then-write. Splitting occupancy into its own table would reopen the race two students taking the same seat simultaneously were supposed to be immune to.
+2. **Open floor counts are derived, never stored.** Which floors are "open" is computed from current occupancy (`ResolveOpenFloorCount`) each time state is built, not persisted as a flag. Storing it would let it drift from the actual seat rows after a release, a sync, or a crash mid-write.
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

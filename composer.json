@@ -11,9 +11,11 @@
     "coderflex/laravel-turnstile": "^2.2.1",
     "dotswan/filament-map-picker": "^2.3.3",
     "filament/filament": "^5.8.1",
+    "filament/spatie-laravel-settings-plugin": "^5.8",
     "genealabs/laravel-caffeine": "^13.0",
     "laravel/framework": "^13.31",
     "laravel/prompts": "^0.3.24",
+    "laravel/reverb": "^1.11",
     "laravel/tinker": "^3.0.2",
     "league/commonmark": "^2.10.1",
     "milon/barcode": "^13.1",
@@ -21,6 +23,7 @@
     "spatie/laravel-csp": "^3.29",
     "spatie/laravel-data": "^4.23.0",
     "spatie/laravel-ray": "^1.43.9",
+    "spatie/laravel-settings": "^3.9",
     "symfony/yaml": "^8.1.6",
     "terpomoj/base64-url-helpers": "^0.1.0"
   },
@@ -58,12 +61,13 @@
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
       "@php artisan key:generate",
       "@php artisan migrate --force",
+      "@php artisan study-room:sync-seats",
       "npm install",
       "npm run build"
     ],
     "dev": [
       "Composer\\Config::disableProcessTimeout",
-      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
+      "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74,#86efac\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" \"php artisan reverb:start\" --names=server,queue,logs,vite,reverb --kill-others"
     ],
     "test": [
       "@php artisan config:clear --ansi",

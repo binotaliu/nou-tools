@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Ramsey\Uuid\Uuid;
 
 final class StudentSchedule extends Model
@@ -80,5 +81,21 @@ final class StudentSchedule extends Model
     public function learningProgresses(): HasMany
     {
         return $this->hasMany(LearningProgress::class);
+    }
+
+    /**
+     * @return HasOne<StudyRoomProfile, $this>
+     */
+    public function studyRoomProfile(): HasOne
+    {
+        return $this->hasOne(StudyRoomProfile::class);
+    }
+
+    /**
+     * @return HasOne<StudyRoomSeat, $this>
+     */
+    public function studyRoomSeat(): HasOne
+    {
+        return $this->hasOne(StudyRoomSeat::class);
     }
 }

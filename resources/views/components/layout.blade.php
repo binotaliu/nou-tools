@@ -101,14 +101,16 @@
             ->all()"
     />
 
-    <link rel="icon" href="{{ asset('favicon.ico') }}?v=2" />
+    <link id="favicon-ico" rel="icon" href="{{ asset('favicon.ico') }}?v=2" />
     <link
+        id="favicon-png"
         rel="icon"
         type="image/png"
         sizes="512x512"
         href="{{ asset('favicon.png') }}?v=2"
     />
     <link
+        id="favicon-svg"
         rel="icon"
         type="image/svg+xml"
         href="{{ asset('favicon.svg') }}?v=2"
@@ -204,6 +206,26 @@
                         >
                             <x-heroicon-o-table-cells class="size-4 shrink-0" />
                             <span class="hidden sm:inline">我的課表</span>
+                        </a>
+
+                        <a
+                            href="{{ route('study-room.show') }}"
+                            @class([
+                                    '-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3',
+                                    'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' => str_starts_with(
+                                        $routeName ?? '',
+                                        'study-room',
+                                    ),
+                                    'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' => ! str_starts_with(
+                                        $routeName ?? '',
+                                        'study-room',
+                                    ),
+                                ])
+                        >
+                            <x-heroicon-o-academic-cap
+                                class="size-4 shrink-0"
+                            />
+                            <span class="hidden sm:inline">自習室</span>
                         </a>
 
                         <a
@@ -383,6 +405,24 @@
                 >
                     <x-heroicon-o-table-cells class="size-4 shrink-0" />
                     我的課表
+                </a>
+
+                <a
+                    href="{{ route('study-room.show') }}"
+                    @class([
+                            'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                            'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100' => str_starts_with(
+                                $routeName ?? '',
+                                'study-room',
+                            ),
+                            'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100' => ! str_starts_with(
+                                $routeName ?? '',
+                                'study-room',
+                            ),
+                        ])
+                >
+                    <x-heroicon-o-academic-cap class="size-4 shrink-0" />
+                    自習室
                 </a>
 
                 <a
