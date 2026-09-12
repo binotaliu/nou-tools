@@ -16,6 +16,7 @@ final class StudyRoomSessionViewModel extends Data
         public DateTimeInterface $startedAt,
         public ?DateTimeInterface $endedAt,
         public int $focusSeconds,
+        public int $overtimeSeconds,
         public bool $wasCompleted,
     ) {}
 
@@ -29,6 +30,7 @@ final class StudyRoomSessionViewModel extends Data
             startedAt: $session->started_at,
             endedAt: $session->ended_at,
             focusSeconds: $session->focus_seconds,
+            overtimeSeconds: $session->overtime_seconds,
             wasCompleted: $session->was_completed,
         );
     }

@@ -21,9 +21,9 @@ use NouTools\Domains\StudyRoom\ValueObjects\PomodoroCycle;
  * the long one after the last round of a cycle. A finished custom timer
  * gets the short break (it has no round to be the last of).
  *
- * Finalizes the focus session itself (idempotently — a no-op if a
- * heartbeat already finalized it) rather than assuming one already ran,
- * since a student can click 開始休息 before the next heartbeat lands.
+ * Finalizes the focus session itself — heartbeats never do, so this is the
+ * only place a normally completed focus round (including any overtime run
+ * past its planned end) gets recorded before the seat moves to Break.
  */
 final readonly class StartBreak
 {

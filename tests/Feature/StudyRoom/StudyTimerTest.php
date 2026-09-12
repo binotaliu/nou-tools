@@ -392,6 +392,100 @@ it('refuses to start the next round unless the seat is on a pomodoro break', fun
     expect($seat->timer_round)->toBe(1);
 });
 
+it('records overtime past the planned end when stopping a custom timer late', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'custom',
+            'minutes' => 10,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    // 10 planned minutes plus 3 extra minutes run past timer_ends_at.
+    $this->travel(13)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->deleteJson(route('study-room.timer.stop'))
+        ->assertOk();
+
+    $session = StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->sole();
+    expect($session->focus_seconds)->toBe(13 * 60)
+        ->and($session->overtime_seconds)->toBe(3 * 60)
+        ->and($session->was_completed)->toBeTrue();
+});
+
+it('starts a count-up timer with no planned end and no round', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $response = $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'count_up',
+            'minutes' => null,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ]);
+
+    $response->assertOk()
+        ->assertJsonPath('state.floors.0.soloSeats.0.timerRound', null)
+        ->assertJsonPath('state.floors.0.soloSeats.0.timerEndsAt', null);
+
+    $seat->refresh();
+    expect($seat->timer_phase)->toBe(StudyTimerPhase::Focus)
+        ->and($seat->timer_round)->toBeNull()
+        ->and($seat->timer_ends_at)->toBeNull()
+        ->and($seat->timer_started_at)->not->toBeNull();
+});
+
+it('records the elapsed time with no overtime when stopping a count-up timer', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'count_up',
+            'minutes' => null,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $this->travel(7)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->deleteJson(route('study-room.timer.stop'))
+        ->assertOk();
+
+    $session = StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->sole();
+    expect($session->focus_seconds)->toBe(7 * 60)
+        ->and($session->overtime_seconds)->toBe(0)
+        ->and($session->was_completed)->toBeTrue();
+});
+
+it('refuses to start a break on a count-up timer, which has no planned end', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'count_up',
+            'minutes' => null,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $this->travel(30)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.break'))
+        ->assertStatus(422);
+});
+
 it('leaves a custom timer without a round and stopping clears it', function () {
     [$schedule, $seat] = seatedStudent();
 
