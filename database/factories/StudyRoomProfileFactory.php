@@ -24,6 +24,7 @@ final class StudyRoomProfileFactory extends Factory
             'student_schedule_id' => StudentSchedule::factory(),
             'nickname' => $this->faker->firstName(),
             'emoji' => $this->faker->randomElement(config('study-room.emojis')),
+            'play_sound_on_timer_end' => true,
         ];
     }
 }

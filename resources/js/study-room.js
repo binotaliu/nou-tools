@@ -1,5 +1,6 @@
 import { buildStarField, computeSky, SKY_PHASE_LABELS } from './study-room-sky'
 import { createSkyRenderer } from './study-room-sky-shader'
+import { playTimerFinishedSound } from './study-room-sound'
 
 // Alpine factory for the 自習室 (study room) page root. All interactive
 // logic lives here rather than in x-* attributes: the project ships
@@ -75,6 +76,12 @@ export default function nouStudyRoom(initial) {
     canChangeNicknameAt: initial.profile.canChangeNicknameAt,
     emojiChoices: initial.emojiChoices,
 
+    playSoundOnTimerEnd: initial.profile.playSoundOnTimerEnd,
+    // The timerEndsAt already notified for, so overtime a seat was already
+    // in in when the page loaded doesn't chime immediately, and a chime
+    // doesn't repeat every tick while a finished timer sits in overtime.
+    lastNotifiedTimerEndsAt: null,
+
     personalInfoOpen: false,
     sessionsLoading: false,
     sessionsFetched: false,
@@ -142,6 +149,7 @@ export default function nouStudyRoom(initial) {
       this.startTwemojiObserver()
 
       this.heldSeatCode = this.deriveHeldSeatCode(this.state)
+      this.suppressAlreadyFinishedSound()
       this.customMinutes = this.config.timerCustomMinMinutes
       this.selectedVerb = this.verbs.length ? this.verbs[0].value : null
       // Kept as a string (matching the <select> option values, including
@@ -280,12 +288,54 @@ export default function nouStudyRoom(initial) {
 
       this.tickHandle = setInterval(() => {
         this.now = Date.now()
+        this.checkTimerFinishedSound()
 
         if (!this.hasVisibleCountdown()) {
           clearInterval(this.tickHandle)
           this.tickHandle = null
         }
       }, 1000)
+    },
+
+    // A seat already sitting in overtime when the page loads (or the tab
+    // regains focus) shouldn't chime right away — only a timer that ends
+    // while the student is watching it should.
+    suppressAlreadyFinishedSound() {
+      const seat = this.mySeat()
+
+      if (
+        seat &&
+        seat.timerEndsAt &&
+        Date.parse(seat.timerEndsAt) <= Date.now()
+      ) {
+        this.lastNotifiedTimerEndsAt = seat.timerEndsAt
+      }
+    },
+
+    // Chimes once per timer end (focus or break) for the viewer's own seat,
+    // the moment its countdown crosses zero — not on every tick afterwards,
+    // since the seat is left sitting in overtime rather than reset.
+    checkTimerFinishedSound() {
+      if (!this.playSoundOnTimerEnd) {
+        return
+      }
+
+      const seat = this.mySeat()
+
+      if (!seat || !seat.timerEndsAt) {
+        return
+      }
+
+      if (Date.parse(seat.timerEndsAt) > this.now) {
+        return
+      }
+
+      if (this.lastNotifiedTimerEndsAt === seat.timerEndsAt) {
+        return
+      }
+
+      this.lastNotifiedTimerEndsAt = seat.timerEndsAt
+      playTimerFinishedSound()
     },
 
     hasVisibleCountdown() {

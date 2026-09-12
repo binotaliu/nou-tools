@@ -32,6 +32,7 @@ final readonly class SetStudyRoomProfile
 
             $profile->student_schedule_id = $viewer->id;
             $profile->emoji = $data->emoji;
+            $profile->play_sound_on_timer_end = $data->playSoundOnTimerEnd;
 
             if ($profile->nickname === null || $isNicknameChanging) {
                 $profile->nickname = $data->nickname;

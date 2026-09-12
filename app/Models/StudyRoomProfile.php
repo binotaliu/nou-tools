@@ -22,6 +22,7 @@ final class StudyRoomProfile extends Model
         'pomodoro_short_break_minutes',
         'pomodoro_long_break_minutes',
         'pomodoro_rounds_per_cycle',
+        'play_sound_on_timer_end',
         'nickname_changed_at',
         'nickname_reset_at',
         'nickname_reset_by',
@@ -32,6 +33,7 @@ final class StudyRoomProfile extends Model
         'pomodoro_short_break_minutes' => 'integer',
         'pomodoro_long_break_minutes' => 'integer',
         'pomodoro_rounds_per_cycle' => 'integer',
+        'play_sound_on_timer_end' => 'boolean',
         'nickname_changed_at' => 'datetime',
         'nickname_reset_at' => 'datetime',
     ];

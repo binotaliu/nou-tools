@@ -68,6 +68,23 @@
         </div>
     </div>
 
+    <div>
+        <label
+            class="flex cursor-pointer items-center gap-2 text-sm text-warm-700 dark:text-zinc-300"
+        >
+            <input type="hidden" name="playSoundOnTimerEnd" value="0" />
+            <input
+                type="checkbox"
+                name="playSoundOnTimerEnd"
+                value="1"
+                class="size-4 rounded border-warm-300 text-warm-600 focus:ring-orange-300 dark:border-zinc-600"
+                data-testid="study-room-play-sound-checkbox"
+                {{ old('playSoundOnTimerEnd', $viewModel->profile->playSoundOnTimerEnd) ? 'checked' : '' }}
+            />
+            時間到時播放音效
+        </label>
+    </div>
+
     <x-button
         type="submit"
         variant="warm-dark"

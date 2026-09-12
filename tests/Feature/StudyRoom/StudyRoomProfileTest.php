@@ -21,6 +21,7 @@ it('creates a profile on the happy path', function () {
         ->post(route('study-room.profile.update'), [
             'nickname' => '認真讀書中',
             'emoji' => config('study-room.emojis')[0],
+            'playSoundOnTimerEnd' => true,
         ]);
 
     $response->assertRedirect()->assertSessionHas('success', '暱稱已更新');
@@ -29,6 +30,23 @@ it('creates a profile on the happy path', function () {
         'student_schedule_id' => $schedule->id,
         'nickname' => '認真讀書中',
         'emoji' => config('study-room.emojis')[0],
+        'play_sound_on_timer_end' => true,
+    ]);
+});
+
+it('saves the play-sound-on-timer-end preference, including turning it off', function () {
+    $schedule = StudentSchedule::factory()->create();
+    $cookie = studyRoomProfileCookie($schedule);
+
+    $this->withCredentials()->withCookie('student_schedule', $cookie)->post(route('study-room.profile.update'), [
+        'nickname' => '愛聽音效',
+        'emoji' => config('study-room.emojis')[0],
+        'playSoundOnTimerEnd' => false,
+    ])->assertSessionHasNoErrors();
+
+    $this->assertDatabaseHas(StudyRoomProfile::class, [
+        'student_schedule_id' => $schedule->id,
+        'play_sound_on_timer_end' => false,
     ]);
 });
 
@@ -40,6 +58,7 @@ it('rejects an emoji outside the allowlist', function () {
         ->post(route('study-room.profile.update'), [
             'nickname' => '認真讀書中',
             'emoji' => '💀',
+            'playSoundOnTimerEnd' => true,
         ]);
 
     $response->assertSessionHasErrors('emoji');
@@ -59,6 +78,7 @@ it('rejects a forbidden nickname, including a whitespace-evasion variant', funct
         ->post(route('study-room.profile.update'), [
             'nickname' => '我是壞字詞啦',
             'emoji' => config('study-room.emojis')[0],
+            'playSoundOnTimerEnd' => true,
         ]);
 
     $response->assertSessionHasErrors('nickname');
@@ -68,6 +88,7 @@ it('rejects a forbidden nickname, including a whitespace-evasion variant', funct
         ->post(route('study-room.profile.update'), [
             'nickname' => '我是 壞 字 詞 啦',
             'emoji' => config('study-room.emojis')[0],
+            'playSoundOnTimerEnd' => true,
         ]);
 
     $evasionResponse->assertSessionHasErrors('nickname');
@@ -81,11 +102,13 @@ it('blocks a second nickname change within the cooldown, then allows it after th
     $this->withCredentials()->withCookie('student_schedule', $cookie)->post(route('study-room.profile.update'), [
         'nickname' => '第一個暱稱',
         'emoji' => config('study-room.emojis')[0],
+        'playSoundOnTimerEnd' => true,
     ])->assertSessionHasNoErrors();
 
     $blocked = $this->withCredentials()->withCookie('student_schedule', $cookie)->post(route('study-room.profile.update'), [
         'nickname' => '第二個暱稱',
         'emoji' => config('study-room.emojis')[0],
+        'playSoundOnTimerEnd' => true,
     ]);
 
     $blocked->assertSessionHasErrors('nickname');
@@ -99,6 +122,7 @@ it('blocks a second nickname change within the cooldown, then allows it after th
     $allowed = $this->withCredentials()->withCookie('student_schedule', $cookie)->post(route('study-room.profile.update'), [
         'nickname' => '第二個暱稱',
         'emoji' => config('study-room.emojis')[0],
+        'playSoundOnTimerEnd' => true,
     ]);
 
     $allowed->assertSessionHasNoErrors()->assertSessionHas('success');
@@ -115,11 +139,13 @@ it('allows an emoji-only change during the nickname cooldown', function () {
     $this->withCredentials()->withCookie('student_schedule', $cookie)->post(route('study-room.profile.update'), [
         'nickname' => '保持不變的暱稱',
         'emoji' => config('study-room.emojis')[0],
+        'playSoundOnTimerEnd' => true,
     ])->assertSessionHasNoErrors();
 
     $response = $this->withCredentials()->withCookie('student_schedule', $cookie)->post(route('study-room.profile.update'), [
         'nickname' => '保持不變的暱稱',
         'emoji' => config('study-room.emojis')[1],
+        'playSoundOnTimerEnd' => true,
     ]);
 
     $response->assertSessionHasNoErrors()->assertSessionHas('success');
@@ -137,11 +163,13 @@ it('allows re-submitting the identical nickname during the cooldown', function (
     $this->withCredentials()->withCookie('student_schedule', $cookie)->post(route('study-room.profile.update'), [
         'nickname' => '相同的暱稱',
         'emoji' => config('study-room.emojis')[0],
+        'playSoundOnTimerEnd' => true,
     ])->assertSessionHasNoErrors();
 
     $response = $this->withCredentials()->withCookie('student_schedule', $cookie)->post(route('study-room.profile.update'), [
         'nickname' => '相同的暱稱',
         'emoji' => config('study-room.emojis')[0],
+        'playSoundOnTimerEnd' => true,
     ]);
 
     $response->assertSessionHasNoErrors()->assertSessionHas('success');
@@ -151,6 +179,7 @@ it('redirects to schedule creation when there is no cookie', function () {
     $response = $this->post(route('study-room.profile.update'), [
         'nickname' => '沒有課表',
         'emoji' => config('study-room.emojis')[0],
+        'playSoundOnTimerEnd' => true,
     ]);
 
     $response->assertRedirect(route('schedules.create'));

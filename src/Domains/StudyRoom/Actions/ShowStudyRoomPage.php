@@ -71,6 +71,7 @@ final readonly class ShowStudyRoomPage
             canChangeNicknameAt: $canChangeNicknameAt,
             canChangeNickname: $canChangeNicknameAt === null || Date::now()->greaterThanOrEqualTo($canChangeNicknameAt),
             pomodoroCycle: StudyRoomPomodoroCycleViewModel::fromCycle(PomodoroCycle::forProfile($profile)),
+            playSoundOnTimerEnd: $profile?->play_sound_on_timer_end ?? true,
         );
     }
 

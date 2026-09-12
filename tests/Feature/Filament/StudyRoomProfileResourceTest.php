@@ -71,6 +71,7 @@ test('force-resetting a nickname clears the cooldown and lets the user set a new
         ->post(route('study-room.profile.update'), [
             'nickname' => '新暱稱',
             'emoji' => config('study-room.emojis')[0],
+            'playSoundOnTimerEnd' => true,
         ]);
 
     $response->assertSessionHasNoErrors();
