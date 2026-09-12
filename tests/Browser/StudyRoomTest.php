@@ -278,14 +278,27 @@ it('draws the garden and windows from the real Taiwan sky, day and night', funct
         ->waitForEvent('load');
 
     $page->assertVisible('[data-testid="study-room-floor-1"] [data-testid="study-room-garden"]')
-        ->assertVisible('[data-testid="study-room-floor-1"] [data-testid="study-room-windows"]');
+        ->assertVisible('[data-testid="study-room-floor-1"] [data-testid="study-room-windows"]')
+        ->assertVisible('[data-testid="study-room-floor-1"] [data-testid="study-room-sky-canvas"]');
 
-    $previewSky = static fn (string $iso): string => 'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0].previewSky('.
+    $component = 'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0]';
+
+    // The sky is painted by a WebGL shader layered over the CSS gradient
+    // (study-room-sky-shader.js). Reading the framebuffer back is the only
+    // way to tell it really painted rather than sitting there transparent —
+    // and where WebGL isn't available it *is* transparent by design, with
+    // the gradient showing through, so the colour checks below only apply
+    // when the renderer actually came up.
+    $shaderPainting = $page->script($component.'.skyCanvasActive');
+    $sampleSky = static fn (): string => $component.'.skyRenderer.sample(0.15, 0.12)';
+
+    $previewSky = static fn (string $iso): string => $component.'.previewSky('.
         (CarbonImmutable::parse($iso)->getTimestampMs()).')';
 
-    // Solstice noon over Luzhou: the sun is almost overhead.
+    // Solstice noon over Luzhou: the sun is almost overhead. The wait has
+    // to clear the garden's 1000ms colour transitions, not just start them.
     $page->script($previewSky('2026-06-21T12:00:00+08:00'));
-    $page->wait(1);
+    $page->wait(2);
 
     $page->assertAttribute('[data-testid="study-room-garden"]', 'data-sky-phase', 'day')
         ->assertAttributeContains('[data-testid="study-room-garden"]', 'aria-label', '白天')
@@ -293,6 +306,14 @@ it('draws the garden and windows from the real Taiwan sky, day and night', funct
 
     expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"study-room-stars\"]')).opacity"))
         ->toBe('0');
+
+    if ($shaderPainting) {
+        // Midday sky, sampled high and away from the sun: blue, and bright.
+        [$red, , $blue] = $page->script($sampleSky());
+
+        expect($blue)->toBeGreaterThan(150)
+            ->and($blue)->toBeGreaterThan($red + 40);
+    }
 
     // The night of the June 2026 full moon: no sun, stars out, moon full.
     $page->script($previewSky('2026-06-29T23:00:00+08:00'));
@@ -305,6 +326,13 @@ it('draws the garden and windows from the real Taiwan sky, day and night', funct
 
     expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"study-room-stars\"]')).opacity"))
         ->toBe('1');
+
+    if ($shaderPainting) {
+        // Same point under the same shader eight hours later: near black.
+        [$red, $green, $blue] = $page->script($sampleSky());
+
+        expect($red + $green + $blue)->toBeLessThan(120);
+    }
 
     // The window panes carry the sky's horizon colour rather than a fixed tint.
     expect($page->script("document.querySelector('[data-testid=\"study-room-windows\"] span').style.background"))

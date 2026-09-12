@@ -298,11 +298,20 @@
                                     :style="gardenVars()"
                                     data-testid="study-room-garden"
                                 >
-                                    {{-- 天空 --}}
+                                    {{-- 天空：底層是調色盤漸層 --}}
                                     <div
                                         class="absolute inset-0"
                                         :style="gardenSkyStyle()"
                                     ></div>
+
+                                    {{-- 天空著色器：只畫天空，蓋在漸層之上、景物之下，補上大氣散射與日暈。沒有 WebGL 就維持透明，露出底下的漸層 --}}
+                                    <canvas
+                                        class="absolute inset-0 size-full transition-opacity duration-700"
+                                        x-init="mountSkyCanvas($el)"
+                                        :style="skyCanvasStyle()"
+                                        data-testid="study-room-sky-canvas"
+                                        aria-hidden="true"
+                                    ></canvas>
 
                                     {{-- 星星：暮色漸深時浮現 --}}
                                     <div
@@ -322,8 +331,9 @@
                                         </template>
                                     </div>
 
-                                    {{-- 日出日落時貼近地平線的霞光 --}}
+                                    {{-- 日出日落時貼近地平線的霞光（著色器接手時改由它繪製） --}}
                                     <div
+                                        x-show="!skyCanvasActive"
                                         class="absolute inset-0 transition-opacity duration-1000"
                                         :style="sunGlowStyle()"
                                         aria-hidden="true"

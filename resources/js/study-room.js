@@ -1,4 +1,5 @@
 import { buildStarField, computeSky, SKY_PHASE_LABELS } from './study-room-sky'
+import { createSkyRenderer } from './study-room-sky-shader'
 
 // Alpine factory for the 自習室 (study room) page root. All interactive
 // logic lives here rather than in x-* attributes: the project ships
@@ -66,6 +67,12 @@ export default function nouStudyRoom(initial) {
     skyMinute: null,
     skyOverrideMs: readSkyOverrideFromUrl(),
     skyStars: buildStarField(),
+    // WebGL renderer for the garden sky, or null when the browser can't
+    // give us a context — in which case the CSS gradient underneath it is
+    // what everyone sees, and skyCanvasActive keeps the CSS sun haze that
+    // goes with it on screen.
+    skyRenderer: null,
+    skyCanvasActive: false,
     heldSeatCode: null,
     busySeatCode: null,
     // Table seat whose hover/tap popover is open.
@@ -528,6 +535,79 @@ export default function nouStudyRoom(initial) {
 
       this.skyMinute = minute
       this.sky = computeSky(ms, this.config.latitude, this.config.longitude)
+      this.pushSkyToCanvas()
+    },
+
+    // The garden's sky is drawn by a shader on a canvas sitting between the
+    // CSS gradient and the scenery (see study-room-sky-shader.js). It reads
+    // the same palette and sun/moon positions as everything else, so it's a
+    // richer rendering of the same sky, not a second one — and it draws the
+    // sky only. The clouds, skyline and trees in front of it stay the flat
+    // SVG and CSS scenery they were.
+    mountSkyCanvas(canvas) {
+      if (this.skyRenderer) {
+        this.skyRenderer.destroy()
+        this.skyRenderer = null
+        this.skyCanvasActive = false
+      }
+
+      // Only flipped on once a frame is really on the canvas, and off
+      // again if the context goes away: either way the CSS gradient
+      // underneath is what's on show.
+      const renderer = createSkyRenderer(canvas, {
+        onFirstPaint: () => {
+          this.skyCanvasActive = true
+        },
+        onContextLost: () => {
+          this.skyCanvasActive = false
+        },
+      })
+
+      if (!renderer) {
+        return
+      }
+
+      this.skyRenderer = renderer
+      this.pushSkyToCanvas()
+    },
+
+    pushSkyToCanvas() {
+      if (this.skyRenderer) {
+        this.skyRenderer.update(this.skyShaderInputs())
+      }
+    },
+
+    // Colours as 0..1 triplets, positions in the same viewport coordinates
+    // the sun and moon discs are placed at, so the shader's glow lands
+    // exactly where the disc is drawn.
+    skyShaderInputs() {
+      const sky = this.sky
+      const sun = this.bodyPoint(sky.sunX, sky.sunY)
+      const moon = this.bodyPoint(sky.moonX, sky.moonY)
+
+      return {
+        top: this.unitRgb(sky.top),
+        mid: this.unitRgb(sky.mid),
+        horizon: this.unitRgb(sky.horizon),
+        sun: [sun.x, sun.y],
+        moon: [moon.x, moon.y],
+        sunGlow: sky.sunGlow,
+        // Fades the sun's haze out through civil twilight, by which point
+        // the palette's own dusk colours have taken over.
+        sunStrength: Math.min(1, Math.max(0, (sky.sunAltitudeDeg + 6) / 8)),
+        moonGlow: sky.moonVisible ? sky.moonFraction * (1 - sky.daylight) : 0,
+        daylight: sky.daylight,
+      }
+    },
+
+    unitRgb(triplet) {
+      return [triplet[0] / 255, triplet[1] / 255, triplet[2] / 255]
+    },
+
+    // Held at 0 until the shader has a context and has painted a frame, so
+    // a browser without WebGL never shows an empty canvas over the gradient.
+    skyCanvasStyle() {
+      return { opacity: this.skyCanvasActive ? 1 : 0 }
     },
 
     // Freeze the sky at an instant (ms since epoch), or null to follow the
@@ -628,10 +708,16 @@ export default function nouStudyRoom(initial) {
     // Bodies are placed in the sky area above the hills: x across the
     // view (east on the left), y from resting on the far hills' ridge
     // (~40% down) to near the top when overhead.
+    bodyPoint(x, y) {
+      return { x, y: 0.06 + (1 - y) * 0.34 }
+    },
+
     bodyStyle(x, y) {
+      const point = this.bodyPoint(x, y)
+
       return {
-        left: x * 100 + '%',
-        top: 6 + (1 - y) * 34 + '%',
+        left: point.x * 100 + '%',
+        top: point.y * 100 + '%',
       }
     },
 
