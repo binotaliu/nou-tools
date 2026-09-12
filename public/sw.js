@@ -1,7 +1,7 @@
 // Minimal offline support: keeps a previously-visited home/schedule/directory
 // page (and the assets it needs) available when the network is down, and
 // shows a generic offline page for any other route that isn't cached.
-const CACHE_VERSION = 'v2'
+const CACHE_VERSION = 'v3'
 const PAGE_CACHE = `nou-schedule-pages-${CACHE_VERSION}`
 const RUNTIME_CACHE = `nou-runtime-${CACHE_VERSION}`
 
@@ -127,6 +127,14 @@ async function staleWhileRevalidate(request) {
   return cached || (await networkFetch) || Response.error()
 }
 
+// Requests made by the page's scripts for JSON (axios sends
+// `Accept: application/json, ...`), as opposed to documents and assets.
+function isJsonRequest(request) {
+  const accept = request.headers.get('accept') || ''
+
+  return accept.startsWith('application/json')
+}
+
 self.addEventListener('fetch', event => {
   const { request } = event
 
@@ -141,6 +149,15 @@ self.addEventListener('fetch', event => {
   // go straight to the network, uncached, or the probe would lie once
   // offline.
   if (url.origin === self.location.origin && url.pathname === '/up') {
+    return
+  }
+
+  // JSON fetched by the page's own scripts (the 自習室's live room state,
+  // a student's session log, ...) is live data, never something to serve
+  // stale: a stale-while-revalidate answer here hands the page the
+  // *previous* response and the room silently snaps back to an older
+  // state. Pass it straight through to the network.
+  if (isJsonRequest(request)) {
     return
   }
 

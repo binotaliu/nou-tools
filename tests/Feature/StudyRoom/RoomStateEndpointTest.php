@@ -112,3 +112,10 @@ it('changes the version for two seat changes landing in the same second', functi
     expect($second->version)->not->toBe($first->version)
         ->and($third->version)->not->toBe($second->version);
 });
+
+it('tells the browser not to cache room state, so its own conditional requests never get a stale body', function () {
+    $response = $this->getJson(route('study-room.state'));
+
+    $response->assertOk()
+        ->assertHeader('Cache-Control', 'no-store, private');
+});
