@@ -313,6 +313,35 @@
                                             <div
                                                 class="flex flex-col items-center gap-0.5"
                                             >
+                                                <template
+                                                    x-if="
+                                                        thoughtBubbleText(seat)
+                                                    "
+                                                >
+                                                    <div
+                                                        class="pointer-events-none absolute -top-7 left-1/2 z-10 w-24 -translate-x-1/2 overflow-hidden rounded-md border border-warm-200 bg-white px-1.5 py-0.5 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
+                                                        data-testid="study-room-seat-bubble"
+                                                    >
+                                                        <span
+                                                            class="block text-[9px] whitespace-nowrap text-warm-700 dark:text-zinc-200"
+                                                            :class="needsMarquee(
+                                                                seat
+                                                            )
+                                                                ? 'inline-block animate-marquee'
+                                                                : 'truncate'"
+                                                            x-text="
+                                                                thoughtBubbleText(
+                                                                    seat
+                                                                )
+                                                            "
+                                                        ></span>
+                                                    </div>
+                                                </template>
+
+                                                <span
+                                                    class="font-mono text-[10px] text-warm-500 tabular-nums dark:text-zinc-400"
+                                                    x-text="timerLabel(seat)"
+                                                ></span>
                                                 <span
                                                     class="text-lg"
                                                     x-text="seat.emoji"
@@ -320,14 +349,6 @@
                                                 <span
                                                     class="max-w-full truncate text-[10px] font-medium text-warm-800 dark:text-zinc-200"
                                                     x-text="seat.nickname"
-                                                ></span>
-                                                <span
-                                                    class="max-w-full truncate text-[9px] text-warm-500 dark:text-zinc-400"
-                                                    x-text="
-                                                        occupantStatusLabel(
-                                                            seat
-                                                        )
-                                                    "
                                                 ></span>
                                             </div>
                                         </template>

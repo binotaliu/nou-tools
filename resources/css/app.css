@@ -39,6 +39,15 @@
   }
 }
 
+@keyframes marquee {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
 @layer base {
   [x-cloak],
   [data-cloak],
@@ -87,6 +96,10 @@
 
 @utility blink-colon {
   animation: blink-colon 1s step-end infinite;
+}
+
+@utility animate-marquee {
+  animation: marquee 6s linear infinite;
 }
 
 @utility prose-warm {

@@ -466,20 +466,45 @@ export default function nouStudyRoom(initial) {
       )
     },
 
-    occupantStatusLabel(seat) {
+    // Timer line shown above the seat's emoji: the mm:ss countdown while
+    // one is running, otherwise a placeholder so every occupied seat keeps
+    // the same 3-line layout.
+    timerLabel(seat) {
+      if (!seat.timerEndsAt) {
+        return '--:--'
+      }
+
+      return this.remainingLabel(seat)
+    },
+
+    // Thought-bubble text floating above the timer: what the occupant is
+    // doing, with no duration in it (the timer line already covers that).
+    thoughtBubbleText(seat) {
       if (!seat.timerMode) {
         return '剛坐下，還沒開始計時'
       }
 
       if (seat.timerPhase === 'break') {
-        return '休息中 · ' + this.remainingLabel(seat)
+        return '休息中'
       }
 
       if (this.isSeatFinishedFocus(seat)) {
         return (seat.activity || '專注') + '（已完成，準備休息）'
       }
 
-      return (seat.activity || '專注中') + ' · ' + this.remainingLabel(seat)
+      return seat.activity || '專注中'
+    },
+
+    // Heuristic, not a DOM measurement: the bubble is a fixed, narrow box
+    // and this project's Alpine build is CSP-locked (no arrow functions or
+    // template literals in directives), so per-seat scrollWidth checks
+    // aren't practical inside an x-for loop. A character-count cutoff
+    // tuned to the bubble's width is good enough to decide when text needs
+    // to marquee instead of just being clipped.
+    needsMarquee(seat) {
+      const text = this.thoughtBubbleText(seat)
+
+      return !!text && text.length > 8
     },
 
     seatTestId(seat) {
