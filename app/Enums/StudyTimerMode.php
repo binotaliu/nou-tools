@@ -8,12 +8,14 @@ enum StudyTimerMode: string
 {
     case Pomodoro = 'pomodoro';
     case Custom = 'custom';
+    case CountUp = 'count_up';
 
     public function label(): string
     {
         return match ($this) {
             self::Pomodoro => '番茄鐘',
-            self::Custom => '自訂計時',
+            self::Custom => '倒數計時',
+            self::CountUp => '正數計時',
         };
     }
 

@@ -33,6 +33,7 @@ final class StudyRoomSessionFactory extends Factory
             'started_at' => $startedAt,
             'ended_at' => (clone $startedAt)->modify("+{$focusSeconds} seconds"),
             'focus_seconds' => $focusSeconds,
+            'overtime_seconds' => 0,
             'was_completed' => true,
         ];
     }

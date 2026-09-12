@@ -25,6 +25,7 @@ final class StudyRoomSession extends Model
         'started_at',
         'ended_at',
         'focus_seconds',
+        'overtime_seconds',
         'was_completed',
     ];
 
