@@ -34,10 +34,13 @@
         >
     </button>
 
+    {{-- Always rendered (not x-show) so the chair's height is reserved
+    whether or not the seat is occupied — toggling this line's presence
+    on take/leave would shift the table and the row of chairs below it. --}}
     <span
-        x-show="seat.isOccupied"
         class="font-mono text-[9px] text-warm-500 tabular-nums dark:text-zinc-400"
-        x-text="timerLabel(seat)"
+        :class="seat.isOccupied ? '' : 'invisible'"
+        x-text="seat.isOccupied ? timerLabel(seat) : '00:00'"
         :data-testid="seatTestId(seat) + '-timer'"
     ></span>
 
