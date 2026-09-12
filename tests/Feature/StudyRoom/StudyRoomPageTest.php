@@ -30,12 +30,18 @@ it('shows the nickname form when there is a cookie but no profile', function () 
         ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
         ->get(route('study-room.show'));
 
+    // The nickname/emoji form is now a PersonalInfo modal that's always
+    // present in the DOM (hidden via x-show, forced open client-side by
+    // Alpine when needsProfile is true) rather than conditionally
+    // rendered server-side, so only its presence is asserted here —
+    // whether it's actually open is a client-side concern covered by
+    // tests/Browser/StudyRoomTest.php.
     $response->assertOk()
         ->assertSee('data-testid="study-room-profile-form"', false)
         ->assertSee('data-testid="study-room-root"', false);
 });
 
-it('shows the seat-map root and no nickname form when there is a cookie and a profile', function () {
+it('shows the seat-map root when there is a cookie and a profile', function () {
     $schedule = StudentSchedule::factory()->create();
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
 
@@ -43,18 +49,21 @@ it('shows the seat-map root and no nickname form when there is a cookie and a pr
         ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
         ->get(route('study-room.show'));
 
-    $response->assertOk()
-        ->assertSee('data-testid="study-room-root"', false)
-        ->assertDontSee('data-testid="study-room-profile-form"', false);
+    $response->assertOk()->assertSee('data-testid="study-room-root"', false);
 });
 
 it('renders the announcement markdown as html', function () {
+    $schedule = StudentSchedule::factory()->create();
+    StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
+
     $settings = app(StudyRoomSettings::class);
     $settings->announcement = '**重要公告**';
     $settings->save();
     app()->forgetInstance(StudyRoomSettings::class);
 
-    $response = $this->get(route('study-room.show'));
+    $response = $this->withCredentials()
+        ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
+        ->get(route('study-room.show'));
 
     $response->assertOk()->assertSee('<strong>', false);
 });

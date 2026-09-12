@@ -2,6 +2,8 @@
 
 use App\Enums\UserRole;
 use App\Filament\Pages\ManageStudyRoom;
+use App\Models\StudentSchedule;
+use App\Models\StudyRoomProfile;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -27,7 +29,16 @@ test('saving the study room settings page persists and renders the announcement'
         ->call('save')
         ->assertHasNoFormErrors();
 
-    $this->get(route('study-room.show'))
+    $schedule = StudentSchedule::factory()->create();
+    StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', json_encode([
+            'id' => $schedule->id,
+            'uuid' => $schedule->uuid,
+            'name' => $schedule->name,
+        ]))
+        ->get(route('study-room.show'))
         ->assertOk()
         ->assertSee('<strong>', false);
 });

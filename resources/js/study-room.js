@@ -19,7 +19,19 @@ export default function nouStudyRoom(initial) {
     hasSchedule: initial.hasSchedule,
     needsProfile: initial.needsProfile,
 
+    profileNickname: initial.profile.nickname,
+    profileEmoji: initial.profile.emoji,
+    canChangeNickname: initial.profile.canChangeNickname,
+    canChangeNicknameAt: initial.profile.canChangeNicknameAt,
+    emojiChoices: initial.emojiChoices,
+
+    personalInfoOpen: false,
+    sessionsLoading: false,
+    sessionsFetched: false,
+    recentSessions: [],
+
     now: Date.now(),
+    clockNow: Date.now(),
     heldSeatCode: null,
     busySeatCode: null,
     panelBusy: false,
@@ -35,6 +47,7 @@ export default function nouStudyRoom(initial) {
     tickHandle: null,
     heartbeatHandle: null,
     connectTimeoutHandle: null,
+    clockHandle: null,
     realtimeChannel: null,
 
     init() {
@@ -49,6 +62,14 @@ export default function nouStudyRoom(initial) {
         this.subjects.length && this.subjects[0].id !== null
           ? String(this.subjects[0].id)
           : ''
+
+      if (this.needsProfile) {
+        this.personalInfoOpen = true
+      }
+
+      this.clockHandle = setInterval(() => {
+        this.clockNow = Date.now()
+      }, 1000)
 
       this.restartTickIfNeeded()
       this.startHeartbeatLoop()
@@ -353,6 +374,66 @@ export default function nouStudyRoom(initial) {
           error.response.data &&
           error.response.data.message) ||
         '網路好像不太穩定，請稍後再試一次。'
+      )
+    },
+
+    // --- personal info modal ---------------------------------------------
+
+    openPersonalInfo() {
+      this.personalInfoOpen = true
+      this.loadRecentSessions()
+    },
+
+    async loadRecentSessions() {
+      if (this.sessionsFetched || this.sessionsLoading) {
+        return
+      }
+
+      this.sessionsLoading = true
+
+      try {
+        const response = await window.axios.get('/study-room/sessions')
+        this.recentSessions = response.data.sessions
+        this.sessionsFetched = true
+      } catch (error) {
+        // Passive — the log is a nice-to-have inside the modal, never
+        // blocks the rest of it from working.
+      } finally {
+        this.sessionsLoading = false
+      }
+    },
+
+    sessionDurationLabel(session) {
+      return this.formatDurationLabel(session.focusSeconds)
+    },
+
+    nicknameCooldownLabel() {
+      if (this.canChangeNickname || !this.canChangeNicknameAt) {
+        return ''
+      }
+
+      const days = Math.ceil(
+        (Date.parse(this.canChangeNicknameAt) - this.clockNow) / 86400000
+      )
+
+      return days > 0 ? '可於 ' + days + ' 天後修改' : '可於今天內修改'
+    },
+
+    // --- clock --------------------------------------------------------
+
+    clockTimeLabel() {
+      const { hour, minute } = window.NouTime.taipeiHM(new Date(this.clockNow))
+
+      return hour + ':' + minute
+    },
+
+    clockDateLabel() {
+      const ymd = window.NouTime.taipeiYmd(new Date(this.clockNow))
+
+      return (
+        window.NouTime.monthDay(ymd) +
+        ' 週' +
+        window.NouTime.weekdayFromYmd(ymd)
       )
     },
 

@@ -58,11 +58,61 @@ it('lets a student remember their schedule, set a profile, take a seat, and star
         ->assertSeeIn('[data-testid="seat-1-S01"]', config('study-room.emojis')[0])
         ->assertSeeIn('[data-testid="seat-1-S01"]', '認真讀書中');
 
+    // The verb select now shows short, natural picker labels (e.g. "準備考試")
+    // rather than the ellipsis-based floor-map sentence template, and both
+    // selects go through the shared <x-select> component. A closed native
+    // <select>'s chosen <option> text isn't picked up by assertSeeIn (its
+    // options have no layout box until the dropdown is open), so the
+    // selected option's label is read directly instead.
+    $page->assertVisible('[data-testid="study-room-verb-select"]')
+        ->assertVisible('[data-testid="study-room-subject-select"]');
+
+    $selectedVerbLabel = $page->script(
+        "document.querySelector('[data-testid=\"study-room-verb-select\"]').selectedOptions[0].textContent.trim()"
+    );
+
+    expect($selectedVerbLabel)->toBe('準備考試');
+
     $page->click('[data-testid="study-room-start-timer"]')
         ->wait(1);
 
     $page->assertVisible('[data-testid="study-room-your-countdown"]')
         ->screenshot();
+});
+
+it('shows the PersonalInfo modal with the focus-session log when opened', function () {
+    $schedule = createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->waitForEvent('load');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]')
+        ->waitForEvent('load');
+
+    $page->assertVisible('[data-testid="study-room-root"]')
+        ->assertMissing('[data-testid="study-room-personal-info-modal"]');
+
+    $page->click('[data-testid="study-room-personal-info"]')
+        ->wait(1);
+
+    $page->assertVisible('[data-testid="study-room-personal-info-modal"]')
+        ->assertVisible('[data-testid="study-room-nickname-input"]')
+        ->assertVisible('[data-testid="study-room-emoji-choices"]');
+
+    // No focus sessions exist yet for a brand-new profile, so the log
+    // should render its empty state rather than staying stuck loading.
+    $page->assertSeeIn(
+        '[data-testid="study-room-personal-info-modal"]',
+        '還沒有紀錄'
+    );
 });
 
 it('shows a connection-error message once the room gives up on a realtime connection', function () {
