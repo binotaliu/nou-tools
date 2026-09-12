@@ -60,20 +60,17 @@ it('lets a student remember their schedule, set a profile, take a seat, and star
         ->assertSeeIn('[data-testid="seat-1-S01"]', config('study-room.emojis')[0])
         ->assertSeeIn('[data-testid="seat-1-S01"]', '認真讀書中');
 
-    // The verb select now shows short, natural picker labels (e.g. "準備考試")
-    // rather than the ellipsis-based floor-map sentence template, and both
-    // selects go through the shared <x-select> component. A closed native
-    // <select>'s chosen <option> text isn't picked up by assertSeeIn (its
-    // options have no layout box until the dropdown is open), so the
-    // selected option's label is read directly instead.
-    $page->assertVisible('[data-testid="study-room-verb-select"]')
+    // The verb picker is a group of large icon buttons (radio inputs behind
+    // sr-only labels) showing short, natural picker labels (e.g. "準備考試")
+    // rather than the ellipsis-based floor-map sentence template.
+    $page->assertVisible('[data-testid="study-room-verb-group"]')
         ->assertVisible('[data-testid="study-room-subject-select"]');
 
-    $selectedVerbLabel = $page->script(
-        "document.querySelector('[data-testid=\"study-room-verb-select\"]').selectedOptions[0].textContent.trim()"
+    $isExamPrepChecked = $page->script(
+        "document.querySelector('[data-testid=\"study-room-verb-exam_prep\"]').checked"
     );
 
-    expect($selectedVerbLabel)->toBe('準備考試');
+    expect($isExamPrepChecked)->toBeTrue();
 
     $page->click('[data-testid="study-room-start-timer"]')
         ->wait(1);

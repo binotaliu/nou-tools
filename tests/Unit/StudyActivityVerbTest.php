@@ -8,7 +8,8 @@ it('formats each activity verb into its Traditional Chinese sentence shape', fun
     expect(StudyActivityVerb::ExamPrep->format($subject))->toBe('正在準備普通物理學考試')
         ->and(StudyActivityVerb::Reading->format($subject))->toBe('正在讀普通物理學')
         ->and(StudyActivityVerb::Homework->format($subject))->toBe('寫普通物理學的作業')
-        ->and(StudyActivityVerb::Review->format($subject))->toBe('正在複習普通物理學');
+        ->and(StudyActivityVerb::Review->format($subject))->toBe('正在複習普通物理學')
+        ->and(StudyActivityVerb::InPersonClass->format($subject))->toBe('正在上普通物理學面授課');
 });
 
 it('provides labels for every case', function () {

@@ -35,122 +35,148 @@
                     data-testid="study-room-timer-form"
                 >
                     <div
-                        class="flex items-center gap-3 lg:w-48 lg:shrink-0 lg:self-center"
+                        class="flex items-center gap-3 lg:w-12 lg:shrink-0 lg:self-center"
                     >
                         @include('study-room.partials._desk-lamp', ['class' => 'size-12 shrink-0'])
-                        <div class="min-w-0">
-                            <p class="truncate text-xs text-warm-500 dark:text-zinc-400">
-                                你的座位 · <span x-text="mySeatLabel()"></span>
-                            </p>
-                            <p class="text-lg font-semibold text-warm-900 dark:text-zinc-100">準備開始專注</p>
-                        </div>
                     </div>
 
-                    <div
-                        class="grid flex-1 gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(8rem,1fr)_minmax(10rem,1.3fr)_auto]"
-                    >
-                        <label class="block">
+                    <div class="flex flex-1 flex-col gap-3">
+                        <div>
                             <span
                                 class="mb-1 block text-xs font-medium text-warm-600 dark:text-zinc-400"
                                 >活動</span
                             >
-                            <x-select
-                                x-model="selectedVerb"
-                                data-testid="study-room-verb-select"
+                            <div
+                                class="grid grid-cols-5 gap-2"
+                                role="radiogroup"
+                                aria-label="活動"
+                                data-testid="study-room-verb-group"
                             >
                                 @foreach ($viewModel->verbs as $verb)
-                                    <option value="{{ $verb->value }}">
-                                        {{ $verb->label }}
-                                    </option>
-                                @endforeach
-                            </x-select>
-                        </label>
-
-                        <label class="block">
-                            <span
-                                class="mb-1 block text-xs font-medium text-warm-600 dark:text-zinc-400"
-                                >科目</span
-                            >
-                            <x-select
-                                x-model="selectedSubjectCourseId"
-                                data-testid="study-room-subject-select"
-                            >
-                                @foreach ($viewModel->subjects as $subject)
-                                    <option value="{{ $subject->id ?? '' }}">
-                                        {{ $subject->name }}
-                                    </option>
-                                @endforeach
-                            </x-select>
-                        </label>
-
-                        <div class="sm:col-span-2 xl:col-span-1">
-                            <span
-                                class="mb-1 block text-xs font-medium text-warm-600 dark:text-zinc-400"
-                                >計時方式</span
-                            >
-                            <div class="flex flex-wrap items-center gap-2">
-                                {{-- 番茄鐘 / 自訂 --}}
-                                <div
-                                    class="inline-flex rounded-lg border border-warm-200 bg-white p-0.5 dark:border-zinc-700 dark:bg-zinc-900"
-                                    role="radiogroup"
-                                    aria-label="計時方式"
-                                >
+                                    @php
+                                        $verbIcon = match ($verb->value) {
+                                            'exam_prep' => 'heroicon-o-academic-cap',
+                                            'reading' => 'heroicon-o-book-open',
+                                            'homework' => 'heroicon-o-pencil-square',
+                                            'review' => 'heroicon-o-arrow-path',
+                                            'in_person_class' => 'heroicon-o-presentation-chart-bar',
+                                            default => 'heroicon-o-check-circle',
+                                        };
+                                    @endphp
                                     <label
-                                        class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-warm-700 has-checked:text-white dark:has-checked:bg-warm-500 dark:has-checked:text-zinc-950"
+                                        class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-warm-200 bg-white px-1 py-2.5 text-center transition has-checked:border-warm-700 has-checked:bg-warm-700 has-checked:text-white sm:gap-1.5 sm:px-3 sm:py-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:has-checked:border-warm-500 dark:has-checked:bg-warm-500 dark:has-checked:text-zinc-950"
                                     >
                                         <input
                                             type="radio"
-                                            value="pomodoro"
-                                            x-model="timerMode"
+                                            value="{{ $verb->value }}"
+                                            x-model="selectedVerb"
                                             class="sr-only"
-                                            data-testid="study-room-mode-pomodoro"
+                                            data-testid="study-room-verb-{{ $verb->value }}"
                                         />
-                                        番茄鐘
+                                        <x-dynamic-component
+                                            :component="$verbIcon"
+                                            class="size-5 sm:size-6"
+                                        />
+                                        <span
+                                            class="text-[11px] leading-tight font-medium sm:text-sm"
+                                            >{{ $verb->label }}</span
+                                        >
                                     </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div
+                            class="grid gap-3 sm:grid-cols-[minmax(10rem,1.3fr)_auto]"
+                        >
+                            <label class="block">
+                                <span
+                                    class="mb-1 block text-xs font-medium text-warm-600 dark:text-zinc-400"
+                                    >科目</span
+                                >
+                                <x-select
+                                    x-model="selectedSubjectCourseId"
+                                    data-testid="study-room-subject-select"
+                                >
+                                    @foreach ($viewModel->subjects as $subject)
+                                        <option
+                                            value="{{ $subject->id ?? '' }}"
+                                        >
+                                            {{ $subject->name }}
+                                        </option>
+                                    @endforeach
+                                </x-select>
+                            </label>
+
+                            <div>
+                                <span
+                                    class="mb-1 block text-xs font-medium text-warm-600 dark:text-zinc-400"
+                                    >計時方式</span
+                                >
+                                <div class="flex flex-wrap items-center gap-2">
+                                    {{-- 番茄鐘 / 自訂 --}}
+                                    <div
+                                        class="inline-flex rounded-lg border border-warm-200 bg-white p-0.5 dark:border-zinc-700 dark:bg-zinc-900"
+                                        role="radiogroup"
+                                        aria-label="計時方式"
+                                    >
+                                        <label
+                                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-warm-700 has-checked:text-white dark:has-checked:bg-warm-500 dark:has-checked:text-zinc-950"
+                                        >
+                                            <input
+                                                type="radio"
+                                                value="pomodoro"
+                                                x-model="timerMode"
+                                                class="sr-only"
+                                                data-testid="study-room-mode-pomodoro"
+                                            />
+                                            番茄鐘
+                                        </label>
+                                        <label
+                                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-warm-700 has-checked:text-white dark:has-checked:bg-warm-500 dark:has-checked:text-zinc-950"
+                                        >
+                                            <input
+                                                type="radio"
+                                                value="custom"
+                                                x-model="timerMode"
+                                                class="sr-only"
+                                                data-testid="study-room-mode-custom"
+                                            />
+                                            自訂
+                                        </label>
+                                    </div>
+
+                                    {{-- 番茄鐘：目前的循環設定 --}}
+                                    <button
+                                        type="button"
+                                        x-show="timerMode === 'pomodoro'"
+                                        @click="openCycleSettings()"
+                                        class="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-warm-300 px-2.5 py-1.5 text-xs text-warm-700 transition hover:border-warm-400 hover:bg-white dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                                        data-testid="study-room-cycle-settings"
+                                    >
+                                        <span x-text="cycleChipLabel()"></span>
+                                        <x-heroicon-o-adjustments-horizontal
+                                            class="size-3.5 shrink-0"
+                                        />
+                                    </button>
+
+                                    {{-- 自訂：分鐘數 --}}
                                     <label
-                                        class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-warm-700 has-checked:text-white dark:has-checked:bg-warm-500 dark:has-checked:text-zinc-950"
+                                        x-show="timerMode === 'custom'"
+                                        x-cloak
+                                        class="inline-flex items-center gap-1.5 text-sm text-warm-700 dark:text-zinc-300"
                                     >
                                         <input
-                                            type="radio"
-                                            value="custom"
-                                            x-model="timerMode"
-                                            class="sr-only"
-                                            data-testid="study-room-mode-custom"
+                                            type="number"
+                                            x-model.number="customMinutes"
+                                            :min="config.timerCustomMinMinutes"
+                                            :max="config.timerCustomMaxMinutes"
+                                            data-testid="study-room-custom-minutes"
+                                            class="w-20 rounded-lg border border-warm-200 bg-white px-2 py-1.5 text-sm tabular-nums dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                                         />
-                                        自訂
+                                        分鐘
                                     </label>
                                 </div>
-
-                                {{-- 番茄鐘：目前的循環設定 --}}
-                                <button
-                                    type="button"
-                                    x-show="timerMode === 'pomodoro'"
-                                    @click="openCycleSettings()"
-                                    class="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-warm-300 px-2.5 py-1.5 text-xs text-warm-700 transition hover:border-warm-400 hover:bg-white dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                                    data-testid="study-room-cycle-settings"
-                                >
-                                    <span x-text="cycleChipLabel()"></span>
-                                    <x-heroicon-o-adjustments-horizontal
-                                        class="size-3.5 shrink-0"
-                                    />
-                                </button>
-
-                                {{-- 自訂：分鐘數 --}}
-                                <label
-                                    x-show="timerMode === 'custom'"
-                                    x-cloak
-                                    class="inline-flex items-center gap-1.5 text-sm text-warm-700 dark:text-zinc-300"
-                                >
-                                    <input
-                                        type="number"
-                                        x-model.number="customMinutes"
-                                        :min="config.timerCustomMinMinutes"
-                                        :max="config.timerCustomMaxMinutes"
-                                        data-testid="study-room-custom-minutes"
-                                        class="w-20 rounded-lg border border-warm-200 bg-white px-2 py-1.5 text-sm tabular-nums dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-                                    />
-                                    分鐘
-                                </label>
                             </div>
                         </div>
                     </div>
