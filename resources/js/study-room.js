@@ -228,6 +228,13 @@ export default function nouStudyRoom(initial) {
         return
       }
 
+      // A floor closed (its last occupant left and it's no longer needed)
+      // — drop it instead of leaving a stale, no-longer-open floor with
+      // frozen seat data rendered on screen.
+      if (payload.openFloors < this.state.floors.length) {
+        this.state.floors = this.state.floors.slice(0, payload.openFloors)
+      }
+
       this.state.openFloors = payload.openFloors
       this.state.totals = payload.totals
       this.state.version = payload.version
@@ -248,11 +255,40 @@ export default function nouStudyRoom(initial) {
         return
       }
 
+      const wasOccupied = target.isOccupied
+
       Object.assign(target, incomingSeat, {
         // Fan-out broadcasts always carry isYou: false — derive it
         // ourselves from the seat code we actually hold.
         isYou: incomingSeat.code === this.heldSeatCode,
       })
+
+      // The broadcast payload doesn't carry per-floor occupied counts, so
+      // the floor badge (e.g. "24 / 24 人在座") has to be kept in sync here
+      // instead of only refreshing on a full state fetch.
+      if (target.isOccupied !== wasOccupied) {
+        const floor = this.floorForSeat(target.code)
+
+        if (floor) {
+          floor.occupiedCount += target.isOccupied ? 1 : -1
+        }
+      }
+    },
+
+    floorForSeat(code) {
+      for (const floor of this.state.floors) {
+        if (floor.soloSeats.some(seat => seat.code === code)) {
+          return floor
+        }
+
+        for (const table of floor.tables) {
+          if (table.seats.some(seat => seat.code === code)) {
+            return floor
+          }
+        }
+      }
+
+      return null
     },
 
     // --- actions --------------------------------------------------------

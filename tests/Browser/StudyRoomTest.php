@@ -183,3 +183,76 @@ it('shows a popover with nickname and activity for an occupied table seat, and o
         ->assertSeeIn('[data-testid="study-room-floor-2"] [data-testid="study-room-stairs"]', '往三樓')
         ->assertVisible('[data-testid="study-room-floor-2"] [data-testid="study-room-stair-blocked"]');
 });
+
+it('updates a floor\'s occupied count live and closes it once its last occupant leaves', function () {
+    // Regression test for two bugs in applyDelta()/patchSeat(): the
+    // per-floor "N / N 人在座" badge never updated from a realtime seat
+    // patch (only a full setState() touched floor.occupiedCount), and a
+    // floor that closed (openFloors shrinking) was never dropped from
+    // state.floors, leaving a stale empty floor rendered forever. Neither
+    // is reachable through a real second Reverb-connected browser in this
+    // test environment, so the fix is exercised by feeding applyDelta()
+    // the same payload shapes StudyRoomUpdated::broadcastWith() produces.
+    $schedule = createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->waitForEvent('load');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]')
+        ->waitForEvent('load');
+
+    // Fill the whole first floor with test students, which also opens
+    // the second floor.
+    app(FillFloorWithTestStudents::class)(1);
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-floor-1"]')
+        ->assertVisible('[data-testid="study-room-floor-2"]')
+        ->assertSeeIn('[data-testid="study-room-floor-1"]', '24 / 24 人在座');
+
+    $emptySeatPayload = static fn (string $code): string => json_encode([
+        'code' => $code,
+        'kind' => 'solo',
+        'groupCode' => null,
+        'seatNumber' => 1,
+        'label' => $code,
+        'isOccupied' => false,
+        'isYou' => false,
+        'nickname' => null,
+        'emoji' => null,
+        'activity' => null,
+        'timerMode' => null,
+        'timerPhase' => null,
+        'timerEndsAt' => null,
+        'timerStartedAt' => null,
+    ]);
+
+    // One seat leaving floor 1 shouldn't require a full refresh to show up
+    // in the floor's occupied count.
+    $page->script(
+        'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0].applyDelta('.
+            '{openFloors: 2, totals: {occupantCount: 23, siteFocusSecondsToday: 0, yourFocusSecondsToday: 0}, version: "v2", seat: '.
+            $emptySeatPayload('1-S01').
+            '})'
+    );
+
+    $page->assertSeeIn('[data-testid="study-room-floor-1"]', '23 / 24 人在座');
+
+    // Once floor 1 is no longer full, floor 2 (which nobody ever sat in)
+    // should close and disappear entirely, not linger with stale data.
+    $page->script(
+        'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0].applyDelta('.
+            '{openFloors: 1, totals: {occupantCount: 22, siteFocusSecondsToday: 0, yourFocusSecondsToday: 0}, version: "v3", seat: '.
+            $emptySeatPayload('1-S02').
+            '})'
+    );
+
+    $page->assertMissing('[data-testid="study-room-floor-2"]');
+});
