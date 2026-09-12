@@ -25,6 +25,10 @@ final class PublicSitePolicy implements Preset
 
         $policy->add(Directive::IMG, '*.tile.openstreetmap.org');
 
+        // Twemoji: script from jsDelivr, emoji images fetched from jsDelivr's default CDN base.
+        $policy->add(Directive::SCRIPT, 'cdn.jsdelivr.net');
+        $policy->add(Directive::IMG, 'cdn.jsdelivr.net');
+
         $reverbOrigins = $this->reverbConnectSources();
 
         if ($reverbOrigins !== []) {

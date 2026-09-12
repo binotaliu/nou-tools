@@ -4,6 +4,7 @@
         src="https://cdn.jsdelivr.net/npm/@twemoji/api@17.0.3/dist/twemoji.min.js"
         integrity="sha384-Y5xukbGJwykbHHkTbLJykYLcBPFxrwipTbEh0puxhkz9CZ90raTPGe2Ks4vCxsYU"
         crossorigin="anonymous"
+        @cspNonce
     ></script>
 @endpush
 

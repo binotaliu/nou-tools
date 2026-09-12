@@ -42,3 +42,18 @@ it('adds no reverb origins to connect-src when reverb has no host configured', f
     'empty string' => [''],
     'null' => [null],
 ]);
+
+it('allows cdn.jsdelivr.net in script-src and img-src for twemoji', function () {
+    $response = $this->get('/');
+
+    $response->assertStatus(200);
+
+    $csp = $response->headers->get('Content-Security-Policy');
+    $directives = collect(explode(';', $csp));
+
+    $scriptSrc = $directives->first(fn (string $directive) => str_contains($directive, 'script-src'));
+    $imgSrc = $directives->first(fn (string $directive) => str_contains($directive, 'img-src'));
+
+    expect($scriptSrc)->toContain('cdn.jsdelivr.net');
+    expect($imgSrc)->toContain('cdn.jsdelivr.net');
+});
