@@ -43,7 +43,7 @@ final readonly class BroadcastStudyRoomChange
                 version: $state->version,
             ));
         } catch (Throwable $throwable) {
-            Log::warning('自習室即時廣播失敗，已略過（前端會退回輪詢）。', [
+            Log::warning('自習室即時廣播失敗，已略過。', [
                 'type' => $type,
                 'exception' => $throwable,
             ]);

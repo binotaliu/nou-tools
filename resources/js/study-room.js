@@ -5,11 +5,11 @@
 // every string built for the template (labels, classes, testids,
 // countdowns) is built here in plain JS and only *read* from attributes.
 //
-// Realtime vs. polling: resources/js/echo.js only builds window.Echo when
-// VITE_REVERB_APP_KEY is set at build time (never in CI/browser tests), so
-// this component always starts on the polling fallback and upgrades to a
-// faster "keepalive" poll once (and only once) a Reverb connection is
-// confirmed live via `echoReady` / `window.__echoReady`.
+// Realtime-only, no polling fallback: resources/js/echo.js only builds
+// window.Echo when VITE_REVERB_APP_KEY is set at build time, and even then
+// the Reverb connection itself can fail. Either way, if a connection isn't
+// confirmed live within `realtimeConnectTimeoutSeconds`, this component
+// gives up and surfaces `connectionFailed` instead of retrying forever.
 export default function nouStudyRoom(initial) {
   return {
     state: initial.roomState,
@@ -25,6 +25,7 @@ export default function nouStudyRoom(initial) {
     panelBusy: false,
     errorMessage: null,
     realtime: false,
+    connectionFailed: false,
 
     timerMode: 'pomodoro',
     customMinutes: 25,
@@ -33,7 +34,7 @@ export default function nouStudyRoom(initial) {
 
     tickHandle: null,
     heartbeatHandle: null,
-    pollHandle: null,
+    connectTimeoutHandle: null,
     realtimeChannel: null,
 
     init() {
@@ -51,13 +52,18 @@ export default function nouStudyRoom(initial) {
 
       this.restartTickIfNeeded()
       this.startHeartbeatLoop()
-      this.schedulePoll()
 
       if (window.__echoReady) {
         this.connectRealtime()
       }
 
       window.addEventListener('echoReady', () => this.connectRealtime())
+
+      this.connectTimeoutHandle = setTimeout(() => {
+        if (!this.realtime) {
+          this.connectionFailed = true
+        }
+      }, this.config.realtimeConnectTimeoutSeconds * 1000)
 
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
@@ -79,27 +85,27 @@ export default function nouStudyRoom(initial) {
         this.applyDelta(payload)
       })
       this.realtime = true
+      this.connectionFailed = false
 
       const pusher = window.Echo.connector && window.Echo.connector.pusher
 
       if (pusher && pusher.connection && pusher.connection.bind) {
         pusher.connection.bind('state_change', states => {
           this.realtime = states.current === 'connected'
+
+          if (this.realtime) {
+            this.connectionFailed = false
+          } else if (
+            states.current === 'unavailable' ||
+            states.current === 'failed'
+          ) {
+            this.connectionFailed = true
+          }
         })
       }
     },
 
-    // --- polling / heartbeat / tick ------------------------------------
-
-    schedulePoll() {
-      const seconds = this.realtime
-        ? this.config.pollRealtimeIntervalSeconds
-        : this.config.pollIntervalSeconds
-
-      this.pollHandle = setTimeout(() => {
-        this.refresh().finally(() => this.schedulePoll())
-      }, seconds * 1000)
-    },
+    // --- heartbeat / tick ------------------------------------------------
 
     startHeartbeatLoop() {
       this.heartbeatHandle = setInterval(() => {
@@ -185,8 +191,8 @@ export default function nouStudyRoom(initial) {
           this.setState(response.data)
         }
       } catch (error) {
-        // Passive background refresh — degrade silently, the next poll
-        // (or the next realtime event) will catch the room back up.
+        // Passive background refresh — degrade silently, the next realtime
+        // event (or a manual retry) will catch the room back up.
       }
     },
 

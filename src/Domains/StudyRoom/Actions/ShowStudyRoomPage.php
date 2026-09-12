@@ -93,8 +93,7 @@ final readonly class ShowStudyRoomPage
         return [
             'heartbeatIntervalSeconds' => (int) config('study-room.heartbeat.interval_seconds'),
             'heartbeatIdleReleaseSeconds' => (int) config('study-room.heartbeat.idle_release_seconds'),
-            'pollIntervalSeconds' => (int) config('study-room.poll.interval_seconds'),
-            'pollRealtimeIntervalSeconds' => (int) config('study-room.poll.realtime_interval_seconds'),
+            'realtimeConnectTimeoutSeconds' => (int) config('study-room.realtime.connect_timeout_seconds'),
             'timerPomodoroFocusMinutes' => (int) config('study-room.timer.pomodoro.focus_minutes'),
             'timerPomodoroBreakMinutes' => (int) config('study-room.timer.pomodoro.break_minutes'),
             'timerCustomMinMinutes' => (int) config('study-room.timer.custom.min_minutes'),

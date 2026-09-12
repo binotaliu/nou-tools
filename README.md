@@ -33,7 +33,7 @@ feat(parser): support new exam schedule format
 本專案使用 [Laravel Reverb](https://reverb.laravel.com/) 提供即時功能，執行 `composer run dev` 時會一併啟動 `php artisan reverb:start`。  
 正式環境部署時，除了一般的 Web 服務外，還需另外維持一個長駐的 `php artisan reverb:start` 行程，並在反向代理（如 Nginx）設定將 WebSocket 連線導向該行程。
 
-自習室功能額外仰賴兩項排程：部署時需執行一次 `php artisan study-room:sync-seats` 以依 `config/study-room.php` 的座位配置建立/校正座位資料，另外排程器每分鐘會執行 `study-room:release-idle-seats` 釋放逾時未心跳的座位。若 Reverb 未啟動或連線中斷，自習室仍可正常運作，僅會退回輪詢（polling）更新座位狀態，不會即時同步。
+自習室功能額外仰賴兩項排程：部署時需執行一次 `php artisan study-room:sync-seats` 以依 `config/study-room.php` 的座位配置建立/校正座位資料，另外排程器每分鐘會執行 `study-room:release-idle-seats` 釋放逾時未心跳的座位。自習室僅依賴即時連線（無輪詢後備機制），若 Reverb 未啟動或連線失敗，畫面會顯示連線錯誤訊息。
 
 ## 授權 / License
 

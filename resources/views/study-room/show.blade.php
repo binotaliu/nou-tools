@@ -159,7 +159,7 @@
                 x-cloak
                 data-testid="study-room-root"
             >
-                {{-- 狀態列：即時/輪詢指示、今日累積專注時數 --}}
+                {{-- 狀態列：連線狀態指示、今日累積專注時數 --}}
                 <div
                     class="flex flex-col gap-2 rounded-lg border border-warm-200 bg-white p-4 text-sm sm:flex-row sm:items-center sm:justify-between dark:border-zinc-700 dark:bg-zinc-900"
                     data-testid="study-room-status-bar"
@@ -189,20 +189,42 @@
 
                     <div
                         class="inline-flex items-center gap-1.5 self-start rounded-full px-3 py-1 text-xs font-medium sm:self-auto"
-                        :class="realtime
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'
-                            : 'bg-warm-100 text-warm-700 dark:bg-zinc-800 dark:text-zinc-300'"
+                        :class="connectionFailed
+                            ? 'bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300'
+                            : realtime
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'
+                              : 'bg-warm-100 text-warm-700 dark:bg-zinc-800 dark:text-zinc-300'"
                         data-testid="study-room-connection-status"
                     >
                         <span
                             class="size-1.5 rounded-full"
-                            :class="realtime
-                                ? 'bg-emerald-500'
-                                : 'bg-warm-400 dark:bg-zinc-500'"
+                            :class="connectionFailed
+                                ? 'bg-red-500'
+                                : realtime
+                                  ? 'bg-emerald-500'
+                                  : 'bg-warm-400 dark:bg-zinc-500'"
                         ></span>
                         <span x-show="realtime">即時同步中</span>
-                        <span x-show="!realtime">輪詢更新中</span>
+                        <span x-show="!realtime && !connectionFailed"
+                            >連線中…</span
+                        >
+                        <span x-show="connectionFailed">連線失敗</span>
                     </div>
+                </div>
+
+                {{-- 連線失敗提示 --}}
+                <div
+                    x-show="connectionFailed"
+                    x-cloak
+                    class="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+                    data-testid="study-room-connection-error"
+                >
+                    <x-heroicon-o-exclamation-triangle
+                        class="size-4 shrink-0"
+                    />
+                    <span
+                        >目前無法連上自習室，自習室可能正在維護。如果問題持續，請聯絡站長。</span
+                    >
                 </div>
 
                 {{-- 錯誤提示 --}}

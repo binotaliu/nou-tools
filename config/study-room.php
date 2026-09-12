@@ -91,17 +91,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Polling
+    | Realtime
     |--------------------------------------------------------------------------
     |
-    | Fallback polling intervals used when the browser isn't (or can't stay)
-    | connected to Reverb for realtime updates.
+    | The room has no polling fallback — it's realtime-only. If the browser
+    | hasn't confirmed a Reverb connection within `connect_timeout_seconds`,
+    | it gives up and shows a connection-error message instead of retrying
+    | forever silently.
     |
     */
 
-    'poll' => [
-        'interval_seconds' => 15,
-        'realtime_interval_seconds' => 60,
+    'realtime' => [
+        'connect_timeout_seconds' => 8,
     ],
 
     /*
