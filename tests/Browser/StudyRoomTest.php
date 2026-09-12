@@ -86,6 +86,74 @@ it('lets a student remember their schedule, set a profile, take a seat, and star
         ->screenshot();
 });
 
+it('prepends the countdown and phase to the tab title, and swaps the favicon, once backgrounded', function () {
+    $schedule = createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->waitForEvent('load');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]')
+        ->waitForEvent('load');
+
+    $page->assertVisible('[data-testid="study-room-root"]')
+        ->click('[data-testid="seat-1-S01"]')
+        ->wait(1)
+        ->click('[data-testid="study-room-start-timer"]')
+        ->wait(1)
+        ->assertVisible('[data-testid="study-room-your-countdown"]');
+
+    $originalTitle = $page->script('document.title');
+    $originalIcoHref = $page->script(
+        'document.getElementById(\'favicon-ico\').getAttribute(\'href\')'
+    );
+
+    // document.hidden has no setter, so backgrounding is faked the same way
+    // real Page Visibility changes surface: override the getter, then fire
+    // the event the component actually listens for.
+    $page->script(
+        'Object.defineProperty(document, "hidden", { configurable: true, get: () => true }); '.
+        'document.dispatchEvent(new Event("visibilitychange"));'
+    );
+    $page->wait(1);
+
+    $title = $page->script('document.title');
+    $icoHref = $page->script(
+        'document.getElementById(\'favicon-ico\').getAttribute(\'href\')'
+    );
+    $svgRel = $page->script(
+        'document.getElementById(\'favicon-svg\').getAttribute(\'rel\')'
+    );
+
+    expect($title)->not->toBe($originalTitle)
+        ->and($title)->toContain($originalTitle)
+        ->and($title)->toMatch('/^\d{2}:\d{2} 專注中/')
+        ->and($icoHref)->not->toBe($originalIcoHref)
+        ->and($icoHref)->toStartWith('data:image/png')
+        ->and($svgRel)->toBe('alternate icon');
+
+    // Foregrounding again restores everything exactly.
+    $page->script(
+        'Object.defineProperty(document, "hidden", { configurable: true, get: () => false }); '.
+        'document.dispatchEvent(new Event("visibilitychange"));'
+    );
+    $page->wait(1);
+
+    expect($page->script('document.title'))->toBe($originalTitle)
+        ->and($page->script(
+            'document.getElementById(\'favicon-ico\').getAttribute(\'href\')'
+        ))->toBe($originalIcoHref)
+        ->and($page->script(
+            'document.getElementById(\'favicon-svg\').getAttribute(\'rel\')'
+        ))->toBe('icon');
+});
+
 it('lets a student tune their pomodoro cycle and walks them through break and next round', function () {
     $schedule = createScheduleWithCourse();
 

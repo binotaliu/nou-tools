@@ -145,8 +145,30 @@ export default function nouStudyRoom(initial) {
     realtimeChannel: null,
     twemojiParseHandle: null,
 
+    // Tab title/favicon while backgrounded: the page's own <title> at load,
+    // and the favicon <link> elements (plus their original hrefs) so a
+    // background countdown indicator can be applied and then exactly
+    // reverted once the tab is foregrounded again or the timer stops.
+    originalTitle: null,
+    faviconIco: null,
+    faviconPng: null,
+    faviconSvg: null,
+    faviconOriginalIcoHref: null,
+    faviconOriginalPngHref: null,
+
     init() {
       this.startTwemojiObserver()
+
+      this.originalTitle = document.title
+      this.faviconIco = document.getElementById('favicon-ico')
+      this.faviconPng = document.getElementById('favicon-png')
+      this.faviconSvg = document.getElementById('favicon-svg')
+      this.faviconOriginalIcoHref = this.faviconIco
+        ? this.faviconIco.getAttribute('href')
+        : null
+      this.faviconOriginalPngHref = this.faviconPng
+        ? this.faviconPng.getAttribute('href')
+        : null
 
       this.heldSeatCode = this.deriveHeldSeatCode(this.state)
       this.suppressAlreadyFinishedSound()
@@ -188,6 +210,8 @@ export default function nouStudyRoom(initial) {
       }, this.config.realtimeConnectTimeoutSeconds * 1000)
 
       document.addEventListener('visibilitychange', () => {
+        this.updateTabIndicators()
+
         if (!document.hidden) {
           this.refresh()
           this.heartbeat()
@@ -289,6 +313,7 @@ export default function nouStudyRoom(initial) {
       this.tickHandle = setInterval(() => {
         this.now = Date.now()
         this.checkTimerFinishedSound()
+        this.updateTabIndicators()
 
         if (!this.hasVisibleCountdown()) {
           clearInterval(this.tickHandle)
@@ -344,6 +369,105 @@ export default function nouStudyRoom(initial) {
       )
     },
 
+    // --- background tab indicators ---------------------------------------
+
+    // Only worth doing while the student has actually switched away: the
+    // countdown and seat state are already visible on screen otherwise, so
+    // rewriting the tab chrome would just be noise (and a wasted paint).
+    updateTabIndicators() {
+      const seat = this.mySeat()
+      const running = !!seat && (!!seat.timerEndsAt || !!seat.timerStartedAt)
+
+      if (!document.hidden || !running) {
+        this.resetTabIndicators()
+        return
+      }
+
+      document.title =
+        this.remainingLabel(seat) +
+        ' ' +
+        this.timerPhaseLabel() +
+        ' - ' +
+        this.originalTitle
+
+      this.applyStageFavicon(this.isOnBreak() ? '#10b981' : '#b05139')
+    },
+
+    resetTabIndicators() {
+      if (
+        this.originalTitle !== null &&
+        document.title !== this.originalTitle
+      ) {
+        document.title = this.originalTitle
+      }
+
+      this.resetFavicon()
+    },
+
+    // Drawn on the fly rather than shipped as static assets: a plain
+    // colored dot is enough to tell focus and break apart at a glance in a
+    // browser tab strip, and it reuses the same amber/emerald pair already
+    // used everywhere else for the two phases.
+    buildStageFaviconDataUrl(color) {
+      const canvas = document.createElement('canvas')
+      canvas.width = 64
+      canvas.height = 64
+      const ctx = canvas.getContext('2d')
+
+      if (!ctx) {
+        return null
+      }
+
+      ctx.beginPath()
+      ctx.arc(32, 32, 28, 0, Math.PI * 2)
+      ctx.fillStyle = color
+      ctx.fill()
+
+      return canvas.toDataURL('image/png')
+    },
+
+    // The svg icon link is disqualified (rather than rewritten) while a
+    // stage color is showing, since a raster dot can't honestly wear
+    // type="image/svg+xml" — browsers otherwise keep preferring the
+    // untouched svg over the ico/png hrefs this swaps in.
+    applyStageFavicon(color) {
+      if (!this.faviconIco && !this.faviconPng) {
+        return
+      }
+
+      const dataUrl = this.buildStageFaviconDataUrl(color)
+
+      if (!dataUrl) {
+        return
+      }
+
+      if (this.faviconIco) {
+        this.faviconIco.setAttribute('href', dataUrl)
+      }
+
+      if (this.faviconPng) {
+        this.faviconPng.setAttribute('href', dataUrl)
+      }
+
+      if (this.faviconSvg) {
+        this.faviconSvg.setAttribute('rel', 'alternate icon')
+      }
+    },
+
+    resetFavicon() {
+      if (this.faviconIco && this.faviconOriginalIcoHref) {
+        this.faviconIco.setAttribute('href', this.faviconOriginalIcoHref)
+      }
+
+      if (this.faviconPng && this.faviconOriginalPngHref) {
+        this.faviconPng.setAttribute('href', this.faviconOriginalPngHref)
+      }
+
+      if (this.faviconSvg) {
+        this.faviconSvg.setAttribute('rel', 'icon')
+      }
+    },
+
     // --- state sync -----------------------------------------------------
 
     allSeats() {
@@ -384,6 +508,7 @@ export default function nouStudyRoom(initial) {
       this.state = state
       this.heldSeatCode = this.deriveHeldSeatCode(state)
       this.restartTickIfNeeded()
+      this.updateTabIndicators()
 
       // Focus mode is a view of a running timer; without one (stopped,
       // or the seat released underneath us) there's nothing to show.

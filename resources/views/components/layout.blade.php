@@ -101,14 +101,16 @@
             ->all()"
     />
 
-    <link rel="icon" href="{{ asset('favicon.ico') }}?v=2" />
+    <link id="favicon-ico" rel="icon" href="{{ asset('favicon.ico') }}?v=2" />
     <link
+        id="favicon-png"
         rel="icon"
         type="image/png"
         sizes="512x512"
         href="{{ asset('favicon.png') }}?v=2"
     />
     <link
+        id="favicon-svg"
         rel="icon"
         type="image/svg+xml"
         href="{{ asset('favicon.svg') }}?v=2"
