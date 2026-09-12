@@ -9,7 +9,7 @@
 
 <x-layout
     title="自習室 - NOU 小幫手"
-    description="陪空大同學一起讀書的虛擬自習室：找個座位坐下、掛上暱稱與表情符號、跑一輪番茄鐘。"
+    description="24 小時開放的自習室，歡迎一起用功。"
 >
     <div
         class="mx-auto max-w-6xl space-y-6"
