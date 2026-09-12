@@ -254,195 +254,327 @@
                     <p class="text-sm text-warm-600 dark:text-zinc-400">請先設定暱稱與表情符號，才能加入自習室。</p>
                 </x-card>
 
-                <div x-show="!needsProfile" class="space-y-4">
-                    {{-- 樓層座位圖 --}}
+                <div x-show="!needsProfile" class="space-y-6">
+                    {{-- 樓層座位圖：由上往下看的閱覽室 --}}
                     <template x-for="floor in state.floors" :key="floor.floor">
-                        <div
-                            class="space-y-4 rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+                        <section
+                            class="space-y-3"
                             :data-testid="'study-room-floor-' + floor.floor"
                         >
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-end justify-between px-1">
                                 <h3
-                                    class="text-lg font-semibold text-warm-900 dark:text-zinc-100"
-                                    x-text="floor.label"
-                                ></h3>
+                                    class="flex items-center gap-2 text-lg font-semibold text-warm-900 dark:text-zinc-100"
+                                >
+                                    <span x-text="floor.label"></span>
+                                    <span
+                                        class="text-sm font-normal text-warm-500 dark:text-zinc-400"
+                                        >閱覽室</span
+                                    >
+                                </h3>
                                 <span
-                                    class="text-xs text-warm-500 dark:text-zinc-400"
-                                    x-text="
-                                        floor.occupiedCount +
-                                        ' / ' +
-                                        floor.totalCount +
-                                        ' 人'
-                                    "
-                                ></span>
+                                    class="inline-flex items-center gap-1.5 rounded-full bg-warm-100 px-2.5 py-1 text-xs text-warm-700 tabular-nums dark:bg-zinc-800 dark:text-zinc-300"
+                                >
+                                    <span
+                                        class="size-1.5 rounded-full bg-emerald-500"
+                                    ></span>
+                                    <span
+                                        x-text="
+                                            floor.occupiedCount +
+                                            ' / ' +
+                                            floor.totalCount +
+                                            ' 人在座'
+                                        "
+                                    ></span>
+                                </span>
                             </div>
 
-                            {{-- 單人座 --}}
+                            {{-- 房間：厚牆 + 木地板 --}}
                             <div
-                                class="grid grid-cols-4 gap-2 sm:grid-cols-6"
-                                data-testid="study-room-solo-seats"
+                                class="relative rounded-2xl border-[6px] border-warm-300 bg-warm-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
                             >
-                                <template
-                                    x-for="seat in floor.soloSeats"
-                                    :key="seat.code"
+                                {{-- 上方牆面的窗戶：一排透光的窗格 --}}
+                                <div
+                                    class="pointer-events-none absolute inset-x-10 -top-[6px] z-10 flex h-[6px] gap-3 sm:inset-x-20"
+                                    aria-hidden="true"
                                 >
-                                    <button
-                                        type="button"
-                                        @click="take(seat.code)"
-                                        :disabled="seat.isOccupied ||
-                                        busySeatCode !== null"
-                                        :class="seatClasses(seat)"
-                                        :data-testid="seatTestId(seat)"
-                                        :aria-label="seatAriaLabel(seat)"
-                                    >
-                                        {{-- 桌子（靠牆） --}}
+                                    <template x-for="pane in 4" :key="pane">
                                         <span
-                                            class="pointer-events-none absolute inset-x-2 top-0 h-3 rounded-b-sm border-x-2 border-b-2 border-warm-400 bg-warm-50 dark:border-zinc-500 dark:bg-zinc-800"
+                                            class="flex-1 bg-sky-200 dark:bg-sky-900"
                                         ></span>
+                                    </template>
+                                </div>
+                                <div
+                                    class="pointer-events-none absolute inset-x-10 top-0 h-12 rounded-t-[10px] bg-gradient-to-b from-sky-100/60 to-transparent sm:inset-x-20 dark:from-sky-900/20"
+                                    aria-hidden="true"
+                                ></div>
 
-                                        <template x-if="!seat.isOccupied">
-                                            <div
-                                                class="flex flex-col items-center gap-0.5"
+                                {{-- 門：只有一樓有對外的門，樓上都是走樓梯 --}}
+                                <template x-if="isGroundFloor(floor)">
+                                    <div>
+                                        <div
+                                            class="pointer-events-none absolute right-8 -bottom-[6px] z-10 h-[6px] w-12 bg-warm-50 dark:bg-zinc-950"
+                                            aria-hidden="true"
+                                        ></div>
+                                        <div
+                                            class="pointer-events-none absolute right-8 bottom-0 z-10 size-12 rounded-tl-full border-t border-l border-dashed border-warm-400 dark:border-zinc-500"
+                                            aria-hidden="true"
+                                        >
+                                            <span
+                                                class="absolute right-0 bottom-0 h-full w-[3px] origin-bottom -rotate-[70deg] rounded-full bg-warm-500 dark:bg-zinc-400"
+                                            ></span>
+                                        </div>
+                                    </div>
+                                </template>
+                                {{-- 木地板紋理 --}}
+                                <div
+                                    class="relative space-y-6 rounded-[10px] bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(0,0,0,0.04)_5.5rem_calc(5.5rem+1px))] px-4 pt-6 pb-16 sm:px-8 dark:bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(255,255,255,0.05)_5.5rem_calc(5.5rem+1px))]"
+                                >
+                                    {{-- 靠牆的單人閱覽桌 --}}
+                                    <div
+                                        class="grid grid-cols-3 justify-items-center gap-x-3 gap-y-7 sm:grid-cols-4 sm:gap-x-5 md:grid-cols-6"
+                                        data-testid="study-room-solo-seats"
+                                    >
+                                        <template
+                                            x-for="seat in floor.soloSeats"
+                                            :key="seat.code"
+                                        >
+                                            <button
+                                                type="button"
+                                                @click="take(seat.code)"
+                                                :disabled="seat.isOccupied ||
+                                                busySeatCode !== null"
+                                                :class="seatClasses(seat)"
+                                                :data-testid="seatTestId(seat)"
+                                                :aria-label="seatAriaLabel(
+                                                    seat
+                                                )"
                                             >
-                                                {{-- 椅子 --}}
+                                                {{-- 桌面與檯燈 --}}
                                                 <span
-                                                    class="flex size-5 items-center justify-center rounded-full border-2 border-warm-300 text-sm leading-none text-warm-300 dark:border-zinc-600 dark:text-zinc-600"
-                                                    >+</span
+                                                    class="pointer-events-none absolute inset-x-1.5 top-0 h-4 rounded-b-md bg-warm-200 shadow-[inset_0_-2px_0_var(--color-warm-300)] dark:bg-zinc-700 dark:shadow-[inset_0_-2px_0_var(--color-zinc-600)]"
+                                                    aria-hidden="true"
                                                 >
-                                                <span
-                                                    class="text-[10px] text-warm-400 dark:text-zinc-500"
-                                                    x-text="seat.seatNumber"
-                                                ></span>
-                                            </div>
-                                        </template>
-                                        <template x-if="seat.isOccupied">
-                                            <div
-                                                class="flex flex-col items-center gap-0.5"
-                                            >
+                                                    <span
+                                                        class="absolute top-1 right-1.5 size-2 rounded-full transition"
+                                                        :class="seat.isOccupied
+                                                            ? 'bg-amber-400 shadow-[0_0_8px_3px_rgba(251,191,36,0.55)]'
+                                                            : 'bg-warm-300 dark:bg-zinc-600'"
+                                                    ></span>
+                                                    <span
+                                                        x-show="seat.isOccupied"
+                                                        class="absolute top-1.5 left-2 h-1.5 w-4 rounded-[2px] bg-sky-400/80 dark:bg-sky-500/70"
+                                                    ></span>
+                                                </span>
+
                                                 <template
-                                                    x-if="
-                                                        thoughtBubbleText(seat)
-                                                    "
+                                                    x-if="!seat.isOccupied"
                                                 >
                                                     <div
-                                                        class="pointer-events-none absolute -top-7 left-1/2 z-10 w-24 -translate-x-1/2 overflow-hidden rounded-md border border-warm-200 bg-white px-1.5 py-0.5 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
-                                                        data-testid="study-room-seat-bubble"
+                                                        class="flex flex-col items-center gap-1"
                                                     >
+                                                        {{-- 空椅子 --}}
                                                         <span
-                                                            class="block text-[9px] whitespace-nowrap text-warm-700 dark:text-zinc-200"
-                                                            :class="needsMarquee(
-                                                                seat
-                                                            )
-                                                                ? 'inline-block animate-marquee'
-                                                                : 'truncate'"
+                                                            class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-warm-300 bg-white text-[10px] font-medium text-warm-400 transition group-hover:border-warm-400 group-hover:text-warm-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-500"
                                                             x-text="
+                                                                seat.seatNumber
+                                                            "
+                                                        ></span>
+                                                        <span
+                                                            class="text-[10px] text-warm-400 opacity-0 transition group-hover:opacity-100 dark:text-zinc-500"
+                                                            >點擊入座</span
+                                                        >
+                                                    </div>
+                                                </template>
+                                                <template
+                                                    x-if="seat.isOccupied"
+                                                >
+                                                    <div
+                                                        class="flex w-full flex-col items-center gap-0.5"
+                                                    >
+                                                        <template
+                                                            x-if="
                                                                 thoughtBubbleText(
                                                                     seat
                                                                 )
                                                             "
+                                                        >
+                                                            <div
+                                                                class="pointer-events-none absolute -top-6 left-1/2 z-10 flex w-24 -translate-x-1/2 overflow-hidden rounded-full border border-warm-200 bg-white px-2 py-0.5 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
+                                                                data-testid="study-room-seat-bubble"
+                                                            >
+                                                                <span
+                                                                    class="text-[9px] whitespace-nowrap text-warm-700 dark:text-zinc-200"
+                                                                    :class="needsMarquee(
+                                                                        seat
+                                                                    )
+                                                                        ? 'inline-block animate-marquee'
+                                                                        : 'block truncate'"
+                                                                    x-text="
+                                                                        thoughtBubbleText(
+                                                                            seat
+                                                                        )
+                                                                    "
+                                                                ></span>
+                                                            </div>
+                                                        </template>
+
+                                                        {{-- 椅子上的同學 --}}
+                                                        <span class="relative">
+                                                            <span
+                                                                class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-warm-400 bg-white text-lg leading-none shadow-sm dark:border-zinc-500 dark:bg-zinc-800"
+                                                                x-text="
+                                                                    seat.emoji
+                                                                "
+                                                            ></span>
+                                                            <span
+                                                                x-show="
+                                                                    isMine(seat)
+                                                                "
+                                                                class="absolute -top-1.5 -right-2 rounded-full bg-amber-500 px-1 text-[9px] leading-4 font-semibold text-white shadow-sm"
+                                                                >你</span
+                                                            >
+                                                        </span>
+                                                        <span
+                                                            class="max-w-full truncate text-[10px] font-medium text-warm-800 dark:text-zinc-200"
+                                                            x-text="
+                                                                seat.nickname
+                                                            "
+                                                        ></span>
+                                                        <span
+                                                            class="font-mono text-[10px] text-warm-500 tabular-nums dark:text-zinc-400"
+                                                            x-text="
+                                                                timerLabel(seat)
+                                                            "
                                                         ></span>
                                                     </div>
                                                 </template>
-
-                                                <span
-                                                    class="font-mono text-[10px] text-warm-500 tabular-nums dark:text-zinc-400"
-                                                    x-text="timerLabel(seat)"
-                                                ></span>
-                                                {{-- 椅子上的同學 --}}
-                                                <span
-                                                    class="flex size-6 items-center justify-center rounded-full border-2 border-warm-300 bg-white text-base leading-none dark:border-zinc-600 dark:bg-zinc-900"
-                                                    x-text="seat.emoji"
-                                                ></span>
-                                                <span
-                                                    class="max-w-full truncate text-[10px] font-medium text-warm-800 dark:text-zinc-200"
-                                                    x-text="seat.nickname"
-                                                ></span>
-                                            </div>
+                                            </button>
                                         </template>
-                                    </button>
-                                </template>
-                            </div>
+                                    </div>
 
-                            {{-- 共桌 --}}
-                            <div
-                                class="flex flex-wrap justify-center gap-6 pt-2 sm:justify-start"
-                                data-testid="study-room-tables"
-                            >
-                                <template
-                                    x-for="table in floor.tables"
-                                    :key="table.groupCode"
-                                >
+                                    {{-- 中間的共桌 --}}
                                     <div
-                                        class="flex flex-col items-center gap-1"
+                                        class="flex flex-wrap justify-center gap-x-8 gap-y-6 pt-2"
+                                        data-testid="study-room-tables"
                                     >
-                                        <div
-                                            class="grid grid-cols-3 grid-rows-2 gap-1"
-                                            :data-testid="'study-room-table-' +
-                                            table.groupCode"
+                                        <template
+                                            x-for="table in floor.tables"
+                                            :key="table.groupCode"
                                         >
                                             <div
-                                                class="col-start-2 row-span-2 row-start-1 flex items-center justify-center rounded-sm border border-warm-300 bg-warm-100 text-[9px] font-medium whitespace-nowrap text-warm-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-                                                style="
-                                                    width: 2rem;
-                                                    height: 5.5rem;
-                                                    writing-mode: vertical-rl;
-                                                "
-                                                x-text="table.label"
-                                            ></div>
-
-                                            <template
-                                                x-for="
-                                                    (seat, index) in table.seats
-                                                "
-                                                :key="seat.code"
+                                                class="flex flex-col items-center gap-1"
+                                                :data-testid="'study-room-table-' +
+                                                table.groupCode"
                                             >
-                                                <button
-                                                    type="button"
-                                                    @click="take(seat.code)"
-                                                    :disabled="seat.isOccupied ||
-                                                    busySeatCode !== null"
-                                                    :class="tableSeatPositionClass(
-                                                        index
-                                                    ) +
-                                                    ' ' +
-                                                    seatClasses(seat, 'table')"
-                                                    style="
-                                                        width: 2.5rem;
-                                                        height: 2.5rem;
-                                                        min-height: 0;
-                                                        padding: 0;
-                                                    "
-                                                    :data-testid="seatTestId(
-                                                        seat
-                                                    )"
-                                                    :aria-label="seatAriaLabel(
-                                                        seat
-                                                    )"
+                                                {{-- 上排椅子（椅背朝上） --}}
+                                                <div class="flex gap-4">
+                                                    <template
+                                                        x-for="
+                                                            seat in
+                                                            tableSeatsRow(
+                                                                table,
+                                                                0
+                                                            )
+                                                        "
+                                                        :key="seat.code"
+                                                    >
+                                                        @include('study-room.partials._table-chair', ['backrest' => 'border-t-4', 'timerSide' => 'top'])
+                                                    </template>
+                                                </div>
+
+                                                {{-- 桌面 --}}
+                                                <div
+                                                    class="flex h-14 w-44 items-center justify-center gap-2 rounded-xl border-2 border-warm-300 bg-warm-200 shadow-[inset_0_2px_0_rgba(255,255,255,0.6),0_2px_4px_rgba(0,0,0,0.06)] dark:border-zinc-600 dark:bg-zinc-700 dark:shadow-none"
                                                 >
-                                                    <template
-                                                        x-if="!seat.isOccupied"
+                                                    <span
+                                                        class="text-base leading-none"
+                                                        aria-hidden="true"
+                                                        >🪴</span
                                                     >
-                                                        <span
-                                                            class="text-xs text-warm-300 dark:text-zinc-600"
-                                                            >+</span
-                                                        >
-                                                    </template>
+                                                    <span
+                                                        class="text-xs font-medium text-warm-700 dark:text-zinc-300"
+                                                        x-text="table.label"
+                                                    ></span>
+                                                </div>
+
+                                                {{-- 下排椅子（椅背朝下） --}}
+                                                <div class="flex gap-4">
                                                     <template
-                                                        x-if="seat.isOccupied"
+                                                        x-for="
+                                                            seat in
+                                                            tableSeatsRow(
+                                                                table,
+                                                                1
+                                                            )
+                                                        "
+                                                        :key="seat.code"
                                                     >
-                                                        <span
-                                                            class="text-xs"
-                                                            x-text="seat.emoji"
-                                                        ></span>
+                                                        @include('study-room.partials._table-chair', ['backrest' => 'border-b-4', 'timerSide' => 'bottom'])
                                                     </template>
-                                                </button>
-                                            </template>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    {{-- 樓梯（左下角）：通往下一層 --}}
+                                    <div
+                                        class="pointer-events-none absolute bottom-0 left-3 flex flex-col items-start gap-1 sm:left-5"
+                                        data-testid="study-room-stairs"
+                                    >
+                                        <span
+                                            class="max-w-40 text-[10px] leading-tight text-warm-500 dark:text-zinc-400"
+                                            x-text="stairHint(floor)"
+                                        ></span>
+                                        <span
+                                            x-show="!isGroundFloor(floor)"
+                                            class="text-[10px] leading-tight text-warm-500 dark:text-zinc-400"
+                                            x-text="stairDownHint(floor)"
+                                        ></span>
+                                        <div
+                                            class="relative h-9 w-16 rounded-t-sm border-x-2 border-t-2 border-warm-300 bg-[repeating-linear-gradient(180deg,var(--color-warm-100)_0_5px,var(--color-warm-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
+                                            aria-hidden="true"
+                                        >
+                                            <x-heroicon-o-arrow-up
+                                                class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-warm-600 dark:text-zinc-300"
+                                            />
                                         </div>
                                     </div>
-                                </template>
+
+                                    {{-- 靠牆的書櫃：留出左邊樓梯與右邊門口的空間 --}}
+                                    <div
+                                        class="pointer-events-none absolute right-24 bottom-0 left-24 flex h-5 items-end justify-center"
+                                        aria-hidden="true"
+                                    >
+                                        <div
+                                            class="h-4 w-full max-w-md rounded-t-sm border-x-2 border-t-2 border-warm-300 bg-[repeating-linear-gradient(90deg,var(--color-warm-500)_0_5px,var(--color-warm-50)_5px_6px,var(--color-warm-700)_6px_9px,var(--color-warm-50)_9px_10px,var(--color-sky-600)_10px_14px,var(--color-warm-50)_14px_15px,var(--color-emerald-600)_15px_21px,var(--color-warm-50)_21px_22px,var(--color-warm-400)_22px_25px,var(--color-warm-50)_25px_26px)] opacity-70 dark:border-zinc-600 dark:opacity-50"
+                                        ></div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </section>
                     </template>
+
+                    <p class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-warm-500 dark:text-zinc-400">
+                        <span class="inline-flex items-center gap-1.5">
+                            <span
+                                class="size-3 rounded-full border-2 border-b-[3px] border-warm-300 bg-white dark:border-zinc-600 dark:bg-zinc-800"
+                            ></span>
+                            空位
+                        </span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <span
+                                class="size-3 rounded-full bg-amber-400 shadow-[0_0_6px_2px_rgba(251,191,36,0.5)]"
+                            ></span>
+                            有人（檯燈亮著）
+                        </span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <span
+                                class="rounded-full bg-amber-500 px-1 text-[9px] leading-4 font-semibold text-white"
+                                >你</span
+                            >
+                            你的座位
+                        </span>
+                    </p>
                 </div>
 
                 {{-- 操作面板：只有目前坐著的同學才會看到，固定在畫面底部 --}}

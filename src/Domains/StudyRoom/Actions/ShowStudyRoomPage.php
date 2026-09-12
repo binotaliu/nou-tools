@@ -99,6 +99,7 @@ final readonly class ShowStudyRoomPage
             'timerCustomMinMinutes' => (int) config('study-room.timer.custom.min_minutes'),
             'timerCustomMaxMinutes' => (int) config('study-room.timer.custom.max_minutes'),
             'timerMaxSessionSeconds' => (int) config('study-room.timer.max_session_seconds'),
+            'maxFloors' => (int) config('study-room.floors.max'),
         ];
     }
 }

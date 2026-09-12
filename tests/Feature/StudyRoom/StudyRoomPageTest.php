@@ -85,3 +85,18 @@ it('auto-syncs seats from zero on first visit', function () {
     expect($expectedSeatsPerFloor)->toBe(24);
     expect(StudyRoomSeat::query()->count())->toBe(24 * config('study-room.floors.max'));
 });
+
+it('passes the maximum floor count to the client so the stairs can explain when the next floor opens', function () {
+    config(['study-room.floors.max' => 5]);
+
+    $schedule = StudentSchedule::factory()->create();
+    StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
+
+    $response = $this->withCredentials()
+        ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
+        ->get(route('study-room.show'));
+
+    $response->assertOk()
+        ->assertSee('data-testid="study-room-stairs"', false)
+        ->assertSee('&quot;maxFloors&quot;:5', false);
+});

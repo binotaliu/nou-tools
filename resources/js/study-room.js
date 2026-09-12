@@ -34,6 +34,8 @@ export default function nouStudyRoom(initial) {
     clockNow: Date.now(),
     heldSeatCode: null,
     busySeatCode: null,
+    // Table seat whose hover/tap popover is open.
+    peekSeatCode: null,
     panelBusy: false,
     errorMessage: null,
     realtime: false,
@@ -524,46 +526,48 @@ export default function nouStudyRoom(initial) {
     },
 
     seatClasses(seat, variant = 'solo') {
-      // Solo seats get three walls (top + sides) and an open front, like
-      // the top-down view of a real study-room cubicle — the bottom stays
-      // unwalled so it reads as the opening the student sits in through.
-      // Table seats sit around a shared table with no partitions, so they
-      // keep a plain bordered shape instead.
+      // Solo seats are drawn as reading carrels seen from above: a
+      // partition on the top and both sides, a desk (rendered in the
+      // template) against the back wall, and an open front where the
+      // chair sits. Table seats are single chairs around a shared table,
+      // so they're just a small rounded chair shape; the template adds the
+      // backrest edge so it faces away from the table.
       const classes =
         variant === 'table'
           ? [
-              'relative flex flex-col items-center justify-center gap-0.5 rounded-lg border p-2 text-center transition',
+              'relative flex size-9 items-center justify-center rounded-lg border-2 text-center transition',
             ]
           : [
-              // Walls are solid and a fixed slate color regardless of
-              // occupancy — a wall doesn't change when someone sits down,
-              // only the floor color inside it does.
-              'relative flex flex-col items-center justify-end gap-0.5 rounded-t-sm border-t-[3px] border-x-[3px] border-warm-400 pt-3.5 pb-1.5 text-center transition min-h-20 dark:border-zinc-500',
+              // Partition walls keep a fixed color regardless of occupancy —
+              // only the floor inside changes when someone sits down. The
+              // occupied layout stacks one more line (emoji + nickname +
+              // timer) than the empty layout (seat number + hint), so the
+              // min-height must fit the occupied content or occupied seats
+              // grow taller than empty ones — and, since seats sit in a CSS
+              // grid, stretch every other seat in their row along with them.
+              'group relative flex min-h-[99px] w-full max-w-24 flex-col items-center justify-end gap-0.5 rounded-t-lg border-x-[3px] border-t-[3px] border-warm-300 px-1 pt-6 pb-1.5 text-center transition dark:border-zinc-600',
             ]
 
       if (this.isMine(seat)) {
-        classes.push(
-          'bg-orange-50 ring-2 ring-orange-400 ring-inset dark:bg-orange-950/30 dark:ring-orange-500'
-        )
-
-        if (variant !== 'table') {
-          classes.push('border-orange-500 dark:border-orange-500')
-        }
-      } else if (seat.isOccupied) {
-        classes.push('bg-warm-100 dark:bg-zinc-800')
-
-        if (variant === 'table') {
-          classes.push('border-warm-300 dark:border-zinc-700')
-        }
-      } else {
-        classes.push(
-          'bg-white text-warm-500 hover:bg-warm-50 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800'
-        )
-
+        // Your own seat gets a warm amber floor and a small "你" badge on
+        // the chair (rendered in the template) — no outline, so it still
+        // reads as furniture rather than a form control.
         classes.push(
           variant === 'table'
-            ? 'border-dashed border-warm-300 hover:border-warm-500 dark:border-zinc-700'
-            : 'hover:border-warm-500 dark:hover:border-zinc-400'
+            ? 'border-amber-400 bg-amber-50 shadow-sm dark:border-amber-600 dark:bg-amber-950/40'
+            : 'bg-amber-50 dark:bg-amber-950/30'
+        )
+      } else if (seat.isOccupied) {
+        classes.push(
+          variant === 'table'
+            ? 'border-warm-400 bg-white shadow-sm dark:border-zinc-500 dark:bg-zinc-800'
+            : 'bg-warm-100/80 dark:bg-zinc-800/80'
+        )
+      } else {
+        classes.push(
+          variant === 'table'
+            ? 'border-warm-300 bg-white/70 hover:border-warm-400 hover:bg-white dark:border-zinc-600 dark:bg-zinc-800/60 dark:hover:border-zinc-500 dark:hover:bg-zinc-800'
+            : 'bg-white/60 hover:bg-white hover:border-warm-400 dark:bg-zinc-900/60 dark:hover:bg-zinc-800 dark:hover:border-zinc-500'
         )
       }
 
@@ -574,18 +578,88 @@ export default function nouStudyRoom(initial) {
       return classes.join(' ')
     },
 
-    tableSeatPositionClass(index) {
-      // Arranges a table's 4 seats two-by-two along its long sides, like
-      // people sitting facing each other across a real table, rather than
-      // one seat per side of a diamond.
-      const positions = [
-        'col-start-1 row-start-1',
-        'col-start-3 row-start-1',
-        'col-start-1 row-start-2',
-        'col-start-3 row-start-2',
+    // Splits a table's seats into the two rows drawn above and below the
+    // table surface, so people sit facing each other across it. Row 0 is
+    // the first half of the seats, row 1 the rest.
+    tableSeatsRow(table, row) {
+      const half = Math.ceil(table.seats.length / 2)
+
+      return row === 0 ? table.seats.slice(0, half) : table.seats.slice(half)
+    },
+
+    // Label on a floor's staircase. Floors open one at a time as the ones
+    // below fill up (see ResolveOpenFloorCount), so the stairs on the
+    // highest open floor explain what it takes for the next one to open.
+    stairHint(floor) {
+      const nextFloor = floor.floor + 1
+      const nextLabel = this.floorLabel(nextFloor)
+
+      if (nextFloor > this.config.maxFloors) {
+        return '頂樓'
+      }
+
+      if (nextFloor <= this.state.openFloors) {
+        return '往' + nextLabel
+      }
+
+      return nextLabel + '尚未開放，' + floor.label + '坐滿後開放'
+    },
+
+    floorLabel(floor) {
+      const digits = [
+        '零',
+        '一',
+        '二',
+        '三',
+        '四',
+        '五',
+        '六',
+        '七',
+        '八',
+        '九',
       ]
 
-      return positions[index % positions.length]
+      return (digits[floor] || String(floor)) + '樓'
+    },
+
+    isGroundFloor(floor) {
+      return floor.floor === 1
+    },
+
+    stairDownHint(floor) {
+      return '往' + this.floorLabel(floor.floor - 1) + ' ↓'
+    },
+
+    // --- table seat popover -----------------------------------------------
+    // Table chairs are too small to show the occupant's nickname and
+    // activity inline, so those live in a popover opened by hovering the
+    // chair on desktop or tapping it on touch screens. Occupied table
+    // chairs therefore stay enabled and route their click here instead of
+    // to take().
+
+    tapTableSeat(seat) {
+      if (!seat.isOccupied) {
+        this.take(seat.code)
+        return
+      }
+
+      this.peekSeatCode = this.peekSeatCode === seat.code ? null : seat.code
+    },
+
+    peek(seat) {
+      if (seat.isOccupied) {
+        this.peekSeatCode = seat.code
+      }
+    },
+
+    unpeek(seat) {
+      if (this.peekSeatCode === seat.code) {
+        this.peekSeatCode = null
+      }
+    },
+
+    isPeeking(seat) {
+      return seat.isOccupied && this.peekSeatCode === seat.code
     },
 
     mySeat() {

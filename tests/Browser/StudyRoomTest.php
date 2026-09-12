@@ -4,6 +4,7 @@ use App\Models\Course;
 use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
 use Illuminate\Support\Str;
+use NouTools\Domains\StudyRoom\Actions\FillFloorWithTestStudents;
 
 // The live seat map, countdown, and realtime sync are all driven
 // client-side by resources/js/study-room.js (registered as the nouStudyRoom
@@ -147,4 +148,37 @@ it('shows a connection-error message once the room gives up on a realtime connec
     );
 
     $page->assertVisible('[data-testid="study-room-connection-error"]');
+});
+
+it('shows a popover with nickname and activity for an occupied table seat, and opens the next floor once the first is full', function () {
+    $schedule = createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->waitForEvent('load');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]')
+        ->waitForEvent('load');
+
+    // Fill the whole first floor with test students, which also opens
+    // the second floor.
+    app(FillFloorWithTestStudents::class)(1);
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-floor-1"]')
+        ->assertVisible('[data-testid="study-room-floor-2"]')
+        ->assertVisible('[data-testid="seat-1-T1-1-timer"]')
+        ->assertMissing('[data-testid="seat-1-T1-1-popover"]')
+        ->hover('[data-testid="seat-1-T1-1"]')
+        ->assertVisible('[data-testid="seat-1-T1-1-popover"]')
+        ->assertSeeIn('[data-testid="seat-1-T1-1-popover"]', '測試')
+        ->assertSeeIn('[data-testid="study-room-floor-1"] [data-testid="study-room-stairs"]', '往二樓')
+        ->assertSeeIn('[data-testid="study-room-floor-2"] [data-testid="study-room-stairs"]', '往一樓')
+        ->assertSeeIn('[data-testid="study-room-floor-2"] [data-testid="study-room-stairs"]', '三樓尚未開放');
 });
