@@ -58,8 +58,11 @@ it('lets a student remember their schedule, set a profile, take a seat, and star
         ->click('[data-testid="seat-1-S01"]')
         ->wait(1);
 
+    // Twemoji swaps the emoji character for an <img alt="..."> once it loads,
+    // so the seat's chosen emoji is checked via source (it survives the swap
+    // in the alt attribute) rather than assertSeeIn's visible-text search.
     $page->assertVisible('[data-testid="study-room-leave-seat"]')
-        ->assertSeeIn('[data-testid="seat-1-S01"]', config('study-room.emojis')[0])
+        ->assertSourceInHas('[data-testid="seat-1-S01"]', config('study-room.emojis')[0])
         ->assertSeeIn('[data-testid="seat-1-S01"]', '認真讀書中');
 
     // The verb picker is a group of large icon buttons (radio inputs behind
