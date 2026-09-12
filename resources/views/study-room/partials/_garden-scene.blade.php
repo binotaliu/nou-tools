@@ -79,10 +79,10 @@
 
     {{-- 路燈：天黑後亮起 --}}
     <svg class="absolute bottom-[14%] left-[58%] h-[34%] w-auto overflow-visible" viewBox="0 0 40 100" aria-hidden="true">
-        <circle cx="20" cy="10" r="26" fill="rgba(255,214,130,0.35)" style="opacity: var(--g-lamp)" />
+        <circle cx="20" cy="10" r="26" fill="rgba(255,214,130,0.35)" class="[opacity:var(--g-lamp)]" />
         <rect x="18" y="14" width="4" height="86" rx="1" fill="var(--g-trunk)" />
         <path d="M10 14 L30 14 L26 4 L14 4 Z" fill="var(--g-buildingNear)" />
-        <circle cx="20" cy="12" r="5" fill="#ffe08a" style="opacity: var(--g-lamp)" />
+        <circle cx="20" cy="12" r="5" fill="#ffe08a" class="[opacity:var(--g-lamp)]" />
     </svg>
 
     {{-- 花叢 --}}
@@ -125,20 +125,16 @@
             class="absolute bottom-[30%] left-[12%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
         ></span>
         <span
-            class="absolute bottom-[55%] left-[31%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
-            style="animation-delay: -2.3s"
+            class="absolute bottom-[55%] left-[31%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-2.3s]"
         ></span>
         <span
-            class="absolute bottom-[40%] left-[52%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
-            style="animation-delay: -4.1s"
+            class="absolute bottom-[40%] left-[52%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-4.1s]"
         ></span>
         <span
-            class="absolute bottom-[62%] left-[70%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
-            style="animation-delay: -1.2s"
+            class="absolute bottom-[62%] left-[70%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-1.2s]"
         ></span>
         <span
-            class="absolute bottom-[25%] left-[86%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
-            style="animation-delay: -5.6s"
+            class="absolute bottom-[25%] left-[86%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-5.6s]"
         ></span>
     </div>
 </div>

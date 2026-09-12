@@ -30,8 +30,7 @@
 
         {{-- 檯燈的光暈：照在牆與桌面上 --}}
         <div
-            class="pointer-events-none absolute right-[-6%] bottom-[2%] size-[70vmin] rounded-full bg-amber-200 opacity-(--c-lamp) blur-3xl transition-opacity duration-1000"
-            style="mix-blend-mode: soft-light"
+            class="pointer-events-none absolute right-[-6%] bottom-[2%] size-[70vmin] rounded-full bg-amber-200 opacity-(--c-lamp) mix-blend-soft-light blur-3xl transition-opacity duration-1000"
             aria-hidden="true"
         ></div>
         <div
@@ -124,10 +123,10 @@
                     <circle cx="18" cy="30" r="15" fill="var(--g-canopy)" />
                 </svg>
                 <svg class="absolute bottom-[10%] left-[64%] h-[26%] w-auto overflow-visible" viewBox="0 0 40 100" aria-hidden="true">
-                    <circle cx="20" cy="10" r="26" fill="rgba(255,214,130,0.35)" style="opacity: var(--g-lamp)" />
+                    <circle cx="20" cy="10" r="26" fill="rgba(255,214,130,0.35)" class="[opacity:var(--g-lamp)]" />
                     <rect x="18" y="14" width="4" height="86" rx="1" fill="var(--g-trunk)" />
                     <path d="M10 14 L30 14 L26 4 L14 4 Z" fill="var(--g-buildingNear)" />
-                    <circle cx="20" cy="12" r="5" fill="#ffe08a" style="opacity: var(--g-lamp)" />
+                    <circle cx="20" cy="12" r="5" fill="#ffe08a" class="[opacity:var(--g-lamp)]" />
                 </svg>
 
                 <div
@@ -138,16 +137,13 @@
                         class="absolute bottom-[30%] left-[12%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
                     ></span>
                     <span
-                        class="absolute bottom-[55%] left-[31%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
-                        style="animation-delay: -2.3s"
+                        class="absolute bottom-[55%] left-[31%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-2.3s]"
                     ></span>
                     <span
-                        class="absolute bottom-[40%] left-[52%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
-                        style="animation-delay: -4.1s"
+                        class="absolute bottom-[40%] left-[52%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-4.1s]"
                     ></span>
                     <span
-                        class="absolute bottom-[25%] left-[86%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
-                        style="animation-delay: -5.6s"
+                        class="absolute bottom-[25%] left-[86%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-5.6s]"
                     ></span>
                 </div>
 
@@ -340,8 +336,7 @@
                 cy="22.44"
                 r="17"
                 fill="url(#study-room-focus-lamp-glow)"
-                class="transition-opacity duration-1000"
-                style="opacity: var(--c-lamp)"
+                class="[opacity:var(--c-lamp)] transition-opacity duration-1000"
             />
 
             <g fill="var(--c-desk-bottom)">
@@ -380,13 +375,12 @@
                     rx="8.6"
                     ry="3"
                     fill="#ffd06a"
-                    class="transition-opacity duration-1000"
-                    style="opacity: var(--c-lamp)"
+                    class="[opacity:var(--c-lamp)] transition-opacity duration-1000"
                 />
             </g>
 
             {{-- 燈泡：藏在燈罩開口裡 --}}
-            <circle data-testid="study-room-lamp-bulb" cx="12.13" cy="22.44" r="2.1" fill="#fff4d6" class="transition-opacity duration-1000" style="opacity: calc(0.35 + 0.65 * var(--c-lamp))" />
+            <circle data-testid="study-room-lamp-bulb" cx="12.13" cy="22.44" r="2.1" fill="#fff4d6" class="[opacity:calc(0.35+0.65*var(--c-lamp))] transition-opacity duration-1000" />
 
             {{-- 燈罩與支臂之間的轉軸 --}}
             <circle cx="19" cy="12" r="2.2" fill="var(--c-desk-bottom)" />

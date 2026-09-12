@@ -52,6 +52,19 @@ it('shows the seat-map root when there is a cookie and a profile', function () {
     $response->assertOk()->assertSee('data-testid="study-room-root"', false);
 });
 
+it('has no literal style attributes, since the strict CSP has no style-src unsafe-inline', function () {
+    $schedule = StudentSchedule::factory()->create();
+    StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
+
+    $response = $this->withCredentials()
+        ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
+        ->get(route('study-room.show'));
+
+    $response->assertOk();
+
+    expect($response->getContent())->not->toMatch('/\sstyle="/');
+});
+
 it('renders the announcement markdown as html', function () {
     $schedule = StudentSchedule::factory()->create();
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create();

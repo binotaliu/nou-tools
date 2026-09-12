@@ -78,8 +78,7 @@
     aria-hidden="true"
 >
     <div
-        class="absolute top-[18%] left-[12%] h-3 w-16 animate-drift {{ $isFocus ? 'scale-[2.5] sm:scale-[3.5]' : '' }}"
-        style="animation-duration: 150s"
+        class="absolute top-[18%] left-[12%] h-3 w-16 animate-drift [animation-duration:150s] {{ $isFocus ? 'scale-[2.5] sm:scale-[3.5]' : '' }}"
     >
         <span
             class="absolute right-0 bottom-0 left-0 h-2.5 rounded-full bg-(--g-cloud)"
@@ -92,8 +91,7 @@
         ></span>
     </div>
     <div
-        class="absolute top-[42%] left-[58%] h-2.5 w-12 animate-drift {{ $isFocus ? 'scale-[2.5] sm:scale-[3.5]' : '' }}"
-        style="animation-duration: 210s; animation-delay: -90s"
+        class="absolute top-[42%] left-[58%] h-2.5 w-12 animate-drift [animation-duration:210s] [animation-delay:-90s] {{ $isFocus ? 'scale-[2.5] sm:scale-[3.5]' : '' }}"
     >
         <span
             class="absolute right-0 bottom-0 left-0 h-2 rounded-full bg-(--g-cloud)"
@@ -106,8 +104,7 @@
         ></span>
     </div>
     <div
-        class="absolute top-[8%] left-[78%] h-3.5 w-20 animate-drift {{ $isFocus ? 'scale-[2.5] sm:scale-[3.5]' : '' }}"
-        style="animation-duration: 180s; animation-delay: -140s"
+        class="absolute top-[8%] left-[78%] h-3.5 w-20 animate-drift [animation-duration:180s] [animation-delay:-140s] {{ $isFocus ? 'scale-[2.5] sm:scale-[3.5]' : '' }}"
     >
         <span
             class="absolute right-0 bottom-0 left-0 h-3 rounded-full bg-(--g-cloud)"
@@ -121,8 +118,7 @@
     </div>
     @if ($isFocus)
         <div
-            class="absolute top-[30%] left-[32%] h-3 w-14 scale-[2.5] animate-drift sm:scale-[3.5]"
-            style="animation-duration: 240s; animation-delay: -40s"
+            class="absolute top-[30%] left-[32%] h-3 w-14 scale-[2.5] animate-drift [animation-delay:-40s] [animation-duration:240s] sm:scale-[3.5]"
         >
             <span
                 class="absolute right-0 bottom-0 left-0 h-2.5 rounded-full bg-(--g-cloud)"
