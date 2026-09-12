@@ -33,6 +33,7 @@ final class StudyRoomSeat extends Model
         'subject_label',
         'timer_mode',
         'timer_phase',
+        'timer_round',
         'timer_started_at',
         'timer_ends_at',
     ];
@@ -42,6 +43,7 @@ final class StudyRoomSeat extends Model
         'activity_verb' => StudyActivityVerb::class,
         'timer_mode' => StudyTimerMode::class,
         'timer_phase' => StudyTimerPhase::class,
+        'timer_round' => 'integer',
         'occupied_at' => 'datetime',
         'last_seen_at' => 'datetime',
         'timer_started_at' => 'datetime',

@@ -55,16 +55,27 @@ return [
     | Timers
     |--------------------------------------------------------------------------
     |
-    | Students run either a pomodoro timer (fixed focus/break lengths) or a
-    | custom timer bounded by `min_minutes`/`max_minutes`. `max_session_seconds`
-    | is a hard backstop so no timer can run away indefinitely.
+    | Students run either a pomodoro cycle or a custom timer bounded by
+    | `min_minutes`/`max_minutes`. A pomodoro cycle is `rounds_per_cycle`
+    | focus rounds of `focus_minutes`, each followed by a
+    | `short_break_minutes` break — except the last, which is followed by a
+    | `long_break_minutes` break. These are the defaults; each student can
+    | tune their own cycle within `bounds`. `max_session_seconds` is a hard
+    | backstop so no timer can run away indefinitely.
     |
     */
 
     'timer' => [
         'pomodoro' => [
             'focus_minutes' => 25,
-            'break_minutes' => 5,
+            'short_break_minutes' => 5,
+            'long_break_minutes' => 30,
+            'rounds_per_cycle' => 4,
+            'bounds' => [
+                'focus_minutes' => [5, 120],
+                'break_minutes' => [1, 60],
+                'rounds_per_cycle' => [1, 12],
+            ],
         ],
         'custom' => [
             'min_minutes' => 5,

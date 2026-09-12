@@ -6,19 +6,23 @@ namespace NouTools\Domains\StudyRoom\Actions;
 
 use App\Enums\StudyTimerMode;
 use App\Enums\StudyTimerPhase;
+use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 use NouTools\Domains\StudyRoom\DataTransferObjects\StartStudyTimerData;
 use NouTools\Domains\StudyRoom\Exceptions\NoSeatHeldException;
+use NouTools\Domains\StudyRoom\ValueObjects\PomodoroCycle;
 
 /**
- * Starts a Focus-phase timer on the viewer's held seat. A pomodoro always
- * runs `timer.pomodoro.focus_minutes`; a custom timer runs the validated
- * `minutes` from the request. 其他 (no course) is recorded with a fixed,
- * non-user-supplied label — deliberately not free text, since it's a
- * second publicly-visible field we've chosen not to have to moderate.
+ * Starts a Focus-phase timer on the viewer's held seat. A pomodoro starts
+ * round 1 of the student's own cycle (saving the cycle they sent as their
+ * preference first, so it's what `StartBreak` and `StartNextRound` follow);
+ * a custom timer runs the validated `minutes` from the request with no
+ * round at all. 其他 (no course) is recorded with a fixed, non-user-supplied
+ * label — deliberately not free text, since it's a second publicly-visible
+ * field we've chosen not to have to moderate.
  */
 final readonly class StartStudyTimer
 {
@@ -37,8 +41,10 @@ final readonly class StartStudyTimer
                 throw new NoSeatHeldException;
             }
 
-            $minutes = $data->mode === StudyTimerMode::Pomodoro
-                ? (int) config('study-room.timer.pomodoro.focus_minutes')
+            $isPomodoro = $data->mode === StudyTimerMode::Pomodoro;
+
+            $minutes = $isPomodoro
+                ? $this->resolveCycle($viewer, $data)->focusMinutes
                 : (int) $data->minutes;
 
             $now = Date::now();
@@ -49,6 +55,7 @@ final readonly class StartStudyTimer
             $seat->subject_label = $data->subjectCourseId === null ? '其他' : null;
             $seat->timer_mode = $data->mode;
             $seat->timer_phase = StudyTimerPhase::Focus;
+            $seat->timer_round = $isPomodoro ? 1 : null;
             $seat->timer_started_at = $now;
             $seat->timer_ends_at = $now->addMinutes($minutes);
             $seat->saveOrFail();
@@ -59,5 +66,32 @@ final readonly class StartStudyTimer
         ($this->broadcastStudyRoomChange)('timer.started', $seat);
 
         return $seat;
+    }
+
+    /**
+     * Saves the cycle from the request onto the student's profile when one
+     * was sent, and returns the cycle this timer should run on either way.
+     */
+    private function resolveCycle(StudentScheduleCookie $viewer, StartStudyTimerData $data): PomodoroCycle
+    {
+        $profile = StudyRoomProfile::query()
+            ->where('student_schedule_id', $viewer->id)
+            ->first();
+
+        if (! $data->hasPomodoroCycle()) {
+            return PomodoroCycle::forProfile($profile);
+        }
+
+        $cycle = $data->pomodoroCycle();
+
+        if ($profile !== null) {
+            $profile->pomodoro_focus_minutes = $cycle->focusMinutes;
+            $profile->pomodoro_short_break_minutes = $cycle->shortBreakMinutes;
+            $profile->pomodoro_long_break_minutes = $cycle->longBreakMinutes;
+            $profile->pomodoro_rounds_per_cycle = $cycle->roundsPerCycle;
+            $profile->saveOrFail();
+        }
+
+        return $cycle;
     }
 }

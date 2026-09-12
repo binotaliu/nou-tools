@@ -11,11 +11,15 @@ use Illuminate\Support\Facades\DB;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 use NouTools\Domains\StudyRoom\Exceptions\NoSeatHeldException;
 use NouTools\Domains\StudyRoom\Exceptions\TimerNotFinishedException;
+use NouTools\Domains\StudyRoom\ValueObjects\PomodoroCycle;
 
 /**
  * Starts the break after a finished focus timer. The break is manual by
  * product decision — there's no auto-advance from Focus to Break, so this
- * only succeeds once the focus timer has actually run out.
+ * only succeeds once the focus timer has actually run out. Its length
+ * comes from the student's own cycle: the short break after most rounds,
+ * the long one after the last round of a cycle. A finished custom timer
+ * gets the short break (it has no round to be the last of).
  *
  * Finalizes the focus session itself (idempotently — a no-op if a
  * heartbeat already finalized it) rather than assuming one already ran,
@@ -54,7 +58,10 @@ final readonly class StartBreak
 
             ($this->recordStudySession)($seat);
 
-            $breakMinutes = (int) config('study-room.timer.pomodoro.break_minutes');
+            $cycle = PomodoroCycle::forProfile($seat->schedule?->studyRoomProfile);
+            $breakMinutes = $seat->timer_round === null
+                ? $cycle->shortBreakMinutes
+                : $cycle->breakMinutesAfterRound($seat->timer_round);
 
             $seat->timer_phase = StudyTimerPhase::Break;
             $seat->timer_started_at = $now;

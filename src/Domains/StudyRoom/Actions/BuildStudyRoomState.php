@@ -137,6 +137,7 @@ final readonly class BuildStudyRoomState
                 $seat->subject_label ?? '',
                 $seat->timer_mode?->value ?? '',
                 $seat->timer_phase?->value ?? '',
+                $seat->timer_round ?? '',
                 $seat->timer_started_at?->getTimestamp() ?? '',
                 $seat->timer_ends_at?->getTimestamp() ?? '',
             ]))

@@ -12,6 +12,8 @@ use App\Settings\StudyRoomSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use NouTools\Domains\StudyRoom\PageData\StudyRoomPageData;
+use NouTools\Domains\StudyRoom\ValueObjects\PomodoroCycle;
+use NouTools\Domains\StudyRoom\ViewModels\StudyRoomPomodoroCycleViewModel;
 use NouTools\Domains\StudyRoom\ViewModels\StudyRoomProfileViewModel;
 use NouTools\Domains\StudyRoom\ViewModels\StudyRoomSubjectViewModel;
 use NouTools\Domains\StudyRoom\ViewModels\StudyRoomVerbViewModel;
@@ -68,6 +70,7 @@ final readonly class ShowStudyRoomPage
             nicknameChangedAt: $profile?->nickname_changed_at,
             canChangeNicknameAt: $canChangeNicknameAt,
             canChangeNickname: $canChangeNicknameAt === null || Date::now()->greaterThanOrEqualTo($canChangeNicknameAt),
+            pomodoroCycle: StudyRoomPomodoroCycleViewModel::fromCycle(PomodoroCycle::forProfile($profile)),
         );
     }
 
@@ -86,16 +89,23 @@ final readonly class ShowStudyRoomPage
     }
 
     /**
-     * @return array<string, int|float>
+     * @return array<string, int|float|array<int, int>>
      */
     private function buildClientConfig(): array
     {
+        $bounds = config('study-room.timer.pomodoro.bounds');
+
         return [
             'heartbeatIntervalSeconds' => (int) config('study-room.heartbeat.interval_seconds'),
             'heartbeatIdleReleaseSeconds' => (int) config('study-room.heartbeat.idle_release_seconds'),
             'realtimeConnectTimeoutSeconds' => (int) config('study-room.realtime.connect_timeout_seconds'),
             'timerPomodoroFocusMinutes' => (int) config('study-room.timer.pomodoro.focus_minutes'),
-            'timerPomodoroBreakMinutes' => (int) config('study-room.timer.pomodoro.break_minutes'),
+            'timerPomodoroShortBreakMinutes' => (int) config('study-room.timer.pomodoro.short_break_minutes'),
+            'timerPomodoroLongBreakMinutes' => (int) config('study-room.timer.pomodoro.long_break_minutes'),
+            'timerPomodoroRoundsPerCycle' => (int) config('study-room.timer.pomodoro.rounds_per_cycle'),
+            'timerPomodoroFocusBounds' => array_map(intval(...), $bounds['focus_minutes']),
+            'timerPomodoroBreakBounds' => array_map(intval(...), $bounds['break_minutes']),
+            'timerPomodoroRoundsBounds' => array_map(intval(...), $bounds['rounds_per_cycle']),
             'timerCustomMinMinutes' => (int) config('study-room.timer.custom.min_minutes'),
             'timerCustomMaxMinutes' => (int) config('study-room.timer.custom.max_minutes'),
             'timerMaxSessionSeconds' => (int) config('study-room.timer.max_session_seconds'),

@@ -41,6 +41,7 @@ final readonly class ReleaseTestStudents
                 $seat->subject_label = null;
                 $seat->timer_mode = null;
                 $seat->timer_phase = null;
+                $seat->timer_round = null;
                 $seat->timer_started_at = null;
                 $seat->timer_ends_at = null;
                 $seat->saveOrFail();

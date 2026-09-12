@@ -21,5 +21,6 @@ final class StudyRoomProfileViewModel extends Data
         public ?DateTimeInterface $nicknameChangedAt,
         public ?DateTimeInterface $canChangeNicknameAt,
         public bool $canChangeNickname,
+        public StudyRoomPomodoroCycleViewModel $pomodoroCycle,
     ) {}
 }

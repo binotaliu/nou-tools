@@ -18,12 +18,20 @@ final class StudyRoomProfile extends Model
         'student_schedule_id',
         'nickname',
         'emoji',
+        'pomodoro_focus_minutes',
+        'pomodoro_short_break_minutes',
+        'pomodoro_long_break_minutes',
+        'pomodoro_rounds_per_cycle',
         'nickname_changed_at',
         'nickname_reset_at',
         'nickname_reset_by',
     ];
 
     protected $casts = [
+        'pomodoro_focus_minutes' => 'integer',
+        'pomodoro_short_break_minutes' => 'integer',
+        'pomodoro_long_break_minutes' => 'integer',
+        'pomodoro_rounds_per_cycle' => 'integer',
         'nickname_changed_at' => 'datetime',
         'nickname_reset_at' => 'datetime',
     ];

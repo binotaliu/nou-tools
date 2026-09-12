@@ -70,6 +70,7 @@ final readonly class FillFloorWithTestStudents
                     $seat->subject_label = fake()->randomElement(['國文', '經濟學', '心理學', '資訊科學導論', '英文']);
                     $seat->timer_mode = StudyTimerMode::Pomodoro;
                     $seat->timer_phase = StudyTimerPhase::Focus;
+                    $seat->timer_round = random_int(1, 4);
                     $seat->timer_started_at = Date::now();
                     $seat->timer_ends_at = Date::now()->addMinutes(random_int(1, $focusMinutes));
                 }

@@ -9,6 +9,7 @@ use App\Enums\StudyTimerMode;
 use App\Enums\StudyTimerPhase;
 use App\Models\StudyRoomSeat;
 use DateTimeInterface;
+use NouTools\Domains\StudyRoom\ValueObjects\PomodoroCycle;
 use Spatie\LaravelData\Data;
 
 /**
@@ -32,6 +33,8 @@ final class StudyRoomSeatViewModel extends Data
         public ?string $activity,
         public ?StudyTimerMode $timerMode,
         public ?StudyTimerPhase $timerPhase,
+        public ?int $timerRound,
+        public ?int $roundsPerCycle,
         public ?DateTimeInterface $timerEndsAt,
         public ?DateTimeInterface $timerStartedAt,
     ) {}
@@ -54,6 +57,8 @@ final class StudyRoomSeatViewModel extends Data
             activity: $seat->activity_verb && $subject ? $seat->activity_verb->format($subject) : null,
             timerMode: $seat->timer_mode,
             timerPhase: $seat->timer_phase,
+            timerRound: $seat->timer_round,
+            roundsPerCycle: $seat->timer_round === null ? null : PomodoroCycle::forProfile($profile)->roundsPerCycle,
             timerEndsAt: $seat->timer_ends_at,
             timerStartedAt: $seat->timer_started_at,
         );
