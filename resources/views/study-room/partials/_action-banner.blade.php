@@ -1,7 +1,7 @@
 {{--
     操作面板：你的書桌。只有目前坐著的同學才會看到，固定在畫面底部。
     還沒計時：選活動、科目、計時方式後開始；計時中：倒數、進度、番茄鐘的輪次，
-    以及開始休息 / 下一輪 / 結束 / 離開座位。桌面上緣那條細線就是進度條，
+    以及開始休息 / 下一輪 / 結束 / 離開座位。桌面下緣那條細線就是進度條，
     左上角的檯燈在計時中會亮起來。
 --}}
 <div
@@ -10,7 +10,7 @@
     x-transition:enter="transition duration-300 ease-out"
     x-transition:enter-start="translate-y-full opacity-0"
     x-transition:enter-end="translate-y-0 opacity-100"
-    class="fixed inset-x-0 bottom-0 z-40"
+    class="fixed inset-x-0 bottom-0 z-40 mb-0"
     data-testid="study-room-control-panel"
 >
     <div class="mx-auto max-w-6xl sm:px-4">
@@ -23,26 +23,6 @@
                 :class="hasTimer() ? 'opacity-100' : 'opacity-0'"
                 aria-hidden="true"
             ></div>
-
-            {{-- 進度條：沿著桌面的上緣 --}}
-            <div
-                x-show="hasTimer()"
-                x-cloak
-                class="absolute inset-x-0 top-0 h-1.5 bg-warm-200/80 dark:bg-zinc-800"
-                role="progressbar"
-                aria-label="計時進度"
-                :aria-valuenow="progressPercent()"
-                aria-valuemin="0"
-                aria-valuemax="100"
-                data-testid="study-room-progress"
-            >
-                <div
-                    class="h-full rounded-r-full transition-[width] duration-1000 ease-linear"
-                    :class="progressBarClass()"
-                    :style="progressStyle()"
-                    data-testid="study-room-progress-bar"
-                ></div>
-            </div>
 
             <div
                 class="relative px-4 pt-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:px-6 sm:pt-6 sm:pb-[calc(env(safe-area-inset-bottom)+1.25rem)]"
@@ -331,6 +311,26 @@
                         </button>
                     </div>
                 </div>
+            </div>
+
+            {{-- 進度條：沿著桌面的下緣 --}}
+            <div
+                x-show="hasTimer()"
+                x-cloak
+                class="absolute inset-x-0 bottom-0 h-1.5 bg-warm-200/80 dark:bg-zinc-800"
+                role="progressbar"
+                aria-label="計時進度"
+                :aria-valuenow="progressPercent()"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                data-testid="study-room-progress"
+            >
+                <div
+                    class="h-full transition-[width] duration-1000 ease-linear"
+                    :class="progressBarClass()"
+                    :style="progressStyle()"
+                    data-testid="study-room-progress-bar"
+                ></div>
             </div>
         </div>
     </div>
