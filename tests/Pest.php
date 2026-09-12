@@ -27,6 +27,23 @@ pest()->extend(TestCase::class)
 
 /*
 |--------------------------------------------------------------------------
+| Skip Vite Manifest Lookup In Feature Tests
+|--------------------------------------------------------------------------
+|
+| Feature tests never build front-end assets, so any view using @vite would
+| throw a ViteManifestNotFoundException. Browser tests render pages through
+| a real in-process HTTP kernel (see LaravelHttpServer::handleRequest) that
+| shares this container, so they still need real built assets and must not
+| have Vite swapped out here.
+|
+*/
+
+uses()->beforeEach(function (): void {
+    $this->withoutVite();
+})->in('Feature');
+
+/*
+|--------------------------------------------------------------------------
 | Browser Tests - Chrome Process Cleanup
 |--------------------------------------------------------------------------
 |
