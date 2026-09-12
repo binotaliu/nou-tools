@@ -11,13 +11,17 @@ enum StudyActivityVerb: string
     case Homework = 'homework';
     case Review = 'review';
 
+    /**
+     * Short, natural-language label for pickers (e.g. the study-room action
+     * selector). Unlike `format()`, this never carries a subject.
+     */
     public function label(): string
     {
         return match ($this) {
-            self::ExamPrep => '正在準備…考試',
-            self::Reading => '正在讀…',
-            self::Homework => '寫…的作業',
-            self::Review => '正在複習…',
+            self::ExamPrep => '準備考試',
+            self::Reading => '閱讀',
+            self::Homework => '寫作業',
+            self::Review => '複習',
         };
     }
 

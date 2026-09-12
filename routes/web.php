@@ -39,6 +39,7 @@ use App\Http\Controllers\StudyRoomController;
 use App\Http\Controllers\StudyRoomHeartbeatController;
 use App\Http\Controllers\StudyRoomProfileController;
 use App\Http\Controllers\StudyRoomSeatController;
+use App\Http\Controllers\StudyRoomSessionController;
 use App\Http\Controllers\StudyRoomStateController;
 use App\Http\Controllers\StudyRoomTimerController;
 use Illuminate\Support\Facades\Route;
@@ -121,6 +122,7 @@ Route::get('/study-room', [StudyRoomController::class, 'show'])->name('study-roo
 
 Route::prefix('study-room')->name('study-room.')->group(function (): void {
     Route::get('/state', StudyRoomStateController::class)->name('state')->middleware('throttle:120,1');
+    Route::get('/sessions', StudyRoomSessionController::class)->name('sessions')->middleware('throttle:60,1');
     Route::post('/profile', StudyRoomProfileController::class)->name('profile.update')->middleware('throttle:5,1');
     Route::post('/seats/{seat}/take', [StudyRoomSeatController::class, 'store'])->name('seats.take')->middleware('throttle:60,1');
     Route::post('/seat/leave', [StudyRoomSeatController::class, 'destroy'])->name('seat.leave')->middleware('throttle:60,1');
