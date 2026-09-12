@@ -107,6 +107,17 @@
     display: none !important;
   }
 
+  /* Twemoji swaps emoji characters for <img class="emoji"> — without this
+     the images render at their native size instead of matching the
+     surrounding text. */
+  img.emoji {
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    margin: 0 0.05em 0 0.1em;
+    vertical-align: -0.1em;
+  }
+
   html {
     color-scheme: light;
   }

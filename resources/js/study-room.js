@@ -136,8 +136,11 @@ export default function nouStudyRoom(initial) {
     connectTimeoutHandle: null,
     clockHandle: null,
     realtimeChannel: null,
+    twemojiParseHandle: null,
 
     init() {
+      this.startTwemojiObserver()
+
       this.heldSeatCode = this.deriveHeldSeatCode(this.state)
       this.customMinutes = this.config.timerCustomMinMinutes
       this.selectedVerb = this.verbs.length ? this.verbs[0].value : null
@@ -182,6 +185,48 @@ export default function nouStudyRoom(initial) {
           this.heartbeat()
         }
       })
+    },
+
+    // --- emoji rendering -------------------------------------------------
+
+    // Alpine re-renders x-text/x-for content constantly (seat occupants,
+    // the profile card, timer countdowns), so emoji can't be swapped for
+    // Twemoji images once at load — they'd only cover whatever happened to
+    // be on screen at that instant. A MutationObserver over the whole
+    // component instead re-parses after every DOM change, batched onto a
+    // single animation frame so a burst of updates (e.g. the once-a-second
+    // countdown tick across many seats) triggers one pass, not many.
+    // twemoji.parse() is idempotent on already-parsed text (the emoji
+    // character is gone, replaced by an <img>), so the mutations it causes
+    // don't retrigger themselves into a loop.
+    startTwemojiObserver() {
+      if (typeof window.twemoji === 'undefined') {
+        return
+      }
+
+      this.parseTwemoji()
+
+      const observer = new MutationObserver(() => this.scheduleTwemojiParse())
+      observer.observe(this.$el, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      })
+    },
+
+    scheduleTwemojiParse() {
+      if (this.twemojiParseHandle) {
+        return
+      }
+
+      this.twemojiParseHandle = requestAnimationFrame(() => {
+        this.twemojiParseHandle = null
+        this.parseTwemoji()
+      })
+    },
+
+    parseTwemoji() {
+      window.twemoji.parse(this.$el)
     },
 
     // --- realtime -----------------------------------------------------
