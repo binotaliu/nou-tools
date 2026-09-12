@@ -523,22 +523,47 @@ export default function nouStudyRoom(initial) {
       return seat.label + '，' + (seat.nickname || '同學') + ' 正在使用'
     },
 
-    seatClasses(seat) {
-      const classes = [
-        'relative flex flex-col items-center justify-center gap-0.5 rounded-lg border p-2 text-center transition min-h-16',
-      ]
+    seatClasses(seat, variant = 'solo') {
+      // Solo seats get three walls (top + sides) and an open front, like
+      // the top-down view of a real study-room cubicle — the bottom stays
+      // unwalled so it reads as the opening the student sits in through.
+      // Table seats sit around a shared table with no partitions, so they
+      // keep a plain bordered shape instead.
+      const classes =
+        variant === 'table'
+          ? [
+              'relative flex flex-col items-center justify-center gap-0.5 rounded-lg border p-2 text-center transition',
+            ]
+          : [
+              // Walls are solid and a fixed slate color regardless of
+              // occupancy — a wall doesn't change when someone sits down,
+              // only the floor color inside it does.
+              'relative flex flex-col items-center justify-end gap-0.5 rounded-t-sm border-t-[3px] border-x-[3px] border-warm-400 pt-3.5 pb-1.5 text-center transition min-h-20 dark:border-zinc-500',
+            ]
 
       if (this.isMine(seat)) {
         classes.push(
-          'border-orange-500 bg-orange-50 ring-2 ring-orange-400 dark:bg-orange-950/30 dark:ring-orange-500'
+          'bg-orange-50 ring-2 ring-orange-400 ring-inset dark:bg-orange-950/30 dark:ring-orange-500'
         )
+
+        if (variant !== 'table') {
+          classes.push('border-orange-500 dark:border-orange-500')
+        }
       } else if (seat.isOccupied) {
-        classes.push(
-          'border-warm-300 bg-warm-100 dark:border-zinc-700 dark:bg-zinc-800'
-        )
+        classes.push('bg-warm-100 dark:bg-zinc-800')
+
+        if (variant === 'table') {
+          classes.push('border-warm-300 dark:border-zinc-700')
+        }
       } else {
         classes.push(
-          'border-dashed border-warm-300 bg-white text-warm-500 hover:border-warm-500 hover:bg-warm-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800'
+          'bg-white text-warm-500 hover:bg-warm-50 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800'
+        )
+
+        classes.push(
+          variant === 'table'
+            ? 'border-dashed border-warm-300 hover:border-warm-500 dark:border-zinc-700'
+            : 'hover:border-warm-500 dark:hover:border-zinc-400'
         )
       }
 
@@ -550,14 +575,14 @@ export default function nouStudyRoom(initial) {
     },
 
     tableSeatPositionClass(index) {
-      // Arranges a table's 4 seats N/E/S/W around a centered tabletop,
-      // so a shared table actually reads as a table with people around
-      // it rather than another grid of squares.
+      // Arranges a table's 4 seats two-by-two along its long sides, like
+      // people sitting facing each other across a real table, rather than
+      // one seat per side of a diamond.
       const positions = [
-        'col-start-2 row-start-1',
-        'col-start-3 row-start-2',
-        'col-start-2 row-start-3',
+        'col-start-1 row-start-1',
+        'col-start-3 row-start-1',
         'col-start-1 row-start-2',
+        'col-start-3 row-start-2',
       ]
 
       return positions[index % positions.length]

@@ -295,12 +295,18 @@
                                         :data-testid="seatTestId(seat)"
                                         :aria-label="seatAriaLabel(seat)"
                                     >
+                                        {{-- 桌子（靠牆） --}}
+                                        <span
+                                            class="pointer-events-none absolute inset-x-2 top-0 h-3 rounded-b-sm border-x-2 border-b-2 border-warm-400 bg-warm-50 dark:border-zinc-500 dark:bg-zinc-800"
+                                        ></span>
+
                                         <template x-if="!seat.isOccupied">
                                             <div
                                                 class="flex flex-col items-center gap-0.5"
                                             >
+                                                {{-- 椅子 --}}
                                                 <span
-                                                    class="text-lg text-warm-300 dark:text-zinc-600"
+                                                    class="flex size-5 items-center justify-center rounded-full border-2 border-warm-300 text-sm leading-none text-warm-300 dark:border-zinc-600 dark:text-zinc-600"
                                                     >+</span
                                                 >
                                                 <span
@@ -342,8 +348,9 @@
                                                     class="font-mono text-[10px] text-warm-500 tabular-nums dark:text-zinc-400"
                                                     x-text="timerLabel(seat)"
                                                 ></span>
+                                                {{-- 椅子上的同學 --}}
                                                 <span
-                                                    class="text-lg"
+                                                    class="flex size-6 items-center justify-center rounded-full border-2 border-warm-300 bg-white text-base leading-none dark:border-zinc-600 dark:bg-zinc-900"
                                                     x-text="seat.emoji"
                                                 ></span>
                                                 <span
@@ -368,24 +375,20 @@
                                     <div
                                         class="flex flex-col items-center gap-1"
                                     >
-                                        <span
-                                            class="text-xs font-medium text-warm-600 dark:text-zinc-400"
-                                            x-text="table.label"
-                                        ></span>
                                         <div
-                                            class="grid grid-cols-3 grid-rows-3 gap-1"
+                                            class="grid grid-cols-3 grid-rows-2 gap-1"
                                             :data-testid="'study-room-table-' +
                                             table.groupCode"
                                         >
                                             <div
-                                                class="col-start-2 row-start-2 flex items-center justify-center rounded-full border border-warm-300 bg-warm-100 text-[9px] text-warm-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                                                class="col-start-2 row-span-2 row-start-1 flex items-center justify-center rounded-sm border border-warm-300 bg-warm-100 text-[9px] font-medium whitespace-nowrap text-warm-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
                                                 style="
-                                                    width: 2.25rem;
-                                                    height: 2.25rem;
+                                                    width: 2rem;
+                                                    height: 5.5rem;
+                                                    writing-mode: vertical-rl;
                                                 "
-                                            >
-                                                桌
-                                            </div>
+                                                x-text="table.label"
+                                            ></div>
 
                                             <template
                                                 x-for="
@@ -402,7 +405,7 @@
                                                         index
                                                     ) +
                                                     ' ' +
-                                                    seatClasses(seat)"
+                                                    seatClasses(seat, 'table')"
                                                     style="
                                                         width: 2.5rem;
                                                         height: 2.5rem;
