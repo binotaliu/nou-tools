@@ -180,5 +180,6 @@ it('shows a popover with nickname and activity for an occupied table seat, and o
         ->assertSeeIn('[data-testid="seat-1-T1-1-popover"]', '測試')
         ->assertSeeIn('[data-testid="study-room-floor-1"] [data-testid="study-room-stairs"]', '往二樓')
         ->assertSeeIn('[data-testid="study-room-floor-2"] [data-testid="study-room-stairs"]', '往一樓')
-        ->assertSeeIn('[data-testid="study-room-floor-2"] [data-testid="study-room-stairs"]', '三樓尚未開放');
+        ->assertSeeIn('[data-testid="study-room-floor-2"] [data-testid="study-room-stairs"]', '往三樓')
+        ->assertVisible('[data-testid="study-room-floor-2"] [data-testid="study-room-stair-blocked"]');
 });

@@ -587,22 +587,28 @@ export default function nouStudyRoom(initial) {
       return row === 0 ? table.seats.slice(0, half) : table.seats.slice(half)
     },
 
-    // Label on a floor's staircase. Floors open one at a time as the ones
-    // below fill up (see ResolveOpenFloorCount), so the stairs on the
-    // highest open floor explain what it takes for the next one to open.
+    // Label on a floor's up staircase. Floors open one at a time as the
+    // ones below fill up (see ResolveOpenFloorCount) — when the next floor
+    // isn't open yet, the stair itself is shown blocked (see
+    // isStairBlocked) rather than explained in text here.
     stairHint(floor) {
       const nextFloor = floor.floor + 1
-      const nextLabel = this.floorLabel(nextFloor)
 
       if (nextFloor > this.config.maxFloors) {
         return '頂樓'
       }
 
-      if (nextFloor <= this.state.openFloors) {
-        return '往' + nextLabel
-      }
+      return '往' + this.floorLabel(nextFloor)
+    },
 
-      return nextLabel + '尚未開放，' + floor.label + '坐滿後開放'
+    // Whether the next floor up hasn't opened yet, in which case the stair
+    // is drawn barricaded instead of walkable.
+    isStairBlocked(floor) {
+      const nextFloor = floor.floor + 1
+
+      return (
+        nextFloor <= this.config.maxFloors && nextFloor > this.state.openFloors
+      )
     },
 
     floorLabel(floor) {

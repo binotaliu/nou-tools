@@ -516,33 +516,84 @@
                                         </template>
                                     </div>
 
-                                    {{-- 樓梯（左下角）：通往下一層 --}}
+                                    {{-- 樓梯（左下角）：左邊固定往上一層，右邊固定往下一層 --}}
                                     <div
-                                        class="pointer-events-none absolute bottom-0 left-3 flex flex-col items-start gap-1 sm:left-5"
+                                        class="pointer-events-none absolute bottom-0 left-3 flex items-end gap-2 sm:left-5"
                                         data-testid="study-room-stairs"
                                     >
-                                        <span
-                                            class="max-w-40 text-[10px] leading-tight text-warm-500 dark:text-zinc-400"
-                                            x-text="stairHint(floor)"
-                                        ></span>
-                                        <span
-                                            x-show="!isGroundFloor(floor)"
-                                            class="text-[10px] leading-tight text-warm-500 dark:text-zinc-400"
-                                            x-text="stairDownHint(floor)"
-                                        ></span>
+                                        {{-- 往上一層（左側，開口朝下）：若下一層尚未開放，樓梯口會被封起來 --}}
                                         <div
-                                            class="relative h-9 w-16 rounded-t-sm border-x-2 border-t-2 border-warm-300 bg-[repeating-linear-gradient(180deg,var(--color-warm-100)_0_5px,var(--color-warm-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
-                                            aria-hidden="true"
+                                            class="flex flex-col items-start gap-1"
+                                            data-testid="study-room-stair-up"
                                         >
-                                            <x-heroicon-o-arrow-up
-                                                class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-warm-600 dark:text-zinc-300"
-                                            />
+                                            <span
+                                                class="max-w-16 text-[10px] leading-tight text-warm-500 dark:text-zinc-400"
+                                                x-text="stairHint(floor)"
+                                            ></span>
+                                            <div
+                                                class="relative h-9 w-16 overflow-hidden rounded-t-sm border-x-2 border-t-2 border-warm-300 bg-[repeating-linear-gradient(180deg,var(--color-warm-100)_0_5px,var(--color-warm-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
+                                                aria-hidden="true"
+                                            >
+                                                <template
+                                                    x-if="
+                                                        !isStairBlocked(floor)
+                                                    "
+                                                >
+                                                    <x-heroicon-o-arrow-up
+                                                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-warm-600 dark:text-zinc-300"
+                                                    />
+                                                </template>
+                                                <template
+                                                    x-if="isStairBlocked(floor)"
+                                                >
+                                                    <div
+                                                        class="absolute inset-x-1.5 top-1/2 flex -translate-y-1/2 flex-col items-center gap-1"
+                                                        data-testid="study-room-stair-blocked"
+                                                    >
+                                                        <div
+                                                            class="h-1.5 w-full rounded-full bg-warm-400/80 shadow-sm dark:bg-zinc-500/80"
+                                                        ></div>
+                                                        <x-heroicon-o-lock-closed
+                                                            class="size-3.5 text-warm-500 dark:text-zinc-400"
+                                                        />
+                                                        <div
+                                                            class="h-1.5 w-full rounded-full bg-warm-400/80 shadow-sm dark:bg-zinc-500/80"
+                                                        ></div>
+                                                    </div>
+                                                </template>
+                                            </div>
                                         </div>
+
+                                        {{-- 往下一層（右側，開口朝上）：一樓沒有下一層 --}}
+                                        <template x-if="!isGroundFloor(floor)">
+                                            <div
+                                                class="flex flex-col items-start gap-1"
+                                                data-testid="study-room-stair-down"
+                                            >
+                                                <span
+                                                    class="max-w-16 text-[10px] leading-tight text-warm-500 dark:text-zinc-400"
+                                                    x-text="
+                                                        stairDownHint(floor)
+                                                    "
+                                                ></span>
+                                                <div
+                                                    class="relative h-9 w-16 rounded-b-sm border-x-2 border-b-2 border-warm-300 bg-[repeating-linear-gradient(180deg,var(--color-warm-100)_0_5px,var(--color-warm-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
+                                                    aria-hidden="true"
+                                                >
+                                                    <x-heroicon-o-arrow-down
+                                                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-warm-600 dark:text-zinc-300"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </template>
                                     </div>
 
                                     {{-- 靠牆的書櫃：留出左邊樓梯與右邊門口的空間 --}}
                                     <div
-                                        class="pointer-events-none absolute right-24 bottom-0 left-24 flex h-5 items-end justify-center"
+                                        class="pointer-events-none absolute right-24 bottom-0 flex h-5 items-end justify-center"
+                                        :class="isGroundFloor(floor)
+                                            ? 'left-24'
+                                            : 'left-40'"
                                         aria-hidden="true"
                                     >
                                         <div
