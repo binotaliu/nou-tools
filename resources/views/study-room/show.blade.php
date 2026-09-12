@@ -783,6 +783,9 @@
 
                 {{-- 操作面板（你的書桌）與番茄鐘設定 --}}
                 @include('study-room.partials._action-banner')
+
+                {{-- 專注模式：面板放大成整個畫面 --}}
+                @include('study-room.partials._focus-mode')
             </div>
         @endif
     </div>
