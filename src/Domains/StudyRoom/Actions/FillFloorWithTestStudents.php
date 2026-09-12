@@ -73,6 +73,8 @@ final readonly class FillFloorWithTestStudents
                     $seat->timer_round = random_int(1, 4);
                     $seat->timer_started_at = Date::now();
                     $seat->timer_ends_at = Date::now()->addMinutes(random_int(1, $focusMinutes));
+                } else {
+                    $seat->no_timer_since = Date::now();
                 }
 
                 $seat->saveOrFail();

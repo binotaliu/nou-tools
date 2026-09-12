@@ -45,6 +45,7 @@ final class StudyRoomSeatFactory extends Factory
             'student_schedule_id' => $schedule->id,
             'occupied_at' => now(),
             'last_seen_at' => now(),
+            'no_timer_since' => now(),
         ]);
     }
 

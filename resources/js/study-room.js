@@ -433,7 +433,7 @@ export default function nouStudyRoom(initial) {
     // --- actions --------------------------------------------------------
 
     async take(code) {
-      if (this.busySeatCode) {
+      if (this.busySeatCode || this.heldSeatCode) {
         return
       }
 

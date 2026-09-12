@@ -500,7 +500,8 @@
                                                 type="button"
                                                 @click="take(seat.code)"
                                                 :disabled="seat.isOccupied ||
-                                                busySeatCode !== null"
+                                                busySeatCode !== null ||
+                                                heldSeatCode !== null"
                                                 :class="seatClasses(seat)"
                                                 :data-testid="seatTestId(seat)"
                                                 :aria-label="seatAriaLabel(

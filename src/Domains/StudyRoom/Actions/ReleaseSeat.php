@@ -58,6 +58,7 @@ final readonly class ReleaseSeat
             $seat->timer_round = null;
             $seat->timer_started_at = null;
             $seat->timer_ends_at = null;
+            $seat->no_timer_since = null;
             $seat->saveOrFail();
 
             return $seat;

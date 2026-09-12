@@ -62,6 +62,7 @@ final readonly class StartStudyTimer
             $seat->timer_round = $isPomodoro ? 1 : null;
             $seat->timer_started_at = $now;
             $seat->timer_ends_at = $minutes === null ? null : $now->addMinutes($minutes);
+            $seat->no_timer_since = null;
             $seat->saveOrFail();
 
             return $seat;

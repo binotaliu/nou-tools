@@ -62,7 +62,7 @@ it('rejects a seat someone else already holds', function () {
     expect($seat->student_schedule_id)->toBe($occupant->id);
 });
 
-it('moves a student to a new seat and frees the old one, without a UNIQUE crash', function () {
+it('rejects claiming a second seat without leaving the first', function () {
     Event::fake([StudyRoomUpdated::class]);
 
     $schedule = withStudyRoomProfile(StudentSchedule::factory()->create());
@@ -78,16 +78,13 @@ it('moves a student to a new seat and frees the old one, without a UNIQUE crash'
         ->withCookie('student_schedule', studyRoomCookie($schedule))
         ->postJson(route('study-room.seats.take', $secondSeat));
 
-    $response->assertOk();
+    $response->assertStatus(422)->assertJsonPath('message', '請先離開目前的座位，才能選擇其他座位。');
 
     $firstSeat->refresh();
     $secondSeat->refresh();
 
-    expect($firstSeat->student_schedule_id)->toBeNull()
-        ->and($secondSeat->student_schedule_id)->toBe($schedule->id);
-
-    Event::assertDispatched(StudyRoomUpdated::class, fn (StudyRoomUpdated $event): bool => $event->type === 'seat.taken' && $event->seat?->code === $secondSeat->code
-    );
+    expect($firstSeat->student_schedule_id)->toBe($schedule->id)
+        ->and($secondSeat->student_schedule_id)->toBeNull();
 });
 
 it('rejects claiming a seat on a floor that is not open', function () {

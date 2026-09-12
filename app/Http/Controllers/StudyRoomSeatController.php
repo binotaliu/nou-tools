@@ -12,6 +12,7 @@ use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 use NouTools\Domains\StudyRoom\Actions\BuildStudyRoomState;
 use NouTools\Domains\StudyRoom\Actions\LeaveSeat;
 use NouTools\Domains\StudyRoom\Actions\TakeSeat;
+use NouTools\Domains\StudyRoom\Exceptions\AlreadySeatedException;
 use NouTools\Domains\StudyRoom\Exceptions\FloorClosedException;
 use NouTools\Domains\StudyRoom\Exceptions\SeatUnavailableException;
 
@@ -27,7 +28,7 @@ final class StudyRoomSeatController extends Controller
 
         try {
             $takeSeat($viewer, $seat);
-        } catch (FloorClosedException $exception) {
+        } catch (FloorClosedException|AlreadySeatedException $exception) {
             return response()->json(['message' => $exception->getMessage()], 422);
         } catch (SeatUnavailableException $exception) {
             return response()->json(['message' => $exception->getMessage()], 409);

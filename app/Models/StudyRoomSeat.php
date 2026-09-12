@@ -36,6 +36,7 @@ final class StudyRoomSeat extends Model
         'timer_round',
         'timer_started_at',
         'timer_ends_at',
+        'no_timer_since',
     ];
 
     protected $casts = [
@@ -48,6 +49,7 @@ final class StudyRoomSeat extends Model
         'last_seen_at' => 'datetime',
         'timer_started_at' => 'datetime',
         'timer_ends_at' => 'datetime',
+        'no_timer_since' => 'datetime',
     ];
 
     /**

@@ -9,6 +9,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
+use NouTools\Domains\StudyRoom\Exceptions\AlreadySeatedException;
 use NouTools\Domains\StudyRoom\Exceptions\FloorClosedException;
 use NouTools\Domains\StudyRoom\Exceptions\SeatUnavailableException;
 
@@ -20,30 +21,32 @@ use NouTools\Domains\StudyRoom\Exceptions\SeatUnavailableException;
  * either sees 0 affected rows, or trips the `unique(student_schedule_id)`
  * index if it raced past the WHERE clause; both are treated the same way.
  *
- * Claiming a second seat *moves* the viewer rather than erroring: any seat
- * they currently hold is released first, inside the same transaction, so a
- * failed claim of the new seat also rolls back the release of the old one.
- * Broadcasting happens only after that transaction returns successfully —
- * `ReleaseSeat` itself never broadcasts, precisely so a seat freed inside
- * this transaction is never announced before we know the whole move
- * actually committed.
+ * Seat switching is disallowed: a viewer who already holds a seat must
+ * leave it (`LeaveSeat`) before claiming another. This is checked inside
+ * the same transaction as the claim, so a concurrent `LeaveSeat` can't
+ * race a `TakeSeat` into leaving the viewer seated in two places at once.
  */
 final readonly class TakeSeat
 {
     public function __construct(
         private ResolveOpenFloorCount $resolveOpenFloorCount,
-        private ReleaseSeat $releaseSeat,
         private BroadcastStudyRoomChange $broadcastStudyRoomChange,
     ) {}
 
     public function __invoke(StudentScheduleCookie $viewer, StudyRoomSeat $seat): StudyRoomSeat
     {
-        [$previousSeat, $seat] = DB::transaction(function () use ($viewer, $seat): array {
+        $seat = DB::transaction(function () use ($viewer, $seat): StudyRoomSeat {
             if ($seat->floor > ($this->resolveOpenFloorCount)()) {
                 throw new FloorClosedException;
             }
 
-            $previousSeat = ($this->releaseSeat)($viewer);
+            $alreadySeated = StudyRoomSeat::query()
+                ->where('student_schedule_id', $viewer->id)
+                ->exists();
+
+            if ($alreadySeated) {
+                throw new AlreadySeatedException;
+            }
 
             try {
                 $affected = StudyRoomSeat::query()
@@ -53,6 +56,7 @@ final readonly class TakeSeat
                         'student_schedule_id' => $viewer->id,
                         'occupied_at' => Date::now(),
                         'last_seen_at' => Date::now(),
+                        'no_timer_since' => Date::now(),
                     ]);
             } catch (QueryException $exception) {
                 if ($exception->getCode() === '23000') {
@@ -66,12 +70,8 @@ final readonly class TakeSeat
                 throw new SeatUnavailableException;
             }
 
-            return [$previousSeat, $seat->fresh()];
+            return $seat->fresh();
         });
-
-        if ($previousSeat !== null) {
-            ($this->broadcastStudyRoomChange)('seat.left', $previousSeat);
-        }
 
         ($this->broadcastStudyRoomChange)('seat.taken', $seat);
 

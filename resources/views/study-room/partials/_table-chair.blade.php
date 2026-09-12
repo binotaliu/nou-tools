@@ -12,7 +12,8 @@
     <button
         type="button"
         @click="tapTableSeat(seat)"
-        :disabled="busySeatCode !== null"
+        :disabled="busySeatCode !== null ||
+        (!seat.isOccupied && heldSeatCode !== null)"
         :class="seatClasses(seat, 'table') + ' {{ $backrest }}'"
         :data-testid="seatTestId(seat)"
         :aria-label="seatAriaLabel(seat)"
