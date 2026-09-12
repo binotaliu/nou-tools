@@ -140,12 +140,11 @@ it('shows a connection-error message once the room gives up on a realtime connec
         ->wait(3);
 
     $page->script(
-        "document.querySelector('[data-testid=\"study-room-root\"]')._x_dataStack[0].connectionFailed = true"
+        "document.querySelector('[data-testid=\"study-room-page\"]')._x_dataStack[0].connectionFailed = true"
     );
     $page->script(
-        "document.querySelector('[data-testid=\"study-room-root\"]')._x_dataStack[0].realtime = false"
+        "document.querySelector('[data-testid=\"study-room-page\"]')._x_dataStack[0].realtime = false"
     );
 
-    $page->assertSeeIn('[data-testid="study-room-connection-status"]', '連線失敗')
-        ->assertVisible('[data-testid="study-room-connection-error"]');
+    $page->assertVisible('[data-testid="study-room-connection-error"]');
 });

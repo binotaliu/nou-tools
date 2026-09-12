@@ -6,7 +6,20 @@
     title="自習室 - NOU 小幫手"
     description="陪空大同學一起讀書的虛擬自習室：找個座位坐下、掛上暱稱與表情符號、跑一輪番茄鐘。"
 >
-    <div class="mx-auto max-w-6xl space-y-6">
+    <div
+        class="mx-auto max-w-6xl space-y-6"
+        data-testid="study-room-page"
+        x-data="nouStudyRoom({
+                    roomState: {{ Js::encode($viewModel->roomState) }},
+                    clientConfig: {{ Js::encode($viewModel->clientConfig) }},
+                    subjects: {{ Js::encode($viewModel->subjects) }},
+                    verbs: {{ Js::encode($viewModel->verbs) }},
+                    hasSchedule: {{ Js::from($viewModel->hasSchedule) }},
+                    needsProfile: {{ Js::from($viewModel->needsProfile) }},
+                    profile: {{ Js::encode($viewModel->profile) }},
+                    emojiChoices: {{ Js::encode($viewModel->emojiChoices) }},
+                })"
+    >
         <div
             class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
         >
@@ -14,15 +27,17 @@
                 <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
                     自習室
                 </h2>
-                <p class="text-sm text-warm-600 dark:text-zinc-400">找個座位坐下，掛上暱稱與表情符號，讓遠距離讀書不再孤單。開放時間：{{ $viewModel->openHoursLabel }}。</p>
+                <p class="text-sm text-warm-600 dark:text-zinc-400">找個座位跟其他同學一起用功。自習室 24 小時開放。</p>
             </div>
 
             <div
                 class="inline-flex items-center gap-2 self-start rounded-full bg-warm-100 px-4 py-2 text-sm font-medium text-warm-800 dark:bg-zinc-800 dark:text-zinc-200"
-                data-testid="study-room-occupant-count"
+                x-cloak
+                data-testid="study-room-site-total"
             >
-                <x-heroicon-o-user-group class="size-4 shrink-0" />
-                目前在線 {{ $viewModel->roomState->totals->occupantCount }} 人
+                <x-heroicon-o-fire class="size-4 shrink-0" />
+                今天大家一起專注了
+                <span x-text="focusTotalLabel()"></span>
             </div>
         </div>
 
@@ -65,74 +80,11 @@
             </noscript>
 
             <div
-                x-data="nouStudyRoom({
-                            roomState: {{ Js::encode($viewModel->roomState) }},
-                            clientConfig: {{ Js::encode($viewModel->clientConfig) }},
-                            subjects: {{ Js::encode($viewModel->subjects) }},
-                            verbs: {{ Js::encode($viewModel->verbs) }},
-                            hasSchedule: {{ Js::from($viewModel->hasSchedule) }},
-                            needsProfile: {{ Js::from($viewModel->needsProfile) }},
-                            profile: {{ Js::encode($viewModel->profile) }},
-                            emojiChoices: {{ Js::encode($viewModel->emojiChoices) }},
-                        })"
                 x-cloak
                 class="space-y-4"
                 :class="heldSeatCode ? 'pb-28' : ''"
                 data-testid="study-room-root"
             >
-                {{-- 狀態列：連線狀態指示、今日累積專注時數 --}}
-                <div
-                    class="flex flex-col gap-2 rounded-lg border border-warm-200 bg-white p-4 text-sm sm:flex-row sm:items-center sm:justify-between dark:border-zinc-700 dark:bg-zinc-900"
-                    data-testid="study-room-status-bar"
-                >
-                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-                        <p
-                            class="text-warm-700 dark:text-zinc-300"
-                            data-testid="study-room-site-total"
-                        >
-                            今天大家一起專注了
-                            <span
-                                class="font-semibold text-warm-900 dark:text-zinc-100"
-                                x-text="focusTotalLabel()"
-                            ></span>
-                        </p>
-                        <p
-                            class="text-warm-700 dark:text-zinc-300"
-                            data-testid="study-room-your-total"
-                        >
-                            你今天專注了
-                            <span
-                                class="font-semibold text-warm-900 dark:text-zinc-100"
-                                x-text="yourFocusTotalLabel()"
-                            ></span>
-                        </p>
-                    </div>
-
-                    <div
-                        class="inline-flex items-center gap-1.5 self-start rounded-full px-3 py-1 text-xs font-medium sm:self-auto"
-                        :class="connectionFailed
-                            ? 'bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300'
-                            : realtime
-                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'
-                              : 'bg-warm-100 text-warm-700 dark:bg-zinc-800 dark:text-zinc-300'"
-                        data-testid="study-room-connection-status"
-                    >
-                        <span
-                            class="size-1.5 rounded-full"
-                            :class="connectionFailed
-                                ? 'bg-red-500'
-                                : realtime
-                                  ? 'bg-emerald-500'
-                                  : 'bg-warm-400 dark:bg-zinc-500'"
-                        ></span>
-                        <span x-show="realtime">即時同步中</span>
-                        <span x-show="!realtime && !connectionFailed"
-                            >連線中…</span
-                        >
-                        <span x-show="connectionFailed">連線失敗</span>
-                    </div>
-                </div>
-
                 {{-- 連線失敗提示 --}}
                 <div
                     x-show="connectionFailed"
@@ -191,7 +143,7 @@
                                     class="text-2xl"
                                     x-text="profileEmoji"
                                 ></span>
-                                <div class="min-w-0">
+                                <div class="min-w-0 flex-1">
                                     <p
                                         class="truncate text-sm font-semibold text-warm-900 dark:text-zinc-100"
                                         x-text="
@@ -206,6 +158,15 @@
                                         "
                                     ></p>
                                 </div>
+                                <button
+                                    type="button"
+                                    @click.stop="openPersonalInfo()"
+                                    aria-label="編輯個人資料"
+                                    data-testid="study-room-personal-info-edit"
+                                    class="shrink-0 rounded-full p-1.5 text-warm-500 transition hover:bg-warm-100 hover:text-warm-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                                >
+                                    <x-heroicon-o-pencil class="size-4" />
+                                </button>
                             </div>
                         </x-card>
                     </div>
