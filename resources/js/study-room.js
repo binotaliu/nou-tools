@@ -290,7 +290,7 @@ export default function nouStudyRoom(initial) {
 
     hasVisibleCountdown() {
       return this.allSeats().some(
-        seat => seat.timerEndsAt && Date.parse(seat.timerEndsAt) > Date.now()
+        seat => seat.timerEndsAt !== null || seat.timerStartedAt !== null
       )
     },
 
@@ -483,7 +483,7 @@ export default function nouStudyRoom(initial) {
 
         const response = await window.axios.post('/study-room/timer', {
           mode: this.timerMode,
-          minutes: isPomodoro ? null : this.customMinutes,
+          minutes: this.timerMode === 'custom' ? this.customMinutes : null,
           verb: this.selectedVerb,
           subjectCourseId:
             this.selectedSubjectCourseId === ''
@@ -607,7 +607,18 @@ export default function nouStudyRoom(initial) {
     },
 
     sessionDurationLabel(session) {
-      return this.formatDurationLabel(session.focusSeconds)
+      const label = this.formatDurationLabel(session.focusSeconds)
+
+      if (!session.overtimeSeconds) {
+        return label
+      }
+
+      return (
+        label +
+        '（超時 ' +
+        this.formatDurationLabel(session.overtimeSeconds) +
+        '）'
+      )
     },
 
     nicknameCooldownLabel() {
@@ -956,19 +967,50 @@ export default function nouStudyRoom(initial) {
       return String(n).padStart(2, '0')
     },
 
+    // A countdown (timerEndsAt set) shows mm:ss while running and keeps
+    // ticking past zero as an overtime count-up, '+mm:ss', instead of
+    // freezing — so has the student actually been focusing (or resting)
+    // longer than planned. A count-up timer (no timerEndsAt at all) has no
+    // planned end to overshoot, so it's shown as a plain mm:ss elapsed
+    // count with no '+' prefix — that count *is* the point, not an extra.
     remainingLabel(seat) {
-      if (!seat.timerEndsAt) {
-        return ''
+      if (seat.timerEndsAt) {
+        const diffMs = Date.parse(seat.timerEndsAt) - this.now
+
+        if (diffMs > 0) {
+          const totalSeconds = Math.ceil(diffMs / 1000)
+
+          return (
+            this.pad2(Math.floor(totalSeconds / 60)) +
+            ':' +
+            this.pad2(totalSeconds % 60)
+          )
+        }
+
+        const overtimeSeconds = Math.floor(-diffMs / 1000)
+
+        return (
+          '+' +
+          this.pad2(Math.floor(overtimeSeconds / 60)) +
+          ':' +
+          this.pad2(overtimeSeconds % 60)
+        )
       }
 
-      const totalSeconds = Math.max(
-        0,
-        Math.ceil((Date.parse(seat.timerEndsAt) - this.now) / 1000)
-      )
-      const minutes = Math.floor(totalSeconds / 60)
-      const seconds = totalSeconds % 60
+      if (seat.timerStartedAt) {
+        const elapsedSeconds = Math.max(
+          0,
+          Math.floor((this.now - Date.parse(seat.timerStartedAt)) / 1000)
+        )
 
-      return this.pad2(minutes) + ':' + this.pad2(seconds)
+        return (
+          this.pad2(Math.floor(elapsedSeconds / 60)) +
+          ':' +
+          this.pad2(elapsedSeconds % 60)
+        )
+      }
+
+      return ''
     },
 
     isSeatFinishedFocus(seat) {
@@ -983,7 +1025,7 @@ export default function nouStudyRoom(initial) {
     // one is running, otherwise a placeholder so every occupied seat keeps
     // the same 3-line layout.
     timerLabel(seat) {
-      if (!seat.timerEndsAt) {
+      if (!seat.timerEndsAt && !seat.timerStartedAt) {
         return '--:--'
       }
 
@@ -1018,6 +1060,15 @@ export default function nouStudyRoom(initial) {
       const text = this.thoughtBubbleText(seat)
 
       return !!text && text.length > 8
+    },
+
+    // Turns the floor-map/table timer text green while the seat is resting,
+    // matching the emerald used everywhere else for break (progressBarClass,
+    // timerPhaseClass).
+    seatTimerLabelClass(seat) {
+      return seat.timerPhase === 'break'
+        ? 'text-emerald-600 dark:text-emerald-400'
+        : 'text-warm-500 dark:text-zinc-400'
     },
 
     seatTestId(seat) {
@@ -1225,6 +1276,20 @@ export default function nouStudyRoom(initial) {
       return !!seat && seat.timerMode === 'pomodoro'
     },
 
+    isCountUp() {
+      const seat = this.mySeat()
+
+      return !!seat && seat.timerMode === 'count_up'
+    },
+
+    // A count-up timer has no planned end, so there's nothing to show a
+    // percent-progress bar against.
+    hasCountdownEnd() {
+      const seat = this.mySeat()
+
+      return !!seat && seat.timerEndsAt !== null
+    },
+
     isOnBreak() {
       const seat = this.mySeat()
 
@@ -1342,11 +1407,11 @@ export default function nouStudyRoom(initial) {
     roundLabel() {
       const round = this.currentRound()
 
-      if (!round) {
-        return '自訂計時'
+      if (round) {
+        return '第 ' + round + ' 輪'
       }
 
-      return '第 ' + round + ' 輪'
+      return this.isCountUp() ? '正數計時' : '倒數計時'
     },
 
     // "預計 14:55 結束" for the running phase.

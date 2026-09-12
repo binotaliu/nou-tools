@@ -114,7 +114,7 @@
                                     >計時方式</span
                                 >
                                 <div class="flex flex-wrap items-center gap-2">
-                                    {{-- 番茄鐘 / 自訂 --}}
+                                    {{-- 番茄鐘 / 倒數 / 正數 --}}
                                     <div
                                         class="inline-flex rounded-lg border border-warm-200 bg-white p-0.5 dark:border-zinc-700 dark:bg-zinc-900"
                                         role="radiogroup"
@@ -142,7 +142,19 @@
                                                 class="sr-only"
                                                 data-testid="study-room-mode-custom"
                                             />
-                                            自訂
+                                            倒數
+                                        </label>
+                                        <label
+                                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-warm-700 has-checked:text-white dark:has-checked:bg-warm-500 dark:has-checked:text-zinc-950"
+                                        >
+                                            <input
+                                                type="radio"
+                                                value="count_up"
+                                                x-model="timerMode"
+                                                class="sr-only"
+                                                data-testid="study-room-mode-count-up"
+                                            />
+                                            正數
                                         </label>
                                     </div>
 
@@ -160,7 +172,7 @@
                                         />
                                     </button>
 
-                                    {{-- 自訂：分鐘數 --}}
+                                    {{-- 倒數：分鐘數 --}}
                                     <label
                                         x-show="timerMode === 'custom'"
                                         x-cloak
@@ -339,9 +351,9 @@
                 </div>
             </div>
 
-            {{-- 進度條：沿著桌面的下緣 --}}
+            {{-- 進度條：沿著桌面的下緣。正數計時沒有終點可比對，不顯示 --}}
             <div
-                x-show="hasTimer()"
+                x-show="hasTimer() && hasCountdownEnd()"
                 x-cloak
                 class="absolute inset-x-0 bottom-0 h-1.5 bg-warm-200/80 dark:bg-zinc-800"
                 role="progressbar"

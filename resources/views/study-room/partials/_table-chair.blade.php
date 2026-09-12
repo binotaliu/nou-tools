@@ -38,8 +38,8 @@
     whether or not the seat is occupied — toggling this line's presence
     on take/leave would shift the table and the row of chairs below it. --}}
     <span
-        class="font-mono text-[9px] text-warm-500 tabular-nums dark:text-zinc-400"
-        :class="seat.isOccupied ? '' : 'invisible'"
+        class="font-mono text-[9px] tabular-nums"
+        :class="seat.isOccupied ? seatTimerLabelClass(seat) : 'invisible'"
         x-text="seat.isOccupied ? timerLabel(seat) : '00:00'"
         :data-testid="seatTestId(seat) + '-timer'"
     ></span>

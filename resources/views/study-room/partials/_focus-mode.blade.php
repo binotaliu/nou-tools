@@ -196,6 +196,8 @@
             ></p>
 
             <div
+                x-show="hasCountdownEnd()"
+                x-cloak
                 class="h-1.5 w-56 overflow-hidden rounded-full sm:w-80"
                 :class="focusProgressTrackClass()"
                 role="progressbar"

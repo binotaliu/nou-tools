@@ -599,7 +599,10 @@
                                                             "
                                                         ></span>
                                                         <span
-                                                            class="font-mono text-[10px] text-warm-500 tabular-nums dark:text-zinc-400"
+                                                            class="font-mono text-[10px] tabular-nums"
+                                                            :class="seatTimerLabelClass(
+                                                                seat
+                                                            )"
                                                             x-text="
                                                                 timerLabel(seat)
                                                             "
