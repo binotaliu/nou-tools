@@ -43,6 +43,7 @@ jobs:
           APP_ENV: testing
           APP_KEY: base64:AH6+ZyuL2jJTWgh+S15f8qCC4MGMC4Z3wq4VXUJMWpk=
           DB_CONNECTION: sqlite
+          COLUMNS: '400'
 
   browser-tests:
     name: PEST (browser)
@@ -91,6 +92,7 @@ jobs:
           APP_ENV: testing
           APP_KEY: base64:AH6+ZyuL2jJTWgh+S15f8qCC4MGMC4Z3wq4VXUJMWpk=
           DB_CONNECTION: sqlite
+          COLUMNS: '400'
 
   linter:
     name: Linter (Prettier + Pint)

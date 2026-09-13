@@ -74,8 +74,11 @@ arch('PageData')
 
 arch('DTOs')
     ->expect('NouTools\Domains\*\DataTransferObjects')
+    ->classes()
     ->toExtend(Data::class)
+    ->classes()
     ->toHaveConstructor()
+    ->classes()
     ->toHaveOnlyCamelCasePublicProperties();
 
 arch('No Directly File Read/Write: use the File facade or Storage facade instead')
