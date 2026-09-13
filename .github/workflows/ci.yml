@@ -36,6 +36,7 @@ jobs:
 
       - name: Run PHPUnit tests
         run: |
+          touch .env
           php artisan config:clear --ansi
           php artisan storage:link --ansi
           php artisan test --testsuite=Unit,Feature --ansi
@@ -86,6 +87,7 @@ jobs:
 
       - name: Run PEST browser tests
         run: |
+          touch .env
           php artisan config:clear --ansi
           php artisan test --testsuite=Browser --ansi
         env:
