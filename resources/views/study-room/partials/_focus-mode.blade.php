@@ -109,6 +109,18 @@
                     class="absolute inset-x-0 bottom-0 h-[16%] bg-[linear-gradient(to_bottom,var(--g-lawnTop),var(--g-lawnBottom))]"
                     aria-hidden="true"
                 ></div>
+                <svg
+                    class="absolute inset-x-0 bottom-0 h-[16%] w-full"
+                    viewBox="0 0 1000 100"
+                    preserveAspectRatio="xMidYMid slice"
+                    aria-hidden="true"
+                >
+                    <path
+                        d="M470 0 C480 30 430 55 400 100 L560 100 C520 60 520 30 528 0 Z"
+                        fill="var(--g-path)"
+                        opacity="0.85"
+                    />
+                </svg>
 
                 <svg class="absolute bottom-[8%] left-[3%] h-[36%] w-auto" viewBox="0 0 60 100" aria-hidden="true">
                     <rect x="27" y="60" width="6" height="40" rx="2" fill="var(--g-trunk)" />
@@ -122,6 +134,13 @@
                     <circle cx="38" cy="34" r="20" fill="var(--g-canopy)" />
                     <circle cx="18" cy="30" r="15" fill="var(--g-canopy)" />
                 </svg>
+                <svg class="absolute bottom-[5%] left-[35%] h-[5%] w-auto" viewBox="0 0 80 40" aria-hidden="true">
+                    <rect x="4" y="4" width="72" height="8" rx="2" fill="var(--g-trunk)" />
+                    <rect x="2" y="18" width="76" height="7" rx="2" fill="var(--g-trunk)" />
+                    <rect x="8" y="12" width="4" height="28" fill="var(--g-trunk)" />
+                    <rect x="68" y="12" width="4" height="28" fill="var(--g-trunk)" />
+                </svg>
+
                 <svg class="absolute bottom-[10%] left-[64%] h-[26%] w-auto overflow-visible" viewBox="0 0 40 100" aria-hidden="true">
                     <circle cx="20" cy="10" r="26" fill="rgba(255,214,130,0.35)" class="[opacity:var(--g-lamp)]" />
                     <rect x="18" y="14" width="4" height="86" rx="1" fill="var(--g-trunk)" />

@@ -19,7 +19,7 @@
     <svg
         class="absolute inset-x-0 bottom-[27%] h-[10%] w-full"
         viewBox="0 0 1000 100"
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid slice"
         aria-hidden="true"
     >
         <path

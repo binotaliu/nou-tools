@@ -5,7 +5,7 @@
 <svg
     class="{{ $class }}"
     viewBox="0 0 1000 100"
-    preserveAspectRatio="none"
+    preserveAspectRatio="xMidYMid slice"
     aria-hidden="true"
 >
     <defs>
