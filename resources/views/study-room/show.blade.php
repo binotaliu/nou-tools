@@ -381,7 +381,7 @@
                                                                     "
                                                                 >
                                                                     <span
-                                                                        class="block truncate text-[9px] whitespace-nowrap text-warm-700 dark:text-zinc-200"
+                                                                        class="block w-full truncate text-center text-[9px] whitespace-nowrap text-warm-700 dark:text-zinc-200"
                                                                         x-text="
                                                                             thoughtBubbleText(
                                                                                 seat
