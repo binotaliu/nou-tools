@@ -122,7 +122,7 @@
                 {{-- 入口那面牆：窗、掛鐘、公告板與你的名牌 --}}
                 @include('study-room.partials._wall')
 
-                {{-- 個人資料：暱稱、表情符號、近期專注紀錄 --}}
+                {{-- 個人資料：暱稱、表情符號 --}}
                 <x-modal
                     name="personalInfoOpen"
                     title="你的自習室資料"
@@ -130,56 +130,127 @@
                     data-testid="study-room-personal-info-modal"
                 >
                     @include('study-room.partials._personal-info-form')
+                </x-modal>
 
-                    <div
-                        class="mt-6 border-t border-warm-200 pt-4 dark:border-zinc-700"
-                    >
-                        <h4
-                            class="mb-2 text-sm font-semibold text-warm-900 dark:text-zinc-100"
-                        >
-                            最近的專注紀錄
-                        </h4>
+                {{-- 專注紀錄與統計：最近 7 天的長條圖，以及點某一天看當天的紀錄 --}}
+                <x-modal
+                    name="statsOpen"
+                    title="專注紀錄與統計"
+                    maxWidth="max-w-lg"
+                    data-testid="study-room-stats-modal"
+                >
+                    <p
+                        x-show="statsLoading"
+                        x-cloak
+                        class="text-sm text-warm-500 dark:text-zinc-400"
+                    >載入中…</p>
 
-                        <p
-                            x-show="sessionsLoading"
-                            x-cloak
-                            class="text-sm text-warm-500 dark:text-zinc-400"
-                        >載入中…</p>
-
-                        <p
-                            x-show="
-                                !sessionsLoading && recentSessions.length === 0
-                            "
-                            x-cloak
-                            class="text-sm text-warm-500 dark:text-zinc-400"
-                        >還沒有紀錄</p>
-
-                        <ul
-                            x-show="
-                                !sessionsLoading && recentSessions.length > 0
-                            "
-                            x-cloak
-                            class="space-y-2"
-                            data-testid="study-room-session-log"
-                        >
-                            <template
-                                x-for="session in recentSessions"
-                                :key="session.startedAt"
+                    <div x-show="!statsLoading" x-cloak class="space-y-4">
+                        <div>
+                            <h4
+                                class="mb-3 text-sm font-semibold text-warm-900 dark:text-zinc-100"
                             >
-                                <li
-                                    class="flex items-center justify-between gap-2 text-sm"
+                                最近 7 天
+                            </h4>
+
+                            <div
+                                class="flex items-end justify-between gap-1.5"
+                                data-testid="study-room-stats-chart"
+                            >
+                                <template
+                                    x-for="day in statsDays"
+                                    :key="day.date"
                                 >
-                                    <span
-                                        class="truncate text-warm-800 dark:text-zinc-200"
-                                        x-text="session.activityLabel"
-                                    ></span>
-                                    <span
-                                        class="shrink-0 text-warm-500 dark:text-zinc-400"
-                                        x-text="sessionDurationLabel(session)"
-                                    ></span>
-                                </li>
-                            </template>
-                        </ul>
+                                    <button
+                                        type="button"
+                                        @click="selectStatsDate(day.date)"
+                                        class="flex flex-1 flex-col items-center gap-1.5 rounded-md py-1.5 transition"
+                                        :class="selectedStatsDate === day.date
+                                            ? 'bg-warm-100 dark:bg-zinc-800'
+                                            : 'hover:bg-warm-50 dark:hover:bg-zinc-800/60'"
+                                        :data-testid="'study-room-stats-bar-' +
+                                        day.date"
+                                    >
+                                        <span
+                                            class="flex h-20 w-full items-end justify-center"
+                                        >
+                                            <span
+                                                class="w-4 rounded-t-sm transition-all"
+                                                :class="selectedStatsDate ===
+                                                day.date
+                                                    ? 'bg-warm-600 dark:bg-warm-400'
+                                                    : 'bg-warm-300 dark:bg-zinc-600'"
+                                                :style="statsBarHeightStyle(
+                                                    day
+                                                )"
+                                            ></span>
+                                        </span>
+                                        <span
+                                            class="text-xs font-medium text-warm-600 dark:text-zinc-400"
+                                            x-text="day.label"
+                                        ></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div
+                            class="border-t border-warm-200 pt-4 dark:border-zinc-700"
+                        >
+                            <div class="mb-2 flex items-center justify-between">
+                                <h4
+                                    class="text-sm font-semibold text-warm-900 dark:text-zinc-100"
+                                    x-text="
+                                        selectedStatsDay().label + ' 的紀錄'
+                                    "
+                                ></h4>
+                                <span
+                                    class="text-xs text-warm-500 dark:text-zinc-400"
+                                    x-text="
+                                        formatDurationLabel(
+                                            selectedStatsDay().focusSeconds
+                                        )
+                                    "
+                                ></span>
+                            </div>
+
+                            <p
+                                x-show="
+                                    selectedStatsDay().sessions.length === 0
+                                "
+                                x-cloak
+                                class="text-sm text-warm-500 dark:text-zinc-400"
+                            >這天沒有紀錄</p>
+
+                            <ul
+                                x-show="selectedStatsDay().sessions.length > 0"
+                                x-cloak
+                                class="space-y-2"
+                                data-testid="study-room-stats-session-log"
+                            >
+                                <template
+                                    x-for="
+                                        session in selectedStatsDay().sessions
+                                    "
+                                    :key="session.startedAt"
+                                >
+                                    <li
+                                        class="flex items-center justify-between gap-2 text-sm"
+                                    >
+                                        <span
+                                            class="truncate text-warm-800 dark:text-zinc-200"
+                                            x-text="session.activityLabel"
+                                        ></span>
+                                        <span
+                                            class="shrink-0 text-warm-500 dark:text-zinc-400"
+                                            x-text="
+                                                sessionDurationLabel(session)
+                                            "
+                                        ></span>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
                     </div>
                 </x-modal>
 

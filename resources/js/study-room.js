@@ -83,9 +83,12 @@ export default function nouStudyRoom(initial) {
     lastNotifiedTimerEndsAt: null,
 
     personalInfoOpen: false,
-    sessionsLoading: false,
-    sessionsFetched: false,
-    recentSessions: [],
+
+    statsOpen: false,
+    statsLoading: false,
+    statsFetched: false,
+    statsDays: [],
+    selectedStatsDate: null,
 
     now: Date.now(),
     clockNow: Date.now(),
@@ -816,26 +819,68 @@ export default function nouStudyRoom(initial) {
 
     openPersonalInfo() {
       this.personalInfoOpen = true
-      this.loadRecentSessions()
     },
 
-    async loadRecentSessions() {
-      if (this.sessionsFetched || this.sessionsLoading) {
+    // --- stats modal -------------------------------------------------------
+
+    openStats() {
+      this.statsOpen = true
+      this.loadStats()
+    },
+
+    async loadStats() {
+      if (this.statsFetched || this.statsLoading) {
         return
       }
 
-      this.sessionsLoading = true
+      this.statsLoading = true
 
       try {
-        const response = await window.axios.get('/study-room/sessions')
-        this.recentSessions = response.data.sessions
-        this.sessionsFetched = true
+        const response = await window.axios.get('/study-room/sessions/stats')
+        this.statsDays = response.data.days
+        this.statsFetched = true
+        // Land on today's bar so the log below the chart isn't empty the
+        // moment the modal opens.
+        this.selectedStatsDate = this.statsDays.length
+          ? this.statsDays[this.statsDays.length - 1].date
+          : null
       } catch (error) {
-        // Passive — the log is a nice-to-have inside the modal, never
-        // blocks the rest of it from working.
+        // Passive — stats are a nice-to-have inside the modal, never blocks
+        // the rest of it from working.
       } finally {
-        this.sessionsLoading = false
+        this.statsLoading = false
       }
+    },
+
+    selectStatsDate(date) {
+      this.selectedStatsDate = date
+    },
+
+    // Always returns a real day object — never null — so templates never
+    // need optional chaining, which @alpinejs/csp's restricted expression
+    // evaluator can't parse (see the comment atop this file).
+    selectedStatsDay() {
+      return (
+        this.statsDays.find(day => day.date === this.selectedStatsDate) || {
+          date: null,
+          label: '',
+          focusSeconds: 0,
+          sessions: [],
+        }
+      )
+    },
+
+    statsBarHeightStyle(day) {
+      const max = Math.max(
+        ...this.statsDays.map(candidate => candidate.focusSeconds),
+        1
+      )
+
+      // Floored at 4% so a zero-focus day still renders a visible sliver of
+      // a bar instead of disappearing entirely.
+      const percent = Math.max(Math.round((day.focusSeconds / max) * 100), 4)
+
+      return { height: percent + '%' }
     },
 
     sessionDurationLabel(session) {

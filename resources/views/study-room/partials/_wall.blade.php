@@ -167,6 +167,15 @@
                     </div>
                     <button
                         type="button"
+                        @click.stop="openStats()"
+                        aria-label="檢視專注紀錄與統計"
+                        data-testid="study-room-personal-info-stats"
+                        class="shrink-0 rounded-full p-1.5 text-warm-500 transition hover:bg-warm-100 hover:text-warm-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
+                    >
+                        <x-heroicon-o-chart-bar class="size-4" />
+                    </button>
+                    <button
+                        type="button"
                         @click.stop="openPersonalInfo()"
                         aria-label="編輯個人資料"
                         data-testid="study-room-personal-info-edit"

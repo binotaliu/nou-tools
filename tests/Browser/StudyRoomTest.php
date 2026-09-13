@@ -309,7 +309,7 @@ it('opens a fullscreen focus mode over the sky and leaves it when the timer stop
         ->assertVisible('[data-testid="study-room-timer-form"]');
 });
 
-it('shows the PersonalInfo modal with the focus-session log when opened', function () {
+it('shows the PersonalInfo modal for editing nickname/emoji, without the session log', function () {
     $schedule = createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
@@ -334,13 +334,39 @@ it('shows the PersonalInfo modal with the focus-session log when opened', functi
 
     $page->assertVisible('[data-testid="study-room-personal-info-modal"]')
         ->assertVisible('[data-testid="study-room-nickname-input"]')
-        ->assertVisible('[data-testid="study-room-emoji-choices"]');
+        ->assertVisible('[data-testid="study-room-emoji-choices"]')
+        ->assertMissing('[data-testid="study-room-stats-session-log"]');
+});
 
-    // No focus sessions exist yet for a brand-new profile, so the log
+it('shows the Stats modal with the 7-day chart and an empty-state log when opened', function () {
+    $schedule = createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->waitForEvent('load');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]')
+        ->waitForEvent('load');
+
+    $page->assertVisible('[data-testid="study-room-root"]')
+        ->click('[data-testid="study-room-personal-info-stats"]')
+        ->wait(1);
+
+    $page->assertVisible('[data-testid="study-room-stats-modal"]')
+        ->assertVisible('[data-testid="study-room-stats-chart"]');
+
+    // No focus sessions exist yet for a brand-new profile, so today's log
     // should render its empty state rather than staying stuck loading.
     $page->assertSeeIn(
-        '[data-testid="study-room-personal-info-modal"]',
-        '還沒有紀錄'
+        '[data-testid="study-room-stats-modal"]',
+        '這天沒有紀錄'
     );
 });
 
