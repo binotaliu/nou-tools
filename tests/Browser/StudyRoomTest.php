@@ -536,6 +536,72 @@ it('updates a floor\'s occupied count live and closes it once its last occupant 
     $page->assertMissing('[data-testid="study-room-floor-2"]');
 });
 
+it('clears the held-seat highlight and action banner once a realtime delta releases your own seat', function () {
+    // Regression test for patchSeat() not clearing heldSeatCode when the
+    // viewer's own seat is released by something other than a heartbeat
+    // response (idle kick, admin clear, etc.) — the seat kept its "this is
+    // mine" amber highlight and the action banner stayed visible until the
+    // next heartbeat poll or full refresh happened to catch up.
+    $schedule = createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->waitForEvent('load');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]')
+        ->waitForEvent('load');
+
+    $page->assertVisible('[data-testid="study-room-root"]')
+        ->click('[data-testid="seat-1-S01"]')
+        ->wait(1);
+
+    $page->assertVisible('[data-testid="study-room-control-panel"]');
+
+    $isHighlighted = $page->script(
+        "document.querySelector('[data-testid=\"seat-1-S01\"]').className.includes('amber')"
+    );
+
+    expect($isHighlighted)->toBeTrue();
+
+    // Same payload shape RecordHeartbeat/ReleaseIdleSeats/an admin clear
+    // broadcasts for a seat that's no longer occupied.
+    $page->script(
+        'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0].applyDelta('.
+            '{openFloors: 1, totals: {occupantCount: 0, siteFocusSecondsToday: 0, yourFocusSecondsToday: 0}, version: "v2", seat: '.
+            json_encode([
+                'code' => '1-S01',
+                'kind' => 'solo',
+                'groupCode' => null,
+                'seatNumber' => 1,
+                'label' => '1-S01',
+                'isOccupied' => false,
+                'isYou' => false,
+                'nickname' => null,
+                'emoji' => null,
+                'activity' => null,
+                'timerMode' => null,
+                'timerPhase' => null,
+                'timerEndsAt' => null,
+                'timerStartedAt' => null,
+            ]).
+            '})'
+    );
+
+    $page->assertMissing('[data-testid="study-room-control-panel"]');
+
+    $isStillHighlighted = $page->script(
+        "document.querySelector('[data-testid=\"seat-1-S01\"]').className.includes('amber')"
+    );
+
+    expect($isStillHighlighted)->toBeFalse();
+});
+
 it('draws the garden and windows from the real Taiwan sky, day and night', function () {
     // The sky is computed client-side from the campus coordinates (see
     // study-room-sky.js); previewSky() freezes it at a chosen instant so

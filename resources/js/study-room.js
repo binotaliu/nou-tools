@@ -593,6 +593,19 @@ export default function nouStudyRoom(initial) {
       }
 
       const wasOccupied = target.isOccupied
+      const isHeldSeat = incomingSeat.code === this.heldSeatCode
+
+      // The seat we hold was released out from under us (idle kick, admin
+      // clear, etc.) — drop our local "this is mine" state immediately
+      // instead of waiting for the next heartbeat poll or full refresh to
+      // notice, which left the highlight and action banner stuck showing.
+      if (isHeldSeat && !incomingSeat.isOccupied) {
+        this.heldSeatCode = null
+
+        if (this.focusMode) {
+          this.closeFocusMode()
+        }
+      }
 
       Object.assign(target, incomingSeat, {
         // Fan-out broadcasts always carry isYou: false — derive it
@@ -605,7 +618,7 @@ export default function nouStudyRoom(initial) {
       // reconnect catch-up) — that's not a crossing the tick observed live,
       // so it shouldn't chime any more than an already-finished timer would
       // on page load.
-      if (target.code === this.heldSeatCode) {
+      if (isHeldSeat) {
         this.suppressAlreadyFinishedSound()
       }
 
