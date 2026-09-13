@@ -486,6 +486,155 @@ it('refuses to start a break on a count-up timer, which has no planned end', fun
         ->assertStatus(422);
 });
 
+it('splits a session at the point activity changes mid-focus, crediting the old activity for elapsed time', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'pomodoro',
+            'minutes' => null,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $originalStartedAt = $seat->refresh()->timer_started_at;
+    $originalEndsAt = $seat->timer_ends_at;
+
+    $this->travel(10)->minutes();
+
+    $response = $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->patchJson(route('study-room.timer.activity'), [
+            'verb' => StudyActivityVerb::Homework->value,
+            'subjectCourseId' => null,
+        ]);
+
+    $response->assertOk();
+
+    $session = StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->sole();
+    expect($session->activity_verb)->toBe(StudyActivityVerb::Review)
+        ->and($session->focus_seconds)->toBe(600)
+        ->and($session->was_completed)->toBeFalse();
+
+    $seat->refresh();
+    expect($seat->activity_verb)->toBe(StudyActivityVerb::Homework)
+        ->and($seat->timer_phase)->toBe(StudyTimerPhase::Focus)
+        // The round's own countdown/progress-bar anchor is untouched by an
+        // activity change — only the new segment's own start moves.
+        ->and($seat->timer_started_at->equalTo($originalStartedAt))->toBeTrue()
+        ->and($seat->timer_ends_at->equalTo($originalEndsAt))->toBeTrue()
+        ->and((int) $seat->activity_started_at->diffInMinutes($seat->timer_ends_at))->toBe(15);
+});
+
+it('records a second session for the new activity, correctly measuring only its own remaining plan', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'custom',
+            'minutes' => 20,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $this->travel(8)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->patchJson(route('study-room.timer.activity'), [
+            'verb' => StudyActivityVerb::Homework->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    // Remaining plan for the new segment is 12 minutes; run 15 (3 overtime).
+    $this->travel(15)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->deleteJson(route('study-room.timer.stop'))
+        ->assertOk();
+
+    $sessions = StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->orderBy('id')->get();
+    expect($sessions)->toHaveCount(2);
+
+    $newSession = $sessions->last();
+    expect($newSession->activity_verb)->toBe(StudyActivityVerb::Homework)
+        ->and($newSession->focus_seconds)->toBe(15 * 60)
+        ->and($newSession->overtime_seconds)->toBe(3 * 60)
+        ->and($newSession->was_completed)->toBeTrue();
+});
+
+it('refuses to change activity when no timer is running', function () {
+    [$schedule] = seatedStudent();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->patchJson(route('study-room.timer.activity'), [
+            'verb' => StudyActivityVerb::Homework->value,
+            'subjectCourseId' => null,
+        ])
+        ->assertStatus(422);
+});
+
+it('refuses to change activity while on a break', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $seat->update([
+        'activity_verb' => StudyActivityVerb::Review,
+        'timer_mode' => 'pomodoro',
+        'timer_phase' => StudyTimerPhase::Break,
+        'timer_started_at' => now(),
+        'timer_ends_at' => now()->addMinutes(5),
+    ]);
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->patchJson(route('study-room.timer.activity'), [
+            'verb' => StudyActivityVerb::Homework->value,
+            'subjectCourseId' => null,
+        ])
+        ->assertStatus(422);
+
+    $seat->refresh();
+    expect($seat->activity_verb)->toBe(StudyActivityVerb::Review);
+});
+
+it('rejects a course that is not in the caller\'s own schedule when changing activity', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'pomodoro',
+            'minutes' => null,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $otherSchedule = StudentSchedule::factory()->create();
+    $course = Course::factory()->create(['term' => config('app.current_semester')]);
+    $courseClass = CourseClass::factory()->for($course)->create();
+    StudentScheduleItem::query()->create([
+        'student_schedule_id' => $otherSchedule->id,
+        'course_id' => $course->id,
+        'course_class_id' => $courseClass->id,
+    ]);
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->patchJson(route('study-room.timer.activity'), [
+            'verb' => StudyActivityVerb::Homework->value,
+            'subjectCourseId' => $course->id,
+        ])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('subjectCourseId');
+
+    $seat->refresh();
+    expect($seat->activity_verb)->toBe(StudyActivityVerb::Review);
+});
+
 it('leaves a custom timer without a round and stopping clears it', function () {
     [$schedule, $seat] = seatedStudent();
 

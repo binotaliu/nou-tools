@@ -41,72 +41,12 @@
                     </div>
 
                     <div class="flex flex-1 flex-col gap-3">
-                        <div>
-                            <span
-                                class="mb-1 block text-xs font-medium text-warm-600 dark:text-zinc-400"
-                                >活動</span
-                            >
-                            <div
-                                class="grid grid-cols-5 gap-2"
-                                role="radiogroup"
-                                aria-label="活動"
-                                data-testid="study-room-verb-group"
-                            >
-                                @foreach ($viewModel->verbs as $verb)
-                                    @php
-                                        $verbIcon = match ($verb->value) {
-                                            'exam_prep' => 'heroicon-o-academic-cap',
-                                            'reading' => 'heroicon-o-book-open',
-                                            'homework' => 'heroicon-o-pencil-square',
-                                            'review' => 'heroicon-o-arrow-path',
-                                            'in_person_class' => 'heroicon-o-presentation-chart-bar',
-                                            default => 'heroicon-o-check-circle',
-                                        };
-                                    @endphp
-                                    <label
-                                        class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-warm-200 bg-white px-1 py-2.5 text-center transition has-checked:border-warm-700 has-checked:bg-warm-700 has-checked:text-white sm:gap-1.5 sm:px-3 sm:py-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:has-checked:border-warm-500 dark:has-checked:bg-warm-500 dark:has-checked:text-zinc-950"
-                                    >
-                                        <input
-                                            type="radio"
-                                            value="{{ $verb->value }}"
-                                            x-model="selectedVerb"
-                                            class="sr-only"
-                                            data-testid="study-room-verb-{{ $verb->value }}"
-                                        />
-                                        <x-dynamic-component
-                                            :component="$verbIcon"
-                                            class="size-5 sm:size-6"
-                                        />
-                                        <span
-                                            class="text-[11px] leading-tight font-medium sm:text-sm"
-                                            >{{ $verb->label }}</span
-                                        >
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
+                        @include('study-room.partials._activity-picker')
 
                         <div
                             class="grid gap-3 sm:grid-cols-[minmax(10rem,1.3fr)_auto]"
                         >
-                            <label class="block">
-                                <span
-                                    class="mb-1 block text-xs font-medium text-warm-600 dark:text-zinc-400"
-                                    >科目</span
-                                >
-                                <x-select
-                                    x-model="selectedSubjectCourseId"
-                                    data-testid="study-room-subject-select"
-                                >
-                                    @foreach ($viewModel->subjects as $subject)
-                                        <option
-                                            value="{{ $subject->id ?? '' }}"
-                                        >
-                                            {{ $subject->name }}
-                                        </option>
-                                    @endforeach
-                                </x-select>
-                            </label>
+                            @include('study-room.partials._subject-select')
 
                             <div>
                                 <span
@@ -236,11 +176,26 @@
                                 x-text="timerPhaseLabel()"
                                 data-testid="study-room-timer-phase"
                             ></p>
-                            <p
-                                class="truncate text-xl font-semibold text-warm-900 dark:text-zinc-100"
-                                x-text="myActivityLabel()"
-                                data-testid="study-room-timer-activity"
-                            ></p>
+                            <p class="flex min-w-0 items-center gap-1.5">
+                                <span
+                                    class="truncate text-xl font-semibold text-warm-900 dark:text-zinc-100"
+                                    x-text="myActivityLabel()"
+                                    data-testid="study-room-timer-activity"
+                                ></span>
+                                <button
+                                    type="button"
+                                    x-show="canChangeActivity()"
+                                    x-cloak
+                                    @click="openChangeActivity()"
+                                    class="inline-flex shrink-0 items-center rounded-lg p-1 text-warm-500 transition hover:bg-white hover:text-warm-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                                    title="變更活動"
+                                    data-testid="study-room-change-activity-open"
+                                >
+                                    <x-heroicon-o-pencil-square
+                                        class="size-4"
+                                    />
+                                </button>
+                            </p>
                             <div
                                 class="mt-1.5 flex items-center gap-2 text-xs text-warm-500 dark:text-zinc-400"
                             >
@@ -463,6 +418,48 @@
                 class="inline-flex items-center rounded-lg bg-warm-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-warm-800 dark:bg-warm-500 dark:text-zinc-950 dark:hover:bg-warm-400"
             >
                 完成
+            </button>
+        </div>
+    </x-slot:footer>
+</x-modal>
+
+{{-- 變更活動：計時中切換活動與科目，不中斷倒數 --}}
+<x-modal
+    name="activityModalOpen"
+    title="變更活動"
+    data-testid="study-room-change-activity-modal"
+>
+    <div class="flex flex-col gap-3">
+        @include('study-room.partials._activity-picker', [
+            'verbModel' => 'changeVerb',
+            'verbGroupTestid' => 'study-room-change-verb-group',
+            'verbTestidPrefix' => 'study-room-change-verb-',
+            'gridColsClass' => 'grid-cols-3',
+        ])
+
+        @include('study-room.partials._subject-select', [
+            'subjectModel' => 'changeSubjectCourseId',
+            'subjectSelectTestid' => 'study-room-change-subject-select',
+        ])
+    </div>
+
+    <x-slot:footer>
+        <div class="flex w-full items-center justify-end gap-2">
+            <button
+                type="button"
+                @click="closeChangeActivity()"
+                class="rounded-lg px-4 py-2 text-sm font-medium text-warm-700 transition hover:bg-warm-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+                取消
+            </button>
+            <button
+                type="button"
+                @click="changeActivity()"
+                :disabled="panelBusy"
+                data-testid="study-room-change-activity-save"
+                class="inline-flex items-center rounded-lg bg-warm-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-warm-800 disabled:opacity-50 dark:bg-warm-500 dark:text-zinc-950 dark:hover:bg-warm-400"
+            >
+                儲存
             </button>
         </div>
     </x-slot:footer>

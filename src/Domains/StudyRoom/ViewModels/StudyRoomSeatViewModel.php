@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\StudyRoom\ViewModels;
 
+use App\Enums\StudyActivityVerb;
 use App\Enums\StudySeatKind;
 use App\Enums\StudyTimerMode;
 use App\Enums\StudyTimerPhase;
@@ -31,6 +32,8 @@ final class StudyRoomSeatViewModel extends Data
         public ?string $nickname,
         public ?string $emoji,
         public ?string $activity,
+        public ?StudyActivityVerb $activityVerb,
+        public ?int $subjectCourseId,
         public ?StudyTimerMode $timerMode,
         public ?StudyTimerPhase $timerPhase,
         public ?int $timerRound,
@@ -55,6 +58,8 @@ final class StudyRoomSeatViewModel extends Data
             nickname: $profile?->nickname,
             emoji: $profile?->emoji,
             activity: $seat->activity_verb && $subject ? $seat->activity_verb->format($subject) : null,
+            activityVerb: $seat->activity_verb,
+            subjectCourseId: $seat->subject_course_id,
             timerMode: $seat->timer_mode,
             timerPhase: $seat->timer_phase,
             timerRound: $seat->timer_round,

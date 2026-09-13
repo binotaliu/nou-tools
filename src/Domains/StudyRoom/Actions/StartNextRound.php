@@ -53,6 +53,7 @@ final readonly class StartNextRound
             $seat->timer_phase = StudyTimerPhase::Focus;
             $seat->timer_round = $seat->timer_round + 1;
             $seat->timer_started_at = $now;
+            $seat->activity_started_at = $now;
             $seat->timer_ends_at = $now->addMinutes($cycle->focusMinutes);
             $seat->saveOrFail();
 

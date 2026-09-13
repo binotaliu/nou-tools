@@ -16,14 +16,21 @@ use Illuminate\Support\Facades\Date;
  * timer never produces a session.
  *
  * Focus seconds are computed server-side, never trusted from the client:
- * `min(now, last_seen_at) - timer_started_at`, clamped to
- * `[0, timer.max_session_seconds]`. Clamping to `last_seen_at` matters for
- * the idle/heartbeat path — a browser that dies mid-pomodoro is credited
- * only up to its last heartbeat, never the full planned duration. Unlike
- * `last_seen_at`, `timer_ends_at` no longer caps the result: a countdown
- * keeps ticking (and being credited) past its planned end until the
- * student acts, and the portion beyond the plan is broken out separately
- * as `overtime_seconds`. A count-up timer has no plan (`timer_ends_at` is
+ * `min(now, last_seen_at) - segmentStartedAt`, clamped to
+ * `[0, timer.max_session_seconds]`, where `segmentStartedAt` is
+ * `activity_started_at` (falling back to `timer_started_at` when null,
+ * i.e. the activity hasn't changed since the round/phase itself started).
+ * Splitting these two timestamps lets `ChangeStudyActivity` close out a
+ * session for the elapsed segment without disturbing `timer_started_at` —
+ * which the countdown progress bar and round timing stay anchored to.
+ *
+ * Clamping to `last_seen_at` matters for the idle/heartbeat path — a
+ * browser that dies mid-pomodoro is credited only up to its last
+ * heartbeat, never the full planned duration. Unlike `last_seen_at`,
+ * `timer_ends_at` no longer caps the result: a countdown keeps ticking
+ * (and being credited) past its planned end until the student acts, and
+ * the portion beyond the plan is broken out separately as
+ * `overtime_seconds`. A count-up timer has no plan (`timer_ends_at` is
  * null) — its whole elapsed time is ordinary focus time, never overtime.
  */
 final readonly class RecordStudySession
@@ -38,19 +45,21 @@ final readonly class RecordStudySession
             return null;
         }
 
+        $segmentStartedAt = $seat->activity_started_at ?? $seat->timer_started_at;
+
         $now = Date::now();
         $lastSeenAt = $seat->last_seen_at ?? $now;
         $effectiveEnd = $now->min($lastSeenAt);
 
         $maxSessionSeconds = (int) config('study-room.timer.max_session_seconds');
-        $focusSeconds = max(0, $effectiveEnd->getTimestamp() - $seat->timer_started_at->getTimestamp());
+        $focusSeconds = max(0, $effectiveEnd->getTimestamp() - $segmentStartedAt->getTimestamp());
         $focusSeconds = min($focusSeconds, $maxSessionSeconds);
 
         if ($seat->timer_ends_at === null) {
             $plannedSeconds = $focusSeconds;
             $wasCompleted = true;
         } else {
-            $plannedSeconds = $seat->timer_ends_at->getTimestamp() - $seat->timer_started_at->getTimestamp();
+            $plannedSeconds = $seat->timer_ends_at->getTimestamp() - $segmentStartedAt->getTimestamp();
             $wasCompleted = $focusSeconds >= $plannedSeconds;
         }
 
@@ -62,7 +71,7 @@ final readonly class RecordStudySession
         $session->subject_label = $seat->subject_label;
         $session->activity_verb = $seat->activity_verb;
         $session->timer_mode = $seat->timer_mode;
-        $session->started_at = $seat->timer_started_at;
+        $session->started_at = $segmentStartedAt;
         $session->ended_at = $effectiveEnd;
         $session->focus_seconds = $focusSeconds;
         $session->overtime_seconds = $overtimeSeconds;

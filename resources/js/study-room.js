@@ -138,6 +138,12 @@ export default function nouStudyRoom(initial) {
     },
     cycleSettingsOpen: false,
 
+    // "Change activity" modal — lets the student swap activity/subject
+    // without stopping a running Focus timer.
+    activityModalOpen: false,
+    changeVerb: null,
+    changeSubjectCourseId: null,
+
     tickHandle: null,
     heartbeatHandle: null,
     connectTimeoutHandle: null,
@@ -749,6 +755,34 @@ export default function nouStudyRoom(initial) {
         const response = await window.axios.post('/study-room/timer/next')
         this.setState(response.data.state)
         this.errorMessage = null
+      } catch (error) {
+        this.errorMessage = this.resolveErrorMessage(error)
+      } finally {
+        this.panelBusy = false
+      }
+    },
+
+    async changeActivity() {
+      if (this.panelBusy) {
+        return
+      }
+
+      this.panelBusy = true
+
+      try {
+        const response = await window.axios.patch(
+          '/study-room/timer/activity',
+          {
+            verb: this.changeVerb,
+            subjectCourseId:
+              this.changeSubjectCourseId === ''
+                ? null
+                : Number(this.changeSubjectCourseId),
+          }
+        )
+        this.setState(response.data.state)
+        this.errorMessage = null
+        this.closeChangeActivity()
       } catch (error) {
         this.errorMessage = this.resolveErrorMessage(error)
       } finally {
@@ -1550,6 +1584,14 @@ export default function nouStudyRoom(initial) {
       return this.isPomodoro() && this.isOnBreak()
     },
 
+    // Activity can only change during Focus — there's no running segment to
+    // split during a break.
+    canChangeActivity() {
+      const seat = this.mySeat()
+
+      return !!seat && seat.timerPhase === 'focus'
+    },
+
     hasRunningTimer() {
       const seat = this.mySeat()
 
@@ -1765,6 +1807,19 @@ export default function nouStudyRoom(initial) {
     closeCycleSettings() {
       this.cycle = this.normalizedCycle()
       this.cycleSettingsOpen = false
+    },
+
+    openChangeActivity() {
+      const seat = this.mySeat()
+
+      this.changeVerb = seat ? seat.activityVerb : null
+      this.changeSubjectCourseId =
+        seat && seat.subjectCourseId !== null ? seat.subjectCourseId : ''
+      this.activityModalOpen = true
+    },
+
+    closeChangeActivity() {
+      this.activityModalOpen = false
     },
 
     resetCycle() {

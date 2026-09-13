@@ -129,6 +129,7 @@ Route::prefix('study-room')->name('study-room.')->group(function (): void {
     Route::post('/seat/leave', [StudyRoomSeatController::class, 'destroy'])->name('seat.leave')->middleware('throttle:60,1');
     Route::post('/timer', [StudyRoomTimerController::class, 'store'])->name('timer.start')->middleware('throttle:60,1');
     Route::delete('/timer', [StudyRoomTimerController::class, 'destroy'])->name('timer.stop')->middleware('throttle:60,1');
+    Route::patch('/timer/activity', [StudyRoomTimerController::class, 'update'])->name('timer.activity')->middleware('throttle:60,1');
     Route::post('/timer/break', StudyRoomBreakController::class)->name('timer.break')->middleware('throttle:60,1');
     Route::post('/timer/next', StudyRoomNextRoundController::class)->name('timer.next')->middleware('throttle:60,1');
     Route::post('/heartbeat', StudyRoomHeartbeatController::class)->name('heartbeat')->middleware('throttle:60,1');
