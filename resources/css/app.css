@@ -50,10 +50,10 @@
 
 @keyframes drift {
   from {
-    left: -12%;
+    left: -40%;
   }
   to {
-    left: 104%;
+    left: 140%;
   }
 }
 
@@ -174,7 +174,7 @@
 }
 
 @utility animate-drift {
-  animation: drift 180s linear infinite;
+  animation: drift 600s linear infinite;
 }
 
 @utility animate-firefly {
