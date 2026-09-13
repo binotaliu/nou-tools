@@ -66,7 +66,7 @@
 {{-- 太陽 --}}
 <span
     x-show="sky.sunVisible"
-    class="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#fff8c9_0%,#ffd84a_55%,#ffb03a_100%)] transition-[top,left] duration-1000 {{ $isFocus ? 'size-20 shadow-[0_0_90px_40px_rgba(255,214,90,0.45)] sm:size-28' : 'size-7 shadow-[0_0_28px_12px_rgba(255,214,90,0.45)]' }}"
+    class="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#ffe488] transition-[top,left] duration-1000 {{ $isFocus ? 'size-20 shadow-[0_0_90px_40px_rgba(255,214,90,0.45)] sm:size-28' : 'size-7 shadow-[0_0_28px_12px_rgba(255,214,90,0.45)]' }}"
     :style="sunStyle('{{ $skyLayout }}')"
     data-testid="{{ $testPrefix }}sun"
     aria-hidden="true"
