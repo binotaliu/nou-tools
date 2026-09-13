@@ -213,6 +213,11 @@ export default function nouStudyRoom(initial) {
         this.updateTabIndicators()
 
         if (!document.hidden) {
+          // A timer that finished while the tab was hidden (and possibly
+          // throttled enough that the tick never got to mark it) shouldn't
+          // chime just because the student switched back — treat it the
+          // same as one that was already finished on page load.
+          this.suppressAlreadyFinishedSound()
           this.refresh()
           this.heartbeat()
         }
@@ -360,6 +365,15 @@ export default function nouStudyRoom(initial) {
       }
 
       this.lastNotifiedTimerEndsAt = seat.timerEndsAt
+
+      // A background tab's tick is throttled, not stopped — it can still
+      // land here well after the crossing. Record it as handled either way
+      // (so a later, foregrounded tick doesn't replay it) but only actually
+      // chime for a crossing the student was here to see.
+      if (document.hidden) {
+        return
+      }
+
       playTimerFinishedSound()
     },
 
@@ -576,6 +590,15 @@ export default function nouStudyRoom(initial) {
         // ourselves from the seat code we actually hold.
         isYou: incomingSeat.code === this.heldSeatCode,
       })
+
+      // A realtime delta for the viewer's own seat can land with a
+      // timerEndsAt that's already in the past (a late-arriving update, a
+      // reconnect catch-up) — that's not a crossing the tick observed live,
+      // so it shouldn't chime any more than an already-finished timer would
+      // on page load.
+      if (target.code === this.heldSeatCode) {
+        this.suppressAlreadyFinishedSound()
+      }
 
       // The broadcast payload doesn't carry per-floor occupied counts, so
       // the floor badge (e.g. "24 / 24 人在座") has to be kept in sync here
