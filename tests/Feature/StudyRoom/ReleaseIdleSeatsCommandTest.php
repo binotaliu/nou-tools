@@ -8,7 +8,7 @@ use App\Models\StudyRoomSeat;
 use App\Models\StudyRoomSession;
 use Illuminate\Support\Facades\Event;
 
-it('releases a seat idle for 6 minutes, crediting focus seconds only up to last_seen_at', function () {
+it('releases a seat idle for 61 minutes, crediting focus seconds only up to last_seen_at', function () {
     Event::fake([StudyRoomUpdated::class]);
 
     $schedule = StudentSchedule::factory()->create();
@@ -23,10 +23,10 @@ it('releases a seat idle for 6 minutes, crediting focus seconds only up to last_
     ]);
 
     // Browser died: last_seen_at stops updating 2 minutes into the focus
-    // session, then 6 more minutes pass with no further heartbeat.
+    // session, then 61 more minutes pass with no further heartbeat.
     $this->travel(2)->minutes();
     $seat->update(['last_seen_at' => now()]);
-    $this->travel(6)->minutes();
+    $this->travel(61)->minutes();
 
     $this->artisan('study-room:release-idle-seats')
         ->expectsOutputToContain('已釋放 1 個閒置座位')
@@ -44,11 +44,11 @@ it('releases a seat idle for 6 minutes, crediting focus seconds only up to last_
     );
 });
 
-it('leaves a seat idle for only 4 minutes untouched', function () {
+it('leaves a seat idle for only 45 minutes untouched', function () {
     $schedule = StudentSchedule::factory()->create();
     $seat = StudyRoomSeat::factory()->occupiedBy($schedule)->create(['last_seen_at' => now()]);
 
-    $this->travel(4)->minutes();
+    $this->travel(45)->minutes();
 
     $this->artisan('study-room:release-idle-seats')->assertExitCode(0);
 

@@ -47,7 +47,7 @@ return [
 
     'heartbeat' => [
         'interval_seconds' => 60,
-        'idle_release_seconds' => 300,
+        'idle_release_seconds' => 3600,
     ],
 
     /*
