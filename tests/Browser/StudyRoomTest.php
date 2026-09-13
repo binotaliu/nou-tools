@@ -438,6 +438,31 @@ it('shows a popover with nickname and activity for an occupied table seat, and o
         ->assertVisible('[data-testid="study-room-floor-2"] [data-testid="study-room-stair-blocked"]');
 });
 
+it('formats a seat timer as mm:ss under an hour and h:mm:ss from an hour onward', function () {
+    $schedule = createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->waitForEvent('load');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]')
+        ->waitForEvent('load');
+
+    $component = 'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0]';
+
+    expect($page->script($component.'.clockLabel(59)'))->toBe('00:59')
+        ->and($page->script($component.'.clockLabel(3599)'))->toBe('59:59')
+        ->and($page->script($component.'.clockLabel(3600)'))->toBe('1:00:00')
+        ->and($page->script($component.'.clockLabel(3661)'))->toBe('1:01:01')
+        ->and($page->script($component.'.clockLabel(7325)'))->toBe('2:02:05');
+});
+
 it('updates a floor\'s occupied count live and closes it once its last occupant leaves', function () {
     // Regression test for two bugs in applyDelta()/patchSeat(): the
     // per-floor "N / N 人在座" badge never updated from a realtime seat

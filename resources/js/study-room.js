@@ -1279,6 +1279,22 @@ export default function nouStudyRoom(initial) {
       return String(n).padStart(2, '0')
     },
 
+    // mm:ss below an hour, h:mm:ss once the count reaches 60 minutes —
+    // so an hours-long session doesn't have to be read as a bare minute
+    // count past 59.
+    clockLabel(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60)
+      const seconds = totalSeconds % 60
+
+      if (minutes < 60) {
+        return this.pad2(minutes) + ':' + this.pad2(seconds)
+      }
+
+      const hours = Math.floor(minutes / 60)
+
+      return hours + ':' + this.pad2(minutes % 60) + ':' + this.pad2(seconds)
+    },
+
     // A countdown (timerEndsAt set) shows mm:ss while running and keeps
     // ticking past zero as an overtime count-up, '+mm:ss', instead of
     // freezing — so has the student actually been focusing (or resting)
@@ -1290,23 +1306,10 @@ export default function nouStudyRoom(initial) {
         const diffMs = Date.parse(seat.timerEndsAt) - this.now
 
         if (diffMs > 0) {
-          const totalSeconds = Math.ceil(diffMs / 1000)
-
-          return (
-            this.pad2(Math.floor(totalSeconds / 60)) +
-            ':' +
-            this.pad2(totalSeconds % 60)
-          )
+          return this.clockLabel(Math.ceil(diffMs / 1000))
         }
 
-        const overtimeSeconds = Math.floor(-diffMs / 1000)
-
-        return (
-          '+' +
-          this.pad2(Math.floor(overtimeSeconds / 60)) +
-          ':' +
-          this.pad2(overtimeSeconds % 60)
-        )
+        return '+' + this.clockLabel(Math.floor(-diffMs / 1000))
       }
 
       if (seat.timerStartedAt) {
@@ -1315,11 +1318,7 @@ export default function nouStudyRoom(initial) {
           Math.floor((this.now - Date.parse(seat.timerStartedAt)) / 1000)
         )
 
-        return (
-          this.pad2(Math.floor(elapsedSeconds / 60)) +
-          ':' +
-          this.pad2(elapsedSeconds % 60)
-        )
+        return this.clockLabel(elapsedSeconds)
       }
 
       return ''
