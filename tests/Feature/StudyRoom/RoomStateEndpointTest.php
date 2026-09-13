@@ -3,7 +3,9 @@
 use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
+use App\Models\StudyRoomSession;
 use Illuminate\Support\Facades\Date;
+use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 use NouTools\Domains\StudyRoom\Actions\BuildStudyRoomState;
 use NouTools\Domains\StudyRoom\Actions\SyncStudyRoomSeats;
 
@@ -111,6 +113,30 @@ it('changes the version for two seat changes landing in the same second', functi
 
     expect($second->version)->not->toBe($first->version)
         ->and($third->version)->not->toBe($second->version);
+});
+
+it('changes the version when the viewer completes a session even with no seat change', function () {
+    $this->travelTo(Date::parse('2026-09-11 10:00:00'));
+
+    $schedule = StudentSchedule::factory()->create();
+    $viewer = StudentScheduleCookie::fromModel($schedule);
+
+    $buildState = app(BuildStudyRoomState::class);
+
+    $first = $buildState($viewer);
+
+    // A session completing changes `yourFocusSecondsToday` without
+    // touching any seat field, which is exactly the case the seat-only
+    // signature used to miss.
+    StudyRoomSession::factory()->for($schedule, 'schedule')->create([
+        'started_at' => Date::now()->subMinutes(25),
+        'ended_at' => Date::now(),
+        'focus_seconds' => 25 * 60,
+    ]);
+
+    $second = $buildState($viewer);
+
+    expect($second->version)->not->toBe($first->version);
 });
 
 it('tells the browser not to cache room state, so its own conditional requests never get a stale body', function () {

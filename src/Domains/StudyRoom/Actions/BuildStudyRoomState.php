@@ -35,13 +35,14 @@ final readonly class BuildStudyRoomState
             ->get();
 
         $floors = $this->buildFloors($seats, $openFloors, $viewer?->id);
+        $totals = $this->buildTotals($seats, $viewer);
 
         return new StudyRoomStateViewModel(
             floors: StudyRoomFloorViewModel::collect($floors, DataCollection::class),
             openFloors: $openFloors,
-            totals: $this->buildTotals($seats, $viewer),
+            totals: $totals,
             serverTime: Date::now()->toIso8601String(),
-            version: $this->resolveVersion($seats),
+            version: $this->resolveVersion($seats, $totals),
         );
     }
 
@@ -125,7 +126,7 @@ final readonly class BuildStudyRoomState
      *
      * @param  Collection<int, StudyRoomSeat>  $seats
      */
-    private function resolveVersion(Collection $seats): string
+    private function resolveVersion(Collection $seats, StudyRoomTotalsViewModel $totals): string
     {
         $signature = $seats
             ->sortBy('id')
@@ -142,6 +143,14 @@ final readonly class BuildStudyRoomState
                 $seat->timer_ends_at?->getTimestamp() ?? '',
             ]))
             ->implode(';');
+
+        // Totals (today's focused seconds, site-wide and for this viewer)
+        // change independently of any seat field above — e.g. a session
+        // completing updates `yourFocusSecondsToday` without necessarily
+        // touching the seat's timer fields in the same instant. Without
+        // folding them in here, a totals-only change would keep matching
+        // the client's cached version and never make it past a 304.
+        $signature .= '|'.$totals->siteFocusSecondsToday.'|'.$totals->yourFocusSecondsToday;
 
         return hash('xxh128', $signature);
     }
