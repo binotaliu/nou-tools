@@ -56,7 +56,6 @@ final readonly class TakeSeat
                         'student_schedule_id' => $viewer->id,
                         'occupied_at' => Date::now(),
                         'last_seen_at' => Date::now(),
-                        'no_timer_since' => Date::now(),
                     ]);
             } catch (QueryException $exception) {
                 if ($exception->getCode() === '23000') {

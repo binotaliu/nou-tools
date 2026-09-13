@@ -52,21 +52,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Seat Without Timer
-    |--------------------------------------------------------------------------
-    |
-    | A student who claims a seat but never starts a timer within
-    | `grace_seconds` is released back to the pool, since an occupied-but-
-    | idle seat blocks other students without anyone actually studying.
-    |
-    */
-
-    'seat_without_timer' => [
-        'grace_seconds' => 300,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Timers
     |--------------------------------------------------------------------------
     |
