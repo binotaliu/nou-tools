@@ -573,7 +573,14 @@ export default function nouStudyRoom(initial) {
       }
 
       this.state.openFloors = payload.openFloors
-      this.state.totals = payload.totals
+      // `payload.totals.yourFocusSecondsToday` is always 0: broadcasts fan
+      // out to every viewer from a single viewer-less build, so it can't
+      // carry a per-viewer total. Keep the value this browser already has
+      // (from page load or its own refresh()) instead of stomping it.
+      this.state.totals = {
+        ...payload.totals,
+        yourFocusSecondsToday: this.state.totals.yourFocusSecondsToday,
+      }
       this.state.version = payload.version
 
       if (payload.seat) {

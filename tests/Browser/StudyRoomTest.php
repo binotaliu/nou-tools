@@ -5,6 +5,7 @@ use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
+use App\Models\StudyRoomSession;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use NouTools\Domains\StudyRoom\Actions\FillFloorWithTestStudents;
@@ -600,6 +601,66 @@ it('clears the held-seat highlight and action banner once a realtime delta relea
     );
 
     expect($isStillHighlighted)->toBeFalse();
+});
+
+it('keeps your own focus total intact when a realtime delta broadcasts for someone else', function () {
+    // Regression test: BroadcastStudyRoomChange builds its payload with a
+    // null viewer (one broadcast fans out to everyone), so
+    // totals.yourFocusSecondsToday in every delta is always 0. applyDelta()
+    // used to replace the whole totals object wholesale, so any seat
+    // join/leave broadcast — even one for a completely different seat —
+    // stomped your real "今天專注了" total with 0 until the next refresh().
+    $schedule = createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->waitForEvent('load');
+
+    StudyRoomSession::factory()->create([
+        'student_schedule_id' => $schedule->id,
+        'focus_seconds' => 25 * 60,
+        'started_at' => now()->subMinutes(30),
+        'ended_at' => now()->subMinutes(5),
+    ]);
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]')
+        ->waitForEvent('load');
+
+    $page->assertVisible('[data-testid="study-room-root"]')
+        ->wait(1);
+
+    $page->assertSeeIn('[data-testid="study-room-personal-info"]', '今天專注了 25 分');
+
+    // Same payload shape a broadcast for an unrelated seat leaving sends.
+    $page->script(
+        'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0].applyDelta('.
+            '{openFloors: 1, totals: {occupantCount: 0, siteFocusSecondsToday: 0, yourFocusSecondsToday: 0}, version: "v2", seat: '.
+            json_encode([
+                'code' => '1-S02',
+                'kind' => 'solo',
+                'groupCode' => null,
+                'seatNumber' => 2,
+                'label' => '1-S02',
+                'isOccupied' => false,
+                'isYou' => false,
+                'nickname' => null,
+                'emoji' => null,
+                'activity' => null,
+                'timerMode' => null,
+                'timerPhase' => null,
+                'timerEndsAt' => null,
+                'timerStartedAt' => null,
+            ]).
+            '})'
+    );
+
+    $page->assertSeeIn('[data-testid="study-room-personal-info"]', '今天專注了 25 分');
 });
 
 it('draws the garden and windows from the real Taiwan sky, day and night', function () {
