@@ -13,6 +13,7 @@
     "filament/filament": "^5.8.1",
     "filament/spatie-laravel-settings-plugin": "^5.8",
     "genealabs/laravel-caffeine": "^13.0",
+    "laravel-notification-channels/webpush": "^13.0",
     "laravel/framework": "^13.31",
     "laravel/prompts": "^0.3.24",
     "laravel/reverb": "^1.11",
