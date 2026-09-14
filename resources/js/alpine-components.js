@@ -38,6 +38,16 @@ export default function registerAlpineComponents(Alpine) {
     },
   }))
 
+  Alpine.data('nouPwaStandalone', () => ({
+    isPwa: false,
+
+    init() {
+      this.isPwa =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true
+    },
+  }))
+
   Alpine.data('nouPwaInstallBanner', () => ({
     storageKey: 'pwa_install_banner_dismissed_v1',
     visible: false,

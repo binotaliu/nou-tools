@@ -74,12 +74,7 @@
                     {{ $viewModel->name ?: '我的課表' }}
                 </h2>
                 <p
-                    x-data="{
-                        isPwa:
-                            window.matchMedia('(display-mode: standalone)')
-                                .matches ||
-                            window.navigator.standalone === true,
-                    }"
+                    x-data="nouPwaStandalone"
                     x-show="!isPwa"
                     x-cloak
                     class="mt-1 flex items-center gap-1 text-sm text-warm-600 dark:text-zinc-400 print:hidden"
