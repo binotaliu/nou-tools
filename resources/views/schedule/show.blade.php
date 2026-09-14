@@ -135,30 +135,72 @@
                     </x-link-button>
                 </div>
 
-                <form
-                    method="GET"
-                    action="{{ route('schedules.show', $viewModel->uuid) }}"
-                    class="w-full sm:w-1/2 lg:w-32 print:hidden"
+                <div
+                    class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden"
                 >
-                    <label for="term" class="sr-only">選擇學期</label>
-                    <x-select
-                        id="term"
-                        name="term"
-                        @change="$event.target.form.submit()"
-                        aria-label="選擇學期"
-                        class="bg-white dark:bg-zinc-900"
-                        data-offline-disable
+                    <form
+                        method="GET"
+                        action="{{ route('schedules.show', $viewModel->uuid) }}"
+                        class="w-full sm:w-1/2 lg:w-32"
                     >
-                        @foreach ($viewModel->availableTerms as $term)
-                            <option
-                                value="{{ $term }}"
-                                @selected($term === $viewModel->selectedTerm)
-                            >
-                                {{ \Illuminate\Support\Str::toShortSemesterDisplay($term) }}
-                            </option>
-                        @endforeach
-                    </x-select>
-                </form>
+                        <label for="term" class="sr-only">選擇學期</label>
+                        <x-select
+                            id="term"
+                            name="term"
+                            @change="$event.target.form.submit()"
+                            aria-label="選擇學期"
+                            class="bg-white dark:bg-zinc-900"
+                            data-offline-disable
+                        >
+                            @foreach ($viewModel->availableTerms as $term)
+                                <option
+                                    value="{{ $term }}"
+                                    @selected($term === $viewModel->selectedTerm)
+                                >
+                                    {{ \Illuminate\Support\Str::toShortSemesterDisplay($term) }}
+                                </option>
+                            @endforeach
+                        </x-select>
+                    </form>
+
+                    <div
+                        x-data="nouPushSubscription({
+                            vapidPublicKey: @js(config('webpush.vapid.public_key')),
+                            subscribeUrl: @js(route('schedules.push-subscriptions.store', $viewModel->uuid)),
+                            unsubscribeUrl: @js(route('schedules.push-subscriptions.destroy', $viewModel->uuid)),
+                        })"
+                        x-show="supported"
+                        x-cloak
+                        class="flex w-full items-center justify-between gap-2 rounded-lg border border-warm-200 bg-white px-3 py-2 sm:w-1/2 lg:w-auto dark:border-zinc-700 dark:bg-zinc-900"
+                    >
+                        <span
+                            class="text-sm font-medium text-warm-800 dark:text-zinc-200"
+                        >
+                            課程提醒通知
+                        </span>
+                        <button
+                            type="button"
+                            role="switch"
+                            :aria-checked="enabled"
+                            aria-label="課程提醒通知"
+                            @click="toggle()"
+                            :disabled="busy"
+                            :class="enabled
+                                ? 'bg-warm-700 dark:bg-zinc-300'
+                                : 'bg-warm-200 dark:bg-zinc-700'"
+                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                            data-analytics-event="schedule_push_toggle"
+                            data-analytics-feature="schedule"
+                        >
+                            <span
+                                :class="enabled
+                                    ? 'translate-x-6'
+                                    : 'translate-x-1'"
+                                class="inline-block size-4 transform rounded-full bg-white shadow transition-transform dark:bg-zinc-900"
+                            ></span>
+                        </button>
+                    </div>
+                </div>
 
                 <span
                     class="hidden text-sm text-warm-600 dark:text-zinc-400 print:inline"

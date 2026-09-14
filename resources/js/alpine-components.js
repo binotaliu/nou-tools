@@ -100,6 +100,96 @@ export default function registerAlpineComponents(Alpine) {
     },
   }))
 
+  Alpine.data('nouPushSubscription', initial => ({
+    supported: false,
+    enabled: false,
+    busy: false,
+
+    init() {
+      this.supported =
+        'serviceWorker' in navigator &&
+        'PushManager' in window &&
+        'Notification' in window
+
+      if (!this.supported) {
+        return
+      }
+
+      navigator.serviceWorker.ready.then(registration =>
+        registration.pushManager.getSubscription().then(subscription => {
+          this.enabled = !!subscription
+        })
+      )
+    },
+
+    toggle() {
+      return this.enabled ? this.disable() : this.enable()
+    },
+
+    async enable() {
+      if (this.busy) {
+        return
+      }
+
+      this.busy = true
+
+      try {
+        const permission = await Notification.requestPermission()
+        if (permission !== 'granted') {
+          return
+        }
+
+        const registration = await navigator.serviceWorker.ready
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: this.urlBase64ToUint8Array(
+            initial.vapidPublicKey
+          ),
+        })
+
+        await window.axios.post(initial.subscribeUrl, subscription.toJSON())
+
+        this.enabled = true
+      } finally {
+        this.busy = false
+      }
+    },
+
+    async disable() {
+      if (this.busy) {
+        return
+      }
+
+      this.busy = true
+
+      try {
+        const registration = await navigator.serviceWorker.ready
+        const subscription = await registration.pushManager.getSubscription()
+
+        if (subscription) {
+          await window.axios.delete(initial.unsubscribeUrl, {
+            data: { endpoint: subscription.endpoint },
+          })
+          await subscription.unsubscribe()
+        }
+
+        this.enabled = false
+      } finally {
+        this.busy = false
+      }
+    },
+
+    urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+      const base64 = (base64String + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/')
+      const rawData = atob(base64)
+
+      return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)))
+    },
+  }))
+
   Alpine.data('nouScheduleCustomize', initial => ({
     links: initial.links,
 
