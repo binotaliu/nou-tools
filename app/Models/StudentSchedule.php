@@ -8,11 +8,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Notifications\Notifiable;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 use Ramsey\Uuid\Uuid;
 
 final class StudentSchedule extends Model
 {
     use HasFactory;
+    use HasPushSubscriptions;
+    use Notifiable;
 
     protected $fillable = [
         'uuid',

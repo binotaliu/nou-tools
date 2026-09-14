@@ -31,6 +31,8 @@ use App\Http\Controllers\ScheduleCalendarSettingsUpdateController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ScheduleCustomizationController;
 use App\Http\Controllers\ScheduleMyController;
+use App\Http\Controllers\SchedulePushSubscriptionDestroyController;
+use App\Http\Controllers\SchedulePushSubscriptionStoreController;
 use App\Http\Controllers\ScheduleRememberController;
 use App\Http\Controllers\ScheduleSubscribeController;
 use App\Http\Controllers\SitemapController;
@@ -100,6 +102,8 @@ Route::put('/schedules/{schedule}/announcement-preferences', [ScheduleAnnounceme
 Route::get('/schedules/{schedule}/subscribe', ScheduleSubscribeController::class)->name('schedules.subscribe');
 Route::put('/schedules/{schedule}/calendar-settings', ScheduleCalendarSettingsUpdateController::class)->name('schedules.calendar-settings.update');
 Route::get('/schedules/{schedule}/calendar', ScheduleCalendarController::class)->name('schedules.calendar');
+Route::post('/schedules/{schedule}/push-subscriptions', SchedulePushSubscriptionStoreController::class)->name('schedules.push-subscriptions.store');
+Route::delete('/schedules/{schedule}/push-subscriptions', SchedulePushSubscriptionDestroyController::class)->name('schedules.push-subscriptions.destroy');
 
 Route::get('/schedules/{schedule}/{term}/learning-progress', [LearningProgressController::class, 'show'])
     ->name('learning-progress.show');
