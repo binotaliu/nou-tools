@@ -13,7 +13,7 @@ final class SubscribeScheduleToPush
     {
         $schedule->updatePushSubscription(
             endpoint: $input->endpoint,
-            key: $input->p256dhKey,
+            key: $input->publicKey,
             token: $input->authToken,
             contentEncoding: $input->contentEncoding,
         );

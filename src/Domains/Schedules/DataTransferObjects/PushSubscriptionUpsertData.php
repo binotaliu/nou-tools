@@ -12,7 +12,7 @@ final class PushSubscriptionUpsertData extends Data
     public function __construct(
         public string $endpoint,
         #[MapInputName('keys.p256dh')]
-        public string $p256dhKey,
+        public string $publicKey,
         #[MapInputName('keys.auth')]
         public string $authToken,
         #[MapInputName('content_encoding')]

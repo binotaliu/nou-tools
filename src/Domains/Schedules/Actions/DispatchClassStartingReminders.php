@@ -8,8 +8,8 @@ use App\Models\ClassSchedule;
 use App\Models\ClassScheduleReminder;
 use App\Models\StudentSchedule;
 use App\Notifications\ClassStartingSoon;
-use Carbon\Carbon;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\Date;
 
 final class DispatchClassStartingReminders
 {
@@ -31,7 +31,7 @@ final class DispatchClassStartingReminders
         $sentCount = 0;
 
         foreach ($classSchedules as $classSchedule) {
-            $startsAt = Carbon::parse(
+            $startsAt = Date::parse(
                 $classSchedule->date->format('Y-m-d').' '.($classSchedule->start_time ?? $classSchedule->courseClass->start_time),
                 'Asia/Taipei',
             );
