@@ -80,10 +80,13 @@ final class ScheduleController extends Controller
 
     public function show(StudentSchedule $schedule, Request $request, ShowSchedulePage $showSchedulePage): View
     {
+        $linkedSchedule = $request->studentScheduleFromCookie();
+
         return view('schedule.show', [
             'schedule' => $schedule,
             'viewModel' => $showSchedulePage($schedule, $request->query('term')),
-            'shouldPromptRememberSchedule' => $request->studentScheduleFromCookie() === null,
+            'shouldPromptRememberSchedule' => $linkedSchedule === null,
+            'isLinkedSchedule' => $linkedSchedule?->id === $schedule->id,
         ]);
     }
 }

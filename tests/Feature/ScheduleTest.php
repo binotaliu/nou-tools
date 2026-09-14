@@ -1046,6 +1046,55 @@ it('does not show the remember-schedule modal when a schedule cookie already exi
         ->assertDontSee('要記住這個課表嗎？');
 });
 
+it('shows the push notification toggle when the schedule is linked in the cookie', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Linked Schedule',
+    ]);
+
+    $response = $this->withCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => $schedule->name,
+    ]))->get(route('schedules.show', $schedule));
+
+    $response->assertStatus(200)
+        ->assertSee('面授開始前接收桌面通知');
+});
+
+it('hides the push notification toggle when no schedule is linked in the cookie', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'No Cookie Schedule',
+    ]);
+
+    $response = $this->get(route('schedules.show', $schedule));
+
+    $response->assertStatus(200)
+        ->assertDontSee('面授開始前接收桌面通知');
+});
+
+it('hides the push notification toggle when a different schedule is linked in the cookie', function () {
+    $linkedSchedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Linked Schedule',
+    ]);
+
+    $otherSchedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Other Schedule',
+    ]);
+
+    $response = $this->withCookie('student_schedule', json_encode([
+        'id' => $linkedSchedule->id,
+        'uuid' => $linkedSchedule->uuid,
+        'name' => $linkedSchedule->name,
+    ]))->get(route('schedules.show', $otherSchedule));
+
+    $response->assertStatus(200)
+        ->assertDontSee('面授開始前接收桌面通知');
+});
+
 it('remembering a schedule sets the student_schedule cookie and redirects back', function () {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
