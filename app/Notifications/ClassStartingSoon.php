@@ -30,9 +30,9 @@ final class ClassStartingSoon extends Notification
         $course = $courseClass->course;
 
         return (new WebPushMessage)
-            ->title("{$course->name} 10 分鐘後開始")
+            ->title("{$course->name} 即將開始上課")
             ->icon('/icons/icon-192.png')
-            ->body('視訊面授即將開始，點擊檢視課表與連結。')
+            ->body("「{$course->name}」將於 10 分鐘後開始上課。點擊通知以開啟 NOU 小幫手課表。")
             ->data(['url' => route('schedules.show', $notifiable)])
             ->options(['TTL' => 600]);
     }
