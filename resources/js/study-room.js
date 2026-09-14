@@ -1244,8 +1244,15 @@ export default function nouStudyRoom(initial) {
     moonStyle(layout = 'garden') {
       const style = this.bodyStyle(this.sky.moonX, this.sky.moonY, layout)
 
-      // The moon is up in daylight too, just washed out by the sky.
-      style.opacity = 0.3 + 0.7 * (1 - this.sky.daylight)
+      // The moon is up in daylight too, just washed out by the sky. Near new
+      // moon it sits close to the sun in the sky, and the disc's flat
+      // sky-coloured shadow (see moonShadowStyle) doesn't match the sun's
+      // glow there — it would paint a visible grey hole through it. Fading
+      // the whole disc out as the illuminated fraction drops to zero avoids
+      // that; it also matches reality, where a near-new moon is essentially
+      // invisible.
+      style.opacity =
+        this.sky.moonFraction * (0.3 + 0.7 * (1 - this.sky.daylight))
 
       return style
     },
