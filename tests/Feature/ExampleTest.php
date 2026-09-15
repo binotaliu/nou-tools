@@ -1,18 +1,26 @@
 <?php
 
+use Inertia\Testing\AssertableInertia as Assert;
+
 it('returns a successful response', function () {
     $response = $this->get('/');
 
     $response->assertStatus(200);
 });
 
-it('uses the standard header logo on error page', function () {
+it('renders the shared Inertia Error page for a 404', function () {
+    // Error pages only render through Inertia when debug mode is off (see
+    // bootstrap/app.php); with debug on, Laravel's own exception page is
+    // shown instead, which is what local development should see.
+    config(['app.debug' => false]);
+
     $response = $this->get('/ThisRouteDoesNotExist');
 
     $response->assertStatus(404);
-    $response->assertSee('NOU 小幫手');
-    // verify we have an SVG icon in the header (the standard book-open icon renders as SVG)
-    $response->assertSee('<svg', false);
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('Error')
+        ->where('status', 404)
+    );
 });
 
 it('returns the llms.txt markdown content when the client prefers markdown on the home page', function () {
