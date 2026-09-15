@@ -5,6 +5,7 @@ use App\Filament\Pages\ManageStudyRoom;
 use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
 use App\Models\User;
+use Inertia\Testing\AssertableInertia as Assert;
 use Livewire\Livewire;
 
 test('an admin can load the study room settings page', function () {
@@ -40,7 +41,10 @@ test('saving the study room settings page persists and renders the announcement'
         ]))
         ->get(route('study-room.show'))
         ->assertOk()
-        ->assertSee('<strong>', false);
+        ->assertInertia(
+            fn (Assert $page) => $page->component('StudyRoom/Show')
+                ->where('announcementHtml', fn (string $html): bool => str_contains($html, '<strong>'))
+        );
 });
 
 test('a non-admin cannot access the study room settings page', function () {
