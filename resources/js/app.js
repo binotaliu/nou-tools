@@ -1,7 +1,7 @@
 import './bootstrap'
 import Alpine from '@alpinejs/csp'
 import { createApp, h } from 'vue'
-import { createInertiaApp } from '@inertiajs/vue3'
+import { createInertiaApp, router } from '@inertiajs/vue3'
 import scheduleEditor from './schedule-editor'
 import courseSchedule from './course-schedule'
 import linksCenterMap from './links-center-map'
@@ -32,6 +32,35 @@ if (document.getElementById('app')) {
         .use(plugin)
         .mount(el)
     },
+  })
+
+  // Inertia does client-side navigation between pages, so the page_view
+  // GA fires on a normal full page load (see the (still-Blade) layout's
+  // own page_view script) never happens again after the first visit. The
+  // 'navigate' event fires for that first visit too (Inertia treats it as
+  // a navigation), so this one hook covers every page view, initial or
+  // SPA. `page.props.analyticsPage` is shared by HandleInertiaRequests and
+  // mirrors the masked route path from `data-analytics-page` on the (only
+  // ever server-rendered once) <body> tag; `document.title` is used for
+  // page_title since every Inertia page sets it via its own <Head title>.
+  router.on('navigate', event => trackPageView(event.detail.page))
+}
+
+function trackPageView(page) {
+  if (typeof window.gtag !== 'function') {
+    return
+  }
+
+  const path = page?.props?.analyticsPage
+
+  if (!path) {
+    return
+  }
+
+  window.gtag('event', 'page_view', {
+    page_path: path,
+    page_title: document.title,
+    page_location: window.location.href,
   })
 }
 

@@ -39,9 +39,29 @@ final class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
+            'analyticsPage' => self::analyticsPagePath($request),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
             ],
         ];
+    }
+
+    /**
+     * Mirrors resources/views/app.blade.php's `$analyticsPage`: the matched
+     * route's URI with dynamic segments masked out (e.g.
+     * `/schedules/{schedule}` -> `/schedules/:schedule`), so Inertia
+     * navigations are grouped by route shape in GA rather than by every
+     * distinct schedule/course/etc. token. The <body> tag only carries this
+     * for the initial (server-rendered) visit, so subsequent client-side
+     * navigations read it from here instead (see resources/js/app.js's
+     * `router.on('navigate', ...)`).
+     */
+    private static function analyticsPagePath(Request $request): string
+    {
+        $route = $request->route();
+
+        return $route
+            ? '/'.ltrim((string) preg_replace('/\{(\w+)\??\}/', ':$1', $route->uri()), '/')
+            : '/'.ltrim($request->path(), '/');
     }
 }
