@@ -6,16 +6,17 @@ namespace App\Http\Controllers;
 
 use App\Models\StudentSchedule;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use NouTools\Domains\Schedules\Actions\BuildAnnouncementPreferencesPage;
 use NouTools\Domains\Schedules\Actions\UpdateAnnouncementPreferences;
 use NouTools\Domains\Schedules\DataTransferObjects\AnnouncementPreferencesUpsertData;
 
 final class ScheduleAnnouncementPreferencesController extends Controller
 {
-    public function edit(StudentSchedule $schedule, BuildAnnouncementPreferencesPage $buildAnnouncementPreferencesPage): View
+    public function edit(StudentSchedule $schedule, BuildAnnouncementPreferencesPage $buildAnnouncementPreferencesPage): Response
     {
-        return view('schedule.announcement-preferences', [
+        return Inertia::render('Schedule/AnnouncementPreferences', [
             'viewModel' => $buildAnnouncementPreferencesPage($schedule),
         ]);
     }

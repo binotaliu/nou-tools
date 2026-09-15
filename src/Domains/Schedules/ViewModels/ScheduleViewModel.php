@@ -127,6 +127,7 @@ final class ScheduleViewModel extends Data
                             'date' => $dateData['date'],
                             'dateKey' => $dateData['dateKey'],
                             'courses' => ScheduleCourseItemViewModel::collect($dateData['courses'], DataCollection::class),
+                            'formattedDate' => Date::parse($dateData['date'])->isoFormat('M/D (dd)'),
                         ])
                         ->values(),
                     DataCollection::class,

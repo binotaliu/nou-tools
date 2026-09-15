@@ -30,11 +30,19 @@ it('shows the latest announcements matching the schedule selection', function ()
 
     $response = get(route('schedules.show', $schedule));
 
+    // The widget's copy ("最新公告"/"檢視更多公告") is static Vue template
+    // text in AnnouncementsWidget.vue; the filtered announcement list is
+    // server-computed into the `announcementsWidget` prop by
+    // BuildScheduleAnnouncementsWidget, so assert against that instead.
     $response->assertSuccessful();
-    $response->assertSee('最新公告');
-    $response->assertSee('符合條件的公告');
-    $response->assertDontSee('不符合條件的公告');
-    $response->assertSee('檢視更多公告');
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/Show');
+
+        $titles = collect($page->toArray()['props']['announcementsWidget']['announcements'])->pluck('title');
+
+        expect($titles)->toContain('符合條件的公告');
+        expect($titles)->not->toContain('不符合條件的公告');
+    });
 });
 
 it('shows the choose-categories empty state when announcement_categories is explicitly empty', function () {
@@ -47,7 +55,10 @@ it('shows the choose-categories empty state when announcement_categories is expl
     $response = get(route('schedules.show', $schedule));
 
     $response->assertSuccessful();
-    $response->assertSee('尚未選擇任何公告分類');
+    $response->assertInertia(
+        fn (Assert $page) => $page->component('Schedule/Show')
+            ->where('announcementsWidget.hasAnySelection', false)
+    );
 });
 
 it('defaults to showing 各處室 announcements when announcement_categories is null', function () {
@@ -71,8 +82,14 @@ it('defaults to showing 各處室 announcements when announcement_categories is 
     $response = get(route('schedules.show', $schedule));
 
     $response->assertSuccessful();
-    $response->assertSee('教務處預設公告');
-    $response->assertDontSee('學系不應顯示的公告');
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/Show');
+
+        $titles = collect($page->toArray()['props']['announcementsWidget']['announcements'])->pluck('title');
+
+        expect($titles)->toContain('教務處預設公告');
+        expect($titles)->not->toContain('學系不應顯示的公告');
+    });
 });
 
 it('links "see more" to the announcements index pre-filtered to the same selection', function () {
@@ -102,7 +119,10 @@ it('links "see more" to the announcements index pre-filtered to the same selecti
 
     $response = get(route('schedules.show', $schedule));
     $response->assertSuccessful();
-    $response->assertSee($seeMoreUrl, false);
+    $response->assertInertia(
+        fn (Assert $page) => $page->component('Schedule/Show')
+            ->where('announcementsWidget.moreAnnouncementsUrl', $seeMoreUrl)
+    );
 
     // The announcements index now renders through Inertia (see
     // AnnouncementController), so its titles no longer appear in the raw
@@ -127,6 +147,12 @@ it('hides the announcements widget when show_announcements display option is off
 
     $response = get(route('schedules.show', $schedule));
 
+    // The widget itself is still rendered (it's an independent prop from
+    // display_options), but wrapped in `v-if="displayOptions.showAnnouncements"`
+    // in Show.vue, so assert the flag that gates it.
     $response->assertSuccessful();
-    $response->assertDontSee('最新公告');
+    $response->assertInertia(
+        fn (Assert $page) => $page->component('Schedule/Show')
+            ->where('viewModel.displayOptions.show_announcements', false)
+    );
 });

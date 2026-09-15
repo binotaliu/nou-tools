@@ -17,9 +17,19 @@ use Pest\Browser\Api\PendingAwaitablePage;
 // no `student_schedule` cookie is present, and cookie state isn't guaranteed
 // to be reset between test files in the same run. click() has no bounded
 // wait, so blindly dismissing a modal that might not be there can hang the
-// whole suite — check for it first via script(), which returns immediately.
+// whole suite — check for it first via script().
+//
+// Unlike the previous server-rendered Blade+Alpine page (whose modal markup
+// was present in the initial HTML immediately, just CSS-hidden via
+// x-show/x-cloak until Alpine booted), the Vue/Inertia page only mounts the
+// modal into the DOM after client-side hydration completes. A `script()`
+// check run immediately after `visit()` can race that hydration and find
+// nothing — so give it a brief moment first (mirrors the `->wait(1)` idiom
+// used elsewhere for async client state, e.g. tests/Browser/StudyRoomTest.php).
 function dismissRememberModalIfPresent(PendingAwaitablePage $page): void
 {
+    $page->wait(1);
+
     if ($page->script("!!document.querySelector('[data-testid=\"remember-schedule-dismiss\"]')")) {
         $page->click('[data-testid="remember-schedule-dismiss"]');
     }

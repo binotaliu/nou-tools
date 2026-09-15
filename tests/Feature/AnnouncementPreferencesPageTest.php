@@ -2,6 +2,7 @@
 
 use App\Models\StudentSchedule;
 use Illuminate\Support\Str;
+use Inertia\Testing\AssertableInertia as Assert;
 
 use function Pest\Laravel\get;
 use function Pest\Laravel\put;
@@ -14,13 +15,24 @@ it('renders the grouped announcement source catalog', function () {
 
     $response = get(route('schedules.announcement-preferences', $schedule));
 
+    // The group/source labels are rendered client-side (AnnouncementPreferences.vue)
+    // from `viewModel.sourceGroups`, so verify the catalog data itself.
     $response->assertSuccessful();
-    $response->assertSee('各處室');
-    $response->assertSee('學系');
-    $response->assertSee('學習指導中心');
-    $response->assertSee('學校首頁');
-    $response->assertSee('通識博雅教育中心');
-    $response->assertSee('海外學生服務組');
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/AnnouncementPreferences');
+
+        $sourceGroups = $page->toArray()['props']['viewModel']['sourceGroups'];
+        $groupLabels = collect($sourceGroups)->pluck('groupLabel');
+        $sourceNames = collect($sourceGroups)
+            ->flatMap(fn (array $group) => collect($group['sources'])->pluck('source'));
+
+        expect($groupLabels)->toContain('各處室');
+        expect($groupLabels)->toContain('學系');
+        expect($groupLabels)->toContain('學習指導中心');
+        expect($sourceNames)->toContain('學校首頁');
+        expect($sourceNames)->toContain('通識博雅教育中心');
+        expect($sourceNames)->toContain('海外學生服務組');
+    });
 });
 
 it('defaults to all 各處室 sources selected when announcement_categories is null', function () {
@@ -40,10 +52,23 @@ it('defaults to all 各處室 sources selected when announcement_categories is n
 
     $response = get(route('schedules.announcement-preferences', $schedule));
 
+    // The selected-category checkboxes are rendered client-side from
+    // `viewModel.sourceGroups[].sources[].selectedCategories`, so verify
+    // that the 教務處 source is selected with all of its categories.
     $response->assertSuccessful();
+    $response->assertInertia(function (Assert $page) use ($administrativeCategories) {
+        $page->component('Schedule/AnnouncementPreferences');
 
-    $administrativeCategories->each(function (string $category) use ($response): void {
-        $response->assertSee($category, false);
+        $sourceGroups = $page->toArray()['props']['viewModel']['sourceGroups'];
+        $source = collect($sourceGroups)
+            ->flatMap(fn (array $group) => $group['sources'])
+            ->firstWhere('source', '教務處');
+
+        expect($source)->not->toBeNull();
+
+        $administrativeCategories->each(function (string $category) use ($source): void {
+            expect($source['selectedCategories'])->toContain($category);
+        });
     });
 });
 

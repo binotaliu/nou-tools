@@ -22,6 +22,9 @@ final class ScheduleExamViewModel extends Data
         public ?string $examTimeEnd,
         public ?CarbonInterface $earliestExamAt,
         public bool $isTentative,
+        public ?string $formattedMidtermDate,
+        public ?string $formattedFinalDate,
+        public ?string $formattedExamTime,
     ) {}
 
     public static function fromCourse(Course $course, ?CourseClass $firstClass): self
@@ -48,39 +51,28 @@ final class ScheduleExamViewModel extends Data
             $dates->push($finalDate);
         }
 
+        $midtermDate = $course->midterm_date ? Date::parse($course->midterm_date) : null;
+        $finalDate = $course->final_date ? Date::parse($course->final_date) : null;
+
+        $formattedExamTime = match (true) {
+            ! $course->exam_time_start && ! $course->exam_time_end => null,
+            (bool) $course->exam_time_start && (bool) $course->exam_time_end => "{$course->exam_time_start} - {$course->exam_time_end}",
+            default => $course->exam_time_start ?? $course->exam_time_end,
+        };
+
         return new self(
             courseId: $course->id,
             courseName: $course->name,
             classCode: $firstClass?->code,
-            midtermDate: $course->midterm_date ? Date::parse($course->midterm_date) : null,
-            finalDate: $course->final_date ? Date::parse($course->final_date) : null,
+            midtermDate: $midtermDate,
+            finalDate: $finalDate,
             examTimeStart: $course->exam_time_start,
             examTimeEnd: $course->exam_time_end,
             earliestExamAt: $dates->count() > 0 ? $dates->min() : null,
             isTentative: $firstClass === null || $firstClass->is_tentative,
+            formattedMidtermDate: $midtermDate?->isoFormat('M/D (dd)'),
+            formattedFinalDate: $finalDate?->isoFormat('M/D (dd)'),
+            formattedExamTime: $formattedExamTime,
         );
-    }
-
-    public function formattedMidtermDate(): ?string
-    {
-        return $this->midtermDate?->isoFormat('M/D (dd)');
-    }
-
-    public function formattedFinalDate(): ?string
-    {
-        return $this->finalDate?->isoFormat('M/D (dd)');
-    }
-
-    public function formattedExamTime(): ?string
-    {
-        if (! $this->examTimeStart && ! $this->examTimeEnd) {
-            return null;
-        }
-
-        if ($this->examTimeStart && $this->examTimeEnd) {
-            return "{$this->examTimeStart} - {$this->examTimeEnd}";
-        }
-
-        return $this->examTimeStart ?? $this->examTimeEnd;
     }
 }

@@ -7,6 +7,7 @@ use App\Models\StudentScheduleItem;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Inertia\Testing\AssertableInertia as Assert;
 use NouTools\Domains\Schedules\Actions\ImportCourseSelectSimulation;
 
 function fakeCourseSelectSimJsonFor(string $term, string $courseName): string
@@ -32,6 +33,14 @@ function fakeCourseSelectSimJsonFor(string $term, string $courseName): string
 
 function mockCourseSelectSimJson(string $term, string $courseName): void
 {
+    // Catch-all fallbacks so other File facade calls made during the
+    // request (e.g. Inertia's `ensure_pages_exist` testing check, which
+    // stats resource_path('js/pages/...') for the rendered component) don't
+    // trip Mockery's "no matching handler" error — only the course-select
+    // simulation JSON path below needs a specific, non-default answer.
+    File::shouldReceive('exists')->andReturn(true)->byDefault();
+    File::shouldReceive('get')->andReturn('')->byDefault();
+
     File::shouldReceive('exists')
         ->with(resource_path('data/course-select-sim.json'))
         ->andReturnTrue()
@@ -130,9 +139,16 @@ it('editor page lists courses without any classes yet', function () {
 
     $response = $this->get(route('schedules.create', ['term' => '2025B']));
 
-    $response->assertStatus(200)
-        ->assertSee('Map Only Course')
-        ->assertSee('&quot;has_classes&quot;:false', false);
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/Editor');
+
+        $course = collect($page->toArray()['props']['viewModel']['courses'])
+            ->firstWhere('name', 'Map Only Course');
+
+        expect($course)->not->toBeNull();
+        expect($course['has_classes'])->toBeFalse();
+    });
 });
 
 it('updating a schedule replaces pending items scoped to the current term only', function () {
@@ -230,9 +246,19 @@ it('schedule show page renders a pending item with a not-yet-assigned indicator'
 
     $response = $this->get(route('schedules.show', $schedule));
 
-    $response->assertStatus(200)
-        ->assertSee('尚有未選擇班級的課程')
-        ->assertSee('前往選擇班級');
+    // The "尚有未選擇班級的課程" panel is a Vue template branch on
+    // `pendingItems` (items with `courseClassId === null`), so verify the
+    // underlying item data instead.
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/Show');
+
+        $items = $page->toArray()['props']['viewModel']['items'];
+        $pending = collect($items)->firstWhere('courseName', 'Pending Show Course');
+
+        expect($pending)->not->toBeNull();
+        expect($pending['courseClassId'])->toBeNull();
+    });
 });
 
 it('schedule show markdown page shows placeholder columns for a pending item', function () {
@@ -285,10 +311,18 @@ it('editor page shows a tentative class option for a pending course after import
 
     $response = $this->get(route('schedules.create', ['term' => '2025B']));
 
-    $response->assertStatus(200)
-        ->assertSee('&quot;has_classes&quot;:true', false)
-        ->assertSee('&quot;is_tentative&quot;:true', false)
-        ->assertSee('&quot;type&quot;:&quot;morning&quot;', false);
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/Editor');
+
+        $course = collect($page->toArray()['props']['viewModel']['courses'])
+            ->firstWhere('name', 'Notice Session Course');
+
+        expect($course)->not->toBeNull();
+        expect($course['has_classes'])->toBeTrue();
+        expect($course['classes'][0]['is_tentative'])->toBeTrue();
+        expect($course['classes'][0]['type'])->toBe('morning');
+    });
 });
 
 it('shows the chosen tentative class and notice disclaimer on the schedule show page', function () {
@@ -313,10 +347,18 @@ it('shows the chosen tentative class and notice disclaimer on the schedule show 
 
     $response = $this->get(route('schedules.show', $schedule));
 
-    $response->assertStatus(200)
-        ->assertSee('Notice Show Course')
-        ->assertSee('尚未分班')
-        ->assertDontSee('模擬資料');
+    // "尚未分班" is rendered client-side (Show.vue / ClassCode.vue) whenever
+    // `courseClass.isTentative` is true, so verify that flag on the item.
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/Show');
+
+        $items = $page->toArray()['props']['viewModel']['items'];
+        $item = collect($items)->firstWhere('courseName', 'Notice Show Course');
+
+        expect($item)->not->toBeNull();
+        expect($item['courseClass']['isTentative'])->toBeTrue();
+    });
 });
 
 it('shows the chosen tentative class in the markdown export', function () {
@@ -395,9 +437,22 @@ it('shows a pending course with a chosen tentative class under 面授日期', fu
 
     $response = $this->get(route('schedules.show', $schedule));
 
-    $response->assertStatus(200)
-        ->assertSee('面授日期')
-        ->assertSee('Notice Class Dates Course')
-        ->assertSee('尚未分班')
-        ->assertSee('9:00 - 10:50');
+    // "面授日期" and its per-date course entries are rendered client-side
+    // from `viewModel.months`, so verify that data directly.
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/Show');
+
+        $months = $page->toArray()['props']['viewModel']['months'];
+        expect($months)->not->toBeEmpty();
+
+        $courses = collect($months)
+            ->flatMap(fn (array $month) => collect($month['dates'])->flatMap(fn (array $date) => $date['courses']));
+
+        $course = $courses->firstWhere('courseName', 'Notice Class Dates Course');
+
+        expect($course)->not->toBeNull();
+        expect($course['isTentative'])->toBeTrue();
+        expect($course['time'])->toBe('9:00 - 10:50');
+    });
 });

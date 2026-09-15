@@ -11,6 +11,17 @@
     $markdownUrl = $markdownRouteName && \Illuminate\Support\Facades\Route::has($markdownRouteName)
         ? route($markdownRouteName, request()->route()->parameters())
         : null;
+
+    // Mirrors resources/views/components/layout.blade.php's
+    // `$analyticsPage`: the matched route's URI with dynamic segments
+    // masked out (e.g. `/schedules/{schedule}` -> `/schedules/:schedule`),
+    // so per-page analytics group by route shape rather than by every
+    // distinct schedule/course/etc. token.
+    $currentRoute = request()->route();
+
+    $analyticsPage = $currentRoute
+        ? '/'.ltrim(preg_replace('/\{(\w+)\??\}/', ':$1', $currentRoute->uri()), '/')
+        : '/'.ltrim(request()->path(), '/');
 @endphp
 <!DOCTYPE html>
 <html lang="zh-hant">
@@ -93,7 +104,10 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-warm-50 text-warm-900 dark:bg-zinc-950 dark:text-zinc-100">
+<body
+    class="bg-warm-50 text-warm-900 dark:bg-zinc-950 dark:text-zinc-100"
+    data-analytics-page="{{ $analyticsPage }}"
+>
     @inertia
 </body>
 </html>

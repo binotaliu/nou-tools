@@ -4,6 +4,7 @@ use App\Models\CourseClass;
 use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
 use Illuminate\Support\Str;
+use Inertia\Testing\AssertableInertia as Assert;
 
 // Countdown days, status ("進行中"), and date formatting are computed on the
 // client from the viewer's Taipei calendar date (see window.nouToolsSchoolCalendar
@@ -77,9 +78,17 @@ it('displays school calendar on schedule show page', function () {
 
     $response = $this->get(route('schedules.show', $schedule));
 
-    $response->assertStatus(200)
-        ->assertSee('學校行事曆')
-        ->assertSee('課程開播');
+    // School calendar events are server-computed into the `schoolCalendar`
+    // prop (see ScheduleController::show) and rendered client-side by
+    // SchoolCalendar.vue, so assert against the prop's raw event payload.
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/Show');
+
+        $names = collect($page->toArray()['props']['schoolCalendar']['events'])->pluck('name');
+
+        expect($names)->toContain('課程開播');
+    });
 });
 
 it('shows the full calendar including past events when a non-current semester is selected', function () {
@@ -115,10 +124,15 @@ it('shows the full calendar including past events when a non-current semester is
 
     $response = $this->get(route('schedules.show', $schedule).'?term=2025A');
 
-    $response->assertStatus(200)
-        ->assertSee('學校行事曆')
-        ->assertSee('114上學期開始')
-        ->assertSee('114上學期期中考');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/Show')->where('schoolCalendar.showPastEvents', true);
+
+        $names = collect($page->toArray()['props']['schoolCalendar']['events'])->pluck('name');
+
+        expect($names)->toContain('114上學期開始');
+        expect($names)->toContain('114上學期期中考');
+    });
 });
 
 it('filters out past events from the embedded payload', function () {

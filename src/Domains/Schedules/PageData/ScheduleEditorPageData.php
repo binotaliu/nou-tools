@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Schedules\PageData;
 
-use App\Models\StudentSchedule;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 use NouTools\Domains\Schedules\ViewModels\ScheduleEditorCourseViewModel;
+use NouTools\Domains\Schedules\ViewModels\ScheduleEditorSelectedItemViewModel;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\DataCollection;
 use Spatie\LaravelData\Resource;
@@ -20,7 +20,10 @@ final class ScheduleEditorPageData extends Resource
         public string $selectedTerm,
         /** @var array<int, string> */
         public array $availableTerms,
-        public ?StudentSchedule $schedule,
+        public ?string $scheduleUuid,
+        public ?string $scheduleName,
+        #[DataCollectionOf(ScheduleEditorSelectedItemViewModel::class)]
+        public ?DataCollection $selectedItems,
         public ?StudentScheduleCookie $previousSchedule,
     ) {}
 }
