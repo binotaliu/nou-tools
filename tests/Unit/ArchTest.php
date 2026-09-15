@@ -12,7 +12,6 @@ use App\Models\StudentScheduleItem;
 use App\Models\User;
 use App\Providers\AppServiceProvider;
 use App\View\Components\Button;
-use App\View\Components\LinkButton;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use NouTools\Domains\Schedules\Actions\GenerateScheduleCalendar;
@@ -51,9 +50,9 @@ arch()->preset()->strict()
         // table, infolist, ...); not a code smell.
         'App\Filament',
 
-        // LinkButton extends Button and overrides its protected style helpers.
+        // Used only for its CSS-class-computation helpers (getClasses() and
+        // friends) by CtaRenderer; never rendered as a Blade component.
         Button::class,
-        LinkButton::class,
     ]);
 
 arch('Actions')
