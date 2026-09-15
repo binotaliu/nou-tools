@@ -3,13 +3,13 @@
 use App\Enums\CourseClassType;
 use App\Models\Course;
 use App\Models\CourseClass;
-use Illuminate\Support\Str;
+use Inertia\Testing\AssertableInertia as Assert;
 
 test('course schedule page loads successfully', function () {
     $response = $this->get(route('course.schedule'));
 
-    $response->assertStatus(200)
-        ->assertSee('本學期開課表');
+    $response->assertStatus(200);
+    $response->assertInertia(fn (Assert $page) => $page->component('Courses/Schedule'));
 });
 
 test('course schedule page includes seo meta description for the selected term', function () {
@@ -17,17 +17,16 @@ test('course schedule page includes seo meta description for the selected term',
 
     $response = $this->get(route('course.schedule'));
 
-    $response->assertStatus(200)
-        ->assertSee(
-            '<meta name="description" content="國立空中大學 '.Str::toSemesterDisplay($term).'開課表，查詢各學系課程的學分數與考試時間。" />',
-            false
-        );
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) use ($term) {
+        expect($page->toArray()['props']['viewModel']['selectedTerm'])->toBe($term);
+    });
 });
 
 // Course grouping (by exam time / department / credits) and the split
-// between 一般課程 and 微學分與全遠距 are rendered entirely client-side by
-// Alpine from the JSON payload embedded in the page, so ordering and
-// grouping are only observable with a real browser. See
+// between 一般課程 and 微學分與全遠距 are rendered entirely client-side by Vue
+// from the `viewModel.groups` / `viewModel.microCreditOrRemoteCourses` props,
+// so ordering and grouping are only observable with a real browser. See
 // tests/Browser/CourseScheduleTest.php.
 
 test('courses without a final exam time are excluded from the general section', function () {
@@ -40,8 +39,15 @@ test('courses without a final exam time are excluded from the general section', 
 
     $response = $this->get(route('course.schedule'));
 
-    $response->assertStatus(200)
-        ->assertDontSee('No Exam Course');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+        $names = collect($viewModel['groups'])
+            ->flatMap(fn (array $group) => collect($group['courses'])->pluck('name'))
+            ->merge(collect($viewModel['microCreditOrRemoteCourses'])->pluck('name'));
+
+        expect($names)->not->toContain('No Exam Course');
+    });
 });
 
 test('courses with only a tentative full_remote or micro_credit class are still included on the page', function () {
@@ -56,8 +62,13 @@ test('courses with only a tentative full_remote or micro_credit class are still 
 
     $response = $this->get(route('course.schedule'));
 
-    $response->assertStatus(200)
-        ->assertSee('Tentative Remote Course');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+
+        expect(collect($viewModel['microCreditOrRemoteCourses'])->pluck('name'))
+            ->toContain('Tentative Remote Course');
+    });
 });
 
 test('term query parameter selects a different semester', function () {
@@ -78,9 +89,16 @@ test('term query parameter selects a different semester', function () {
 
     $response = $this->get(route('course.schedule', ['term' => '2025A']));
 
-    $response->assertStatus(200)
-        ->assertDontSee('Current Term Course')
-        ->assertSee('Other Term Course');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+        $names = collect($viewModel['groups'])
+            ->flatMap(fn (array $group) => collect($group['courses'])->pluck('name'));
+
+        expect($names)->toContain('Other Term Course');
+        expect($names)->not->toContain('Current Term Course');
+        expect($viewModel['selectedTerm'])->toBe('2025A');
+    });
 });
 
 test('term selector lists all distinct terms', function () {
@@ -90,10 +108,12 @@ test('term selector lists all distinct terms', function () {
 
     $response = $this->get(route('course.schedule'));
 
-    $response->assertStatus(200)
-        ->assertSee('value="2025B"', false)
-        ->assertSee('value="2025A"', false)
-        ->assertSee('value="2024B"', false);
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $availableTerms = $page->toArray()['props']['viewModel']['availableTerms'];
+
+        expect($availableTerms)->toContain('2025B', '2025A', '2024B');
+    });
 });
 
 test('markdown version of the course schedule page is available', function () {

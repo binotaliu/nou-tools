@@ -6,6 +6,7 @@ use App\Models\PreviousExam;
 use App\Models\StudentSchedule;
 use App\Models\Textbook;
 use Illuminate\Support\Str;
+use Inertia\Testing\AssertableInertia as Assert;
 
 test('course show page loads successfully', function () {
     $course = Course::factory()->create([
@@ -16,9 +17,15 @@ test('course show page loads successfully', function () {
 
     $response = $this->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee('Test Course')
-        ->assertSee('Test Department');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Courses/Show');
+
+        $courseData = $page->toArray()['props']['viewModel']['course'];
+
+        expect($courseData['name'])->toBe('Test Course');
+        expect($courseData['department'])->toBe('Test Department');
+    });
 });
 
 test('course show page includes seo meta description', function () {
@@ -31,11 +38,18 @@ test('course show page includes seo meta description', function () {
 
     $response = $this->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee(
-            'Test Course 是國立空中大學 Test Department 在 '.Str::toSemesterDisplay('11401').' 開設的 3 學分課程',
-            false
-        );
+    // The <meta name="description"> is rendered client-side by
+    // Courses/Show.vue from viewModel.course; assert the underlying data
+    // instead of the rendered tag (there's no SSR yet).
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $courseData = $page->toArray()['props']['viewModel']['course'];
+
+        expect($courseData['name'])->toBe('Test Course');
+        expect($courseData['department'])->toBe('Test Department');
+        expect($courseData['credits'])->toBe(3);
+        expect($courseData['term'])->toBe('11401');
+    });
 });
 
 test('course show page displays course information', function () {
@@ -53,14 +67,19 @@ test('course show page displays course information', function () {
 
     $response = $this->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee('Advanced Testing')
-        ->assertSee('必修')
-        ->assertSee('3 學分')
-        ->assertSee('Computer Science')
-        ->assertSee('四次')
-        ->assertSee('網頁')
-        ->assertSee('進階');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+        $courseData = $viewModel['course'];
+
+        expect($courseData['name'])->toBe('Advanced Testing');
+        expect($courseData['creditType'])->toBe('必修');
+        expect($courseData['credits'])->toBe(3);
+        expect($courseData['department'])->toBe('Computer Science');
+        expect($viewModel['inPersonClassType'])->toBe('四次');
+        expect($viewModel['media'])->toBe('網頁');
+        expect($courseData['nature'])->toBe('進階');
+    });
 });
 
 test('course show page displays course classes', function () {
@@ -79,13 +98,16 @@ test('course show page displays course classes', function () {
 
     $response = $this->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee('TEST001')
-        ->assertSee('王')
-        ->assertSee('老師')
-        ->assertDontSee('~');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $classes = $page->toArray()['props']['viewModel']['course']['classes'];
 
-    $this->assertMatchesRegularExpression('/09:00\s*-\s*11:00/', $response->getContent());
+        expect($classes)->toHaveCount(1);
+        expect($classes[0]['code'])->toBe('TEST001');
+        expect($classes[0]['teacherName'])->toBe('王老師');
+        expect($classes[0]['startTime'])->toBe('09:00');
+        expect($classes[0]['endTime'])->toBe('11:00');
+    });
 });
 
 test('schedule-level overrides show next to dates only', function () {
@@ -112,13 +134,19 @@ test('schedule-level overrides show next to dates only', function () {
 
     $response = $this->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee($dateWithOverride->format('n/j'))
-        ->assertSee($dateWithoutOverride->format('n/j'))
-        ->assertDontSee('~');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) use ($dateWithOverride, $dateWithoutOverride) {
+        $sessions = $page->toArray()['props']['viewModel']['course']['classes'][0]['sessions'];
+        $byDate = collect($sessions)->keyBy('date');
 
-    $this->assertMatchesRegularExpression('/09:00\s*-\s*11:00/', $response->getContent());
-    $this->assertMatchesRegularExpression('/14:00\s*-\s*16:00/', $response->getContent());
+        $overrideSession = $byDate->get($dateWithOverride->toDateString());
+        $defaultSession = $byDate->get($dateWithoutOverride->toDateString());
+
+        expect($overrideSession['startTime'])->toBe('14:00');
+        expect($overrideSession['endTime'])->toBe('16:00');
+        expect($defaultSession['startTime'])->toBe('09:00');
+        expect($defaultSession['endTime'])->toBe('11:00');
+    });
 });
 
 test('course show page with missing schedule information', function () {
@@ -130,9 +158,13 @@ test('course show page with missing schedule information', function () {
 
     $response = $this->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee('EMPTY001')
-        ->assertSee('未設定上課時間');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $classes = $page->toArray()['props']['viewModel']['course']['classes'];
+
+        expect($classes[0]['code'])->toBe('EMPTY001');
+        expect($classes[0]['sessions'])->toBe([]);
+    });
 });
 
 test('course show page without classes', function () {
@@ -142,8 +174,13 @@ test('course show page without classes', function () {
 
     $response = $this->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee('Standalone Course');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+
+        expect($viewModel['course']['name'])->toBe('Standalone Course');
+        expect($viewModel['course']['classes'])->toBe([]);
+    });
 });
 
 test('course show page shows previous-schedule link when cookie exists', function () {
@@ -160,9 +197,14 @@ test('course show page shows previous-schedule link when cookie exists', functio
         'name' => $schedule->name,
     ]))->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee('回到我的課表')
-        ->assertSee(route('schedules.show', $schedule));
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) use ($schedule) {
+        $previousSchedule = $page->toArray()['props']['viewModel']['previousSchedule'];
+
+        expect($previousSchedule)->not->toBeNull();
+        expect($previousSchedule['uuid'])->toBe((string) $schedule->uuid);
+        expect($previousSchedule['token'])->toBe((string) $schedule->getRouteKey());
+    });
 });
 
 // new test for multiple previous exams
@@ -201,19 +243,32 @@ test('course show page displays all previous exams for course when cookie exists
         'name' => $schedule->name,
     ]))->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee('考古題')
-        ->assertSee('114上學期')
-        ->assertSee('115下學期')
-        ->assertSee('mid1.pdf')
-        ->assertSee('mid1b.pdf')
-        ->assertSee('fin1.pdf')
-        ->assertSee('fin1b.pdf')
-        ->assertSee('mid2.pdf')
-        ->assertSee('fin2b.pdf');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $previousExams = $page->toArray()['props']['viewModel']['course']['previousExams'];
+        $terms = collect($previousExams)->pluck('term');
+
+        expect($terms)->toContain('114上學期', '115下學期');
+
+        $first = collect($previousExams)->firstWhere('term', '114上學期');
+        $second = collect($previousExams)->firstWhere('term', '115下學期');
+
+        expect($first['midtermReferencePrimary'])->toBe('mid1.pdf');
+        expect($first['midtermReferenceSecondary'])->toBe('mid1b.pdf');
+        expect($first['finalReferencePrimary'])->toBe('fin1.pdf');
+        expect($first['finalReferenceSecondary'])->toBe('fin1b.pdf');
+        expect($second['midtermReferencePrimary'])->toBe('mid2.pdf');
+        expect($second['finalReferenceSecondary'])->toBe('fin2b.pdf');
+    });
 });
 
 test('course show page sets download attribute with subject name and term for exam links', function () {
+    // The `download="..."` attribute (course name with Str::toFilenameSafe()
+    // applied + term + reference filename) is built client-side by
+    // Courses/Show.vue's examSubjectName/fileExtension helpers, not
+    // server-rendered, so this asserts the raw ViewModel data those helpers
+    // need is present and unmodified (the filename-unsafe characters in
+    // particular) rather than the rendered attribute.
     $course = Course::factory()->create(['name' => 'History/101: Intro']);
 
     $schedule = StudentSchedule::create([
@@ -237,11 +292,18 @@ test('course show page sets download attribute with subject name and term for ex
         'name' => $schedule->name,
     ]))->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee('download="History101 Intro_114上學期_期中考正參.pdf"', false)
-        ->assertSee('download="History101 Intro_114上學期_期中考副參.pdf"', false)
-        ->assertSee('download="History101 Intro_114上學期_期末考正參.pdf"', false)
-        ->assertSee('download="History101 Intro_114上學期_期末考副參.pdf"', false);
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+        $exam = $viewModel['course']['previousExams'][0];
+
+        expect($viewModel['course']['name'])->toBe('History/101: Intro');
+        expect($exam['term'])->toBe('114上學期');
+        expect($exam['midtermReferencePrimary'])->toBe('mid1.pdf');
+        expect($exam['midtermReferenceSecondary'])->toBe('mid1b.pdf');
+        expect($exam['finalReferencePrimary'])->toBe('fin1.pdf');
+        expect($exam['finalReferenceSecondary'])->toBe('fin1b.pdf');
+    });
 });
 
 test('course show page displays exam information', function () {
@@ -255,18 +317,20 @@ test('course show page displays exam information', function () {
 
     $response = $this->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee('期中考')
-        ->assertSee('期末考')
-        ->assertSee('4/25')
-        ->assertSee('6/27');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $courseData = $page->toArray()['props']['viewModel']['course'];
 
-    $this->assertMatchesRegularExpression('/13:30\s*-\s*14:40/', $response->getContent());
+        expect($courseData['midtermDate'])->toBe('2025-04-25');
+        expect($courseData['finalDate'])->toBe('2025-06-27');
+        expect($courseData['examTimeStart'])->toBe('13:30');
+        expect($courseData['examTimeEnd'])->toBe('14:40');
+    });
 });
 
 test('course show page displays textbook information', function () {
     $course = Course::factory()->create();
-    $textbook = Textbook::factory()->create([
+    Textbook::factory()->create([
         'course_id' => $course->id,
         'book_title' => 'Introduction to Testing',
         'edition' => '第2版',
@@ -276,12 +340,15 @@ test('course show page displays textbook information', function () {
 
     $response = $this->get(route('course.show', $course));
 
-    $response->assertStatus(200)
-        ->assertSee('教科書資訊')
-        ->assertSee('Introduction to Testing')
-        ->assertSee('第2版')
-        ->assertSee('200元')
-        ->assertSee('https://example.com/book');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $textbook = $page->toArray()['props']['viewModel']['course']['textbook'];
+
+        expect($textbook['bookTitle'])->toBe('Introduction to Testing');
+        expect($textbook['edition'])->toBe('第2版');
+        expect($textbook['priceInfo'])->toBe('200元');
+        expect($textbook['referenceUrl'])->toBe('https://example.com/book');
+    });
 });
 
 test('course show markdown page lists class and exam information', function () {
@@ -293,7 +360,7 @@ test('course show markdown page lists class and exam information', function () {
         'exam_time_end' => '14:40',
     ]);
 
-    $class = CourseClass::factory()->create([
+    CourseClass::factory()->create([
         'course_id' => $course->id,
         'code' => 'MD101',
         'start_time' => '09:00',
@@ -303,7 +370,7 @@ test('course show markdown page lists class and exam information', function () {
         'backup_classroom_url' => 'https://example.com/backup-link',
     ]);
 
-    $textbook = Textbook::factory()->create([
+    Textbook::factory()->create([
         'course_id' => $course->id,
         'book_title' => 'Introduction to Testing',
     ]);
