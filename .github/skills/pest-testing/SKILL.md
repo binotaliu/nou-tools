@@ -67,6 +67,26 @@ it('returns all', function () {
 | `assertNotFound()`   | `assertStatus(404)` |
 | `assertForbidden()`  | `assertStatus(403)` |
 
+## Inertia-Aware Testing
+
+For controller-level HTTP feature tests against Inertia-migrated pages, use `assertInertia()` instead of Blade-response checks like `assertSee()`:
+
+<!-- Pest Inertia Assertion Example -->
+
+```php
+use Inertia\Testing\AssertableInertia as Assert;
+
+it('renders the schedule page', function () {
+    $this->actingAs(User::factory()->create())
+        ->get('/schedules/my')
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Schedules/My')
+            ->has('viewModel'));
+});
+```
+
+Real browser tests (`visit()->assertSee()->assertNoJavaScriptErrors()`) need no special Inertia handling — they exercise the actually-rendered SPA in a real browser and keep working unchanged across the migration.
+
 ## Mocking
 
 Import mock function before use: `use function Pest\Laravel\mock;`
