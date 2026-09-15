@@ -15,6 +15,7 @@ final class DiscountStoreIndexPageData extends Resource
 {
     /**
      * @param  Collection<int, string>  $cities
+     * @param  array<int, array{value: string, label: string}>  $types
      */
     public function __construct(
         #[DataCollectionOf(DiscountStoreViewModel::class)]
@@ -22,6 +23,7 @@ final class DiscountStoreIndexPageData extends Resource
         #[DataCollectionOf(DiscountStoreCategoryViewModel::class)]
         public DataCollection $categories,
         public Collection $cities,
+        public array $types,
         public ?int $selectedCategoryId,
         public ?string $selectedType,
         public ?string $search,

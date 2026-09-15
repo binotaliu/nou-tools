@@ -11,25 +11,29 @@ use App\Models\DiscountStoreCategory;
 use Coderflex\LaravelTurnstile\Rules\TurnstileCheck;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use NouTools\Domains\DiscountStores\Actions\LoadTaiwanRegions;
+use NouTools\Domains\DiscountStores\Actions\ShowDiscountStoreDetailPage;
 use NouTools\Domains\DiscountStores\Actions\ShowDiscountStorePage;
 use NouTools\Domains\DiscountStores\Actions\SubmitDiscountStore;
 use NouTools\Domains\DiscountStores\DataTransferObjects\ShowDiscountStorePageData;
 use NouTools\Domains\DiscountStores\DataTransferObjects\SubmitDiscountStoreDTO;
+use NouTools\Domains\DiscountStores\ViewModels\DiscountStoreCategoryViewModel;
+use Spatie\LaravelData\DataCollection;
 
 final class DiscountStoreController extends Controller
 {
     public function index(
         ShowDiscountStorePage $showDiscountStorePage,
         ShowDiscountStorePageData $input,
-    ): View {
-        return view('discount-stores.index', [
+    ): Response {
+        return Inertia::render('DiscountStores/Index', [
             'viewModel' => $showDiscountStorePage($input),
         ]);
     }
 
-    public function create(LoadTaiwanRegions $loadTaiwanRegions): View
+    public function create(LoadTaiwanRegions $loadTaiwanRegions): Response
     {
         $regions = $loadTaiwanRegions();
 
@@ -44,30 +48,31 @@ final class DiscountStoreController extends Controller
             ])
             ->all();
 
-        return view('discount-stores.create', [
-            'categories' => DiscountStoreCategory::query()->orderBy('sort_order')->get(),
-            'types' => DiscountStoreType::cases(),
+        $categories = DiscountStoreCategory::query()->orderBy('sort_order')->get();
+
+        return Inertia::render('DiscountStores/Create', [
+            'categories' => DiscountStoreCategoryViewModel::collect(
+                $categories->map(fn (DiscountStoreCategory $category) => DiscountStoreCategoryViewModel::fromModel($category)),
+                DataCollection::class,
+            ),
+            'types' => collect(DiscountStoreType::cases())
+                ->map(fn (DiscountStoreType $type): array => ['value' => $type->value, 'label' => $type->label()])
+                ->all(),
             'cities' => $cities,
             'districtsByCity' => $districtsByCity,
+            'turnstileSiteKey' => config('turnstile.turnstile_site_key'),
         ]);
     }
 
-    public function show(DiscountStore $store): View
+    public function show(DiscountStore $store, ShowDiscountStoreDetailPage $showDiscountStoreDetailPage): Response
     {
         abort_unless($store->status === DiscountStoreStatus::Online, 404);
 
-        $store->load([
-            'category',
-            'reports' => fn ($query) => $query->latest()->limit(6),
-            'comments' => fn ($query) => $query->where('is_approved', true)->latest(),
-        ])->loadCount([
-            'reports as valid_reports_count' => fn ($query) => $query->where('is_valid', true),
-            'reports as invalid_reports_count' => fn ($query) => $query->where('is_valid', false),
-            'comments' => fn ($query) => $query->where('is_approved', true),
-        ]);
-
-        return view('discount-stores.show', [
-            'store' => $store,
+        return Inertia::render('DiscountStores/Show', [
+            'viewModel' => $showDiscountStoreDetailPage($store),
+            'mapTileLayer' => config('services.map.tileLayer'),
+            'mapTileLayerAttribution' => config('services.map.tileLayerAttribution'),
+            'turnstileSiteKey' => config('turnstile.turnstile_site_key'),
         ]);
     }
 
