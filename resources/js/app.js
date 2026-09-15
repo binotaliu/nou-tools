@@ -1,5 +1,7 @@
 import './bootstrap'
 import Alpine from '@alpinejs/csp'
+import { createApp, h } from 'vue'
+import { createInertiaApp } from '@inertiajs/vue3'
 import scheduleEditor from './schedule-editor'
 import courseSchedule from './course-schedule'
 import linksCenterMap from './links-center-map'
@@ -11,6 +13,27 @@ import nouStudyRoom from './study-room'
 import registerAlpineComponents from './alpine-components'
 
 window.Alpine = Alpine
+
+// Migration transition: existing Blade pages still render via
+// components/layout.blade.php and are driven by Alpine (below). Pages that
+// have been migrated to Inertia render resources/views/app.blade.php, which
+// provides a `<div id="app">` for Inertia to mount into. No pages use it yet
+// (see the migration plan), so this only boots the Vue/Inertia runtime when
+// that div is actually present, leaving every current Alpine-driven page
+// untouched.
+if (document.getElementById('app')) {
+  createInertiaApp({
+    resolve: name => {
+      const pages = import.meta.glob('./Pages/**/*.vue', { eager: false })
+      return pages[`./Pages/${name}.vue`]()
+    },
+    setup({ el, App, props, plugin }) {
+      createApp({ render: () => h(App, props) })
+        .use(plugin)
+        .mount(el)
+    },
+  })
+}
 
 // Registers the offline-support service worker (see public/sw.js). It caches
 // previously-visited home and /schedules/{schedule} pages (plus their assets)

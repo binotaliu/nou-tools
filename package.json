@@ -45,6 +45,9 @@
   },
   "dependencies": {
     "@alpinejs/csp": "^3.17.2",
-    "leaflet": "^1.9.4"
+    "@inertiajs/vue3": "^3.7.1",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "leaflet": "^1.9.4",
+    "vue": "^3.5.42"
   }
 }
