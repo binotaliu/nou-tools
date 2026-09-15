@@ -39,12 +39,14 @@ src/Domains/{Domain}/
 
 ## Frontend Rendering
 
-Migrating incrementally from Blade+Alpine.js to Inertia.js+Vue. Not all pages are migrated yet — until a page is migrated it still uses `components/layout.blade.php` + `resources/js/alpine-components.js`.
+Public-facing pages are Inertia.js+Vue. The Blade+Alpine.js UI they replaced is gone; Filament's admin panel (`app/Filament/`, Blade+Livewire) is a separate, untouched system.
 
 - Inertia pages live in `resources/js/Pages/{Domain}/`, mirroring the `src/Domains/{Domain}/` naming.
 - Shared layout is `resources/js/Layouts/AppLayout.vue`; pages wrap themselves in it.
 - ViewModels/DTOs pass straight into `Inertia::render()` as props — no reshaping, same objects that used to go into `view()`.
 - **Exception: StudyRoom.** Inertia is used only for the page shell/navigation there. Live seat/session state is fetched and mutated via its existing REST JSON endpoints and Echo/Reverb broadcasts, not Inertia props — seat-claim state changes far more frequently than a page-prop model suits.
+- **Alpine.js is still loaded, narrowly.** Article Markdown content (`src/Domains/Articles/Markdown/Container/Renderers`) is rendered server-side to raw HTML and mounted via `v-html` (see `resources/js/Pages/Articles/Show.vue`/`Index.vue`), so the `:::tabs`, `:::checklist`, and `:::countdown` containers emit plain `x-data`/`x-show`/`@click` attributes that Vue never sees. `resources/js/app.js` boots Alpine (`@alpinejs/csp`) just for these — `nouToolsChecklist` and `nouToolsCountdown` are its only remaining registrations. Every other page-level Alpine component was ported to a Vue composable/component and removed.
+- `resources/views/offline.blade.php` (PWA offline fallback) and the machine-readable exports (`sitemap.blade.php`, `redocly.blade.php`, `llms-txt.md.blade.php`, `*/markdown/*.md.blade.php`) stay plain Blade by design — no Inertia, no Alpine.
 
 ## 自習室 (Study Room)
 
