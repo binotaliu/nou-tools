@@ -13,7 +13,7 @@
 // page is exactly when the full nav (with its live theme/menu state) is
 // least likely to be useful. This page mirrors that same minimal chrome.
 import { computed } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import Icon from '../Components/Icon.vue'
 
 const props = defineProps({
@@ -78,7 +78,7 @@ function goBack() {
           name="book-open"
           class="size-5 shrink-0 text-warm-700 md:size-6 dark:text-zinc-300"
         />
-        <a href="/" class="shrink-0">NOU 小幫手</a>
+        <Link href="/" class="shrink-0">NOU 小幫手</Link>
       </h1>
     </div>
   </header>
@@ -124,12 +124,12 @@ function goBack() {
             >
               回到上一頁
             </button>
-            <a
+            <Link
               href="/"
               class="flex-1 rounded-md bg-warm-600 px-4 py-2 text-center font-medium text-white transition-colors hover:bg-warm-700"
             >
               回到首頁
-            </a>
+            </Link>
           </div>
         </div>
       </div>

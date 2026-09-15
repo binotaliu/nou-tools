@@ -3,6 +3,8 @@
 // (App\View\Components\AnnouncementsWidget). Purely presentational — all
 // filtering/preference resolution happens server-side (see
 // ScheduleController::show's `announcementsWidget` prop).
+import { Link } from '@inertiajs/vue3'
+
 defineProps({
   scheduleUuid: {
     type: String,
@@ -43,12 +45,12 @@ function relativeLabel(announcement) {
         class="rounded-lg border border-dashed border-warm-300 bg-warm-50 px-4 py-6 text-center text-sm text-warm-600 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
       >
         尚未選擇任何公告分類。
-        <a
+        <Link
           :href="`/schedules/${scheduleUuid}/announcement-preferences`"
           class="font-medium text-orange-700 hover:underline dark:text-orange-400"
         >
           立即選擇
-        </a>
+        </Link>
       </div>
 
       <div
@@ -105,19 +107,19 @@ function relativeLabel(announcement) {
       <div
         class="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between"
       >
-        <a
+        <Link
           :href="moreAnnouncementsUrl"
           class="text-sm font-medium text-orange-700 hover:underline dark:text-orange-400"
         >
           檢視更多公告
-        </a>
+        </Link>
 
-        <a
+        <Link
           :href="`/schedules/${scheduleUuid}/announcement-preferences`"
           class="text-sm text-warm-600 hover:underline dark:text-zinc-400"
         >
           選擇公告分類
-        </a>
+        </Link>
       </div>
     </div>
   </div>

@@ -15,7 +15,7 @@
 // LearningProgress/Show.vue's progress form avoids Inertia's request cycle
 // for the same class of reason.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
+import { Head, Link, router } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 
@@ -236,14 +236,14 @@ const csrfToken =
           </div>
         </div>
         <div class="flex gap-2">
-          <a
+          <Link
             :href="`/schedules/${viewModel.previousSchedule.token}`"
             class="rounded bg-yellow-400 px-4 py-2 font-semibold text-yellow-900 hover:bg-yellow-500 dark:bg-yellow-600 dark:text-yellow-100 dark:hover:bg-yellow-500"
             data-analytics-event="schedule_open_previous"
             data-analytics-feature="schedule"
           >
             檢視舊課表
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -558,7 +558,7 @@ const csrfToken =
             <span v-if="!submitting">{{ submitLabel }}</span>
             <span v-else>{{ submittingLabel }}</span>
           </button>
-          <a
+          <Link
             :href="
               editing
                 ? `/schedules/${viewModel.scheduleUuid}`
@@ -567,7 +567,7 @@ const csrfToken =
             class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-6 py-3 text-lg font-semibold text-warm-900 transition hover:bg-warm-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
           >
             取消
-          </a>
+          </Link>
         </div>
       </form>
     </div>

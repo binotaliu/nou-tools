@@ -6,7 +6,7 @@
 // video-course date picker is the `nouDatePicker` Alpine.data() component
 // (resources/js/alpine-components.js); useDatePicker.js is its Vue port.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import Greeting from '../../Components/Greeting.vue'
@@ -163,7 +163,7 @@ const courses = computed(() =>
             </h2>
           </div>
 
-          <a
+          <Link
             v-if="viewModel.previousSchedule"
             :href="`/schedules/${viewModel.previousSchedule.token}`"
             data-analytics-event="schedule_open_previous"
@@ -175,8 +175,8 @@ const courses = computed(() =>
             <span class="max-w-xs truncate">
               {{ viewModel.previousSchedule.name ?? '（未命名）' }}
             </span>
-          </a>
-          <a
+          </Link>
+          <Link
             v-else
             href="/schedules/create"
             data-analytics-event="schedule_create_start"
@@ -186,18 +186,18 @@ const courses = computed(() =>
             <Icon name="table-cells" class="size-4" />
 
             建立我的課表
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/announcements"
             class="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 font-semibold text-warm-900 transition hover:bg-warm-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
           >
             <Icon name="megaphone" class="size-4" />
 
             學校公告
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/directory"
             data-offline-allow
             class="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 font-semibold text-warm-900 transition hover:bg-warm-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
@@ -205,20 +205,20 @@ const courses = computed(() =>
             <Icon name="map" class="size-4" />
 
             連結 / 學習指導中心目錄
-          </a>
+          </Link>
 
           <div
             v-if="viewModel.previousSchedule"
             class="mt-3 w-full text-center text-sm"
           >
-            <a
+            <Link
               href="/schedules/create"
               class="text-warm-600 underline hover:text-warm-800 dark:text-zinc-400 dark:hover:text-zinc-200"
               data-analytics-event="schedule_create_start"
               data-analytics-feature="schedule"
             >
               建立新課表
-            </a>
+            </Link>
           </div>
         </div>
 

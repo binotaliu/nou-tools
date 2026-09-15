@@ -16,7 +16,7 @@
 // without risking a duplicate/conflicting <link> tag, so that scoping is
 // not carried over here — installs fall back to the site-wide manifest.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import Greeting from '../../Components/Greeting.vue'
@@ -417,7 +417,7 @@ function localHint(next) {
             class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden"
           >
             <div class="flex w-full shrink-0 gap-2 sm:w-1/2 lg:w-auto">
-              <a
+              <Link
                 :href="`/schedules/${viewModel.uuid}/edit?term=${viewModel.selectedTerm}`"
                 data-analytics-event="schedule_edit"
                 data-analytics-feature="schedule"
@@ -425,9 +425,9 @@ function localHint(next) {
               >
                 <Icon name="pencil-square" class="size-4" />
                 編輯
-              </a>
+              </Link>
 
-              <a
+              <Link
                 :href="`/schedules/${viewModel.uuid}/customize`"
                 data-analytics-event="schedule_customize_open"
                 data-analytics-feature="schedule"
@@ -435,10 +435,10 @@ function localHint(next) {
               >
                 <Icon name="cog-6-tooth" class="size-4" />
                 自訂
-              </a>
+              </Link>
             </div>
 
-            <a
+            <Link
               :href="`/schedules/${viewModel.uuid}/${viewModel.selectedTerm}/learning-progress`"
               data-analytics-event="learning_progress_open"
               data-analytics-feature="learning_progress"
@@ -446,9 +446,9 @@ function localHint(next) {
             >
               <Icon name="clipboard" class="size-4" />
               學習進度表
-            </a>
+            </Link>
 
-            <a
+            <Link
               :href="`/schedules/${viewModel.uuid}/subscribe`"
               data-analytics-event="calendar_subscribe_open"
               data-analytics-feature="schedule"
@@ -456,7 +456,7 @@ function localHint(next) {
             >
               <Icon name="calendar" class="inline size-4" />
               訂閱行事曆
-            </a>
+            </Link>
           </div>
 
           <div
@@ -560,12 +560,12 @@ function localHint(next) {
 
           <p class="text-sm text-warm-600 dark:text-zinc-400">
             您可以切換其他學期，或前往
-            <a
+            <Link
               :href="`/schedules/${viewModel.uuid}/edit?term=${viewModel.selectedTerm}`"
               class="font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
             >
               編輯課表
-            </a>
+            </Link>
             新增課程。
           </p>
         </div>
@@ -724,14 +724,14 @@ function localHint(next) {
                 <td
                   class="px-4 py-3 text-warm-800 dark:text-zinc-200 print:hidden"
                 >
-                  <a
+                  <Link
                     :href="row.item.courseInfoUrl"
                     class="mr-3 inline-flex items-center gap-1 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
                     :aria-label="row.item.courseName + ' 的課程資訊'"
                   >
                     <Icon name="information-circle" class="inline size-4" />
                     課程資訊
-                  </a>
+                  </Link>
 
                   <a
                     v-show="row.item.videoLink"
@@ -861,13 +861,13 @@ function localHint(next) {
               <div
                 class="flex gap-2 border-t border-warm-100 pt-3 dark:border-zinc-800"
               >
-                <a
+                <Link
                   :href="row.item.courseInfoUrl"
                   class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-warm-800 underline underline-offset-4 transition hover:bg-warm-50 hover:text-warm-900 dark:text-zinc-200 dark:hover:bg-zinc-950 dark:hover:text-zinc-100"
                 >
                   <Icon name="information-circle" class="mr-1 inline size-4" />
                   課程資訊
-                </a>
+                </Link>
 
                 <a
                   v-show="row.item.videoLink"
@@ -937,12 +937,12 @@ function localHint(next) {
             class="flex items-center justify-between gap-3 text-warm-700 dark:text-zinc-300"
           >
             <span>{{ item.courseName }}</span>
-            <a
+            <Link
               :href="`/schedules/${viewModel.uuid}/edit?term=${viewModel.selectedTerm}`"
               class="shrink-0 font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
             >
               前往選擇班級
-            </a>
+            </Link>
           </li>
         </ul>
       </div>
@@ -1066,14 +1066,14 @@ function localHint(next) {
                 <div class="mt-1 flex items-center gap-2">
                   <ClassCode v-if="exam.classCode" :code="exam.classCode" />
 
-                  <a
+                  <Link
                     :href="`/courses/${exam.courseId}#previous-exams`"
                     class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100 print:hidden"
                     :aria-label="exam.courseName + ' 的課程資訊'"
                   >
                     <Icon name="information-circle" class="inline size-4" />
                     考古題
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -1174,14 +1174,14 @@ function localHint(next) {
                       :code="exam.classCode"
                     />
 
-                    <a
+                    <Link
                       :href="`/courses/${exam.courseId}#previous-exams`"
                       class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-warm-800 underline underline-offset-4 hover:text-warm-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100 print:hidden"
                       :aria-label="exam.courseName + ' 的課程資訊'"
                     >
                       <Icon name="information-circle" class="inline size-4" />
                       考古題
-                    </a>
+                    </Link>
                   </div>
                 </td>
 

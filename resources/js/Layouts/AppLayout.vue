@@ -9,7 +9,7 @@
 // with Inertia's `usePage().url`, matched against route paths (there is no
 // Ziggy route() helper on the frontend yet).
 import { computed, ref } from 'vue'
-import { usePage } from '@inertiajs/vue3'
+import { Link, usePage } from '@inertiajs/vue3'
 import Icon from '../Components/Icon.vue'
 import Notification from '../Components/Notification.vue'
 import useThemeSwitcher from '../Composables/useThemeSwitcher'
@@ -109,12 +109,12 @@ const moreMenuItems = [
             name="book-open"
             class="size-5 shrink-0 text-warm-700 md:size-6 dark:text-zinc-300"
           />
-          <a href="/" class="shrink-0">NOU 小幫手</a>
+          <Link href="/" class="shrink-0">NOU 小幫手</Link>
         </h1>
 
         <div class="flex min-h-9.5 items-center gap-2">
           <nav class="hidden items-center gap-1 gap-x-6 md:flex print:hidden">
-            <a
+            <Link
               v-for="item in navItems"
               :key="item.href"
               :href="item.href"
@@ -127,7 +127,7 @@ const moreMenuItems = [
             >
               <Icon :name="item.icon" class="size-4 shrink-0" />
               <span class="hidden sm:inline">{{ item.label }}</span>
-            </a>
+            </Link>
 
             <div class="relative -mt-px" @click.self="moreMenuOpen = false">
               <button
@@ -153,7 +153,7 @@ const moreMenuItems = [
                 v-show="moreMenuOpen"
                 class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-md border border-warm-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
               >
-                <a
+                <Link
                   v-for="item in moreMenuItems"
                   :key="item.href"
                   :href="item.href"
@@ -167,7 +167,7 @@ const moreMenuItems = [
                 >
                   <Icon :name="item.icon" class="size-4 shrink-0" />
                   {{ item.label }}
-                </a>
+                </Link>
               </div>
             </div>
           </nav>
@@ -204,7 +204,7 @@ const moreMenuItems = [
         v-show="mobileMenuOpen"
         class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-warm-200 bg-white p-3 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900 print:hidden"
       >
-        <a
+        <Link
           v-for="item in navItems"
           :key="item.href"
           :href="item.href"
@@ -217,9 +217,9 @@ const moreMenuItems = [
         >
           <Icon :name="item.icon" class="size-4 shrink-0" />
           {{ item.label }}
-        </a>
+        </Link>
 
-        <a
+        <Link
           v-for="item in moreMenuItems"
           :key="item.href"
           :href="item.href"
@@ -233,7 +233,7 @@ const moreMenuItems = [
         >
           <Icon :name="item.icon" class="size-4 shrink-0" />
           {{ item.label }}
-        </a>
+        </Link>
       </div>
     </div>
   </header>
@@ -288,12 +288,12 @@ const moreMenuItems = [
           </div>
 
           <div class="text-center md:text-left">
-            <a
+            <Link
               href="/"
               class="text-lg font-semibold text-warm-700 hover:text-warm-900 dark:text-zinc-300 dark:hover:text-zinc-100"
             >
               NOU 小幫手
-            </a>
+            </Link>
             <p class="mt-1 text-xs text-warm-500 dark:text-zinc-400">
               給 NOU 同學的非官方小工具
             </p>

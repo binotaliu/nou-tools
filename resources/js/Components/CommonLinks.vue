@@ -2,6 +2,7 @@
 // Vue port of resources/views/components/common-links.blade.php. The three
 // external links and the directory link are static; `customLinks` is the
 // per-schedule custom link list (see ScheduleCustomizationPageData).
+import { Link } from '@inertiajs/vue3'
 import Icon from './Icon.vue'
 
 defineProps({
@@ -57,13 +58,13 @@ defineProps({
     </div>
 
     <div class="mt-2 flex justify-end">
-      <a
+      <Link
         href="/directory"
         data-offline-allow
         class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-700 bg-warm-700 px-3 py-1 text-sm font-semibold text-white transition hover:bg-warm-800"
       >
         連結 / 學習指導中心目錄
-      </a>
+      </Link>
     </div>
 
     <div

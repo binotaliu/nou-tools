@@ -3,7 +3,7 @@
 // settings form uses Inertia's useForm() for the real PUT submission
 // (ScheduleCalendarSettingsUpdateController is a plain validate-then-redirect
 // action, unmodified by this migration).
-import { Head, useForm } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 
@@ -65,13 +65,13 @@ function submit() {
           </p>
         </div>
 
-        <a
+        <Link
           :href="`/schedules/${viewModel.uuid}`"
           class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 font-semibold text-warm-900 transition hover:bg-warm-50 sm:w-auto dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
         >
           <Icon name="arrow-left" class="size-4" />
           回到課表
-        </a>
+        </Link>
         <a
           href="/manual/calendar-subscription"
           target="_blank"
@@ -300,12 +300,12 @@ function submit() {
               儲存設定
             </button>
 
-            <a
+            <Link
               :href="`/schedules/${viewModel.uuid}`"
               class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-warm-200 bg-warm-200 px-4 py-2 font-semibold text-warm-900 transition hover:bg-warm-300 sm:w-auto dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
             >
               回到課表
-            </a>
+            </Link>
           </div>
         </form>
       </div>

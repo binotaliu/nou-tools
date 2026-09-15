@@ -11,7 +11,7 @@
 // `viewModel.sourceGroups` for the Alpine widget's convenience, so it's
 // re-derived here rather than added to AnnouncementPreferencesPageData.
 import { computed } from 'vue'
-import { Head, useForm } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import useAnnouncementPreferences from '../../Composables/useAnnouncementPreferences'
@@ -115,13 +115,13 @@ function submit() {
           </p>
         </div>
 
-        <a
+        <Link
           :href="`/schedules/${viewModel.scheduleUuid}`"
           class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 font-semibold text-warm-900 transition hover:bg-warm-50 sm:w-auto dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
         >
           <Icon name="arrow-left" class="size-4" />
           回到課表
-        </a>
+        </Link>
       </div>
 
       <form class="space-y-6" @submit.prevent="submit">
@@ -250,12 +250,12 @@ function submit() {
             儲存公告分類設定
           </button>
 
-          <a
+          <Link
             :href="`/schedules/${viewModel.scheduleUuid}`"
             class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 font-semibold text-warm-900 transition hover:bg-warm-50 sm:w-auto dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
           >
             取消
-          </a>
+          </Link>
         </div>
       </form>
     </div>

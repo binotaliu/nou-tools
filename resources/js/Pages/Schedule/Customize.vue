@@ -5,7 +5,7 @@
 // submission (ScheduleCustomizationController::update() is a plain
 // validate-then-redirect action, unmodified by this migration).
 import { reactive } from 'vue'
-import { Head, useForm } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import useScheduleCustomize from '../../Composables/useScheduleCustomize'
@@ -81,13 +81,13 @@ function submit() {
           </p>
         </div>
 
-        <a
+        <Link
           :href="`/schedules/${viewModel.scheduleUuid}`"
           class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 font-semibold text-warm-900 transition hover:bg-warm-50 sm:w-auto dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
         >
           <Icon name="arrow-left" class="size-4" />
           回到課表
-        </a>
+        </Link>
       </div>
 
       <form class="space-y-6" @submit.prevent="submit">
@@ -124,12 +124,12 @@ function submit() {
 
           <p class="mt-4 text-sm text-warm-600 dark:text-zinc-400">
             想調整「最新公告」要顯示哪些分類？前往
-            <a
+            <Link
               :href="`/schedules/${viewModel.scheduleUuid}/announcement-preferences`"
               class="font-medium text-orange-700 hover:underline dark:text-orange-400"
             >
               公告分類設定
-            </a>
+            </Link>
             。
           </p>
         </div>
@@ -237,12 +237,12 @@ function submit() {
             儲存自訂設定
           </button>
 
-          <a
+          <Link
             :href="`/schedules/${viewModel.scheduleUuid}`"
             class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 font-semibold text-warm-900 transition hover:bg-warm-50 sm:w-auto dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
           >
             取消
-          </a>
+          </Link>
         </div>
       </form>
     </div>
