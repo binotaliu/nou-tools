@@ -1,6 +1,33 @@
+@php
+    // Mirrors resources/views/components/layout.blade.php's markdown-discovery
+    // comment for the (still-Blade) pages that haven't migrated to Inertia yet.
+    $routeName = request()->route()?->getName();
+
+    $markdownRouteName = match ($routeName) {
+        'home' => 'llms-txt',
+        default => $routeName ? $routeName.'.md' : null,
+    };
+
+    $markdownUrl = $markdownRouteName && \Illuminate\Support\Facades\Route::has($markdownRouteName)
+        ? route($markdownRouteName, request()->route()->parameters())
+        : null;
+@endphp
 <!DOCTYPE html>
 <html lang="zh-hant">
 <head>
+    <!--
+        For AI agents: this page has a Markdown version that is easier to
+        parse.
+
+        @if ($markdownUrl)
+        Markdown version of this page: {{ $markdownUrl }}
+        @endif
+
+        You can also request this site with `Accept: text/markdown` to automatically get the Markdown version if available.
+
+        Site-wide index for agents: {{ route('llms-txt') }}
+    -->
+
     {{-- Anti-flash-of-wrong-theme: must run synchronously before any CSS/paint --}}
     <script @cspNonce>
         ;(() => {

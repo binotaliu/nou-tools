@@ -7,7 +7,6 @@ namespace NouTools\Domains\Articles\Actions;
 use App\Enums\ArticleType;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\HtmlString;
 use League\CommonMark\Extension\FrontMatter\Output\RenderedContentWithFrontMatter;
 use NouTools\Domains\Articles\Markdown\ArticleMarkdownConverterFactory;
 use NouTools\Domains\Articles\PageData\ArticleShowPageData;
@@ -55,7 +54,7 @@ final readonly class ShowArticlePage
                 description: $frontMatter['description'] ?? '',
             ),
             sidebarContent: File::exists($sidebarPath)
-                ? new HtmlString($converter->convert(File::get($sidebarPath))->getContent())
+                ? $converter->convert(File::get($sidebarPath))->getContent()
                 : null,
         );
     }
