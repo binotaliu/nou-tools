@@ -113,6 +113,9 @@ final readonly class ShowStudyRoomPage
             'maxFloors' => (int) config('study-room.floors.max'),
             'latitude' => (float) config('study-room.location.latitude'),
             'longitude' => (float) config('study-room.location.longitude'),
+            'nicknameMinLength' => (int) config('study-room.nickname.min_length'),
+            'nicknameMaxLength' => (int) config('study-room.nickname.max_length'),
+            'nicknameCooldownDays' => (int) config('study-room.nickname.cooldown_days'),
         ];
     }
 }
