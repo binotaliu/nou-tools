@@ -11,10 +11,22 @@
 import { computed, ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import Icon from '../Components/Icon.vue'
+import Notification from '../Components/Notification.vue'
 import useThemeSwitcher from '../Composables/useThemeSwitcher'
 
 const page = usePage()
 const currentPath = computed(() => page.url.split('?')[0])
+
+// Port of the old `@if (session('success'))` / `@if ($errors->any())` toast
+// notifications in components/layout.blade.php. `flash.success` is shared by
+// HandleInertiaRequests; `errors` is Inertia's own default shared prop.
+const successMessage = computed(() => page.props.flash?.success ?? null)
+const firstErrorMessage = computed(() => {
+  const errors = page.props.errors ?? {}
+  const keys = Object.keys(errors)
+
+  return keys.length ? errors[keys[0]] : null
+})
 
 function isActive(prefix) {
   return (
@@ -227,6 +239,22 @@ const moreMenuItems = [
   </header>
 
   <main id="main-content" class="mx-auto max-w-7xl px-6 py-8">
+    <!-- flash notifications use slide-in toasts instead of the old alert box -->
+    <Notification
+      v-if="successMessage"
+      type="success"
+      :message="successMessage"
+      class="print:hidden"
+    />
+
+    <!-- show first error only in toast; the page can still display the full list if needed -->
+    <Notification
+      v-if="firstErrorMessage"
+      type="error"
+      :message="firstErrorMessage"
+      class="print:hidden"
+    />
+
     <slot />
   </main>
 

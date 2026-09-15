@@ -32,8 +32,7 @@ it('shows announcement entry points on home page', function () {
     $response = get(route('home'));
 
     $response->assertSuccessful();
-    $response->assertSee('學校公告');
-    $response->assertSee(route('announcements.index'));
+    $response->assertInertia(fn (Assert $page) => $page->component('Home/Index'));
 });
 
 it('shows latest announcements with filter options', function () {

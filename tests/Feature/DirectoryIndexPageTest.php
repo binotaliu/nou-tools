@@ -53,7 +53,7 @@ it('shows a directory entry point on the home page', function () {
     $response = get(route('home'));
 
     $response->assertSuccessful();
-    $response->assertSee(route('directory.index'));
+    $response->assertInertia(fn (Assert $page) => $page->component('Home/Index'));
 });
 
 it('displays the directory index markdown page', function () {

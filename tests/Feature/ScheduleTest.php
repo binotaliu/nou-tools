@@ -649,9 +649,15 @@ it('shows previous schedule on home when cookie exists', function () {
         'name' => $schedule->name,
     ]))->get(route('home'));
 
-    $response->assertStatus(200)
-        ->assertSee('Previously Saved')
-        ->assertSee(route('schedules.show', $schedule));
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) use ($schedule) {
+        $page->component('Home/Index');
+
+        $props = $page->toArray()['props'];
+
+        expect($props['viewModel']['previousSchedule']['name'])->toBe('Previously Saved');
+        expect($props['viewModel']['previousSchedule']['token'])->toBe((string) $schedule->getRouteKey());
+    });
 });
 
 it('shows prompt on schedule create page when cookie exists and can be ignored with ?new=1', function () {
