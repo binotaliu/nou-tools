@@ -9,7 +9,6 @@ import discountStoreIndex from './discount-store-index'
 import discountStoreCreateForm from './discount-store-create-form'
 import discountStoreReportForm from './discount-store-report-form'
 import nouToolsScheduleItems from './schedule-items'
-import nouStudyRoom from './study-room'
 import registerAlpineComponents from './alpine-components'
 
 window.Alpine = Alpine
@@ -179,7 +178,6 @@ document.addEventListener('alpine:init', () => {
   window.Alpine.data('nouToolsGreeting', nouToolsGreeting)
   window.Alpine.data('nouToolsSchoolCalendar', nouToolsSchoolCalendar)
   window.Alpine.data('nouToolsCountdown', nouToolsCountdown)
-  window.Alpine.data('nouStudyRoom', nouStudyRoom)
 
   window.Alpine.store('network', {
     offline: typeof navigator !== 'undefined' && !navigator.onLine,
