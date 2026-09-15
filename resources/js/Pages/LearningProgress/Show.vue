@@ -10,7 +10,7 @@
 // Only the constructor properties survive Inertia's JSON serialization, so
 // those derivations are re-implemented here from `viewModel.entries`.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import { CheckIcon } from '@heroicons/vue/24/solid'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
@@ -192,7 +192,7 @@ const csrfToken =
         </div>
 
         <div class="flex w-full gap-2 md:w-auto print:hidden">
-          <a
+          <Link
             :href="`/schedules/${viewModel.scheduleUuid}`"
             class="inline-flex w-1/2 items-center justify-center gap-2 rounded-md border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 transition-colors hover:bg-warm-50 md:w-auto dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
             data-analytics-event="learning_progress_back"
@@ -200,7 +200,7 @@ const csrfToken =
           >
             <Icon name="arrow-left" class="size-4" />
             回到課表
-          </a>
+          </Link>
 
           <button
             type="button"

@@ -4,7 +4,7 @@
 // Vue template logic ported from the Blade @php blocks and helpers
 // (Str::toSemesterDisplay/toFilenameSafe, the CC by-date exam formatting).
 import { computed } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import { StarIcon } from '@heroicons/vue/24/solid'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
@@ -177,13 +177,13 @@ function examReferenceUrl(reference) {
   <AppLayout>
     <div class="mx-auto max-w-5xl">
       <div class="mb-8">
-        <a
+        <Link
           :href="backUrl"
           class="mb-4 inline-flex items-center justify-center gap-2 text-orange-600 hover:text-orange-700"
         >
           <Icon name="chevron-left" class="size-4" />
           回到我的課表
-        </a>
+        </Link>
         <h2 class="mb-2 text-3xl font-bold text-warm-900 dark:text-zinc-100">
           {{ course.name }}
         </h2>
@@ -881,13 +881,13 @@ function examReferenceUrl(reference) {
         </div>
 
         <div class="mt-2 flex justify-end">
-          <a
+          <Link
             href="/directory"
             data-offline-allow
             class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-700 bg-warm-700 px-3 py-1 text-sm font-semibold text-white transition hover:bg-warm-800"
           >
             連結 / 學習指導中心目錄
-          </a>
+          </Link>
         </div>
       </div>
 

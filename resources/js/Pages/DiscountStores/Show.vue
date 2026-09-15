@@ -20,7 +20,7 @@
 // page alone needs two independent instances of the exact same
 // load-script/render/track-challenge sequence, and Create.vue needs a third.
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
-import { Head, useForm, usePage } from '@inertiajs/vue3'
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import DynamicHeroIcon from '../../Components/DynamicHeroIcon.vue'
@@ -295,13 +295,13 @@ onUnmounted(() => {
         <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
           優惠店家詳情
         </h2>
-        <a
+        <Link
           href="/discount-stores"
           class="inline-flex items-center gap-1 text-warm-600 transition hover:text-warm-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100"
         >
           <Icon name="chevron-left" class="size-4" />
           回到優惠店家列表
-        </a>
+        </Link>
       </div>
 
       <div

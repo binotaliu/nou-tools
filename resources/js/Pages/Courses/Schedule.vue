@@ -6,7 +6,7 @@
 // rather than as a shared composable, mirroring how Directory/Index.vue
 // inlines its one-off Leaflet map logic.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
+import { Head, Link, router } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 
@@ -587,12 +587,12 @@ const creditsDropdown = useDropdown()
                       scope="row"
                       class="px-4 py-3 font-normal text-warm-800 dark:text-zinc-200"
                     >
-                      <a
+                      <Link
                         :href="course.url"
                         class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
                       >
                         {{ course.name }}
-                      </a>
+                      </Link>
                     </th>
                     <td
                       class="px-4 py-3 text-warm-800 dark:text-zinc-200"
@@ -621,12 +621,12 @@ const creditsDropdown = useDropdown()
                 :key="course.id"
                 class="rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
               >
-                <a
+                <Link
                   :href="course.url"
                   class="text-base font-semibold text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
                 >
                   {{ course.name }}
-                </a>
+                </Link>
                 <div
                   class="mt-1 flex items-center gap-2 text-sm text-warm-600 dark:text-zinc-400"
                 >

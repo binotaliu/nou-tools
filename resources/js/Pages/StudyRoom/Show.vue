@@ -12,7 +12,7 @@
 // as the old Alpine controller did — never through an Inertia prop or
 // router.reload().
 import { computed, onMounted, onUnmounted } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import {
   ArrowUpIcon,
   ArrowDownIcon,
@@ -241,19 +241,19 @@ onUnmounted(() => {
             </p>
           </div>
           <div class="flex flex-wrap justify-center gap-2 pt-2">
-            <a
+            <Link
               href="/schedules/create"
               class="inline-flex items-center gap-1.5 rounded-lg bg-warm-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-warm-900 dark:bg-warm-600 dark:hover:bg-warm-500"
             >
               <PlusIcon class="size-4" />
               建立我的課表
-            </a>
-            <a
+            </Link>
+            <Link
               href="/schedules/my"
               class="inline-flex items-center gap-1.5 rounded-lg border border-warm-300 bg-white px-4 py-2 text-sm font-semibold text-warm-800 transition hover:bg-warm-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
               我已經有課表了
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -255,12 +255,12 @@ function isExpired(announcement) {
                     套用篩選
                   </button>
 
-                  <a
+                  <Link
                     href="/announcements"
                     class="inline-flex w-full items-center justify-center gap-2 rounded-md border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 transition-colors hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                   >
                     清除條件
-                  </a>
+                  </Link>
 
                   <button
                     type="button"

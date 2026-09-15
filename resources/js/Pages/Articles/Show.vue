@@ -9,7 +9,7 @@
 // HTML (rendered Markdown) straight from the ViewModel, rendered with
 // v-html.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import useArticleShare from '../../Composables/useArticleShare'
@@ -115,13 +115,13 @@ onUnmounted(() => window.removeEventListener('keydown', handleEscape))
             <div
               class="mt-4 border-t border-warm-200 pt-4 dark:border-zinc-700"
             >
-              <a
+              <Link
                 :href="indexUrl"
                 class="inline-flex items-center gap-1 text-sm text-warm-600 transition-colors hover:text-warm-900 dark:text-zinc-400 dark:hover:text-zinc-100"
               >
                 <Icon name="chevron-left" class="size-3" />
                 回到{{ typeLabel }}首頁
-              </a>
+              </Link>
             </div>
           </div>
         </aside>
