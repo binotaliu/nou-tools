@@ -74,7 +74,11 @@ it('hides the leaflet map embed and shows an offline notice when offline', funct
     $page->click('[data-testid="center-button-0"]')
         ->assertVisible('[data-testid="center-map"]');
 
-    $page->script("Alpine.store('network').offline = true");
+    // The offline banner is now driven by the page's own online/offline
+    // event listener (see resources/js/Pages/Directory/Index.vue), not the
+    // Alpine `network` store directly, so dispatch a real 'offline' event
+    // rather than mutating the store.
+    $page->script("window.dispatchEvent(new Event('offline'))");
 
     $page->assertSee('目前處於離線狀態')
         ->assertMissing('[data-testid="center-map"]')

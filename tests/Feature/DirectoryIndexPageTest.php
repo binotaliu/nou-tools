@@ -1,5 +1,7 @@
 <?php
 
+use Inertia\Testing\AssertableInertia as Assert;
+
 use function Pest\Laravel\get;
 use function Pest\Laravel\withoutVite;
 
@@ -11,23 +13,40 @@ it('shows link groups with entries grouped by 各處室、學系、學習指導�
     $response = get(route('directory.index'));
 
     $response->assertSuccessful();
-    $response->assertSee('各處室');
-    $response->assertSee('學系');
-    $response->assertSee('學習指導中心');
-    $response->assertSee('教務處');
-    $response->assertSee('人文學系');
-    $response->assertSee('基隆中心');
-    $response->assertSee('https://www.nou.edu.tw', escape: false);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Directory/Index');
+
+        $props = $page->toArray()['props'];
+        $labels = collect($props['viewModel']['linkGroups'])->pluck('label');
+
+        expect($labels)->toContain('各處室', '學系');
+        expect($props['viewModel']['centerGroup']['label'] ?? null)->toBe('學習指導中心');
+
+        $linkNames = collect($props['viewModel']['linkGroups'])
+            ->flatMap(fn (array $group) => collect($group['links'])->pluck('name'));
+        $linkUrls = collect($props['viewModel']['linkGroups'])
+            ->flatMap(fn (array $group) => collect($group['links'])->pluck('url'));
+
+        expect($linkNames)->toContain('教務處');
+        expect(collect($props['viewModel']['centerGroup']['centers'] ?? [])->pluck('name'))->toContain('基隆中心');
+        expect($linkUrls->contains(fn (string $url) => str_contains($url, 'https://www.nou.edu.tw')))->toBeTrue();
+    });
 });
 
 it('shows address, phone and transport info for 學習指導中心 entries', function () {
     $response = get(route('directory.index'));
 
     $response->assertSuccessful();
-    $response->assertSee('202 基隆市中正區北寧路2號（海洋大學海空大樓8樓）');
-    $response->assertSee('02-2462-9938');
-    $response->assertSee('開啟中心網站');
-    $response->assertSee('交通資訊');
+    $response->assertInertia(function (Assert $page) {
+        $props = $page->toArray()['props'];
+        $centers = collect($props['viewModel']['centerGroup']['centers'] ?? []);
+
+        expect($centers->pluck('address'))->toContain('202 基隆市中正區北寧路2號（海洋大學海空大樓8樓）');
+        expect(
+            $centers->flatMap(fn (array $center) => collect($center['phone'])->pluck('display'))
+        )->toContain('02-2462-9938');
+        expect($centers->pluck('transportUrl')->filter())->not->toBeEmpty();
+    });
 });
 
 it('shows a directory entry point on the home page', function () {
