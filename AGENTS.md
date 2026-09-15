@@ -37,6 +37,15 @@ src/Domains/{Domain}/
 | ViewModel   | Endpoint returns structured data            |
 | QueryFilter | List endpoint has multiple optional filters |
 
+## Frontend Rendering
+
+Migrating incrementally from Blade+Alpine.js to Inertia.js+Vue. Not all pages are migrated yet — until a page is migrated it still uses `components/layout.blade.php` + `resources/js/alpine-components.js`.
+
+- Inertia pages live in `resources/js/Pages/{Domain}/`, mirroring the `src/Domains/{Domain}/` naming.
+- Shared layout is `resources/js/Layouts/AppLayout.vue`; pages wrap themselves in it.
+- ViewModels/DTOs pass straight into `Inertia::render()` as props — no reshaping, same objects that used to go into `view()`.
+- **Exception: StudyRoom.** Inertia is used only for the page shell/navigation there. Live seat/session state is fetched and mutated via its existing REST JSON endpoints and Echo/Reverb broadcasts, not Inertia props — seat-claim state changes far more frequently than a page-prop model suits.
+
 ## 自習室 (Study Room)
 
 Lives in `src/Domains/StudyRoom/` (Actions, DTOs, ViewModels, PageData) plus `App\Models\StudyRoomSeat`/`StudyRoomProfile`/`StudyRoomSession`. Two design decisions are load-bearing — breaking either reintroduces race conditions or drift:
