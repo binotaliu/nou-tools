@@ -3,6 +3,7 @@
 use App\Models\Announcement;
 use App\Models\StudentSchedule;
 use Illuminate\Support\Str;
+use Inertia\Testing\AssertableInertia as Assert;
 
 use function Pest\Laravel\get;
 
@@ -103,10 +104,18 @@ it('links "see more" to the announcements index pre-filtered to the same selecti
     $response->assertSuccessful();
     $response->assertSee($seeMoreUrl, false);
 
+    // The announcements index now renders through Inertia (see
+    // AnnouncementController), so its titles no longer appear in the raw
+    // HTML response body — assert against the Inertia `viewModel` prop
+    // instead.
     $indexResponse = get($seeMoreUrl);
     $indexResponse->assertSuccessful();
-    $indexResponse->assertSee('保留的公告');
-    $indexResponse->assertDontSee('不應出現的公告');
+    $indexResponse->assertInertia(function (Assert $page) {
+        $titles = collect($page->toArray()['props']['viewModel']['announcements']['data'])->pluck('title');
+
+        expect($titles)->toContain('保留的公告');
+        expect($titles)->not->toContain('不應出現的公告');
+    });
 });
 
 it('hides the announcements widget when show_announcements display option is off', function () {
