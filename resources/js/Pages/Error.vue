@@ -1,17 +1,13 @@
 <script setup>
-// Single, status-driven error page replacing the old per-status Blade
-// views (resources/views/errors/401.blade.php, 404.blade.php, ...) plus
-// their shared errors::minimal layout. Laravel's exception handler
+// Single, status-driven error page. Laravel's exception handler
 // (bootstrap/app.php) renders this via Inertia::render('Error', ['status'
-// => $code]) instead of view("errors.{$code}"), following the standard
-// Laravel+Inertia convention of one generic error component switching on
-// status rather than nine near-identical pages.
+// => $code]), following the standard Laravel+Inertia convention of one
+// generic error component switching on status rather than a page per code.
 //
-// Intentionally NOT wrapped in AppLayout: the original errors::minimal
-// layout deliberately used a stripped-down header (logo + home link only,
-// no nav items) rather than the full site chrome, since a broken/expired
-// page is exactly when the full nav (with its live theme/menu state) is
-// least likely to be useful. This page mirrors that same minimal chrome.
+// Intentionally NOT wrapped in AppLayout: it uses a stripped-down header
+// (logo + home link only, no nav items) rather than the full site chrome,
+// since a broken/expired page is exactly when the full nav (with its live
+// theme/menu state) is least likely to be useful.
 import { computed } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import Icon from '../Components/Icon.vue'

@@ -1,14 +1,11 @@
 <script setup>
-// Vue port of resources/views/learning-progress/show.blade.php. Uses the
-// already-ported `useLearningProgress` composable (Phase 1) for the
-// scroll-gradient overlay + print-friendly form submission, and the new
-// `Greeting` component (see resources/js/Components/Greeting.vue) for the
-// greeting card.
+// Uses the `useLearningProgress` composable for the scroll-gradient overlay
+// + print-friendly form submission, and the `Greeting` component (see
+// resources/js/Components/Greeting.vue) for the greeting card.
 //
-// The old ViewModel exposed derived-state *methods* (isVideoComplete,
-// isWeekFullyComplete, getCurrentWeek, ...) that Blade called directly.
-// Only the constructor properties survive Inertia's JSON serialization, so
-// those derivations are re-implemented here from `viewModel.entries`.
+// Only the ViewModel's constructor properties survive Inertia's JSON
+// serialization, so derived state (isVideoComplete, isWeekFullyComplete,
+// getCurrentWeek, ...) is computed here from `viewModel.entries` instead.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import { CheckIcon } from '@heroicons/vue/24/solid'
