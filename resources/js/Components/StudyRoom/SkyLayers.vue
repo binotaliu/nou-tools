@@ -1,6 +1,5 @@
 <script setup>
-// Vue port of resources/views/study-room/partials/_sky-layers.blade.php: the
-// sky itself (gradient, WebGL shader canvas, stars, sun/moon, clouds).
+// The sky itself (gradient, WebGL shader canvas, stars, sun/moon, clouds).
 // `skyLayout` is 'garden' (the strip above the ground floor) or 'focus'
 // (the fullscreen focus mode) — both read the same `sky` composable state,
 // just drawn at different sizes.

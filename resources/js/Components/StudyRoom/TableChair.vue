@@ -1,8 +1,7 @@
 <script setup>
-// Vue port of resources/views/study-room/partials/_table-chair.blade.php: a
-// chair around a shared table. `backrest` picks which edge the backrest sits
-// on so chairs face the table from both sides; `timerSide` mirrors that for
-// the always-reserved timer line below the chair.
+// A chair around a shared table. `backrest` picks which edge the backrest
+// sits on so chairs face the table from both sides; `timerSide` mirrors
+// that for the always-reserved timer line below the chair.
 //
 // Table chairs are too small to show nickname/activity inline, so those
 // live in a hover/tap popover (peek/unpeek/isPeeking in useSeatGrid).

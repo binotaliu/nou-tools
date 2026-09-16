@@ -1,7 +1,6 @@
 <script setup>
-// Vue port of resources/views/alt-uu.blade.php. Purely static marketing
-// content (no ViewModel/props), so this page only needs the layout chrome
-// and its own inline markup.
+// Purely static marketing content (no ViewModel/props), so this page only
+// needs the layout chrome and its own inline markup.
 import { Head } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'

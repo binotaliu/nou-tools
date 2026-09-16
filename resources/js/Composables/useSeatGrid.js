@@ -1,10 +1,9 @@
 import { reactive, ref } from 'vue'
 
-// Vue port of the floor-map / seat-display section of
-// resources/js/study-room.js: seat CSS classes, aria labels, floor/stair
-// labels, and the table-chair hover/tap popover. Pure display logic over
-// the socket's `state` — the actual seat claim (take()) lives in
-// useStudyRoomSocket.js, since it's a state mutation, not a display concern.
+// Seat CSS classes, aria labels, floor/stair labels, and the table-chair
+// hover/tap popover. Pure display logic over the socket's `state` — the
+// actual seat claim (take()) lives in useStudyRoomSocket.js, since it's a
+// state mutation, not a display concern.
 export default function useSeatGrid(socket, config) {
   const peekSeatCode = ref(null)
 

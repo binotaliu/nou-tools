@@ -1,6 +1,5 @@
 <script setup>
-// Vue port of resources/views/study-room/partials/_focus-mode.blade.php:
-// the action banner blown up to fill the whole browser window — the view
+// The action banner blown up to fill the whole browser window — the view
 // from your carrel. Only shown while a timer is running (timer.hasTimer());
 // closes itself if the timer ends or the seat is released underneath you
 // (see useStudyTimer's onRoomStateChanged).

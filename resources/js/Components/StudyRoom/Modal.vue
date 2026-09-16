@@ -1,7 +1,6 @@
 <script setup>
-// Vue port of resources/views/components/modal.blade.php (the x-modal Blade
-// component), used only by StudyRoom's Vue page for now. Teleports to
-// <body>, closes on Escape or a click on the backdrop.
+// Used only by StudyRoom's page. Teleports to <body>, closes on Escape or a
+// click on the backdrop.
 defineProps({
   open: { type: Boolean, required: true },
   title: { type: String, default: '' },

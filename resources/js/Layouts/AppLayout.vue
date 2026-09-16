@@ -14,9 +14,9 @@ import useThemeSwitcher from '../Composables/useThemeSwitcher'
 const page = usePage()
 const currentPath = computed(() => page.url.split('?')[0])
 
-// Port of the old `@if (session('success'))` / `@if ($errors->any())` toast
-// notifications in components/layout.blade.php. `flash.success` is shared by
-// HandleInertiaRequests; `errors` is Inertia's own default shared prop.
+// Toast notifications for flash messages and validation errors.
+// `flash.success` is shared by HandleInertiaRequests; `errors` is Inertia's
+// own default shared prop.
 const successMessage = computed(() => page.props.flash?.success ?? null)
 const firstErrorMessage = computed(() => {
   const errors = page.props.errors ?? {}

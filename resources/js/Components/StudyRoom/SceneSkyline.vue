@@ -1,6 +1,5 @@
 <script setup>
-// Vue port of resources/views/study-room/partials/_scene-skyline.blade.php:
-// the distant city skyline, whose windows light up at night. `idPrefix`
+// The distant city skyline, whose windows light up at night. `idPrefix`
 // keeps the <pattern> ids unique when this appears twice on one page (the
 // garden window and the fullscreen focus mode).
 defineProps({

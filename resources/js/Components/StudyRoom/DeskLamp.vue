@@ -1,6 +1,5 @@
 <script setup>
-// Vue port of resources/views/study-room/partials/_desk-lamp.blade.php: the
-// desk lamp shown in the action banner, lit while a timer is running.
+// The desk lamp shown in the action banner, lit while a timer is running.
 defineProps({
   hasTimer: { type: Boolean, required: true },
   sizeClass: { type: String, default: 'size-12 shrink-0' },

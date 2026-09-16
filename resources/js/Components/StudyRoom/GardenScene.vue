@@ -1,6 +1,5 @@
 <script setup>
-// Vue port of resources/views/study-room/partials/_garden-scene.blade.php:
-// the window-view scene shown in the entrance wall (see Wall.vue) — sky,
+// The window-view scene shown in the entrance wall (see Wall.vue) — sky,
 // distant city, hedge, lawn, trees, a bench, a lamppost, flowers and
 // fireflies, all lit by the same `sky` composable as the fullscreen focus
 // window.

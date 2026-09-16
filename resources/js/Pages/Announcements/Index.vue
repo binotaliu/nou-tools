@@ -1,8 +1,7 @@
 <script setup>
-// Vue port of resources/views/announcements/index.blade.php. The source/
-// category filter panel uses the already-ported `useAnnouncementFilter`
-// composable (Phase 1); the mobile filter-panel toggle is a one-off local
-// ref since it's not shared with any other page.
+// The source/category filter panel uses the `useAnnouncementFilter`
+// composable; the mobile filter-panel toggle is a one-off local ref since
+// it's not shared with any other page.
 import { computed, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'

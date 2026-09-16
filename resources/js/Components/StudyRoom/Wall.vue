@@ -1,7 +1,6 @@
 <script setup>
-// Vue port of resources/views/study-room/partials/_wall.blade.php: the
-// entrance wall — a window onto the garden scene, a wall clock running on
-// Taipei time, the announcement board, and the viewer's own nameplate
+// The entrance wall — a window onto the garden scene, a wall clock running
+// on Taipei time, the announcement board, and the viewer's own nameplate
 // (click to edit nickname/emoji, or open the stats modal).
 import { ref } from 'vue'
 import { ChartBarIcon, PencilIcon } from '@heroicons/vue/24/outline'

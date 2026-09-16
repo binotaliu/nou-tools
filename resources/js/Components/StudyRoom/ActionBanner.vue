@@ -1,6 +1,5 @@
 <script setup>
-// Vue port of resources/views/study-room/partials/_action-banner.blade.php:
-// the control panel fixed to the bottom of the page while the viewer holds
+// The control panel fixed to the bottom of the page while the viewer holds
 // a seat — the "start timer" form, the running-timer countdown/controls,
 // the pomodoro cycle settings modal, and the change-activity modal.
 import {

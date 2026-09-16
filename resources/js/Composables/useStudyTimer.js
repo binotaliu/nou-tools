@@ -5,11 +5,9 @@ import { playTimerFinishedSound } from '../study-room-sound'
 // used to tell our own title apart from the page's real one.
 const TIMER_TITLE_PATTERN = /^\d{2}:\d{2} /
 
-// Vue port of the "heartbeat/tick", "action banner: timer state",
-// "pomodoro cycle settings" and "focus mode" sections of
-// resources/js/study-room.js. Everything the banner (and focus mode) shows
-// is derived from the held seat's timer columns plus the ticking clock,
-// never stored separately — see socket.mySeat().
+// Everything the banner (and focus mode) shows is derived from the held
+// seat's timer columns plus the ticking clock, never stored separately —
+// see socket.mySeat().
 // `profile` is the reactive object returned by useStudyRoomProfile — read
 // here as `profile.playSoundOnTimerEnd` (a plain reactive property, not a
 // ref) rather than passed in as a ref, since that's what the profile

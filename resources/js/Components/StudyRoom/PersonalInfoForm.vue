@@ -1,10 +1,7 @@
 <script setup>
-// Vue port of resources/views/study-room/partials/_personal-info-form.blade.php.
-// The old version was a real HTML form posted to
-// study-room.profile.update with a full-page redirect back; this submits
-// the same fields over axios via profile.submitProfile() (see
-// useStudyRoomProfile.js / the now-JSON StudyRoomProfileController) and
-// closes the modal itself on success.
+// Submits fields over axios via profile.submitProfile() (see
+// useStudyRoomProfile.js / StudyRoomProfileController) and closes the modal
+// itself on success.
 import { ref } from 'vue'
 import { CheckIcon } from '@heroicons/vue/24/outline'
 

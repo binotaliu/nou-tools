@@ -1,6 +1,5 @@
 <script setup>
-// Vue port of resources/views/study-room/partials/_activity-picker.blade.php:
-// the activity radio-button group shared by the "start timer" form and the
+// The activity radio-button group shared by the "start timer" form and the
 // "change activity" modal (distinguished by `groupTestid`/`testidPrefix` so
 // both can appear in the DOM at once without colliding data-testids).
 import {
