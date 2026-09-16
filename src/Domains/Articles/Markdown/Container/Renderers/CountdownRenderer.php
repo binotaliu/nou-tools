@@ -20,7 +20,10 @@ use NouTools\Domains\Articles\Markdown\Support\InlineTextExtractor;
  * count is rendered server-side against "today" in Asia/Taipei (matching
  * how school-calendar dates are anchored elsewhere in the app, see
  * `ListUpcomingSchoolEvents`) and then kept live client-side by
- * `window.nouToolsCountdown` in app.js, so it still works without JavaScript.
+ * `useMarkdownContainers` (resources/js/Composables), which reads the range
+ * back off `data-countdown-start`/`data-countdown-end`. Because the count is
+ * already correct in the HTML, it still works without JavaScript — the client
+ * only stops it going stale in a long-lived tab.
  */
 final class CountdownRenderer implements ContainerRendererInterface
 {
@@ -65,19 +68,15 @@ final class CountdownRenderer implements ContainerRendererInterface
     {
         $rangeText = $start === $end ? $start : "{$start} ~ {$end}";
 
-        $config = (string) \json_encode([
-            'start' => $start,
-            'end' => $end,
-        ], \JSON_THROW_ON_ERROR);
-
         return new HtmlElement('div', [
             'class' => 'md-countdown-item',
-            'x-data' => 'nouToolsCountdown('.$config.')',
+            'data-countdown-start' => $start,
+            'data-countdown-end' => $end,
         ], [
             new HtmlElement('p', ['class' => 'md-countdown-label'], Xml::escape($label)),
             new HtmlElement('p', ['class' => 'md-countdown-range'], Xml::escape($rangeText)),
             new HtmlElement('p', ['class' => 'md-countdown-days'], [
-                new HtmlElement('span', ['x-text' => 'daysText'], Xml::escape($this->daysText($start, $end))),
+                new HtmlElement('span', ['data-countdown-days' => true], Xml::escape($this->daysText($start, $end))),
             ]),
         ]);
     }

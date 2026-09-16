@@ -237,7 +237,7 @@ MD);
 
 // --- 2.5 tabs ------------------------------------------------------------
 
-test('tabs render alpine-powered panels with escaped titles', function () {
+test('tabs render data-attribute panels with escaped titles', function () {
     $html = ($this->convert)(<<<'MD'
 ::::tabs
 :::tab iPhone / iPad
@@ -250,14 +250,17 @@ test('tabs render alpine-powered panels with escaped titles', function () {
 MD);
 
     expect($html)
-        ->toContain('<div class="md-tabs" x-data="{ tab: 0 }">')
-        ->toContain('role="tablist" x-cloak')
+        ->toContain('<div class="md-tabs">')
+        ->toContain('<div class="md-tabs-list" role="tablist">')
         ->toContain('>iPhone / iPad</button>')
         ->toContain('&lt;b&gt;Android&lt;/b&gt;')
-        ->toContain(':aria-selected="tab === 0"')
-        ->toContain('x-show="tab === 1"')
+        ->toContain('aria-selected="true" data-active="true"')
+        ->toContain('aria-selected="false" data-active="false"')
         ->toContain('data-tab-index="0"')
-        ->toContain('data-tab-index="1"');
+        ->toContain('data-tab-index="1"')
+        // No panel ships hidden: without JavaScript every panel stays
+        // readable and CSS suppresses the tab strip instead.
+        ->not->toContain('hidden');
 });
 
 test('nested tabs render independently with unique panel ids', function () {
@@ -439,11 +442,11 @@ test('a plain markdown image without a local file is left without width/height',
 
 // --- 2.11 checklist ----------------------------------------------------------
 
-test('checklist renders an alpine-powered task list', function () {
+test('checklist renders an interactive task list', function () {
     $html = ($this->convert)(":::checklist\n- [ ] 待辦一\n- [x] 已完成\n:::\n");
 
     expect($html)
-        ->toContain('<div class="md-checklist" x-data="nouToolsChecklist()">')
+        ->toContain('<div class="md-checklist">')
         ->toContain('<label><input type="checkbox"><span class="md-checklist-content"> 待辦一</span></label>')
         ->toContain('<label><input checked="" type="checkbox"><span class="md-checklist-content"> 已完成</span></label>')
         ->not->toContain('disabled')
@@ -459,20 +462,20 @@ test('countdown renders a live-updating card with the day count for an upcoming 
 
     expect($html)
         ->toContain('<div class="md-countdown">')
-        ->toContain('<div class="md-countdown-item" x-data="nouToolsCountdown({&quot;start&quot;:&quot;2026-09-05&quot;,&quot;end&quot;:&quot;2026-09-06&quot;})">')
+        ->toContain('<div class="md-countdown-item" data-countdown-start="2026-09-05" data-countdown-end="2026-09-06">')
         ->toContain('<p class="md-countdown-label">115暑期期末考</p>')
         ->toContain('<p class="md-countdown-range">2026-09-05 ~ 2026-09-06</p>')
-        ->toContain('<span x-text="daysText">倒數 9 天</span>');
+        ->toContain('<span data-countdown-days>倒數 9 天</span>');
 });
 
 test('countdown marks a date range as in progress or ended', function () {
     $this->travelTo(Carbon::parse('2026-09-05 12:00:00', 'Asia/Taipei'));
     $ongoing = ($this->convert)(":::countdown\n**期末考**: 2026-09-05 ~ 2026-09-06\n:::\n");
-    expect($ongoing)->toContain('<span x-text="daysText">進行中</span>');
+    expect($ongoing)->toContain('<span data-countdown-days>進行中</span>');
 
     $this->travelTo(Carbon::parse('2026-09-10 00:00:00', 'Asia/Taipei'));
     $ended = ($this->convert)(":::countdown\n**期末考**: 2026-09-05 ~ 2026-09-06\n:::\n");
-    expect($ended)->toContain('<span x-text="daysText">已結束</span>');
+    expect($ended)->toContain('<span data-countdown-days>已結束</span>');
 });
 
 test('countdown accepts a single date with no range', function () {
@@ -482,7 +485,7 @@ test('countdown accepts a single date with no range', function () {
 
     expect($html)
         ->toContain('<p class="md-countdown-range">2026-01-02</p>')
-        ->toContain('<span x-text="daysText">倒數 1 天</span>');
+        ->toContain('<span data-countdown-days>倒數 1 天</span>');
 });
 
 // --- 2.12 inline / document level -------------------------------------------

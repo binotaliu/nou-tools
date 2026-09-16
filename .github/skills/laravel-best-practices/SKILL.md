@@ -47,6 +47,7 @@ Cross-cutting changes often need more than one rule file.
 | Scheduled tasks and overlap protection                        | [`rules/scheduling.md`](rules/scheduling.md)                     |
 | Collections, lazy iteration, bulk operations                  | [`rules/collections.md`](rules/collections.md)                   |
 | Blade components, attributes, composers                       | [`rules/blade-views.md`](rules/blade-views.md)                   |
+| Inertia + Vue pages, layouts, composables, partial reloads    | [`rules/inertia-vue-views.md`](rules/inertia-vue-views.md)       |
 | Environment values and application configuration              | [`rules/config.md`](rules/config.md)                             |
 | Pest/PHPUnit patterns, factories, fakes                       | [`rules/testing.md`](rules/testing.md)                           |
 | Naming, helpers, file boundaries, PHP style                   | [`rules/style.md`](rules/style.md)                               |

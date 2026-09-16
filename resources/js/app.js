@@ -1,16 +1,47 @@
 import './bootstrap'
-import Alpine from '@alpinejs/csp'
-import scheduleEditor from './schedule-editor'
-import courseSchedule from './course-schedule'
-import linksCenterMap from './links-center-map'
-import discountStoreIndex from './discount-store-index'
-import discountStoreCreateForm from './discount-store-create-form'
-import discountStoreReportForm from './discount-store-report-form'
-import nouToolsScheduleItems from './schedule-items'
-import nouStudyRoom from './study-room'
-import registerAlpineComponents from './alpine-components'
+import { createApp, h } from 'vue'
+import { createInertiaApp, router } from '@inertiajs/vue3'
 
-window.Alpine = Alpine
+createInertiaApp({
+  resolve: name => {
+    const pages = import.meta.glob('./Pages/**/*.vue', { eager: false })
+    return pages[`./Pages/${name}.vue`]()
+  },
+  setup({ el, App, props, plugin }) {
+    createApp({ render: () => h(App, props) })
+      .use(plugin)
+      .mount(el)
+  },
+})
+
+// Inertia does client-side navigation between pages, so the page_view GA
+// event that a normal full page load fires never happens again after the
+// first visit. The 'navigate' event fires for that first visit too (Inertia
+// treats it as a navigation), so this one hook covers every page view,
+// initial or SPA. `page.props.analyticsPage` is shared by
+// HandleInertiaRequests and mirrors the masked route path from
+// `data-analytics-page` on the (only ever server-rendered once) <body> tag;
+// `document.title` is used for page_title since every Inertia page sets it
+// via its own <Head title>.
+router.on('navigate', event => trackPageView(event.detail.page))
+
+function trackPageView(page) {
+  if (typeof window.gtag !== 'function') {
+    return
+  }
+
+  const path = page?.props?.analyticsPage
+
+  if (!path) {
+    return
+  }
+
+  window.gtag('event', 'page_view', {
+    page_path: path,
+    page_title: document.title,
+    page_location: window.location.href,
+  })
+}
 
 // Registers the offline-support service worker (see public/sw.js). It caches
 // previously-visited home and /schedules/{schedule} pages (plus their assets)
@@ -24,8 +55,8 @@ if ('serviceWorker' in navigator) {
 
 // Chrome/Edge/Android fire this ahead of time and expect preventDefault() so
 // the browser's own mini-infobar is suppressed in favor of our own install
-// banner (see nouPwaInstallBanner in alpine-components.js), which re-triggers
-// the captured event's prompt() on click.
+// banner (see usePwaInstallBanner.js), which re-triggers the captured
+// event's prompt() on click.
 window.__nouInstallPrompt = null
 window.addEventListener('beforeinstallprompt', event => {
   event.preventDefault()
@@ -69,11 +100,11 @@ function isOfflineAllowedLink(link) {
 // Visually disables and blocks navigation on every other link while offline,
 // plus any other control opting in via data-offline-disable (e.g. the term
 // switcher — switching semesters means a fresh, uncached page load). Runs on
-// every DOM mutation (Alpine renders schedule rows client-side) so
+// every DOM mutation (Inertia/Vue re-render page content client-side) so
 // dynamically-inserted elements are covered too, not just what's in the
 // initial HTML.
 function updateOfflineLinkStates() {
-  const offline = window.Alpine?.store('network')?.offline ?? false
+  const offline = window.NouNetwork?.offline ?? false
 
   document.querySelectorAll('a[href]').forEach(link => {
     const disabled = offline && !isOfflineAllowedLink(link)
@@ -103,64 +134,35 @@ new MutationObserver(() => updateOfflineLinkStates()).observe(
   }
 )
 
-// Global online/offline flag, shared via Alpine.store so the schedule page's
-// offline banner and the (separately-scoped) schedule-items component can
-// both react to the same state. Registered on 'alpine:init' — app.js runs
-// before the deferred Alpine CDN bundle (see layout.blade.php), so this
-// listener is always in place before Alpine fires that event.
-document.addEventListener('alpine:init', () => {
-  registerAlpineComponents(window.Alpine)
+// Global online/offline flag, read by updateOfflineLinkStates() above and by
+// the schedule/directory pages' own offline banners. navigator.onLine only
+// reflects whether *a* network interface is up, not whether our server is
+// actually reachable — so on top of the online/offline events, this probes
+// the app's own health-check route. That's what makes offline detection
+// correct even when the page is opened fresh while already offline
+// (onLine can lag or be wrong at that point, especially on a page restored
+// from the service worker cache).
+window.NouNetwork = {
+  offline: typeof navigator !== 'undefined' && !navigator.onLine,
 
-  // The CSP build's expression parser rejects bare global references (e.g.
-  // `window.print()` in @click), so global calls needed from templates are
-  // exposed as magics instead.
-  window.Alpine.magic('print', () => () => window.print())
+  setOffline(value) {
+    this.offline = value
+    updateOfflineLinkStates()
+  },
 
-  window.Alpine.data('scheduleEditor', scheduleEditor)
-  window.Alpine.data('courseSchedule', courseSchedule)
-  window.Alpine.data('linksCenterMap', linksCenterMap)
-  window.Alpine.data('discountStoreIndex', discountStoreIndex)
-  window.Alpine.data('discountStoreCreateForm', discountStoreCreateForm)
-  window.Alpine.data('discountStoreReportForm', discountStoreReportForm)
-  window.Alpine.data('nouToolsScheduleItems', nouToolsScheduleItems)
-  window.Alpine.data('nouToolsChecklist', nouToolsChecklist)
-  window.Alpine.data('nouToolsGreeting', nouToolsGreeting)
-  window.Alpine.data('nouToolsSchoolCalendar', nouToolsSchoolCalendar)
-  window.Alpine.data('nouToolsCountdown', nouToolsCountdown)
-  window.Alpine.data('nouStudyRoom', nouStudyRoom)
+  async checkConnectivity() {
+    try {
+      const response = await fetch('/up', { cache: 'no-store' })
+      this.setOffline(!response.ok)
+    } catch (error) {
+      this.setOffline(true)
+    }
+  },
+}
 
-  window.Alpine.store('network', {
-    offline: typeof navigator !== 'undefined' && !navigator.onLine,
-
-    init() {
-      // navigator.onLine only reflects whether *a* network interface is up,
-      // not whether our server is actually reachable — so on top of the
-      // online/offline events, probe the app's own health-check route.
-      // This is what makes offline detection correct even when the page is
-      // opened fresh while already offline (onLine can lag or be wrong at
-      // that point, especially on a page restored from the service worker
-      // cache).
-      this.checkConnectivity()
-
-      window.addEventListener('online', () => this.checkConnectivity())
-      window.addEventListener('offline', () => this.setOffline(true))
-    },
-
-    setOffline(value) {
-      this.offline = value
-      updateOfflineLinkStates()
-    },
-
-    async checkConnectivity() {
-      try {
-        const response = await fetch('/up', { cache: 'no-store' })
-        this.setOffline(!response.ok)
-      } catch (error) {
-        this.setOffline(true)
-      }
-    },
-  })
-})
+window.NouNetwork.checkConnectivity()
+window.addEventListener('online', () => window.NouNetwork.checkConnectivity())
+window.addEventListener('offline', () => window.NouNetwork.setOffline(true))
 
 const trackAnalyticsEvent = (eventName, params = {}) => {
   if (typeof window.gtag !== 'function' || !eventName) {
@@ -185,11 +187,9 @@ document.addEventListener('click', event => {
   })
 })
 
-// Client-side time helpers, shared by the greeting and schedule-items
-// components. This module runs before the deferred Alpine CDN bundle boots
-// (see the @vite/Alpine ordering in components/layout.blade.php), which
-// guarantees window.NouTime / window.nouToolsGreeting exist by the time Alpine
-// evaluates any x-data that references them.
+// Client-side time helpers, used by the useGreeting/useSchoolCalendar and
+// useMarkdownContainers Vue composables (the latter keeps `:::countdown`
+// article containers from going stale — see resources/js/Composables).
 //
 // Everything here is timezone-aware on purpose: National Open University has
 // overseas students, so greetings and "next class" must reflect the viewer's
@@ -353,416 +353,3 @@ window.NouTime =
       chineseNumber,
     }
   })()
-
-// Alpine factory for article checklists. It turns Markdown's read-only GFM
-// task-list checkboxes into interactive controls and stores each checklist's
-// state in localStorage, scoped by page path + checklist index.
-function nouToolsChecklist() {
-  return {
-    storageKey: '',
-
-    init() {
-      this.storageKey = this.resolveStorageKey()
-
-      const states = this.readStates()
-      const items = this.$el.querySelectorAll('li')
-
-      items.forEach((item, index) => {
-        const checkbox = item.querySelector('input[type="checkbox"]')
-
-        if (!checkbox) {
-          return
-        }
-
-        this.wrapItemContent(item, checkbox)
-
-        checkbox.removeAttribute('disabled')
-
-        if (typeof states[index] === 'boolean') {
-          checkbox.checked = states[index]
-        }
-
-        this.syncItemState(item, checkbox)
-
-        checkbox.addEventListener('change', () => {
-          this.syncItemState(item, checkbox)
-          this.writeStates()
-        })
-      })
-    },
-
-    resolveStorageKey() {
-      const allChecklists = Array.from(
-        document.querySelectorAll('.md-checklist')
-      )
-      const checklistIndex = allChecklists.indexOf(this.$el)
-      const path = window.location.pathname
-
-      return `nou:article-checklist:${path}:${checklistIndex >= 0 ? checklistIndex : 0}:v1`
-    },
-
-    readStates() {
-      try {
-        const raw = localStorage.getItem(this.storageKey)
-
-        if (!raw) {
-          return []
-        }
-
-        const parsed = JSON.parse(raw)
-
-        return Array.isArray(parsed) ? parsed.map(value => !!value) : []
-      } catch (error) {
-        return []
-      }
-    },
-
-    writeStates() {
-      const states = Array.from(
-        this.$el.querySelectorAll('input[type="checkbox"]')
-      ).map(checkbox => checkbox.checked)
-
-      try {
-        localStorage.setItem(this.storageKey, JSON.stringify(states))
-      } catch (error) {}
-    },
-
-    wrapItemContent(item, checkbox) {
-      if (item.querySelector(':scope > label > .md-checklist-content')) {
-        return
-      }
-
-      const label = item.querySelector(':scope > label') ?? item
-      const content = document.createElement('span')
-      content.className = 'md-checklist-content'
-
-      let node = checkbox.nextSibling
-
-      while (node) {
-        const next = node.nextSibling
-        content.appendChild(node)
-        node = next
-      }
-
-      label.appendChild(content)
-    },
-
-    syncItemState(item, checkbox) {
-      item.dataset.checked = checkbox.checked ? 'true' : 'false'
-    },
-  }
-}
-
-// Alpine factory for the greeting card. Everything is derived from the
-// viewer's local clock so an overseas student sees the greeting that
-// matches their own time of day.
-function nouToolsGreeting(config) {
-  // Persisted so the viewer's chosen widget style (normal vs. compact)
-  // survives reloads.
-  const compactStorageKey = 'nou_greeting_compact_v1'
-
-  return {
-    greetingText: '',
-    dateString: '',
-    semesterInfo: '',
-    compactMode: false,
-    compactDateString: '',
-    compactSemesterInfo: '',
-    showTaiwanClock: false,
-    taiwanHour: '',
-    taiwanMinute: '',
-    taiwanDateString: '',
-
-    init() {
-      this.compactMode = localStorage.getItem(compactStorageKey) === '1'
-
-      this.refreshGreeting(config)
-      // Re-derive the greeting/date/week each minute so a page left open
-      // across a boundary (e.g. 11:59 -> 12:00, or midnight) doesn't stay
-      // stuck on a stale "早安"/date/semester week.
-      setInterval(() => this.refreshGreeting(config), 60 * 1000)
-
-      const T = window.NouTime
-      this.showTaiwanClock = T.differsFromTaipei(new Date())
-
-      if (this.showTaiwanClock) {
-        this.refreshTaiwanClock()
-        // Only the minute digits are shown, so a per-second tick is enough
-        // to keep the clock from drifting a minute behind.
-        setInterval(() => this.refreshTaiwanClock(), 1000)
-      }
-    },
-
-    refreshGreeting(config) {
-      const T = window.NouTime
-      const now = new Date()
-      const hour = now.getHours()
-
-      this.greetingText =
-        hour >= 5 && hour < 12
-          ? '早安'
-          : hour >= 12 && hour < 18
-            ? '午安'
-            : '晚安'
-
-      this.dateString =
-        now.getFullYear() +
-        ' 年 ' +
-        (now.getMonth() + 1) +
-        ' 月 ' +
-        now.getDate() +
-        ' 日 (' +
-        T.WEEKDAYS[now.getDay()] +
-        ')'
-
-      this.compactDateString =
-        now.getFullYear() +
-        '/' +
-        T.pad(now.getMonth() + 1) +
-        '/' +
-        T.pad(now.getDate()) +
-        ' (' +
-        T.WEEKDAYS[now.getDay()] +
-        ')'
-
-      this.semesterInfo = this.buildSemesterInfo(config, now)
-      this.compactSemesterInfo = this.buildCompactSemesterInfo(config, now)
-    },
-
-    toggleCompact() {
-      this.compactMode = !this.compactMode
-      localStorage.setItem(compactStorageKey, this.compactMode ? '1' : '0')
-    },
-
-    refreshTaiwanClock() {
-      const T = window.NouTime
-      const now = new Date()
-
-      const { hour, minute } = T.taipeiHM(now)
-      this.taiwanHour = hour
-      this.taiwanMinute = minute
-
-      const ymd = T.taipeiYmd(now)
-      const [y, m, d] = ymd.split('-').map(Number)
-      this.taiwanDateString =
-        y + '/' + m + '/' + d + ' (' + T.weekdayFromYmd(ymd) + ')'
-    },
-
-    buildSemesterInfo(config, now) {
-      const T = window.NouTime
-
-      if (!config.semesterStart || !config.semesterEnd) {
-        return config.semesterCode || ''
-      }
-
-      // Zero-padded Y-m-d strings compare chronologically as text.
-      const today = T.localYmd(now)
-
-      if (today < config.semesterStart) {
-        return config.semesterLabel + '尚未開始'
-      }
-
-      if (today > config.semesterEnd) {
-        return config.semesterLabel + '已結束'
-      }
-
-      const start = Date.parse(config.semesterStart + 'T00:00:00Z')
-      const current = Date.parse(today + 'T00:00:00Z')
-      const weekNumber = Math.floor((current - start) / 86400000 / 7) + 1
-
-      return config.semesterLabel + '第' + T.chineseNumber(weekNumber) + '週'
-    },
-
-    // Compact single-line rendering of the semester, e.g. "115 暑 W3".
-    // Uses a ROC year + single-character term abbreviation and an arabic
-    // week number, mirroring Str::toShortSemesterDisplay but terser still.
-    buildCompactSemesterInfo(config, now) {
-      const T = window.NouTime
-
-      const match = /^(\d{4})([ABC])$/.exec(config.semesterCode || '')
-
-      if (!match) {
-        return config.semesterCode || ''
-      }
-
-      const rocYear = Number(match[1]) - 1911
-      const termChar = { A: '上', B: '下', C: '暑' }[match[2]]
-      const shortLabel = rocYear + ' ' + termChar
-
-      if (!config.semesterStart || !config.semesterEnd) {
-        return shortLabel
-      }
-
-      const today = T.localYmd(now)
-
-      if (today < config.semesterStart || today > config.semesterEnd) {
-        return shortLabel
-      }
-
-      const start = Date.parse(config.semesterStart + 'T00:00:00Z')
-      const current = Date.parse(today + 'T00:00:00Z')
-      const weekNumber = Math.floor((current - start) / 86400000 / 7) + 1
-
-      return shortLabel + ' W' + weekNumber
-    },
-  }
-}
-
-// Alpine factory for the school calendar card. School events are published
-// on Taipei's academic calendar, not the viewer's own, so "today" and every
-// day count here are anchored to Asia/Taipei rather than the local clock
-// (contrast with nouToolsGreeting/nouToolsScheduleItems above). Overseas students get
-// a small hint instead, telling them the dates are in Taiwan time.
-function nouToolsSchoolCalendar(events, showPastEvents = false) {
-  const T = window.NouTime
-
-  return {
-    events,
-    showPastEvents,
-    today: T.taipeiYmd(new Date()),
-    showTaipeiHint: T.differsFromTaipei(new Date()),
-
-    init() {
-      // Daily-granularity data, so an hourly refresh (plus on tab-return) is
-      // enough to keep "today" and the local-vs-Taipei hint from going stale
-      // in a long-lived or offline-restored tab.
-      setInterval(() => this.refreshNow(), 60 * 60 * 1000)
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-          this.refreshNow()
-        }
-      })
-    },
-
-    refreshNow() {
-      const now = new Date()
-      this.today = T.taipeiYmd(now)
-      this.showTaipeiHint = T.differsFromTaipei(now)
-    },
-
-    statusOf(event) {
-      return this.today >= event.start && this.today <= event.end
-        ? 'ongoing'
-        : 'upcoming'
-    },
-
-    daysUntilOf(event) {
-      return this.today >= event.start
-        ? 0
-        : T.diffInDaysYmd(this.today, event.start)
-    },
-
-    // Events to display: for the current semester, only ones that have
-    // not fully ended yet; for a specific non-current semester
-    // (showPastEvents), the semester's whole calendar. Decorated with the
-    // status/count that used to be computed server-side, sorted by start
-    // date.
-    get activeEvents() {
-      return this.events
-        .filter(event => this.showPastEvents || event.end >= this.today)
-        .map(event => ({
-          ...event,
-          status: this.statusOf(event),
-          daysUntil: this.daysUntilOf(event),
-        }))
-        .sort((a, b) => (a.start < b.start ? -1 : a.start > b.start ? 1 : 0))
-    },
-
-    // Nearest countdown-flagged event that is still upcoming or ongoing.
-    // Never shown when browsing a past semester's full calendar.
-    get countdownEvent() {
-      if (this.showPastEvents) {
-        return null
-      }
-
-      return this.activeEvents.find(event => event.countdown) ?? null
-    },
-
-    // Remaining active events, excluding whichever one is shown as the
-    // countdown card (kept in the list, hidden on screen, for print).
-    isCountdownMatch(event) {
-      const countdown = this.countdownEvent
-
-      return (
-        !!countdown &&
-        event.name === countdown.name &&
-        event.start === countdown.start
-      )
-    },
-
-    monthDayZh(ymd) {
-      const [, m, d] = ymd.split('-').map(Number)
-
-      return m + ' 月 ' + d + ' 日'
-    },
-
-    yearMonthDayZh(ymd) {
-      const [y, m, d] = ymd.split('-').map(Number)
-
-      return y + ' 年 ' + m + ' 月 ' + d + ' 日'
-    },
-
-    // "Y 年 n 月 j 日 – n 月 j 日" (end omitted for single-day events).
-    dateRange(event) {
-      let range = this.yearMonthDayZh(event.start)
-
-      if (event.start !== event.end) {
-        range += ' – ' + this.monthDayZh(event.end)
-      }
-
-      return range
-    },
-
-    // "n 月 j 日 – n 月 j 日", used in the list rows (no year).
-    shortDateRange(event) {
-      let range = this.monthDayZh(event.start)
-
-      if (event.start !== event.end) {
-        range += ' – ' + this.monthDayZh(event.end)
-      }
-
-      return range
-    },
-  }
-}
-
-// Alpine factory for the `:::countdown` article container. Mirrors
-// CountdownRenderer's server-side day count so the markup renders correctly
-// without JavaScript, then keeps it live against Asia/Taipei "today" (these
-// are academic dates, published on Taipei's calendar - see nouToolsSchoolCalendar
-// above for the same reasoning).
-function nouToolsCountdown(config) {
-  const T = window.NouTime
-
-  return {
-    daysText: '',
-
-    init() {
-      this.refresh()
-      // Daily-granularity data, so an hourly refresh (plus on tab-return)
-      // is enough to keep the day count from going stale in a long-lived
-      // or offline-restored tab.
-      setInterval(() => this.refresh(), 60 * 60 * 1000)
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-          this.refresh()
-        }
-      })
-    },
-
-    refresh() {
-      const today = T.taipeiYmd(new Date())
-
-      if (today < config.start) {
-        const days = T.diffInDaysYmd(today, config.start)
-        this.daysText = `倒數 ${days} 天`
-      } else if (today <= config.end) {
-        this.daysText = '進行中'
-      } else {
-        this.daysText = '已結束'
-      }
-    },
-  }
-}
-
-Alpine.start()

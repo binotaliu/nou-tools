@@ -4,6 +4,7 @@ use App\Models\CourseClass;
 use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
 use Illuminate\Support\Str;
+use Inertia\Testing\AssertableInertia as Assert;
 
 // Countdown days, status ("進行中"), and date formatting are computed on the
 // client from the viewer's Taipei calendar date (see window.nouToolsSchoolCalendar
@@ -34,11 +35,17 @@ it('displays school calendar on home page with events embedded for the client', 
 
     $response = $this->get('/');
 
-    $response->assertStatus(200)
-        ->assertSee('學校行事曆')
-        ->assertSee('nouToolsSchoolCalendar(', false)
-        ->assertSee('114下學期課程開播')
-        ->assertSee('114下學期期中考');
+    // Countdown/status rendering happens client-side in SchoolCalendar.vue;
+    // the server only needs to hand it the raw event payload via the
+    // `schoolCalendar` prop (see HomeController::index).
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Home/Index');
+
+        $names = collect($page->toArray()['props']['schoolCalendar']['events'])->pluck('name');
+
+        expect($names)->toContain('114下學期課程開播', '114下學期期中考');
+    });
 });
 
 it('does not display school calendar when no events configured', function () {
@@ -47,8 +54,12 @@ it('does not display school calendar when no events configured', function () {
 
     $response = $this->get('/');
 
-    $response->assertStatus(200)
-        ->assertDontSee('學校行事曆');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Home/Index');
+
+        expect($page->toArray()['props']['schoolCalendar']['events'])->toBe([]);
+    });
 });
 
 it('displays school calendar on schedule show page', function () {
@@ -77,9 +88,17 @@ it('displays school calendar on schedule show page', function () {
 
     $response = $this->get(route('schedules.show', $schedule));
 
-    $response->assertStatus(200)
-        ->assertSee('學校行事曆')
-        ->assertSee('課程開播');
+    // School calendar events are server-computed into the `schoolCalendar`
+    // prop (see ScheduleController::show) and rendered client-side by
+    // SchoolCalendar.vue, so assert against the prop's raw event payload.
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/Show');
+
+        $names = collect($page->toArray()['props']['schoolCalendar']['events'])->pluck('name');
+
+        expect($names)->toContain('課程開播');
+    });
 });
 
 it('shows the full calendar including past events when a non-current semester is selected', function () {
@@ -115,10 +134,15 @@ it('shows the full calendar including past events when a non-current semester is
 
     $response = $this->get(route('schedules.show', $schedule).'?term=2025A');
 
-    $response->assertStatus(200)
-        ->assertSee('學校行事曆')
-        ->assertSee('114上學期開始')
-        ->assertSee('114上學期期中考');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Schedule/Show')->where('schoolCalendar.showPastEvents', true);
+
+        $names = collect($page->toArray()['props']['schoolCalendar']['events'])->pluck('name');
+
+        expect($names)->toContain('114上學期開始');
+        expect($names)->toContain('114上學期期中考');
+    });
 });
 
 it('filters out past events from the embedded payload', function () {
@@ -142,9 +166,15 @@ it('filters out past events from the embedded payload', function () {
 
     $response = $this->get('/');
 
-    $response->assertStatus(200)
-        ->assertDontSee('過去的活動')
-        ->assertSee('未來的活動');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Home/Index');
+
+        $names = collect($page->toArray()['props']['schoolCalendar']['events'])->pluck('name');
+
+        expect($names)->not->toContain('過去的活動');
+        expect($names)->toContain('未來的活動');
+    });
 });
 
 it('embeds events in chronological order for the client to render', function () {
@@ -174,12 +204,12 @@ it('embeds events in chronological order for the client to render', function () 
 
     $response = $this->get('/');
 
-    $content = $response->content();
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Home/Index');
 
-    $pos二月 = strpos($content, '二月活動');
-    $pos三月 = strpos($content, '三月活動');
-    $pos四月 = strpos($content, '四月活動');
+        $names = collect($page->toArray()['props']['schoolCalendar']['events'])->pluck('name')->all();
 
-    expect($pos二月)->toBeLessThan($pos三月)
-        ->and($pos三月)->toBeLessThan($pos四月);
+        expect($names)->toBe(['二月活動', '三月活動', '四月活動']);
+    });
 });

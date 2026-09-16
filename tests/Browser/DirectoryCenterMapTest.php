@@ -1,6 +1,6 @@
 <?php
 
-// The center picker (list + map) is driven entirely by Alpine.js state
+// The center picker (list + map) is driven entirely by client-side state
 // (selectedKey, selectedCenter) and Leaflet map rendering, so this behaviour
 // is only observable with a real browser rather than the server-rendered
 // Feature test.
@@ -74,7 +74,10 @@ it('hides the leaflet map embed and shows an offline notice when offline', funct
     $page->click('[data-testid="center-button-0"]')
         ->assertVisible('[data-testid="center-map"]');
 
-    $page->script("Alpine.store('network').offline = true");
+    // The offline banner is driven by the page's own online/offline event
+    // listener (see resources/js/Pages/Directory/Index.vue), so dispatch a
+    // real 'offline' event rather than mutating any shared state.
+    $page->script("window.dispatchEvent(new Event('offline'))");
 
     $page->assertSee('目前處於離線狀態')
         ->assertMissing('[data-testid="center-map"]')

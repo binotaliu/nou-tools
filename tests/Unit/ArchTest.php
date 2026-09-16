@@ -11,8 +11,6 @@ use App\Models\DiscountStoreReport;
 use App\Models\StudentScheduleItem;
 use App\Models\User;
 use App\Providers\AppServiceProvider;
-use App\View\Components\Button;
-use App\View\Components\LinkButton;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use NouTools\Domains\Schedules\Actions\GenerateScheduleCalendar;
@@ -50,10 +48,6 @@ arch()->preset()->strict()
         // Filament's own protected hook overrides (getHeaderActions, form,
         // table, infolist, ...); not a code smell.
         'App\Filament',
-
-        // LinkButton extends Button and overrides its protected style helpers.
-        Button::class,
-        LinkButton::class,
     ]);
 
 arch('Actions')

@@ -6,7 +6,6 @@ namespace NouTools\Domains\Articles\Actions;
 
 use App\Enums\ArticleType;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\HtmlString;
 use NouTools\Domains\Articles\Markdown\ArticleMarkdownConverterFactory;
 use NouTools\Domains\Articles\PageData\ArticleIndexPageData;
 
@@ -22,7 +21,7 @@ final readonly class ShowArticleIndexPage
             return null;
         }
 
-        $content = new HtmlString($this->converterFactory->make()->convert(File::get($path))->getContent());
+        $content = $this->converterFactory->make()->convert(File::get($path))->getContent();
 
         return new ArticleIndexPageData(
             type: $type,

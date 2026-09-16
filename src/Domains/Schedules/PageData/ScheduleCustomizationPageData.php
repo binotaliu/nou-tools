@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Schedules\PageData;
 
-use App\Models\StudentSchedule;
 use NouTools\Domains\Schedules\ViewModels\ScheduleCalendarSettingsViewModel;
 use NouTools\Domains\Schedules\ViewModels\ScheduleCustomLinkViewModel;
 use NouTools\Domains\Schedules\ViewModels\ScheduleDisplayOptionsViewModel;
@@ -18,7 +17,8 @@ final class ScheduleCustomizationPageData extends Resource
     public const REMINDER_OFFSET_OPTIONS = [5, 10, 15, 30, 60, 120, 180, 1440];
 
     public function __construct(
-        public StudentSchedule $schedule,
+        public string $scheduleUuid,
+        public ?string $scheduleName,
         public ScheduleDisplayOptionsViewModel $displayOptions,
         #[DataCollectionOf(ScheduleCustomLinkViewModel::class)]
         public DataCollection $customLinks,

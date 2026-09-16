@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use NouTools\Domains\Courses\Actions\BuildCourseSchedulePage;
 
 final class CourseScheduleController extends Controller
 {
-    public function __invoke(Request $request, BuildCourseSchedulePage $buildCourseSchedulePage): View
+    public function __invoke(Request $request, BuildCourseSchedulePage $buildCourseSchedulePage): Response
     {
         $term = $request->query('term');
 
-        return view('course.schedule', [
-            'page' => $buildCourseSchedulePage(is_string($term) ? $term : null),
+        return Inertia::render('Courses/Schedule', [
+            'viewModel' => $buildCourseSchedulePage(is_string($term) ? $term : null),
         ]);
     }
 }

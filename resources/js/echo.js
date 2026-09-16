@@ -27,7 +27,7 @@ if (typeof key === 'string' && key.length > 0) {
   window.__echoReady = true
 
   // Dispatch on the next macrotask so a listener registered later in the
-  // same tick (e.g. an Alpine component's init()) still catches the event.
+  // same tick (e.g. from a component's onMounted) still catches the event.
   setTimeout(() => {
     window.dispatchEvent(new CustomEvent('echoReady'))
   }, 0)

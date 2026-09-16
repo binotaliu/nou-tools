@@ -2,6 +2,7 @@
 
 use App\Csp\DocsApiPolicy;
 use App\Enums\ArticleType;
+use App\Http\Controllers\AltUuController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CourseController;
@@ -66,7 +67,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home')
     ->withMarkdown(HomeIndexMarkdownController::class, uri: '/llms.txt', name: 'llms-txt');
 Route::redirect('/ai.txt', '/llms.txt', 301);
 
-Route::view('/alt-uu', 'alt-uu')->name('alt-uu');
+Route::get('/alt-uu', AltUuController::class)->name('alt-uu');
 
 Route::view('/offline', 'offline')->name('offline');
 

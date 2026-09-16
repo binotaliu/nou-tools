@@ -28,7 +28,7 @@ $classCode = ($item->courseClass === null || $item->courseClass->isTentative) ? 
 
 @foreach ($month->dates as $date)
 
-### {{ $date->formattedDate() }}
+### {{ $date->formattedDate }}
 
 @foreach ($date->courses as $course)
 
@@ -47,9 +47,9 @@ $classCode = ($item->courseClass === null || $item->courseClass->isTentative) ? 
 @foreach ($viewModel->exams as $exam)
 
 - {{ $exam->courseName }}@if ($exam->classCode)（{{ $exam->classCode }}）@endif：
-  @if ($exam->formattedMidtermDate())期中考 {{ $exam->formattedMidtermDate() }}@endif
-  @if ($exam->formattedFinalDate())期末考 {{ $exam->formattedFinalDate() }}@endif
-  @if ($exam->formattedExamTime()){{ $exam->formattedExamTime() }}@endif
+  @if ($exam->formattedMidtermDate)期中考 {{ $exam->formattedMidtermDate }}@endif
+  @if ($exam->formattedFinalDate)期末考 {{ $exam->formattedFinalDate }}@endif
+  @if ($exam->formattedExamTime){{ $exam->formattedExamTime }}@endif
 
 @endforeach
 @endif

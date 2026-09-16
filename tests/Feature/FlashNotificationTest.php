@@ -3,21 +3,25 @@
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
 
-it('shows a toast notification when session has success', function () {
+// The toast itself is rendered client-side by AppLayout.vue's Notification.vue
+// (see HandleInertiaRequests::share for the `flash.success` prop; `errors` is
+// Inertia's own default shared prop), so these only assert the server hands
+// the right raw data through.
+
+it('shares a success flash message for the toast notification', function () {
     $response = $this->withSession(['success' => 'Saved successfully'])->get('/');
 
     $response->assertStatus(200);
-
-    // message must be rendered
-    $response->assertSee('Saved successfully');
-    // make sure the notification container is present (raw html, unescaped)
-    $response->assertSee('pointer-events-none fixed inset-0', false);
+    $response->assertInertia(function (Assert $page) {
+        expect($page->toArray()['props']['flash']['success'])->toBe('Saved successfully');
+    });
 });
 
-it('shows first error message in a toast when validation fails', function () {
+it('shares the first validation error for the toast notification', function () {
     // manually craft the standard error bag that ShareErrorsFromSession middleware expects
     $bag = new ViewErrorBag;
     $bag->put('default', new MessageBag(['first' => 'First error']));
@@ -25,7 +29,7 @@ it('shows first error message in a toast when validation fails', function () {
     $response = $this->withSession(['errors' => $bag])->get('/');
 
     $response->assertStatus(200);
-    $response->assertSee('First error');
-    // design now uses a red icon instead of background color
-    $response->assertSee('text-red-400');
+    $response->assertInertia(function (Assert $page) {
+        expect(array_values($page->toArray()['props']['errors']))->toContain('First error');
+    });
 });

@@ -10,6 +10,7 @@ use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
 use App\Models\StudyRoomSession;
 use Illuminate\Support\Facades\Date;
+use Inertia\Testing\AssertableInertia as Assert;
 
 function studyTimerCookie(StudentSchedule $schedule): string
 {
@@ -281,7 +282,10 @@ it('saves the sent pomodoro cycle as the student\'s preference and starts round 
         ->withCookie('student_schedule', studyTimerCookie($schedule))
         ->get(route('study-room.show'));
 
-    $page->assertOk()->assertSee('focusMinutes&quot;:50', false);
+    $page->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('profile.pomodoroCycle.focusMinutes', 50)
+    );
 });
 
 it('rejects a pomodoro cycle outside the configured bounds', function () {

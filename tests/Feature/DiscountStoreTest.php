@@ -12,6 +12,7 @@ use App\Notifications\NewPendingDiscountStore;
 use Coderflex\LaravelTurnstile\Facades\LaravelTurnstile;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
+use Inertia\Testing\AssertableInertia as Assert;
 
 use function Pest\Laravel\get;
 use function Pest\Laravel\post;
@@ -34,11 +35,15 @@ it('displays the discount store index page', function () {
     $response = get(route('discount-stores.index'));
 
     $response->assertSuccessful();
-    $response->assertSee('優惠店家');
-    $response->assertSee('測試優惠店家');
-    $response->assertSee(route('discount-stores.show', $store), false);
-    $response->assertDontSee('回報有效');
-    $response->assertDontSee('留言（確認後顯示）');
+    $response->assertInertia(function (Assert $page) use ($store) {
+        $page->component('DiscountStores/Index');
+
+        $props = $page->toArray()['props'];
+        $stores = collect($props['viewModel']['stores']);
+
+        expect($stores->pluck('name'))->toContain('測試優惠店家');
+        expect($stores->firstWhere('id', $store->id)['typeLabel'])->toBe('線上');
+    });
 });
 
 it('displays the discount store detail page', function () {
@@ -71,17 +76,21 @@ it('displays the discount store detail page', function () {
     $response = get(route('discount-stores.show', $store));
 
     $response->assertSuccessful();
-    $response->assertSee('詳細頁店家');
-    $response->assertSee('詳細優惠內容');
-    $response->assertSee('最新回報');
-    $response->assertSee('目前還沒有回報資料。');
-    $response->assertSee('留言（確認後顯示）');
-    $response->assertSee('學生小芳');
-    $response->assertSee('這個優惠很棒');
-    $response->assertDontSee('這是未確認留言');
-    $response->assertSee('x-ref="mapContainer"', false);
-    $response->assertDontSee('<meta name="robots" content="noindex, nofollow" />', false);
-    $response->assertSee('<meta name="description" content="國立空中大學學生是否可享有 詳細頁店家 優惠？', false);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('DiscountStores/Show');
+
+        $props = $page->toArray()['props'];
+        $viewModel = $props['viewModel'];
+
+        expect($viewModel['name'])->toBe('詳細頁店家');
+        expect($viewModel['discountDetails'])->toBe('詳細優惠內容');
+        expect($viewModel['reports'])->toBe([]);
+        expect($viewModel['latitude'])->toBe(22.9909);
+        expect($viewModel['longitude'])->toBe(120.1971);
+        expect(collect($viewModel['comments'])->pluck('nickname'))->toContain('學生小芳')
+            ->not->toContain('匿名');
+        expect($viewModel['seoDescription'])->toContain('國立空中大學學生是否可享有 詳細頁店家 優惠？');
+    });
 });
 
 it('does not render map block on online discount store detail page', function () {
@@ -96,7 +105,11 @@ it('does not render map block on online discount store detail page', function ()
     $response = get(route('discount-stores.show', $store));
 
     $response->assertSuccessful();
-    $response->assertDontSee('x-ref="mapContainer"', false);
+    $response->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+
+        expect($viewModel['typeValue'])->toBe('online');
+    });
 });
 
 it('shows latest report details and expandable recent report list on store detail page', function () {
@@ -127,11 +140,14 @@ it('shows latest report details and expandable recent report list on store detai
     $response = get(route('discount-stores.show', $store));
 
     $response->assertSuccessful();
-    $response->assertSee('最新回報');
-    $response->assertSee('最新回報內容');
-    $response->assertSee('展開看更多近期回報（2）');
-    $response->assertSee('較新回報');
-    $response->assertSee('最舊回報');
+    $response->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+        $reports = collect($viewModel['reports']);
+
+        expect($reports)->toHaveCount(3);
+        expect($reports->first()['comment'])->toBe('最新回報內容');
+        expect($reports->pluck('comment'))->toContain('較新回報', '最舊回報');
+    });
 });
 
 it('returns not found when opening a non-online discount store detail page', function () {
@@ -168,9 +184,12 @@ it('only shows online stores', function () {
 
     $response = get(route('discount-stores.index'));
 
-    $response->assertSee('上線店家');
-    $response->assertDontSee('待確認店家');
-    $response->assertDontSee('已過期店家');
+    $response->assertInertia(function (Assert $page) {
+        $names = collect($page->toArray()['props']['viewModel']['stores'])->pluck('name');
+
+        expect($names)->toContain('上線店家')
+            ->not->toContain('待確認店家', '已過期店家');
+    });
 });
 
 it('hides expired stores from the index page but keeps their detail page reachable', function () {
@@ -200,9 +219,12 @@ it('hides expired stores from the index page but keeps their detail page reachab
 
     $response = get(route('discount-stores.index'));
 
-    $response->assertDontSee('已到期店家');
-    $response->assertSee('未到期店家');
-    $response->assertSee('無到期時間店家');
+    $response->assertInertia(function (Assert $page) {
+        $names = collect($page->toArray()['props']['viewModel']['stores'])->pluck('name');
+
+        expect($names)->not->toContain('已到期店家');
+        expect($names)->toContain('未到期店家', '無到期時間店家');
+    });
 
     get(route('discount-stores.show', $expiredStore))->assertSuccessful();
 });
@@ -218,8 +240,15 @@ it('shows the expiry date on the index and detail pages when set', function () {
 
     $expectedDate = $store->fresh()->expires_at->timezone('Asia/Taipei')->format('Y/m/d H:i');
 
-    get(route('discount-stores.index'))->assertSee($expectedDate);
-    get(route('discount-stores.show', $store))->assertSee($expectedDate);
+    get(route('discount-stores.index'))->assertInertia(function (Assert $page) use ($expectedDate) {
+        $stores = collect($page->toArray()['props']['viewModel']['stores']);
+
+        expect($stores->pluck('expiresAtDate'))->toContain($expectedDate);
+    });
+
+    get(route('discount-stores.show', $store))->assertInertia(function (Assert $page) use ($expectedDate) {
+        expect($page->toArray()['props']['viewModel']['expiresAtDateTime'])->toBe($expectedDate);
+    });
 });
 
 it('initializes filter state from query parameters', function () {
@@ -239,15 +268,14 @@ it('initializes filter state from query parameters', function () {
         'city' => '臺北市',
     ]));
 
-    $response->assertSee('discountStoreIndex(');
-    $response->assertSee('initialSearch');
-    $response->assertSee('Spotify');
-    $response->assertSee('initialCategory');
-    $response->assertSee((string) $this->category->id);
-    $response->assertSee('initialType');
-    $response->assertSee('online');
-    $response->assertSee('initialCity');
-    $response->assertSee('臺北市');
+    $response->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+
+        expect($viewModel['search'])->toBe('Spotify');
+        expect($viewModel['selectedCategoryId'])->toBe($this->category->id);
+        expect($viewModel['selectedType'])->toBe('online');
+        expect($viewModel['selectedCity'])->toBe('臺北市');
+    });
 });
 
 it('orders stores by latest report validity priority on index page', function () {
@@ -284,19 +312,25 @@ it('orders stores by latest report validity priority on index page', function ()
 
     $response = get(route('discount-stores.index'));
 
-    $response->assertSeeInOrder([
-        '可用優先店家',
-        '尚無確認店家',
-        '不可用最後店家',
-    ]);
+    $response->assertInertia(function (Assert $page) {
+        $names = collect($page->toArray()['props']['viewModel']['stores'])->pluck('name')->values()->all();
+
+        expect($names)->toBe(['可用優先店家', '尚無確認店家', '不可用最後店家']);
+    });
 });
 
 it('displays the create discount store page', function () {
     $response = get(route('discount-stores.create'));
 
     $response->assertSuccessful();
-    $response->assertSee('新增優惠店家');
-    $response->assertDontSee('livewire:submit-discount-store-form');
+    $response->assertInertia(function (Assert $page) {
+        $page->component('DiscountStores/Create');
+
+        $props = $page->toArray()['props'];
+
+        expect($props['categories'])->toBeArray();
+        expect(collect($props['types'])->pluck('value'))->toContain('online', 'chain', 'local');
+    });
 });
 
 it('displays the submitted confirmation page with the store name', function () {
@@ -304,16 +338,20 @@ it('displays the submitted confirmation page with the store name', function () {
         ->get(route('discount-stores.submitted'));
 
     $response->assertSuccessful();
-    $response->assertSee('已收到您送出的資料');
-    $response->assertSee('測試新店家');
+    $response->assertInertia(function (Assert $page) {
+        $page->component('DiscountStores/Submitted');
+        $page->where('storeName', '測試新店家');
+    });
 });
 
 it('displays the submitted confirmation page without a store name', function () {
     $response = get(route('discount-stores.submitted'));
 
     $response->assertSuccessful();
-    $response->assertSee('已收到您送出的資料');
-    $response->assertSee('感謝您提供的優惠店家資訊！');
+    $response->assertInertia(function (Assert $page) {
+        $page->component('DiscountStores/Submitted');
+        $page->where('storeName', null);
+    });
 });
 
 it('submits a new discount store with the web form', function () {
@@ -516,15 +554,20 @@ it('shows approved comments on store detail page', function () {
 
     $response = get(route('discount-stores.show', $store));
 
-    $response->assertSee('學生小芳');
-    $response->assertSee('這個優惠很棒');
-    $response->assertDontSee('這是未確認留言');
+    $response->assertInertia(function (Assert $page) {
+        $comments = collect($page->toArray()['props']['viewModel']['comments']);
+
+        expect($comments->pluck('nickname'))->toContain('學生小芳')->not->toContain('匿名');
+        expect($comments->pluck('content'))->toContain('這個優惠很棒')->not->toContain('這是未確認留言');
+    });
 });
 
 it('shows empty state when no stores match', function () {
     $response = get(route('discount-stores.index'));
 
-    $response->assertSee('目前沒有符合條件的優惠店家');
+    $response->assertInertia(function (Assert $page) {
+        expect($page->toArray()['props']['viewModel']['stores'])->toBe([]);
+    });
 });
 
 it('displays the discount store index markdown page', function () {

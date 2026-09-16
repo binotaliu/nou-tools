@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\DiscountStores\Actions;
 
 use App\Enums\DiscountStoreStatus;
+use App\Enums\DiscountStoreType;
 use App\Models\DiscountStore;
 use App\Models\DiscountStoreCategory;
 use NouTools\Domains\DiscountStores\DataTransferObjects\ShowDiscountStorePageData;
@@ -72,6 +73,9 @@ final readonly class ShowDiscountStorePage
                 DataCollection::class,
             ),
             cities: $cities,
+            types: collect(DiscountStoreType::cases())
+                ->map(fn (DiscountStoreType $type): array => ['value' => $type->value, 'label' => $type->label()])
+                ->all(),
             selectedCategoryId: $input->categoryId,
             selectedType: $input->type,
             search: $input->search,

@@ -9,6 +9,16 @@ use League\CommonMark\Util\HtmlElement;
 use NouTools\Domains\Articles\Markdown\Container\ContainerNode;
 use NouTools\Domains\Articles\Markdown\Container\ContainerRendererInterface;
 
+/**
+ * `:::checklist` turns Markdown's read-only GFM task list into an interactive
+ * one: the `disabled` attribute is stripped and each item's content is wrapped
+ * in a `<label>` so the whole row is clickable, both server-side here.
+ *
+ * That leaves only persistence to the client — `useMarkdownContainers`
+ * (resources/js/Composables) restores each box from localStorage and tracks
+ * `data-checked` for styling — so the list is usable, if forgetful, with no
+ * JavaScript at all.
+ */
 final class ChecklistRenderer implements ContainerRendererInterface
 {
     public function render(ContainerNode $node, ChildNodeRendererInterface $childRenderer): \Stringable
@@ -23,7 +33,6 @@ final class ChecklistRenderer implements ContainerRendererInterface
 
         return new HtmlElement('div', [
             'class' => 'md-checklist',
-            'x-data' => 'nouToolsChecklist()',
         ], $content);
     }
 }

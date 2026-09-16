@@ -11,9 +11,50 @@ use Illuminate\Support\Str;
 use NouTools\Domains\StudyRoom\Actions\FillFloorWithTestStudents;
 
 // The live seat map, countdown, and realtime sync are all driven
-// client-side by resources/js/study-room.js (registered as the nouStudyRoom
-// Alpine factory), so this behaviour is only observable with a real
-// browser rather than the server-rendered Feature tests.
+// client-side by resources/js/Pages/StudyRoom/Show.vue and its composables
+// (resources/js/Composables/useStudyRoomSocket.js, useSeatGrid.js,
+// useStudyTimer.js, useStudyRoomSky.js, useStudyRoomProfile.js), so this
+// behaviour is only observable with a real browser rather than the
+// server-rendered Feature tests. Low-level assertions that used to reach
+// into Alpine's `_x_dataStack[0]` now go through `window.__studyRoomTest`,
+// a debug bridge the page exposes onMounted (see Show.vue).
+
+/**
+ * Pulls the lamp's shade opening and bulb out of the rendered page. Moved
+ * here from the old tests/Feature/StudyRoom/DeskLampTest.php, which
+ * asserted on server-rendered Blade markup — the lamp is now client-rendered
+ * by Vue, so this geometry check needs a real browser.
+ *
+ * @return array<string, array{cx: float, cy: float, r: float}>
+ */
+function studyRoomLampParts(string $html): array
+{
+    $parts = [];
+
+    foreach (['shade-mouth', 'bulb'] as $part) {
+        preg_match_all(
+            '/<(?:ellipse|circle)\b[^>]*data-testid="study-room-lamp-'.$part.'"[^>]*>/s',
+            $html,
+            $tags
+        );
+
+        foreach ($tags[0] as $tag) {
+            $attribute = function (string $name) use ($tag): float {
+                preg_match('/\b'.$name.'="([\d.]+)"/', $tag, $value);
+
+                return (float) ($value[1] ?? 0);
+            };
+
+            $parts[$part][] = [
+                'cx' => $attribute('cx'),
+                'cy' => $attribute('cy'),
+                'r' => $attribute('r') ?: min($attribute('rx'), $attribute('ry')),
+            ];
+        }
+    }
+
+    return $parts;
+}
 
 function createScheduleWithCourse(): StudentSchedule
 {
@@ -52,7 +93,7 @@ it('lets a student remember their schedule, set a profile, take a seat, and star
         // input directly and times out waiting for it to become visible.
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->assertMissing('[data-testid="study-room-profile-form"]')
@@ -106,7 +147,7 @@ it('prepends the countdown and phase to the tab title, and swaps the favicon, on
         ->fill('nickname', '認真讀書中')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->click('[data-testid="seat-1-S01"]')
@@ -174,7 +215,7 @@ it('lets a student tune their pomodoro cycle and walks them through break and ne
         ->fill('nickname', '認真讀書中')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->click('[data-testid="seat-1-S01"]')
@@ -206,7 +247,7 @@ it('lets a student tune their pomodoro cycle and walks them through break and ne
     $seat = StudyRoomSeat::query()->where('student_schedule_id', $schedule->id)->sole();
     $seat->update(['timer_ends_at' => now()->subSecond()]);
 
-    $component = 'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0]';
+    $component = 'window.__studyRoomTest.socket';
 
     $page->script($component.'.refresh()');
     $page->wait(1)
@@ -253,7 +294,7 @@ it('opens a fullscreen focus mode over the sky and leaves it when the timer stop
         ->fill('nickname', '認真讀書中')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->click('[data-testid="seat-1-S01"]')
@@ -274,6 +315,30 @@ it('opens a fullscreen focus mode over the sky and leaves it when the timer stop
         ->assertSeeIn('[data-testid="study-room-focus-activity"]', '準備')
         ->assertSeeIn('[data-testid="study-room-focus-phase"]', '專注中')
         ->assertSeeIn('[data-testid="study-room-focus-mode"]', '認真讀書中');
+
+    // Regression check (formerly a Feature test asserting on server-rendered
+    // Blade markup — the lamp is now client-rendered, so it needs a real
+    // browser): the desk lamp's bulb has to fit inside its shade opening in
+    // all three places it's drawn (the "start timer" form, the running
+    // timer panel, and focus mode) — the old lamp hung the bulb off the
+    // outside edge of the shade.
+    $lampHtml = $page->script(
+        'document.querySelector(\'[data-testid="study-room-page"]\').outerHTML'
+    );
+    $lampParts = studyRoomLampParts($lampHtml);
+
+    expect($lampParts['bulb'])->toHaveCount(3);
+
+    foreach ($lampParts['bulb'] as $index => $bulb) {
+        $mouth = $lampParts['shade-mouth'][$index];
+
+        expect($bulb['r'])->toBeGreaterThan(0);
+        expect($mouth['r'])->toBeGreaterThan(0);
+
+        $offset = sqrt(($bulb['cx'] - $mouth['cx']) ** 2 + ($bulb['cy'] - $mouth['cy']) ** 2);
+
+        expect($offset + $bulb['r'])->toBeLessThanOrEqual($mouth['r']);
+    }
 
     // The clock in focus mode is the same clock as the page's.
     $focusClock = $page->script('document.querySelector(\'[data-testid="study-room-focus-clock"]\').textContent.trim()');
@@ -325,7 +390,7 @@ it('shows the PersonalInfo modal for editing nickname/emoji, without the session
         ->fill('nickname', '認真讀書中')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->assertMissing('[data-testid="study-room-personal-info-modal"]');
@@ -354,7 +419,7 @@ it('shows the Stats modal with the 7-day chart and an empty-state log when opene
         ->fill('nickname', '認真讀書中')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->click('[data-testid="study-room-personal-info-stats"]')
@@ -395,12 +460,8 @@ it('shows a connection-error message once the room gives up on a realtime connec
         ->assertVisible('[data-testid="study-room-root"]')
         ->wait(3);
 
-    $page->script(
-        "document.querySelector('[data-testid=\"study-room-page\"]')._x_dataStack[0].connectionFailed = true"
-    );
-    $page->script(
-        "document.querySelector('[data-testid=\"study-room-page\"]')._x_dataStack[0].realtime = false"
-    );
+    $page->script('window.__studyRoomTest.socket.connectionFailed = true');
+    $page->script('window.__studyRoomTest.socket.realtime = false');
 
     $page->assertVisible('[data-testid="study-room-connection-error"]');
 });
@@ -419,7 +480,7 @@ it('shows a popover with nickname and activity for an occupied table seat, and o
         ->fill('nickname', '認真讀書中')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
     // Fill the whole first floor with test students, which also opens
     // the second floor.
@@ -453,9 +514,9 @@ it('formats a seat timer as mm:ss under an hour and h:mm:ss from an hour onward'
         ->fill('nickname', '認真讀書中')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
-    $component = 'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0]';
+    $component = 'window.__studyRoomTest.timer';
 
     expect($page->script($component.'.clockLabel(59)'))->toBe('00:59')
         ->and($page->script($component.'.clockLabel(3599)'))->toBe('59:59')
@@ -486,7 +547,7 @@ it('updates a floor\'s occupied count live and closes it once its last occupant 
         ->fill('nickname', '認真讀書中')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
     // Fill the whole first floor with test students, which also opens
     // the second floor.
@@ -517,7 +578,7 @@ it('updates a floor\'s occupied count live and closes it once its last occupant 
     // One seat leaving floor 1 shouldn't require a full refresh to show up
     // in the floor's occupied count.
     $page->script(
-        'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0].applyDelta('.
+        'window.__studyRoomTest.socket.applyDelta('.
             '{openFloors: 2, totals: {occupantCount: 23, siteFocusSecondsToday: 0, yourFocusSecondsToday: 0}, version: "v2", seat: '.
             $emptySeatPayload('1-S01').
             '})'
@@ -528,7 +589,7 @@ it('updates a floor\'s occupied count live and closes it once its last occupant 
     // Once floor 1 is no longer full, floor 2 (which nobody ever sat in)
     // should close and disappear entirely, not linger with stale data.
     $page->script(
-        'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0].applyDelta('.
+        'window.__studyRoomTest.socket.applyDelta('.
             '{openFloors: 1, totals: {occupantCount: 22, siteFocusSecondsToday: 0, yourFocusSecondsToday: 0}, version: "v3", seat: '.
             $emptySeatPayload('1-S02').
             '})'
@@ -556,7 +617,7 @@ it('clears the held-seat highlight and action banner once a realtime delta relea
         ->fill('nickname', '認真讀書中')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->click('[data-testid="seat-1-S01"]')
@@ -573,7 +634,7 @@ it('clears the held-seat highlight and action banner once a realtime delta relea
     // Same payload shape RecordHeartbeat/ReleaseIdleSeats/an admin clear
     // broadcasts for a seat that's no longer occupied.
     $page->script(
-        'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0].applyDelta('.
+        'window.__studyRoomTest.socket.applyDelta('.
             '{openFloors: 1, totals: {occupantCount: 0, siteFocusSecondsToday: 0, yourFocusSecondsToday: 0}, version: "v2", seat: '.
             json_encode([
                 'code' => '1-S01',
@@ -630,7 +691,7 @@ it('keeps your own focus total intact when a realtime delta broadcasts for someo
         ->fill('nickname', '認真讀書中')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->wait(1);
@@ -639,7 +700,7 @@ it('keeps your own focus total intact when a realtime delta broadcasts for someo
 
     // Same payload shape a broadcast for an unrelated seat leaving sends.
     $page->script(
-        'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0].applyDelta('.
+        'window.__studyRoomTest.socket.applyDelta('.
             '{openFloors: 1, totals: {occupantCount: 0, siteFocusSecondsToday: 0, yourFocusSecondsToday: 0}, version: "v2", seat: '.
             json_encode([
                 'code' => '1-S02',
@@ -680,13 +741,13 @@ it('draws the garden and windows from the real Taiwan sky, day and night', funct
         ->fill('nickname', '認真讀書中')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
-        ->waitForEvent('load');
+        ->wait(1);
 
     $page->assertVisible('[data-testid="study-room-wall"] [data-testid="study-room-garden"]')
         ->assertVisible('[data-testid="study-room-wall"] [data-testid="study-room-sky-canvas"]')
         ->assertVisible('[data-testid="study-room-floor-1"] [data-testid="study-room-windows"]');
 
-    $component = 'document.querySelector(\'[data-testid="study-room-page"]\')._x_dataStack[0]';
+    $component = 'window.__studyRoomTest.sky';
 
     // The sky is painted by a WebGL shader layered over the CSS gradient
     // (study-room-sky-shader.js). Reading the framebuffer back is the only
@@ -746,7 +807,7 @@ it('draws the garden and windows from the real Taiwan sky, day and night', funct
     // The clock hanging beside the window reads Taipei time on its hands,
     // not the viewer's own zone. Stopping the tick first pins the clock, so
     // the hands can't move between setting the time and reading the DOM.
-    $page->script('clearInterval('.$component.'.clockHandle); '.$component.'.clockNow = '.
+    $page->script($component.'.stopClock(); '.$component.'.clockNow = '.
         CarbonImmutable::parse('2026-06-21T15:20:30+08:00')->getTimestampMs());
     $page->wait(1);
 

@@ -16,7 +16,8 @@ use Spatie\LaravelData\Resource;
 final class AnnouncementPreferencesPageData extends Resource
 {
     public function __construct(
-        public StudentSchedule $schedule,
+        public string $scheduleUuid,
+        public ?string $scheduleName,
         #[DataCollectionOf(AnnouncementSourceGroupViewModel::class)]
         public DataCollection $sourceGroups,
     ) {}
@@ -48,7 +49,8 @@ final class AnnouncementPreferencesPageData extends Resource
             ->values();
 
         return new self(
-            schedule: $schedule,
+            scheduleUuid: $schedule->getRouteKey(),
+            scheduleName: $schedule->name,
             sourceGroups: AnnouncementSourceGroupViewModel::collect($groups, DataCollection::class),
         );
     }

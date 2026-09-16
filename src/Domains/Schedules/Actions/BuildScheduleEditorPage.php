@@ -9,6 +9,7 @@ use App\Models\StudentSchedule;
 use Illuminate\Http\Request;
 use NouTools\Domains\Schedules\PageData\ScheduleEditorPageData;
 use NouTools\Domains\Schedules\ViewModels\ScheduleEditorCourseViewModel;
+use NouTools\Domains\Schedules\ViewModels\ScheduleEditorSelectedItemViewModel;
 use Spatie\LaravelData\DataCollection;
 
 final readonly class BuildScheduleEditorPage
@@ -58,7 +59,12 @@ final readonly class BuildScheduleEditorPage
             currentSemester: $currentSemester,
             selectedTerm: $selectedTerm,
             availableTerms: $availableTerms,
-            schedule: $schedule,
+            scheduleUuid: $schedule?->getRouteKey(),
+            scheduleName: $schedule?->name,
+            selectedItems: $schedule ? ScheduleEditorSelectedItemViewModel::collect(
+                $schedule->items->map(fn ($item) => ScheduleEditorSelectedItemViewModel::fromModel($item)),
+                DataCollection::class,
+            ) : null,
             previousSchedule: $previousSchedule,
         );
     }

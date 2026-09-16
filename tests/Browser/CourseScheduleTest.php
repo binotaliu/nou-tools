@@ -5,11 +5,10 @@ use App\Models\Course;
 use App\Models\CourseClass;
 
 // Grouping (考試時間 / 學系 / 學分數), the 一般課程 vs 微學分與全遠距 split, and
-// the resulting table columns are all computed client-side by Alpine from
-// the JSON payload embedded in the page (see courseSchedule() in
-// resources/views/course/schedule.blade.php), so this behaviour is only
-// observable with a real browser rather than the server-rendered Feature
-// test. Switch the dropdown via the `[data-testid="group-by-select"]`
+// the resulting table columns are all computed client-side from the Inertia
+// props (see resources/js/Pages/Courses/Schedule.vue), so this behaviour is
+// only observable with a real browser rather than the server-rendered
+// Feature test. Switch the dropdown via the `[data-testid="group-by-select"]`
 // selector, not its visible label text, to avoid ambiguity with the
 // `<option>` text nodes.
 

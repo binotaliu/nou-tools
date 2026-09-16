@@ -4,6 +4,7 @@ use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
 use App\Settings\StudyRoomSettings;
+use Inertia\Testing\AssertableInertia as Assert;
 
 function studyRoomScheduleCookie(StudentSchedule $schedule): string
 {
@@ -14,45 +15,35 @@ function studyRoomScheduleCookie(StudentSchedule $schedule): string
     ]);
 }
 
-it('shows the schedule prompt and no seat-map root when there is no cookie', function () {
+it('shows the schedule prompt state when there is no cookie', function () {
     $response = $this->get(route('study-room.show'));
 
-    $response->assertOk()
-        ->assertSee('先建立課表才能進自習室')
-        ->assertSee(route('schedules.create'), false)
-        ->assertDontSee('data-testid="study-room-root"', false);
+    $response->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('hasSchedule', false)
+            ->where('needsProfile', false)
+    );
 });
 
-it('shows the nickname form when there is a cookie but no profile', function () {
+it('flags that a profile is still needed when there is a cookie but no profile', function () {
     $schedule = StudentSchedule::factory()->create();
 
     $response = $this->withCredentials()
         ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
         ->get(route('study-room.show'));
 
-    // The nickname/emoji form is now a PersonalInfo modal that's always
-    // present in the DOM (hidden via x-show, forced open client-side by
-    // Alpine when needsProfile is true) rather than conditionally
-    // rendered server-side, so only its presence is asserted here —
-    // whether it's actually open is a client-side concern covered by
-    // tests/Browser/StudyRoomTest.php.
-    $response->assertOk()
-        ->assertSee('data-testid="study-room-profile-form"', false)
-        ->assertSee('data-testid="study-room-root"', false);
+    // The live seat map / profile check itself is a client-side concern
+    // (the Vue page fetches /study-room/state and reacts to needsProfile),
+    // covered by tests/Browser/StudyRoomTest.php — this only asserts the
+    // page-shell prop the client bootstraps from.
+    $response->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('hasSchedule', true)
+            ->where('needsProfile', true)
+    );
 });
 
-it('shows the seat-map root when there is a cookie and a profile', function () {
-    $schedule = StudentSchedule::factory()->create();
-    StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
-
-    $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
-        ->get(route('study-room.show'));
-
-    $response->assertOk()->assertSee('data-testid="study-room-root"', false);
-});
-
-it('has no literal style attributes, since the strict CSP has no style-src unsafe-inline', function () {
+it('does not flag needsProfile when there is a cookie and a profile', function () {
     $schedule = StudentSchedule::factory()->create();
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
 
@@ -60,9 +51,11 @@ it('has no literal style attributes, since the strict CSP has no style-src unsaf
         ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
         ->get(route('study-room.show'));
 
-    $response->assertOk();
-
-    expect($response->getContent())->not->toMatch('/\sstyle="/');
+    $response->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('hasSchedule', true)
+            ->where('needsProfile', false)
+    );
 });
 
 it('renders the announcement markdown as html', function () {
@@ -78,13 +71,19 @@ it('renders the announcement markdown as html', function () {
         ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
         ->get(route('study-room.show'));
 
-    $response->assertOk()->assertSee('<strong>', false);
+    $response->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('announcementHtml', fn (string $html): bool => str_contains($html, '<strong>'))
+    );
 });
 
 it('shows the configured open hours label', function () {
     $response = $this->get(route('study-room.show'));
 
-    $response->assertOk()->assertSee('24 小時');
+    $response->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('openHoursLabel', '24 小時')
+    );
 });
 
 it('auto-syncs seats from zero on first visit', function () {
@@ -102,30 +101,53 @@ it('auto-syncs seats from zero on first visit', function () {
 it('passes the maximum floor count to the client so the stairs can explain when the next floor opens', function () {
     config(['study-room.floors.max' => 5]);
 
-    $schedule = StudentSchedule::factory()->create();
-    StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
+    $response = $this->get(route('study-room.show'));
 
-    $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
-        ->get(route('study-room.show'));
+    $response->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('clientConfig.maxFloors', 5)
+    );
+});
 
-    $response->assertOk()
-        ->assertSee('data-testid="study-room-stairs"', false)
-        ->assertSee('&quot;maxFloors&quot;:5', false);
+it('passes the seat layout counts to the client so the initial skeleton matches the real floor grid', function () {
+    config(['study-room.layout' => [
+        'solo_seats_per_floor' => 12,
+        'tables_per_floor' => 3,
+        'seats_per_table' => 4,
+    ]]);
+
+    $response = $this->get(route('study-room.show'));
+
+    $response->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('clientConfig.soloSeatsPerFloor', 12)
+            ->where('clientConfig.tablesPerFloor', 3)
+            ->where('clientConfig.seatsPerTable', 4)
+    );
 });
 
 it('passes the campus coordinates to the client so the windows can follow the real sun and moon', function () {
     config(['study-room.location' => ['latitude' => 25.0847, 'longitude' => 121.4737]]);
 
-    $schedule = StudentSchedule::factory()->create();
-    StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
+    $response = $this->get(route('study-room.show'));
 
-    $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
-        ->get(route('study-room.show'));
+    $response->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('clientConfig.latitude', 25.0847)
+            ->where('clientConfig.longitude', 121.4737)
+    );
+});
 
-    $response->assertOk()
-        ->assertSee('data-testid="study-room-garden"', false)
-        ->assertSee('&quot;latitude&quot;:25.0847', false)
-        ->assertSee('&quot;longitude&quot;:121.4737', false);
+it('does not pass live room state as an Inertia prop', function () {
+    // Load-bearing: the seat grid/timer state changes far faster than an
+    // Inertia page-prop model should carry — see AGENTS.md "自習室 (Study
+    // Room)" and .github/skills/laravel-best-practices/rules/inertia-vue-views.md.
+    // The Vue page fetches it itself from GET /study-room/state instead.
+    $response = $this->get(route('study-room.show'));
+
+    $response->assertOk()->assertInertia(function (Assert $page) {
+        $props = $page->toArray()['props'];
+
+        expect($props)->not->toHaveKey('roomState');
+    });
 });

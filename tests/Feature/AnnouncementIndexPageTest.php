@@ -2,41 +2,37 @@
 
 use App\Models\Announcement;
 use Illuminate\Testing\TestResponse;
+use Inertia\Testing\AssertableInertia as Assert;
 
 use function Pest\Laravel\get;
 
-function currentFilterSummaryHtml(TestResponse $response): string
+/**
+ * Selected source => categories directly from the Inertia
+ * `viewModel.sourceCategorySelections` prop (this replaces scraping the
+ * old server-rendered "目前條件" summary now that the filter chips are
+ * rendered client-side by Vue rather than Blade).
+ *
+ * @return array<string, array<int, string>>
+ */
+function selectedSourceCategoriesFromResponse(TestResponse $response): array
 {
-    preg_match(
-        '/目前條件：<\/span>\s*<div[^>]*>(.*?)<\/div>\s*<\/div>/su',
-        $response->getContent(),
-        $matches,
-    );
+    $props = null;
 
-    expect($matches[1] ?? null)->not->toBeNull();
+    $response->assertInertia(function (Assert $page) use (&$props) {
+        $props = $page->toArray()['props'];
+    });
 
-    return $matches[1];
-}
-
-function currentPaginationSummaryText(TestResponse $response): string
-{
-    preg_match(
-        '/text-warm-600 dark:text-zinc-400">(.*?)<\/p>/su',
-        $response->getContent(),
-        $matches,
-    );
-
-    expect($matches[1] ?? null)->not->toBeNull();
-
-    return preg_replace('/\s+/u', ' ', trim($matches[1]));
+    return collect($props['viewModel']['sourceCategorySelections'])
+        ->filter(fn (array $selection) => $selection['selectedCategories'] !== [])
+        ->mapWithKeys(fn (array $selection) => [$selection['source'] => $selection['selectedCategories']])
+        ->all();
 }
 
 it('shows announcement entry points on home page', function () {
     $response = get(route('home'));
 
     $response->assertSuccessful();
-    $response->assertSee('學校公告');
-    $response->assertSee(route('announcements.index'));
+    $response->assertInertia(fn (Assert $page) => $page->component('Home/Index'));
 });
 
 it('shows latest announcements with filter options', function () {
@@ -57,11 +53,13 @@ it('shows latest announcements with filter options', function () {
     $response = get(route('announcements.index'));
 
     $response->assertSuccessful();
-    $response->assertSee('學校公告');
-    $response->assertSee('期中考公告');
-    $response->assertSee('迎新活動');
-    $response->assertSee('教務處');
-    $response->assertSee('活動資訊');
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Announcements/Index');
+
+        $titles = collect($page->toArray()['props']['viewModel']['announcements']['data'])->pluck('title');
+
+        expect($titles)->toContain('期中考公告', '迎新活動');
+    });
 });
 
 it('filters announcements by source and category', function () {
@@ -89,14 +87,20 @@ it('filters announcements by source and category', function () {
     ]));
 
     $response->assertSuccessful();
-    $response->assertSee('保留的公告');
-    $response->assertDontSee('錯誤分類公告');
-    $response->assertDontSee('錯誤來源公告');
 
-    $currentFilters = currentFilterSummaryHtml($response);
+    $titles = null;
 
-    expect($currentFilters)->toContain('教務處');
-    expect($currentFilters)->toContain('考試資訊');
+    $response->assertInertia(function (Assert $page) use (&$titles) {
+        $titles = collect($page->toArray()['props']['viewModel']['announcements']['data'])->pluck('title');
+    });
+
+    expect($titles)->toContain('保留的公告');
+    expect($titles)->not->toContain('錯誤分類公告', '錯誤來源公告');
+
+    $currentFilters = selectedSourceCategoriesFromResponse($response);
+
+    expect($currentFilters)->toHaveKey('教務處');
+    expect($currentFilters['教務處'])->toContain('考試資訊');
 });
 
 it('keeps filtered results paginated', function () {
@@ -118,11 +122,13 @@ it('keeps filtered results paginated', function () {
     ]));
 
     $pageTwoResponse->assertSuccessful();
-    $pageTwoResponse->assertDontSee('其他來源公告');
+    $pageTwoResponse->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
 
-    $paginationSummary = currentPaginationSummaryText($pageTwoResponse);
-
-    expect($paginationSummary)->toContain('第 2 / 2 頁，共');
+        expect(collect($viewModel['announcements']['data'])->pluck('title'))->not->toContain('其他來源公告');
+        expect($viewModel['announcements']['current_page'])->toBe(2);
+        expect($viewModel['announcements']['last_page'])->toBe(2);
+    });
 });
 
 it('filters announcements by selected source categories tree', function () {
@@ -151,14 +157,20 @@ it('filters announcements by selected source categories tree', function () {
     ]));
 
     $response->assertSuccessful();
-    $response->assertSee('教務處考試公告');
-    $response->assertDontSee('教務處選課公告');
-    $response->assertDontSee('台北中心公告');
 
-    $currentFilters = currentFilterSummaryHtml($response);
+    $titles = null;
 
-    expect($currentFilters)->toContain('教務處');
-    expect($currentFilters)->toContain('考試資訊');
+    $response->assertInertia(function (Assert $page) use (&$titles) {
+        $titles = collect($page->toArray()['props']['viewModel']['announcements']['data'])->pluck('title');
+    });
+
+    expect($titles)->toContain('教務處考試公告');
+    expect($titles)->not->toContain('教務處選課公告', '台北中心公告');
+
+    $currentFilters = selectedSourceCategoriesFromResponse($response);
+
+    expect($currentFilters)->toHaveKey('教務處');
+    expect($currentFilters['教務處'])->toContain('考試資訊');
 });
 
 it('filters announcements by multiple sources', function () {
@@ -185,14 +197,19 @@ it('filters announcements by multiple sources', function () {
     ]));
 
     $response->assertSuccessful();
-    $response->assertSee('教務處公告');
-    $response->assertSee('台北中心公告');
-    $response->assertDontSee('其他來源公告');
 
-    $currentFilters = currentFilterSummaryHtml($response);
+    $titles = null;
 
-    expect($currentFilters)->toContain('教務處');
-    expect($currentFilters)->toContain('台北中心');
+    $response->assertInertia(function (Assert $page) use (&$titles) {
+        $titles = collect($page->toArray()['props']['viewModel']['announcements']['data'])->pluck('title');
+    });
+
+    expect($titles)->toContain('教務處公告', '台北中心公告');
+    expect($titles)->not->toContain('其他來源公告');
+
+    $currentFilters = selectedSourceCategoriesFromResponse($response);
+
+    expect($currentFilters)->toHaveKeys(['教務處', '台北中心']);
 });
 
 it('shows only the source when all categories under it are selected', function () {
@@ -219,15 +236,29 @@ it('shows only the source when all categories under it are selected', function (
     ]));
 
     $response->assertSuccessful();
-    $response->assertSee('台北中心教務公告');
 
-    $currentFilters = currentFilterSummaryHtml($response);
+    $titles = null;
+    $sourceCategorySelections = null;
 
-    expect($currentFilters)->toContain('台北中心');
-
-    $allCategoriesForTaipeiCenter->each(function (string $category) use ($currentFilters): void {
-        expect($currentFilters)->not->toContain($category);
+    $response->assertInertia(function (Assert $page) use (&$titles, &$sourceCategorySelections) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+        $titles = collect($viewModel['announcements']['data'])->pluck('title');
+        $sourceCategorySelections = collect($viewModel['sourceCategorySelections'])->keyBy('source');
     });
+
+    expect($titles)->toContain('台北中心教務公告');
+
+    // The frontend (useAnnouncementFilter/Announcements/Index.vue) collapses
+    // the displayed chips to just the source name when every available
+    // category under it is selected; at the data level that's simply
+    // selectedCategories === availableCategories.
+    $selection = $sourceCategorySelections->get('台北中心');
+
+    expect($selection)->not->toBeNull();
+    expect(collect($selection['selectedCategories'])->sort()->values()->all())
+        ->toBe($allCategoriesForTaipeiCenter->sort()->values()->all());
+    expect(collect($selection['availableCategories'])->sort()->values()->all())
+        ->toBe($allCategoriesForTaipeiCenter->sort()->values()->all());
 });
 
 it('displays the announcement index markdown page', function () {

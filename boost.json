@@ -10,6 +10,7 @@
     "laravel-best-practices",
     "pest-testing",
     "tailwindcss-development",
-    "debugging-output-and-previewing-html-using-ray"
+    "debugging-output-and-previewing-html-using-ray",
+    "inertia-vue-development"
   ]
 }

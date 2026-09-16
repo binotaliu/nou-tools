@@ -1,0 +1,488 @@
+<script setup>
+// Uses the `useLearningProgress` composable for the scroll-gradient overlay
+// + print-friendly form submission, and the `Greeting` component (see
+// resources/js/Components/Greeting.vue) for the greeting card.
+//
+// Only the ViewModel's constructor properties survive Inertia's JSON
+// serialization, so derived state (isVideoComplete, isWeekFullyComplete,
+// getCurrentWeek, ...) is computed here from `viewModel.entries` instead.
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { Head, Link } from '@inertiajs/vue3'
+import { CheckIcon } from '@heroicons/vue/24/solid'
+import AppLayout from '../../Layouts/AppLayout.vue'
+import Icon from '../../Components/Icon.vue'
+import Greeting from '../../Components/Greeting.vue'
+import useLearningProgress from '../../Composables/useLearningProgress'
+
+const props = defineProps({
+  viewModel: {
+    type: Object,
+    required: true,
+  },
+  greeting: {
+    type: Object,
+    required: true,
+  },
+})
+
+const semesterLabel = computed(() => {
+  const match = /^(\d{4})([ABC])$/.exec(props.viewModel.term)
+
+  if (!match) {
+    return props.viewModel.term
+  }
+
+  const rocYear = Number(match[1]) - 1911
+  const termName = { A: '上學期', B: '下學期', C: '暑期' }[match[2]]
+
+  return `${rocYear} 學年度${termName}`
+})
+
+const pageTitle = computed(() => {
+  const suffix = props.viewModel.scheduleName
+    ? ` - ${props.viewModel.scheduleName}`
+    : ''
+
+  return `學習進度表 - ${semesterLabel.value}${suffix}- NOU 小幫手`
+})
+
+// --- derived progress state (ported from LearningProgressViewModel's
+// methods, which don't survive JSON serialization) ---
+const entryMap = computed(() => {
+  const map = new Map()
+
+  props.viewModel.entries.forEach(entry => {
+    map.set(`${entry.courseId}-${entry.weekNum}`, entry)
+  })
+
+  return map
+})
+
+function findEntry(courseId, weekNum) {
+  return entryMap.value.get(`${courseId}-${weekNum}`) ?? null
+}
+
+function isVideoComplete(courseId, weekNum) {
+  return findEntry(courseId, weekNum)?.videoCompleted ?? false
+}
+
+function isTextbookComplete(courseId, weekNum) {
+  return findEntry(courseId, weekNum)?.textbookCompleted ?? false
+}
+
+function isProgressComplete(courseId, weekNum) {
+  return (
+    isVideoComplete(courseId, weekNum) && isTextbookComplete(courseId, weekNum)
+  )
+}
+
+function getNote(courseId, weekNum) {
+  return findEntry(courseId, weekNum)?.note ?? ''
+}
+
+function isWeekFullyComplete(weekNum) {
+  return props.viewModel.courses.every(course =>
+    isProgressComplete(course.id, weekNum)
+  )
+}
+
+function hasIncompleteCourseInWeek(weekNum) {
+  return props.viewModel.courses.some(
+    course => !isProgressComplete(course.id, weekNum)
+  )
+}
+
+const currentWeek = computed(() => {
+  if (
+    !props.viewModel.semesterStart ||
+    !props.viewModel.semesterEnd ||
+    !props.viewModel.now
+  ) {
+    return null
+  }
+
+  const today = new Date(props.viewModel.now)
+  today.setHours(0, 0, 0, 0)
+
+  const start = new Date(props.viewModel.semesterStart)
+  const end = new Date(props.viewModel.semesterEnd)
+
+  if (today < start || today > end) {
+    return null
+  }
+
+  const diffDays = Math.round(Math.abs(today - start) / 86400000)
+
+  return Math.floor(diffDays / 7) + 1
+})
+
+function isWeekPassed(weekNum) {
+  return currentWeek.value !== null && weekNum < currentWeek.value
+}
+
+function toChineseNumber(n) {
+  return window.NouTime ? window.NouTime.chineseNumber(n) : String(n)
+}
+
+// --- scroll-gradient overlay + form submission (ported composable) ---
+const progressForm = ref(null)
+
+const {
+  showHorizontalGradient,
+  showVerticalGradient,
+  checkGradientVisibility,
+  init,
+  submitProgressForm,
+} = useLearningProgress(progressForm)
+
+let scrollDebounceTimer = null
+
+function onFormScroll() {
+  clearTimeout(scrollDebounceTimer)
+  scrollDebounceTimer = setTimeout(checkGradientVisibility, 100)
+}
+
+onMounted(() => {
+  init()
+  window.addEventListener('resize', checkGradientVisibility)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkGradientVisibility)
+  clearTimeout(scrollDebounceTimer)
+})
+
+function print() {
+  window.print()
+}
+
+// The progress form is a plain native POST (see useLearningProgress's
+// fallback `document.getElementById(formId)?.submit()`), not an Inertia/XHR
+// request, so it needs its own CSRF token field rather than relying on the
+// XSRF-TOKEN cookie Inertia's axios instance reads automatically.
+const csrfToken =
+  typeof document !== 'undefined'
+    ? (document.querySelector('meta[name="csrf-token"]')?.content ?? '')
+    : ''
+</script>
+
+<template>
+  <Head :title="pageTitle">
+    <meta name="robots" content="noindex, nofollow" />
+  </Head>
+
+  <AppLayout>
+    <div class="mx-auto max-w-7xl">
+      <div
+        class="mb-8 flex flex-col items-start justify-between gap-y-4 md:flex-row"
+      >
+        <div>
+          <h2 class="mb-2 text-3xl font-bold text-warm-900 dark:text-zinc-100">
+            學習進度表
+            <small v-if="viewModel.scheduleName"
+              >— {{ viewModel.scheduleName }}</small
+            >
+          </h2>
+          <p class="text-lg text-warm-700 dark:text-zinc-300">
+            {{ semesterLabel }}
+          </p>
+        </div>
+
+        <div class="flex w-full gap-2 md:w-auto print:hidden">
+          <Link
+            :href="`/schedules/${viewModel.scheduleUuid}`"
+            class="inline-flex w-1/2 items-center justify-center gap-2 rounded-md border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 transition-colors hover:bg-warm-50 md:w-auto dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+            data-analytics-event="learning_progress_back"
+            data-analytics-feature="learning_progress"
+          >
+            <Icon name="arrow-left" class="size-4" />
+            回到課表
+          </Link>
+
+          <button
+            type="button"
+            class="inline-flex w-1/2 items-center justify-center gap-2 rounded-md bg-warm-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-warm-600 md:w-auto"
+            data-analytics-event="learning_progress_save"
+            data-analytics-feature="learning_progress"
+            @click="submitProgressForm()"
+          >
+            <Icon name="check" class="size-4" />
+            保存進度
+          </button>
+        </div>
+      </div>
+
+      <Greeting
+        class="mb-6"
+        :semester-label="greeting.semesterLabel"
+        :semester-code="greeting.semesterCode"
+        :semester-start="greeting.semesterStart"
+        :semester-end="greeting.semesterEnd"
+      />
+
+      <div class="mb-4 w-full print:hidden">
+        <p class="mb-1 text-sm text-warm-700 dark:text-zinc-300">
+          本學期完成進度：{{ viewModel.percentage.toFixed(0) }}%
+        </p>
+        <div
+          class="relative h-2 w-full overflow-hidden rounded bg-warm-200 dark:bg-zinc-700"
+          aria-hidden="true"
+        >
+          <div
+            class="h-full bg-warm-500"
+            :style="{ width: viewModel.percentage + '%' }"
+          ></div>
+        </div>
+      </div>
+
+      <div class="relative rounded border border-warm-300 dark:border-zinc-600">
+        <form
+          id="progress-form"
+          ref="progressForm"
+          method="POST"
+          :action="`/schedules/${viewModel.scheduleUuid}/${viewModel.term}/learning-progress`"
+          class="max-h-[min(45rem,90vh)] max-w-full overflow-x-auto rounded bg-linear-to-b from-warm-100 to-white dark:from-zinc-900 dark:to-zinc-950 print:max-h-full"
+          :style="{
+            '--courses-count': viewModel.courses.length,
+            '--weeks-count': viewModel.weeks.length,
+          }"
+          @scroll="onFormScroll"
+        >
+          <input type="hidden" name="_method" value="PUT" />
+          <input type="hidden" name="_token" :value="csrfToken" />
+
+          <table
+            class="w-full min-w-4xl table-fixed border-collapse rounded print:min-w-0"
+          >
+            <thead class="print:table-header-group">
+              <tr
+                class="sticky top-0 z-20 rounded-t bg-warm-100 dark:bg-zinc-900 print:static"
+              >
+                <th
+                  class="sticky left-0 z-30 w-24 rounded-tl border border-t-0 border-l-0 border-warm-300 bg-warm-100 px-0 py-2 text-center text-sm font-bold text-warm-900 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 print:static"
+                  rowspan="2"
+                >
+                  週次 \ 課程
+                  <div
+                    class="absolute top-full left-0 h-px w-full bg-warm-300 dark:bg-zinc-600 print:hidden"
+                  ></div>
+                </th>
+                <th
+                  v-for="course in viewModel.courses"
+                  :key="course.id"
+                  class="relative w-[calc((100%-6rem)/var(--courses-count))] border border-t-0 border-warm-300 px-2 py-2 text-center font-bold text-warm-900 last:rounded-tr last:border-r-0 dark:border-zinc-600 dark:text-zinc-100 print:static"
+                  colspan="2"
+                >
+                  <div class="line-clamp-2 w-full overflow-hidden text-xs">
+                    {{ course.name }}
+                  </div>
+                  <div
+                    class="absolute top-full left-0 h-px w-full bg-warm-300 dark:bg-zinc-600 print:hidden"
+                  ></div>
+                </th>
+              </tr>
+              <tr
+                class="hidden border-b border-warm-300 bg-warm-100 dark:border-zinc-600 dark:bg-zinc-900 print:table-row"
+              >
+                <template v-for="course in viewModel.courses" :key="course.id">
+                  <th
+                    class="border border-t-0 border-b-0 border-warm-300 px-0 py-1 text-center text-xs font-medium text-warm-700 dark:border-zinc-600 dark:text-zinc-300"
+                  >
+                    影音
+                  </th>
+                  <th
+                    class="border border-t-0 border-b-0 border-warm-300 px-0 py-1 text-center text-xs font-medium text-warm-700 last:border-r-0 dark:border-zinc-600 dark:text-zinc-300"
+                  >
+                    課本
+                  </th>
+                </template>
+              </tr>
+            </thead>
+            <tbody>
+              <template v-for="week in viewModel.weeks" :key="week.num">
+                <tr
+                  class="border-b border-warm-300 hover:bg-warm-50 dark:border-zinc-600 dark:hover:bg-zinc-950"
+                >
+                  <td
+                    class="sticky left-0 z-10 break-inside-avoid border border-b-0 border-l-0 border-warm-300 px-0 py-0 font-semibold text-warm-900 dark:border-zinc-600 dark:text-zinc-100 print:static print:bg-warm-50"
+                    :class="
+                      currentWeek === week.num
+                        ? 'bg-blue-50 dark:bg-blue-950/60'
+                        : isWeekFullyComplete(week.num)
+                          ? 'bg-white dark:bg-zinc-900 [&>div]:text-gray-400 dark:[&>div]:text-zinc-500'
+                          : isWeekPassed(week.num) &&
+                              hasIncompleteCourseInWeek(week.num)
+                            ? 'bg-red-50 dark:bg-red-950/60'
+                            : 'bg-warm-50 dark:bg-zinc-950'
+                    "
+                    rowspan="2"
+                  >
+                    <div
+                      class="text-center text-xs font-semibold print:text-black!"
+                    >
+                      第{{ toChineseNumber(week.num) }}週
+                    </div>
+                    <div
+                      class="text-center text-xs text-warm-600 dark:text-zinc-400 print:text-warm-600!"
+                    >
+                      {{ week.start }} - {{ week.end }}
+                    </div>
+                    <div
+                      class="absolute top-0 left-full h-full w-px bg-warm-300 dark:bg-zinc-600 print:hidden"
+                    ></div>
+                  </td>
+
+                  <template
+                    v-for="course in viewModel.courses"
+                    :key="course.id"
+                  >
+                    <td
+                      class="border border-warm-300 text-center last:border-r-0 dark:border-zinc-600 [&:has(input:checked)]:bg-white dark:[&:has(input:checked)]:bg-zinc-900"
+                      :class="
+                        currentWeek === week.num
+                          ? 'bg-blue-50 dark:bg-blue-950/60'
+                          : isWeekPassed(week.num)
+                            ? 'bg-red-50 dark:bg-red-950/60'
+                            : 'bg-white dark:bg-zinc-900'
+                      "
+                    >
+                      <label
+                        class="group flex h-full w-full cursor-pointer items-center justify-center gap-1 px-2 py-3"
+                      >
+                        <div class="grid size-4 grid-cols-1">
+                          <input
+                            type="checkbox"
+                            :name="`progress[${course.id}][${week.num}][video]`"
+                            value="1"
+                            :checked="isVideoComplete(course.id, week.num)"
+                            :aria-label="`第${toChineseNumber(week.num)}週 ${course.name} 的影音學習進度`"
+                            class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
+                          />
+                          <CheckIcon
+                            class="col-start-1 row-start-1 m-0.5 size-3 text-gray-400 opacity-0 group-has-checked:opacity-100 print:hidden"
+                          />
+                          <div
+                            class="col-start-1 row-start-1 hidden size-4 rounded border border-gray-500 bg-white dark:bg-zinc-900 print:block"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs group-has-checked:text-gray-400 print:hidden"
+                          >影音</span
+                        >
+                      </label>
+                    </td>
+                    <td
+                      class="border border-warm-300 text-center last:border-r-0 dark:border-zinc-600 [&:has(input:checked)]:bg-white dark:[&:has(input:checked)]:bg-zinc-900"
+                      :class="
+                        currentWeek === week.num
+                          ? 'bg-blue-50 dark:bg-blue-950/60'
+                          : isWeekPassed(week.num)
+                            ? 'bg-red-50 dark:bg-red-950/60'
+                            : 'bg-white dark:bg-zinc-900'
+                      "
+                    >
+                      <label
+                        class="group flex h-full w-full cursor-pointer items-center justify-center gap-1 px-2 py-3"
+                      >
+                        <div class="grid size-4 grid-cols-1">
+                          <input
+                            type="checkbox"
+                            :name="`progress[${course.id}][${week.num}][textbook]`"
+                            value="1"
+                            :checked="isTextbookComplete(course.id, week.num)"
+                            :aria-label="`第${toChineseNumber(week.num)}週 ${course.name} 的課本學習進度`"
+                            class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
+                          />
+                          <CheckIcon
+                            class="col-start-1 row-start-1 m-0.5 size-3 text-gray-400 opacity-0 group-has-checked:opacity-100 print:hidden"
+                          />
+                          <div
+                            class="col-start-1 row-start-1 hidden size-4 rounded border border-gray-500 bg-white dark:bg-zinc-900 print:block"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs group-has-checked:text-gray-400 print:hidden"
+                          >課本</span
+                        >
+                      </label>
+                    </td>
+                  </template>
+                </tr>
+                <tr>
+                  <td
+                    v-for="course in viewModel.courses"
+                    :key="course.id"
+                    class="border border-b-0 border-warm-300 bg-white last:border-r-0 dark:border-zinc-600 dark:bg-zinc-900 print:h-16"
+                    colspan="2"
+                  >
+                    <textarea
+                      :name="`notes[${course.id}][${week.num}]`"
+                      placeholder="（尚未設定目標）"
+                      :class="
+                        isProgressComplete(course.id, week.num)
+                          ? 'text-gray-400'
+                          : 'text-warm-700 dark:text-zinc-300'
+                      "
+                      class="m-0 h-full w-full resize-none px-2 py-2 text-xs placeholder-gray-400 focus:border-blue-500 focus:outline-none print:text-black print:placeholder-transparent"
+                      rows="2"
+                      :aria-label="`第${toChineseNumber(week.num)}週 ${course.name} 的學習目標與備註`"
+                      >{{ getNote(course.id, week.num) }}</textarea>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </form>
+
+        <div
+          class="pointer-events-none absolute bottom-0 left-0 z-20 h-16 w-full rounded-b bg-linear-to-t from-stone-900/20 to-transparent transition-opacity duration-150 ease-in md:h-32 print:hidden"
+          :class="showHorizontalGradient ? 'opacity-100' : 'opacity-0'"
+        ></div>
+
+        <div
+          class="pointer-events-none absolute top-0 right-0 z-20 h-full w-16 rounded-r bg-linear-to-l from-stone-900/20 to-transparent transition-opacity duration-150 ease-in md:w-32 print:hidden"
+          :class="showVerticalGradient ? 'opacity-100' : 'opacity-0'"
+        ></div>
+      </div>
+
+      <div class="mt-6 flex items-start justify-between">
+        <div
+          class="bg-warm-50 dark:bg-zinc-950 print:hidden"
+          aria-hidden="true"
+        >
+          <p
+            class="mb-2 text-sm font-semibold text-warm-900 dark:text-zinc-100"
+          >
+            圖例：
+          </p>
+          <div class="flex items-center justify-start gap-4">
+            <div class="flex items-center gap-2">
+              <div
+                class="size-3 rounded border-2 border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-950/60"
+              ></div>
+              <span class="text-xs text-warm-700 dark:text-zinc-300"
+                >目前週次</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <div
+                class="size-3 rounded border-2 border-red-400 bg-red-50 dark:border-red-400 dark:bg-red-950/60"
+              ></div>
+              <span class="text-xs text-red-700 dark:text-red-400"
+                >進度落後（未完成）</span
+              >
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-2 rounded-md border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 transition-colors hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950 print:hidden"
+          @click="print()"
+        >
+          <Icon name="printer" class="inline size-4" />
+          列印
+        </button>
+      </div>
+    </div>
+  </AppLayout>
+</template>

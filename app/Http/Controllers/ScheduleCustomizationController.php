@@ -6,16 +6,17 @@ namespace App\Http\Controllers;
 
 use App\Models\StudentSchedule;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use NouTools\Domains\Schedules\Actions\BuildScheduleCustomizationPage;
 use NouTools\Domains\Schedules\Actions\UpdateScheduleCustomization;
 use NouTools\Domains\Schedules\DataTransferObjects\ScheduleCustomizationUpsertData;
 
 final class ScheduleCustomizationController extends Controller
 {
-    public function edit(StudentSchedule $schedule, BuildScheduleCustomizationPage $buildScheduleCustomizationPage): View
+    public function edit(StudentSchedule $schedule, BuildScheduleCustomizationPage $buildScheduleCustomizationPage): Response
     {
-        return view('schedule.customize', [
+        return Inertia::render('Schedule/Customize', [
             'viewModel' => $buildScheduleCustomizationPage($schedule),
         ]);
     }

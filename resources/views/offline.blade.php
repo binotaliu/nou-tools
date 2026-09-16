@@ -23,8 +23,8 @@
 
     {{--
             This page must render correctly with zero network access, so
-            (like errors/minimal.blade.php) it does not use <x-layout> or
-            @vite — both may depend on assets that were never cached.
+            it is self-contained: no layout, no @vite, no Inertia — all of
+            which may depend on assets that were never cached.
         --}}
     <style>
         :root,

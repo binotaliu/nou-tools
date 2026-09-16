@@ -4,8 +4,9 @@ use App\Models\StudentSchedule;
 use Illuminate\Support\Str;
 
 // The modal's visibility also depends on the browser's live network status
-// (Alpine.store('network').offline), so it's only reliably observable with a
-// real browser rather than the server-rendered Feature test.
+// (window.NouNetwork.offline, see resources/js/app.js), so it's only
+// reliably observable with a real browser rather than the server-rendered
+// Feature test.
 
 it('prompts to remember the schedule and hides the modal after confirming', function () {
     $schedule = StudentSchedule::create([

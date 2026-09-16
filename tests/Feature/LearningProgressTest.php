@@ -6,6 +6,7 @@ use App\Models\LearningProgress;
 use App\Models\StudentSchedule;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
 
@@ -27,11 +28,11 @@ test('can view learning progress page', function () {
     ]));
 
     $response->assertStatus(200);
-    $response->assertViewHas('viewModel');
-    $response->assertViewIs('learning-progress.show');
-
-    // progress bar text should be present, default 0%
-    $response->assertSee('完成進度');
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('LearningProgress/Show')
+        ->has('viewModel')
+        ->where('viewModel.percentage', 0)
+    );
 });
 
 test('returns 404 when schedule has no courses for the term', function () {
@@ -184,18 +185,33 @@ test('viewmodel reflects marked progress and note after update-then-reload', fun
     ]));
 
     $response->assertStatus(200);
-    $viewModel = $response->viewData('viewModel');
 
-    expect($viewModel->isProgressComplete($courseId, 1))->toBeTrue();
-    expect($viewModel->isVideoComplete($courseId, 1))->toBeTrue();
-    expect($viewModel->isTextbookComplete($courseId, 1))->toBeTrue();
-    expect($viewModel->getNote($courseId, 1))->toBe('Watched lecture and read chapter 1');
+    // The old ViewModel exposed derived-state methods (isProgressComplete,
+    // isVideoComplete, getNote, ...) that only Blade could call; only the
+    // constructor properties (here, `entries`) survive Inertia's JSON
+    // serialization, so assert against those directly.
+    $entries = null;
+
+    $response->assertInertia(function (Assert $page) use (&$entries) {
+        $entries = collect($page->toArray()['props']['viewModel']['entries']);
+    });
+
+    $findEntry = fn (int $weekNum) => $entries->first(
+        fn (array $entry) => $entry['courseId'] === $courseId && $entry['weekNum'] === $weekNum,
+    );
+
+    $week1 = $findEntry(1);
+
+    expect($week1['videoCompleted'])->toBeTrue();
+    expect($week1['textbookCompleted'])->toBeTrue();
+    expect($week1['note'])->toBe('Watched lecture and read chapter 1');
 
     // an untouched week should remain incomplete with an empty note
-    expect($viewModel->isProgressComplete($courseId, 2))->toBeFalse();
-    expect($viewModel->getNote($courseId, 2))->toBe('');
+    $week2 = $findEntry(2);
 
-    $response->assertSee('Watched lecture and read chapter 1');
+    expect($week2['videoCompleted'])->toBeFalse();
+    expect($week2['textbookCompleted'])->toBeFalse();
+    expect($week2['note'])->toBe('');
 });
 
 test('unique constraint on student_schedule_id and term', function () {

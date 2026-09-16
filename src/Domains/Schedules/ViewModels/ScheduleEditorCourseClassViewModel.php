@@ -13,8 +13,8 @@ use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 
 /**
  * A course class option for the schedule editor's class/section picker.
- * Snake-cased on output/JSON serialization to stay compatible with the
- * editor's inline Alpine.js (`courseClass.start_time`, etc.).
+ * Snake-cased on output/JSON serialization to match what the editor reads
+ * (`courseClass.start_time`, etc. — see resources/js/Pages/Schedule/Editor.vue).
  */
 #[MapName(SnakeCaseMapper::class)]
 final class ScheduleEditorCourseClassViewModel extends Data

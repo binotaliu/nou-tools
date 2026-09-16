@@ -16,10 +16,6 @@ final class ScheduleDateViewModel extends Data
         public string $dateKey,
         #[DataCollectionOf(ScheduleCourseItemViewModel::class)]
         public DataCollection $courses,
+        public string $formattedDate,
     ) {}
-
-    public function formattedDate(): string
-    {
-        return $this->date->isoFormat('M/D (dd)');
-    }
 }

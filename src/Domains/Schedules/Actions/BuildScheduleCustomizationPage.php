@@ -12,7 +12,8 @@ final class BuildScheduleCustomizationPage
     public function __invoke(StudentSchedule $schedule): ScheduleCustomizationPageData
     {
         return new ScheduleCustomizationPageData(
-            schedule: $schedule,
+            scheduleUuid: $schedule->getRouteKey(),
+            scheduleName: $schedule->name,
             displayOptions: ScheduleCustomizationPageData::normalizeDisplayOptions($schedule->display_options),
             customLinks: ScheduleCustomizationPageData::normalizeCustomLinks($schedule->custom_links),
         );

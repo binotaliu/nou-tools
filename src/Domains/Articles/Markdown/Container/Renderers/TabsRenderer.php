@@ -10,6 +10,17 @@ use League\CommonMark\Util\Xml;
 use NouTools\Domains\Articles\Markdown\Container\ContainerNode;
 use NouTools\Domains\Articles\Markdown\Container\ContainerRendererInterface;
 
+/**
+ * `:::tabs` emits a plain tablist plus one panel per `:::tab`, marked up with
+ * `data-*` only — the interactive behaviour is attached client-side by
+ * `useMarkdownContainers` (resources/js/Composables), which is also what sets
+ * `data-enhanced` on the wrapper.
+ *
+ * No panel is emitted `hidden`, on purpose: without JavaScript every panel
+ * stays readable and CSS suppresses the tab strip instead (see the
+ * `.md-tabs:not([data-enhanced])` rule in resources/css/app.css), so the
+ * content is never hidden behind a control that can't work.
+ */
 final class TabsRenderer implements ContainerRendererInterface
 {
     public function render(ContainerNode $node, ChildNodeRendererInterface $childRenderer): \Stringable
@@ -35,9 +46,8 @@ final class TabsRenderer implements ContainerRendererInterface
                 'role' => 'tab',
                 'id' => $tabId,
                 'aria-controls' => $panelId,
-                ':aria-selected' => "tab === {$index}",
-                ':data-active' => "tab === {$index}",
-                '@click' => "tab = {$index}",
+                'aria-selected' => $index === 0 ? 'true' : 'false',
+                'data-active' => $index === 0 ? 'true' : 'false',
             ], Xml::escape($title));
 
             $panels[] = new HtmlElement('div', [
@@ -45,7 +55,6 @@ final class TabsRenderer implements ContainerRendererInterface
                 'role' => 'tabpanel',
                 'id' => $panelId,
                 'aria-labelledby' => $tabId,
-                'x-show' => "tab === {$index}",
                 'data-tab-index' => (string) $index,
             ], $childRenderer->renderNodes($child->children()));
 
@@ -55,12 +64,10 @@ final class TabsRenderer implements ContainerRendererInterface
         $tabList = new HtmlElement('div', [
             'class' => 'md-tabs-list',
             'role' => 'tablist',
-            'x-cloak' => true,
         ], $triggers);
 
         return new HtmlElement('div', [
             'class' => 'md-tabs',
-            'x-data' => '{ tab: 0 }',
         ], [$tabList, ...$panels]);
     }
 }

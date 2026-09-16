@@ -4,6 +4,13 @@ use App\Models\ClassSchedule;
 use App\Models\Course;
 use App\Models\CourseClass;
 use Carbon\Carbon;
+use Inertia\Testing\AssertableInertia as Assert;
+
+use function Pest\Laravel\withoutVite;
+
+beforeEach(function () {
+    withoutVite();
+});
 
 test('homepage returns Link headers for API discovery', function () {
     $response = $this->get(route('home'));
@@ -29,8 +36,17 @@ test('homepage lists courses with in-person classes scheduled for the selected d
 
     $response = $this->get(route('home'));
 
-    $response->assertStatus(200)
-        ->assertSee('普通物理學')
-        ->assertSee('ZZZ001')
-        ->assertDontSee('不面授的課');
+    $response->assertStatus(200);
+    $response->assertInertia(function (Assert $page) {
+        $page->component('Home/Index');
+
+        $props = $page->toArray()['props'];
+        $courseNames = collect($props['viewModel']['courses'])->pluck('name');
+        $courseCodes = collect($props['viewModel']['courses'])
+            ->flatMap(fn (array $course) => collect($course['classes'])->pluck('code'));
+
+        expect($courseNames)->toContain('普通物理學')
+            ->not->toContain('不面授的課');
+        expect($courseCodes)->toContain('ZZZ001');
+    });
 });
