@@ -1,6 +1,10 @@
 import { reactive, ref } from 'vue'
 import { playTimerFinishedSound } from '../study-room-sound'
 
+// Shape of the titles updateTabIndicators() writes ("MM:SS 專注中 - ..."),
+// used to tell our own title apart from the page's real one.
+const TIMER_TITLE_PATTERN = /^\d{2}:\d{2} /
+
 // Vue port of the "heartbeat/tick", "action banner: timer state",
 // "pomodoro cycle settings" and "focus mode" sections of
 // resources/js/study-room.js. Everything the banner (and focus mode) shows
@@ -173,8 +177,18 @@ export default function useStudyTimer(
   let faviconOriginalIcoHref = null
   let faviconOriginalPngHref = null
 
+  // Inertia's <Head> applies the page title asynchronously, so at onMounted
+  // time document.title can still be the root layout's. It also changes
+  // again on every SPA navigation. So rather than capturing once, re-read it
+  // whenever it isn't a title this composable wrote itself.
+  function captureOriginalTitle() {
+    if (!TIMER_TITLE_PATTERN.test(document.title)) {
+      originalTitle = document.title
+    }
+  }
+
   function initTabIndicators() {
-    originalTitle = document.title
+    captureOriginalTitle()
     faviconIco = document.getElementById('favicon-ico')
     faviconPng = document.getElementById('favicon-png')
     faviconSvg = document.getElementById('favicon-svg')
@@ -183,6 +197,8 @@ export default function useStudyTimer(
   }
 
   function updateTabIndicators() {
+    captureOriginalTitle()
+
     const seat = socket.mySeat()
     const running = !!seat && (!!seat.timerEndsAt || !!seat.timerStartedAt)
 
