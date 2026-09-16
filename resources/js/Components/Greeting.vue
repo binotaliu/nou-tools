@@ -1,7 +1,5 @@
 <script setup>
-// Vue port of resources/views/components/greeting.blade.php (the
-// `nouToolsGreeting` Alpine.data() widget). See useGreeting.js for the
-// ported logic.
+// See useGreeting.js for the greeting logic.
 import useGreeting from '../Composables/useGreeting'
 
 const props = defineProps({

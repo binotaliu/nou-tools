@@ -1,8 +1,5 @@
 <script setup>
-// Vue port of resources/views/components/school-calendar.blade.php (the
-// `nouToolsSchoolCalendar` Alpine.data() widget). See useSchoolCalendar.js
-// for the ported logic. `events`/`showPastEvents` mirror
-// App\View\Components\SchoolCalendar's constructor.
+// See useSchoolCalendar.js for the calendar logic.
 import useSchoolCalendar from '../Composables/useSchoolCalendar'
 
 const props = defineProps({

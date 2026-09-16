@@ -1,8 +1,4 @@
 <script setup>
-// Vue port of components/pwa-install-banner.blade.php +
-// usePwaInstallBanner.js (the `nouPwaInstallBanner` Alpine.data()
-// component). Not wired into any page yet (no pages are migrated); ported
-// now so later phases can import it directly.
 import Icon from './Icon.vue'
 import usePwaInstallBanner from '../Composables/usePwaInstallBanner'
 

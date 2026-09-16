@@ -1,13 +1,10 @@
 <script setup>
-// Vue port of resources/views/components/layout.blade.php's persistent
-// chrome (sticky header/nav + footer). Not used by any page yet (no pages
-// are migrated in this phase) but is a complete, working layout: pages will
-// wrap themselves in it later via `<AppLayout>...</AppLayout>` or the
+// Shared persistent chrome (sticky header/nav + footer). Pages wrap
+// themselves in it via `<AppLayout>...</AppLayout>` or the
 // `defineOptions({ layout: AppLayout })` convention.
 //
-// Blade's `request()->route()->getName()` active-state checks are replaced
-// with Inertia's `usePage().url`, matched against route paths (there is no
-// Ziggy route() helper on the frontend yet).
+// Nav active-state checks use Inertia's `usePage().url`, matched against
+// route paths (there is no Ziggy route() helper on the frontend).
 import { computed, ref } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import Icon from '../Components/Icon.vue'
