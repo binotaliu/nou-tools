@@ -3,15 +3,24 @@
 // entrance wall — a window onto the garden scene, a wall clock running on
 // Taipei time, the announcement board, and the viewer's own nameplate
 // (click to edit nickname/emoji, or open the stats modal).
+import { ref } from 'vue'
 import { ChartBarIcon, PencilIcon } from '@heroicons/vue/24/outline'
 import GardenScene from './GardenScene.vue'
+import useMarkdownContainers from '../../Composables/useMarkdownContainers'
 
-defineProps({
+const props = defineProps({
   sky: { type: Object, required: true },
   profile: { type: Object, required: true },
   announcementHtml: { type: String, required: true },
   yourFocusSecondsToday: { type: Number, required: true },
 })
+
+// The announcement is admin-authored Markdown run through the same
+// converter as articles (RenderStudyRoomAnnouncement), so it can contain
+// the same interactive containers.
+const announcementRoot = ref(null)
+
+useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
 </script>
 
 <template>
@@ -136,6 +145,7 @@ defineProps({
             </h2>
             <!-- eslint-disable-next-line vue/no-v-html -->
             <div
+              ref="announcementRoot"
               class="prose prose-sm max-h-36 max-w-none overflow-y-auto prose-warm dark:prose-zinc dark:prose-invert"
               v-html="announcementHtml"
             ></div>

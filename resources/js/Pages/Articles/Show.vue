@@ -13,6 +13,7 @@ import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import useArticleShare from '../../Composables/useArticleShare'
+import useMarkdownContainers from '../../Composables/useMarkdownContainers'
 
 const props = defineProps({
   viewModel: {
@@ -85,6 +86,18 @@ function handleEscape(event) {
 
 onMounted(() => window.addEventListener('keydown', handleEscape))
 onUnmounted(() => window.removeEventListener('keydown', handleEscape))
+
+// Two separate v-html roots, hydrated independently — the sidebar is
+// _sidebar.md and can carry the same containers the body can.
+const articleContentRoot = ref(null)
+const sidebarContentRoot = ref(null)
+
+useMarkdownContainers(articleContentRoot, [
+  () => props.viewModel.article.content,
+])
+useMarkdownContainers(sidebarContentRoot, [
+  () => props.viewModel.sidebarContent,
+])
 </script>
 
 <template>
@@ -108,6 +121,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleEscape))
 
             <nav
               v-if="viewModel.sidebarContent"
+              ref="sidebarContentRoot"
               class="prose prose-sm max-w-none prose-warm dark:prose-invert"
               v-html="viewModel.sidebarContent"
             ></nav>
@@ -237,6 +251,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleEscape))
 
             <!-- Article Content -->
             <div
+              ref="articleContentRoot"
               class="prose max-w-none prose-warm dark:prose-zinc dark:prose-invert"
               v-html="viewModel.article.content"
             ></div>

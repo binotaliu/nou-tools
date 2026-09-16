@@ -101,12 +101,6 @@
 }
 
 @layer base {
-  [x-cloak],
-  [data-cloak],
-  .x-cloak {
-    display: none !important;
-  }
-
   /* Twemoji swaps emoji characters for <img class="emoji"> — without this
      the images render at their native size instead of matching the
      surrounding text. */
@@ -396,6 +390,17 @@
 
   .md-tabs-list {
     @apply flex flex-wrap gap-1 border-b border-warm-200 bg-warm-100 p-1 dark:border-zinc-700 dark:bg-zinc-800;
+  }
+
+  /* Until useMarkdownContainers has wired the triggers up, the tab strip
+     can't do anything, so it stays hidden and every panel stays readable —
+     stacked, but never trapped behind a control that doesn't work. */
+  .md-tabs:not([data-enhanced]) .md-tabs-list {
+    @apply hidden;
+  }
+
+  .md-tabs[data-enhanced] .md-tabs-panel[hidden] {
+    @apply hidden;
   }
 
   .md-tabs-trigger {

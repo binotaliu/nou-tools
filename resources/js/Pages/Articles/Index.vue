@@ -4,9 +4,10 @@
 // `manual`), so the `App\Enums\ArticleType::label()` mapping is re-implemented
 // here from that value. `viewModel.indexContent` is plain HTML (rendered
 // Markdown) coming straight from the ViewModel, so it's rendered with v-html.
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
+import useMarkdownContainers from '../../Composables/useMarkdownContainers'
 
 const props = defineProps({
   viewModel: {
@@ -32,6 +33,12 @@ const jsonLd = computed(() => ({
   name: pageTitle.value,
   url: typeof window !== 'undefined' ? window.location.href : undefined,
 }))
+
+// The index is itself rendered Markdown, so it can carry the same
+// interactive containers an article can.
+const indexContentRoot = ref(null)
+
+useMarkdownContainers(indexContentRoot, [() => props.viewModel.indexContent])
 </script>
 
 <template>
@@ -47,6 +54,7 @@ const jsonLd = computed(() => ({
         class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div
+          ref="indexContentRoot"
           class="prose max-w-none prose-warm dark:prose-invert"
           v-html="viewModel.indexContent"
         ></div>
