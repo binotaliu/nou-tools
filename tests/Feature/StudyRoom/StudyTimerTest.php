@@ -52,6 +52,8 @@ it('sets timer_ends_at to 25 minutes out for a pomodoro', function () {
 it('records exactly 600 focus seconds when stopping a pomodoro 10 minutes in', function () {
     [$schedule, $seat] = seatedStudent();
 
+    Date::setTestNow(Date::now());
+
     $this->withCredentials()
         ->withCookie('student_schedule', studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
@@ -76,6 +78,8 @@ it('records exactly 600 focus seconds when stopping a pomodoro 10 minutes in', f
     $seat->refresh();
     expect($seat->timer_mode)->toBeNull()
         ->and($seat->timer_phase)->toBeNull();
+
+    Date::setTestNow();
 });
 
 it('rejects custom minutes outside the configured bounds', function () {
@@ -183,6 +187,8 @@ it('records no session when stopping a break-phase timer', function () {
 it('records the focus session when leaving a seat mid-timer', function () {
     [$schedule, $seat] = seatedStudent();
 
+    Date::setTestNow(Date::now());
+
     $this->withCredentials()
         ->withCookie('student_schedule', studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
@@ -204,6 +210,8 @@ it('records the focus session when leaving a seat mid-timer', function () {
 
     $seat->refresh();
     expect($seat->student_schedule_id)->toBeNull();
+
+    Date::setTestNow();
 });
 
 it('respects the Asia/Taipei day boundary for daily totals', function () {
@@ -399,6 +407,8 @@ it('refuses to start the next round unless the seat is on a pomodoro break', fun
 it('records overtime past the planned end when stopping a custom timer late', function () {
     [$schedule, $seat] = seatedStudent();
 
+    Date::setTestNow(Date::now());
+
     $this->withCredentials()
         ->withCookie('student_schedule', studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
@@ -420,6 +430,8 @@ it('records overtime past the planned end when stopping a custom timer late', fu
     expect($session->focus_seconds)->toBe(13 * 60)
         ->and($session->overtime_seconds)->toBe(3 * 60)
         ->and($session->was_completed)->toBeTrue();
+
+    Date::setTestNow();
 });
 
 it('starts a count-up timer with no planned end and no round', function () {
@@ -448,6 +460,8 @@ it('starts a count-up timer with no planned end and no round', function () {
 it('records the elapsed time with no overtime when stopping a count-up timer', function () {
     [$schedule, $seat] = seatedStudent();
 
+    Date::setTestNow(Date::now());
+
     $this->withCredentials()
         ->withCookie('student_schedule', studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
@@ -468,6 +482,8 @@ it('records the elapsed time with no overtime when stopping a count-up timer', f
     expect($session->focus_seconds)->toBe(7 * 60)
         ->and($session->overtime_seconds)->toBe(0)
         ->and($session->was_completed)->toBeTrue();
+
+    Date::setTestNow();
 });
 
 it('refuses to start a break on a count-up timer, which has no planned end', function () {
@@ -492,6 +508,8 @@ it('refuses to start a break on a count-up timer, which has no planned end', fun
 
 it('splits a session at the point activity changes mid-focus, crediting the old activity for elapsed time', function () {
     [$schedule, $seat] = seatedStudent();
+
+    Date::setTestNow(Date::now());
 
     $this->withCredentials()
         ->withCookie('student_schedule', studyTimerCookie($schedule))
@@ -529,10 +547,14 @@ it('splits a session at the point activity changes mid-focus, crediting the old 
         ->and($seat->timer_started_at->equalTo($originalStartedAt))->toBeTrue()
         ->and($seat->timer_ends_at->equalTo($originalEndsAt))->toBeTrue()
         ->and((int) $seat->activity_started_at->diffInMinutes($seat->timer_ends_at))->toBe(15);
+
+    Date::setTestNow();
 });
 
 it('records a second session for the new activity, correctly measuring only its own remaining plan', function () {
     [$schedule, $seat] = seatedStudent();
+
+    Date::setTestNow(Date::now());
 
     $this->withCredentials()
         ->withCookie('student_schedule', studyTimerCookie($schedule))
@@ -568,6 +590,8 @@ it('records a second session for the new activity, correctly measuring only its 
         ->and($newSession->focus_seconds)->toBe(15 * 60)
         ->and($newSession->overtime_seconds)->toBe(3 * 60)
         ->and($newSession->was_completed)->toBeTrue();
+
+    Date::setTestNow();
 });
 
 it('refuses to change activity when no timer is running', function () {
