@@ -1,12 +1,10 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-// Vue port of the `nouToolsSchoolCalendar` Alpine.data() component
-// (resources/js/app.js). School events are published on Taipei's academic
-// calendar, not the viewer's own, so "today" and every day count here are
-// anchored to Asia/Taipei rather than the local clock. `events` mirrors the
-// raw upcoming/ongoing events array (see App\View\Components\SchoolCalendar);
-// `showPastEvents` is true when browsing a non-current semester's full
-// calendar.
+// School events are published on Taipei's academic calendar, not the
+// viewer's own, so "today" and every day count here are anchored to
+// Asia/Taipei rather than the local clock. `events` is the raw
+// upcoming/ongoing events array; `showPastEvents` is true when browsing a
+// non-current semester's full calendar.
 export default function useSchoolCalendar(events, showPastEvents = false) {
   const T = window.NouTime
 
@@ -56,8 +54,8 @@ export default function useSchoolCalendar(events, showPastEvents = false) {
 
   // Events to display: for the current semester, only ones that have not
   // fully ended yet; for a specific non-current semester (showPastEvents),
-  // the semester's whole calendar. Decorated with the status/count that
-  // used to be computed server-side, sorted by start date.
+  // the semester's whole calendar. Decorated with status/count, sorted by
+  // start date.
   const activeEvents = computed(() =>
     events
       .filter(event => showPastEvents || event.end >= today.value)

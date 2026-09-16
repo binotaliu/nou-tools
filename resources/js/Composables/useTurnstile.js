@@ -1,13 +1,9 @@
 import { ref } from 'vue'
 
-// Port of the `renderTurnstile()` helper shared by the report and comment
-// modals in the old `discountStoreReportForm` Alpine component
-// (resources/js/discount-store-report-form.js), plus the auto-rendering
-// `x-turnstile-widget` used on the create-store form. All three forms in the
-// discount-stores/ domain need the exact same "load the script once, render
-// an explicit widget into a container, track whether the challenge has been
-// solved" sequence, so it's extracted here rather than duplicated three
-// times in this same migration batch.
+// All three forms in the discount-stores/ domain need the exact same "load
+// the script once, render an explicit widget into a container, track
+// whether the challenge has been solved" sequence, so it's extracted here
+// rather than duplicated three times.
 const SCRIPT_ID = 'cf-turnstile-script'
 const SCRIPT_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
 

@@ -3,9 +3,7 @@ import { nextTick, onBeforeUnmount, onMounted, watch } from 'vue'
 // Article Markdown is rendered to HTML server-side (see
 // src/Domains/Articles/Markdown/) and mounted with v-html, so Vue never
 // compiles it and the interactive containers can't be Vue components. This
-// attaches their behaviour to the raw DOM instead, which is what let the
-// Alpine build — previously booted site-wide for just these three widgets —
-// be dropped entirely.
+// attaches their behaviour to the raw DOM instead.
 //
 // `rootRef` is the element holding the rendered Markdown. `sources` are
 // getters for the reactive values it was rendered from; watching them is not
@@ -204,9 +202,8 @@ function enhanceCountdowns(root) {
 
   // Daily-granularity data, so an hourly tick plus a refresh when the tab
   // comes back is enough for a long-lived or offline-restored tab. One timer
-  // and one listener for the whole root: the Alpine version registered a
-  // pair per item and released neither, so they accumulated for the life of
-  // the tab across every SPA navigation.
+  // and one listener for the whole root, not one pair per item, so nothing
+  // accumulates across repeated SPA navigations.
   const interval = setInterval(refresh, 60 * 60 * 1000)
   const onVisibilityChange = () => {
     if (!document.hidden) {
