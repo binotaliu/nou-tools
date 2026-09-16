@@ -76,9 +76,9 @@ function handleVisibilityChange() {
   }
 }
 
-// twemoji renders emoji consistently across platforms. It's loaded from a
-// CDN script rather than an npm dependency, since it's only needed on this
-// one page — see the dynamic <script> injection below.
+// twemoji renders emoji consistently across platforms. It's dynamically
+// imported rather than loaded globally, since it's only needed on this page
+// — mirrors the echo.js import below.
 let twemojiObserver = null
 let twemojiRafHandle = null
 
@@ -99,30 +99,15 @@ function scheduleTwemojiParse(root) {
   })
 }
 
-function loadTwemoji(root) {
-  if (typeof window.twemoji !== 'undefined') {
+async function loadTwemoji(root) {
+  if (window.twemoji) {
     startTwemojiObserver(root)
     return
   }
 
-  if (document.querySelector('script[data-twemoji]')) {
-    return
-  }
-
-  const script = document.createElement('script')
-  script.src =
-    'https://cdn.jsdelivr.net/npm/@twemoji/api@17.0.3/dist/twemoji.min.js'
-  script.crossOrigin = 'anonymous'
-  script.dataset.twemoji = 'true'
-
-  const existingNonce = document.querySelector('script[nonce]')?.nonce
-
-  if (existingNonce) {
-    script.nonce = existingNonce
-  }
-
-  script.addEventListener('load', () => startTwemojiObserver(root))
-  document.head.appendChild(script)
+  const { default: twemoji } = await import('@twemoji/api')
+  window.twemoji = twemoji
+  startTwemojiObserver(root)
 }
 
 function startTwemojiObserver(root) {
