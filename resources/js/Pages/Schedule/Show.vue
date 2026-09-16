@@ -447,7 +447,7 @@ function localHint(next) {
               :href="`/schedules/${viewModel.uuid}/subscribe`"
               data-analytics-event="calendar_subscribe_open"
               data-analytics-feature="schedule"
-              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-orange-500 bg-orange-500 px-4 py-2 font-semibold text-white transition hover:bg-orange-600 sm:w-1/2 lg:w-auto"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-warm-600 bg-warm-600 px-4 py-2 font-semibold text-white transition hover:bg-warm-700 sm:w-1/2 lg:w-auto"
             >
               <Icon name="calendar" class="inline size-4" />
               訂閱行事曆
@@ -463,23 +463,30 @@ function localHint(next) {
               class="w-full sm:w-1/2 lg:w-32"
             >
               <label for="term" class="sr-only">選擇學期</label>
-              <select
-                id="term"
-                name="term"
-                aria-label="選擇學期"
-                data-offline-disable
-                class="h-10 w-full appearance-none rounded-lg border border-warm-200 bg-white px-3 dark:border-zinc-700 dark:bg-zinc-900"
-                :value="viewModel.selectedTerm"
-                @change="$event.target.form.submit()"
-              >
-                <option
-                  v-for="term in viewModel.availableTerms"
-                  :key="term"
-                  :value="term"
+              <div class="relative">
+                <select
+                  id="term"
+                  name="term"
+                  aria-label="選擇學期"
+                  data-offline-disable
+                  class="h-10 w-full appearance-none rounded-lg border border-warm-200 bg-white px-3 dark:border-zinc-700 dark:bg-zinc-900"
+                  :value="viewModel.selectedTerm"
+                  @change="$event.target.form.submit()"
                 >
-                  {{ toShortSemesterDisplay(term) }}
-                </option>
-              </select>
+                  <option
+                    v-for="term in viewModel.availableTerms"
+                    :key="term"
+                    :value="term"
+                  >
+                    {{ toShortSemesterDisplay(term) }}
+                  </option>
+                </select>
+                <div
+                  class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
+                >
+                  <Icon name="chevron-down" class="size-5 text-gray-400" />
+                </div>
+              </div>
             </form>
 
             <div
