@@ -1,8 +1,6 @@
 <script setup>
-// Vue port of resources/views/components/announcements-widget.blade.php
-// (App\View\Components\AnnouncementsWidget). Purely presentational — all
-// filtering/preference resolution happens server-side (see
-// ScheduleController::show's `announcementsWidget` prop).
+// Purely presentational — all filtering/preference resolution happens
+// server-side (see ScheduleController::show's `announcementsWidget` prop).
 import { Link } from '@inertiajs/vue3'
 
 defineProps({

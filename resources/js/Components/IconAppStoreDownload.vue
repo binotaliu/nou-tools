@@ -1,6 +1,4 @@
 <script setup>
-// Vue port of resources/views/components/icon-app-store-download.blade.php.
-//
 // **NOTE**:
 // This asset is provided by Apple and is subject to the following terms and
 // conditions: https://www.apple.com/marketing/guidelines/, and thus not

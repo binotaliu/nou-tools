@@ -1,7 +1,6 @@
 <script setup>
-// Vue port of resources/views/components/common-links.blade.php. The three
-// external links and the directory link are static; `customLinks` is the
-// per-schedule custom link list (see ScheduleCustomizationPageData).
+// The three external links and the directory link are static; `customLinks`
+// is the per-schedule custom link list (see ScheduleCustomizationPageData).
 import { Link } from '@inertiajs/vue3'
 import Icon from './Icon.vue'
 

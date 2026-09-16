@@ -1,6 +1,4 @@
 <script setup>
-// Vue port of resources/views/components/icon-google-play-download.blade.php.
-//
 // **NOTE**:
 // This asset is provided by Google and is subject to the following terms
 // and conditions:

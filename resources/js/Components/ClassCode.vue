@@ -1,7 +1,7 @@
 <script setup>
-// Vue port of resources/views/components/class-code.blade.php. Renders a
-// class code badge, showing "統一面授" instead of the raw code for the
-// synthetic "ZZZ000" class used to represent a unified in-person session.
+// Renders a class code badge, showing "統一面授" instead of the raw code
+// for the synthetic "ZZZ000" class used to represent a unified in-person
+// session.
 defineProps({
   code: {
     type: String,

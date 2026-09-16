@@ -1,10 +1,6 @@
 import { reactive, ref } from 'vue'
 
-// Vue port of the "state sync" + "realtime" + "actions" sections of
-// resources/js/study-room.js (the old Alpine `nouStudyRoom` factory).
-//
-// This is the ONE place StudyRoom deliberately breaks from the rest of the
-// Inertia migration: per AGENTS.md "自習室 (Study Room)" and
+// Per AGENTS.md "自習室 (Study Room)" and
 // .github/skills/laravel-best-practices/rules/inertia-vue-views.md, the live
 // seat/session state is fetched and mutated via the existing REST JSON
 // endpoints and kept in sync over Echo/Reverb, never through Inertia props

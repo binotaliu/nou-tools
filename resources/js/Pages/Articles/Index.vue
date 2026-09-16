@@ -1,9 +1,9 @@
 <script setup>
-// Vue port of resources/views/articles/index.blade.php. `viewModel.type` only
-// survives Inertia's JSON serialization as the enum's string value (`kb` /
-// `manual`), so the `App\Enums\ArticleType::label()` mapping is re-implemented
-// here from that value. `viewModel.indexContent` is plain HTML (rendered
-// Markdown) coming straight from the ViewModel, so it's rendered with v-html.
+// `viewModel.type` only survives Inertia's JSON serialization as the enum's
+// string value (`kb` / `manual`), so the `App\Enums\ArticleType::label()`
+// mapping is re-implemented here from that value. `viewModel.indexContent`
+// is plain HTML (rendered Markdown) coming straight from the ViewModel, so
+// it's rendered with v-html.
 import { computed, ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'

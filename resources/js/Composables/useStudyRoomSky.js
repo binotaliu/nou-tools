@@ -2,16 +2,13 @@ import { reactive, ref } from 'vue'
 import { buildStarField, computeSky, SKY_PHASE_LABELS } from '../study-room-sky'
 import { createSkyRenderer } from '../study-room-sky-shader'
 
-// Vue port of the sky/clock/garden/focus-carrel visuals from
-// resources/js/study-room.js (the old Alpine `nouStudyRoom` factory). Ported
-// as a standalone composable since it's self-contained (only needs
-// latitude/longitude from clientConfig) and used by several template
-// regions: the entrance wall's garden window, the floor map's windows, and
-// the fullscreen focus mode.
+// Standalone composable for the sky/clock/garden/focus-carrel visuals: it's
+// self-contained (only needs latitude/longitude from clientConfig) and used
+// by several template regions — the entrance wall's garden window, the
+// floor map's windows, and the fullscreen focus mode.
 //
-// Unlike the Alpine version, no restricted-CSP expression workaround is
-// needed here — Vue SFCs compile to plain render functions at build time
-// (see other migrated pages using `:style`), so this composable is free to
+// No restricted-CSP expression workaround is needed here — Vue SFCs compile
+// to plain render functions at build time, so this composable is free to
 // use normal JS in its helpers.
 function readSkyOverrideFromUrl() {
   const raw = new URLSearchParams(window.location.search).get('sky-at')
@@ -407,8 +404,7 @@ export default function useStudyRoomSky(config) {
     clockNow,
     sky,
     // Exposed for tests/Browser/StudyRoomTest.php's shader-sampling
-    // assertions (the old Alpine version exposed these as plain data
-    // properties too).
+    // assertions.
     get skyRenderer() {
       return canvases.garden.renderer
     },

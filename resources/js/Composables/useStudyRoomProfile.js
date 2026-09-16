@@ -1,13 +1,9 @@
 import { reactive, ref } from 'vue'
 
-// Vue port of the "personal info modal" and "stats modal" sections of
-// resources/js/study-room.js, plus the profile-update submit itself.
-//
-// The old Blade partial posted a real HTML form to
-// study-room.profile.update and relied on a full-page redirect back
-// (see app/Http/Controllers/StudyRoomProfileController.php, now JSON-only)
-// — this submits the same fields over axios instead and applies the
-// returned profile view model to local state directly, no navigation.
+// Profile updates are submitted over axios to
+// app/Http/Controllers/StudyRoomProfileController.php (JSON-only), and the
+// returned profile view model is applied to local state directly, with no
+// navigation.
 export default function useStudyRoomProfile(initialProfile, emojiChoices) {
   const nickname = ref(initialProfile.nickname)
   const emoji = ref(initialProfile.emoji)
