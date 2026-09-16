@@ -1,8 +1,6 @@
 <script setup>
-// Vue port of resources/views/articles/show.blade.php. The share button +
-// modal use the already-ported `useArticleShare` composable (same
-// `nouArticleShare` Alpine.data() component, see resources/js/Pages/... for
-// the x-modal markup it drives). `viewModel.article.type` only survives
+// The share button and modal are driven by the `useArticleShare`
+// composable. `viewModel.article.type` only survives
 // Inertia's JSON serialization as the enum's string value (`kb` / `manual`),
 // so `App\Enums\ArticleType::label()` is re-implemented here from that
 // value. `viewModel.article.content` / `viewModel.sidebarContent` are plain

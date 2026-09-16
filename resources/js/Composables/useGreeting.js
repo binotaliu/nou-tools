@@ -1,15 +1,11 @@
 import { onMounted, onUnmounted, reactive, toRefs } from 'vue'
 
-// Vue port of the `nouToolsGreeting` Alpine.data() component (defined
-// inline in resources/js/app.js, registered globally via
-// `window.Alpine.data('nouToolsGreeting', nouToolsGreeting)`). Relies on
-// `window.NouTime`, the same timezone-aware date helpers app.js defines
-// unconditionally (independent of Alpine/Inertia), which is guaranteed to
-// exist by the time this composable's `init()` runs since app.js always
-// executes before Vue mounts.
+// Relies on `window.NouTime`, the timezone-aware date helpers app.js
+// defines unconditionally, which is guaranteed to exist by the time this
+// composable's `init()` runs since app.js always executes before Vue mounts.
 //
-// `config` mirrors the Alpine version's `{ semesterLabel, semesterCode,
-// semesterStart, semesterEnd }`.
+// `config` mirrors `{ semesterLabel, semesterCode, semesterStart,
+// semesterEnd }`.
 export default function useGreeting(config) {
   const compactStorageKey = 'nou_greeting_compact_v1'
 
