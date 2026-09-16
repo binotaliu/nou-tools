@@ -1,8 +1,6 @@
 import { reactive } from 'vue'
 
-// Vue port of the `nouAnnouncementFilter` Alpine.data() component
-// (resources/js/alpine-components.js). `initial` mirrors
-// { sourceCategories, selected }.
+// `initial` mirrors { sourceCategories, selected }.
 export default function useAnnouncementFilter(initial) {
   const state = reactive({
     sourceCategories: initial.sourceCategories,

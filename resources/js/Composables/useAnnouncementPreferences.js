@@ -1,8 +1,6 @@
 import { reactive } from 'vue'
 
-// Vue port of the `nouAnnouncementPreferences` Alpine.data() component
-// (resources/js/alpine-components.js). `initial` mirrors
-// { catalog, flatCatalog, selected }.
+// `initial` mirrors { catalog, flatCatalog, selected }.
 export default function useAnnouncementPreferences(initial) {
   const state = reactive({
     catalog: initial.catalog,

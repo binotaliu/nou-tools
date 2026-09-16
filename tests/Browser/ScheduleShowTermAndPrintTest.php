@@ -7,11 +7,10 @@ use App\Models\StudentScheduleItem;
 use Illuminate\Support\Str;
 use Pest\Browser\Api\PendingAwaitablePage;
 
-// The semester `<select>` and the print button on schedule/show.blade.php sit
-// outside any `x-data` scope, so Alpine's CSP build (which only walks trees
-// rooted at [x-data]) previously never attached their @change/@click
-// listeners at all — this was invisible to server-rendered Feature tests
-// since the markup itself is correct; only a real browser exposes it.
+// The semester `<select>` and the print button are wired up client-side, so
+// the markup alone looks correct to a server-rendered Feature test whether
+// or not the listeners actually attached. This regressed exactly that way
+// once before, so it's checked in a real browser.
 
 // The remember-schedule modal (see RememberScheduleTest) only shows up when
 // no `student_schedule` cookie is present, and cookie state isn't guaranteed
@@ -19,13 +18,11 @@ use Pest\Browser\Api\PendingAwaitablePage;
 // wait, so blindly dismissing a modal that might not be there can hang the
 // whole suite — check for it first via script().
 //
-// Unlike the previous server-rendered Blade+Alpine page (whose modal markup
-// was present in the initial HTML immediately, just CSS-hidden via
-// x-show/x-cloak until Alpine booted), the Vue/Inertia page only mounts the
-// modal into the DOM after client-side hydration completes. A `script()`
-// check run immediately after `visit()` can race that hydration and find
-// nothing — so give it a brief moment first (mirrors the `->wait(1)` idiom
-// used elsewhere for async client state, e.g. tests/Browser/StudyRoomTest.php).
+// The Inertia page only mounts the modal into the DOM once client-side
+// hydration completes, so a `script()` check run immediately after `visit()`
+// can race it and find nothing — give it a brief moment first (mirrors the
+// `->wait(1)` idiom used elsewhere for async client state, e.g.
+// tests/Browser/StudyRoomTest.php).
 function dismissRememberModalIfPresent(PendingAwaitablePage $page): void
 {
     $page->wait(1);
@@ -46,7 +43,7 @@ it('submits the term form and navigates when a different semester is selected', 
 
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
-        'name' => 'Alpine Term Switch Schedule',
+        'name' => 'Term Switch Schedule',
     ]);
 
     StudentScheduleItem::create([
@@ -76,7 +73,7 @@ it('submits the term form and navigates when a different semester is selected', 
 it('calls window.print() when the print button is clicked', function () {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
-        'name' => 'Alpine Print Schedule',
+        'name' => 'Print Schedule',
     ]);
 
     $page = visit(route('schedules.show', $schedule));

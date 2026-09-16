@@ -1,10 +1,7 @@
 import { nextTick, ref } from 'vue'
 
-// Vue port of the `nouLearningProgress` Alpine.data() component
-// (resources/js/alpine-components.js). `progressFormRef` mirrors the
-// Alpine version's `$refs.progressForm` and must point at the scrollable
-// form element; `formId` mirrors the `#progress-form` id used for the
-// fallback native submit.
+// `progressFormRef` must point at the scrollable form element; `formId` is
+// the id used for the fallback native submit.
 export default function useLearningProgress(
   progressFormRef,
   formId = 'progress-form'

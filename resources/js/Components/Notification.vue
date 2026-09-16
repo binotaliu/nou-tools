@@ -1,8 +1,6 @@
 <script setup>
-// Vue port of components/notification.blade.php + the `nouNotification`
-// Alpine.data() component (resources/js/alpine-components.js). Not wired
-// into any page yet (no pages are migrated); ported now so later phases can
-// import it directly.
+// Auto-dismissing flash/toast message, rendered site-wide by AppLayout.vue
+// from the session's flash bag.
 import { onMounted, ref } from 'vue'
 import Icon from './Icon.vue'
 

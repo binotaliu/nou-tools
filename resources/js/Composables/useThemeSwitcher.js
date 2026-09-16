@@ -1,11 +1,9 @@
 import { onMounted, ref } from 'vue'
 
-// Vue port of the `nouThemeSwitcher` Alpine.data() component
-// (resources/js/alpine-components.js). Cycles system -> light -> dark ->
-// system, persisted in localStorage, toggling the `dark` class on <html>
-// (the anti-flash-of-wrong-theme inline script in app.blade.php /
-// components/layout.blade.php reads the same localStorage key on first
-// paint, so this only needs to keep it in sync after mount).
+// Cycles system -> light -> dark -> system, persisted in localStorage,
+// toggling the `dark` class on <html>. The anti-flash-of-wrong-theme inline
+// script in app.blade.php reads the same localStorage key on first paint, so
+// this only needs to keep it in sync after mount.
 export default function useThemeSwitcher() {
   const theme = ref(
     (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) ||

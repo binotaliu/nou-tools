@@ -1,8 +1,7 @@
 import { onMounted, ref } from 'vue'
 
-// Vue port of the `nouPwaInstallBanner` Alpine.data() component
-// (resources/js/alpine-components.js). Reacts to the `beforeinstallprompt`
-// capture + `nou:install-prompt-ready` event wired up in app.js.
+// Reacts to the `beforeinstallprompt` capture and the
+// `nou:install-prompt-ready` event wired up in app.js.
 export default function usePwaInstallBanner() {
   const storageKey = 'pwa_install_banner_dismissed_v1'
   const visible = ref(false)

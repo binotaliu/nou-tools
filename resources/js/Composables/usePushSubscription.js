@@ -8,10 +8,7 @@ function urlBase64ToUint8Array(base64String) {
   return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)))
 }
 
-// Vue port of the `nouPushSubscription` Alpine.data() component
-// (resources/js/alpine-components.js). `initial` mirrors the object the
-// Blade x-data previously received: { vapidPublicKey, subscribeUrl,
-// unsubscribeUrl }.
+// `initial` mirrors { vapidPublicKey, subscribeUrl, unsubscribeUrl }.
 export default function usePushSubscription(initial) {
   const supported = ref(false)
   const enabled = ref(false)

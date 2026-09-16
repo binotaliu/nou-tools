@@ -33,7 +33,8 @@ function isScheduleShowUrl(url) {
 }
 
 // Third-party origins whose assets are safe to cache for offline rendering
-// (currently just the Alpine.js CDN loaded from the layout).
+// (currently just Twemoji, loaded on demand by the study room — see
+// resources/js/Pages/StudyRoom/Show.vue).
 function isCacheableCrossOrigin(url) {
   return url.hostname === 'cdn.jsdelivr.net'
 }

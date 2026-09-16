@@ -1,6 +1,6 @@
 @php
-    // Mirrors resources/views/components/layout.blade.php's markdown-discovery
-    // comment for the (still-Blade) pages that haven't migrated to Inertia yet.
+    // Advertises the machine-readable Markdown twin of the current page
+    // (see the *MarkdownController classes) when the route has one.
     $routeName = request()->route()?->getName();
 
     $markdownRouteName = match ($routeName) {
@@ -12,7 +12,6 @@
         ? route($markdownRouteName, request()->route()->parameters())
         : null;
 
-    // Mirrors resources/views/components/layout.blade.php's
     // `$analyticsPage`: the matched route's URI with dynamic segments
     // masked out (e.g. `/schedules/{schedule}` -> `/schedules/:schedule`),
     // so per-page analytics group by route shape rather than by every

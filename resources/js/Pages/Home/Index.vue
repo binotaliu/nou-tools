@@ -1,10 +1,7 @@
 <script setup>
-// Vue port of resources/views/home.blade.php (the site's homepage). Reuses
-// the already-ported shared widgets (Greeting, SchoolCalendar, CommonLinks)
-// rather than the Blade `<x-greeting>`/`<x-school-calendar>`/`<x-common-links>`
-// components, which this migration was the last remaining user of. The
-// video-course date picker is the `nouDatePicker` Alpine.data() component
-// (resources/js/alpine-components.js); useDatePicker.js is its Vue port.
+// The site's homepage. Composed from the shared Greeting, SchoolCalendar,
+// and CommonLinks components; the video-course date picker is driven by
+// useDatePicker.js.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'

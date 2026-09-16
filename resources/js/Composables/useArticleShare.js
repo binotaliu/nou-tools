@@ -1,10 +1,8 @@
 import { ref } from 'vue'
 
-// Vue port of the `nouArticleShare` Alpine.data() component
-// (resources/js/alpine-components.js). `initial` mirrors
-// { shareTitle, shareUrl }. `shareInputRef` is an optional ref to the
-// fallback <input> used for the copy-to-clipboard `execCommand` fallback
-// (the Alpine version used `$refs.shareInput`).
+// `initial` mirrors { shareTitle, shareUrl }. `shareInputRef` is an
+// optional ref to the <input> used for the copy-to-clipboard `execCommand`
+// fallback.
 export default function useArticleShare(initial, shareInputRef = null) {
   const showShareModal = ref(false)
   const copied = ref(false)

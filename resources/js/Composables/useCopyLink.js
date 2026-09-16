@@ -1,9 +1,7 @@
 import { ref } from 'vue'
 
-// Vue port of the `nouCopyLink` Alpine.data() component
-// (resources/js/alpine-components.js). `initial` mirrors { shareUrl }.
-// `shareInputRef` is an optional ref to the fallback <input> used for the
-// copy-to-clipboard `execCommand` fallback.
+// `initial` mirrors { shareUrl }. `shareInputRef` is an optional ref to the
+// <input> used for the copy-to-clipboard `execCommand` fallback.
 export default function useCopyLink(initial, shareInputRef = null) {
   const shareUrl = ref(initial.shareUrl)
   const copied = ref(false)

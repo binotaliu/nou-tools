@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 
-// Vue port of the `nouScheduleCustomize` Alpine.data() component
-// (resources/js/alpine-components.js). `initial` mirrors { links }.
+// `initial` mirrors { links }.
 export default function useScheduleCustomize(initial) {
   const links = ref(initial.links)
 
