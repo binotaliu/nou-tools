@@ -1,10 +1,7 @@
 <script setup>
-// Vue port of resources/views/discount-stores/show.blade.php. Ported from
-// the `discountStoreReportForm` Alpine.data() component
-// (resources/js/discount-store-report-form.js), which bundled three
-// different concerns: a single-marker Leaflet map + "open in map app"
-// picker, and two small forms (report validity / add comment) each gated by
-// a Cloudflare Turnstile challenge.
+// This page combines a single-marker Leaflet map + "open in map app" picker
+// with two small forms (report validity / add comment), each gated by a
+// Cloudflare Turnstile challenge.
 //
 // The Leaflet map + map-app-selection modal stays inlined per-page (same
 // choice already made, and explained, in Directory/Index.vue) rather than

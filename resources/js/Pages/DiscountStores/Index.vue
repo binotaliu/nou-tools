@@ -1,10 +1,8 @@
 <script setup>
-// Vue port of resources/views/discount-stores/index.blade.php. Filtering and
-// pagination were driven by the `discountStoreIndex` Alpine.data() component
-// (resources/js/discount-store-index.js); that's pure client-side derived
-// state (search/category/type/city filters + pagination over an already
-// server-sorted list), so it's reimplemented here as computed properties
-// rather than kept as backend logic.
+// Filtering and pagination are pure client-side derived state
+// (search/category/type/city filters + pagination over an already
+// server-sorted list), implemented as computed properties rather than
+// kept as backend logic.
 import { computed, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'

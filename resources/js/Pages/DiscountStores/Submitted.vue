@@ -1,6 +1,4 @@
 <script setup>
-// Vue port of resources/views/discount-stores/submitted.blade.php. No
-// Alpine component involved -- this page was static.
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'

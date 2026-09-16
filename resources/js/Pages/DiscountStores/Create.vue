@@ -1,13 +1,8 @@
 <script setup>
-// Vue port of resources/views/discount-stores/create.blade.php. City/district
-// cascading selects were driven by the `discountStoreCreateForm`
-// Alpine.data() component (resources/js/discount-store-create-form.js) --
-// pure derived UI state, reimplemented here as a computed property. The form
-// submission itself now goes through useForm() instead of a plain HTML POST,
-// and the Cloudflare Turnstile widget (previously auto-rendered via the
-// `x-turnstile-widget` Blade component) is rendered explicitly through the
-// shared useTurnstile() composable (see Show.vue for the other two forms
-// that need the same widget).
+// City/district cascading selects are pure derived UI state, implemented as
+// a computed property. The Cloudflare Turnstile widget is rendered
+// explicitly through the shared useTurnstile() composable (see Show.vue for
+// the other two forms that need the same widget).
 import { computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
