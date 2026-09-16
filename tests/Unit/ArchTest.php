@@ -11,7 +11,6 @@ use App\Models\DiscountStoreReport;
 use App\Models\StudentScheduleItem;
 use App\Models\User;
 use App\Providers\AppServiceProvider;
-use App\View\Components\Button;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use NouTools\Domains\Schedules\Actions\GenerateScheduleCalendar;
@@ -49,10 +48,6 @@ arch()->preset()->strict()
         // Filament's own protected hook overrides (getHeaderActions, form,
         // table, infolist, ...); not a code smell.
         'App\Filament',
-
-        // Used only for its CSS-class-computation helpers (getClasses() and
-        // friends) by CtaRenderer; never rendered as a Blade component.
-        Button::class,
     ]);
 
 arch('Actions')

@@ -14,9 +14,8 @@ use NouTools\Domains\Schedules\ViewModels\ScheduleAnnouncementsWidgetViewModel;
 use Spatie\LaravelData\DataCollection;
 
 /**
- * Server-side port of App\View\Components\AnnouncementsWidget (rendered
- * client-side as resources/js/Components/AnnouncementsWidget.vue since
- * Blade view components can't render into an Inertia page).
+ * Builds the props for resources/js/Components/AnnouncementsWidget.vue,
+ * which renders the widget client-side.
  */
 final readonly class BuildScheduleAnnouncementsWidget
 {

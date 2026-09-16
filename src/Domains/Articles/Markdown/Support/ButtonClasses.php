@@ -2,28 +2,44 @@
 
 declare(strict_types=1);
 
-namespace App\View\Components;
+namespace NouTools\Domains\Articles\Markdown\Support;
 
-use Illuminate\View\Component;
-use Illuminate\View\View;
-
-class Button extends Component
+/**
+ * The Tailwind class list for a button, as used by the `:::cta` container.
+ *
+ * This began as a Blade `<x-button>` component. Every UI that rendered it is
+ * Vue now and styles its own buttons inline, so what survived the migration
+ * is only the class computation — `CtaRenderer` needs it to style the anchors
+ * it emits into server-rendered Markdown, where a Vue component can't reach.
+ */
+final readonly class ButtonClasses
 {
     public function __construct(
         public string $variant = 'primary',
         public string $size = 'md',
-        public ?string $type = 'button',
         public bool $disabled = false,
         public bool $fullWidth = false,
         public ?string $class = null,
     ) {}
 
-    protected function getBaseClasses(): string
+    public function toString(): string
+    {
+        return \implode(' ', \array_filter([
+            $this->baseClasses(),
+            $this->paddingClasses(),
+            $this->variantClasses(),
+            $this->fullWidth ? 'w-full' : '',
+            $this->disabled ? 'opacity-50 cursor-not-allowed' : '',
+            $this->class,
+        ]));
+    }
+
+    private function baseClasses(): string
     {
         return 'inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition';
     }
 
-    protected function getPaddingClasses(): string
+    private function paddingClasses(): string
     {
         return match ($this->size) {
             'sm' => 'px-3 py-1 text-sm',
@@ -32,7 +48,7 @@ class Button extends Component
         };
     }
 
-    protected function getVariantClasses(): string
+    private function variantClasses(): string
     {
         return match ($this->variant) {
             'primary' => 'border border-warm-600 bg-warm-600 text-white hover:bg-warm-700 disabled:bg-warm-400',
@@ -45,34 +61,5 @@ class Button extends Component
             'text-link' => 'text-orange-600 hover:text-orange-700',
             default => 'border border-orange-500 bg-orange-500 text-white hover:bg-orange-600 disabled:bg-orange-300',
         };
-    }
-
-    protected function getWidthClasses(): string
-    {
-        return $this->fullWidth ? 'w-full' : '';
-    }
-
-    protected function getDisabledClasses(): string
-    {
-        return $this->disabled ? 'opacity-50 cursor-not-allowed' : '';
-    }
-
-    public function getClasses(): string
-    {
-        $classes = [
-            $this->getBaseClasses(),
-            $this->getPaddingClasses(),
-            $this->getVariantClasses(),
-            $this->getWidthClasses(),
-            $this->getDisabledClasses(),
-            $this->class,
-        ];
-
-        return implode(' ', array_filter($classes));
-    }
-
-    public function render(): View
-    {
-        return view('components.button');
     }
 }
