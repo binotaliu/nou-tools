@@ -1,15 +1,13 @@
 <script setup>
-// Vue port of resources/views/schedule/announcement-preferences.blade.php.
-// Uses the already-ported `useAnnouncementPreferences` composable (Phase 1)
-// for the group/source/category checkbox tree state, and Inertia's
-// useForm() for the real PUT submission
-// (ScheduleAnnouncementPreferencesController::update() is a plain
-// validate-then-redirect action, unmodified by this migration).
+// Uses the `useAnnouncementPreferences` composable for the
+// group/source/category checkbox tree state, and Inertia's useForm() for
+// the real PUT submission (ScheduleAnnouncementPreferencesController::update()
+// is a plain validate-then-redirect action).
 //
-// The Blade view's `$groupedCatalogTree`/`$flatCatalogTree`/
-// `$selectedSourceCategories` @php block was a pure view-layer reshaping of
-// `viewModel.sourceGroups` for the Alpine widget's convenience, so it's
-// re-derived here rather than added to AnnouncementPreferencesPageData.
+// The grouped/flat catalog tree and selected-source-categories are a pure
+// view-layer reshaping of `viewModel.sourceGroups` for the checkbox tree's
+// convenience, so they're derived here rather than added to
+// AnnouncementPreferencesPageData.
 import { computed } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'

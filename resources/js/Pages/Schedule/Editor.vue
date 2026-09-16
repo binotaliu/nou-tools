@@ -1,19 +1,16 @@
 <script setup>
-// Vue port of resources/views/schedule/editor.blade.php (the `scheduleEditor`
-// Alpine.data() component, resources/js/schedule-editor.js). Serves both
-// the create ('/schedules/create') and edit ('/schedules/{schedule}/edit')
-// routes, mirroring ScheduleController::create()/edit() sharing one Blade
-// view before this migration.
+// Serves both the create ('/schedules/create') and edit
+// ('/schedules/{schedule}/edit') routes, since
+// ScheduleController::create()/edit() share this one view.
 //
 // The submit form is a real (non-Inertia) POST/PUT, not useForm(): the
 // controller's store()/update() actions branch on `$request->wantsJson()`
 // for a non-Inertia JSON API consumer (exercised directly by
 // tests/Feature/ScheduleTest.php's postJson/putJson assertions), and
 // Inertia's own XHR requests would risk tripping that branch. A native
-// form submit (Accept: text/html) always takes the redirect path, exactly
-// like the previous Alpine `this.$refs.form.submit()` did. Mirrors how
-// LearningProgress/Show.vue's progress form avoids Inertia's request cycle
-// for the same class of reason.
+// form submit (Accept: text/html) always takes the redirect path. Mirrors
+// how LearningProgress/Show.vue's progress form avoids Inertia's request
+// cycle for the same class of reason.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'

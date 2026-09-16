@@ -1,20 +1,15 @@
 <script setup>
-// Vue port of resources/views/schedule/show.blade.php. The page's own small
-// widgets (remember-schedule modal, push notification toggle, "Add to
-// bookmarks" hint, copy-link box) use the already-ported Phase 1
-// composables (usePwaStandalone, usePushSubscription, useCopyLink). The
-// item table (previously the `nouToolsScheduleItems` Alpine component,
-// resources/js/schedule-items.js) is only used on this page, so its
-// row-sorting/"next class" logic is ported inline here, mirroring how
-// Courses/Schedule.vue inlines its one-off `courseSchedule` logic.
+// The page's own small widgets (remember-schedule modal, push notification
+// toggle, "Add to bookmarks" hint, copy-link box) use the
+// usePwaStandalone/usePushSubscription/useCopyLink composables. The item
+// table's row-sorting/"next class" logic is inline here rather than a
+// shared composable, since it's only used on this page — mirroring how
+// Courses/Schedule.vue inlines its one-off logic.
 //
-// NOTE: the Blade view rendered a schedule-scoped PWA manifest link
-// (`:pwaScheduleUuid="$viewModel->uuid"`, see resources/views/components/
-// layout.blade.php) so "Add to Home Screen" installs a schedule-specific
-// shortcut. Inertia's root template (resources/views/app.blade.php) renders
-// one static site-wide manifest link that isn't easily overridden per-page
-// without risking a duplicate/conflicting <link> tag, so that scoping is
-// not carried over here — installs fall back to the site-wide manifest.
+// NOTE: "Add to Home Screen" installs the site-wide PWA manifest, not a
+// schedule-specific shortcut: the root template renders one static manifest
+// link that isn't easily overridden per-page without risking a
+// duplicate/conflicting <link> tag.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'

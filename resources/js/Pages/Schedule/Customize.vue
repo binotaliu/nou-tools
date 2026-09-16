@@ -1,9 +1,8 @@
 <script setup>
-// Vue port of resources/views/schedule/customize.blade.php. Uses the
-// already-ported `useScheduleCustomize` composable (Phase 1) for the custom
-// link list's add/remove state, and Inertia's useForm() for the real PUT
-// submission (ScheduleCustomizationController::update() is a plain
-// validate-then-redirect action, unmodified by this migration).
+// Uses the `useScheduleCustomize` composable for the custom link list's
+// add/remove state, and Inertia's useForm() for the real PUT submission
+// (ScheduleCustomizationController::update() is a plain
+// validate-then-redirect action).
 import { reactive } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'

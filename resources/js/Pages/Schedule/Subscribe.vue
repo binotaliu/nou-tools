@@ -1,8 +1,7 @@
 <script setup>
-// Vue port of resources/views/schedule/subscribe.blade.php. The calendar
-// settings form uses Inertia's useForm() for the real PUT submission
-// (ScheduleCalendarSettingsUpdateController is a plain validate-then-redirect
-// action, unmodified by this migration).
+// The calendar settings form uses Inertia's useForm() for the real PUT
+// submission (ScheduleCalendarSettingsUpdateController is a plain
+// validate-then-redirect action).
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
