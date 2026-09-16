@@ -55,6 +55,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    {{-- Read by resources/js/app.js so Inertia's progress-bar <style> tag can
+    carry the same nonce our CSP (style-src with no 'unsafe-inline') requires,
+    otherwise the browser silently drops that inline stylesheet. --}}
+    <meta name="csp-nonce" content="{{ app('csp-nonce') }}" />
 
     <title inertia>NOU 小幫手</title>
 

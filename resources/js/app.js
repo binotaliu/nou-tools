@@ -2,6 +2,15 @@ import './bootstrap'
 import { createApp, h } from 'vue'
 import { createInertiaApp, router } from '@inertiajs/vue3'
 
+// The CSP (style-src with no 'unsafe-inline') requires a nonce on every
+// inline <style>, including the one Inertia's progress bar injects itself.
+// Must be passed here rather than set on @inertiajs/core's config beforehand:
+// createInertiaApp() calls config.replace() internally, which wipes out
+// anything set before this call.
+const cspNonce = document
+  .querySelector('meta[name="csp-nonce"]')
+  ?.getAttribute('content')
+
 createInertiaApp({
   resolve: name => {
     const pages = import.meta.glob('./Pages/**/*.vue', { eager: false })
@@ -12,6 +21,7 @@ createInertiaApp({
       .use(plugin)
       .mount(el)
   },
+  nonce: cspNonce,
 })
 
 // Inertia does client-side navigation between pages, so the page_view GA
