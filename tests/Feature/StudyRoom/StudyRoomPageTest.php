@@ -109,6 +109,23 @@ it('passes the maximum floor count to the client so the stairs can explain when 
     );
 });
 
+it('passes the seat layout counts to the client so the initial skeleton matches the real floor grid', function () {
+    config(['study-room.layout' => [
+        'solo_seats_per_floor' => 12,
+        'tables_per_floor' => 3,
+        'seats_per_table' => 4,
+    ]]);
+
+    $response = $this->get(route('study-room.show'));
+
+    $response->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('clientConfig.soloSeatsPerFloor', 12)
+            ->where('clientConfig.tablesPerFloor', 3)
+            ->where('clientConfig.seatsPerTable', 4)
+    );
+});
+
 it('passes the campus coordinates to the client so the windows can follow the real sun and moon', function () {
     config(['study-room.location' => ['latitude' => 25.0847, 'longitude' => 121.4737]]);
 

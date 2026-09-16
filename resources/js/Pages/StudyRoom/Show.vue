@@ -25,6 +25,7 @@ import Modal from '../../Components/StudyRoom/Modal.vue'
 import PersonalInfoForm from '../../Components/StudyRoom/PersonalInfoForm.vue'
 import TableChair from '../../Components/StudyRoom/TableChair.vue'
 import Wall from '../../Components/StudyRoom/Wall.vue'
+import FloorSkeleton from '../../Components/StudyRoom/FloorSkeleton.vue'
 import useSeatGrid from '../../Composables/useSeatGrid'
 import useStudyRoomProfile from '../../Composables/useStudyRoomProfile'
 import useStudyRoomSky from '../../Composables/useStudyRoomSky'
@@ -397,6 +398,13 @@ onUnmounted(() => {
             請先設定暱稱與表情符號，才能加入自習室。
           </p>
         </div>
+
+        <FloorSkeleton
+          v-if="!needsProfile && !socket.state"
+          :solo-seats-per-floor="clientConfig.soloSeatsPerFloor"
+          :tables-per-floor="clientConfig.tablesPerFloor"
+          :seats-per-table="clientConfig.seatsPerTable"
+        />
 
         <div v-show="!needsProfile && socket.state" class="space-y-6">
           <section
