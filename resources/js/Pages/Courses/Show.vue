@@ -1,8 +1,4 @@
 <script setup>
-// Vue port of resources/views/course/show.blade.php. Purely presentational:
-// no Alpine components were used on this page, so everything here is plain
-// Vue template logic ported from the Blade @php blocks and helpers
-// (Str::toSemesterDisplay/toFilenameSafe, the CC by-date exam formatting).
 import { computed } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import { StarIcon } from '@heroicons/vue/24/solid'

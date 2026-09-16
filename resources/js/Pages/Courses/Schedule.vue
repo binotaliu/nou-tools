@@ -1,10 +1,7 @@
 <script setup>
-// Vue port of resources/views/course/schedule.blade.php. The `courseSchedule`
-// Alpine.data() component (resources/js/course-schedule.js) is only used on
-// this one page (registered in resources/js/app.js but referenced from no
-// other Blade view), so its filtering/grouping logic is ported inline here
-// rather than as a shared composable, mirroring how Directory/Index.vue
-// inlines its one-off Leaflet map logic.
+// Filtering/grouping logic is inline here rather than as a shared
+// composable, since it's only used on this one page — mirroring how
+// Directory/Index.vue inlines its one-off Leaflet map logic.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'

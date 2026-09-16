@@ -1,12 +1,7 @@
 <script setup>
-// Vue port of resources/views/directory/index.blade.php. The 學習指導中心
-// map picker was driven by the `linksCenterMap` Alpine.data() component
-// (resources/js/links-center-map.js) plus resources/js/leaflet.js (pushed
-// into <head> only on this page via @push('head')); both are one-off to
-// this page, so their logic is ported inline here rather than as a shared
-// composable. Leaflet itself is still loaded lazily via a dynamic import,
-// mirroring the original @vite(['resources/js/leaflet.js']) being scoped
-// to just this page.
+// The 學習指導中心 map picker logic below is inline rather than a shared
+// composable, since it's one-off to this page. Leaflet itself is loaded
+// lazily via a dynamic import, so it's only fetched when this page needs it.
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
@@ -46,7 +41,6 @@ const jsonLd = computed(() => {
   }
 })
 
-// Region-grouped centers, mirroring the Blade view's $centersByRegion.
 const centersByRegion = computed(() => {
   const centers = props.viewModel.centerGroup?.centers ?? []
   const groups = new Map()
@@ -65,9 +59,9 @@ const allCenters = computed(() =>
   centersByRegion.value.flatMap(region => region.centers)
 )
 
-// --- offline banner (one-off port of the `$store.network.offline` usage on
-// this page; the site-wide link-disabling behavior in app.js listens to the
-// same real online/offline browser events independently) ---
+// --- offline banner (listens to real online/offline browser events;
+// the site-wide link-disabling behavior in app.js does the same,
+// independently) ---
 const offline = ref(typeof navigator !== 'undefined' && !navigator.onLine)
 
 function setOffline(value) {
@@ -92,7 +86,7 @@ onUnmounted(() => {
   window.removeEventListener('offline', handleOffline)
 })
 
-// --- 學習指導中心 map picker (port of linksCenterMap Alpine component) ---
+// --- 學習指導中心 map picker ---
 const selectedKey = ref(null)
 const mapContainer = ref(null)
 const showMapSelectionModal = ref(false)
