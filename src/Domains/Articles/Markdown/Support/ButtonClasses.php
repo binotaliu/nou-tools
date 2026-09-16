@@ -7,10 +7,8 @@ namespace NouTools\Domains\Articles\Markdown\Support;
 /**
  * The Tailwind class list for a button, as used by the `:::cta` container.
  *
- * This began as a Blade `<x-button>` component. Every UI that rendered it is
- * Vue now and styles its own buttons inline, so what survived the migration
- * is only the class computation — `CtaRenderer` needs it to style the anchors
- * it emits into server-rendered Markdown, where a Vue component can't reach.
+ * `CtaRenderer` needs this to style the anchors it emits into
+ * server-rendered Markdown, where a Vue component can't reach.
  */
 final readonly class ButtonClasses
 {
