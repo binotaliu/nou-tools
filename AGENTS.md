@@ -39,14 +39,18 @@ src/Domains/{Domain}/
 
 ## Frontend Rendering
 
-Public-facing pages are Inertia.js+Vue. The Blade+Alpine.js UI they replaced is gone; Filament's admin panel (`app/Filament/`, Blade+Livewire) is a separate, untouched system.
+Public-facing pages are Inertia.js+Vue. The Blade+Alpine.js UI they replaced is gone, and Alpine is no longer a dependency at all; Filament's admin panel (`app/Filament/`, Blade+Livewire) is a separate, untouched system.
 
 - Inertia pages live in `resources/js/Pages/{Domain}/`, mirroring the `src/Domains/{Domain}/` naming.
 - Shared layout is `resources/js/Layouts/AppLayout.vue`; pages wrap themselves in it.
 - ViewModels/DTOs pass straight into `Inertia::render()` as props — no reshaping, same objects that used to go into `view()`.
 - **Exception: StudyRoom.** Inertia is used only for the page shell/navigation there. Live seat/session state is fetched and mutated via its existing REST JSON endpoints and Echo/Reverb broadcasts, not Inertia props — seat-claim state changes far more frequently than a page-prop model suits.
-- **Alpine.js is still loaded, narrowly.** Article Markdown content (`src/Domains/Articles/Markdown/Container/Renderers`) is rendered server-side to raw HTML and mounted via `v-html` (see `resources/js/Pages/Articles/Show.vue`/`Index.vue`), so the `:::tabs`, `:::checklist`, and `:::countdown` containers emit plain `x-data`/`x-show`/`@click` attributes that Vue never sees. `resources/js/app.js` boots Alpine (`@alpinejs/csp`) just for these — `nouToolsChecklist` and `nouToolsCountdown` are its only remaining registrations. Every other page-level Alpine component was ported to a Vue composable/component and removed.
-- `resources/views/offline.blade.php` (PWA offline fallback) and the machine-readable exports (`sitemap.blade.php`, `redocly.blade.php`, `llms-txt.md.blade.php`, `*/markdown/*.md.blade.php`) stay plain Blade by design — no Inertia, no Alpine.
+- **Markdown containers are hydrated, not compiled.** Article Markdown (`src/Domains/Articles/Markdown/`) is rendered to HTML server-side and mounted via `v-html`, so Vue never compiles it and the interactive `:::tabs`, `:::checklist`, and `:::countdown` containers cannot be Vue components. They emit framework-neutral `data-*` markup instead, and `resources/js/Composables/useMarkdownContainers.js` attaches the behaviour to the raw DOM. Anything adding a container that needs JavaScript goes through that composable — do not reach for a second framework.
+  - There are **four** `v-html` roots, and each one must call the composable: `Articles/Show.vue` (body _and_ sidebar), `Articles/Index.vue`, and `Components/StudyRoom/Wall.vue` (the announcement runs through the same converter via `RenderStudyRoomAnnouncement`).
+  - The composable **watches its source props**. Inertia reuses the page component when navigating article → article, so `v-html` swaps content without a remount and new markup would otherwise never be hydrated.
+  - Renderers keep a **working no-JS fallback**: the countdown's day count and the checklist's `<label>`/`disabled` handling are done server-side, and no tab panel ships `hidden` — CSS suppresses the tab strip until the composable sets `data-enhanced`, so content is never trapped behind a dead control.
+  - The checklist's `nou:article-checklist:{path}:{index}:v1` localStorage key is a compatibility contract with readers who already have ticks saved; `tests/Browser/ArticleMarkdownContainersTest.php` asserts it literally.
+- `resources/views/offline.blade.php` (PWA offline fallback) and the machine-readable exports (`sitemap.blade.php`, `redocly.blade.php`, `llms-txt.md.blade.php`, `*/markdown/*.md.blade.php`) stay plain Blade by design — no Inertia, no client-side framework.
 
 ## 自習室 (Study Room)
 

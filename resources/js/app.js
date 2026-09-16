@@ -1,18 +1,6 @@
 import './bootstrap'
-import Alpine from '@alpinejs/csp'
 import { createApp, h } from 'vue'
 import { createInertiaApp, router } from '@inertiajs/vue3'
-
-// Alpine is no longer used to drive whole pages (every page is Inertia+Vue
-// now), but it still boots site-wide: article Markdown content is rendered
-// server-side to raw HTML and mounted via v-html (see Articles/Show.vue,
-// Articles/Index.vue), so the `:::tabs`, `:::checklist`, and `:::countdown`
-// container renderers (src/Domains/Articles/Markdown/Container/Renderers)
-// emit plain x-data/x-show/@click attributes that only Alpine can hydrate —
-// Vue never sees that markup. `nouToolsChecklist`/`nouToolsCountdown` below
-// back the latter two; `:::tabs` only needs an inline `x-data="{ tab: 0 }"`,
-// no named component.
-window.Alpine = Alpine
 
 createInertiaApp({
   resolve: name => {
@@ -146,13 +134,6 @@ new MutationObserver(() => updateOfflineLinkStates()).observe(
   }
 )
 
-// Registers the two Alpine components still needed for Markdown-rendered
-// article content (see the note above `window.Alpine = Alpine`).
-document.addEventListener('alpine:init', () => {
-  window.Alpine.data('nouToolsChecklist', nouToolsChecklist)
-  window.Alpine.data('nouToolsCountdown', nouToolsCountdown)
-})
-
 // Global online/offline flag, read by updateOfflineLinkStates() above and by
 // the schedule/directory pages' own offline banners. navigator.onLine only
 // reflects whether *a* network interface is up, not whether our server is
@@ -206,10 +187,9 @@ document.addEventListener('click', event => {
   })
 })
 
-// Client-side time helpers, used by the useGreeting/useSchoolCalendar Vue
-// composables and by nouToolsCountdown below (Markdown-rendered
-// `:::countdown` containers, hydrated by Alpine — see the note above
-// `window.Alpine = Alpine`).
+// Client-side time helpers, used by the useGreeting/useSchoolCalendar and
+// useMarkdownContainers Vue composables (the latter keeps `:::countdown`
+// article containers from going stale — see resources/js/Composables).
 //
 // Everything here is timezone-aware on purpose: National Open University has
 // overseas students, so greetings and "next class" must reflect the viewer's
@@ -373,143 +353,3 @@ window.NouTime =
       chineseNumber,
     }
   })()
-
-// Alpine factory for article checklists. It turns Markdown's read-only GFM
-// task-list checkboxes into interactive controls and stores each checklist's
-// state in localStorage, scoped by page path + checklist index.
-function nouToolsChecklist() {
-  return {
-    storageKey: '',
-
-    init() {
-      this.storageKey = this.resolveStorageKey()
-
-      const states = this.readStates()
-      const items = this.$el.querySelectorAll('li')
-
-      items.forEach((item, index) => {
-        const checkbox = item.querySelector('input[type="checkbox"]')
-
-        if (!checkbox) {
-          return
-        }
-
-        this.wrapItemContent(item, checkbox)
-
-        checkbox.removeAttribute('disabled')
-
-        if (typeof states[index] === 'boolean') {
-          checkbox.checked = states[index]
-        }
-
-        this.syncItemState(item, checkbox)
-
-        checkbox.addEventListener('change', () => {
-          this.syncItemState(item, checkbox)
-          this.writeStates()
-        })
-      })
-    },
-
-    resolveStorageKey() {
-      const allChecklists = Array.from(
-        document.querySelectorAll('.md-checklist')
-      )
-      const checklistIndex = allChecklists.indexOf(this.$el)
-      const path = window.location.pathname
-
-      return `nou:article-checklist:${path}:${checklistIndex >= 0 ? checklistIndex : 0}:v1`
-    },
-
-    readStates() {
-      try {
-        const raw = localStorage.getItem(this.storageKey)
-
-        if (!raw) {
-          return []
-        }
-
-        const parsed = JSON.parse(raw)
-
-        return Array.isArray(parsed) ? parsed.map(value => !!value) : []
-      } catch (error) {
-        return []
-      }
-    },
-
-    writeStates() {
-      const states = Array.from(
-        this.$el.querySelectorAll('input[type="checkbox"]')
-      ).map(checkbox => checkbox.checked)
-
-      try {
-        localStorage.setItem(this.storageKey, JSON.stringify(states))
-      } catch (error) {}
-    },
-
-    wrapItemContent(item, checkbox) {
-      if (item.querySelector(':scope > label > .md-checklist-content')) {
-        return
-      }
-
-      const label = item.querySelector(':scope > label') ?? item
-      const content = document.createElement('span')
-      content.className = 'md-checklist-content'
-
-      let node = checkbox.nextSibling
-
-      while (node) {
-        const next = node.nextSibling
-        content.appendChild(node)
-        node = next
-      }
-
-      label.appendChild(content)
-    },
-
-    syncItemState(item, checkbox) {
-      item.dataset.checked = checkbox.checked ? 'true' : 'false'
-    },
-  }
-}
-
-// Alpine factory for the `:::countdown` article container. Mirrors
-// CountdownRenderer's server-side day count so the markup renders correctly
-// without JavaScript, then keeps it live against Asia/Taipei "today" (these
-// are academic dates, published on Taipei's calendar - same reasoning as
-// useSchoolCalendar.js's client-side countdown).
-function nouToolsCountdown(config) {
-  const T = window.NouTime
-
-  return {
-    daysText: '',
-
-    init() {
-      this.refresh()
-      // Daily-granularity data, so an hourly refresh (plus on tab-return)
-      // is enough to keep the day count from going stale in a long-lived
-      // or offline-restored tab.
-      setInterval(() => this.refresh(), 60 * 60 * 1000)
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-          this.refresh()
-        }
-      })
-    },
-
-    refresh() {
-      const today = T.taipeiYmd(new Date())
-
-      if (today < config.start) {
-        const days = T.diffInDaysYmd(today, config.start)
-        this.daysText = `倒數 ${days} 天`
-      } else if (today <= config.end) {
-        this.daysText = '進行中'
-      } else {
-        this.daysText = '已結束'
-      }
-    },
-  }
-}
-
-Alpine.start()
