@@ -238,6 +238,8 @@ onUnmounted(() => {
         :class="socket.heldSeatCode ? 'pb-96 sm:pb-72 lg:pb-48' : ''"
         :data-testid="rootTestidValue"
       >
+        <div id="study-room-modal-target"></div>
+
         <div
           v-show="socket.connectionFailed"
           class="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
@@ -271,6 +273,7 @@ onUnmounted(() => {
           :open="profile.personalInfoOpen"
           title="你的自習室資料"
           max-width="max-w-lg"
+          teleport-to="#study-room-modal-target"
           data-testid="study-room-personal-info-modal"
           @close="profile.closePersonalInfo()"
         >
@@ -287,6 +290,7 @@ onUnmounted(() => {
           :open="profile.statsOpen"
           title="專注紀錄與統計"
           max-width="max-w-lg"
+          teleport-to="#study-room-modal-target"
           data-testid="study-room-stats-modal"
           @close="profile.statsOpen = false"
         >

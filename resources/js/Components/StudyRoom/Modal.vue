@@ -1,11 +1,15 @@
 <script setup>
-// Used only by StudyRoom's page. Teleports to <body>, closes on Escape or a
-// click on the backdrop.
+// Used only by StudyRoom's page. Teleports (default: <body>), closes on
+// Escape or a click on the backdrop. StudyRoom's Show.vue overrides
+// teleportTo to a target inside its Twemoji-observed root, since Twemoji's
+// MutationObserver only watches that subtree and can't see content
+// teleported straight to <body>.
 defineProps({
   open: { type: Boolean, required: true },
   title: { type: String, default: '' },
   description: { type: String, default: '' },
   maxWidth: { type: String, default: 'max-w-md' },
+  teleportTo: { type: String, default: 'body' },
 })
 
 const emit = defineEmits(['close'])
@@ -18,7 +22,7 @@ function close() {
 </script>
 
 <template>
-  <Teleport to="body">
+  <Teleport :to="teleportTo" defer>
     <div
       v-show="open"
       class="fixed inset-0 z-50 flex items-start justify-center p-4 sm:items-center sm:p-0"
