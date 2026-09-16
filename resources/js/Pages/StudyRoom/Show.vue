@@ -1,16 +1,12 @@
 <script setup>
-// Vue port of resources/views/study-room/show.blade.php + the old
-// `nouStudyRoom` Alpine factory (resources/js/study-room.js, now removed).
-//
 // Per AGENTS.md "自習室 (Study Room)" and
 // .github/skills/laravel-best-practices/rules/inertia-vue-views.md, this
 // page uses Inertia only for the page shell/navigation — the props below
 // are static/semi-static (hasSchedule, emoji choices, subjects/verbs,
 // client config, the viewer's own profile). The live seat map / timer /
 // session state is fetched from GET /study-room/state on mount and kept in
-// sync via the existing REST endpoints and Echo/Reverb broadcasts, exactly
-// as the old Alpine controller did — never through an Inertia prop or
-// router.reload().
+// sync via the existing REST endpoints and Echo/Reverb broadcasts — never
+// through an Inertia prop or router.reload().
 import { computed, onMounted, onUnmounted } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import {
@@ -61,11 +57,9 @@ const timer = useStudyTimer(
   props.subjects
 )
 
-// The old Alpine controller derived needsProfile once from the initial
-// server render and relied on a full-page redirect to recompute it after a
-// profile save. Since the profile now updates in place (see
-// useStudyRoomProfile.submitProfile), it's derived client-side instead:
-// once the viewer has a nickname, they no longer need the profile prompt.
+// Derived client-side, not from the initial server prop: the profile
+// updates in place (see useStudyRoomProfile.submitProfile), so once the
+// viewer has a nickname, they no longer need the profile prompt.
 const needsProfile = computed(() => !profile.nickname)
 
 socket.onStateChange(() => {
@@ -83,8 +77,8 @@ function handleVisibilityChange() {
 }
 
 // twemoji renders emoji consistently across platforms. It's loaded from a
-// CDN script (not an npm dependency) since the old Blade view only pulled
-// it in for this one page — see the dynamic <script> injection below.
+// CDN script rather than an npm dependency, since it's only needed on this
+// one page — see the dynamic <script> injection below.
 let twemojiObserver = null
 let twemojiRafHandle = null
 
@@ -155,21 +149,16 @@ onMounted(async () => {
 
   document.addEventListener('visibilitychange', handleVisibilityChange)
 
-  // Test-only bridge: the old Alpine version exposed its whole component
-  // instance on the DOM node (`_x_dataStack[0]`), which
-  // tests/Browser/StudyRoomTest.php reached into directly for low-level
-  // assertions (shader sampling, clock overrides, injecting a realtime
-  // delta without a live Echo connection). Vue components have no
-  // equivalent, so the same handful of internals are exposed here instead —
-  // unconditionally, like the Alpine internals it replaces, since browser
-  // tests run against a built (production) bundle. Never read by
-  // production code.
+  // Test-only bridge: tests/Browser/StudyRoomTest.php reaches into these
+  // internals directly for low-level assertions (shader sampling, clock
+  // overrides, injecting a realtime delta without a live Echo connection).
+  // Exposed unconditionally since browser tests run against a built
+  // (production) bundle. Never read by production code.
   window.__studyRoomTest = { socket, timer, sky, profile, grid }
 
   // Separate Vite entry (see resources/js/echo.js) so pages that don't need
   // realtime don't pay for pusher-js/laravel-echo — dynamically imported
-  // here instead of loaded globally, mirroring how the old Blade view only
-  // pulled it in for this one page via @vite(['resources/js/echo.js']).
+  // here instead of loaded globally, since it's only needed on this page.
   import('../../echo')
 
   await socket.load()
