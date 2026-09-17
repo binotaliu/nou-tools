@@ -9,7 +9,7 @@ import { computed, ref } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import Icon from '../Components/Icon.vue'
 import Notification from '../Components/Notification.vue'
-import useThemeSwitcher from '../Composables/useThemeSwitcher'
+import ThemeSwitcherPopover from '../Components/ThemeSwitcherPopover.vue'
 
 const page = usePage()
 const currentPath = computed(() => page.url.split('?')[0])
@@ -33,8 +33,6 @@ function isActive(prefix) {
 
 const mobileMenuOpen = ref(false)
 const moreMenuOpen = ref(false)
-
-const { theme, cycle } = useThemeSwitcher()
 
 const navItems = [
   {
@@ -169,19 +167,7 @@ const moreMenuItems = [
             </div>
           </nav>
 
-          <div class="pl-2 print:hidden">
-            <button
-              type="button"
-              class="inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none md:mr-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
-              @click="cycle()"
-            >
-              <span class="sr-only">切換佈景主題</span>
-
-              <Icon v-if="theme === 'light'" name="sun" class="size-5" />
-              <Icon v-else-if="theme === 'dark'" name="moon" class="size-5" />
-              <Icon v-else name="computer-desktop" class="size-5" />
-            </button>
-          </div>
+          <ThemeSwitcherPopover />
 
           <button
             type="button"
