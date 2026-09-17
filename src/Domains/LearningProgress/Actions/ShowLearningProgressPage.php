@@ -64,6 +64,7 @@ final class ShowLearningProgressPage
             'term' => $term,
             'progress' => [],
             'notes' => [],
+            'homework' => [],
         ]);
     }
 

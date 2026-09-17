@@ -82,6 +82,12 @@ test('creates learning progress record if not exists', function () {
         'term' => '2025B',
     ]);
     $response->assertStatus(200);
+
+    $created = LearningProgress::where('student_schedule_id', $schedule->id)
+        ->where('term', '2025B')
+        ->firstOrFail();
+
+    expect($created->homework)->toBe([]);
 });
 
 test('can update learning progress', function () {
@@ -103,6 +109,11 @@ test('can update learning progress', function () {
                 '1' => 'Test note for week 1',
             ],
         ],
+        'homework' => [
+            '1' => [
+                '1' => ['deadline' => '2026-10-01', 'note' => 'Read chapter 1', 'completed' => '1'],
+            ],
+        ],
     ];
 
     $response = $this->put(route('learning-progress.update', [
@@ -116,6 +127,9 @@ test('can update learning progress', function () {
     $updated = LearningProgress::find($progress->id);
     $this->assertNotNull($updated->progress[1][1]['video']);
     $this->assertNotNull($updated->notes[1][1]);
+    $this->assertEquals('2026-10-01', $updated->homework[1][1]['deadline']);
+    $this->assertEquals('Read chapter 1', $updated->homework[1][1]['note']);
+    $this->assertNotNull($updated->homework[1][1]['completed']);
 });
 
 test('learning progress has correct structure', function () {

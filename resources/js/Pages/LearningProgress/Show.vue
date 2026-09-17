@@ -120,6 +120,21 @@ function isWeekPassed(weekNum) {
   return currentWeek.value !== null && weekNum < currentWeek.value
 }
 
+// --- homework table state ---
+const homeworkMap = computed(() => {
+  const map = new Map()
+
+  props.viewModel.homeworkEntries.forEach(entry => {
+    map.set(`${entry.courseId}-${entry.number}`, entry)
+  })
+
+  return map
+})
+
+function findHomework(courseId, number) {
+  return homeworkMap.value.get(`${courseId}-${number}`) ?? null
+}
+
 function toChineseNumber(n) {
   return window.NouTime ? window.NouTime.chineseNumber(n) : String(n)
 }
@@ -301,6 +316,88 @@ const csrfToken =
               </tr>
             </thead>
             <tbody>
+              <template v-for="number in [1, 2]" :key="`homework-${number}`">
+                <tr
+                  class="border-b border-theme-300 bg-theme-50 dark:border-zinc-600 dark:bg-zinc-950"
+                >
+                  <td
+                    class="sticky left-0 z-10 break-inside-avoid border border-b-0 border-l-0 border-theme-300 bg-theme-50 px-0 py-0 text-center text-xs font-semibold text-theme-900 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100 print:static"
+                    rowspan="2"
+                  >
+                    {{ number === 1 ? '作業一' : '作業二' }}
+                    <div
+                      class="absolute top-0 left-full h-full w-px bg-theme-300 dark:bg-zinc-600 print:hidden"
+                    ></div>
+                  </td>
+
+                  <template
+                    v-for="course in viewModel.courses"
+                    :key="course.id"
+                  >
+                    <td
+                      class="border border-theme-300 bg-white text-center last:border-r-0 dark:border-zinc-600 dark:bg-zinc-900 [&:has(input:checked)]:bg-theme-50 dark:[&:has(input:checked)]:bg-zinc-950"
+                    >
+                      <label
+                        class="group flex h-full w-full cursor-pointer items-center justify-center gap-1 px-2 py-3"
+                      >
+                        <div class="grid size-4 grid-cols-1">
+                          <input
+                            type="checkbox"
+                            :name="`homework[${course.id}][${number}][completed]`"
+                            value="1"
+                            :checked="
+                              findHomework(course.id, number)?.completed ??
+                              false
+                            "
+                            :aria-label="`${course.name} ${number === 1 ? '作業一' : '作業二'}已完成`"
+                            class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
+                          />
+                          <CheckIcon
+                            class="col-start-1 row-start-1 m-0.5 size-3 text-gray-400 opacity-0 group-has-checked:opacity-100 print:hidden"
+                          />
+                          <div
+                            class="col-start-1 row-start-1 hidden size-4 rounded border border-gray-500 bg-white dark:bg-zinc-900 print:block"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs group-has-checked:text-gray-400 print:hidden"
+                          >完成</span
+                        >
+                      </label>
+                    </td>
+                    <td
+                      class="border border-theme-300 bg-white p-0 text-center last:border-r-0 dark:border-zinc-600 dark:bg-zinc-900"
+                    >
+                      <input
+                        type="date"
+                        :name="`homework[${course.id}][${number}][deadline]`"
+                        :value="findHomework(course.id, number)?.deadline ?? ''"
+                        :aria-label="`${course.name} ${number === 1 ? '作業一' : '作業二'}的截止日期`"
+                        class="m-0 h-full w-full border-0 bg-transparent px-2 py-2 text-xs text-theme-900 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-inset dark:text-zinc-100"
+                      />
+                    </td>
+                  </template>
+                </tr>
+                <tr>
+                  <td
+                    v-for="course in viewModel.courses"
+                    :key="course.id"
+                    class="border border-b-0 border-theme-300 bg-white last:border-r-0 dark:border-zinc-600 dark:bg-zinc-900 print:h-16"
+                    colspan="2"
+                  >
+                    <textarea
+                      :name="`homework[${course.id}][${number}][note]`"
+                      placeholder="（尚未設定備註）"
+                      class="m-0 h-full w-full resize-none px-2 py-2 text-xs text-theme-700 placeholder-gray-400 focus:border-blue-500 focus:outline-none dark:text-zinc-300 print:text-black print:placeholder-transparent"
+                      rows="2"
+                      :aria-label="`${course.name} ${number === 1 ? '作業一' : '作業二'}的備註`"
+                      >{{
+                        findHomework(course.id, number)?.note ?? ''
+                      }}</textarea>
+                  </td>
+                </tr>
+              </template>
+
               <template v-for="week in viewModel.weeks" :key="week.num">
                 <tr
                   class="border-b border-theme-300 hover:bg-theme-50 dark:border-zinc-600 dark:hover:bg-zinc-950"

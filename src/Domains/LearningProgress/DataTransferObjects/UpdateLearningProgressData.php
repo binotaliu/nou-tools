@@ -11,6 +11,7 @@ final class UpdateLearningProgressData extends Data
     public function __construct(
         public array $progress = [],
         public array $notes = [],
+        public array $homework = [],
     ) {}
 
     public static function rules(): array
@@ -18,6 +19,7 @@ final class UpdateLearningProgressData extends Data
         return [
             'progress' => ['sometimes', 'array'],
             'notes' => ['sometimes', 'array'],
+            'homework' => ['sometimes', 'array'],
         ];
     }
 }

@@ -17,6 +17,7 @@ final class UpdateLearningProgress
 
         $learningProgress->progress = $input->progress;
         $learningProgress->notes = $input->notes;
+        $learningProgress->homework = $input->homework;
         $learningProgress->saveOrFail();
     }
 }

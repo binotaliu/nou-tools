@@ -28,6 +28,8 @@ final class LearningProgressViewModel extends Data
         public CarbonInterface $now,
         #[DataCollectionOf(LearningProgressEntryViewModel::class)]
         public DataCollection $entries,
+        #[DataCollectionOf(LearningProgressHomeworkEntryViewModel::class)]
+        public DataCollection $homeworkEntries,
         public int $completedCount = 0,
         public int $totalCount = 0,
         public float $percentage = 0.0,
@@ -41,6 +43,7 @@ final class LearningProgressViewModel extends Data
     {
         $progressData = $learningProgress->progress ?? [];
         $notesData = $learningProgress->notes ?? [];
+        $homeworkData = $learningProgress->homework ?? [];
         $total = count($courses) * count($weeks) * 2;
         $completed = 0;
 
@@ -70,6 +73,24 @@ final class LearningProgressViewModel extends Data
             }
         }
 
+        $homeworkLabels = [1 => '作業一', 2 => '作業二'];
+        $homeworkEntries = [];
+
+        foreach ($courses as $course) {
+            foreach ($homeworkLabels as $number => $label) {
+                $slot = $homeworkData[$course['id']][$number] ?? [];
+
+                $homeworkEntries[] = new LearningProgressHomeworkEntryViewModel(
+                    courseId: $course['id'],
+                    number: $number,
+                    label: $label,
+                    deadline: $slot['deadline'] ?? null,
+                    note: (string) ($slot['note'] ?? ''),
+                    completed: (bool) ($slot['completed'] ?? false),
+                );
+            }
+        }
+
         return new self(
             id: $learningProgress->id,
             scheduleUuid: $schedule->getRouteKey(),
@@ -87,6 +108,7 @@ final class LearningProgressViewModel extends Data
             semesterEnd: $semesterEnd,
             now: Date::now('Asia/Taipei'),
             entries: new DataCollection(LearningProgressEntryViewModel::class, $entries),
+            homeworkEntries: new DataCollection(LearningProgressHomeworkEntryViewModel::class, $homeworkEntries),
             completedCount: $completed,
             totalCount: $total,
             percentage: $total > 0 ? ($completed / $total) * 100 : 0,

@@ -25,6 +25,7 @@ final class LearningProgressFactory extends Factory
             'term' => '2025B',
             'progress' => [],
             'notes' => [],
+            'homework' => [],
         ];
     }
 }

@@ -17,6 +17,7 @@ final class LearningProgress extends Model
         'term',
         'progress',
         'notes',
+        'homework',
     ];
 
     protected $table = 'learning_progresses';
@@ -24,6 +25,7 @@ final class LearningProgress extends Model
     protected $casts = [
         'progress' => 'json',
         'notes' => 'json',
+        'homework' => 'json',
     ];
 
     public function studentSchedule(): BelongsTo

@@ -60,3 +60,63 @@ test('viewmodel calculates completion percentage correctly', function () {
     expect($vm->completedCount)->toEqual(7);
     expect($vm->percentage)->toBe(87.5);
 });
+
+test('viewmodel builds homework entries from homework data', function () {
+    $schedule = new StudentSchedule;
+    $schedule->uuid = Uuid::uuid4()->toString();
+    $schedule->name = 'Demo';
+
+    $courses = [
+        ['id' => 1, 'code' => 'A', 'name' => 'Course A'],
+        ['id' => 2, 'code' => 'B', 'name' => 'Course B'],
+    ];
+
+    $weeks = [
+        ['num' => 1, 'start' => '2026-01-01', 'end' => '2026-01-07'],
+    ];
+
+    $learning = new LearningProgress;
+    $learning->id = 999;
+    $learning->term = '2025B';
+    $learning->progress = [];
+    $learning->notes = [];
+    $learning->homework = [
+        1 => [
+            1 => ['deadline' => '2026-10-01', 'note' => 'Read chapter 1', 'completed' => true],
+        ],
+    ];
+
+    $vm = LearningProgressViewModel::fromModel(
+        $learning,
+        $schedule,
+        $courses,
+        $weeks,
+        Carbon::parse('2026-01-01'),
+        Carbon::parse('2026-05-01'),
+    );
+
+    // two courses × two homeworks (作業一/作業二) = 4 entries
+    expect($vm->homeworkEntries)->toHaveCount(4);
+
+    $findEntry = fn (int $courseId, int $number) => $vm->homeworkEntries->first(
+        fn ($entry) => $entry->courseId === $courseId && $entry->number === $number,
+    );
+
+    $courseAHomework1 = $findEntry(1, 1);
+    expect($courseAHomework1->label)->toBe('作業一');
+    expect($courseAHomework1->deadline)->toBe('2026-10-01');
+    expect($courseAHomework1->note)->toBe('Read chapter 1');
+    expect($courseAHomework1->completed)->toBeTrue();
+
+    // homework without any saved data yet defaults to null deadline, empty note, and not completed
+    $courseAHomework2 = $findEntry(1, 2);
+    expect($courseAHomework2->label)->toBe('作業二');
+    expect($courseAHomework2->deadline)->toBeNull();
+    expect($courseAHomework2->note)->toBe('');
+    expect($courseAHomework2->completed)->toBeFalse();
+
+    $courseBHomework1 = $findEntry(2, 1);
+    expect($courseBHomework1->deadline)->toBeNull();
+    expect($courseBHomework1->note)->toBe('');
+    expect($courseBHomework1->completed)->toBeFalse();
+});
