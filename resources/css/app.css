@@ -16,16 +16,16 @@
 
 @theme {
   --font-sans: system-ui, sans-serif;
-  --color-warm-50: oklch(0.98 0.01 40);
-  --color-warm-100: oklch(0.96 0.02 40);
-  --color-warm-200: oklch(0.93 0.04 40);
-  --color-warm-300: oklch(0.88 0.07 40);
-  --color-warm-400: oklch(0.8 0.12 40);
-  --color-warm-500: oklch(0.72 0.15 40);
-  --color-warm-600: oklch(0.65 0.15 35);
-  --color-warm-700: oklch(0.55 0.13 35);
-  --color-warm-800: oklch(0.45 0.1 35);
-  --color-warm-900: oklch(0.35 0.08 35);
+  --color-theme-50: oklch(0.98 0.01 40);
+  --color-theme-100: oklch(0.96 0.02 40);
+  --color-theme-200: oklch(0.93 0.04 40);
+  --color-theme-300: oklch(0.88 0.07 40);
+  --color-theme-400: oklch(0.8 0.12 40);
+  --color-theme-500: oklch(0.72 0.15 40);
+  --color-theme-600: oklch(0.65 0.15 35);
+  --color-theme-700: oklch(0.55 0.13 35);
+  --color-theme-800: oklch(0.45 0.1 35);
+  --color-theme-900: oklch(0.35 0.08 35);
 }
 
 @keyframes blink-colon {
@@ -120,6 +120,32 @@
     color-scheme: dark;
   }
 
+  html[data-accent='ocean'] {
+    --color-theme-50: oklch(0.98 0.01 230);
+    --color-theme-100: oklch(0.96 0.02 230);
+    --color-theme-200: oklch(0.93 0.04 230);
+    --color-theme-300: oklch(0.88 0.07 230);
+    --color-theme-400: oklch(0.8 0.12 230);
+    --color-theme-500: oklch(0.72 0.15 230);
+    --color-theme-600: oklch(0.65 0.15 235);
+    --color-theme-700: oklch(0.55 0.13 235);
+    --color-theme-800: oklch(0.45 0.1 235);
+    --color-theme-900: oklch(0.35 0.08 235);
+  }
+
+  html[data-accent='forest'] {
+    --color-theme-50: oklch(0.98 0.01 150);
+    --color-theme-100: oklch(0.96 0.02 150);
+    --color-theme-200: oklch(0.93 0.04 150);
+    --color-theme-300: oklch(0.88 0.07 150);
+    --color-theme-400: oklch(0.8 0.12 150);
+    --color-theme-500: oklch(0.72 0.15 150);
+    --color-theme-600: oklch(0.65 0.15 145);
+    --color-theme-700: oklch(0.55 0.13 145);
+    --color-theme-800: oklch(0.45 0.1 145);
+    --color-theme-900: oklch(0.35 0.08 145);
+  }
+
   @media print {
     html {
       color-scheme: light;
@@ -129,16 +155,16 @@
   @media (prefers-contrast: more) {
     body {
       /* amplify lightness differences so every step passes AA/AAA */
-      --color-warm-50: oklch(0.99 0.01 40 / 1);
-      --color-warm-100: oklch(0.9 0.02 40 / 1);
-      --color-warm-200: oklch(0.8 0.04 40 / 1);
-      --color-warm-300: oklch(0.6 0.07 40 / 1);
-      --color-warm-400: oklch(0.4 0.12 40 / 1);
-      --color-warm-500: oklch(0.2 0.15 40 / 1);
-      --color-warm-600: oklch(0.15 0.15 35 / 1);
-      --color-warm-700: oklch(0.1 0.13 35 / 1);
-      --color-warm-800: oklch(0.05 0.1 35 / 1);
-      --color-warm-900: oklch(0.02 0.08 35 / 1);
+      --color-theme-50: oklch(0.99 0.01 40 / 1);
+      --color-theme-100: oklch(0.9 0.02 40 / 1);
+      --color-theme-200: oklch(0.8 0.04 40 / 1);
+      --color-theme-300: oklch(0.6 0.07 40 / 1);
+      --color-theme-400: oklch(0.4 0.12 40 / 1);
+      --color-theme-500: oklch(0.2 0.15 40 / 1);
+      --color-theme-600: oklch(0.15 0.15 35 / 1);
+      --color-theme-700: oklch(0.1 0.13 35 / 1);
+      --color-theme-800: oklch(0.05 0.1 35 / 1);
+      --color-theme-900: oklch(0.02 0.08 35 / 1);
     }
   }
 
@@ -175,39 +201,39 @@
   animation: firefly 7s ease-in-out infinite;
 }
 
-@utility prose-warm {
-  --tw-prose-body: var(--color-warm-800);
-  --tw-prose-headings: var(--color-warm-900);
-  --tw-prose-lead: var(--color-warm-700);
-  --tw-prose-links: var(--color-warm-900);
-  --tw-prose-bold: var(--color-warm-900);
-  --tw-prose-counters: var(--color-warm-600);
-  --tw-prose-bullets: var(--color-warm-400);
-  --tw-prose-hr: var(--color-warm-300);
-  --tw-prose-quotes: var(--color-warm-900);
-  --tw-prose-quote-borders: var(--color-warm-300);
-  --tw-prose-captions: var(--color-warm-700);
-  --tw-prose-code: var(--color-warm-900);
-  --tw-prose-pre-code: var(--color-warm-100);
-  --tw-prose-pre-bg: var(--color-warm-900);
-  --tw-prose-th-borders: var(--color-warm-300);
-  --tw-prose-td-borders: var(--color-warm-200);
-  --tw-prose-invert-body: var(--color-warm-200);
+@utility prose-theme {
+  --tw-prose-body: var(--color-theme-800);
+  --tw-prose-headings: var(--color-theme-900);
+  --tw-prose-lead: var(--color-theme-700);
+  --tw-prose-links: var(--color-theme-900);
+  --tw-prose-bold: var(--color-theme-900);
+  --tw-prose-counters: var(--color-theme-600);
+  --tw-prose-bullets: var(--color-theme-400);
+  --tw-prose-hr: var(--color-theme-300);
+  --tw-prose-quotes: var(--color-theme-900);
+  --tw-prose-quote-borders: var(--color-theme-300);
+  --tw-prose-captions: var(--color-theme-700);
+  --tw-prose-code: var(--color-theme-900);
+  --tw-prose-pre-code: var(--color-theme-100);
+  --tw-prose-pre-bg: var(--color-theme-900);
+  --tw-prose-th-borders: var(--color-theme-300);
+  --tw-prose-td-borders: var(--color-theme-200);
+  --tw-prose-invert-body: var(--color-theme-200);
   --tw-prose-invert-headings: var(--color-white);
-  --tw-prose-invert-lead: var(--color-warm-300);
+  --tw-prose-invert-lead: var(--color-theme-300);
   --tw-prose-invert-links: var(--color-white);
   --tw-prose-invert-bold: var(--color-white);
-  --tw-prose-invert-counters: var(--color-warm-400);
-  --tw-prose-invert-bullets: var(--color-warm-600);
-  --tw-prose-invert-hr: var(--color-warm-700);
-  --tw-prose-invert-quotes: var(--color-warm-100);
-  --tw-prose-invert-quote-borders: var(--color-warm-700);
-  --tw-prose-invert-captions: var(--color-warm-400);
+  --tw-prose-invert-counters: var(--color-theme-400);
+  --tw-prose-invert-bullets: var(--color-theme-600);
+  --tw-prose-invert-hr: var(--color-theme-700);
+  --tw-prose-invert-quotes: var(--color-theme-100);
+  --tw-prose-invert-quote-borders: var(--color-theme-700);
+  --tw-prose-invert-captions: var(--color-theme-400);
   --tw-prose-invert-code: var(--color-white);
-  --tw-prose-invert-pre-code: var(--color-warm-300);
+  --tw-prose-invert-pre-code: var(--color-theme-300);
   --tw-prose-invert-pre-bg: rgb(0 0 0 / 50%);
-  --tw-prose-invert-th-borders: var(--color-warm-600);
-  --tw-prose-invert-td-borders: var(--color-warm-700);
+  --tw-prose-invert-th-borders: var(--color-theme-600);
+  --tw-prose-invert-td-borders: var(--color-theme-700);
 }
 
 /**
@@ -231,15 +257,15 @@
   }
 
   .md-dialogue > p {
-    @apply mb-3 text-xs font-medium text-warm-600 dark:text-zinc-600;
+    @apply mb-3 text-xs font-medium text-theme-600 dark:text-zinc-600;
   }
 
   .md-dialogue-turn {
-    @apply relative mb-4 flex w-full flex-row items-start gap-3 rounded-lg border-2 border-warm-700 bg-warm-50 p-4 dark:border-zinc-600 dark:bg-zinc-800;
+    @apply relative mb-4 flex w-full flex-row items-start gap-3 rounded-lg border-2 border-theme-700 bg-theme-50 p-4 dark:border-zinc-600 dark:bg-zinc-800;
   }
 
   .md-dialogue-avatar {
-    @apply relative z-10 flex size-16 shrink-0 items-center justify-center overflow-hidden rounded border border-warm-700 bg-warm-100 p-1 text-lg leading-none dark:border-zinc-800 dark:bg-zinc-700;
+    @apply relative z-10 flex size-16 shrink-0 items-center justify-center overflow-hidden rounded border border-theme-700 bg-theme-100 p-1 text-lg leading-none dark:border-zinc-800 dark:bg-zinc-700;
   }
 
   .md-dialogue-avatar-img {
@@ -251,7 +277,7 @@
   }
 
   .md-dialogue-speaker {
-    @apply -mt-8! mb-2! w-24 rounded border border-warm-700 bg-warm-200 px-2 py-1 text-sm font-bold text-warm-900 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-200;
+    @apply -mt-8! mb-2! w-24 rounded border border-theme-700 bg-theme-200 px-2 py-1 text-sm font-bold text-theme-900 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-200;
   }
 
   .md-dialogue-body {
@@ -313,7 +339,7 @@
   }
 
   .md-steps-title {
-    @apply mb-3 font-semibold text-warm-900 dark:text-zinc-100;
+    @apply mb-3 font-semibold text-theme-900 dark:text-zinc-100;
   }
 
   .md-steps {
@@ -326,7 +352,7 @@
 
   .md-step::before {
     content: '';
-    @apply absolute top-8 left-5.5 -ml-px h-[calc(100%-2rem)] w-px bg-warm-300 dark:bg-zinc-800;
+    @apply absolute top-8 left-5.5 -ml-px h-[calc(100%-2rem)] w-px bg-theme-300 dark:bg-zinc-800;
   }
 
   .md-step:last-child::before {
@@ -334,7 +360,7 @@
   }
 
   .md-step-marker {
-    @apply z-10 flex size-8 shrink-0 items-center justify-center rounded-full bg-warm-600 text-sm font-semibold text-white dark:bg-warm-700;
+    @apply z-10 flex size-8 shrink-0 items-center justify-center rounded-full bg-theme-600 text-sm font-semibold text-white dark:bg-theme-700;
   }
 
   .md-step-body {
@@ -351,11 +377,11 @@
   }
 
   .md-faq-item {
-    @apply rounded-lg border border-warm-200 px-4 dark:border-zinc-700;
+    @apply rounded-lg border border-theme-200 px-4 dark:border-zinc-700;
   }
 
   .md-faq-question {
-    @apply flex cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium text-warm-900 marker:content-none dark:text-zinc-100;
+    @apply flex cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium text-theme-900 marker:content-none dark:text-zinc-100;
   }
 
   .md-faq-question::-webkit-details-marker {
@@ -364,7 +390,7 @@
 
   .md-faq-question::after {
     content: '⌄';
-    @apply text-lg text-warm-400 transition-transform duration-200 dark:text-zinc-500;
+    @apply text-lg text-theme-400 transition-transform duration-200 dark:text-zinc-500;
   }
 
   .md-faq-item[open] .md-faq-question::after {
@@ -372,7 +398,7 @@
   }
 
   .md-faq-answer {
-    @apply pb-4 text-warm-700 dark:text-zinc-300;
+    @apply pb-4 text-theme-700 dark:text-zinc-300;
   }
 
   .md-faq-answer :where(p:first-child) {
@@ -385,11 +411,11 @@
 
   /* 2.5 Tabs */
   .md-tabs {
-    @apply my-6 overflow-hidden rounded-lg border border-warm-200 dark:border-zinc-700;
+    @apply my-6 overflow-hidden rounded-lg border border-theme-200 dark:border-zinc-700;
   }
 
   .md-tabs-list {
-    @apply flex flex-wrap gap-1 border-b border-warm-200 bg-warm-100 p-1 dark:border-zinc-700 dark:bg-zinc-800;
+    @apply flex flex-wrap gap-1 border-b border-theme-200 bg-theme-100 p-1 dark:border-zinc-700 dark:bg-zinc-800;
   }
 
   /* Until useMarkdownContainers has wired the triggers up, the tab strip
@@ -404,11 +430,11 @@
   }
 
   .md-tabs-trigger {
-    @apply rounded-full px-3 py-1.5 text-sm font-medium text-warm-600 transition-colors hover:bg-white/60 dark:text-zinc-400 dark:hover:bg-zinc-700/60;
+    @apply rounded-full px-3 py-1.5 text-sm font-medium text-theme-600 transition-colors hover:bg-white/60 dark:text-zinc-400 dark:hover:bg-zinc-700/60;
   }
 
   .md-tabs-trigger[data-active='true'] {
-    @apply bg-white text-warm-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100;
+    @apply bg-white text-theme-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100;
   }
 
   .md-tabs-panel {
@@ -429,15 +455,15 @@
   }
 
   .md-card {
-    @apply flex flex-col gap-1 rounded-lg border border-warm-200 p-4 no-underline transition-all hover:-translate-y-0.5 hover:border-warm-400 hover:shadow-md dark:border-zinc-700 dark:hover:border-zinc-500;
+    @apply flex flex-col gap-1 rounded-lg border border-theme-200 p-4 no-underline transition-all hover:-translate-y-0.5 hover:border-theme-400 hover:shadow-md dark:border-zinc-700 dark:hover:border-zinc-500;
   }
 
   .md-card-title {
-    @apply font-semibold text-warm-900 dark:text-zinc-100;
+    @apply font-semibold text-theme-900 dark:text-zinc-100;
   }
 
   .md-card-desc {
-    @apply text-sm text-warm-600 dark:text-zinc-400;
+    @apply text-sm text-theme-600 dark:text-zinc-400;
   }
 
   /* 2.7 Timeline */
@@ -447,22 +473,22 @@
 
   /* Timeline title (optional) */
   .md-timeline-title {
-    @apply mb-2 text-xl font-bold text-warm-900 dark:text-zinc-100;
+    @apply mb-2 text-xl font-bold text-theme-900 dark:text-zinc-100;
   }
 
   /* Flat timeline (backward compatibility) */
   .md-timeline-flat {
-    @apply flex list-none flex-col gap-6 border-l-2 border-warm-300 pl-6 dark:border-zinc-700;
+    @apply flex list-none flex-col gap-6 border-l-2 border-theme-300 pl-6 dark:border-zinc-700;
   }
 
   /* Section container */
   .md-timeline-section {
-    @apply relative flex flex-col gap-4 border-l-2 border-warm-300 pl-6 dark:border-zinc-700;
+    @apply relative flex flex-col gap-4 border-l-2 border-theme-300 pl-6 dark:border-zinc-700;
   }
 
   /* Section title (heading) */
   .md-timeline-section-title {
-    @apply mb-2 -ml-6 w-fit rounded-r-lg bg-warm-600 px-4 py-1.5 font-semibold text-white dark:bg-warm-500;
+    @apply mb-2 -ml-6 w-fit rounded-r-lg bg-theme-600 px-4 py-1.5 font-semibold text-white dark:bg-theme-500;
   }
 
   .md-timeline-section-title :where(h2, h3, h4) {
@@ -471,7 +497,7 @@
 
   /* Section content (between heading and items) */
   .md-timeline-section-content {
-    @apply mb-4 text-sm text-warm-700 dark:text-zinc-300;
+    @apply mb-4 text-sm text-theme-700 dark:text-zinc-300;
   }
 
   .md-timeline-section-content :where(p) {
@@ -495,12 +521,12 @@
 
   /* Timeline dot */
   .md-timeline-dot {
-    @apply absolute top-1 -left-[1.95rem]! size-3 rounded-full bg-warm-600 ring-4 ring-warm-50 dark:bg-warm-500 dark:ring-zinc-900;
+    @apply absolute top-1 -left-[1.95rem]! size-3 rounded-full bg-theme-600 ring-4 ring-theme-50 dark:bg-theme-500 dark:ring-zinc-900;
   }
 
   /* Timeline label (bold prefix) */
   .md-timeline-label {
-    @apply mr-1 font-semibold text-warm-900 dark:text-zinc-100;
+    @apply mr-1 font-semibold text-theme-900 dark:text-zinc-100;
   }
 
   /* Timeline body content */
@@ -518,16 +544,16 @@
   }
 
   .md-timeline-body :where(ul li) {
-    @apply text-sm! text-warm-700! dark:text-zinc-300!;
+    @apply text-sm! text-theme-700! dark:text-zinc-300!;
   }
 
   /* 2.8 Summary */
   .md-summary {
-    @apply my-6 rounded-xl border-2 border-warm-300 bg-warm-50 p-5 dark:border-zinc-700 dark:bg-zinc-800/60;
+    @apply my-6 rounded-xl border-2 border-theme-300 bg-theme-50 p-5 dark:border-zinc-700 dark:bg-zinc-800/60;
   }
 
   .md-summary-title {
-    @apply mt-0! mb-2! text-lg font-semibold text-warm-900 dark:text-zinc-100;
+    @apply mt-0! mb-2! text-lg font-semibold text-theme-900 dark:text-zinc-100;
   }
 
   .md-summary-body :where(p:last-child) {
@@ -549,12 +575,12 @@
   }
 
   .md-figcaption {
-    @apply mt-2 text-sm text-warm-600 dark:text-zinc-400;
+    @apply mt-2 text-sm text-theme-600 dark:text-zinc-400;
   }
 
   /* 2.11 Checklist */
   .md-checklist {
-    @apply my-6 rounded-2xl border border-warm-200 bg-warm-50/70 p-4 dark:border-zinc-700 dark:bg-zinc-800/60;
+    @apply my-6 rounded-2xl border border-theme-200 bg-theme-50/70 p-4 dark:border-zinc-700 dark:bg-zinc-800/60;
   }
 
   .md-checklist :where(ul) {
@@ -562,15 +588,15 @@
   }
 
   .md-checklist :where(li) {
-    @apply flex w-full items-center gap-2 rounded-xl border border-warm-200 bg-white/80 px-4! py-2! text-warm-800 shadow-xs transition-colors dark:border-zinc-700 dark:bg-zinc-900/70 dark:text-zinc-100;
+    @apply flex w-full items-center gap-2 rounded-xl border border-theme-200 bg-white/80 px-4! py-2! text-theme-800 shadow-xs transition-colors dark:border-zinc-700 dark:bg-zinc-900/70 dark:text-zinc-100;
   }
 
   .md-checklist :where(li[data-checked='true']) {
-    @apply border-warm-300 bg-warm-100/80 py-0 text-warm-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400;
+    @apply border-theme-300 bg-theme-100/80 py-0 text-theme-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400;
   }
 
   .md-checklist :where(li input[type='checkbox']) {
-    @apply block size-4 shrink-0 rounded border-warm-400 accent-warm-600;
+    @apply block size-4 shrink-0 rounded border-theme-400 accent-theme-600;
   }
 
   .md-checklist :where(li > label) {
@@ -591,32 +617,32 @@
   }
 
   .md-countdown-item {
-    @apply flex-1 rounded-xl border border-warm-200 bg-warm-50/70 px-5 py-4 text-center dark:border-zinc-700 dark:bg-zinc-800/60;
+    @apply flex-1 rounded-xl border border-theme-200 bg-theme-50/70 px-5 py-4 text-center dark:border-zinc-700 dark:bg-zinc-800/60;
   }
 
   .md-countdown-label {
-    @apply m-0! text-sm font-semibold text-warm-700 dark:text-zinc-300;
+    @apply m-0! text-sm font-semibold text-theme-700 dark:text-zinc-300;
   }
 
   .md-countdown-range {
-    @apply m-0! text-xs text-warm-500 dark:text-zinc-400;
+    @apply m-0! text-xs text-theme-500 dark:text-zinc-400;
   }
 
   .md-countdown-days {
-    @apply m-0! text-2xl font-bold text-warm-900 dark:text-zinc-100;
+    @apply m-0! text-2xl font-bold text-theme-900 dark:text-zinc-100;
   }
 
   /* 2.12 Inline / document-level */
   .md-mark {
-    @apply rounded bg-warm-200 px-1 py-0.5 text-warm-900 dark:bg-warm-700 dark:text-warm-50;
+    @apply rounded bg-theme-200 px-1 py-0.5 text-theme-900 dark:bg-theme-700 dark:text-theme-50;
   }
 
   .md-toc {
-    @apply my-6 rounded-lg border border-warm-200 bg-warm-50 p-4 text-sm dark:border-zinc-700 dark:bg-zinc-800/60;
+    @apply my-6 rounded-lg border border-theme-200 bg-theme-50 p-4 text-sm dark:border-zinc-700 dark:bg-zinc-800/60;
   }
 
   .md-toc-title {
-    @apply mt-0! mb-3! text-lg font-semibold text-warm-900 dark:text-zinc-50;
+    @apply mt-0! mb-3! text-lg font-semibold text-theme-900 dark:text-zinc-50;
   }
 
   .md-toc ol {
@@ -633,7 +659,7 @@
   }
 
   .md-heading-anchor {
-    @apply mr-2 text-warm-400 no-underline opacity-0 transition-opacity focus:opacity-100 dark:text-zinc-500;
+    @apply mr-2 text-theme-400 no-underline opacity-0 transition-opacity focus:opacity-100 dark:text-zinc-500;
   }
 
   :where(h2, h3, h4):hover .md-heading-anchor,
@@ -698,7 +724,7 @@
   }
 
   .md-card:hover .md-card-title {
-    @apply text-warm-700! dark:text-zinc-50!;
+    @apply text-theme-700! dark:text-zinc-50!;
   }
 
   .md-steps,

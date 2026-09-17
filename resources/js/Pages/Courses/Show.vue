@@ -180,13 +180,13 @@ function examReferenceUrl(reference) {
           <Icon name="chevron-left" class="size-4" />
           回到我的課表
         </Link>
-        <h2 class="mb-2 text-3xl font-bold text-warm-900 dark:text-zinc-100">
+        <h2 class="mb-2 text-3xl font-bold text-theme-900 dark:text-zinc-100">
           {{ course.name }}
         </h2>
 
         <div
           v-if="course.term"
-          class="mb-4 text-sm text-warm-600 dark:text-zinc-400"
+          class="mb-4 text-sm text-theme-600 dark:text-zinc-400"
         >
           {{ toSemesterDisplay(course.term) }}
         </div>
@@ -194,11 +194,11 @@ function examReferenceUrl(reference) {
 
       <!-- Course Information -->
       <div
-        class="mb-6 rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="mb-6 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="mb-4">
           <h2
-            class="mb-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
+            class="mb-1 text-xl font-semibold text-theme-900 dark:text-zinc-100"
           >
             課程資訊
           </h2>
@@ -206,10 +206,10 @@ function examReferenceUrl(reference) {
 
         <dl class="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div v-if="course.descriptionUrl">
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               科目內容
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               <a
                 :href="course.descriptionUrl"
                 target="_blank"
@@ -225,19 +225,19 @@ function examReferenceUrl(reference) {
           </div>
 
           <div v-if="course.creditType">
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               必/選修
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               {{ course.creditType }}
             </dd>
           </div>
 
           <div v-if="course.credits">
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               學分
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               <div class="flex items-center gap-3">
                 <div
                   class="flex items-center gap-1 text-orange-500"
@@ -250,13 +250,13 @@ function examReferenceUrl(reference) {
                   />
                   <span
                     v-if="starCount > displayStars"
-                    class="text-xs text-warm-600 dark:text-zinc-400"
+                    class="text-xs text-theme-600 dark:text-zinc-400"
                   >
                     +{{ starCount - displayStars }}
                   </span>
                 </div>
 
-                <div class="text-sm text-warm-600 dark:text-zinc-400">
+                <div class="text-sm text-theme-600 dark:text-zinc-400">
                   {{ course.credits }} 學分
                 </div>
               </div>
@@ -264,37 +264,37 @@ function examReferenceUrl(reference) {
           </div>
 
           <div v-if="course.department">
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               學系
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               {{ course.department }}
             </dd>
           </div>
 
           <div v-if="viewModel.inPersonClassType">
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               面授類別
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               {{ viewModel.inPersonClassType }}
             </dd>
           </div>
 
           <div v-if="viewModel.media">
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               媒體
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               {{ viewModel.media }}
             </dd>
           </div>
 
           <div v-if="viewModel.multimediaUrl">
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               多媒體簡介
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               <a
                 :href="viewModel.multimediaUrl"
                 target="_blank"
@@ -308,10 +308,10 @@ function examReferenceUrl(reference) {
           </div>
 
           <div v-if="course.nature">
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               課程性質
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               {{ course.nature }}
             </dd>
           </div>
@@ -324,20 +324,20 @@ function examReferenceUrl(reference) {
               course.examTimeEnd
             "
           >
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               考試資訊
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               <div v-if="course.midtermDate" class="mb-2">
                 <div class="font-semibold">期中考</div>
                 <div
-                  class="flex items-center justify-start gap-x-2 text-sm text-warm-700 tabular-nums dark:text-zinc-300"
+                  class="flex items-center justify-start gap-x-2 text-sm text-theme-700 tabular-nums dark:text-zinc-300"
                 >
                   <div>{{ formatSessionDate(course.midtermDate) }}</div>
 
                   <div
                     v-if="course.examTimeStart || course.examTimeEnd"
-                    class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
+                    class="text-sm whitespace-nowrap text-theme-600 dark:text-zinc-400"
                   >
                     <template v-if="course.examTimeStart && course.examTimeEnd">
                       {{ course.examTimeStart }} - {{ course.examTimeEnd }}
@@ -352,13 +352,13 @@ function examReferenceUrl(reference) {
               <div v-if="course.finalDate">
                 <div class="font-semibold">期末考</div>
                 <div
-                  class="flex items-center justify-start gap-x-2 text-sm text-warm-700 tabular-nums dark:text-zinc-300"
+                  class="flex items-center justify-start gap-x-2 text-sm text-theme-700 tabular-nums dark:text-zinc-300"
                 >
                   <div>{{ formatSessionDate(course.finalDate) }}</div>
 
                   <div
                     v-if="course.examTimeStart || course.examTimeEnd"
-                    class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
+                    class="text-sm whitespace-nowrap text-theme-600 dark:text-zinc-400"
                   >
                     <template v-if="course.examTimeStart && course.examTimeEnd">
                       {{ course.examTimeStart }} - {{ course.examTimeEnd }}
@@ -377,33 +377,33 @@ function examReferenceUrl(reference) {
       <!-- 教科書資訊 -->
       <div
         v-if="course.textbook !== null"
-        class="mb-6 rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="mb-6 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="mb-4">
           <h2
-            class="mb-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
+            class="mb-1 text-xl font-semibold text-theme-900 dark:text-zinc-100"
           >
             教科書資訊
           </h2>
         </div>
 
         <dl
-          class="grid grid-cols-1 gap-6 text-warm-700 md:grid-cols-2 dark:text-zinc-300"
+          class="grid grid-cols-1 gap-6 text-theme-700 md:grid-cols-2 dark:text-zinc-300"
         >
           <div>
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               書名
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               {{ course.textbook.bookTitle }}
             </dd>
           </div>
 
           <div v-if="course.textbook.edition">
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               版本
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               {{ course.textbook.edition }}
             </dd>
           </div>
@@ -414,27 +414,27 @@ function examReferenceUrl(reference) {
               !Number.isNaN(Number(course.textbook.priceInfo))
             "
           >
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               價格
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               ${{ Number(course.textbook.priceInfo).toLocaleString() }}
             </dd>
           </div>
           <div v-else-if="course.textbook.priceInfo">
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               坊間教科書資訊
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               {{ course.textbook.priceInfo }}
             </dd>
           </div>
 
           <div v-if="course.textbook.referenceUrl">
-            <dt class="mb-2 font-semibold text-warm-900 dark:text-zinc-100">
+            <dt class="mb-2 font-semibold text-theme-900 dark:text-zinc-100">
               參考連結
             </dt>
-            <dd class="text-warm-700 dark:text-zinc-300">
+            <dd class="text-theme-700 dark:text-zinc-300">
               <a
                 :href="course.textbook.referenceUrl"
                 target="_blank"
@@ -452,11 +452,11 @@ function examReferenceUrl(reference) {
       <!-- Course Classes -->
       <div
         v-if="course.classes.length > 0"
-        class="mb-6 rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="mb-6 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="mb-4">
           <h2
-            class="mb-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
+            class="mb-1 text-xl font-semibold text-theme-900 dark:text-zinc-100"
           >
             視訊面授班級與上課時間
           </h2>
@@ -464,7 +464,7 @@ function examReferenceUrl(reference) {
 
         <div class="space-y-6">
           <div v-for="group in classesByType" :key="group.type">
-            <div class="mb-3 font-semibold text-warm-900 dark:text-zinc-100">
+            <div class="mb-3 font-semibold text-theme-900 dark:text-zinc-100">
               {{ group.label }}
             </div>
 
@@ -472,19 +472,19 @@ function examReferenceUrl(reference) {
               <div
                 v-for="courseClass in group.classes"
                 :key="courseClass.id"
-                class="rounded-lg border-2 border-warm-200 bg-warm-50 p-4 dark:border-zinc-700 dark:bg-zinc-950"
+                class="rounded-lg border-2 border-theme-200 bg-theme-50 p-4 dark:border-zinc-700 dark:bg-zinc-950"
               >
                 <div class="mb-3">
                   <div class="flex items-start justify-between">
                     <div>
                       <div
-                        class="font-semibold text-warm-900 dark:text-zinc-100"
+                        class="font-semibold text-theme-900 dark:text-zinc-100"
                       >
                         {{ courseClass.code }}
                       </div>
                       <div
                         v-if="courseClass.teacherName"
-                        class="mt-1 truncate text-sm text-warm-700 dark:text-zinc-300"
+                        class="mt-1 truncate text-sm text-theme-700 dark:text-zinc-300"
                       >
                         <span
                           v-if="
@@ -505,7 +505,7 @@ function examReferenceUrl(reference) {
                       </div>
                     </div>
                     <div
-                      class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
+                      class="text-sm whitespace-nowrap text-theme-600 dark:text-zinc-400"
                     >
                       <div v-if="courseClass.startTime">
                         {{ courseClass.startTime }} - {{ courseClass.endTime }}
@@ -534,7 +534,7 @@ function examReferenceUrl(reference) {
                     :href="courseClass.backupClassroomUrl"
                     target="_blank"
                     rel="noopener"
-                    class="inline-flex items-center gap-1 rounded-full border border-warm-200 bg-white px-3 py-1.5 text-sm font-semibold text-warm-700 transition hover:bg-warm-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                    class="inline-flex items-center gap-1 rounded-full border border-theme-200 bg-white px-3 py-1.5 text-sm font-semibold text-theme-700 transition hover:bg-theme-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900"
                   >
                     <Icon name="squares-plus" class="size-4" />
                     備用教室
@@ -546,13 +546,13 @@ function examReferenceUrl(reference) {
                   class="mt-2 rounded bg-white p-3 dark:bg-zinc-900"
                 >
                   <p
-                    class="mb-2 text-sm font-semibold text-warm-900 dark:text-zinc-100"
+                    class="mb-2 text-sm font-semibold text-theme-900 dark:text-zinc-100"
                   >
                     視訊面授日期：
                   </p>
 
                   <div
-                    class="space-y-1 text-sm text-warm-700 dark:text-zinc-300"
+                    class="space-y-1 text-sm text-theme-700 dark:text-zinc-300"
                   >
                     <div
                       v-for="entry in sessionsByDate(courseClass.sessions)"
@@ -565,7 +565,7 @@ function examReferenceUrl(reference) {
 
                       <div
                         v-if="entry.session.startTime || entry.session.endTime"
-                        class="text-sm whitespace-nowrap text-warm-600 dark:text-zinc-400"
+                        class="text-sm whitespace-nowrap text-theme-600 dark:text-zinc-400"
                       >
                         <template
                           v-if="
@@ -582,7 +582,10 @@ function examReferenceUrl(reference) {
                     </div>
                   </div>
                 </div>
-                <p v-else class="mt-2 text-sm text-warm-600 dark:text-zinc-400">
+                <p
+                  v-else
+                  class="mt-2 text-sm text-theme-600 dark:text-zinc-400"
+                >
                   未設定上課時間
                 </p>
               </div>
@@ -595,11 +598,11 @@ function examReferenceUrl(reference) {
       <div
         v-if="viewModel.previousSchedule && course.previousExams.length > 0"
         id="previous-exams"
-        class="mb-6 rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900 print:hidden"
+        class="mb-6 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900 print:hidden"
       >
         <div class="mb-4">
           <h2
-            class="mb-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
+            class="mb-1 text-xl font-semibold text-theme-900 dark:text-zinc-100"
           >
             考古題
           </h2>
@@ -610,15 +613,15 @@ function examReferenceUrl(reference) {
           <div
             v-for="(exam, index) in course.previousExams"
             :key="index"
-            class="rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+            class="rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
           >
-            <div class="mb-3 font-semibold text-warm-900 dark:text-zinc-100">
+            <div class="mb-3 font-semibold text-theme-900 dark:text-zinc-100">
               {{ exam.term ?? '-' }}
             </div>
 
             <div class="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <p class="mb-1 font-semibold text-warm-600 dark:text-zinc-400">
+                <p class="mb-1 font-semibold text-theme-600 dark:text-zinc-400">
                   期中考正參
                 </p>
                 <a
@@ -633,11 +636,11 @@ function examReferenceUrl(reference) {
                   正參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
                 </a>
-                <span v-else class="text-warm-500 dark:text-zinc-400">—</span>
+                <span v-else class="text-theme-500 dark:text-zinc-400">—</span>
               </div>
 
               <div>
-                <p class="mb-1 font-semibold text-warm-600 dark:text-zinc-400">
+                <p class="mb-1 font-semibold text-theme-600 dark:text-zinc-400">
                   期中考副參
                 </p>
                 <a
@@ -652,11 +655,11 @@ function examReferenceUrl(reference) {
                   副參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
                 </a>
-                <span v-else class="text-warm-500 dark:text-zinc-400">—</span>
+                <span v-else class="text-theme-500 dark:text-zinc-400">—</span>
               </div>
 
               <div>
-                <p class="mb-1 font-semibold text-warm-600 dark:text-zinc-400">
+                <p class="mb-1 font-semibold text-theme-600 dark:text-zinc-400">
                   期末考正參
                 </p>
                 <a
@@ -671,11 +674,11 @@ function examReferenceUrl(reference) {
                   正參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
                 </a>
-                <span v-else class="text-warm-500 dark:text-zinc-400">—</span>
+                <span v-else class="text-theme-500 dark:text-zinc-400">—</span>
               </div>
 
               <div>
-                <p class="mb-1 font-semibold text-warm-600 dark:text-zinc-400">
+                <p class="mb-1 font-semibold text-theme-600 dark:text-zinc-400">
                   期末考副參
                 </p>
                 <a
@@ -690,7 +693,7 @@ function examReferenceUrl(reference) {
                   副參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
                 </a>
-                <span v-else class="text-warm-500 dark:text-zinc-400">—</span>
+                <span v-else class="text-theme-500 dark:text-zinc-400">—</span>
               </div>
             </div>
           </div>
@@ -705,36 +708,36 @@ function examReferenceUrl(reference) {
               考古題
             </caption>
             <thead
-              class="border-b-2 border-warm-300 bg-warm-100 dark:border-zinc-600 dark:bg-zinc-900"
+              class="border-b-2 border-theme-300 bg-theme-100 dark:border-zinc-600 dark:bg-zinc-900"
             >
               <tr>
                 <th
                   scope="col"
-                  class="px-4 py-3 text-center font-bold text-warm-900 dark:text-zinc-100"
+                  class="px-4 py-3 text-center font-bold text-theme-900 dark:text-zinc-100"
                 >
                   學期
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 text-center font-bold text-warm-900 dark:text-zinc-100"
+                  class="px-4 py-3 text-center font-bold text-theme-900 dark:text-zinc-100"
                 >
                   期中考正參
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 text-center font-bold text-warm-900 dark:text-zinc-100"
+                  class="px-4 py-3 text-center font-bold text-theme-900 dark:text-zinc-100"
                 >
                   期中考副參
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 text-center font-bold text-warm-900 dark:text-zinc-100"
+                  class="px-4 py-3 text-center font-bold text-theme-900 dark:text-zinc-100"
                 >
                   期末考正參
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 text-center font-bold text-warm-900 dark:text-zinc-100"
+                  class="px-4 py-3 text-center font-bold text-theme-900 dark:text-zinc-100"
                 >
                   期末考副參
                 </th>
@@ -745,16 +748,16 @@ function examReferenceUrl(reference) {
               <tr
                 v-for="(exam, index) in course.previousExams"
                 :key="index"
-                class="border-b border-warm-200 dark:border-zinc-700"
+                class="border-b border-theme-200 dark:border-zinc-700"
               >
                 <th
                   scope="row"
-                  class="px-4 py-3 text-center font-normal text-warm-800 tabular-nums dark:text-zinc-200"
+                  class="px-4 py-3 text-center font-normal text-theme-800 tabular-nums dark:text-zinc-200"
                 >
                   {{ exam.term ?? '-' }}
                 </th>
                 <td
-                  class="px-4 py-3 text-center text-warm-800 dark:text-zinc-200"
+                  class="px-4 py-3 text-center text-theme-800 dark:text-zinc-200"
                 >
                   <a
                     v-if="exam.midtermReferencePrimary"
@@ -771,7 +774,7 @@ function examReferenceUrl(reference) {
                   <template v-else>—</template>
                 </td>
                 <td
-                  class="px-4 py-3 text-center text-warm-800 dark:text-zinc-200"
+                  class="px-4 py-3 text-center text-theme-800 dark:text-zinc-200"
                 >
                   <a
                     v-if="exam.midtermReferenceSecondary"
@@ -788,7 +791,7 @@ function examReferenceUrl(reference) {
                   <template v-else>—</template>
                 </td>
                 <td
-                  class="px-4 py-3 text-center text-warm-800 dark:text-zinc-200"
+                  class="px-4 py-3 text-center text-theme-800 dark:text-zinc-200"
                 >
                   <a
                     v-if="exam.finalReferencePrimary"
@@ -805,7 +808,7 @@ function examReferenceUrl(reference) {
                   <template v-else>—</template>
                 </td>
                 <td
-                  class="px-4 py-3 text-center text-warm-800 dark:text-zinc-200"
+                  class="px-4 py-3 text-center text-theme-800 dark:text-zinc-200"
                 >
                   <a
                     v-if="exam.finalReferenceSecondary"
@@ -829,11 +832,11 @@ function examReferenceUrl(reference) {
 
       <!-- 常用連結 -->
       <div
-        class="mb-6 w-full rounded-lg border border-warm-200 bg-white p-6 md:w-auto dark:border-zinc-700 dark:bg-zinc-900"
+        class="mb-6 w-full rounded-lg border border-theme-200 bg-white p-6 md:w-auto dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="mb-4">
           <h2
-            class="mb-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
+            class="mb-1 text-xl font-semibold text-theme-900 dark:text-zinc-100"
           >
             常用連結
           </h2>
@@ -847,7 +850,7 @@ function examReferenceUrl(reference) {
             target="_blank"
             rel="noopener noreferrer"
             data-offline-allow
-            class="flex items-center justify-center gap-2 truncate rounded border border-warm-200 bg-white px-3 py-2 text-base text-warm-700 hover:bg-warm-50 md:flex-col dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-950"
+            class="flex items-center justify-center gap-2 truncate rounded border border-theme-200 bg-white px-3 py-2 text-base text-theme-700 hover:bg-theme-50 md:flex-col dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-950"
           >
             <Icon name="academic-cap" class="size-8 md:size-16" />
             <span class="flex grow">學校官網</span>
@@ -858,7 +861,7 @@ function examReferenceUrl(reference) {
             target="_blank"
             rel="noopener noreferrer"
             data-offline-allow
-            class="flex items-center justify-center gap-2 truncate rounded border border-warm-200 bg-white px-3 py-2 text-base text-warm-700 hover:bg-warm-50 md:flex-col dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-950"
+            class="flex items-center justify-center gap-2 truncate rounded border border-theme-200 bg-white px-3 py-2 text-base text-theme-700 hover:bg-theme-50 md:flex-col dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-950"
           >
             <Icon name="computer-desktop" class="size-8 md:size-16" />
             <span class="flex grow">教務行政資訊系統</span>
@@ -869,7 +872,7 @@ function examReferenceUrl(reference) {
             target="_blank"
             rel="noopener noreferrer"
             data-offline-allow
-            class="flex items-center justify-center gap-2 truncate rounded border border-warm-200 bg-white px-3 py-2 text-base text-warm-700 hover:bg-warm-50 md:flex-col dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-950"
+            class="flex items-center justify-center gap-2 truncate rounded border border-theme-200 bg-white px-3 py-2 text-base text-theme-700 hover:bg-theme-50 md:flex-col dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-950"
           >
             <Icon name="globe-alt" class="size-8 md:size-16" />
             <span class="flex grow">數位學習平台 (UU平台)</span>
@@ -880,7 +883,7 @@ function examReferenceUrl(reference) {
           <Link
             href="/directory"
             data-offline-allow
-            class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-700 bg-warm-700 px-3 py-1 text-sm font-semibold text-white transition hover:bg-warm-800"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-3 py-1 text-sm font-semibold text-white transition hover:bg-theme-800"
           >
             連結 / 學習指導中心目錄
           </Link>
@@ -888,16 +891,16 @@ function examReferenceUrl(reference) {
       </div>
 
       <div
-        class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="mb-4">
           <h2
-            class="mb-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
+            class="mb-1 text-xl font-semibold text-theme-900 dark:text-zinc-100"
           >
             免責聲明
           </h2>
         </div>
-        <p class="text-sm text-warm-600 dark:text-zinc-400">
+        <p class="text-sm text-theme-600 dark:text-zinc-400">
           課程資料來自國立空中大學之公開資料，基於合理使用原則，以非商用、公開的方式供其他上課同學參考使用，資料版權屬於國立空中大學所有。本站只搜集課程之詮釋資料（Metadata），例如課程名稱、教師、學分數、上課時間等，不保存其他資料。
         </p>
       </div>

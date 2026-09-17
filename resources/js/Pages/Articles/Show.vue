@@ -111,25 +111,25 @@ useMarkdownContainers(sidebarContentRoot, [
         <!-- Sidebar -->
         <aside class="shrink-0 md:w-64">
           <div
-            class="sticky top-[6.45rem] rounded-lg border border-warm-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+            class="sticky top-[6.45rem] rounded-lg border border-theme-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
           >
-            <h3 class="mb-3 font-semibold text-warm-900 dark:text-zinc-100">
+            <h3 class="mb-3 font-semibold text-theme-900 dark:text-zinc-100">
               {{ typeLabel }}
             </h3>
 
             <nav
               v-if="viewModel.sidebarContent"
               ref="sidebarContentRoot"
-              class="prose prose-sm max-w-none prose-warm dark:prose-invert"
+              class="prose prose-sm max-w-none prose-theme dark:prose-invert"
               v-html="viewModel.sidebarContent"
             ></nav>
 
             <div
-              class="mt-4 border-t border-warm-200 pt-4 dark:border-zinc-700"
+              class="mt-4 border-t border-theme-200 pt-4 dark:border-zinc-700"
             >
               <Link
                 :href="indexUrl"
-                class="inline-flex items-center gap-1 text-sm text-warm-600 transition-colors hover:text-warm-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                class="inline-flex items-center gap-1 text-sm text-theme-600 transition-colors hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-100"
               >
                 <Icon name="chevron-left" class="size-3" />
                 回到{{ typeLabel }}首頁
@@ -141,20 +141,22 @@ useMarkdownContainers(sidebarContentRoot, [
         <!-- Main Content -->
         <main class="min-w-0 flex-1">
           <article
-            class="rounded-lg border border-warm-200 bg-white p-8 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+            class="rounded-lg border border-theme-200 bg-white p-8 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
           >
             <!-- Article Header -->
             <header
-              class="mb-6 border-b border-warm-200 pb-6 dark:border-zinc-700"
+              class="mb-6 border-b border-theme-200 pb-6 dark:border-zinc-700"
             >
               <div class="mb-3 flex items-start justify-between gap-4">
-                <h1 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+                <h1
+                  class="text-3xl font-bold text-theme-900 dark:text-zinc-100"
+                >
                   {{ viewModel.article.title }}
                 </h1>
 
                 <button
                   type="button"
-                  class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-warm-200 bg-white px-3 py-1 text-sm font-semibold text-warm-900 transition hover:bg-warm-50 disabled:border-warm-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:disabled:border-zinc-800"
+                  class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-theme-200 bg-white px-3 py-1 text-sm font-semibold text-theme-900 transition hover:bg-theme-50 disabled:border-theme-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:disabled:border-zinc-800"
                   data-testid="article-share-button"
                   @click="share()"
                 >
@@ -164,7 +166,7 @@ useMarkdownContainers(sidebarContentRoot, [
               </div>
 
               <div
-                class="flex items-center gap-4 text-sm text-warm-500 dark:text-zinc-400"
+                class="flex items-center gap-4 text-sm text-theme-500 dark:text-zinc-400"
               >
                 <span>作者：{{ viewModel.article.author }}</span>
                 <span
@@ -194,17 +196,17 @@ useMarkdownContainers(sidebarContentRoot, [
                     @click.self="showShareModal = false"
                   >
                     <h3
-                      class="mb-2 text-lg font-semibold text-warm-900 dark:text-zinc-100"
+                      class="mb-2 text-lg font-semibold text-theme-900 dark:text-zinc-100"
                     >
                       分享這篇文章
                     </h3>
 
                     <div
-                      class="flex items-stretch gap-3 rounded border border-warm-300 bg-white text-sm text-warm-600 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
+                      class="flex items-stretch gap-3 rounded border border-theme-300 bg-white text-sm text-theme-600 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
                     >
                       <input
                         ref="shareInput"
-                        class="flex-1 px-3 py-2 font-mono break-all text-warm-600 dark:text-zinc-400"
+                        class="flex-1 px-3 py-2 font-mono break-all text-theme-600 dark:text-zinc-400"
                         :value="shareUrl"
                         readonly
                         aria-label="文章連結"
@@ -213,7 +215,7 @@ useMarkdownContainers(sidebarContentRoot, [
 
                       <button
                         type="button"
-                        class="my-1 mr-1 inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-warm-200 bg-warm-200 px-3 py-1 text-sm font-semibold whitespace-nowrap text-warm-900 transition hover:bg-warm-300 disabled:bg-warm-100 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600 dark:disabled:bg-zinc-900"
+                        class="my-1 mr-1 inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-theme-200 bg-theme-200 px-3 py-1 text-sm font-semibold whitespace-nowrap text-theme-900 transition hover:bg-theme-300 disabled:bg-theme-100 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600 dark:disabled:bg-zinc-900"
                         :aria-pressed="copied.toString()"
                         data-testid="article-share-copy"
                         @click="copy()"
@@ -235,7 +237,7 @@ useMarkdownContainers(sidebarContentRoot, [
                     <div class="mt-4 flex justify-end">
                       <button
                         type="button"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 text-sm font-semibold text-warm-900 transition hover:bg-warm-50 disabled:border-warm-200 disabled:bg-warm-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:disabled:border-zinc-700 dark:disabled:bg-zinc-950"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 text-sm font-semibold text-theme-900 transition hover:bg-theme-50 disabled:border-theme-200 disabled:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:disabled:border-zinc-700 dark:disabled:bg-zinc-950"
                         data-testid="article-share-close"
                         @click="showShareModal = false"
                       >
@@ -250,22 +252,22 @@ useMarkdownContainers(sidebarContentRoot, [
             <!-- Article Content -->
             <div
               ref="articleContentRoot"
-              class="prose max-w-none prose-warm dark:prose-zinc dark:prose-invert"
+              class="prose max-w-none prose-theme dark:prose-zinc dark:prose-invert"
               v-html="viewModel.article.content"
             ></div>
 
             <!-- License Footer -->
             <footer
-              class="mt-8 border-t border-warm-200 pt-6 dark:border-zinc-700"
+              class="mt-8 border-t border-theme-200 pt-6 dark:border-zinc-700"
             >
               <div
-                class="flex items-center gap-3 text-sm text-warm-600 dark:text-zinc-400"
+                class="flex items-center gap-3 text-sm text-theme-600 dark:text-zinc-400"
               >
                 <Icon name="information-circle" class="size-5 shrink-0" />
 
                 <div>
                   <p
-                    class="sr-only font-medium text-warm-700 dark:text-zinc-300"
+                    class="sr-only font-medium text-theme-700 dark:text-zinc-300"
                   >
                     授權方式
                   </p>
@@ -275,7 +277,7 @@ useMarkdownContainers(sidebarContentRoot, [
                       href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="text-warm-700 underline transition hover:text-warm-900 hover:no-underline dark:text-zinc-300 dark:hover:text-zinc-100"
+                      class="text-theme-700 underline transition hover:text-theme-900 hover:no-underline dark:text-zinc-300 dark:hover:text-zinc-100"
                     >
                       創用 CC 姓名標示─非商業性─相同方式分享 4.0 國際版授權條款
                       (CC BY-NC-SA 4.0)

@@ -289,12 +289,12 @@ onUnmounted(() => {
       <div
         class="flex flex-col flex-wrap items-start justify-center gap-2 text-sm"
       >
-        <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+        <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
           優惠店家詳情
         </h2>
         <Link
           href="/discount-stores"
-          class="inline-flex items-center gap-1 text-warm-600 transition hover:text-warm-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100"
+          class="inline-flex items-center gap-1 text-theme-600 transition hover:text-theme-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100"
         >
           <Icon name="chevron-left" class="size-4" />
           回到優惠店家列表
@@ -302,12 +302,12 @@ onUnmounted(() => {
       </div>
 
       <div
-        class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="space-y-4">
           <div class="flex flex-wrap items-center gap-2 text-sm">
             <span
-              class="rounded-full bg-warm-100 px-3 py-1 font-medium text-warm-800 dark:bg-zinc-900 dark:text-zinc-200"
+              class="rounded-full bg-theme-100 px-3 py-1 font-medium text-theme-800 dark:bg-zinc-900 dark:text-zinc-200"
             >
               <DynamicHeroIcon
                 v-if="viewModel.categoryIcon"
@@ -324,7 +324,7 @@ onUnmounted(() => {
 
             <span
               v-if="viewModel.city"
-              class="text-warm-500 dark:text-zinc-400"
+              class="text-theme-500 dark:text-zinc-400"
             >
               {{ viewModel.city }} {{ viewModel.district }}
             </span>
@@ -337,13 +337,13 @@ onUnmounted(() => {
             </span>
           </div>
 
-          <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+          <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
             {{ viewModel.name }}
           </h2>
 
           <p
             v-if="viewModel.address"
-            class="flex items-center gap-1 text-sm text-warm-600 dark:text-zinc-400"
+            class="flex items-center gap-1 text-sm text-theme-600 dark:text-zinc-400"
           >
             <template v-if="viewModel.typeValue === 'online'">
               <template
@@ -385,10 +385,10 @@ onUnmounted(() => {
             v-show="shouldShowMap"
             ref="mapContainer"
             data-testid="store-map"
-            class="h-80 w-full rounded-lg border border-warm-100 dark:border-zinc-800"
+            class="h-80 w-full rounded-lg border border-theme-100 dark:border-zinc-800"
           ></div>
 
-          <div class="text-sm text-warm-700 dark:text-zinc-300">
+          <div class="text-sm text-theme-700 dark:text-zinc-300">
             <p class="wrap-break-word">
               <span class="font-medium">優惠內容：</span>
               <span class="whitespace-pre-line">{{
@@ -406,17 +406,17 @@ onUnmounted(() => {
 
           <p
             v-if="viewModel.notes"
-            class="text-sm wrap-break-word text-warm-500 dark:text-zinc-400"
+            class="text-sm wrap-break-word text-theme-500 dark:text-zinc-400"
           >
             備註：
             <span class="whitespace-pre-line">{{ viewModel.notes }}</span>
           </p>
 
           <div
-            class="space-y-2 rounded-lg border border-warm-100 bg-warm-50 px-4 py-3 text-sm text-warm-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
+            class="space-y-2 rounded-lg border border-theme-100 bg-theme-50 px-4 py-3 text-sm text-theme-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
           >
             <div class="flex flex-wrap items-center gap-2">
-              <p class="font-medium text-warm-900 dark:text-zinc-100">
+              <p class="font-medium text-theme-900 dark:text-zinc-100">
                 最新回報
               </p>
               <span
@@ -438,26 +438,26 @@ onUnmounted(() => {
 
             <div v-if="latestReport" class="space-y-1">
               <p
-                class="text-sm wrap-break-word text-warm-700 dark:text-zinc-300"
+                class="text-sm wrap-break-word text-theme-700 dark:text-zinc-300"
               >
                 <span class="whitespace-pre-line">{{
                   latestReport.comment || '（無補充說明）'
                 }}</span>
               </p>
 
-              <p class="text-xs text-warm-500 dark:text-zinc-400">
+              <p class="text-xs text-theme-500 dark:text-zinc-400">
                 {{ latestReport.createdAtHuman }}
               </p>
             </div>
 
             <details
               v-if="latestReport && recentReports.length > 0"
-              class="rounded-lg border border-warm-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
+              class="rounded-lg border border-theme-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900"
               :open="recentReportsExpanded"
               @toggle="recentReportsExpanded = $event.target.open"
             >
               <summary
-                class="cursor-pointer text-sm font-medium text-warm-700 dark:text-zinc-300"
+                class="cursor-pointer text-sm font-medium text-theme-700 dark:text-zinc-300"
               >
                 展開看更多近期回報（{{ recentReports.length }}）
               </summary>
@@ -465,7 +465,7 @@ onUnmounted(() => {
                 <div
                   v-for="(report, index) in recentReports"
                   :key="index"
-                  class="rounded-md border border-warm-100 bg-warm-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-950"
+                  class="rounded-md border border-theme-100 bg-theme-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-950"
                 >
                   <p
                     class="inline-flex items-center gap-1 text-sm font-medium"
@@ -482,13 +482,13 @@ onUnmounted(() => {
                     {{ report.isValid ? '有效' : '無效' }}
                   </p>
                   <p
-                    class="mt-1 text-sm wrap-break-word text-warm-700 dark:text-zinc-300"
+                    class="mt-1 text-sm wrap-break-word text-theme-700 dark:text-zinc-300"
                   >
                     <span class="whitespace-pre-line">{{
                       report.comment || '（無補充說明）'
                     }}</span>
                   </p>
-                  <p class="mt-1 text-xs text-warm-500 dark:text-zinc-400">
+                  <p class="mt-1 text-xs text-theme-500 dark:text-zinc-400">
                     {{ report.createdAtHuman }}
                   </p>
                 </div>
@@ -497,16 +497,16 @@ onUnmounted(() => {
 
             <p
               v-if="!latestReport"
-              class="text-sm text-warm-600 dark:text-zinc-400"
+              class="text-sm text-theme-600 dark:text-zinc-400"
             >
               目前還沒有回報資料。
             </p>
           </div>
 
           <div
-            class="flex flex-col gap-2 border-t border-warm-100 pt-3 dark:border-zinc-800"
+            class="flex flex-col gap-2 border-t border-theme-100 pt-3 dark:border-zinc-800"
           >
-            <p class="text-sm text-warm-600 dark:text-zinc-400">
+            <p class="text-sm text-theme-600 dark:text-zinc-400">
               使用了本優惠嗎？請協助回報優惠的有效性，讓其他同學參考！
             </p>
             <div class="flex items-center gap-2">
@@ -543,7 +543,7 @@ onUnmounted(() => {
             class="mx-4 w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-900"
           >
             <h3
-              class="mb-4 text-lg font-semibold text-warm-900 dark:text-zinc-100"
+              class="mb-4 text-lg font-semibold text-theme-900 dark:text-zinc-100"
             >
               回報「{{ viewModel.name }}」{{ pendingIsValid ? '有效' : '無效' }}
             </h3>
@@ -551,7 +551,7 @@ onUnmounted(() => {
               <div>
                 <label
                   for="report-comment"
-                  class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+                  class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
                 >
                   備註（選填）
                 </label>
@@ -559,7 +559,7 @@ onUnmounted(() => {
                   id="report-comment"
                   v-model="reportForm.comment"
                   rows="2"
-                  class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                  class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                   placeholder="補充說明..."
                 ></textarea>
               </div>
@@ -587,7 +587,7 @@ onUnmounted(() => {
                 </button>
                 <button
                   type="button"
-                  class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-700 transition hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 transition hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                   @click="closeReportModal()"
                 >
                   取消
@@ -608,31 +608,31 @@ onUnmounted(() => {
             class="mx-4 w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-900"
           >
             <h3
-              class="mb-4 text-lg font-semibold text-warm-900 dark:text-zinc-100"
+              class="mb-4 text-lg font-semibold text-theme-900 dark:text-zinc-100"
             >
               選擇地圖 App
             </h3>
-            <p class="mb-6 text-sm text-warm-600 dark:text-zinc-400">
+            <p class="mb-6 text-sm text-theme-600 dark:text-zinc-400">
               選擇你慣用的地圖應用程式來檢視店家位置。
             </p>
             <div class="space-y-2">
               <button
                 type="button"
-                class="w-full rounded-lg border border-warm-200 px-4 py-3 text-center text-sm font-medium text-warm-700 transition hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                class="w-full rounded-lg border border-theme-200 px-4 py-3 text-center text-sm font-medium text-theme-700 transition hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                 @click="openInMap('osm')"
               >
                 在 OpenStreetMap 開啟
               </button>
               <button
                 type="button"
-                class="w-full rounded-lg border border-warm-200 px-4 py-3 text-center text-sm font-medium text-warm-700 transition hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                class="w-full rounded-lg border border-theme-200 px-4 py-3 text-center text-sm font-medium text-theme-700 transition hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                 @click="openInMap('apple')"
               >
                 在 Apple 地圖開啟
               </button>
               <button
                 type="button"
-                class="w-full rounded-lg border border-warm-200 px-4 py-3 text-center text-sm font-medium text-warm-700 transition hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                class="w-full rounded-lg border border-theme-200 px-4 py-3 text-center text-sm font-medium text-theme-700 transition hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                 @click="openInMap('google')"
               >
                 在 Google 地圖開啟
@@ -640,7 +640,7 @@ onUnmounted(() => {
             </div>
             <button
               type="button"
-              class="mt-4 w-full rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-700 transition hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+              class="mt-4 w-full rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 transition hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
               @click="closeMapSelectionModal()"
             >
               關閉
@@ -651,16 +651,16 @@ onUnmounted(() => {
 
       <div
         v-if="viewModel.comments.length > 0"
-        class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="space-y-2">
           <h3
-            class="flex items-center gap-1 text-base font-semibold text-warm-700 dark:text-zinc-300"
+            class="flex items-center gap-1 text-base font-semibold text-theme-700 dark:text-zinc-300"
           >
             留言
             <span
               v-if="viewModel.commentsCount > 0"
-              class="inline-flex items-center gap-1 rounded-full bg-warm-100 px-2 py-0.5 text-xs font-medium text-warm-800 dark:bg-zinc-900 dark:text-zinc-200"
+              class="inline-flex items-center gap-1 rounded-full bg-theme-100 px-2 py-0.5 text-xs font-medium text-theme-800 dark:bg-zinc-900 dark:text-zinc-200"
             >
               {{ viewModel.commentsCount }}
             </span>
@@ -668,17 +668,17 @@ onUnmounted(() => {
           <div
             v-for="(comment, index) in viewModel.comments"
             :key="index"
-            class="rounded-lg bg-warm-50 px-3 py-2 text-sm text-warm-700 dark:bg-zinc-950 dark:text-zinc-300"
+            class="rounded-lg bg-theme-50 px-3 py-2 text-sm text-theme-700 dark:bg-zinc-950 dark:text-zinc-300"
           >
             <p
-              class="mb-2 text-sm font-medium text-warm-900 dark:text-zinc-100"
+              class="mb-2 text-sm font-medium text-theme-900 dark:text-zinc-100"
             >
               {{ comment.nickname }}
             </p>
             <p class="wrap-break-word whitespace-pre-line">
               {{ comment.content }}
             </p>
-            <span class="text-xs text-warm-400 dark:text-zinc-500">
+            <span class="text-xs text-theme-400 dark:text-zinc-500">
               — {{ comment.createdAtHuman }}
             </span>
           </div>
@@ -686,18 +686,18 @@ onUnmounted(() => {
       </div>
 
       <div
-        class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="space-y-2">
-          <h3 class="text-base font-semibold text-warm-700 dark:text-zinc-300">
+          <h3 class="text-base font-semibold text-theme-700 dark:text-zinc-300">
             新增留言
           </h3>
-          <p class="text-sm text-warm-600 dark:text-zinc-400">
+          <p class="text-sm text-theme-600 dark:text-zinc-400">
             歡迎分享使用經驗，留言會在確認後顯示。
           </p>
           <button
             type="button"
-            class="inline-flex items-center gap-1 rounded-lg bg-warm-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-warm-900"
+            class="inline-flex items-center gap-1 rounded-lg bg-theme-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-theme-900"
             @click="openCommentModal()"
           >
             <Icon name="chat-bubble-left" class="size-4" />
@@ -716,7 +716,7 @@ onUnmounted(() => {
             class="mx-4 w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-900"
           >
             <h3
-              class="mb-4 text-lg font-semibold text-warm-900 dark:text-zinc-100"
+              class="mb-4 text-lg font-semibold text-theme-900 dark:text-zinc-100"
             >
               新增留言
             </h3>
@@ -725,14 +725,14 @@ onUnmounted(() => {
                 <input
                   v-model="commentForm.nickname"
                   type="text"
-                  class="rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                  class="rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                   placeholder="暱稱"
                   maxlength="100"
                   required
                 />
                 <textarea
                   v-model="commentForm.content"
-                  class="flex-1 rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                  class="flex-1 rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                   placeholder="留言（確認後顯示）..."
                   maxlength="1000"
                   rows="5"
@@ -748,13 +748,13 @@ onUnmounted(() => {
                   {{ commentForm.errors['cf-turnstile-response'] }}
                 </p>
               </div>
-              <p class="text-xs text-warm-500 dark:text-zinc-400">
+              <p class="text-xs text-theme-500 dark:text-zinc-400">
                 為避免垃圾留言，留言將由管理員確認後才會顯示出來。
               </p>
               <div class="flex items-center gap-2">
                 <button
                   type="submit"
-                  class="inline-flex items-center gap-1 rounded-lg bg-warm-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-warm-900 disabled:bg-gray-400"
+                  class="inline-flex items-center gap-1 rounded-lg bg-theme-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-theme-900 disabled:bg-gray-400"
                   :disabled="
                     commentForm.processing || !commentChallengeExecuted
                   "
@@ -764,7 +764,7 @@ onUnmounted(() => {
                 </button>
                 <button
                   type="button"
-                  class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-700 transition hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 transition hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                   @click="closeCommentModal()"
                 >
                   取消

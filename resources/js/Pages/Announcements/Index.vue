@@ -125,7 +125,7 @@ function isExpired(announcement) {
         class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
       >
         <div class="space-y-2">
-          <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+          <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
             學校公告
           </h2>
         </div>
@@ -134,7 +134,7 @@ function isExpired(announcement) {
       <div class="grid gap-6 lg:grid-cols-12 lg:items-start">
         <button
           type="button"
-          class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-200 bg-white px-4 py-2 text-sm font-medium text-warm-800 shadow-sm transition hover:border-warm-300 hover:bg-warm-50 lg:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
+          class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-200 bg-white px-4 py-2 text-sm font-medium text-theme-800 shadow-sm transition hover:border-theme-300 hover:bg-theme-50 lg:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
           :aria-expanded="isFilterPanelOpen"
           aria-controls="announcement-filter-panel"
           @click="isFilterPanelOpen = !isFilterPanelOpen"
@@ -150,11 +150,11 @@ function isExpired(announcement) {
           :class="isFilterPanelOpen ? 'block' : 'hidden lg:block'"
         >
           <div
-            class="rounded-lg border border-warm-200 bg-white p-6 lg:sticky lg:top-6 dark:border-zinc-700 dark:bg-zinc-900"
+            class="rounded-lg border border-theme-200 bg-white p-6 lg:sticky lg:top-6 dark:border-zinc-700 dark:bg-zinc-900"
           >
             <div class="mb-4">
               <h2
-                class="mb-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
+                class="mb-1 text-xl font-semibold text-theme-900 dark:text-zinc-100"
               >
                 選擇來源
               </h2>
@@ -164,7 +164,7 @@ function isExpired(announcement) {
               <form method="GET" action="/announcements" class="space-y-4">
                 <button
                   type="button"
-                  class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-700 transition hover:border-warm-300 hover:bg-warm-50 lg:hidden dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
+                  class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 transition hover:border-theme-300 hover:bg-theme-50 lg:hidden dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
                   @click="isFilterPanelOpen = false"
                 >
                   <Icon name="eye-slash" class="size-4" />
@@ -172,26 +172,26 @@ function isExpired(announcement) {
                 </button>
 
                 <div
-                  class="max-h-[60vh] space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-warm-200 p-2 dark:border-zinc-700"
+                  class="max-h-[60vh] space-y-2 overflow-y-auto overscroll-contain rounded-xl border border-theme-200 p-2 dark:border-zinc-700"
                 >
                   <section
                     v-for="(categories, source) in sourceCategoryTree"
                     :key="source"
-                    class="overflow-hidden rounded-lg border border-warm-200 p-1 dark:border-zinc-700"
+                    class="overflow-hidden rounded-lg border border-theme-200 p-1 dark:border-zinc-700"
                   >
                     <div class="flex items-center justify-between gap-2">
                       <label
-                        class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition hover:bg-warm-50 dark:hover:bg-zinc-950"
+                        class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition hover:bg-theme-50 dark:hover:bg-zinc-950"
                       >
                         <input
                           type="checkbox"
-                          class="size-4 rounded border-warm-300 text-warm-700 focus:ring-warm-300 dark:border-zinc-600 dark:text-zinc-300"
+                          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600 dark:text-zinc-300"
                           :checked="isSourceChecked(source)"
                           :indeterminate="isSourceIndeterminate(source)"
                           @change="toggleSource(source, $event.target.checked)"
                         />
                         <span
-                          class="min-w-0 truncate text-sm font-semibold text-warm-900 dark:text-zinc-100"
+                          class="min-w-0 truncate text-sm font-semibold text-theme-900 dark:text-zinc-100"
                         >
                           {{ source }}
                         </span>
@@ -200,7 +200,7 @@ function isExpired(announcement) {
                       <button
                         v-if="categories.length > 0"
                         type="button"
-                        class="inline-flex items-center rounded-md p-2 text-warm-600 transition hover:bg-warm-100 hover:text-warm-800 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-200"
+                        class="inline-flex items-center rounded-md p-2 text-theme-600 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-200"
                         :aria-expanded="isSourceExpanded(source)"
                         :aria-label="'展開或收合 ' + source + ' 分類'"
                         @click="toggleSourceExpansion(source)"
@@ -221,13 +221,13 @@ function isExpired(announcement) {
                       <label
                         v-for="category in categories"
                         :key="category"
-                        class="flex min-w-0 cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 text-sm text-warm-700 transition hover:bg-warm-50 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                        class="flex min-w-0 cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 text-sm text-theme-700 transition hover:bg-theme-50 dark:text-zinc-300 dark:hover:bg-zinc-950"
                       >
                         <input
                           type="checkbox"
                           :name="`source_categories[${source}][]`"
                           :value="category"
-                          class="size-4 rounded border-warm-300 text-orange-600 focus:ring-orange-300 dark:border-zinc-600"
+                          class="size-4 rounded border-theme-300 text-orange-600 focus:ring-orange-300 dark:border-zinc-600"
                           :checked="isCategoryChecked(source, category)"
                           @change="
                             toggleCategory(
@@ -248,7 +248,7 @@ function isExpired(announcement) {
                 >
                   <button
                     type="submit"
-                    class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-warm-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-warm-900 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-theme-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-theme-900 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
                   >
                     <Icon name="funnel" class="size-4" />
                     套用篩選
@@ -256,14 +256,14 @@ function isExpired(announcement) {
 
                   <Link
                     href="/announcements"
-                    class="inline-flex w-full items-center justify-center gap-2 rounded-md border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 transition-colors hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-md border border-theme-200 px-4 py-2 text-sm font-medium text-theme-700 transition-colors hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                   >
                     清除條件
                   </Link>
 
                   <button
                     type="button"
-                    class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-700 transition hover:border-warm-300 hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 transition hover:border-theme-300 hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
                     @click="state.selected = {}"
                   >
                     <Icon name="x-mark" class="size-4" />
@@ -276,13 +276,13 @@ function isExpired(announcement) {
         </aside>
 
         <section class="space-y-4 lg:col-span-8 xl:col-span-9">
-          <h3 class="text-lg font-semibold text-warm-800 dark:text-zinc-200">
+          <h3 class="text-lg font-semibold text-theme-800 dark:text-zinc-200">
             所選來源公告
           </h3>
 
           <div
             v-if="Object.keys(state.selected).length > 0"
-            class="mt-4 flex flex-col gap-y-1 text-sm text-warm-600 dark:text-zinc-400"
+            class="mt-4 flex flex-col gap-y-1 text-sm text-theme-600 dark:text-zinc-400"
           >
             <span class="font-medium">目前條件：</span>
 
@@ -294,7 +294,7 @@ function isExpired(announcement) {
                 :key="selectedSource"
               >
                 <span
-                  class="rounded-full border border-warm-200 bg-warm-100 px-3 py-1 font-medium text-warm-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                  class="rounded-full border border-theme-200 bg-theme-100 px-3 py-1 font-medium text-theme-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
                 >
                   {{ selectedSource }}
                 </span>
@@ -311,7 +311,7 @@ function isExpired(announcement) {
           </div>
           <div
             v-else-if="totalSelectedCategories > 0"
-            class="mt-4 text-sm text-warm-600 dark:text-zinc-400"
+            class="mt-4 text-sm text-theme-600 dark:text-zinc-400"
           >
             目前條件：已勾選 {{ totalSelectedCategories }} 個分類
           </div>
@@ -320,7 +320,7 @@ function isExpired(announcement) {
             <article
               v-for="announcement in viewModel.announcements.data"
               :key="announcement.url"
-              class="rounded-lg border border-warm-200 bg-white p-5 transition hover:border-warm-300 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600"
+              class="rounded-lg border border-theme-200 bg-white p-5 transition hover:border-theme-300 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600"
             >
               <div
                 class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
@@ -328,7 +328,7 @@ function isExpired(announcement) {
                 <div class="min-w-0 flex-1 space-y-3">
                   <div class="flex flex-wrap items-center gap-2 text-sm">
                     <span
-                      class="rounded-full bg-warm-100 px-3 py-1 font-medium text-warm-800 dark:bg-zinc-800 dark:text-zinc-200"
+                      class="rounded-full bg-theme-100 px-3 py-1 font-medium text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
                     >
                       {{ announcement.source_name }}
                     </span>
@@ -348,7 +348,7 @@ function isExpired(announcement) {
                   </div>
 
                   <h3
-                    class="min-w-0 text-xl leading-8 font-semibold text-warm-900 dark:text-zinc-100"
+                    class="min-w-0 text-xl leading-8 font-semibold text-theme-900 dark:text-zinc-100"
                   >
                     <a
                       :href="announcement.url"
@@ -359,7 +359,7 @@ function isExpired(announcement) {
                       <span
                         v-for="tag in announcement.tags ?? []"
                         :key="tag"
-                        class="mr-1 truncate rounded border border-warm-200 px-1 py-0.5 text-sm text-warm-600 dark:border-zinc-700 dark:text-zinc-400"
+                        class="mr-1 truncate rounded border border-theme-200 px-1 py-0.5 text-sm text-theme-600 dark:border-zinc-700 dark:text-zinc-400"
                         >{{ tag }}</span
                       >
 
@@ -371,7 +371,7 @@ function isExpired(announcement) {
                 <div
                   class="flex shrink-0 flex-col items-start gap-3 lg:items-end"
                 >
-                  <p class="text-xs text-warm-500 dark:text-zinc-400">
+                  <p class="text-xs text-theme-500 dark:text-zinc-400">
                     <span class="sr-only">發布時間：</span>
                     {{ formatDate(announcement.published_at) }}
                   </p>
@@ -381,22 +381,22 @@ function isExpired(announcement) {
 
             <div
               v-if="viewModel.announcements.data.length === 0"
-              class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+              class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
             >
               <div
                 class="flex min-h-56 flex-col items-center justify-center gap-3 text-center"
               >
                 <Icon
                   name="inbox"
-                  class="size-10 text-warm-400 dark:text-zinc-500"
+                  class="size-10 text-theme-400 dark:text-zinc-500"
                 />
                 <div class="space-y-1">
                   <h3
-                    class="text-xl font-semibold text-warm-800 dark:text-zinc-200"
+                    class="text-xl font-semibold text-theme-800 dark:text-zinc-200"
                   >
                     目前沒有符合條件的公告
                   </h3>
-                  <p class="text-sm text-warm-500 dark:text-zinc-400">
+                  <p class="text-sm text-theme-500 dark:text-zinc-400">
                     可以調整來源或分類，或稍後再回來檢視。
                   </p>
                 </div>
@@ -406,12 +406,12 @@ function isExpired(announcement) {
 
           <div
             v-if="viewModel.announcements.last_page > 1"
-            class="rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+            class="rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
           >
             <div
               class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
             >
-              <p class="text-sm text-warm-600 dark:text-zinc-400">
+              <p class="text-sm text-theme-600 dark:text-zinc-400">
                 第 {{ viewModel.announcements.current_page }} /
                 {{ viewModel.announcements.last_page }} 頁，共
                 {{ viewModel.announcements.total.toLocaleString() }} 筆結果
@@ -420,7 +420,7 @@ function isExpired(announcement) {
               <div class="flex items-center gap-3">
                 <span
                   v-if="!viewModel.announcements.prev_page_url"
-                  class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-400 dark:border-zinc-700 dark:text-zinc-500"
+                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-400 dark:border-zinc-700 dark:text-zinc-500"
                 >
                   <Icon name="chevron-left" class="size-4" />
                   上一頁
@@ -428,7 +428,7 @@ function isExpired(announcement) {
                 <Link
                   v-else
                   :href="viewModel.announcements.prev_page_url"
-                  class="inline-flex items-center gap-2 rounded-md border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 transition-colors hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                  class="inline-flex items-center gap-2 rounded-md border border-theme-200 px-4 py-2 text-sm font-medium text-theme-700 transition-colors hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                 >
                   <Icon name="chevron-left" class="size-4" />
                   上一頁
@@ -436,7 +436,7 @@ function isExpired(announcement) {
 
                 <span
                   v-if="!viewModel.announcements.next_page_url"
-                  class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-400 dark:border-zinc-700 dark:text-zinc-500"
+                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-400 dark:border-zinc-700 dark:text-zinc-500"
                 >
                   下一頁
                   <Icon name="chevron-right" class="size-4" />
@@ -444,7 +444,7 @@ function isExpired(announcement) {
                 <Link
                   v-else
                   :href="viewModel.announcements.next_page_url"
-                  class="inline-flex items-center gap-2 rounded-md border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 transition-colors hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                  class="inline-flex items-center gap-2 rounded-md border border-theme-200 px-4 py-2 text-sm font-medium text-theme-700 transition-colors hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                 >
                   下一頁
                   <Icon name="chevron-right" class="size-4" />

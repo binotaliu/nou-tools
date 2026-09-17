@@ -12,7 +12,7 @@ defineProps({
 
 <template>
   <span
-    class="inline-block rounded bg-warm-100 px-2 py-1 font-mono text-xs font-normal text-warm-800 dark:bg-zinc-800 dark:text-zinc-200 print:bg-transparent print:p-0"
+    class="inline-block rounded bg-theme-100 px-2 py-1 font-mono text-xs font-normal text-theme-800 dark:bg-zinc-800 dark:text-zinc-200 print:bg-transparent print:p-0"
   >
     <template v-if="code === 'ZZZ000'">統一面授</template>
     <template v-else>

@@ -100,10 +100,10 @@ const jsonLd = computed(() => ({
         class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
       >
         <div class="space-y-2">
-          <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+          <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
             優惠店家
           </h2>
-          <p class="text-sm text-warm-600 dark:text-zinc-400">
+          <p class="text-sm text-theme-600 dark:text-zinc-400">
             適用於空大學生的優惠店家列表，歡迎回報或新增店家資訊。
             <br />
             此區資料由 <strong>112姍姍</strong> 同學維護。
@@ -111,7 +111,7 @@ const jsonLd = computed(() => ({
         </div>
         <Link
           href="/discount-stores/create"
-          class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-700 bg-warm-700 px-4 py-2 font-semibold text-white transition hover:bg-warm-800"
+          class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800"
         >
           <Icon name="plus" class="size-4" />
           新增優惠店家
@@ -119,13 +119,13 @@ const jsonLd = computed(() => ({
       </div>
 
       <div
-        class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <form class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" @submit.prevent>
           <div>
             <label
               for="search"
-              class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+              class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               搜尋
             </label>
@@ -135,14 +135,14 @@ const jsonLd = computed(() => ({
               type="text"
               name="search"
               placeholder="店家名稱..."
-              class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+              class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
               @input="applyFilters()"
             />
           </div>
           <div>
             <label
               for="category"
-              class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+              class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               分類
             </label>
@@ -151,7 +151,7 @@ const jsonLd = computed(() => ({
                 id="category"
                 v-model="category"
                 name="category"
-                class="w-full appearance-none rounded-lg border border-warm-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
                 @change="applyFilters()"
               >
                 <option value="">全部分類</option>
@@ -173,7 +173,7 @@ const jsonLd = computed(() => ({
           <div>
             <label
               for="type"
-              class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+              class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               類型
             </label>
@@ -182,7 +182,7 @@ const jsonLd = computed(() => ({
                 id="type"
                 v-model="type"
                 name="type"
-                class="w-full appearance-none rounded-lg border border-warm-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
                 @change="applyFilters()"
               >
                 <option value="">全部類型</option>
@@ -204,7 +204,7 @@ const jsonLd = computed(() => ({
           <div>
             <label
               for="city"
-              class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+              class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               縣市
             </label>
@@ -213,7 +213,7 @@ const jsonLd = computed(() => ({
                 id="city"
                 v-model="city"
                 name="city"
-                class="w-full appearance-none rounded-lg border border-warm-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
                 @change="applyFilters()"
               >
                 <option value="">全部縣市</option>
@@ -235,7 +235,7 @@ const jsonLd = computed(() => ({
           <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-4">
             <button
               type="submit"
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-700 bg-warm-700 px-4 py-2 font-semibold text-white transition hover:bg-warm-800"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800"
               @click="applyFilters()"
             >
               <Icon name="funnel" class="size-4" />
@@ -256,22 +256,22 @@ const jsonLd = computed(() => ({
       <div class="space-y-4">
         <div
           v-if="filteredStores.length === 0"
-          class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+          class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div
             class="flex min-h-56 flex-col items-center justify-center gap-3 text-center"
           >
             <Icon
               name="building-storefront"
-              class="size-10 text-warm-400 dark:text-zinc-500"
+              class="size-10 text-theme-400 dark:text-zinc-500"
             />
             <div class="space-y-1">
               <h3
-                class="text-xl font-semibold text-warm-800 dark:text-zinc-200"
+                class="text-xl font-semibold text-theme-800 dark:text-zinc-200"
               >
                 目前沒有符合條件的優惠店家
               </h3>
-              <p class="text-sm text-warm-500 dark:text-zinc-400">
+              <p class="text-sm text-theme-500 dark:text-zinc-400">
                 可以調整篩選條件，或新增一個優惠店家！
               </p>
             </div>
@@ -283,13 +283,13 @@ const jsonLd = computed(() => ({
           :id="`store-${store.id}`"
           :key="store.id"
           :data-index="index"
-          class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+          class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div class="flex flex-col gap-3">
             <div class="min-w-0 flex-1 space-y-2">
               <div class="flex flex-wrap items-center gap-2 text-sm">
                 <span
-                  class="inline-flex items-center gap-1 rounded-full bg-warm-100 px-3 py-1 font-medium text-warm-800 dark:bg-zinc-800 dark:text-zinc-200"
+                  class="inline-flex items-center gap-1 rounded-full bg-theme-100 px-3 py-1 font-medium text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
                 >
                   <template v-if="store.category">
                     <DynamicHeroIcon
@@ -308,7 +308,7 @@ const jsonLd = computed(() => ({
 
                 <span
                   v-if="store.city"
-                  class="text-warm-500 dark:text-zinc-400"
+                  class="text-theme-500 dark:text-zinc-400"
                 >
                   {{ store.city }} {{ store.district }}
                 </span>
@@ -326,7 +326,7 @@ const jsonLd = computed(() => ({
               >
                 <div class="min-w-0 flex-1 flex-col">
                   <h3
-                    class="truncate text-xl font-semibold text-warm-900 dark:text-zinc-100"
+                    class="truncate text-xl font-semibold text-theme-900 dark:text-zinc-100"
                   >
                     <Link
                       :href="`/discount-stores/${store.id}`"
@@ -337,7 +337,7 @@ const jsonLd = computed(() => ({
                   </h3>
 
                   <p
-                    class="line-clamp-2 text-sm text-warm-600 dark:text-zinc-400"
+                    class="line-clamp-2 text-sm text-theme-600 dark:text-zinc-400"
                   >
                     <Link
                       :href="`/discount-stores/${store.id}`"
@@ -350,7 +350,7 @@ const jsonLd = computed(() => ({
 
                 <Link
                   :href="`/discount-stores/${store.id}`"
-                  class="hidden! items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 text-warm-900 transition hover:bg-warm-50 md:inline-flex! dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+                  class="hidden! items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 text-theme-900 transition hover:bg-theme-50 md:inline-flex! dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
                 >
                   <Icon name="eye" class="size-4" />
                   檢視詳情
@@ -387,7 +387,7 @@ const jsonLd = computed(() => ({
 
             <Link
               :href="`/discount-stores/${store.id}`"
-              class="flex! items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 text-warm-900 transition hover:bg-warm-50 md:hidden! dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              class="flex! items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 text-theme-900 transition hover:bg-theme-50 md:hidden! dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
             >
               <Icon name="eye" class="size-4" />
               檢視詳情
@@ -398,12 +398,12 @@ const jsonLd = computed(() => ({
 
       <div
         v-show="filteredStores.length > perPage"
-        class="rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+        class="rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div
           class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
         >
-          <p class="text-sm text-warm-600 dark:text-zinc-400">
+          <p class="text-sm text-theme-600 dark:text-zinc-400">
             第 {{ page }} / {{ totalPages }} 頁，共
             {{ filteredStores.length.toLocaleString() }} 筆結果
           </p>
@@ -411,7 +411,7 @@ const jsonLd = computed(() => ({
           <div class="flex items-center gap-3">
             <button
               type="button"
-              class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400"
+              class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400"
               :disabled="page === 1"
               @click.prevent="goToPage(page - 1)"
             >
@@ -421,7 +421,7 @@ const jsonLd = computed(() => ({
 
             <button
               type="button"
-              class="inline-flex items-center gap-2 rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400"
+              class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400"
               :disabled="page === totalPages"
               @click.prevent="goToPage(page + 1)"
             >

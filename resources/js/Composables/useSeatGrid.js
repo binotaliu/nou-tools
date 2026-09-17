@@ -44,7 +44,7 @@ export default function useSeatGrid(socket, config) {
   function seatTimerLabelClass(seat) {
     return seat.timerPhase === 'break'
       ? 'text-emerald-600 dark:text-emerald-400'
-      : 'text-warm-500 dark:text-zinc-400'
+      : 'text-theme-500 dark:text-zinc-400'
   }
 
   function seatClasses(seat, variant = 'solo') {
@@ -54,7 +54,7 @@ export default function useSeatGrid(socket, config) {
             'relative flex size-9 items-center justify-center rounded-lg border-2 text-center transition',
           ]
         : [
-            'group relative flex min-h-[99px] w-full max-w-24 flex-col items-center justify-end gap-0.5 rounded-t-lg border-x-[3px] border-t-[3px] border-warm-300 px-1 pt-6 pb-1.5 text-center transition dark:border-zinc-600',
+            'group relative flex min-h-[99px] w-full max-w-24 flex-col items-center justify-end gap-0.5 rounded-t-lg border-x-[3px] border-t-[3px] border-theme-300 px-1 pt-6 pb-1.5 text-center transition dark:border-zinc-600',
           ]
 
     if (isMine(seat)) {
@@ -66,14 +66,14 @@ export default function useSeatGrid(socket, config) {
     } else if (seat.isOccupied) {
       classes.push(
         variant === 'table'
-          ? 'border-warm-400 bg-white shadow-sm dark:border-zinc-500 dark:bg-zinc-800'
-          : 'bg-warm-100/80 dark:bg-zinc-800/80'
+          ? 'border-theme-400 bg-white shadow-sm dark:border-zinc-500 dark:bg-zinc-800'
+          : 'bg-theme-100/80 dark:bg-zinc-800/80'
       )
     } else {
       classes.push(
         variant === 'table'
-          ? 'border-warm-300 bg-white/70 hover:border-warm-400 hover:bg-white dark:border-zinc-600 dark:bg-zinc-800/60 dark:hover:border-zinc-500 dark:hover:bg-zinc-800'
-          : 'bg-white/60 hover:bg-white hover:border-warm-400 dark:bg-zinc-900/60 dark:hover:bg-zinc-800 dark:hover:border-zinc-500'
+          ? 'border-theme-300 bg-white/70 hover:border-theme-400 hover:bg-white dark:border-zinc-600 dark:bg-zinc-800/60 dark:hover:border-zinc-500 dark:hover:bg-zinc-800'
+          : 'bg-white/60 hover:bg-white hover:border-theme-400 dark:bg-zinc-900/60 dark:hover:bg-zinc-800 dark:hover:border-zinc-500'
       )
     }
 

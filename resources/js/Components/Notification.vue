@@ -57,7 +57,7 @@ onMounted(() => {
       >
         <div
           v-show="show"
-          class="pointer-events-auto z-50 w-full max-w-sm translate-y-0 transform rounded-lg border border-warm-200 bg-white opacity-100 shadow outline-1 -outline-offset-1 outline-white/10 transition duration-300 ease-out sm:translate-x-0 dark:border-zinc-700 dark:bg-zinc-900"
+          class="pointer-events-auto z-50 w-full max-w-sm translate-y-0 transform rounded-lg border border-theme-200 bg-white opacity-100 shadow outline-1 -outline-offset-1 outline-white/10 transition duration-300 ease-out sm:translate-x-0 dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div class="p-4">
             <div class="flex items-start">

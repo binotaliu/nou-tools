@@ -49,6 +49,11 @@
                 stored === 'dark' || (stored === 'system' && prefersDark)
 
             document.documentElement.classList.toggle('dark', isDark)
+
+            const accent = localStorage.getItem('accent-color')
+            if (accent) {
+                document.documentElement.dataset.accent = accent
+            }
         })()
     </script>
 
@@ -108,7 +113,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body
-    class="bg-warm-50 text-warm-900 dark:bg-zinc-950 dark:text-zinc-100"
+    class="bg-theme-50 text-theme-900 dark:bg-zinc-950 dark:text-zinc-100"
     data-analytics-page="{{ $analyticsPage }}"
 >
     @inertia

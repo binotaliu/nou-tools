@@ -30,11 +30,11 @@
         :root,
         :host {
             --color-white: #fff;
-            --color-warm-50: oklch(0.98 0.01 40);
-            --color-warm-200: oklch(0.93 0.04 40);
-            --color-warm-600: oklch(0.65 0.15 35);
-            --color-warm-700: oklch(0.55 0.13 35);
-            --color-warm-900: oklch(0.35 0.08 35);
+            --color-theme-50: oklch(0.98 0.01 40);
+            --color-theme-200: oklch(0.93 0.04 40);
+            --color-theme-600: oklch(0.65 0.15 35);
+            --color-theme-700: oklch(0.55 0.13 35);
+            --color-theme-900: oklch(0.35 0.08 35);
             --color-zinc-100: oklch(0.967 0.001 286.375);
             --color-zinc-300: oklch(0.871 0.006 286.286);
             --color-zinc-400: oklch(0.705 0.015 286.067);
@@ -51,14 +51,14 @@
 
         body {
             font-family: system-ui, sans-serif;
-            background: var(--color-warm-50);
-            color: var(--color-warm-900);
+            background: var(--color-theme-50);
+            color: var(--color-theme-900);
         }
 
         header {
             position: sticky;
             top: 0;
-            border-bottom: 1px solid var(--color-warm-200);
+            border-bottom: 1px solid var(--color-theme-200);
             background: var(--color-white);
             padding: 0.5rem 0.75rem;
         }
@@ -69,7 +69,7 @@
             gap: 0.5rem;
             font-size: 1.125rem;
             font-weight: 700;
-            color: var(--color-warm-700);
+            color: var(--color-theme-700);
         }
 
         header a {
@@ -89,7 +89,7 @@
 
         .card {
             width: 100%;
-            border: 1px solid var(--color-warm-200);
+            border: 1px solid var(--color-theme-200);
             border-radius: 0.5rem;
             background: var(--color-white);
             padding: 2rem;
@@ -99,12 +99,12 @@
         .card h2 {
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--color-warm-900);
+            color: var(--color-theme-900);
             margin-bottom: 0.75rem;
         }
 
         .card p {
-            color: var(--color-warm-900);
+            color: var(--color-theme-900);
             line-height: 1.6;
         }
 
@@ -132,14 +132,14 @@
         }
 
         .actions button {
-            border: 1px solid var(--color-warm-200);
+            border: 1px solid var(--color-theme-200);
             background: transparent;
-            color: var(--color-warm-700);
+            color: var(--color-theme-700);
         }
 
         .actions a {
             border: 0;
-            background: var(--color-warm-600);
+            background: var(--color-theme-600);
             color: var(--color-white);
         }
 
@@ -155,10 +155,10 @@
 
         .schedule-links a {
             display: block;
-            border: 1px solid var(--color-warm-200);
+            border: 1px solid var(--color-theme-200);
             border-radius: 0.375rem;
             padding: 0.5rem 0.75rem;
-            color: var(--color-warm-700);
+            color: var(--color-theme-700);
             text-decoration: none;
         }
 

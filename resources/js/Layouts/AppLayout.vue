@@ -89,22 +89,22 @@ const moreMenuItems = [
 <template>
   <a
     href="#main-content"
-    class="skip-link absolute top-auto -left-100 z-999 bg-transparent px-2 py-1 focus:top-0 focus:left-0 focus:bg-white focus:text-warm-900 focus:ring-2 focus:ring-warm-500 dark:focus:bg-zinc-900 dark:focus:text-zinc-100"
+    class="skip-link absolute top-auto -left-100 z-999 bg-transparent px-2 py-1 focus:top-0 focus:left-0 focus:bg-white focus:text-theme-900 focus:ring-2 focus:ring-theme-500 dark:focus:bg-zinc-900 dark:focus:text-zinc-100"
   >
     跳到主要區塊
   </a>
 
   <header
-    class="sticky top-0 z-40 border-b border-warm-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 print:static"
+    class="sticky top-0 z-40 border-b border-theme-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 print:static"
   >
     <div class="relative mx-auto max-w-7xl px-3 py-2 md:px-6 md:py-4">
       <div class="flex items-center justify-between">
         <h1
-          class="inline-flex items-center gap-2 pb-0 text-lg font-bold text-warm-700 md:gap-4 md:text-2xl dark:text-zinc-300"
+          class="inline-flex items-center gap-2 pb-0 text-lg font-bold text-theme-700 md:gap-4 md:text-2xl dark:text-zinc-300"
         >
           <Icon
             name="book-open"
-            class="size-5 shrink-0 text-warm-700 md:size-6 dark:text-zinc-300"
+            class="size-5 shrink-0 text-theme-700 md:size-6 dark:text-zinc-300"
           />
           <Link href="/" class="shrink-0">NOU 小幫手</Link>
         </h1>
@@ -118,8 +118,8 @@ const moreMenuItems = [
               class="-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3"
               :class="
                 isActive(item.prefix)
-                  ? 'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100'
-                  : 'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100'
+                  ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
+                  : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
               "
             >
               <Icon :name="item.icon" class="size-4 shrink-0" />
@@ -132,8 +132,8 @@ const moreMenuItems = [
                 class="-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3"
                 :class="
                   moreMenuItems.some(item => isActive(item.prefix))
-                    ? 'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100'
-                    : 'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100'
+                    ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
+                    : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
                 "
                 :aria-expanded="moreMenuOpen.toString()"
                 @click="moreMenuOpen = !moreMenuOpen"
@@ -148,7 +148,7 @@ const moreMenuItems = [
 
               <div
                 v-show="moreMenuOpen"
-                class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-md border border-warm-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+                class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-md border border-theme-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
               >
                 <Link
                   v-for="item in moreMenuItems"
@@ -158,8 +158,8 @@ const moreMenuItems = [
                   class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
                   :class="
                     isActive(item.prefix)
-                      ? 'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100'
-                      : 'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100'
+                      ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
+                      : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
                   "
                 >
                   <Icon :name="item.icon" class="size-4 shrink-0" />
@@ -172,7 +172,7 @@ const moreMenuItems = [
           <div class="pl-2 print:hidden">
             <button
               type="button"
-              class="inline-flex items-center justify-center rounded-md border border-warm-200 bg-white p-2 text-warm-700 transition hover:bg-warm-50 focus:ring-2 focus:ring-warm-500 focus:outline-none md:mr-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              class="inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none md:mr-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
               @click="cycle()"
             >
               <span class="sr-only">切換佈景主題</span>
@@ -185,7 +185,7 @@ const moreMenuItems = [
 
           <button
             type="button"
-            class="inline-flex items-center justify-center rounded-md border border-warm-200 bg-white p-2 text-warm-700 transition hover:bg-warm-50 focus:ring-2 focus:ring-warm-500 focus:outline-none md:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            class="inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none md:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
             :aria-expanded="mobileMenuOpen.toString()"
             @click="mobileMenuOpen = !mobileMenuOpen"
           >
@@ -199,7 +199,7 @@ const moreMenuItems = [
 
       <div
         v-show="mobileMenuOpen"
-        class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-warm-200 bg-white p-3 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900 print:hidden"
+        class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-theme-200 bg-white p-3 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900 print:hidden"
       >
         <Link
           v-for="item in navItems"
@@ -208,8 +208,8 @@ const moreMenuItems = [
           class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
           :class="
             isActive(item.prefix)
-              ? 'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100'
-              : 'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100'
+              ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
+              : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
           "
         >
           <Icon :name="item.icon" class="size-4 shrink-0" />
@@ -224,8 +224,8 @@ const moreMenuItems = [
           class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
           :class="
             isActive(item.prefix)
-              ? 'bg-warm-100 text-warm-900 dark:bg-warm-900/40 dark:text-warm-100'
-              : 'text-warm-600 hover:bg-warm-100 hover:text-warm-900 dark:text-zinc-400 dark:hover:bg-warm-900/40 dark:hover:text-warm-100'
+              ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
+              : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
           "
         >
           <Icon :name="item.icon" class="size-4 shrink-0" />
@@ -256,10 +256,10 @@ const moreMenuItems = [
   </main>
 
   <footer
-    class="mt-12 border-t border-warm-200 bg-warm-100 py-8 text-warm-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 print:bg-white print:text-black"
+    class="mt-12 border-t border-theme-200 bg-theme-100 py-8 text-theme-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 print:bg-white print:text-black"
   >
     <div class="mx-auto max-w-7xl px-6">
-      <div class="hidden py-2 text-center text-xs text-warm-800 print:block">
+      <div class="hidden py-2 text-center text-xs text-theme-800 print:block">
         <p class="mb-1">
           &copy; {{ new Date().getFullYear() }} NOU 小幫手 —
           {{ typeof window !== 'undefined' ? window.location.origin : '' }}
@@ -280,18 +280,18 @@ const moreMenuItems = [
           <div class="p-3">
             <Icon
               name="book-open"
-              class="size-6 text-warm-700 dark:text-zinc-300"
+              class="size-6 text-theme-700 dark:text-zinc-300"
             />
           </div>
 
           <div class="text-center md:text-left">
             <Link
               href="/"
-              class="text-lg font-semibold text-warm-700 hover:text-warm-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+              class="text-lg font-semibold text-theme-700 hover:text-theme-900 dark:text-zinc-300 dark:hover:text-zinc-100"
             >
               NOU 小幫手
             </Link>
-            <p class="mt-1 text-xs text-warm-500 dark:text-zinc-400">
+            <p class="mt-1 text-xs text-theme-500 dark:text-zinc-400">
               給 NOU 同學的非官方小工具
             </p>
           </div>
@@ -299,7 +299,7 @@ const moreMenuItems = [
 
         <div class="flex flex-col items-center gap-6 sm:flex-row">
           <div
-            class="max-w-lg text-center text-sm text-warm-400 md:text-left dark:text-zinc-500"
+            class="max-w-lg text-center text-sm text-theme-400 md:text-left dark:text-zinc-500"
           >
             <span class="font-semibold">免責聲明：</span>
             <p class="mb-2 text-justify text-xs md:text-left">
@@ -319,14 +319,14 @@ const moreMenuItems = [
       </div>
 
       <div
-        class="mt-6 flex flex-col-reverse items-center justify-between gap-6 border-t border-warm-200 pt-4 text-xs text-warm-500 md:flex-row md:gap-3 dark:border-zinc-700 dark:text-zinc-400 print:hidden"
+        class="mt-6 flex flex-col-reverse items-center justify-between gap-6 border-t border-theme-200 pt-4 text-xs text-theme-500 md:flex-row md:gap-3 dark:border-zinc-700 dark:text-zinc-400 print:hidden"
       >
         <div>&copy; {{ new Date().getFullYear() }} NOU 小幫手</div>
         <div class="flex items-center gap-x-8 gap-y-2">
           <div class="text-xs">
             <a
               href="https://kuma.binota.org/status/nou"
-              class="inline-flex items-center gap-1 text-warm-500 hover:text-warm-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+              class="inline-flex items-center gap-1 text-theme-500 hover:text-theme-600 dark:text-zinc-400 dark:hover:text-zinc-300"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -337,7 +337,7 @@ const moreMenuItems = [
           <div class="text-xs">
             <a
               href="https://github.com/binotaliu/nou-tools"
-              class="inline-flex items-center gap-1 text-warm-500 hover:text-warm-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+              class="inline-flex items-center gap-1 text-theme-500 hover:text-theme-600 dark:text-zinc-400 dark:hover:text-zinc-300"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -348,7 +348,7 @@ const moreMenuItems = [
           <div class="text-xs">
             <a
               href="mailto:nou-tools-contact@binota.org"
-              class="inline-flex items-center gap-1 text-warm-500 hover:text-warm-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+              class="inline-flex items-center gap-1 text-theme-500 hover:text-theme-600 dark:text-zinc-400 dark:hover:text-zinc-300"
             >
               <Icon name="envelope" class="size-3" />
               聯絡作者

@@ -23,16 +23,16 @@ defineProps({
   <AppLayout>
     <div class="mx-auto max-w-2xl">
       <div
-        class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="flex flex-col items-center gap-4 py-8 text-center">
           <Icon name="check-circle" class="size-16 text-green-500" />
 
-          <h2 class="text-2xl font-bold text-warm-900 dark:text-zinc-100">
+          <h2 class="text-2xl font-bold text-theme-900 dark:text-zinc-100">
             已收到您送出的資料
           </h2>
 
-          <p class="max-w-md text-sm text-warm-600 dark:text-zinc-400">
+          <p class="max-w-md text-sm text-theme-600 dark:text-zinc-400">
             <template v-if="storeName">
               感謝您提供的「{{ storeName }}」優惠店家資訊！
             </template>

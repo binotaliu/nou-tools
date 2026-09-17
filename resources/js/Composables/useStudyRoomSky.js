@@ -336,7 +336,7 @@ export default function useStudyRoomSky(config) {
 
   function focusChromeClass() {
     return focusInk() > 0.5
-      ? 'border-black/10 bg-white/50 text-warm-900 hover:bg-white/80'
+      ? 'border-black/10 bg-white/50 text-theme-900 hover:bg-white/80'
       : 'border-white/20 bg-white/10 text-white hover:bg-white/20'
   }
 
@@ -345,7 +345,7 @@ export default function useStudyRoomSky(config) {
   }
 
   function focusDotClass(dot) {
-    const lit = focusInk() > 0.5 ? 'bg-warm-900' : 'bg-white'
+    const lit = focusInk() > 0.5 ? 'bg-theme-900' : 'bg-white'
     const dim = focusInk() > 0.5 ? 'bg-black/15' : 'bg-white/25'
 
     if (dot.state === 'todo') {

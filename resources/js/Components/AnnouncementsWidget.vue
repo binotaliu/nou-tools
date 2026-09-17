@@ -29,10 +29,10 @@ function relativeLabel(announcement) {
 
 <template>
   <div
-    class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+    class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
   >
     <div class="mb-4">
-      <h2 class="text-xl font-semibold text-warm-900 dark:text-zinc-100">
+      <h2 class="text-xl font-semibold text-theme-900 dark:text-zinc-100">
         最新公告
       </h2>
     </div>
@@ -40,7 +40,7 @@ function relativeLabel(announcement) {
     <div class="space-y-1">
       <div
         v-if="!hasAnySelection"
-        class="rounded-lg border border-dashed border-warm-300 bg-warm-50 px-4 py-6 text-center text-sm text-warm-600 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
+        class="rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-6 text-center text-sm text-theme-600 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
       >
         尚未選擇任何公告分類。
         <Link
@@ -53,7 +53,7 @@ function relativeLabel(announcement) {
 
       <div
         v-else-if="announcements.length === 0"
-        class="rounded-lg border border-dashed border-warm-300 bg-warm-50 px-4 py-6 text-center text-sm text-warm-600 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
+        class="rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-6 text-center text-sm text-theme-600 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
       >
         目前沒有符合條件的最新公告。
       </div>
@@ -62,12 +62,12 @@ function relativeLabel(announcement) {
         <div
           v-for="(announcement, index) in announcements"
           :key="index"
-          class="flex flex-col gap-1 border-b border-warm-100 py-2 last:border-0 dark:border-zinc-800"
+          class="flex flex-col gap-1 border-b border-theme-100 py-2 last:border-0 dark:border-zinc-800"
         >
           <div class="flex items-start justify-between gap-3">
             <div class="flex flex-wrap items-center gap-1.5 text-xs">
               <span
-                class="rounded-full bg-warm-100 px-2 py-0.5 font-medium text-warm-800 dark:bg-zinc-800 dark:text-zinc-200"
+                class="rounded-full bg-theme-100 px-2 py-0.5 font-medium text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
               >
                 {{ announcement.sourceName }}
               </span>
@@ -81,7 +81,7 @@ function relativeLabel(announcement) {
             <div class="flex-1"></div>
 
             <p
-              class="shrink-0 text-right text-xs whitespace-nowrap text-warm-500 dark:text-zinc-400"
+              class="shrink-0 text-right text-xs whitespace-nowrap text-theme-500 dark:text-zinc-400"
             >
               <template v-if="announcement.publishedAt">
                 {{ relativeLabel(announcement) }} •
@@ -95,7 +95,7 @@ function relativeLabel(announcement) {
             :href="announcement.url"
             target="_blank"
             rel="noopener noreferrer"
-            class="line-clamp-1! block max-w-full text-sm font-medium break-all text-warm-900 transition hover:text-orange-700 dark:text-zinc-100 dark:hover:text-orange-400"
+            class="line-clamp-1! block max-w-full text-sm font-medium break-all text-theme-900 transition hover:text-orange-700 dark:text-zinc-100 dark:hover:text-orange-400"
           >
             {{ announcement.title }}
           </a>
@@ -114,7 +114,7 @@ function relativeLabel(announcement) {
 
         <Link
           :href="`/schedules/${scheduleUuid}/announcement-preferences`"
-          class="text-sm text-warm-600 hover:underline dark:text-zinc-400"
+          class="text-sm text-theme-600 hover:underline dark:text-zinc-400"
         >
           選擇公告分類
         </Link>

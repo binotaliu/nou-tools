@@ -43,13 +43,13 @@ function close() {
       >
         <h3
           v-if="title"
-          class="mb-2 text-lg font-semibold text-warm-900 dark:text-zinc-100"
+          class="mb-2 text-lg font-semibold text-theme-900 dark:text-zinc-100"
         >
           {{ title }}
         </h3>
         <p
           v-if="description"
-          class="mb-4 text-sm text-warm-600 dark:text-zinc-400"
+          class="mb-4 text-sm text-theme-600 dark:text-zinc-400"
         >
           {{ description }}
         </p>

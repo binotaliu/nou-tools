@@ -37,7 +37,7 @@ function iconFor(value) {
 <template>
   <div>
     <span
-      class="mb-1 block text-xs font-medium text-warm-600 dark:text-zinc-400"
+      class="mb-1 block text-xs font-medium text-theme-600 dark:text-zinc-400"
       >活動</span
     >
     <div
@@ -50,7 +50,7 @@ function iconFor(value) {
       <label
         v-for="verb in verbs"
         :key="verb.value"
-        class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-warm-200 bg-white px-1 py-2.5 text-center transition has-checked:border-warm-700 has-checked:bg-warm-700 has-checked:text-white sm:gap-1.5 sm:px-3 sm:py-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:has-checked:border-warm-500 dark:has-checked:bg-warm-500 dark:has-checked:text-zinc-950"
+        class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-theme-200 bg-white px-1 py-2.5 text-center transition has-checked:border-theme-700 has-checked:bg-theme-700 has-checked:text-white sm:gap-1.5 sm:px-3 sm:py-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:has-checked:border-theme-500 dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950"
       >
         <input
           type="radio"

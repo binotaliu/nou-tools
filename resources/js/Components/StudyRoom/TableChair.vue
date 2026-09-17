@@ -55,7 +55,7 @@ onUnmounted(() => {
     >
       <span
         v-if="!seat.isOccupied"
-        class="text-[10px] font-medium text-warm-400 dark:text-zinc-500"
+        class="text-[10px] font-medium text-theme-400 dark:text-zinc-500"
         >{{ seat.seatNumber }}</span
       >
       <span v-else class="text-base leading-none">{{ seat.emoji }}</span>
@@ -77,25 +77,27 @@ onUnmounted(() => {
 
     <div
       v-show="grid.isPeeking(seat)"
-      class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 w-36 -translate-x-1/2 rounded-lg border border-warm-200 bg-white p-2 text-left shadow-md dark:border-zinc-600 dark:bg-zinc-800"
+      class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 w-36 -translate-x-1/2 rounded-lg border border-theme-200 bg-white p-2 text-left shadow-md dark:border-zinc-600 dark:bg-zinc-800"
       :data-testid="grid.seatTestId(seat) + '-popover'"
     >
       <p
-        class="flex items-center gap-1.5 text-xs font-semibold text-warm-900 dark:text-zinc-100"
+        class="flex items-center gap-1.5 text-xs font-semibold text-theme-900 dark:text-zinc-100"
       >
         <span>{{ seat.emoji }}</span>
         <span class="truncate">{{ seat.nickname }}</span>
       </p>
-      <p class="mt-1 text-[11px] leading-snug text-warm-700 dark:text-zinc-300">
+      <p
+        class="mt-1 text-[11px] leading-snug text-theme-700 dark:text-zinc-300"
+      >
         {{ grid.thoughtBubbleText(seat) }}
       </p>
       <p
-        class="mt-1 font-mono text-[11px] text-warm-500 tabular-nums dark:text-zinc-400"
+        class="mt-1 font-mono text-[11px] text-theme-500 tabular-nums dark:text-zinc-400"
       >
         剩餘 {{ timer.timerLabel(seat) }}
       </p>
       <span
-        class="absolute top-full left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rotate-45 border-r border-b border-warm-200 bg-white dark:border-zinc-600 dark:bg-zinc-800"
+        class="absolute top-full left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rotate-45 border-r border-b border-theme-200 bg-white dark:border-zinc-600 dark:bg-zinc-800"
         aria-hidden="true"
       ></span>
     </div>

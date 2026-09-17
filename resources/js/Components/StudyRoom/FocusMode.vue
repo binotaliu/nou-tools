@@ -388,10 +388,10 @@ onUnmounted(() => {
         class="absolute inset-0 bg-[repeating-linear-gradient(90deg,transparent_0_9rem,rgba(0,0,0,0.06)_9rem_calc(9rem+2px))]"
       ></div>
       <div
-        class="absolute top-[26%] left-[10%] h-[22%] w-28 rotate-[-4deg] rounded-sm bg-warm-800/85 shadow-md sm:w-40"
+        class="absolute top-[26%] left-[10%] h-[22%] w-28 rotate-[-4deg] rounded-sm bg-theme-800/85 shadow-md sm:w-40"
       >
         <div
-          class="absolute inset-y-0 left-0 w-2 rounded-l-sm bg-warm-900"
+          class="absolute inset-y-0 left-0 w-2 rounded-l-sm bg-theme-900"
         ></div>
         <div class="absolute top-1/2 right-4 left-6 h-px bg-white/20"></div>
       </div>
@@ -403,13 +403,13 @@ onUnmounted(() => {
         ></div>
       </div>
       <div
-        class="absolute top-[20%] left-[34%] h-[38%] w-10 rounded-t-sm rounded-b-lg bg-warm-50/90 shadow-md sm:w-12"
+        class="absolute top-[20%] left-[34%] h-[38%] w-10 rounded-t-sm rounded-b-lg bg-theme-50/90 shadow-md sm:w-12"
       >
         <div
-          class="absolute top-[18%] -right-3 h-[45%] w-4 rounded-r-full border-4 border-l-0 border-warm-50/90"
+          class="absolute top-[18%] -right-3 h-[45%] w-4 rounded-r-full border-4 border-l-0 border-theme-50/90"
         ></div>
         <div
-          class="absolute inset-x-1.5 top-1 h-1.5 rounded-full bg-warm-700/70"
+          class="absolute inset-x-1.5 top-1 h-1.5 rounded-full bg-theme-700/70"
         ></div>
       </div>
     </div>

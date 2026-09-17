@@ -324,11 +324,11 @@ const creditsDropdown = useDropdown()
     <div class="mx-auto max-w-5xl">
       <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 class="mb-2 text-3xl font-bold text-warm-900 dark:text-zinc-100">
+          <h2 class="mb-2 text-3xl font-bold text-theme-900 dark:text-zinc-100">
             本學期開課表
           </h2>
 
-          <div class="text-sm text-warm-600 dark:text-zinc-400">
+          <div class="text-sm text-theme-600 dark:text-zinc-400">
             {{ toSemesterDisplay(viewModel.selectedTerm) }}
           </div>
         </div>
@@ -340,7 +340,7 @@ const creditsDropdown = useDropdown()
               id="term"
               name="term"
               aria-label="選擇學期"
-              class="w-full appearance-none rounded-lg border border-warm-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+              class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
               :value="viewModel.selectedTerm"
               @change="selectTerm($event.target.value)"
             >
@@ -363,13 +363,13 @@ const creditsDropdown = useDropdown()
 
       <!-- Filters -->
       <div
-        class="mb-6 rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="mb-6 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <form class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" @submit.prevent>
           <div>
             <label
               for="search"
-              class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+              class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               搜尋
             </label>
@@ -379,13 +379,13 @@ const creditsDropdown = useDropdown()
               type="text"
               name="search"
               placeholder="課程名稱..."
-              class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+              class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
             />
           </div>
           <div>
             <label
               for="groupBy"
-              class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+              class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               分組方式
             </label>
@@ -395,7 +395,7 @@ const creditsDropdown = useDropdown()
                 v-model="groupBy"
                 aria-label="分組方式"
                 data-testid="group-by-select"
-                class="w-full appearance-none rounded-lg border border-warm-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
               >
                 <option value="exam">考試時間</option>
                 <option value="department">學系</option>
@@ -410,7 +410,7 @@ const creditsDropdown = useDropdown()
           </div>
           <div>
             <label
-              class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+              class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               學系
             </label>
@@ -420,7 +420,7 @@ const creditsDropdown = useDropdown()
             >
               <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-lg border border-warm-200 px-3 py-2 text-left text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                class="flex w-full items-center justify-between rounded-lg border border-theme-200 px-3 py-2 text-left text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                 @click="
                   departmentDropdown.open.value = !departmentDropdown.open.value
                 "
@@ -436,18 +436,18 @@ const creditsDropdown = useDropdown()
               </button>
               <div
                 v-show="departmentDropdown.open.value"
-                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-warm-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-800"
+                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-theme-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-800"
               >
                 <label
                   v-for="departmentOption in departmentOptions"
                   :key="departmentOption"
-                  class="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-warm-50 dark:hover:bg-zinc-700"
+                  class="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-theme-50 dark:hover:bg-zinc-700"
                 >
                   <input
                     v-model="department"
                     type="checkbox"
                     :value="departmentOption"
-                    class="rounded border-warm-300 dark:border-zinc-600"
+                    class="rounded border-theme-300 dark:border-zinc-600"
                   />
                   {{ departmentOption }}
                 </label>
@@ -456,14 +456,14 @@ const creditsDropdown = useDropdown()
           </div>
           <div>
             <label
-              class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+              class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               學分
             </label>
             <div :ref="el => (creditsDropdown.el.value = el)" class="relative">
               <button
                 type="button"
-                class="flex w-full items-center justify-between rounded-lg border border-warm-200 px-3 py-2 text-left text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                class="flex w-full items-center justify-between rounded-lg border border-theme-200 px-3 py-2 text-left text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                 @click="
                   creditsDropdown.open.value = !creditsDropdown.open.value
                 "
@@ -479,18 +479,18 @@ const creditsDropdown = useDropdown()
               </button>
               <div
                 v-show="creditsDropdown.open.value"
-                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-warm-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-800"
+                class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-theme-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-800"
               >
                 <label
                   v-for="creditOption in creditOptions"
                   :key="creditOption"
-                  class="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-warm-50 dark:hover:bg-zinc-700"
+                  class="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-theme-50 dark:hover:bg-zinc-700"
                 >
                   <input
                     v-model="credits"
                     type="checkbox"
                     :value="String(creditOption)"
-                    class="rounded border-warm-300 dark:border-zinc-600"
+                    class="rounded border-theme-300 dark:border-zinc-600"
                   />
                   {{ creditOption }}
                 </label>
@@ -501,7 +501,7 @@ const creditsDropdown = useDropdown()
             <a
               v-show="hasFilters"
               href="#"
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 font-semibold text-warm-900 transition hover:bg-warm-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
               @click.prevent="clearFilters()"
             >
               清除條件
@@ -513,16 +513,18 @@ const creditsDropdown = useDropdown()
       <div
         v-for="section in sections"
         :key="section.key"
-        class="mb-6 rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="mb-6 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         :data-testid="'schedule-section-' + section.key"
       >
-        <h2 class="mb-4 text-xl font-semibold text-warm-900 dark:text-zinc-100">
+        <h2
+          class="mb-4 text-xl font-semibold text-theme-900 dark:text-zinc-100"
+        >
           {{ section.title }}
         </h2>
 
         <p
           v-if="section.groups.length === 0"
-          class="text-sm text-warm-600 dark:text-zinc-400"
+          class="text-sm text-theme-600 dark:text-zinc-400"
         >
           {{ section.emptyMessage }}
         </p>
@@ -531,7 +533,7 @@ const creditsDropdown = useDropdown()
           <div v-for="group in section.groups" :key="group.key">
             <div
               v-show="group.label"
-              class="mb-3 font-semibold text-warm-900 dark:text-zinc-100"
+              class="mb-3 font-semibold text-theme-900 dark:text-zinc-100"
             >
               {{ group.label }}
             </div>
@@ -542,31 +544,31 @@ const creditsDropdown = useDropdown()
               data-testid="schedule-desktop-table"
             >
               <table
-                class="w-full border-collapse overflow-hidden rounded text-left text-warm-700 dark:text-zinc-300"
+                class="w-full border-collapse overflow-hidden rounded text-left text-theme-700 dark:text-zinc-300"
               >
                 <caption class="sr-only">
                   課程列表
                 </caption>
                 <thead
-                  class="border-b-2 border-warm-300 bg-warm-100 dark:border-zinc-600 dark:bg-zinc-900"
+                  class="border-b-2 border-theme-300 bg-theme-100 dark:border-zinc-600 dark:bg-zinc-900"
                 >
                   <tr>
                     <th
                       scope="col"
-                      class="px-4 py-3 font-bold text-warm-900 dark:text-zinc-100"
+                      class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                     >
                       課程名稱
                     </th>
                     <th
                       scope="col"
-                      class="px-4 py-3 font-bold text-warm-900 dark:text-zinc-100"
+                      class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                       :class="fieldMeta[columns[0]].thClass"
                     >
                       {{ fieldMeta[columns[0]].title }}
                     </th>
                     <th
                       scope="col"
-                      class="px-4 py-3 font-bold text-warm-900 dark:text-zinc-100"
+                      class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                       :class="fieldMeta[columns[1]].thClass"
                     >
                       {{ fieldMeta[columns[1]].title }}
@@ -578,11 +580,11 @@ const creditsDropdown = useDropdown()
                   <tr
                     v-for="course in group.courses"
                     :key="course.id"
-                    class="border-b border-warm-200 hover:bg-warm-50 dark:border-zinc-700 dark:hover:bg-zinc-950"
+                    class="border-b border-theme-200 hover:bg-theme-50 dark:border-zinc-700 dark:hover:bg-zinc-950"
                   >
                     <th
                       scope="row"
-                      class="px-4 py-3 font-normal text-warm-800 dark:text-zinc-200"
+                      class="px-4 py-3 font-normal text-theme-800 dark:text-zinc-200"
                     >
                       <Link
                         :href="course.url"
@@ -592,13 +594,13 @@ const creditsDropdown = useDropdown()
                       </Link>
                     </th>
                     <td
-                      class="px-4 py-3 text-warm-800 dark:text-zinc-200"
+                      class="px-4 py-3 text-theme-800 dark:text-zinc-200"
                       :class="fieldMeta[columns[0]].tdClass"
                     >
                       {{ columnValue(course, columns[0]) }}
                     </td>
                     <td
-                      class="px-4 py-3 text-warm-800 dark:text-zinc-200"
+                      class="px-4 py-3 text-theme-800 dark:text-zinc-200"
                       :class="fieldMeta[columns[1]].tdClass"
                     >
                       {{ columnValue(course, columns[1]) }}
@@ -616,7 +618,7 @@ const creditsDropdown = useDropdown()
               <div
                 v-for="course in group.courses"
                 :key="course.id"
-                class="rounded-lg border border-warm-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+                class="rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
               >
                 <Link
                   :href="course.url"
@@ -625,7 +627,7 @@ const creditsDropdown = useDropdown()
                   {{ course.name }}
                 </Link>
                 <div
-                  class="mt-1 flex items-center gap-2 text-sm text-warm-600 dark:text-zinc-400"
+                  class="mt-1 flex items-center gap-2 text-sm text-theme-600 dark:text-zinc-400"
                 >
                   <span>{{ mobileColumnValue(course, columns[0]) }}</span>
                   <span>·</span>

@@ -24,11 +24,11 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
 
 <template>
   <div
-    class="relative overflow-hidden rounded-2xl border-[6px] border-warm-300 bg-warm-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
+    class="relative overflow-hidden rounded-2xl border-[6px] border-theme-300 bg-theme-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
     data-testid="study-room-wall"
   >
     <div
-      class="pointer-events-none absolute inset-x-0 bottom-0 h-3 border-t-2 border-warm-300 bg-warm-200 dark:border-zinc-600 dark:bg-zinc-800"
+      class="pointer-events-none absolute inset-x-0 bottom-0 h-3 border-t-2 border-theme-300 bg-theme-200 dark:border-zinc-600 dark:bg-zinc-800"
       aria-hidden="true"
     ></div>
 
@@ -43,23 +43,23 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
         ></div>
 
         <div
-          class="relative h-40 overflow-hidden rounded-lg border-4 border-warm-300 shadow-sm sm:h-44 dark:border-zinc-600"
+          class="relative h-40 overflow-hidden rounded-lg border-4 border-theme-300 shadow-sm sm:h-44 dark:border-zinc-600"
         >
           <GardenScene :sky="sky" scene-class="absolute inset-0" />
 
           <div
-            class="pointer-events-none absolute inset-y-0 left-1/2 w-1.5 -translate-x-1/2 bg-warm-300 dark:bg-zinc-600"
+            class="pointer-events-none absolute inset-y-0 left-1/2 w-1.5 -translate-x-1/2 bg-theme-300 dark:bg-zinc-600"
             aria-hidden="true"
           ></div>
           <div
-            class="pointer-events-none absolute inset-x-0 top-[46%] h-1.5 bg-warm-300 dark:bg-zinc-600"
+            class="pointer-events-none absolute inset-x-0 top-[46%] h-1.5 bg-theme-300 dark:bg-zinc-600"
             aria-hidden="true"
           ></div>
         </div>
 
         <div class="relative">
           <div
-            class="-mx-1.5 h-2 rounded-full bg-warm-300 dark:bg-zinc-600"
+            class="-mx-1.5 h-2 rounded-full bg-theme-300 dark:bg-zinc-600"
             aria-hidden="true"
           ></div>
           <span
@@ -75,7 +75,7 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
         data-testid="study-room-clock"
       >
         <div
-          class="relative size-20 rounded-full border-2 border-b-4 border-warm-300 bg-white shadow-sm sm:size-24 dark:border-zinc-600 dark:bg-zinc-800"
+          class="relative size-20 rounded-full border-2 border-b-4 border-theme-300 bg-white shadow-sm sm:size-24 dark:border-zinc-600 dark:bg-zinc-800"
           aria-hidden="true"
         >
           <span
@@ -85,18 +85,18 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             :style="sky.clockTickStyle(tick)"
           >
             <span
-              class="block w-full rounded-full bg-warm-300 dark:bg-zinc-600"
+              class="block w-full rounded-full bg-theme-300 dark:bg-zinc-600"
               :class="sky.clockTickClass(tick)"
             ></span>
           </span>
 
           <span
-            class="absolute bottom-1/2 left-1/2 h-[26%] w-1 origin-bottom rounded-full bg-warm-700 dark:bg-zinc-300"
+            class="absolute bottom-1/2 left-1/2 h-[26%] w-1 origin-bottom rounded-full bg-theme-700 dark:bg-zinc-300"
             :style="sky.clockHandStyle('hour')"
             data-testid="study-room-clock-hour-hand"
           ></span>
           <span
-            class="absolute bottom-1/2 left-1/2 h-[36%] w-0.5 origin-bottom rounded-full bg-warm-700 dark:bg-zinc-300"
+            class="absolute bottom-1/2 left-1/2 h-[36%] w-0.5 origin-bottom rounded-full bg-theme-700 dark:bg-zinc-300"
             :style="sky.clockHandStyle('minute')"
             data-testid="study-room-clock-minute-hand"
           ></span>
@@ -105,16 +105,16 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             :style="sky.clockHandStyle('second')"
           ></span>
           <span
-            class="absolute top-1/2 left-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-warm-700 dark:bg-zinc-300"
+            class="absolute top-1/2 left-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-theme-700 dark:bg-zinc-300"
           ></span>
         </div>
 
         <p class="text-center">
           <span
-            class="block font-mono text-sm leading-tight font-semibold text-warm-800 tabular-nums dark:text-zinc-200"
+            class="block font-mono text-sm leading-tight font-semibold text-theme-800 tabular-nums dark:text-zinc-200"
             >{{ sky.clockTimeLabel() }}</span
           >
-          <span class="block text-[10px] text-warm-500 dark:text-zinc-400">{{
+          <span class="block text-[10px] text-theme-500 dark:text-zinc-400">{{
             sky.clockDateLabel()
           }}</span>
         </p>
@@ -122,11 +122,11 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
 
       <div class="flex min-w-0 flex-1 flex-col gap-3">
         <div
-          class="rounded-xl border-2 border-b-4 border-warm-300 bg-warm-200 p-3 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
+          class="rounded-xl border-2 border-b-4 border-theme-300 bg-theme-200 p-3 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
           data-testid="study-room-announcement"
         >
           <div
-            class="relative rounded-lg border border-warm-200 bg-white px-4 py-3 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+            class="relative rounded-lg border border-theme-200 bg-white px-4 py-3 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
           >
             <span
               class="absolute -top-1 left-5 size-2 rounded-full bg-rose-400 shadow-sm"
@@ -138,21 +138,21 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             ></span>
 
             <h2
-              class="mb-1.5 text-sm font-semibold text-warm-900 dark:text-zinc-100"
+              class="mb-1.5 text-sm font-semibold text-theme-900 dark:text-zinc-100"
             >
               公告板
             </h2>
             <!-- eslint-disable-next-line vue/no-v-html -->
             <div
               ref="announcementRoot"
-              class="prose prose-sm max-h-36 max-w-none overflow-y-auto prose-warm dark:prose-zinc dark:prose-invert"
+              class="prose prose-sm max-h-36 max-w-none overflow-y-auto prose-theme dark:prose-zinc dark:prose-invert"
               v-html="announcementHtml"
             ></div>
           </div>
         </div>
 
         <div
-          class="relative -rotate-1 cursor-pointer rounded-lg border-2 border-b-4 border-warm-300 bg-white px-4 py-2.5 shadow-sm transition hover:rotate-0 hover:border-warm-400 dark:border-zinc-600 dark:bg-zinc-800 dark:hover:border-zinc-500"
+          class="relative -rotate-1 cursor-pointer rounded-lg border-2 border-b-4 border-theme-300 bg-white px-4 py-2.5 shadow-sm transition hover:rotate-0 hover:border-theme-400 dark:border-zinc-600 dark:bg-zinc-800 dark:hover:border-zinc-500"
           data-testid="study-room-personal-info"
           @click="profile.openPersonalInfo()"
         >
@@ -165,11 +165,11 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             <span class="text-2xl">{{ profile.emoji }}</span>
             <div class="min-w-0 flex-1">
               <p
-                class="truncate text-sm font-semibold text-warm-900 dark:text-zinc-100"
+                class="truncate text-sm font-semibold text-theme-900 dark:text-zinc-100"
               >
                 {{ profile.nickname || '尚未設定暱稱' }}
               </p>
-              <p class="text-xs text-warm-500 dark:text-zinc-400">
+              <p class="text-xs text-theme-500 dark:text-zinc-400">
                 今天專注了
                 {{ profile.formatDurationLabel(yourFocusSecondsToday) }}
               </p>
@@ -178,7 +178,7 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
               type="button"
               aria-label="檢視專注紀錄與統計"
               data-testid="study-room-personal-info-stats"
-              class="shrink-0 rounded-full p-1.5 text-warm-500 transition hover:bg-warm-100 hover:text-warm-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
+              class="shrink-0 rounded-full p-1.5 text-theme-500 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
               @click.stop="profile.openStats()"
             >
               <ChartBarIcon class="size-4" />
@@ -187,7 +187,7 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
               type="button"
               aria-label="編輯個人資料"
               data-testid="study-room-personal-info-edit"
-              class="shrink-0 rounded-full p-1.5 text-warm-500 transition hover:bg-warm-100 hover:text-warm-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
+              class="shrink-0 rounded-full p-1.5 text-theme-500 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
               @click.stop="profile.openPersonalInfo()"
             >
               <PencilIcon class="size-4" />

@@ -472,7 +472,7 @@ export default function useStudyTimer(
       return 'bg-amber-500 ring-2 ring-amber-300 dark:ring-amber-700'
     }
 
-    return 'bg-warm-300 dark:bg-zinc-600'
+    return 'bg-theme-300 dark:bg-zinc-600'
   }
 
   function normalizedCycle() {

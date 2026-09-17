@@ -177,13 +177,13 @@ const csrfToken =
         class="mb-8 flex flex-col items-start justify-between gap-y-4 md:flex-row"
       >
         <div>
-          <h2 class="mb-2 text-3xl font-bold text-warm-900 dark:text-zinc-100">
+          <h2 class="mb-2 text-3xl font-bold text-theme-900 dark:text-zinc-100">
             學習進度表
             <small v-if="viewModel.scheduleName"
               >— {{ viewModel.scheduleName }}</small
             >
           </h2>
-          <p class="text-lg text-warm-700 dark:text-zinc-300">
+          <p class="text-lg text-theme-700 dark:text-zinc-300">
             {{ semesterLabel }}
           </p>
         </div>
@@ -191,7 +191,7 @@ const csrfToken =
         <div class="flex w-full gap-2 md:w-auto print:hidden">
           <Link
             :href="`/schedules/${viewModel.scheduleUuid}`"
-            class="inline-flex w-1/2 items-center justify-center gap-2 rounded-md border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 transition-colors hover:bg-warm-50 md:w-auto dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+            class="inline-flex w-1/2 items-center justify-center gap-2 rounded-md border border-theme-200 px-4 py-2 text-sm font-medium text-theme-700 transition-colors hover:bg-theme-50 md:w-auto dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
             data-analytics-event="learning_progress_back"
             data-analytics-feature="learning_progress"
           >
@@ -201,7 +201,7 @@ const csrfToken =
 
           <button
             type="button"
-            class="inline-flex w-1/2 items-center justify-center gap-2 rounded-md bg-warm-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-warm-600 md:w-auto"
+            class="inline-flex w-1/2 items-center justify-center gap-2 rounded-md bg-theme-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-theme-600 md:w-auto"
             data-analytics-event="learning_progress_save"
             data-analytics-feature="learning_progress"
             @click="submitProgressForm()"
@@ -221,27 +221,29 @@ const csrfToken =
       />
 
       <div class="mb-4 w-full print:hidden">
-        <p class="mb-1 text-sm text-warm-700 dark:text-zinc-300">
+        <p class="mb-1 text-sm text-theme-700 dark:text-zinc-300">
           本學期完成進度：{{ viewModel.percentage.toFixed(0) }}%
         </p>
         <div
-          class="relative h-2 w-full overflow-hidden rounded bg-warm-200 dark:bg-zinc-700"
+          class="relative h-2 w-full overflow-hidden rounded bg-theme-200 dark:bg-zinc-700"
           aria-hidden="true"
         >
           <div
-            class="h-full bg-warm-500"
+            class="h-full bg-theme-500"
             :style="{ width: viewModel.percentage + '%' }"
           ></div>
         </div>
       </div>
 
-      <div class="relative rounded border border-warm-300 dark:border-zinc-600">
+      <div
+        class="relative rounded border border-theme-300 dark:border-zinc-600"
+      >
         <form
           id="progress-form"
           ref="progressForm"
           method="POST"
           :action="`/schedules/${viewModel.scheduleUuid}/${viewModel.term}/learning-progress`"
-          class="max-h-[min(45rem,90vh)] max-w-full overflow-x-auto rounded bg-linear-to-b from-warm-100 to-white dark:from-zinc-900 dark:to-zinc-950 print:max-h-full"
+          class="max-h-[min(45rem,90vh)] max-w-full overflow-x-auto rounded bg-linear-to-b from-theme-100 to-white dark:from-zinc-900 dark:to-zinc-950 print:max-h-full"
           :style="{
             '--courses-count': viewModel.courses.length,
             '--weeks-count': viewModel.weeks.length,
@@ -256,42 +258,42 @@ const csrfToken =
           >
             <thead class="print:table-header-group">
               <tr
-                class="sticky top-0 z-20 rounded-t bg-warm-100 dark:bg-zinc-900 print:static"
+                class="sticky top-0 z-20 rounded-t bg-theme-100 dark:bg-zinc-900 print:static"
               >
                 <th
-                  class="sticky left-0 z-30 w-24 rounded-tl border border-t-0 border-l-0 border-warm-300 bg-warm-100 px-0 py-2 text-center text-sm font-bold text-warm-900 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 print:static"
+                  class="sticky left-0 z-30 w-24 rounded-tl border border-t-0 border-l-0 border-theme-300 bg-theme-100 px-0 py-2 text-center text-sm font-bold text-theme-900 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 print:static"
                   rowspan="2"
                 >
                   週次 \ 課程
                   <div
-                    class="absolute top-full left-0 h-px w-full bg-warm-300 dark:bg-zinc-600 print:hidden"
+                    class="absolute top-full left-0 h-px w-full bg-theme-300 dark:bg-zinc-600 print:hidden"
                   ></div>
                 </th>
                 <th
                   v-for="course in viewModel.courses"
                   :key="course.id"
-                  class="relative w-[calc((100%-6rem)/var(--courses-count))] border border-t-0 border-warm-300 px-2 py-2 text-center font-bold text-warm-900 last:rounded-tr last:border-r-0 dark:border-zinc-600 dark:text-zinc-100 print:static"
+                  class="relative w-[calc((100%-6rem)/var(--courses-count))] border border-t-0 border-theme-300 px-2 py-2 text-center font-bold text-theme-900 last:rounded-tr last:border-r-0 dark:border-zinc-600 dark:text-zinc-100 print:static"
                   colspan="2"
                 >
                   <div class="line-clamp-2 w-full overflow-hidden text-xs">
                     {{ course.name }}
                   </div>
                   <div
-                    class="absolute top-full left-0 h-px w-full bg-warm-300 dark:bg-zinc-600 print:hidden"
+                    class="absolute top-full left-0 h-px w-full bg-theme-300 dark:bg-zinc-600 print:hidden"
                   ></div>
                 </th>
               </tr>
               <tr
-                class="hidden border-b border-warm-300 bg-warm-100 dark:border-zinc-600 dark:bg-zinc-900 print:table-row"
+                class="hidden border-b border-theme-300 bg-theme-100 dark:border-zinc-600 dark:bg-zinc-900 print:table-row"
               >
                 <template v-for="course in viewModel.courses" :key="course.id">
                   <th
-                    class="border border-t-0 border-b-0 border-warm-300 px-0 py-1 text-center text-xs font-medium text-warm-700 dark:border-zinc-600 dark:text-zinc-300"
+                    class="border border-t-0 border-b-0 border-theme-300 px-0 py-1 text-center text-xs font-medium text-theme-700 dark:border-zinc-600 dark:text-zinc-300"
                   >
                     影音
                   </th>
                   <th
-                    class="border border-t-0 border-b-0 border-warm-300 px-0 py-1 text-center text-xs font-medium text-warm-700 last:border-r-0 dark:border-zinc-600 dark:text-zinc-300"
+                    class="border border-t-0 border-b-0 border-theme-300 px-0 py-1 text-center text-xs font-medium text-theme-700 last:border-r-0 dark:border-zinc-600 dark:text-zinc-300"
                   >
                     課本
                   </th>
@@ -301,10 +303,10 @@ const csrfToken =
             <tbody>
               <template v-for="week in viewModel.weeks" :key="week.num">
                 <tr
-                  class="border-b border-warm-300 hover:bg-warm-50 dark:border-zinc-600 dark:hover:bg-zinc-950"
+                  class="border-b border-theme-300 hover:bg-theme-50 dark:border-zinc-600 dark:hover:bg-zinc-950"
                 >
                   <td
-                    class="sticky left-0 z-10 break-inside-avoid border border-b-0 border-l-0 border-warm-300 px-0 py-0 font-semibold text-warm-900 dark:border-zinc-600 dark:text-zinc-100 print:static print:bg-warm-50"
+                    class="sticky left-0 z-10 break-inside-avoid border border-b-0 border-l-0 border-theme-300 px-0 py-0 font-semibold text-theme-900 dark:border-zinc-600 dark:text-zinc-100 print:static print:bg-theme-50"
                     :class="
                       currentWeek === week.num
                         ? 'bg-blue-50 dark:bg-blue-950/60'
@@ -313,7 +315,7 @@ const csrfToken =
                           : isWeekPassed(week.num) &&
                               hasIncompleteCourseInWeek(week.num)
                             ? 'bg-red-50 dark:bg-red-950/60'
-                            : 'bg-warm-50 dark:bg-zinc-950'
+                            : 'bg-theme-50 dark:bg-zinc-950'
                     "
                     rowspan="2"
                   >
@@ -323,12 +325,12 @@ const csrfToken =
                       第{{ toChineseNumber(week.num) }}週
                     </div>
                     <div
-                      class="text-center text-xs text-warm-600 dark:text-zinc-400 print:text-warm-600!"
+                      class="text-center text-xs text-theme-600 dark:text-zinc-400 print:text-theme-600!"
                     >
                       {{ week.start }} - {{ week.end }}
                     </div>
                     <div
-                      class="absolute top-0 left-full h-full w-px bg-warm-300 dark:bg-zinc-600 print:hidden"
+                      class="absolute top-0 left-full h-full w-px bg-theme-300 dark:bg-zinc-600 print:hidden"
                     ></div>
                   </td>
 
@@ -337,7 +339,7 @@ const csrfToken =
                     :key="course.id"
                   >
                     <td
-                      class="border border-warm-300 text-center last:border-r-0 dark:border-zinc-600 [&:has(input:checked)]:bg-white dark:[&:has(input:checked)]:bg-zinc-900"
+                      class="border border-theme-300 text-center last:border-r-0 dark:border-zinc-600 [&:has(input:checked)]:bg-white dark:[&:has(input:checked)]:bg-zinc-900"
                       :class="
                         currentWeek === week.num
                           ? 'bg-blue-50 dark:bg-blue-950/60'
@@ -372,7 +374,7 @@ const csrfToken =
                       </label>
                     </td>
                     <td
-                      class="border border-warm-300 text-center last:border-r-0 dark:border-zinc-600 [&:has(input:checked)]:bg-white dark:[&:has(input:checked)]:bg-zinc-900"
+                      class="border border-theme-300 text-center last:border-r-0 dark:border-zinc-600 [&:has(input:checked)]:bg-white dark:[&:has(input:checked)]:bg-zinc-900"
                       :class="
                         currentWeek === week.num
                           ? 'bg-blue-50 dark:bg-blue-950/60'
@@ -412,7 +414,7 @@ const csrfToken =
                   <td
                     v-for="course in viewModel.courses"
                     :key="course.id"
-                    class="border border-b-0 border-warm-300 bg-white last:border-r-0 dark:border-zinc-600 dark:bg-zinc-900 print:h-16"
+                    class="border border-b-0 border-theme-300 bg-white last:border-r-0 dark:border-zinc-600 dark:bg-zinc-900 print:h-16"
                     colspan="2"
                   >
                     <textarea
@@ -421,7 +423,7 @@ const csrfToken =
                       :class="
                         isProgressComplete(course.id, week.num)
                           ? 'text-gray-400'
-                          : 'text-warm-700 dark:text-zinc-300'
+                          : 'text-theme-700 dark:text-zinc-300'
                       "
                       class="m-0 h-full w-full resize-none px-2 py-2 text-xs placeholder-gray-400 focus:border-blue-500 focus:outline-none print:text-black print:placeholder-transparent"
                       rows="2"
@@ -447,11 +449,11 @@ const csrfToken =
 
       <div class="mt-6 flex items-start justify-between">
         <div
-          class="bg-warm-50 dark:bg-zinc-950 print:hidden"
+          class="bg-theme-50 dark:bg-zinc-950 print:hidden"
           aria-hidden="true"
         >
           <p
-            class="mb-2 text-sm font-semibold text-warm-900 dark:text-zinc-100"
+            class="mb-2 text-sm font-semibold text-theme-900 dark:text-zinc-100"
           >
             圖例：
           </p>
@@ -460,7 +462,7 @@ const csrfToken =
               <div
                 class="size-3 rounded border-2 border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-950/60"
               ></div>
-              <span class="text-xs text-warm-700 dark:text-zinc-300"
+              <span class="text-xs text-theme-700 dark:text-zinc-300"
                 >目前週次</span
               >
             </div>
@@ -476,7 +478,7 @@ const csrfToken =
         </div>
         <button
           type="button"
-          class="inline-flex items-center justify-center gap-2 rounded-md border border-warm-200 px-4 py-2 text-sm font-medium text-warm-700 transition-colors hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950 print:hidden"
+          class="inline-flex items-center justify-center gap-2 rounded-md border border-theme-200 px-4 py-2 text-sm font-medium text-theme-700 transition-colors hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950 print:hidden"
           @click="print()"
         >
           <Icon name="printer" class="inline size-4" />

@@ -108,27 +108,27 @@ function submit() {
   <AppLayout>
     <div class="mx-auto max-w-3xl space-y-6">
       <div class="space-y-2">
-        <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+        <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
           新增優惠店家
         </h2>
-        <p class="text-sm text-warm-600 dark:text-zinc-400">
+        <p class="text-sm text-theme-600 dark:text-zinc-400">
           填寫下方表單來送出新的學生優惠店家。送出後需經管理員確認才會顯示在前台。
         </p>
       </div>
 
       <div
-        class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <form class="space-y-6" @submit.prevent="submit">
           <div class="space-y-4">
-            <h3 class="text-lg font-semibold text-warm-900 dark:text-zinc-100">
+            <h3 class="text-lg font-semibold text-theme-900 dark:text-zinc-100">
               基本資料
             </h3>
             <div class="grid gap-4 sm:grid-cols-2">
               <div>
                 <label
                   for="name"
-                  class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+                  class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
                 >
                   店家名稱
                   <span class="text-red-500">*</span>
@@ -138,7 +138,7 @@ function submit() {
                   v-model="form.name"
                   type="text"
                   name="name"
-                  class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                  class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                   placeholder="店家名稱或網站名稱"
                 />
                 <p v-if="form.errors.name" class="mt-1 text-xs text-red-500">
@@ -149,7 +149,7 @@ function submit() {
               <div>
                 <label
                   for="type"
-                  class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+                  class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
                 >
                   類型
                   <span class="text-red-500">*</span>
@@ -159,7 +159,7 @@ function submit() {
                     id="type"
                     v-model="form.type"
                     name="type"
-                    class="w-full appearance-none rounded-lg border border-warm-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                    class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
                     @change="handleTypeChange()"
                   >
                     <option value="">請選擇</option>
@@ -185,7 +185,7 @@ function submit() {
               <div>
                 <label
                   for="category_id"
-                  class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+                  class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
                 >
                   分類
                   <span class="text-red-500">*</span>
@@ -195,7 +195,7 @@ function submit() {
                     id="category_id"
                     v-model="form.category_id"
                     name="category_id"
-                    class="w-full appearance-none rounded-lg border border-warm-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                    class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
                   >
                     <option value="">請選擇</option>
                     <option
@@ -223,14 +223,14 @@ function submit() {
           </div>
 
           <div v-show="form.type && form.type !== 'online'" class="space-y-4">
-            <h3 class="text-lg font-semibold text-warm-900 dark:text-zinc-100">
+            <h3 class="text-lg font-semibold text-theme-900 dark:text-zinc-100">
               地點資訊
             </h3>
             <div class="grid gap-4 sm:grid-cols-2">
               <div>
                 <label
                   for="city"
-                  class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+                  class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
                 >
                   縣市
                   <span v-show="form.type === 'local'" class="text-red-500">
@@ -242,7 +242,7 @@ function submit() {
                     id="city"
                     v-model="form.city"
                     name="city"
-                    class="w-full appearance-none rounded-lg border border-warm-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                    class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
                     @change="handleCityChange()"
                   >
                     <option value="">請選擇</option>
@@ -268,7 +268,7 @@ function submit() {
               <div>
                 <label
                   for="district"
-                  class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+                  class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
                 >
                   鄉鎮市區
                   <span v-show="form.type === 'local'" class="text-red-500">
@@ -280,7 +280,7 @@ function submit() {
                     id="district"
                     v-model="form.district"
                     name="district"
-                    class="w-full appearance-none rounded-lg border border-warm-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                    class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
                   >
                     <option value="">請選擇</option>
                     <option
@@ -310,7 +310,7 @@ function submit() {
           <div>
             <label
               for="address"
-              class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+              class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               {{ form.type === 'online' ? '網址' : '詳細地址' }}
             </label>
@@ -319,7 +319,7 @@ function submit() {
               v-model="form.address"
               type="text"
               name="address"
-              class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+              class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
               :placeholder="form.type === 'online' ? 'https://...' : '詳細地址'"
             />
             <p v-if="form.errors.address" class="mt-1 text-xs text-red-500">
@@ -328,13 +328,13 @@ function submit() {
           </div>
 
           <div class="space-y-4">
-            <h3 class="text-lg font-semibold text-warm-900 dark:text-zinc-100">
+            <h3 class="text-lg font-semibold text-theme-900 dark:text-zinc-100">
               優惠資訊
             </h3>
             <div>
               <label
                 for="verification_method"
-                class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+                class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
               >
                 驗證方式
               </label>
@@ -343,7 +343,7 @@ function submit() {
                 v-model="form.verification_method"
                 type="text"
                 name="verification_method"
-                class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                 placeholder="例如：學生信箱、學生證、學生證+選課卡"
               />
               <p
@@ -357,7 +357,7 @@ function submit() {
             <div>
               <label
                 for="discount_details"
-                class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+                class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
               >
                 優惠內容
                 <span class="text-red-500">*</span>
@@ -367,7 +367,7 @@ function submit() {
                 v-model="form.discount_details"
                 name="discount_details"
                 rows="3"
-                class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                 placeholder="描述詳細的優惠內容..."
               ></textarea>
               <p
@@ -381,7 +381,7 @@ function submit() {
             <div>
               <label
                 for="notes"
-                class="mb-1 block text-sm font-medium text-warm-700 dark:text-zinc-300"
+                class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
               >
                 備註
               </label>
@@ -390,7 +390,7 @@ function submit() {
                 v-model="form.notes"
                 name="notes"
                 rows="2"
-                class="w-full rounded-lg border border-warm-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                 placeholder="其他補充說明（選填）"
               ></textarea>
               <p v-if="form.errors.notes" class="mt-1 text-xs text-red-500">
@@ -406,9 +406,9 @@ function submit() {
                 v-model="form.tested_valid"
                 type="checkbox"
                 name="tested_valid"
-                class="mt-0.5 rounded border-warm-300 text-orange-500 focus:ring-orange-300 dark:border-zinc-700"
+                class="mt-0.5 rounded border-theme-300 text-orange-500 focus:ring-orange-300 dark:border-zinc-700"
               />
-              <span class="text-sm text-warm-700 dark:text-zinc-300">
+              <span class="text-sm text-theme-700 dark:text-zinc-300">
                 我已實際測試過，確認此優惠資訊正確有效
               </span>
             </label>
@@ -433,7 +433,7 @@ function submit() {
           <div class="flex items-center gap-3">
             <button
               type="submit"
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-700 bg-warm-700 px-4 py-2 font-semibold text-white transition hover:bg-warm-800 disabled:cursor-not-allowed disabled:bg-warm-600"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:cursor-not-allowed disabled:bg-theme-600"
               :disabled="form.processing || !turnstileChallengeExecuted"
             >
               <Icon name="paper-airplane" class="size-4" />
@@ -441,7 +441,7 @@ function submit() {
             </button>
             <Link
               href="/discount-stores"
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-warm-500 bg-white px-4 py-2 text-warm-900 transition hover:bg-warm-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
             >
               取消
             </Link>

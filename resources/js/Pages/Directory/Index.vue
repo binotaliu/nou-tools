@@ -249,10 +249,10 @@ onMounted(() => {
       </div>
 
       <div class="space-y-2">
-        <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+        <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
           連結 / 學習指導中心目錄
         </h2>
-        <p class="text-sm text-warm-600 dark:text-zinc-400">
+        <p class="text-sm text-theme-600 dark:text-zinc-400">
           彙整校內各處室、學系與學習指導中心的官方網站連結。
         </p>
       </div>
@@ -261,11 +261,11 @@ onMounted(() => {
         <div
           v-for="linkGroup in viewModel.linkGroups"
           :key="linkGroup.group"
-          class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+          class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div class="mb-4">
             <h2
-              class="mb-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
+              class="mb-1 text-xl font-semibold text-theme-900 dark:text-zinc-100"
             >
               {{ linkGroup.label }}
             </h2>
@@ -279,12 +279,12 @@ onMounted(() => {
               target="_blank"
               rel="noopener noreferrer"
               data-offline-allow
-              class="flex items-center justify-between gap-2 rounded-lg border border-warm-200 bg-white px-4 py-3 text-sm font-medium text-warm-800 transition hover:border-warm-300 hover:bg-warm-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
+              class="flex items-center justify-between gap-2 rounded-lg border border-theme-200 bg-white px-4 py-3 text-sm font-medium text-theme-800 transition hover:border-theme-300 hover:bg-theme-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
             >
               <span class="truncate">{{ link.name }}</span>
               <Icon
                 name="arrow-top-right-on-square"
-                class="size-4 shrink-0 text-warm-400 dark:text-zinc-500"
+                class="size-4 shrink-0 text-theme-400 dark:text-zinc-500"
               />
             </a>
           </div>
@@ -292,11 +292,11 @@ onMounted(() => {
 
         <div
           v-if="viewModel.centerGroup"
-          class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+          class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div class="mb-4">
             <h2
-              class="mb-1 text-xl font-semibold text-warm-900 dark:text-zinc-100"
+              class="mb-1 text-xl font-semibold text-theme-900 dark:text-zinc-100"
             >
               {{ viewModel.centerGroup.label }}
             </h2>
@@ -306,7 +306,7 @@ onMounted(() => {
             <select
               :value="selectedKey"
               data-testid="center-select"
-              class="w-full rounded-lg border border-warm-200 bg-white px-3 py-2 text-sm font-medium text-warm-800 sm:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+              class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm font-medium text-theme-800 sm:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
               @change="selectCenter($event.target.value)"
             >
               <option value="">請選擇學習指導中心</option>
@@ -334,7 +334,7 @@ onMounted(() => {
                 class="space-y-1"
               >
                 <p
-                  class="px-3 text-xs font-semibold tracking-wide text-warm-500 uppercase dark:text-zinc-500"
+                  class="px-3 text-xs font-semibold tracking-wide text-theme-500 uppercase dark:text-zinc-500"
                 >
                   {{ region.label }}
                 </p>
@@ -345,8 +345,8 @@ onMounted(() => {
                     type="button"
                     :class="
                       selectedKey === center.key
-                        ? 'bg-warm-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
-                        : 'text-warm-700 hover:bg-warm-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
+                        ? 'bg-theme-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
+                        : 'text-theme-700 hover:bg-theme-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
                     "
                     class="truncate rounded-lg px-3 py-2 text-left text-sm font-medium transition"
                     :data-testid="'center-button-' + center.key"
@@ -368,21 +368,23 @@ onMounted(() => {
                   v-show="!offline"
                   ref="mapContainer"
                   data-testid="center-map"
-                  class="h-80 w-full rounded-lg border border-warm-100 dark:border-zinc-800"
+                  class="h-80 w-full rounded-lg border border-theme-100 dark:border-zinc-800"
                 ></div>
 
                 <div
                   v-show="offline"
                   data-testid="center-map-offline-notice"
-                  class="flex h-80 w-full flex-col items-center justify-center gap-2 rounded-lg border border-warm-100 px-4 text-center text-sm text-warm-700 dark:border-zinc-800 dark:text-zinc-400"
+                  class="flex h-80 w-full flex-col items-center justify-center gap-2 rounded-lg border border-theme-100 px-4 text-center text-sm text-theme-700 dark:border-zinc-800 dark:text-zinc-400"
                 >
                   <Icon name="signal-slash" class="size-6 shrink-0" />
                   <p>目前處於離線狀態，學習指導中心地圖需要連線才能顯示。</p>
                 </div>
 
-                <div class="space-y-2 text-sm text-warm-700 dark:text-zinc-300">
+                <div
+                  class="space-y-2 text-sm text-theme-700 dark:text-zinc-300"
+                >
                   <p
-                    class="text-base font-semibold text-warm-900 dark:text-zinc-100"
+                    class="text-base font-semibold text-theme-900 dark:text-zinc-100"
                   >
                     {{ selectedCenter.name }}
                   </p>
@@ -429,12 +431,12 @@ onMounted(() => {
                     rel="noopener noreferrer"
                     data-testid="center-website-button"
                     data-offline-allow
-                    class="flex items-center justify-between gap-2 rounded-lg border border-warm-200 bg-white px-4 py-3 text-sm font-medium text-warm-800 transition hover:border-warm-300 hover:bg-warm-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
+                    class="flex items-center justify-between gap-2 rounded-lg border border-theme-200 bg-white px-4 py-3 text-sm font-medium text-theme-800 transition hover:border-theme-300 hover:bg-theme-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
                   >
                     <span class="truncate">開啟中心網站</span>
                     <Icon
                       name="arrow-top-right-on-square"
-                      class="size-4 shrink-0 text-warm-400 dark:text-zinc-500"
+                      class="size-4 shrink-0 text-theme-400 dark:text-zinc-500"
                     />
                   </a>
 
@@ -445,12 +447,12 @@ onMounted(() => {
                     rel="noopener noreferrer"
                     data-testid="center-transport-button"
                     data-offline-allow
-                    class="flex items-center justify-between gap-2 rounded-lg border border-warm-200 bg-white px-4 py-3 text-sm font-medium text-warm-800 transition hover:border-warm-300 hover:bg-warm-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
+                    class="flex items-center justify-between gap-2 rounded-lg border border-theme-200 bg-white px-4 py-3 text-sm font-medium text-theme-800 transition hover:border-theme-300 hover:bg-theme-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-950"
                   >
                     <span class="truncate">交通資訊</span>
                     <Icon
                       name="truck"
-                      class="size-4 shrink-0 text-warm-400 dark:text-zinc-500"
+                      class="size-4 shrink-0 text-theme-400 dark:text-zinc-500"
                     />
                   </a>
                 </div>
@@ -459,7 +461,7 @@ onMounted(() => {
               <div
                 v-else
                 data-testid="center-placeholder"
-                class="flex h-80 w-full items-center justify-center rounded-lg border border-warm-100 text-warm-700 md:text-lg dark:border-zinc-800 dark:text-zinc-500"
+                class="flex h-80 w-full items-center justify-center rounded-lg border border-theme-100 text-theme-700 md:text-lg dark:border-zinc-800 dark:text-zinc-500"
               >
                 <span class="hidden md:inline"
                   >從左側選擇一個學習指導中心來檢視詳情</span
@@ -480,31 +482,31 @@ onMounted(() => {
                   class="mx-4 w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-zinc-900"
                 >
                   <h3
-                    class="mb-4 text-lg font-semibold text-warm-900 dark:text-zinc-100"
+                    class="mb-4 text-lg font-semibold text-theme-900 dark:text-zinc-100"
                   >
                     選擇地圖 App
                   </h3>
-                  <p class="mb-6 text-sm text-warm-600 dark:text-zinc-400">
+                  <p class="mb-6 text-sm text-theme-600 dark:text-zinc-400">
                     選擇你慣用的地圖應用程式來檢視學習指導中心位置。
                   </p>
                   <div class="space-y-2">
                     <button
                       type="button"
-                      class="w-full rounded-lg border border-warm-200 px-4 py-3 text-center text-sm font-medium text-warm-700 transition hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                      class="w-full rounded-lg border border-theme-200 px-4 py-3 text-center text-sm font-medium text-theme-700 transition hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                       @click="openInMap('osm')"
                     >
                       在 OpenStreetMap 開啟
                     </button>
                     <button
                       type="button"
-                      class="w-full rounded-lg border border-warm-200 px-4 py-3 text-center text-sm font-medium text-warm-700 transition hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                      class="w-full rounded-lg border border-theme-200 px-4 py-3 text-center text-sm font-medium text-theme-700 transition hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                       @click="openInMap('apple')"
                     >
                       在 Apple 地圖開啟
                     </button>
                     <button
                       type="button"
-                      class="w-full rounded-lg border border-warm-200 px-4 py-3 text-center text-sm font-medium text-warm-700 transition hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                      class="w-full rounded-lg border border-theme-200 px-4 py-3 text-center text-sm font-medium text-theme-700 transition hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                       @click="
                         openInMap('google', selectedCenter?.googleMapsUrl)
                       "
@@ -514,7 +516,7 @@ onMounted(() => {
                   </div>
                   <button
                     type="button"
-                    class="mt-4 w-full rounded-lg border border-warm-200 px-4 py-2 text-sm text-warm-700 transition hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+                    class="mt-4 w-full rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 transition hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
                     @click="closeMapSelectionModal()"
                   >
                     關閉

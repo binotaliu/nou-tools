@@ -179,17 +179,17 @@ onUnmounted(() => {
         class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
       >
         <div class="space-y-2">
-          <h2 class="text-3xl font-bold text-warm-900 dark:text-zinc-100">
+          <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
             自習室
           </h2>
-          <p class="text-sm text-warm-600 dark:text-zinc-400">
+          <p class="text-sm text-theme-600 dark:text-zinc-400">
             找個座位跟其他同學一起用功。自習室 {{ openHoursLabel }} 開放。
           </p>
         </div>
 
         <div
           v-if="socket.state"
-          class="inline-flex items-center gap-2 self-start rounded-full bg-warm-100 px-4 py-2 text-sm font-medium text-warm-800 dark:bg-zinc-800 dark:text-zinc-200"
+          class="inline-flex items-center gap-2 self-start rounded-full bg-theme-100 px-4 py-2 text-sm font-medium text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
           data-testid="study-room-site-total"
         >
           <FireIcon class="size-4 shrink-0" />
@@ -203,29 +203,29 @@ onUnmounted(() => {
       <div
         v-if="!hasSchedule"
         data-testid="study-room-needs-schedule"
-        class="rounded-lg border border-warm-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+        class="rounded-lg border border-theme-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="flex flex-col items-center gap-3 py-6 text-center">
-          <TableCellsIcon class="size-10 text-warm-400 dark:text-zinc-500" />
+          <TableCellsIcon class="size-10 text-theme-400 dark:text-zinc-500" />
           <div class="space-y-1">
-            <h3 class="text-xl font-semibold text-warm-800 dark:text-zinc-200">
+            <h3 class="text-xl font-semibold text-theme-800 dark:text-zinc-200">
               先建立課表才能進自習室
             </h3>
-            <p class="text-sm text-warm-500 dark:text-zinc-400">
+            <p class="text-sm text-theme-500 dark:text-zinc-400">
               自習室會用你的課表列出「你在讀什麼」的選項，所以需要先有一份儲存好的課表。
             </p>
           </div>
           <div class="flex flex-wrap justify-center gap-2 pt-2">
             <Link
               href="/schedules/create"
-              class="inline-flex items-center gap-1.5 rounded-lg bg-warm-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-warm-900 dark:bg-warm-600 dark:hover:bg-warm-500"
+              class="inline-flex items-center gap-1.5 rounded-lg bg-theme-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-theme-900 dark:bg-theme-600 dark:hover:bg-theme-500"
             >
               <PlusIcon class="size-4" />
               建立我的課表
             </Link>
             <Link
               href="/schedules/my"
-              class="inline-flex items-center gap-1.5 rounded-lg border border-warm-300 bg-white px-4 py-2 text-sm font-semibold text-warm-800 transition hover:bg-warm-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              class="inline-flex items-center gap-1.5 rounded-lg border border-theme-300 bg-white px-4 py-2 text-sm font-semibold text-theme-800 transition hover:bg-theme-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
               我已經有課表了
             </Link>
@@ -297,7 +297,7 @@ onUnmounted(() => {
         >
           <p
             v-show="profile.statsLoading"
-            class="text-sm text-warm-500 dark:text-zinc-400"
+            class="text-sm text-theme-500 dark:text-zinc-400"
           >
             載入中…
           </p>
@@ -305,7 +305,7 @@ onUnmounted(() => {
           <div v-show="!profile.statsLoading" class="space-y-4">
             <div>
               <h4
-                class="mb-3 text-sm font-semibold text-warm-900 dark:text-zinc-100"
+                class="mb-3 text-sm font-semibold text-theme-900 dark:text-zinc-100"
               >
                 最近 7 天
               </h4>
@@ -321,8 +321,8 @@ onUnmounted(() => {
                   class="flex flex-1 flex-col items-center gap-1.5 rounded-md py-1.5 transition"
                   :class="
                     profile.selectedStatsDate === day.date
-                      ? 'bg-warm-100 dark:bg-zinc-800'
-                      : 'hover:bg-warm-50 dark:hover:bg-zinc-800/60'
+                      ? 'bg-theme-100 dark:bg-zinc-800'
+                      : 'hover:bg-theme-50 dark:hover:bg-zinc-800/60'
                   "
                   :data-testid="'study-room-stats-bar-' + day.date"
                   @click="profile.selectStatsDate(day.date)"
@@ -332,28 +332,28 @@ onUnmounted(() => {
                       class="w-4 rounded-t-sm transition-all"
                       :class="
                         profile.selectedStatsDate === day.date
-                          ? 'bg-warm-600 dark:bg-warm-400'
-                          : 'bg-warm-300 dark:bg-zinc-600'
+                          ? 'bg-theme-600 dark:bg-theme-400'
+                          : 'bg-theme-300 dark:bg-zinc-600'
                       "
                       :style="profile.statsBarHeightStyle(day)"
                     ></span>
                   </span>
                   <span
-                    class="text-xs font-medium text-warm-600 dark:text-zinc-400"
+                    class="text-xs font-medium text-theme-600 dark:text-zinc-400"
                     >{{ day.label }}</span
                   >
                 </button>
               </div>
             </div>
 
-            <div class="border-t border-warm-200 pt-4 dark:border-zinc-700">
+            <div class="border-t border-theme-200 pt-4 dark:border-zinc-700">
               <div class="mb-2 flex items-center justify-between">
                 <h4
-                  class="text-sm font-semibold text-warm-900 dark:text-zinc-100"
+                  class="text-sm font-semibold text-theme-900 dark:text-zinc-100"
                 >
                   {{ profile.selectedStatsDay().label }} 的紀錄
                 </h4>
-                <span class="text-xs text-warm-500 dark:text-zinc-400">{{
+                <span class="text-xs text-theme-500 dark:text-zinc-400">{{
                   profile.formatDurationLabel(
                     profile.selectedStatsDay().focusSeconds
                   )
@@ -362,7 +362,7 @@ onUnmounted(() => {
 
               <p
                 v-show="profile.selectedStatsDay().sessions.length === 0"
-                class="text-sm text-warm-500 dark:text-zinc-400"
+                class="text-sm text-theme-500 dark:text-zinc-400"
               >
                 這天沒有紀錄
               </p>
@@ -377,10 +377,10 @@ onUnmounted(() => {
                   :key="session.startedAt"
                   class="flex items-center justify-between gap-2 text-sm"
                 >
-                  <span class="truncate text-warm-800 dark:text-zinc-200">{{
+                  <span class="truncate text-theme-800 dark:text-zinc-200">{{
                     session.activityLabel
                   }}</span>
-                  <span class="shrink-0 text-warm-500 dark:text-zinc-400">{{
+                  <span class="shrink-0 text-theme-500 dark:text-zinc-400">{{
                     profile.sessionDurationLabel(session)
                   }}</span>
                 </li>
@@ -392,9 +392,9 @@ onUnmounted(() => {
         <div
           v-show="needsProfile"
           data-testid="study-room-needs-profile-placeholder"
-          class="rounded-lg border border-warm-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+          class="rounded-lg border border-theme-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
         >
-          <p class="text-sm text-warm-600 dark:text-zinc-400">
+          <p class="text-sm text-theme-600 dark:text-zinc-400">
             請先設定暱稱與表情符號，才能加入自習室。
           </p>
         </div>
@@ -415,16 +415,16 @@ onUnmounted(() => {
           >
             <div class="flex items-end justify-between px-1">
               <h3
-                class="flex items-center gap-2 text-lg font-semibold text-warm-900 dark:text-zinc-100"
+                class="flex items-center gap-2 text-lg font-semibold text-theme-900 dark:text-zinc-100"
               >
                 <span>{{ floor.label }}</span>
                 <span
-                  class="text-sm font-normal text-warm-500 dark:text-zinc-400"
+                  class="text-sm font-normal text-theme-500 dark:text-zinc-400"
                   >閱覽室</span
                 >
               </h3>
               <span
-                class="inline-flex items-center gap-1.5 rounded-full bg-warm-100 px-2.5 py-1 text-xs text-warm-700 tabular-nums dark:bg-zinc-800 dark:text-zinc-300"
+                class="inline-flex items-center gap-1.5 rounded-full bg-theme-100 px-2.5 py-1 text-xs text-theme-700 tabular-nums dark:bg-zinc-800 dark:text-zinc-300"
               >
                 <span class="size-1.5 rounded-full bg-emerald-500"></span>
                 <span
@@ -435,7 +435,7 @@ onUnmounted(() => {
             </div>
 
             <div
-              class="relative rounded-2xl border-[6px] border-warm-300 bg-warm-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
+              class="relative rounded-2xl border-[6px] border-theme-300 bg-theme-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
             >
               <div
                 class="pointer-events-none absolute inset-x-10 -top-[6px] z-10 flex h-[6px] gap-3 sm:inset-x-20"
@@ -457,15 +457,15 @@ onUnmounted(() => {
 
               <template v-if="grid.isGroundFloor(floor)">
                 <div
-                  class="pointer-events-none absolute right-8 -bottom-[6px] z-10 h-[6px] w-12 bg-warm-50 dark:bg-zinc-950"
+                  class="pointer-events-none absolute right-8 -bottom-[6px] z-10 h-[6px] w-12 bg-theme-50 dark:bg-zinc-950"
                   aria-hidden="true"
                 ></div>
                 <div
-                  class="pointer-events-none absolute right-8 bottom-0 z-10 size-12 rounded-tl-full border-t border-l border-dashed border-warm-400 dark:border-zinc-500"
+                  class="pointer-events-none absolute right-8 bottom-0 z-10 size-12 rounded-tl-full border-t border-l border-dashed border-theme-400 dark:border-zinc-500"
                   aria-hidden="true"
                 >
                   <span
-                    class="absolute right-0 bottom-0 h-full w-[3px] origin-bottom -rotate-[70deg] rounded-full bg-warm-500 dark:bg-zinc-400"
+                    class="absolute right-0 bottom-0 h-full w-[3px] origin-bottom -rotate-[70deg] rounded-full bg-theme-500 dark:bg-zinc-400"
                   ></span>
                 </div>
               </template>
@@ -492,7 +492,7 @@ onUnmounted(() => {
                     @click="socket.take(seat.code)"
                   >
                     <span
-                      class="pointer-events-none absolute inset-x-1.5 top-0 h-4 rounded-b-md bg-warm-200 shadow-[inset_0_-2px_0_var(--color-warm-300)] dark:bg-zinc-700 dark:shadow-[inset_0_-2px_0_var(--color-zinc-600)]"
+                      class="pointer-events-none absolute inset-x-1.5 top-0 h-4 rounded-b-md bg-theme-200 shadow-[inset_0_-2px_0_var(--color-theme-300)] dark:bg-zinc-700 dark:shadow-[inset_0_-2px_0_var(--color-zinc-600)]"
                       aria-hidden="true"
                     >
                       <span
@@ -500,7 +500,7 @@ onUnmounted(() => {
                         :class="
                           seat.isOccupied
                             ? 'bg-amber-400 shadow-[0_0_8px_3px_rgba(251,191,36,0.55)]'
-                            : 'bg-warm-300 dark:bg-zinc-600'
+                            : 'bg-theme-300 dark:bg-zinc-600'
                         "
                       ></span>
                       <span
@@ -514,11 +514,11 @@ onUnmounted(() => {
                       class="flex flex-col items-center gap-1"
                     >
                       <span
-                        class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-warm-300 bg-white text-[10px] font-medium text-warm-400 transition group-hover:border-warm-400 group-hover:text-warm-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-500"
+                        class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-300 bg-white text-[10px] font-medium text-theme-400 transition group-hover:border-theme-400 group-hover:text-theme-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-500"
                         >{{ seat.seatNumber }}</span
                       >
                       <span
-                        class="text-[10px] text-warm-400 opacity-0 transition group-hover:opacity-100 dark:text-zinc-500"
+                        class="text-[10px] text-theme-400 opacity-0 transition group-hover:opacity-100 dark:text-zinc-500"
                         >點擊入座</span
                       >
                     </div>
@@ -528,12 +528,12 @@ onUnmounted(() => {
                     >
                       <div
                         v-if="grid.thoughtBubbleText(seat)"
-                        class="pointer-events-none absolute -top-6 left-1/2 z-10 flex w-24 -translate-x-1/2 overflow-hidden rounded-full border border-warm-200 bg-white px-2 py-0.5 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
+                        class="pointer-events-none absolute -top-6 left-1/2 z-10 flex w-24 -translate-x-1/2 overflow-hidden rounded-full border border-theme-200 bg-white px-2 py-0.5 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
                         data-testid="study-room-seat-bubble"
                       >
                         <span
                           v-if="grid.needsMarquee(seat)"
-                          class="flex animate-marquee text-[9px] whitespace-nowrap text-warm-700 dark:text-zinc-200"
+                          class="flex animate-marquee text-[9px] whitespace-nowrap text-theme-700 dark:text-zinc-200"
                         >
                           <span class="pr-4">{{
                             grid.thoughtBubbleText(seat)
@@ -544,14 +544,14 @@ onUnmounted(() => {
                         </span>
                         <span
                           v-else
-                          class="block w-full truncate text-center text-[9px] whitespace-nowrap text-warm-700 dark:text-zinc-200"
+                          class="block w-full truncate text-center text-[9px] whitespace-nowrap text-theme-700 dark:text-zinc-200"
                           >{{ grid.thoughtBubbleText(seat) }}</span
                         >
                       </div>
 
                       <span class="relative">
                         <span
-                          class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-warm-400 bg-white text-lg leading-none shadow-sm dark:border-zinc-500 dark:bg-zinc-800"
+                          class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-400 bg-white text-lg leading-none shadow-sm dark:border-zinc-500 dark:bg-zinc-800"
                           >{{ seat.emoji }}</span
                         >
                         <span
@@ -561,7 +561,7 @@ onUnmounted(() => {
                         >
                       </span>
                       <span
-                        class="max-w-full truncate text-[10px] font-medium text-warm-800 dark:text-zinc-200"
+                        class="max-w-full truncate text-[10px] font-medium text-theme-800 dark:text-zinc-200"
                         >{{ seat.nickname }}</span
                       >
                       <span
@@ -597,13 +597,13 @@ onUnmounted(() => {
                     </div>
 
                     <div
-                      class="flex h-14 w-44 items-center justify-center gap-2 rounded-xl border-2 border-warm-300 bg-warm-200 shadow-[inset_0_2px_0_rgba(255,255,255,0.6),0_2px_4px_rgba(0,0,0,0.06)] dark:border-zinc-600 dark:bg-zinc-700 dark:shadow-none"
+                      class="flex h-14 w-44 items-center justify-center gap-2 rounded-xl border-2 border-theme-300 bg-theme-200 shadow-[inset_0_2px_0_rgba(255,255,255,0.6),0_2px_4px_rgba(0,0,0,0.06)] dark:border-zinc-600 dark:bg-zinc-700 dark:shadow-none"
                     >
                       <span class="text-base leading-none" aria-hidden="true"
                         >🪴</span
                       >
                       <span
-                        class="text-xs font-medium text-warm-700 dark:text-zinc-300"
+                        class="text-xs font-medium text-theme-700 dark:text-zinc-300"
                         >{{ table.label }}</span
                       >
                     </div>
@@ -632,16 +632,16 @@ onUnmounted(() => {
                     data-testid="study-room-stair-up"
                   >
                     <span
-                      class="max-w-16 text-[10px] leading-tight text-warm-500 dark:text-zinc-400"
+                      class="max-w-16 text-[10px] leading-tight text-theme-500 dark:text-zinc-400"
                       >{{ grid.stairHint(floor) }}</span
                     >
                     <div
-                      class="relative h-9 w-16 overflow-hidden rounded-t-sm border-x-2 border-t-2 border-warm-300 bg-[repeating-linear-gradient(180deg,var(--color-warm-100)_0_5px,var(--color-warm-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
+                      class="relative h-9 w-16 overflow-hidden rounded-t-sm border-x-2 border-t-2 border-theme-300 bg-[repeating-linear-gradient(180deg,var(--color-theme-100)_0_5px,var(--color-theme-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
                       aria-hidden="true"
                     >
                       <ArrowUpIcon
                         v-if="!grid.isStairBlocked(floor)"
-                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-warm-600 dark:text-zinc-300"
+                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-theme-600 dark:text-zinc-300"
                       />
                       <div
                         v-else
@@ -649,13 +649,13 @@ onUnmounted(() => {
                         data-testid="study-room-stair-blocked"
                       >
                         <div
-                          class="h-1.5 w-full rounded-full bg-warm-400/80 shadow-sm dark:bg-zinc-500/80"
+                          class="h-1.5 w-full rounded-full bg-theme-400/80 shadow-sm dark:bg-zinc-500/80"
                         ></div>
                         <LockClosedIcon
-                          class="size-3.5 text-warm-500 dark:text-zinc-400"
+                          class="size-3.5 text-theme-500 dark:text-zinc-400"
                         />
                         <div
-                          class="h-1.5 w-full rounded-full bg-warm-400/80 shadow-sm dark:bg-zinc-500/80"
+                          class="h-1.5 w-full rounded-full bg-theme-400/80 shadow-sm dark:bg-zinc-500/80"
                         ></div>
                       </div>
                     </div>
@@ -667,15 +667,15 @@ onUnmounted(() => {
                     data-testid="study-room-stair-down"
                   >
                     <span
-                      class="max-w-16 text-[10px] leading-tight text-warm-500 dark:text-zinc-400"
+                      class="max-w-16 text-[10px] leading-tight text-theme-500 dark:text-zinc-400"
                       >{{ grid.stairDownHint(floor) }}</span
                     >
                     <div
-                      class="relative h-9 w-16 rounded-b-sm border-x-2 border-b-2 border-warm-300 bg-[repeating-linear-gradient(180deg,var(--color-warm-100)_0_5px,var(--color-warm-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
+                      class="relative h-9 w-16 rounded-b-sm border-x-2 border-b-2 border-theme-300 bg-[repeating-linear-gradient(180deg,var(--color-theme-100)_0_5px,var(--color-theme-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
                       aria-hidden="true"
                     >
                       <ArrowDownIcon
-                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-warm-600 dark:text-zinc-300"
+                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-theme-600 dark:text-zinc-300"
                       />
                     </div>
                   </div>
@@ -687,7 +687,7 @@ onUnmounted(() => {
                   aria-hidden="true"
                 >
                   <div
-                    class="h-4 w-full max-w-md rounded-t-sm border-x-2 border-t-2 border-warm-300 bg-[repeating-linear-gradient(90deg,var(--color-warm-500)_0_5px,var(--color-warm-50)_5px_6px,var(--color-warm-700)_6px_9px,var(--color-warm-50)_9px_10px,var(--color-sky-600)_10px_14px,var(--color-warm-50)_14px_15px,var(--color-emerald-600)_15px_21px,var(--color-warm-50)_21px_22px,var(--color-warm-400)_22px_25px,var(--color-warm-50)_25px_26px)] opacity-70 dark:border-zinc-600 dark:opacity-50"
+                    class="h-4 w-full max-w-md rounded-t-sm border-x-2 border-t-2 border-theme-300 bg-[repeating-linear-gradient(90deg,var(--color-theme-500)_0_5px,var(--color-theme-50)_5px_6px,var(--color-theme-700)_6px_9px,var(--color-theme-50)_9px_10px,var(--color-sky-600)_10px_14px,var(--color-theme-50)_14px_15px,var(--color-emerald-600)_15px_21px,var(--color-theme-50)_21px_22px,var(--color-theme-400)_22px_25px,var(--color-theme-50)_25px_26px)] opacity-70 dark:border-zinc-600 dark:opacity-50"
                   ></div>
                 </div>
               </div>
@@ -695,11 +695,11 @@ onUnmounted(() => {
           </section>
 
           <p
-            class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-warm-500 dark:text-zinc-400"
+            class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-theme-500 dark:text-zinc-400"
           >
             <span class="inline-flex items-center gap-1.5">
               <span
-                class="size-3 rounded-full border-2 border-b-[3px] border-warm-300 bg-white dark:border-zinc-600 dark:bg-zinc-800"
+                class="size-3 rounded-full border-2 border-b-[3px] border-theme-300 bg-white dark:border-zinc-600 dark:bg-zinc-800"
               ></span>
               空位
             </span>

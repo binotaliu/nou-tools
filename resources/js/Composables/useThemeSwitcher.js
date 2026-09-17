@@ -30,6 +30,12 @@ export default function useThemeSwitcher() {
     apply()
   }
 
+  function setTheme(value) {
+    theme.value = value
+    localStorage.setItem('theme', theme.value)
+    apply()
+  }
+
   onMounted(() => {
     apply()
     window
@@ -41,5 +47,5 @@ export default function useThemeSwitcher() {
       })
   })
 
-  return { theme, cycle }
+  return { theme, cycle, setTheme }
 }

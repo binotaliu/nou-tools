@@ -26,10 +26,10 @@ const {
 <template>
   <div
     v-if="events.length > 0"
-    class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+    class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
   >
     <div class="mb-4">
-      <h2 class="text-xl font-semibold text-warm-900 dark:text-zinc-100">
+      <h2 class="text-xl font-semibold text-theme-900 dark:text-zinc-100">
         學校行事曆
       </h2>
     </div>
@@ -46,15 +46,15 @@ const {
         class="w-full print:hidden"
       >
         <div
-          class="mb-4 rounded-lg border border-warm-200 bg-warm-50 p-4 dark:border-zinc-700 dark:bg-zinc-950"
+          class="mb-4 rounded-lg border border-theme-200 bg-theme-50 p-4 dark:border-zinc-700 dark:bg-zinc-950"
         >
           <div class="flex items-center justify-between">
             <div>
-              <div class="font-semibold text-warm-800 dark:text-zinc-200">
+              <div class="font-semibold text-theme-800 dark:text-zinc-200">
                 {{ countdownEvent.name }}
               </div>
               <p
-                class="mt-1 text-sm text-warm-600 tabular-nums dark:text-zinc-400"
+                class="mt-1 text-sm text-theme-600 tabular-nums dark:text-zinc-400"
               >
                 {{ dateRange(countdownEvent) }}
               </p>
@@ -68,11 +68,13 @@ const {
               </div>
               <div v-else>
                 <div
-                  class="text-3xl font-bold text-warm-700 dark:text-zinc-300"
+                  class="text-3xl font-bold text-theme-700 dark:text-zinc-300"
                 >
                   {{ countdownEvent.daysUntil }}
                 </div>
-                <div class="text-sm text-warm-500 dark:text-zinc-400">天後</div>
+                <div class="text-sm text-theme-500 dark:text-zinc-400">
+                  天後
+                </div>
               </div>
             </div>
           </div>
@@ -97,13 +99,13 @@ const {
             v-for="event in activeEvents"
             :key="event.start + event.name"
             :class="isCountdownMatch(event) ? 'hidden print:flex' : 'flex'"
-            class="flex-col-reverse items-start justify-between gap-x-2 gap-y-1 border-b border-warm-100 py-2 last:border-0 sm:flex-row sm:items-center dark:border-zinc-800"
+            class="flex-col-reverse items-start justify-between gap-x-2 gap-y-1 border-b border-theme-100 py-2 last:border-0 sm:flex-row sm:items-center dark:border-zinc-800"
           >
-            <span class="font-medium text-warm-800 dark:text-zinc-200">
+            <span class="font-medium text-theme-800 dark:text-zinc-200">
               {{ event.name }}
             </span>
             <div
-              class="flex flex-col-reverse items-start gap-x-2 text-sm text-warm-600 tabular-nums sm:flex-row sm:items-center dark:text-zinc-400"
+              class="flex flex-col-reverse items-start gap-x-2 text-sm text-theme-600 tabular-nums sm:flex-row sm:items-center dark:text-zinc-400"
             >
               <span
                 v-if="event.status === 'ongoing'"
@@ -121,7 +123,7 @@ const {
 
     <p
       v-if="showTaipeiHint"
-      class="mt-3 text-xs text-warm-500 dark:text-zinc-400 print:hidden"
+      class="mt-3 text-xs text-theme-500 dark:text-zinc-400 print:hidden"
     >
       此區塊日期皆為台灣時間（Asia/Taipei）
     </p>

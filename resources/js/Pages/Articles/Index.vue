@@ -51,11 +51,11 @@ useMarkdownContainers(indexContentRoot, [() => props.viewModel.indexContent])
   <AppLayout>
     <div class="mx-auto max-w-4xl">
       <div
-        class="rounded-lg border border-warm-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div
           ref="indexContentRoot"
-          class="prose max-w-none prose-warm dark:prose-invert"
+          class="prose max-w-none prose-theme dark:prose-invert"
           v-html="viewModel.indexContent"
         ></div>
       </div>

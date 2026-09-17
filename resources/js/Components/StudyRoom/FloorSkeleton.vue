@@ -25,15 +25,15 @@ function bottomRowCount(seatsPerTable) {
   <section class="space-y-3" data-testid="study-room-floor-skeleton">
     <div class="flex items-end justify-between px-1">
       <div
-        class="h-7 w-20 animate-pulse rounded bg-warm-200 dark:bg-zinc-800"
+        class="h-7 w-20 animate-pulse rounded bg-theme-200 dark:bg-zinc-800"
       ></div>
       <div
-        class="h-6 w-28 animate-pulse rounded-full bg-warm-100 dark:bg-zinc-800"
+        class="h-6 w-28 animate-pulse rounded-full bg-theme-100 dark:bg-zinc-800"
       ></div>
     </div>
 
     <div
-      class="relative rounded-2xl border-[6px] border-warm-300 bg-warm-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
+      class="relative rounded-2xl border-[6px] border-theme-300 bg-theme-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
     >
       <div class="relative space-y-6 rounded-[10px] px-4 pt-6 pb-16 sm:px-8">
         <div
@@ -42,7 +42,7 @@ function bottomRowCount(seatsPerTable) {
           <div
             v-for="n in soloSeatsPerFloor"
             :key="n"
-            class="min-h-[99px] w-full max-w-24 animate-pulse rounded-t-lg bg-warm-200/70 dark:bg-zinc-800/70"
+            class="min-h-[99px] w-full max-w-24 animate-pulse rounded-t-lg bg-theme-200/70 dark:bg-zinc-800/70"
           ></div>
         </div>
 
@@ -56,19 +56,19 @@ function bottomRowCount(seatsPerTable) {
               <div
                 v-for="seat in topRowCount(seatsPerTable)"
                 :key="seat"
-                class="size-9 animate-pulse rounded-lg bg-warm-200/70 dark:bg-zinc-800/70"
+                class="size-9 animate-pulse rounded-lg bg-theme-200/70 dark:bg-zinc-800/70"
               ></div>
             </div>
 
             <div
-              class="h-14 w-44 animate-pulse rounded-xl bg-warm-100/70 dark:bg-zinc-800/50"
+              class="h-14 w-44 animate-pulse rounded-xl bg-theme-100/70 dark:bg-zinc-800/50"
             ></div>
 
             <div class="flex gap-4">
               <div
                 v-for="seat in bottomRowCount(seatsPerTable)"
                 :key="seat"
-                class="size-9 animate-pulse rounded-lg bg-warm-200/70 dark:bg-zinc-800/70"
+                class="size-9 animate-pulse rounded-lg bg-theme-200/70 dark:bg-zinc-800/70"
               ></div>
             </div>
           </div>

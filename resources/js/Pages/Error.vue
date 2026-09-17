@@ -64,15 +64,15 @@ function goBack() {
   <Head :title="message" />
 
   <header
-    class="sticky top-0 z-40 border-b border-warm-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+    class="sticky top-0 z-40 border-b border-theme-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
   >
     <div class="mx-auto max-w-7xl px-3 py-2 md:px-6 md:py-4">
       <h1
-        class="inline-flex items-center gap-2 text-lg font-bold text-warm-700 md:gap-4 md:text-2xl dark:text-zinc-300"
+        class="inline-flex items-center gap-2 text-lg font-bold text-theme-700 md:gap-4 md:text-2xl dark:text-zinc-300"
       >
         <Icon
           name="book-open"
-          class="size-5 shrink-0 text-warm-700 md:size-6 dark:text-zinc-300"
+          class="size-5 shrink-0 text-theme-700 md:size-6 dark:text-zinc-300"
         />
         <Link href="/" class="shrink-0">NOU 小幫手</Link>
       </h1>
@@ -83,26 +83,26 @@ function goBack() {
     <div class="flex min-h-[60vh] items-center justify-center">
       <div class="w-full max-w-md">
         <div
-          class="rounded-lg border border-warm-200 bg-white p-8 dark:border-zinc-700 dark:bg-zinc-900"
+          class="rounded-lg border border-theme-200 bg-white p-8 dark:border-zinc-700 dark:bg-zinc-900"
           data-testid="error-page"
         >
           <div class="mb-6 text-center">
             <h2
-              class="mb-2 text-4xl font-bold text-warm-600 dark:text-zinc-400"
+              class="mb-2 text-4xl font-bold text-theme-600 dark:text-zinc-400"
               data-testid="error-status"
             >
               {{ status }}
             </h2>
             <p
-              class="mb-4 text-2xl font-semibold text-warm-900 dark:text-zinc-100"
+              class="mb-4 text-2xl font-semibold text-theme-900 dark:text-zinc-100"
               data-testid="error-message"
             >
               {{ message }}
             </p>
-            <p class="text-warm-900 dark:text-zinc-100">
+            <p class="text-theme-900 dark:text-zinc-100">
               抱歉，發生了一些問題。如果問題持續，請
               <a
-                class="text-warm-600 underline hover:no-underline dark:text-zinc-400"
+                class="text-theme-600 underline hover:no-underline dark:text-zinc-400"
                 :href="mailtoLink"
               >
                 點擊此連結寫信聯絡網站作者
@@ -115,14 +115,14 @@ function goBack() {
             <button
               type="button"
               data-testid="error-back-button"
-              class="flex-1 rounded-md border border-warm-200 px-4 py-2 text-center font-medium text-warm-700 transition-colors hover:bg-warm-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
+              class="flex-1 rounded-md border border-theme-200 px-4 py-2 text-center font-medium text-theme-700 transition-colors hover:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-950"
               @click="goBack"
             >
               回到上一頁
             </button>
             <Link
               href="/"
-              class="flex-1 rounded-md bg-warm-600 px-4 py-2 text-center font-medium text-white transition-colors hover:bg-warm-700"
+              class="flex-1 rounded-md bg-theme-600 px-4 py-2 text-center font-medium text-white transition-colors hover:bg-theme-700"
             >
               回到首頁
             </Link>
