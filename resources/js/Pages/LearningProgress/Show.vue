@@ -121,10 +121,15 @@ function isWeekPassed(weekNum) {
 }
 
 // --- homework table state ---
+// `homeworkEntries` is guarded because the app's service worker
+// (public/sw.js) caches JS chunks independently of the page's props, so a
+// visitor mid-deploy can end up running a bundle from a different build than
+// the one that served this viewModel — better to render an empty homework
+// section than hard-crash the whole page.
 const homeworkMap = computed(() => {
   const map = new Map()
 
-  props.viewModel.homeworkEntries.forEach(entry => {
+  ;(props.viewModel.homeworkEntries ?? []).forEach(entry => {
     map.set(`${entry.courseId}-${entry.number}`, entry)
   })
 
