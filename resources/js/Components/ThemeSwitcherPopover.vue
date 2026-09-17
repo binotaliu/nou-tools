@@ -86,6 +86,9 @@ onBeforeUnmount(() => {
                 ? 'bg-white text-theme-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100'
                 : 'text-theme-600 hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-100'
             "
+            data-analytics-event="theme_mode_change"
+            data-analytics-feature="theme"
+            :data-analytics-label="mode.value"
             @click="setTheme(mode.value)"
           >
             {{ mode.label }}
@@ -111,6 +114,9 @@ onBeforeUnmount(() => {
                 : 'ring-transparent hover:ring-theme-200 dark:hover:ring-zinc-700'
             "
             :style="{ backgroundColor: option.swatch }"
+            data-analytics-event="theme_accent_change"
+            data-analytics-feature="theme"
+            :data-analytics-label="option.value"
             @click="setAccent(option.value)"
           >
             <Icon
