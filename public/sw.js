@@ -1,7 +1,7 @@
 // Minimal offline support: keeps a previously-visited home/schedule/directory
 // page (and the assets it needs) available when the network is down, and
 // shows a generic offline page for any other route that isn't cached.
-const CACHE_VERSION = 'v3'
+const CACHE_VERSION = 'v4'
 const PAGE_CACHE = `nou-schedule-pages-${CACHE_VERSION}`
 const RUNTIME_CACHE = `nou-runtime-${CACHE_VERSION}`
 
@@ -136,6 +136,21 @@ function isJsonRequest(request) {
   return accept.startsWith('application/json')
 }
 
+// Inertia's own client-side page visits (<Link>, router.visit — used for
+// every in-app navigation since the Blade+Alpine → Inertia+Vue migration).
+// These are `fetch()` calls, so `request.mode` is never 'navigate' (only a
+// real browser-initiated document load gets that), and their `Accept` is
+// `text/html, application/xhtml+xml`, not `application/json` — so without
+// this check they fall through to the generic same-origin
+// staleWhileRevalidate bucket below, meant for JS/CSS/image assets. Serving
+// one of those stale hands back a stale `X-Inertia-Version` header too,
+// which silently defeats Inertia's own version-mismatch reload (it never
+// sees the fresh response that would have triggered it). Treat these as live
+// data like JSON: always network, never cached.
+function isInertiaRequest(request) {
+  return request.headers.get('X-Inertia') === 'true'
+}
+
 self.addEventListener('fetch', event => {
   const { request } = event
 
@@ -159,6 +174,10 @@ self.addEventListener('fetch', event => {
   // *previous* response and the room silently snaps back to an older
   // state. Pass it straight through to the network.
   if (isJsonRequest(request)) {
+    return
+  }
+
+  if (isInertiaRequest(request)) {
     return
   }
 

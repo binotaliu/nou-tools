@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 // The service worker (public/sw.js) intercepts navigations and swaps in the
 // cached /offline page when the network response is a gateway/outage error
@@ -34,4 +35,30 @@ it('leaves a real error response like a 404 untouched instead of masking it with
     $page->navigate('/this-route-does-not-exist')
         ->assertDontSee('離線')
         ->screenshot();
+});
+
+// Inertia's own client-side page visits (<Link>, router.visit) are fetch()
+// calls with an `X-Inertia: true` header — not a real browser navigation
+// (`request.mode` is never 'navigate' for those) and not JSON, so without an
+// explicit check they used to fall into the generic same-origin
+// staleWhileRevalidate bucket meant for JS/CSS/image assets. That silently
+// served stale props (and a stale X-Inertia-Version header, defeating
+// Inertia's own version-mismatch reload) on every repeat client-side visit.
+it("never caches Inertia's own client-side page-visit requests", function () {
+    Route::get('/__browser-test__/simulated/inertia-visit', fn () => response(Str::random(32)));
+
+    $page = visit('/');
+
+    $page->script('navigator.serviceWorker.ready');
+
+    $fetchInertiaVisit = <<<'JS'
+        fetch('/__browser-test__/simulated/inertia-visit', {
+            headers: { 'X-Inertia': 'true' },
+        }).then(r => r.text())
+        JS;
+
+    $first = $page->script($fetchInertiaVisit);
+    $second = $page->script($fetchInertiaVisit);
+
+    expect($first)->not->toBe($second);
 });
