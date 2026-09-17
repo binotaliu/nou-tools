@@ -40,6 +40,7 @@ final class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'analyticsPage' => self::analyticsPagePath($request),
+            'analyticsTitle' => self::analyticsTitle($request),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
             ],
@@ -63,5 +64,24 @@ final class HandleInertiaRequests extends Middleware
         return $route
             ? '/'.ltrim((string) preg_replace('/\{(\w+)\??\}/', ':$1', $route->uri()), '/')
             : '/'.ltrim($request->path(), '/');
+    }
+
+    /**
+     * A generic, route-name-keyed page title for GA's `page_title`, used
+     * instead of `document.title` on schedule pages. Those pages title
+     * themselves after the student's own schedule/course names (e.g. "{$name}
+     * - NOU 小幫手"), which would otherwise leak into analytics verbatim.
+     * Falls back to `document.title` client-side for every other route.
+     */
+    private static function analyticsTitle(Request $request): ?string
+    {
+        return match ($request->route()?->getName()) {
+            'schedules.show' => '我的課表 - NOU 小幫手',
+            'schedules.customize' => '自訂課表 - NOU 小幫手',
+            'schedules.announcement-preferences' => '公告分類設定 - NOU 小幫手',
+            'schedules.subscribe' => '訂閱行事曆 - NOU 小幫手',
+            'learning-progress.show' => '學習進度表 - NOU 小幫手',
+            default => null,
+        };
     }
 }

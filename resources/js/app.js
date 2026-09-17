@@ -30,9 +30,11 @@ createInertiaApp({
 // treats it as a navigation), so this one hook covers every page view,
 // initial or SPA. `page.props.analyticsPage` is shared by
 // HandleInertiaRequests and mirrors the masked route path from
-// `data-analytics-page` on the (only ever server-rendered once) <body> tag;
-// `document.title` is used for page_title since every Inertia page sets it
-// via its own <Head title>.
+// `data-analytics-page` on the (only ever server-rendered once) <body> tag.
+// `page.props.analyticsTitle` overrides page_title for schedule pages, whose
+// <Head title> is personalized with the student's own schedule/course names
+// and would otherwise leak into analytics; `document.title` is the fallback
+// for every other route.
 router.on('navigate', event => trackPageView(event.detail.page))
 
 function trackPageView(page) {
@@ -48,7 +50,7 @@ function trackPageView(page) {
 
   window.gtag('event', 'page_view', {
     page_path: path,
-    page_title: document.title,
+    page_title: page?.props?.analyticsTitle || document.title,
     page_location: window.location.href,
   })
 }
