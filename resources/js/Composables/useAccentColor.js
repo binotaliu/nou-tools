@@ -7,6 +7,10 @@ export const ACCENTS = [
   { value: 'warm', label: '暖橘', swatch: 'oklch(0.72 0.15 40)' },
   { value: 'ocean', label: '海藍', swatch: 'oklch(0.72 0.15 230)' },
   { value: 'forest', label: '森綠', swatch: 'oklch(0.72 0.15 150)' },
+  { value: 'purple', label: '皇紫', swatch: 'oklch(0.72 0.15 300)' },
+  { value: 'pink', label: '粉紅', swatch: 'oklch(0.72 0.15 350)' },
+  { value: 'red', label: '緋紅', swatch: 'oklch(0.72 0.15 20)' },
+  { value: 'grey', label: '銀灰', swatch: 'oklch(0.72 0.02 250)' },
 ]
 
 // Persisted in localStorage, applied via a `data-accent` attribute on <html>

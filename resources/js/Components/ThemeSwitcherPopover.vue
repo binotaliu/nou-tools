@@ -59,9 +59,7 @@ onBeforeUnmount(() => {
     >
       <span class="sr-only">切換佈景主題</span>
 
-      <Icon v-if="theme === 'light'" name="sun" class="size-5" />
-      <Icon v-else-if="theme === 'dark'" name="moon" class="size-5" />
-      <Icon v-else name="computer-desktop" class="size-5" />
+      <Icon name="paint-brush" class="size-5" />
     </button>
 
     <div
@@ -99,14 +97,14 @@ onBeforeUnmount(() => {
         <p class="mb-2 text-xs font-medium text-theme-600 dark:text-zinc-400">
           主題色
         </p>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
           <button
             v-for="option in ACCENTS"
             :key="option.value"
             type="button"
             :aria-pressed="(accent === option.value).toString()"
             :aria-label="option.label"
-            class="flex size-8 items-center justify-center rounded-full ring-2 ring-offset-2 ring-offset-white transition dark:ring-offset-zinc-900"
+            class="flex aspect-square size-5 shrink-0 items-center justify-center rounded-full ring-2 ring-offset-2 ring-offset-white transition dark:ring-offset-zinc-900"
             :class="
               accent === option.value
                 ? 'ring-theme-500'
@@ -118,7 +116,7 @@ onBeforeUnmount(() => {
             <Icon
               v-if="accent === option.value"
               name="check"
-              class="size-4 text-white"
+              class="size-3 text-white"
             />
           </button>
         </div>
