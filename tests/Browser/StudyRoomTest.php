@@ -199,6 +199,28 @@ it('prepends the countdown and phase to the tab title, and swaps the favicon, on
         ->and($page->script(
             'document.getElementById(\'favicon-svg\').getAttribute(\'rel\')'
         ))->toBe('icon');
+
+    // Once the round finishes, remainingLabel() switches to the "+MM:SS"
+    // overtime form. That title must still be recognised as "ours" on the
+    // next tick, or captureOriginalTitle() treats it as the real page title
+    // and every subsequent tick prepends another "+MM:SS 這一輪完成了 - "
+    // segment onto it forever.
+    $seat = StudyRoomSeat::query()->where('student_schedule_id', $schedule->id)->sole();
+    $seat->update(['timer_ends_at' => now()->subSecond()]);
+
+    $page->script('window.__studyRoomTest.socket.refresh()');
+    $page->wait(1);
+    $page->script(
+        'Object.defineProperty(document, "hidden", { configurable: true, get: () => true }); '.
+        'document.dispatchEvent(new Event("visibilitychange"));'
+    );
+    $page->wait(3);
+
+    $overtimeTitle = $page->script('document.title');
+
+    expect($overtimeTitle)->toMatch('/^\+\d{2}:\d{2} 這一輪完成了 - /')
+        ->and($overtimeTitle)->toContain($originalTitle)
+        ->and(substr_count($overtimeTitle, '這一輪完成了'))->toBe(1);
 });
 
 it('lets a student tune their pomodoro cycle and walks them through break and next round', function () {

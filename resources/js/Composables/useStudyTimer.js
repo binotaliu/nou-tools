@@ -1,9 +1,10 @@
 import { reactive, ref } from 'vue'
 import { playTimerFinishedSound } from '../study-room-sound'
 
-// Shape of the titles updateTabIndicators() writes ("MM:SS 專注中 - ..."),
-// used to tell our own title apart from the page's real one.
-const TIMER_TITLE_PATTERN = /^\d{2}:\d{2} /
+// The Study Room page's <Head title> (resources/js/Pages/StudyRoom/Show.vue)
+// is a static string with no dynamic segment, so it can be hardcoded here
+// instead of sniffed back out of document.title on every tick.
+const STUDY_ROOM_TITLE = '自習室 - NOU 小幫手'
 
 // Everything the banner (and focus mode) shows is derived from the held
 // seat's timer columns plus the ticking clock, never stored separately —
@@ -168,25 +169,13 @@ export default function useStudyTimer(
 
   // --- background tab indicators ---
 
-  let originalTitle = null
   let faviconIco = null
   let faviconPng = null
   let faviconSvg = null
   let faviconOriginalIcoHref = null
   let faviconOriginalPngHref = null
 
-  // Inertia's <Head> applies the page title asynchronously, so at onMounted
-  // time document.title can still be the root layout's. It also changes
-  // again on every SPA navigation. So rather than capturing once, re-read it
-  // whenever it isn't a title this composable wrote itself.
-  function captureOriginalTitle() {
-    if (!TIMER_TITLE_PATTERN.test(document.title)) {
-      originalTitle = document.title
-    }
-  }
-
   function initTabIndicators() {
-    captureOriginalTitle()
     faviconIco = document.getElementById('favicon-ico')
     faviconPng = document.getElementById('favicon-png')
     faviconSvg = document.getElementById('favicon-svg')
@@ -195,8 +184,6 @@ export default function useStudyTimer(
   }
 
   function updateTabIndicators() {
-    captureOriginalTitle()
-
     const seat = socket.mySeat()
     const running = !!seat && (!!seat.timerEndsAt || !!seat.timerStartedAt)
 
@@ -206,14 +193,14 @@ export default function useStudyTimer(
     }
 
     document.title =
-      remainingLabel(seat) + ' ' + timerPhaseLabel() + ' - ' + originalTitle
+      remainingLabel(seat) + ' ' + timerPhaseLabel() + ' - ' + STUDY_ROOM_TITLE
 
     applyStageFavicon(isOnBreak() ? '#10b981' : '#b05139')
   }
 
   function resetTabIndicators() {
-    if (originalTitle !== null && document.title !== originalTitle) {
-      document.title = originalTitle
+    if (document.title !== STUDY_ROOM_TITLE) {
+      document.title = STUDY_ROOM_TITLE
     }
 
     resetFavicon()
