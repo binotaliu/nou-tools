@@ -396,7 +396,7 @@ test('cta renders links as buttons with the requested variant', function () {
     expect($html)
         ->toContain('<div class="md-cta" data-variant="secondary">')
         ->toContain('href="/schedules"')
-        ->toContain('border-warm-500 bg-white text-warm-900')
+        ->toContain('border-theme-500 bg-white text-theme-900')
         ->toContain('no-underline')
         ->toContain('>開始建立我的課表</a>');
 });
