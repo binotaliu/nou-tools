@@ -1,0 +1,154 @@
+<?php
+
+declare(strict_types=1);
+
+namespace NouTools\Domains\Newsletter\Actions;
+
+use App\Enums\NewsletterSection;
+use App\Models\Announcement;
+use App\Models\NewsletterIssue;
+use App\Models\NewsletterItem;
+use DomainException;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use NouTools\Domains\Newsletter\Ai\NewsletterHighlightsWriter;
+use NouTools\Domains\Newsletter\Ai\NewsletterItemCurator;
+
+final readonly class DraftNewsletterWithAi
+{
+    private const array WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
+
+    public function __construct(
+        private ListNewsletterCandidateAnnouncements $listNewsletterCandidateAnnouncements,
+    ) {}
+
+    /**
+     * Let the AI editor pick and summarise announcements for both news
+     * sections and write the highlights intro, then replace the issue's
+     * items and intro with the result. Every AI call happens before
+     * anything is written, so a failure leaves the issue untouched.
+     *
+     * Ids the model returns that weren't in its candidate list are dropped.
+     *
+     * @throws DomainException when the issue is already published
+     */
+    public function __invoke(NewsletterIssue $issue): NewsletterIssue
+    {
+        if ($issue->isPublished()) {
+            throw new DomainException("雙週報 {$issue->issue_key} 已發布，不能重新產生草稿。");
+        }
+
+        $candidatesBySection = ($this->listNewsletterCandidateAnnouncements)($issue->covers_from, $issue->covers_to);
+
+        /** @var Collection<string, Collection<int, array{announcement: Announcement, headline: string, summary: string}>> $curatedBySection */
+        $curatedBySection = $candidatesBySection->map(
+            fn (EloquentCollection $candidates, string $section): Collection => $this->curate(NewsletterSection::from($section), $candidates)
+        );
+
+        $intro = $this->writeIntro($issue, $curatedBySection);
+
+        DB::transaction(function () use ($issue, $curatedBySection, $intro): void {
+            $issue->items()->delete();
+
+            foreach ($curatedBySection as $section => $curatedItems) {
+                foreach ($curatedItems->values() as $position => $curated) {
+                    $item = new NewsletterItem;
+                    $item->fill([
+                        'newsletter_issue_id' => $issue->id,
+                        'announcement_id' => $curated['announcement']->id,
+                        'section' => $section,
+                        'source_name' => $curated['announcement']->source_name,
+                        'url' => $curated['announcement']->url,
+                        'headline' => $curated['headline'],
+                        'summary' => $curated['summary'],
+                        'position' => $position,
+                    ]);
+                    $item->saveOrFail();
+                }
+            }
+
+            $issue->highlights_intro = $intro;
+            $issue->ai_drafted_at = Date::now();
+            $issue->saveOrFail();
+        });
+
+        return $issue->refresh();
+    }
+
+    /**
+     * @param  EloquentCollection<int, Announcement>  $candidates
+     * @return Collection<int, array{announcement: Announcement, headline: string, summary: string}>
+     */
+    private function curate(NewsletterSection $section, EloquentCollection $candidates): Collection
+    {
+        if ($candidates->isEmpty()) {
+            return collect();
+        }
+
+        $candidates = $candidates
+            ->take((int) config('newsletter.ai.max_candidates_per_section'))
+            ->keyBy('id');
+
+        $prompt = "以下是本期「{$section->label()}」的候選公告（JSON Lines）：\n\n"
+            .$candidates->map(fn (Announcement $announcement): string => (string) json_encode([
+                'id' => $announcement->id,
+                'source' => $announcement->source_name,
+                'category' => $announcement->category,
+                'title' => $announcement->title,
+                'date' => ($announcement->published_at ?? $announcement->fetched_at)?->toDateString(),
+                'tags' => $announcement->tags ?? [],
+            ], JSON_UNESCAPED_UNICODE))->implode("\n");
+
+        $response = (new NewsletterItemCurator($section))->prompt($prompt);
+
+        return collect($response['items'] ?? [])
+            ->filter(fn (mixed $item): bool => is_array($item)
+                && $candidates->has($item['announcement_id'] ?? null)
+                && filled($item['headline'] ?? null))
+            ->unique('announcement_id')
+            ->take((int) config('newsletter.ai.max_items_per_section'))
+            ->map(fn (array $item): array => [
+                'announcement' => $candidates->get($item['announcement_id']),
+                'headline' => Str::limit(trim((string) $item['headline']), 250, ''),
+                'summary' => trim((string) ($item['summary'] ?? '')),
+            ])
+            ->values();
+    }
+
+    /**
+     * @param  Collection<string, Collection<int, array{announcement: Announcement, headline: string, summary: string}>>  $curatedBySection
+     */
+    private function writeIntro(NewsletterIssue $issue, Collection $curatedBySection): string
+    {
+        $events = collect($issue->highlights_events ?? [])
+            ->map(fn (array $event): string => $event['start'] === $event['end']
+                ? "- {$this->formatDate($event['start'])}：{$event['name']}"
+                : "- {$this->formatDate($event['start'])} 至 {$this->formatDate($event['end'])}：{$event['name']}")
+            ->implode("\n");
+
+        $headlines = $curatedBySection
+            ->flatMap(fn (Collection $items): Collection => $items->pluck('headline'))
+            ->map(fn (string $headline): string => "- {$headline}")
+            ->implode("\n");
+
+        $prompt = implode("\n\n", [
+            "本期為 {$issue->issue_key}，於 {$this->formatDate($issue->publishes_on->toDateString())} 發刊，涵蓋 {$this->formatDate($issue->highlights_from->toDateString())} 至 {$this->formatDate($issue->highlights_to->toDateString())}。",
+            "這兩週的校曆事件：\n".($events !== '' ? $events : '（無）'),
+            "本期收錄的消息標題：\n".($headlines !== '' ? $headlines : '（無）'),
+        ]);
+
+        $response = (new NewsletterHighlightsWriter)->prompt($prompt);
+
+        return trim((string) ($response['intro'] ?? ''));
+    }
+
+    private function formatDate(string $date): string
+    {
+        $parsed = Date::parse($date);
+
+        return "{$parsed->month} 月 {$parsed->day} 日（".self::WEEKDAYS[$parsed->dayOfWeek].'）';
+    }
+}
