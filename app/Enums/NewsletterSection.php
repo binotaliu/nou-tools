@@ -21,4 +21,16 @@ enum NewsletterSection: string
     {
         return $group === AnnouncementSourceGroup::Center ? self::Centers : self::News;
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getLabels(): array
+    {
+        return array_reduce(self::cases(), function (array $carry, self $case): array {
+            $carry[$case->value] = $case->label();
+
+            return $carry;
+        }, []);
+    }
 }

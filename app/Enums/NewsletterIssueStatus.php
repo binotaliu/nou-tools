@@ -27,4 +27,16 @@ enum NewsletterIssueStatus: string
             self::Published => 'success',
         };
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getLabels(): array
+    {
+        return array_reduce(self::cases(), function (array $carry, self $case): array {
+            $carry[$case->value] = $case->label();
+
+            return $carry;
+        }, []);
+    }
 }
