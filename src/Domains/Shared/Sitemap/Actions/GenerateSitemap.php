@@ -8,6 +8,7 @@ use App\Enums\ArticleType;
 use App\Enums\DiscountStoreStatus;
 use App\Models\Course;
 use App\Models\DiscountStore;
+use App\Models\NewsletterIssue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use NouTools\Domains\Articles\Actions\ShowArticlePage;
@@ -28,6 +29,7 @@ final readonly class GenerateSitemap
             new SitemapUrlViewModel(url: route('home'), changeFrequency: 'daily', priority: 1.0),
             new SitemapUrlViewModel(url: route('alt-uu'), changeFrequency: 'monthly', priority: 0.5),
             new SitemapUrlViewModel(url: route('announcements.index'), changeFrequency: 'hourly', priority: 0.8),
+            new SitemapUrlViewModel(url: route('newsletter.index'), changeFrequency: 'weekly', priority: 0.7),
             new SitemapUrlViewModel(url: route('directory.index'), changeFrequency: 'monthly', priority: 0.6),
             new SitemapUrlViewModel(url: route('course.schedule'), changeFrequency: 'weekly', priority: 0.7),
             new SitemapUrlViewModel(url: route('discount-stores.index'), changeFrequency: 'daily', priority: 0.7),
@@ -36,6 +38,7 @@ final readonly class GenerateSitemap
         ])
             ->merge($this->courseUrls())
             ->merge($this->discountStoreUrls())
+            ->merge($this->newsletterIssueUrls())
             ->merge($this->articleUrls());
     }
 
@@ -66,6 +69,22 @@ final readonly class GenerateSitemap
                 lastModified: $store->updated_at,
                 changeFrequency: 'weekly',
                 priority: 0.5,
+            ));
+    }
+
+    /**
+     * @return Collection<int, SitemapUrlViewModel>
+     */
+    private function newsletterIssueUrls(): Collection
+    {
+        return NewsletterIssue::query()
+            ->published()
+            ->get(['issue_key', 'updated_at'])
+            ->map(fn (NewsletterIssue $issue): SitemapUrlViewModel => new SitemapUrlViewModel(
+                url: route('newsletter.show', $issue->issue_key),
+                lastModified: $issue->updated_at,
+                changeFrequency: 'monthly',
+                priority: 0.6,
             ));
     }
 

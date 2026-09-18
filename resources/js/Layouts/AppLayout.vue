@@ -69,6 +69,12 @@ const navItems = [
 
 const moreMenuItems = [
   {
+    href: '/newsletter',
+    prefix: '/newsletter',
+    label: '浣熊的空大雙週報',
+    icon: 'newspaper',
+  },
+  {
     href: '/courses/schedule',
     prefix: '/courses/schedule',
     label: '本學期開課表',
