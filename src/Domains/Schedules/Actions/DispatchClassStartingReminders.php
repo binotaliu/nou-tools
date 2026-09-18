@@ -123,7 +123,7 @@ final class DispatchClassStartingReminders
 
         // A student schedule may have multiple push subscriptions (multiple
         // devices); each device's outcome is logged independently by
-        // LogWebPushDeliveryOutcome. Treat the occurrence as sent once any
+        // LogWebPushNotificationSent/Failed. Treat the occurrence as sent once any
         // device received it.
         $deliveries = PushNotificationDelivery::query()
             ->where('id', '>', $lastDeliveryId)
