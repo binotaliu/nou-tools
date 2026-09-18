@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Listeners\LogWebPushDeliveryOutcome;
 use App\Models\Announcement;
 use App\Models\Course;
 use App\Models\DiscountStore;
@@ -21,7 +20,6 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
@@ -29,8 +27,6 @@ use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
-use NotificationChannels\WebPush\Events\NotificationFailed;
-use NotificationChannels\WebPush\Events\NotificationSent;
 use NouTools\Domains\Schedules\Actions\ReadStudentScheduleCookie;
 
 final class AppServiceProvider extends ServiceProvider
@@ -82,9 +78,6 @@ final class AppServiceProvider extends ServiceProvider
 
             return $this->middleware('markdown:'.$controller);
         });
-
-        Event::listen(NotificationSent::class, [LogWebPushDeliveryOutcome::class, 'handleSent']);
-        Event::listen(NotificationFailed::class, [LogWebPushDeliveryOutcome::class, 'handleFailed']);
 
         Password::defaults(fn (): Password => Password::min(8)->uncompromised());
 

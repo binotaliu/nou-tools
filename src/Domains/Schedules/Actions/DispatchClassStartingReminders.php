@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Schedules\Actions;
 
+use App\Enums\ClassScheduleReminderStatus;
 use App\Models\ClassSchedule;
 use App\Models\ClassScheduleReminder;
+use App\Models\PushNotificationDelivery;
 use App\Models\StudentSchedule;
 use App\Notifications\ClassStartingSoon;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
+use Throwable;
 
 final class DispatchClassStartingReminders
 {
@@ -46,30 +50,95 @@ final class DispatchClassStartingReminders
                 ->get();
 
             foreach ($subscribedSchedules as $studentSchedule) {
-                if (! $this->markAsSent($classSchedule, $studentSchedule)) {
+                $reminder = $this->reserveReminder($classSchedule, $studentSchedule);
+
+                if ($reminder === null) {
                     continue;
                 }
 
-                $studentSchedule->notify(new ClassStartingSoon($classSchedule));
-                $sentCount++;
+                $outcome = $this->attemptDelivery($classSchedule, $studentSchedule);
+
+                $reminder->update([
+                    'status' => $outcome['status'],
+                    'failure_reason' => $outcome['reason'],
+                    'sent_at' => $outcome['status'] === ClassScheduleReminderStatus::Sent ? now() : null,
+                ]);
+
+                if ($outcome['status'] === ClassScheduleReminderStatus::Sent) {
+                    $sentCount++;
+                }
             }
         }
 
         return $sentCount;
     }
 
-    private function markAsSent(ClassSchedule $classSchedule, StudentSchedule $studentSchedule): bool
+    /**
+     * Reserve the (class, student) occurrence so concurrent runs don't send
+     * it twice, without permanently blocking retries: a prior "failed" row
+     * is handed back for another attempt, and only "sent" is treated as
+     * done.
+     */
+    private function reserveReminder(ClassSchedule $classSchedule, StudentSchedule $studentSchedule): ?ClassScheduleReminder
     {
+        $reminder = ClassScheduleReminder::query()
+            ->where('class_schedule_id', $classSchedule->id)
+            ->where('student_schedule_id', $studentSchedule->id)
+            ->first();
+
+        if ($reminder?->status === ClassScheduleReminderStatus::Sent) {
+            return null;
+        }
+
+        if ($reminder !== null) {
+            return $reminder;
+        }
+
         try {
-            ClassScheduleReminder::query()->create([
+            return ClassScheduleReminder::query()->create([
                 'class_schedule_id' => $classSchedule->id,
                 'student_schedule_id' => $studentSchedule->id,
-                'sent_at' => now(),
+                'status' => ClassScheduleReminderStatus::Failed,
             ]);
-
-            return true;
         } catch (UniqueConstraintViolationException) {
-            return false;
+            // A concurrent run just claimed this occurrence; let it handle the send.
+            return null;
         }
+    }
+
+    /**
+     * @return array{status: ClassScheduleReminderStatus, reason: ?string}
+     */
+    private function attemptDelivery(ClassSchedule $classSchedule, StudentSchedule $studentSchedule): array
+    {
+        $lastDeliveryId = (int) PushNotificationDelivery::query()->max('id');
+
+        try {
+            $studentSchedule->notify(new ClassStartingSoon($classSchedule));
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return ['status' => ClassScheduleReminderStatus::Failed, 'reason' => Str::limit($exception->getMessage(), 255, '')];
+        }
+
+        // A student schedule may have multiple push subscriptions (multiple
+        // devices); each device's outcome is logged independently by
+        // LogWebPushDeliveryOutcome. Treat the occurrence as sent once any
+        // device received it.
+        $deliveries = PushNotificationDelivery::query()
+            ->where('id', '>', $lastDeliveryId)
+            ->where('subscribable_type', $studentSchedule->getMorphClass())
+            ->where('subscribable_id', $studentSchedule->getKey())
+            ->get();
+
+        if ($deliveries->contains('success', true)) {
+            return ['status' => ClassScheduleReminderStatus::Sent, 'reason' => null];
+        }
+
+        $reason = $deliveries->isEmpty()
+            ? 'No push subscriptions were attempted'
+            : $deliveries->pluck('reason')->filter()->unique()->implode('; ');
+
+        return ['status' => ClassScheduleReminderStatus::Failed, 'reason' => Str::limit($reason, 255, '')];
     }
 }

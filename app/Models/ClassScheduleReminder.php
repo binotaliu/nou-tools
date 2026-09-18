@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\ClassScheduleReminderStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -14,6 +15,8 @@ final class ClassScheduleReminder extends Model
     protected $fillable = [
         'class_schedule_id',
         'student_schedule_id',
+        'status',
+        'failure_reason',
         'sent_at',
     ];
 
@@ -23,6 +26,7 @@ final class ClassScheduleReminder extends Model
     protected function casts(): array
     {
         return [
+            'status' => ClassScheduleReminderStatus::class,
             'sent_at' => 'datetime',
         ];
     }
