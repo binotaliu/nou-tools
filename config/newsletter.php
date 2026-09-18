@@ -24,6 +24,14 @@ return [
         'model' => env('NEWSLETTER_AI_MODEL', 'claude-sonnet-5'),
         'max_items_per_section' => 12,
         'max_candidates_per_section' => 300,
+
+        // The curator may open an announcement's page (HTML or PDF) when its
+        // title alone isn't enough to summarise it. Each fetch costs roughly
+        // 10–20k input tokens, so it's capped per section, and limited to
+        // school hosts (subdomains included) so short links and third-party
+        // sites are never fetched.
+        'max_fetches_per_section' => (int) env('NEWSLETTER_AI_MAX_FETCHES', 12),
+        'fetch_domains' => ['nou.edu.tw'],
     ],
 
 ];

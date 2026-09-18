@@ -26,6 +26,10 @@ final class DraftNewsletterIssueWithAi implements ShouldQueue
 
     public function handle(DraftNewsletterWithAi $draftNewsletterWithAi): void
     {
+        // Runs after the admin's response inside the web worker, where PHP's
+        // execution limit still applies; page fetches can take minutes.
+        set_time_limit(0);
+
         try {
             $draftNewsletterWithAi($this->issue);
         } catch (Throwable $exception) {

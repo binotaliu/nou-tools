@@ -59,7 +59,7 @@ Lives in `src/Domains/Newsletter/` plus `App\Models\NewsletterIssue`/`Newsletter
 - **Issue key = ISO week of the publish Monday** (`2026-W39`), but the every-other-Monday cadence is counted in 14-day steps from `config('newsletter.anchor_date')` in `ResolveNewsletterIssueSchedule`. Never derive it from week-number parity: 53-week ISO years flip it (2026-W53 → 2027-W02).
 - **Issues are snapshots.** Items copy `source_name`/`url` from their announcement and the school-calendar events are stored in `highlights_events`, so later announcement edits or calendar config changes never rewrite a published issue.
 - **Lifecycle:** `newsletter:draft` (Mondays 09:00) creates the issue whose editing week starts that day and runs the laravel/ai editor (`Ai/NewsletterItemCurator`, `Ai/NewsletterHighlightsWriter`); the editor marks it 待發布 and `newsletter:publish-due` (Mondays 08:00) publishes it. Drafts are never auto-published. All AI calls finish before any write, so a failed draft leaves the issue untouched.
-- The AI only sees announcement metadata (titles, not bodies) — announcements don't store content.
+- Announcements don't store bodies, so the curator gets each candidate's metadata **and URL** and decides per item whether to open it (HTML or PDF) with Anthropic's server-side web fetch, capped by `newsletter.ai.max_fetches_per_section` and limited to `newsletter.ai.fetch_domains`. Candidates are sent as plain-text blocks with the URL alone on its line: inside JSON the model sliced URLs badly and wasted fetches on URLs that don't exist.
 
 ## 自習室 (Study Room)
 

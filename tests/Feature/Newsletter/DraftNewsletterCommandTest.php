@@ -1,10 +1,12 @@
 <?php
 
 use App\Enums\NewsletterIssueStatus;
+use App\Enums\NewsletterSection;
 use App\Models\Announcement;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
 use Illuminate\Support\Facades\Date;
+use Laravel\Ai\Providers\Tools\WebFetch;
 use NouTools\Domains\Newsletter\Ai\NewsletterHighlightsWriter;
 use NouTools\Domains\Newsletter\Ai\NewsletterItemCurator;
 
@@ -58,7 +60,7 @@ it('drafts items and the intro with AI, dropping ids outside the candidate set',
 
     NewsletterItemCurator::fake(fn (string $prompt): array => str_contains($prompt, '空大新消息')
         ? ['items' => [
-            ['announcement_id' => $news->id, 'headline' => '期中考開始報名', 'summary' => '記得報名。'],
+            ['announcement_id' => $news->id, 'headline' => '期中考開始報名', 'summary' => '記得報名。', 'read_source' => true],
             ['announcement_id' => $outsideWindow->id, 'headline' => '不該出現', 'summary' => ''],
             ['announcement_id' => 999999, 'headline' => '編造的', 'summary' => ''],
             ['announcement_id' => $news->id, 'headline' => '重複', 'summary' => ''],
@@ -80,7 +82,8 @@ it('drafts items and the intro with AI, dropping ids outside the candidate set',
         ])
         ->and($issue->centerItems->pluck('headline')->all())->toBe(['臺北中心讀書會招募中']);
 
-    NewsletterItemCurator::assertPrompted(fn ($prompt): bool => str_contains($prompt->prompt, '115上學期期中考報名'));
+    NewsletterItemCurator::assertPrompted(fn ($prompt): bool => str_contains($prompt->prompt, '115上學期期中考報名')
+        && str_contains($prompt->prompt, "url: {$news->url}\n") || str_ends_with($prompt->prompt, "url: {$news->url}"));
     NewsletterHighlightsWriter::assertPrompted(fn ($prompt): bool => str_contains($prompt->prompt, '期中考報名截止')
         && str_contains($prompt->prompt, '期中考開始報名'));
 });
@@ -125,4 +128,24 @@ it('publishes due ready issues from the scheduler command', function () {
     $this->artisan('newsletter:publish-due')->assertSuccessful();
 
     expect($ready->fresh()->status)->toBe(NewsletterIssueStatus::Published);
+});
+
+it('lets the curator read announcement pages within a capped, school-only budget', function () {
+    config(['newsletter.ai.max_fetches_per_section' => 5, 'newsletter.ai.fetch_domains' => ['nou.edu.tw']]);
+
+    $tools = collect((new NewsletterItemCurator(NewsletterSection::News))->tools());
+
+    expect($tools)->toHaveCount(1)
+        ->and($tools->first())->toBeInstanceOf(WebFetch::class)
+        ->and($tools->first()->maxSearches)->toBe(5)
+        ->and($tools->first()->allowedDomains)->toBe(['nou.edu.tw']);
+});
+
+it('drops the fetch tool when the fetch budget is zero', function () {
+    config(['newsletter.ai.max_fetches_per_section' => 0]);
+
+    $curator = new NewsletterItemCurator(NewsletterSection::Centers);
+
+    expect(collect($curator->tools()))->toBeEmpty()
+        ->and((string) $curator->instructions())->toContain('本次不讀取原文');
 });
