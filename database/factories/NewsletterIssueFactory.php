@@ -6,7 +6,7 @@ namespace Database\Factories;
 
 use App\Enums\NewsletterIssueStatus;
 use App\Models\NewsletterIssue;
-use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 
@@ -62,7 +62,7 @@ final class NewsletterIssueFactory extends Factory
     /**
      * @return array<string, mixed>
      */
-    private function attributesForPublishDate(CarbonImmutable $publishesOn): array
+    private function attributesForPublishDate(CarbonInterface $publishesOn): array
     {
         return [
             'issue_key' => $publishesOn->format('o-\WW'),

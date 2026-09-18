@@ -28,6 +28,7 @@ use App\Http\Controllers\Markdown\NewsletterShowMarkdownController;
 use App\Http\Controllers\Markdown\ScheduleShowMarkdownController;
 use App\Http\Controllers\Markdown\StudyRoomMarkdownController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\NewsletterFeedController;
 use App\Http\Controllers\PwaManifestController;
 use App\Http\Controllers\ScheduleAnnouncementPreferencesController;
 use App\Http\Controllers\ScheduleCalendarController;
@@ -79,7 +80,7 @@ Route::get('/announcements', [AnnouncementController::class, 'index'])->name('an
 
 Route::get('/newsletter', [NewsletterController::class, 'index'])->name('newsletter.index')
     ->withMarkdown(NewsletterIndexMarkdownController::class);
-Route::get('/newsletter/feed.xml', [NewsletterController::class, 'feed'])->name('newsletter.feed');
+Route::get('/newsletter/feed.xml', NewsletterFeedController::class)->name('newsletter.feed');
 Route::get('/newsletter/{issueKey}', [NewsletterController::class, 'show'])->name('newsletter.show')
     ->withMarkdown(NewsletterShowMarkdownController::class)
     ->where('issueKey', '\d{4}-W\d{2}');

@@ -12,7 +12,7 @@ use NouTools\Domains\Newsletter\Actions\CreateNewsletterDraft;
 use NouTools\Domains\Newsletter\Actions\ListNewsletterCandidateAnnouncements;
 use NouTools\Domains\Newsletter\Actions\PublishDueNewsletterIssues;
 use NouTools\Domains\Newsletter\Actions\PublishNewsletterIssue;
-use NouTools\Domains\Newsletter\Actions\ResolveNewsletterIssueSchedule;
+use NouTools\Domains\Newsletter\Schedule\NewsletterCadence;
 
 beforeEach(function () {
     config(['newsletter.anchor_date' => '2026-09-21']);
@@ -25,7 +25,7 @@ beforeEach(function () {
 });
 
 it('creates a draft with windows and a calendar snapshot, idempotently', function () {
-    $schedule = app(ResolveNewsletterIssueSchedule::class)('2026-09-21');
+    $schedule = app(NewsletterCadence::class)->forPublishDate('2026-09-21');
 
     $issue = app(CreateNewsletterDraft::class)($schedule);
     $again = app(CreateNewsletterDraft::class)($schedule);

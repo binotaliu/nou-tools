@@ -18,8 +18,8 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Date;
-use NouTools\Domains\Newsletter\Actions\ListNewsletterCandidateAnnouncements;
-use NouTools\Domains\Newsletter\Actions\ResolveNewsletterIssueSchedule;
+use NouTools\Domains\Newsletter\Actions\QueryNewsletterCandidateAnnouncements;
+use NouTools\Domains\Newsletter\Schedule\NewsletterCadence;
 
 class NewsletterIssueForm
 {
@@ -35,7 +35,7 @@ class NewsletterIssueForm
                             ->required()
                             ->disabledOn('edit')
                             ->rule(fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
-                                if (! app(ResolveNewsletterIssueSchedule::class)->isIssueDate((string) $value)) {
+                                if (! app(NewsletterCadence::class)->isIssueDate((string) $value)) {
                                     $fail('發刊日必須是雙週報的發刊週一。');
                                 }
                             }),
@@ -198,8 +198,7 @@ class NewsletterIssueForm
             return [];
         }
 
-        return app(ListNewsletterCandidateAnnouncements::class)
-            ->query(Date::parse($from), Date::parse($to))
+        return app(QueryNewsletterCandidateAnnouncements::class)(Date::parse($from), Date::parse($to))
             ->where(fn ($query) => $query
                 ->where('title', 'like', "%{$search}%")
                 ->orWhere('source_name', 'like', "%{$search}%"))

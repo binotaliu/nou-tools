@@ -1,13 +1,13 @@
 <?php
 
-use NouTools\Domains\Newsletter\Actions\ResolveNewsletterIssueSchedule;
+use NouTools\Domains\Newsletter\Schedule\NewsletterCadence;
 
 beforeEach(function () {
     config(['newsletter.anchor_date' => '2026-09-21', 'newsletter.cadence_days' => 14]);
 });
 
 it('resolves the anchor issue and its windows', function () {
-    $schedule = app(ResolveNewsletterIssueSchedule::class)('2026-09-21');
+    $schedule = app(NewsletterCadence::class)->forPublishDate('2026-09-21');
 
     expect($schedule->issueKey)->toBe('2026-W39')
         ->and($schedule->editingStartsOn->toDateString())->toBe('2026-09-14')
@@ -18,7 +18,7 @@ it('resolves the anchor issue and its windows', function () {
 });
 
 it('finds the next issue on or after a date', function (string $date, string $expectedKey) {
-    expect(app(ResolveNewsletterIssueSchedule::class)->nextOnOrAfter($date)->issueKey)->toBe($expectedKey);
+    expect(app(NewsletterCadence::class)->nextOnOrAfter($date)->issueKey)->toBe($expectedKey);
 })->with([
     'before the anchor' => ['2026-09-01', '2026-W39'],
     'on the anchor' => ['2026-09-21', '2026-W39'],
@@ -27,10 +27,10 @@ it('finds the next issue on or after a date', function (string $date, string $ex
 ]);
 
 it('keeps a 14-day cadence across a 53-week ISO year', function () {
-    $resolve = app(ResolveNewsletterIssueSchedule::class);
+    $cadence = app(NewsletterCadence::class);
 
-    $lastOf2026 = $resolve('2026-12-28');
-    $firstOf2027 = $resolve->nextOnOrAfter('2026-12-29');
+    $lastOf2026 = $cadence->forPublishDate('2026-12-28');
+    $firstOf2027 = $cadence->nextOnOrAfter('2026-12-29');
 
     expect($lastOf2026->issueKey)->toBe('2026-W53')
         ->and($firstOf2027->issueKey)->toBe('2027-W02')
@@ -38,15 +38,15 @@ it('keeps a 14-day cadence across a 53-week ISO year', function () {
 });
 
 it('resolves an issue from its key', function () {
-    $schedule = app(ResolveNewsletterIssueSchedule::class)->forIssueKey('2027-W02');
+    $schedule = app(NewsletterCadence::class)->forIssueKey('2027-W02');
 
     expect($schedule->publishesOn->toDateString())->toBe('2027-01-11');
 });
 
 it('rejects off-cadence dates and keys', function (string $input) {
-    $resolve = app(ResolveNewsletterIssueSchedule::class);
+    $cadence = app(NewsletterCadence::class);
 
-    str_contains($input, 'W') ? $resolve->forIssueKey($input) : $resolve($input);
+    str_contains($input, 'W') ? $cadence->forIssueKey($input) : $cadence->forPublishDate($input);
 })->with([
     'odd-cadence Monday' => ['2026-09-28'],
     'not a Monday' => ['2026-09-22'],
@@ -57,8 +57,8 @@ it('rejects off-cadence dates and keys', function (string $input) {
 ])->throws(InvalidArgumentException::class);
 
 it('knows which issue starts its editing week on a Monday', function () {
-    $resolve = app(ResolveNewsletterIssueSchedule::class);
+    $cadence = app(NewsletterCadence::class);
 
-    expect($resolve->startingEditingOn('2026-09-28')?->issueKey)->toBe('2026-W41')
-        ->and($resolve->startingEditingOn('2026-10-05'))->toBeNull();
+    expect($cadence->startingEditingOn('2026-09-28')?->issueKey)->toBe('2026-W41')
+        ->and($cadence->startingEditingOn('2026-10-05'))->toBeNull();
 });

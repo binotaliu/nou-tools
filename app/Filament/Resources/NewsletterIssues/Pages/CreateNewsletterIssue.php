@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\ValidationException;
 use NouTools\Domains\Newsletter\Actions\CreateNewsletterDraft;
-use NouTools\Domains\Newsletter\Actions\ResolveNewsletterIssueSchedule;
+use NouTools\Domains\Newsletter\Schedule\NewsletterCadence;
 
 class CreateNewsletterIssue extends CreateRecord
 {
@@ -19,10 +19,10 @@ class CreateNewsletterIssue extends CreateRecord
 
     protected function fillForm(): void
     {
-        $nextFreeIssue = app(ResolveNewsletterIssueSchedule::class)->nextOnOrAfter(Date::now(ResolveNewsletterIssueSchedule::TIMEZONE));
+        $nextFreeIssue = app(NewsletterCadence::class)->nextOnOrAfter(Date::now(NewsletterCadence::TIMEZONE));
 
         while (NewsletterIssue::query()->where('issue_key', $nextFreeIssue->issueKey)->exists()) {
-            $nextFreeIssue = app(ResolveNewsletterIssueSchedule::class)->nextOnOrAfter($nextFreeIssue->publishesOn->addDay());
+            $nextFreeIssue = app(NewsletterCadence::class)->nextOnOrAfter($nextFreeIssue->publishesOn->addDay());
         }
 
         $this->form->fill(['publishes_on' => $nextFreeIssue->publishesOn->toDateString()]);
@@ -36,7 +36,7 @@ class CreateNewsletterIssue extends CreateRecord
      */
     protected function handleRecordCreation(array $data): Model
     {
-        $schedule = app(ResolveNewsletterIssueSchedule::class)((string) $data['publishes_on']);
+        $schedule = app(NewsletterCadence::class)->forPublishDate((string) $data['publishes_on']);
 
         if (NewsletterIssue::query()->where('issue_key', $schedule->issueKey)->exists()) {
             throw ValidationException::withMessages([

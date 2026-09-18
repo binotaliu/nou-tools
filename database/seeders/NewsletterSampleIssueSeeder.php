@@ -11,7 +11,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use NouTools\Domains\Newsletter\Actions\CreateNewsletterDraft;
 use NouTools\Domains\Newsletter\Actions\PublishNewsletterIssue;
-use NouTools\Domains\Newsletter\Actions\ResolveNewsletterIssueSchedule;
+use NouTools\Domains\Newsletter\Schedule\NewsletterCadence;
 
 /**
  * Local-only placeholder for the first issue (2026-W39), filled with every
@@ -23,11 +23,11 @@ use NouTools\Domains\Newsletter\Actions\ResolveNewsletterIssueSchedule;
 final class NewsletterSampleIssueSeeder extends Seeder
 {
     public function run(
-        ResolveNewsletterIssueSchedule $resolveNewsletterIssueSchedule,
+        NewsletterCadence $newsletterCadence,
         CreateNewsletterDraft $createNewsletterDraft,
         PublishNewsletterIssue $publishNewsletterIssue,
     ): void {
-        $issue = $createNewsletterDraft($resolveNewsletterIssueSchedule->forIssueKey('2026-W39'));
+        $issue = $createNewsletterDraft($newsletterCadence->forIssueKey('2026-W39'));
 
         DB::transaction(function () use ($issue): void {
             $issue->items()->delete();

@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Date;
 use InvalidArgumentException;
 use NouTools\Domains\Newsletter\Actions\CreateNewsletterDraft;
 use NouTools\Domains\Newsletter\Actions\DraftNewsletterWithAi;
-use NouTools\Domains\Newsletter\Actions\ResolveNewsletterIssueSchedule;
 use NouTools\Domains\Newsletter\DataTransferObjects\NewsletterIssueScheduleDTO;
+use NouTools\Domains\Newsletter\Schedule\NewsletterCadence;
 use Throwable;
 
 final class DraftNewsletterCommand extends Command
@@ -23,12 +23,12 @@ final class DraftNewsletterCommand extends Command
     protected $description = '建立浣熊的空大雙週報草稿，並以 AI 產生初稿';
 
     public function handle(
-        ResolveNewsletterIssueSchedule $resolveNewsletterIssueSchedule,
+        NewsletterCadence $newsletterCadence,
         CreateNewsletterDraft $createNewsletterDraft,
         DraftNewsletterWithAi $draftNewsletterWithAi,
     ): int {
         try {
-            $schedule = $this->resolveSchedule($resolveNewsletterIssueSchedule);
+            $schedule = $this->resolveSchedule($newsletterCadence);
         } catch (InvalidArgumentException $exception) {
             $this->error($exception->getMessage());
 
@@ -73,14 +73,14 @@ final class DraftNewsletterCommand extends Command
         return self::SUCCESS;
     }
 
-    private function resolveSchedule(ResolveNewsletterIssueSchedule $resolveNewsletterIssueSchedule): ?NewsletterIssueScheduleDTO
+    private function resolveSchedule(NewsletterCadence $newsletterCadence): ?NewsletterIssueScheduleDTO
     {
         $issueKey = $this->option('issue');
 
         if (filled($issueKey)) {
-            return $resolveNewsletterIssueSchedule->forIssueKey((string) $issueKey);
+            return $newsletterCadence->forIssueKey((string) $issueKey);
         }
 
-        return $resolveNewsletterIssueSchedule->startingEditingOn(Date::now(ResolveNewsletterIssueSchedule::TIMEZONE));
+        return $newsletterCadence->startingEditingOn(Date::now(NewsletterCadence::TIMEZONE));
     }
 }

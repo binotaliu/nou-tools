@@ -8,6 +8,9 @@ use App\Models\CourseClass;
 use App\Models\DiscountStore;
 use App\Models\DiscountStoreComment;
 use App\Models\DiscountStoreReport;
+use App\Models\NewsletterColumn;
+use App\Models\NewsletterIssue;
+use App\Models\NewsletterItem;
 use App\Models\StudentScheduleItem;
 use App\Models\User;
 use App\Providers\AppServiceProvider;
@@ -41,6 +44,9 @@ arch()->preset()->strict()
         DiscountStore::class,
         DiscountStoreComment::class,
         DiscountStoreReport::class,
+        NewsletterColumn::class,
+        NewsletterIssue::class,
+        NewsletterItem::class,
         StudentScheduleItem::class,
         User::class,
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Newsletter\DataTransferObjects;
 
-use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Spatie\LaravelData\Data;
 
 /**
@@ -16,11 +16,11 @@ final class NewsletterIssueScheduleDTO extends Data
 {
     public function __construct(
         public string $issueKey,
-        public CarbonImmutable $publishesOn,
-        public CarbonImmutable $editingStartsOn,
-        public CarbonImmutable $coversFrom,
-        public CarbonImmutable $coversTo,
-        public CarbonImmutable $highlightsFrom,
-        public CarbonImmutable $highlightsTo,
+        public CarbonInterface $publishesOn,
+        public CarbonInterface $editingStartsOn,
+        public CarbonInterface $coversFrom,
+        public CarbonInterface $coversTo,
+        public CarbonInterface $highlightsFrom,
+        public CarbonInterface $highlightsTo,
     ) {}
 }
