@@ -1,6 +1,6 @@
 # {{ $issue->displayTitle() }}
 
-> {{ $issue->publishes_on->toDateString() }} 發刊｜本期重點涵蓋 {{ $issue->highlights_from->toDateString() }} 至 {{ $issue->highlights_to->toDateString() }}@unless ($issue->isPublished())｜{{ $issue->status->label() }}（預覽）@endunless
+> {{ $issue->publishes_on->toDateString() }} 發刊｜本期重點涵蓋 {{ $issue->highlights_from->toDateString() }} 至 {{ $issue->highlights_to->toDateString() }}{{ $issue->isPublished() ? '' : '｜'.$issue->status->label().'（預覽）' }}
 
 ## 本期重點事項
 
@@ -19,7 +19,7 @@
 
 ### {{ $item->headline }}
 
-{{ $item->source_name }}@if ($item->url)｜原文：{{ $item->url }}@endif
+{{ $item->source_name }}{{ $item->url ? '｜原文：'.$item->url : '' }}
 
 {!! $item->summary !!}
 
