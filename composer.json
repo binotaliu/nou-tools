@@ -15,6 +15,7 @@
     "genealabs/laravel-caffeine": "^13.0",
     "inertiajs/inertia-laravel": "^3.3",
     "laravel-notification-channels/webpush": "^13.0",
+    "laravel/ai": "^0.11.2",
     "laravel/framework": "^13.31",
     "laravel/prompts": "^0.3.24",
     "laravel/reverb": "^1.11",
