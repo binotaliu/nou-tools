@@ -30,6 +30,14 @@ final class PublicSitePolicy implements Preset
         // nicknames can contain arbitrary emoji beyond our fixed seat-choice list.
         $policy->add(Directive::IMG, 'cdn.jsdelivr.net');
 
+        // The og-image card (spatie/laravel-og-image) loads Noto Sans TC from
+        // Google Fonts, but only in the `?ogimage` screenshot document, so the
+        // rest of the site's CSP stays untouched.
+        if (request()->has(config('og-image.preview_parameter', 'ogimage'))) {
+            $policy->add(Directive::STYLE, 'https://fonts.googleapis.com');
+            $policy->add(Directive::FONT, 'https://fonts.gstatic.com');
+        }
+
         $reverbOrigins = $this->reverbConnectSources();
 
         if ($reverbOrigins !== []) {

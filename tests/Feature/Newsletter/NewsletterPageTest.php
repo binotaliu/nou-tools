@@ -176,3 +176,54 @@ it('orders center items like the directory: by region, then configured order', f
                 '基隆中心', '桃園中心', '台中中心', '高雄中心', '花蓮中心', '金門中心',
             ]));
 });
+
+it('advertises a generated og:image card for published issues', function () {
+    publishedIssueWithContent();
+
+    get('/newsletter/2026-W39')
+        ->assertSuccessful()
+        ->assertSee('<template data-og-image', false)
+        ->assertSee('浣熊的空大雙週報 2026-W39', false)
+        ->assertSee('<span>NOU 小幫手</span>', false)
+        ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
+        ->assertDontSee(asset('og-image.png'), false);
+});
+
+it('keeps the static og:image on pages without a card', function () {
+    get(route('newsletter.index'))
+        ->assertSuccessful()
+        ->assertDontSee('<template data-og-image', false)
+        ->assertSee('<meta property="og:image" content="'.asset('og-image.png').'"', false);
+});
+
+it('renders the card for admins previewing drafts', function () {
+    NewsletterIssue::factory()->publishingOn('2026-09-21')->draft()->create();
+
+    actingAs(User::factory()->create(['roles' => [UserRole::Admin->value]]));
+
+    get('/newsletter/2026-W39')
+        ->assertSuccessful()
+        ->assertSee('<template data-og-image', false);
+});
+
+it('allows Google Fonts in the CSP only when rendering the og-image card', function () {
+    publishedIssueWithContent();
+
+    $policy = fn ($response): string => (string) $response->headers->get('Content-Security-Policy');
+
+    expect($policy(get('/newsletter/2026-W39?ogimage')))
+        ->toContain('https://fonts.googleapis.com')
+        ->toContain('https://fonts.gstatic.com')
+        ->and($policy(get('/newsletter/2026-W39')))
+        ->not->toContain('fonts.googleapis.com')
+        ->not->toContain('fonts.gstatic.com');
+});
+
+it('loads Noto Sans TC in the og-image screenshot document', function () {
+    publishedIssueWithContent();
+
+    get('/newsletter/2026-W39?ogimage')
+        ->assertSuccessful()
+        ->assertSee('family=Noto+Sans+TC', false)
+        ->assertSee("font-family: 'Noto Sans TC'", false);
+});
