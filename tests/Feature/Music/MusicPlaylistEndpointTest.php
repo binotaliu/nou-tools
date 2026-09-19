@@ -50,8 +50,8 @@ it('returns playlists with their tracks in playback order', function () {
         ->assertJsonPath('playlists.0.tracks.1.author', $first->author)
         ->assertJsonPath('playlists.0.tracks.1.license', 'CC BY 4.0')
         ->assertJsonPath('playlists.0.tracks.1.durationSeconds', 100)
-        ->assertJsonPath('playlists.0.tracks.1.mp3Url', Storage::disk(MusicTrack::AUDIO_DISK)->url($first->mp3_path))
-        ->assertJsonPath('playlists.0.tracks.1.oggUrl', Storage::disk(MusicTrack::AUDIO_DISK)->url($first->ogg_path));
+        ->assertJsonPath('playlists.0.tracks.1.audioMp3Url', Storage::disk(MusicTrack::AUDIO_DISK)->url($first->mp3_path))
+        ->assertJsonPath('playlists.0.tracks.1.audioOggUrl', Storage::disk(MusicTrack::AUDIO_DISK)->url($first->ogg_path));
 });
 
 it('has a null cover url when the playlist has no cover', function () {

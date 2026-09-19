@@ -18,8 +18,8 @@ final class MusicTrackViewModel extends Data
         public ?string $licenseUrl,
         public ?string $sourceUrl,
         public int $durationSeconds,
-        public string $mp3Url,
-        public string $oggUrl,
+        public string $audioMp3Url,
+        public string $audioOggUrl,
     ) {}
 
     public static function fromModel(MusicTrack $track): self
@@ -34,8 +34,8 @@ final class MusicTrackViewModel extends Data
             licenseUrl: $track->license_url,
             sourceUrl: $track->source_url,
             durationSeconds: $track->duration_seconds,
-            mp3Url: $disk->url($track->mp3_path),
-            oggUrl: $disk->url($track->ogg_path),
+            audioMp3Url: $disk->url($track->mp3_path),
+            audioOggUrl: $disk->url($track->ogg_path),
         );
     }
 }
