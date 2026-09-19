@@ -20,6 +20,7 @@ class MusicPlaylistsTable
                 ImageColumn::make('cover_image')
                     ->label('封面')
                     ->disk(MusicPlaylist::COVER_DISK)
+                    ->visibility('public')
                     ->square(),
                 TextColumn::make('title')
                     ->label('標題')
