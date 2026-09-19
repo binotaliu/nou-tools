@@ -295,36 +295,8 @@ const moreMenuItems = [
             class="max-w-lg text-center text-sm text-theme-400 md:text-left dark:text-zinc-500"
           >
             <span class="font-semibold">免責聲明：</span>
-            <p class="mb-2 text-justify text-xs md:text-left">
+            <p class="text-justify text-xs md:text-left">
               本網站為學生自發製作之工具，僅供同學參考使用，並非學校官方發布；所有資訊以學校正式公告為準；本網站已盡可能提供準確資訊，但不保證其完整性或正確性；針對重要資訊，請使用者自行查證並以學校官方公告為準；課程相關資訊係搜集整理自學校官方公告、網站，與其他官方資料，採用合理使用原則提供同學參考使用；使用本網站即表示同意此免責聲明之內容。
-            </p>
-            <span class="font-semibold">開放原始碼授權聲明：</span>
-            <p class="text-justify text-xs md:text-left">
-              本網站是自由且開放原始碼之軟體，使用 AGPL-3.0
-              授權條款。歡迎各位同學自由審閱、修改、使用、再散佈本網站原始碼，但請遵守
-              AGPL
-              授權條款。如果您以任何形式參考了本網站之原始碼並開發了新的軟體，則此一沿伸軟體也必須使用與遵守
-              AGPL
-              授權條款，請在閱讀、參考、引用本網站原始碼時特別注意授權問題。
-            </p>
-            <span class="mt-2 block font-semibold">圖樣授權聲明：</span>
-            <p class="text-justify text-xs md:text-left">
-              分享卡片背景圖樣「I Like Food」與「Plus」出自 Steve Schoger 的
-              <a
-                href="https://heropatterns.com/"
-                class="underline hover:text-theme-600 dark:hover:text-zinc-300"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Hero Patterns</a
-              >，依
-              <a
-                href="https://creativecommons.org/licenses/by/4.0/"
-                class="underline hover:text-theme-600 dark:hover:text-zinc-300"
-                target="_blank"
-                rel="noopener noreferrer"
-                >CC BY 4.0</a
-              >
-              授權使用，本站已調整其顏色與透明度。
             </p>
           </div>
         </div>
@@ -335,6 +307,15 @@ const moreMenuItems = [
       >
         <div>&copy; {{ new Date().getFullYear() }} NOU 小幫手</div>
         <div class="flex items-center gap-x-8 gap-y-2">
+          <div class="text-xs">
+            <Link
+              href="/about"
+              class="inline-flex items-center gap-1 text-theme-500 hover:text-theme-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+            >
+              <Icon name="information-circle" class="size-3" />
+              關於本站
+            </Link>
+          </div>
           <div class="text-xs">
             <a
               href="https://kuma.binota.org/status/nou"
