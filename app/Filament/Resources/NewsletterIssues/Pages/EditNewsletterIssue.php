@@ -15,7 +15,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use NouTools\Domains\Newsletter\Actions\ChangeNewsletterIssueReadiness;
 use NouTools\Domains\Newsletter\Actions\PublishNewsletterIssue;
-use NouTools\Domains\Newsletter\Actions\RefreshNewsletterHighlightEvents;
 
 /**
  * @property NewsletterIssue $record
@@ -29,7 +28,6 @@ class EditNewsletterIssue extends EditRecord
         return [
             $this->getPreviewAction(),
             $this->getAiDraftAction(),
-            $this->getRefreshCalendarAction(),
             $this->getMarkReadyAction(),
             $this->getReturnToDraftAction(),
             $this->getPublishAction(),
@@ -66,24 +64,6 @@ class EditNewsletterIssue extends EditRecord
                     ->title('AI 正在產生草稿')
                     ->body('約需一至兩分鐘，完成後重新整理頁面即可看到結果。')
                     ->send();
-            });
-    }
-
-    private function getRefreshCalendarAction(): Action
-    {
-        return Action::make('refreshCalendar')
-            ->label('重新讀取校曆')
-            ->icon('heroicon-o-calendar-days')
-            ->color('gray')
-            ->requiresConfirmation()
-            ->modalDescription('會以目前的校曆覆蓋本期的校曆事件列表。')
-            ->visible(fn (NewsletterIssue $record): bool => ! $record->isPublished())
-            ->action(function (NewsletterIssue $record): void {
-                app(RefreshNewsletterHighlightEvents::class)($record);
-
-                $this->refreshFormData(['highlights_events']);
-
-                Notification::make()->success()->title('已重新讀取校曆')->send();
             });
     }
 

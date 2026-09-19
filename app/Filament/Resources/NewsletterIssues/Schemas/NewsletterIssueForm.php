@@ -6,7 +6,10 @@ namespace App\Filament\Resources\NewsletterIssues\Schemas;
 
 use App\Enums\NewsletterSection;
 use App\Models\Announcement;
+use App\Models\NewsletterIssue;
 use Closure;
+use Filament\Actions\Action;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
@@ -15,17 +18,22 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Mansoor\UnsplashPicker\Actions\UnsplashPickerAction;
+use NouTools\Domains\Newsletter\Actions\ListNewsletterCandidateAnnouncements;
 use NouTools\Domains\Newsletter\Actions\QueryNewsletterCandidateAnnouncements;
 use NouTools\Domains\Newsletter\Schedule\NewsletterCadence;
+use NouTools\Domains\Shared\SchoolCalendar\Actions\ListSchoolEventsBetween;
 
 class NewsletterIssueForm
 {
@@ -123,13 +131,21 @@ class NewsletterIssueForm
                     ->columns(2)
                     ->columnSpanFull(),
 
-                Section::make('本期重點事項')
+                Section::make('前言')
                     ->schema([
                         MarkdownEditor::make('highlights_intro')
-                            ->label('開場文字'),
+                            ->hiddenLabel(),
+                    ])
+                    ->columnSpanFull()
+                    ->hiddenOn('create'),
+
+                Section::make('本期重點事項')
+                    ->key('highlightsSection')
+                    ->headerActions([self::importCalendarEventsAction()])
+                    ->schema([
                         Repeater::make('highlights_events')
                             ->label('校曆事件')
-                            ->helperText('建立時自動擷取自校曆，可手動調整；「重新讀取校曆」會覆蓋此列表。')
+                            ->helperText('建立時自動擷取自校曆，可手動調整；「匯入校曆事件」會覆蓋此列表。')
                             ->schema([
                                 DatePicker::make('start')->label('開始')->required(),
                                 DatePicker::make('end')->label('結束')->required(),
@@ -144,6 +160,8 @@ class NewsletterIssueForm
                     ->hiddenOn('create'),
 
                 Section::make('消息')
+                    ->key('itemsSection')
+                    ->headerActions([self::importAnnouncementsAction()])
                     ->description('空大新消息與各中心消息。選擇公告會自動帶入來源、連結與標題。')
                     ->schema([
                         Repeater::make('items')
@@ -192,6 +210,117 @@ class NewsletterIssueForm
                     ->columnSpanFull()
                     ->hiddenOn('create'),
             ]);
+    }
+
+    private static function importCalendarEventsAction(): Action
+    {
+        return Action::make('importCalendarEvents')
+            ->label('匯入校曆事件')
+            ->icon(Heroicon::CalendarDays)
+            ->color('gray')
+            ->hidden(fn (?NewsletterIssue $record): bool => $record?->isPublished() ?? false)
+            ->requiresConfirmation()
+            ->modalDescription('會以校曆中「重點起」至「重點迄」的事件覆蓋目前的校曆事件列表，儲存後才會生效。')
+            ->action(function (Get $get, Set $set): void {
+                $from = $get('highlights_from');
+                $to = $get('highlights_to');
+
+                if (blank($from) || blank($to)) {
+                    Notification::make()->warning()->title('請先設定重點起訖日期')->send();
+
+                    return;
+                }
+
+                $events = app(ListSchoolEventsBetween::class)(
+                    Date::parse($from)->toDateString(),
+                    Date::parse($to)->toDateString(),
+                );
+
+                $set('highlights_events', $events);
+
+                Notification::make()->success()->title('已匯入 '.count($events).' 個校曆事件')->body('請記得儲存。')->send();
+            });
+    }
+
+    private static function importAnnouncementsAction(): Action
+    {
+        return Action::make('importAnnouncements')
+            ->label('匯入公告')
+            ->icon(Heroicon::ArrowDownTray)
+            ->color('gray')
+            ->hidden(fn (?NewsletterIssue $record): bool => $record?->isPublished() ?? false)
+            ->modalHeading('匯入公告')
+            ->modalDescription('列出「公告起」至「公告迄」範圍內、尚未加入的公告。匯入後請記得儲存。')
+            ->modalSubmitActionLabel('匯入')
+            ->schema(fn (Get $get): array => self::announcementImportFields($get))
+            ->action(function (array $data, Get $get, Set $set): void {
+                $ids = collect(NewsletterSection::cases())
+                    ->flatMap(fn (NewsletterSection $section): array => $data[$section->value] ?? [])
+                    ->all();
+
+                if ($ids === []) {
+                    return;
+                }
+
+                $announcements = Announcement::query()->whereKey($ids)->get()->keyBy('id');
+                $items = $get('items') ?? [];
+
+                foreach (NewsletterSection::cases() as $section) {
+                    foreach ($data[$section->value] ?? [] as $id) {
+                        $announcement = $announcements->get($id);
+
+                        if ($announcement === null) {
+                            continue;
+                        }
+
+                        $items[(string) Str::uuid()] = [
+                            'section' => $section->value,
+                            'announcement_id' => $announcement->id,
+                            'source_name' => $announcement->source_name,
+                            'url' => $announcement->url,
+                            'headline' => Str::limit($announcement->title, 250, ''),
+                            'summary' => null,
+                        ];
+                    }
+                }
+
+                $set('items', $items);
+
+                Notification::make()->success()->title('已匯入 '.count($ids).' 則公告')->body('請記得儲存。')->send();
+            });
+    }
+
+    /**
+     * One checkbox list per newsletter section, listing the candidate
+     * announcements that aren't already items of the issue.
+     *
+     * @return array<int, mixed>
+     */
+    private static function announcementImportFields(Get $get): array
+    {
+        $from = $get('covers_from');
+        $to = $get('covers_to');
+
+        if (blank($from) || blank($to)) {
+            return [Placeholder::make('missing_window')->hiddenLabel()->content('請先設定公告起訖日期。')];
+        }
+
+        $imported = collect($get('items') ?? [])->pluck('announcement_id')->filter()->map(fn (mixed $id): int => (int) $id)->all();
+        $candidates = app(ListNewsletterCandidateAnnouncements::class)(Date::parse($from), Date::parse($to));
+
+        $fields = $candidates
+            ->map(fn ($announcements, string $section) => $announcements->reject(fn (Announcement $announcement): bool => in_array($announcement->id, $imported, true)))
+            ->filter(fn ($announcements): bool => $announcements->isNotEmpty())
+            ->map(fn ($announcements, string $section): CheckboxList => CheckboxList::make($section)
+                ->label(NewsletterSection::from($section)->label())
+                ->options($announcements->mapWithKeys(fn (Announcement $announcement): array => [$announcement->id => self::announcementOptionLabel($announcement)])->all())
+                ->searchable()
+                ->bulkToggleable()
+                ->columns(1))
+            ->values()
+            ->all();
+
+        return $fields !== [] ? $fields : [Placeholder::make('no_candidates')->hiddenLabel()->content('沒有可匯入的公告。')];
     }
 
     /**

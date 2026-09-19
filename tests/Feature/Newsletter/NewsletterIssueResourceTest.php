@@ -11,6 +11,8 @@ use App\Models\Announcement;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
 use App\Models\User;
+use Filament\Actions\Exceptions\ActionNotResolvableException;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Date;
@@ -222,12 +224,47 @@ it('dispatches the AI draft after the response', function () {
     Bus::assertDispatchedAfterResponse(DraftNewsletterIssueWithAi::class, fn (DraftNewsletterIssueWithAi $job): bool => $job->issue->is($issue));
 });
 
-it('refreshes the calendar snapshot', function () {
+it('imports calendar events into the form without saving', function () {
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create(['highlights_events' => []]);
 
-    Livewire::test(EditNewsletterIssue::class, ['record' => $issue->getRouteKey()])
-        ->callAction('refreshCalendar')
+    $component = Livewire::test(EditNewsletterIssue::class, ['record' => $issue->getRouteKey()])
+        ->callAction(TestAction::make('importCalendarEvents')->schemaComponent('highlightsSection'))
         ->assertNotified();
 
+    expect($issue->refresh()->highlights_events)->toBe([]);
+
+    $component->call('save');
+
     expect(array_column($issue->refresh()->highlights_events, 'name'))->toBe(['期中考報名截止']);
+});
+
+it('imports the announcements picked in the modal as items', function () {
+    $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create();
+    $inWindow = Announcement::factory()->create([
+        'source_name' => '教務處',
+        'title' => '加退選公告',
+        'url' => 'https://studadm.nou.edu.tw/x',
+        'published_at' => $issue->covers_from->toDateString().' 10:00:00',
+    ]);
+    $alreadyImported = Announcement::factory()->create(['published_at' => $issue->covers_from->toDateString().' 11:00:00']);
+    NewsletterItem::factory()->for($issue, 'issue')->create(['announcement_id' => $alreadyImported->id]);
+
+    Livewire::test(EditNewsletterIssue::class, ['record' => $issue->getRouteKey()])
+        ->callAction(TestAction::make('importAnnouncements')->schemaComponent('itemsSection'), ['news' => [$inWindow->id]])
+        ->assertNotified()
+        ->call('save');
+
+    expect($issue->items()->pluck('announcement_id')->all())->toContain($inWindow->id, $alreadyImported->id)
+        ->and($issue->items()->where('announcement_id', $inWindow->id)->sole()->only(['section', 'source_name', 'headline']))
+        ->toBe(['section' => NewsletterSection::News, 'source_name' => '教務處', 'headline' => '加退選公告']);
+});
+
+it('hides the import actions on a published issue', function () {
+    $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create(['status' => NewsletterIssueStatus::Published]);
+
+    foreach (['importCalendarEvents' => 'highlightsSection', 'importAnnouncements' => 'itemsSection'] as $action => $section) {
+        expect(fn () => Livewire::test(EditNewsletterIssue::class, ['record' => $issue->getRouteKey()])
+            ->callAction(TestAction::make($action)->schemaComponent($section)))
+            ->toThrow(ActionNotResolvableException::class);
+    }
 });
