@@ -19,6 +19,7 @@ beforeEach(function (): void {
     ]);
     NewsletterItem::factory()->for($issue, 'issue')->create(['headline' => '期中考開始報名', 'source_name' => '教務處']);
     NewsletterItem::factory()->for($issue, 'issue')->centers('臺北中心')->create(['headline' => '讀書會招募']);
+    NewsletterItem::factory()->for($issue, 'issue')->centers('臺中中心')->create(['headline' => '秋季健行活動報名']);
     NewsletterColumn::factory()->for($issue, 'issue')->create([
         'title' => '浣熊站長的自言自語',
         'body' => <<<'MD'
@@ -49,6 +50,9 @@ it('renders every section of an issue', function () {
         ->assertSee('期中考開始報名')
         ->assertSee('各中心消息')
         ->assertSee('讀書會招募')
+        ->assertSee('臺北中心')
+        ->assertSee('秋季健行活動報名')
+        ->assertSee('臺中中心')
         ->assertSee('浣熊站長的自言自語');
 });
 
