@@ -1,6 +1,5 @@
-{{-- Open Graph / Twitter tags for a newsletter issue. Included into <head> by
-app.blade.php (Inertia's <Head> is client-side only, so crawlers would never
-see tags set there); the og:image itself comes from the og-image card. --}}
+{{-- Open Graph / Twitter tags for a newsletter issue; the og:image itself comes
+from the og-image card. --}}
 @php
     $issue = $props['viewModel']['issue'] ?? null;
 @endphp
@@ -16,20 +15,19 @@ see tags set there); the og:image itself comes from the og-image card. --}}
         }
     @endphp
 
-    <meta name="description" content="{{ $description }}" />
-    <meta property="og:type" content="article" />
-    <meta property="og:site_name" content="NOU 小幫手" />
-    <meta property="og:locale" content="zh_TW" />
-    <meta property="og:title" content="{{ $issue['title'] }}" />
-    <meta property="og:description" content="{{ $description }}" />
-    <meta property="og:url" content="{{ url()->current() }}" />
-    @if ($issue['publishedAt'])
-        <meta
-            property="article:published_time"
-            content="{{ $issue['publishedAt'] }}"
-        />
-    @endif
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="{{ $issue['title'] }}" />
-    <meta name="twitter:description" content="{{ $description }}" />
+    @include('open-graph._meta', [
+        'title' => $issue['title'].' - NOU 小幫手',
+        'ogTitle' => $issue['title'],
+        'ogType' => 'article',
+        'description' => $description,
+        'publishedTime' => $issue['publishedAt'],
+        'feed' => ['title' => $props['viewModel']['newsletterTitle'], 'href' => $props['viewModel']['feedUrl']],
+        'jsonLd' => [
+            '@context' => 'https://schema.org',
+            '@type' => 'NewsArticle',
+            'headline' => $issue['title'],
+            'datePublished' => $issue['publishedAt'] ?? $issue['publishesOn'],
+            'isPartOf' => ['@type' => 'Periodical', 'name' => $props['viewModel']['newsletterTitle']],
+        ],
+    ])
 @endif

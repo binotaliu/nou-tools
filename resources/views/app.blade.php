@@ -22,11 +22,16 @@
         ? '/'.ltrim(preg_replace('/\{(\w+)\??\}/', ':$1', $currentRoute->uri()), '/')
         : '/'.ltrim(request()->path(), '/');
 
-    $ogImageView = $routeName && view()->exists('og-image.'.$routeName)
+    // Errors raised inside a matched route (a 404 on articles.show, ...) keep
+    // that route's name but render the Error page, which has none of the
+    // props the per-route head views read.
+    $isErrorPage = ($page['component'] ?? null) === 'Error';
+
+    $ogImageView = $routeName && ! $isErrorPage && view()->exists('og-image.'.$routeName)
         ? 'og-image.'.$routeName
         : null;
 
-    $openGraphView = $routeName && view()->exists('open-graph.'.$routeName)
+    $openGraphView = $routeName && ! $isErrorPage && view()->exists('open-graph.'.$routeName)
         ? 'open-graph.'.$routeName
         : null;
 @endphp
@@ -73,19 +78,20 @@
     otherwise the browser silently drops that inline stylesheet. --}}
     <meta name="csp-nonce" content="{{ app('csp-nonce') }}" />
 
-    <title inertia>NOU 小幫手</title>
+    {{-- Pages with a resources/views/open-graph/{route name}.blade.php get
+    their own <title>, description, robots, Open Graph/Twitter tags and JSON-LD
+    (see open-graph/_meta.blade.php); everything else falls back to this title. --}}
+    @if ($openGraphView)
+        @include($openGraphView, ['props' => $page['props']])
+    @else
+        <title inertia>NOU 小幫手</title>
+    @endif
 
     {{-- Pages with a resources/views/og-image/{route name}.blade.php card get
     a generated og:image from spatie/laravel-og-image instead of the static one. --}}
     @unless ($ogImageView)
         <meta property="og:image" content="{{ asset('og-image.png') }}" />
     @endunless
-
-    {{-- Pages with a resources/views/open-graph/{route name}.blade.php get
-    their own title/description/type tags. --}}
-    @if ($openGraphView)
-        @include($openGraphView, ['props' => $page['props']])
-    @endif
 
     <link id="favicon-ico" rel="icon" href="{{ asset('favicon.ico') }}?v=2" />
     <link

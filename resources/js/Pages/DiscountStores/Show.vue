@@ -273,9 +273,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Head :title="`${viewModel.name} - 優惠店家 - NOU 小幫手`">
-    <meta name="description" :content="viewModel.seoDescription" />
-  </Head>
+  <Head :title="`${viewModel.name} - 優惠店家 - NOU 小幫手`" />
 
   <AppLayout>
     <div class="mx-auto max-w-4xl space-y-6">

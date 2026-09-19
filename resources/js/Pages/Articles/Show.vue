@@ -41,21 +41,6 @@ const currentUrl = computed(() =>
   typeof window !== 'undefined' ? window.location.href : ''
 )
 
-const jsonLd = computed(() => ({
-  '@context': 'https://schema.org',
-  '@type': 'Article',
-  headline: props.viewModel.article.title,
-  description: props.viewModel.article.description,
-  author: {
-    '@type': 'Organization',
-    name: props.viewModel.article.author,
-  },
-  datePublished: props.viewModel.article.publishedAt,
-  dateModified:
-    props.viewModel.article.updatedAt ?? props.viewModel.article.publishedAt,
-  mainEntityOfPage: currentUrl.value,
-}))
-
 function formatDate(value) {
   if (!value) {
     return ''
@@ -99,11 +84,7 @@ useMarkdownContainers(sidebarContentRoot, [
 </script>
 
 <template>
-  <Head :title="pageTitle">
-    <script type="application/ld+json">
-      {{ JSON.stringify(jsonLd) }}
-    </script>
-  </Head>
+  <Head :title="pageTitle" />
 
   <AppLayout>
     <div class="mx-auto max-w-7xl">

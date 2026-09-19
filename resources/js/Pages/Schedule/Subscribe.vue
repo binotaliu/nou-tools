@@ -46,9 +46,7 @@ function submit() {
 </script>
 
 <template>
-  <Head :title="`訂閱行事曆 - ${viewModel.name || '我的課表'} - NOU 小幫手`">
-    <meta name="robots" content="noindex, nofollow" />
-  </Head>
+  <Head :title="`訂閱行事曆 - ${viewModel.name || '我的課表'} - NOU 小幫手`" />
 
   <AppLayout>
     <div class="mx-auto max-w-2xl">

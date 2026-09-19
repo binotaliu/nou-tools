@@ -214,14 +214,14 @@ it('advertises Open Graph and Twitter tags for published issues', function () {
 
     get('/newsletter/2026-W39')
         ->assertSuccessful()
-        ->assertSee('<meta property="og:type" content="article" />', false)
-        ->assertSee('<meta property="og:site_name" content="NOU 小幫手" />', false)
-        ->assertSee('<meta property="og:title" content="浣熊的空大雙週報 2026-W39" />', false)
-        ->assertSee('<meta property="og:url" content="'.url('/newsletter/2026-W39').'" />', false)
-        ->assertSee('<meta property="og:description" content="這兩週要注意 期中考報名。alert(1)" />', false)
-        ->assertSee('<meta name="description" content="這兩週要注意 期中考報名。alert(1)" />', false)
+        ->assertSee('<meta data-seo property="og:type" content="article" />', false)
+        ->assertSee('<meta data-seo property="og:site_name" content="NOU 小幫手" />', false)
+        ->assertSee('<meta data-seo property="og:title" content="浣熊的空大雙週報 2026-W39" />', false)
+        ->assertSee('<meta data-seo property="og:url" content="'.url('/newsletter/2026-W39').'" />', false)
+        ->assertSee('<meta data-seo property="og:description" content="這兩週要注意 期中考報名。alert(1)" />', false)
+        ->assertSee('<meta data-seo name="description" content="這兩週要注意 期中考報名。alert(1)" />', false)
         ->assertSee('property="article:published_time"', false)
-        ->assertSee('<meta name="twitter:card" content="summary_large_image" />', false);
+        ->assertSee('<meta data-seo name="twitter:card" content="summary_large_image" />', false);
 });
 
 it('falls back to a generic description when the issue has no intro', function () {
@@ -229,13 +229,14 @@ it('falls back to a generic description when the issue has no intro', function (
 
     get('/newsletter/2026-W39')
         ->assertSuccessful()
-        ->assertSee('<meta property="og:description" content="浣熊的空大雙週報 2026-W39：', false);
+        ->assertSee('<meta data-seo property="og:description" content="浣熊的空大雙週報 2026-W39：', false);
 });
 
-it('does not emit issue Open Graph tags on pages without them', function () {
+it('does not emit issue Open Graph tags on the index', function () {
     get(route('newsletter.index'))
         ->assertSuccessful()
-        ->assertDontSee('<meta property="og:type"', false);
+        ->assertSee('<meta data-seo property="og:type" content="website" />', false)
+        ->assertDontSee('property="article:published_time"', false);
 });
 
 it('keeps the static og:image on pages without a card', function () {

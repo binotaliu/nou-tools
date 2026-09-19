@@ -39,42 +39,7 @@ function toFilenameSafe(value) {
 
 const examSubjectName = computed(() => toFilenameSafe(course.value.name))
 
-const seoDescription = computed(() => {
-  let description = `${course.value.name} 是國立空中大學`
-
-  if (course.value.department) {
-    description += ` ${course.value.department}`
-  }
-  if (course.value.term) {
-    description += ` 在 ${toSemesterDisplay(course.value.term)}`
-  }
-  description += ' 開設的'
-  description += course.value.credits
-    ? ` ${course.value.credits} 學分課程`
-    : '課程'
-
-  return description
-})
-
 const pageTitle = computed(() => `${course.value.name} - 檢視課程 - NOU 小幫手`)
-
-const currentUrl = computed(() =>
-  typeof window !== 'undefined' ? window.location.href : ''
-)
-
-const jsonLd = computed(() => ({
-  '@context': 'https://schema.org',
-  '@type': 'Course',
-  name: course.value.name,
-  description: seoDescription.value,
-  courseCode: String(course.value.id),
-  provider: {
-    '@type': 'CollegeOrUniversity',
-    name: '國立空中大學',
-  },
-  url: currentUrl.value,
-  inLanguage: 'zh-Hant',
-}))
 
 const backUrl = computed(() =>
   props.viewModel.previousSchedule
@@ -163,12 +128,7 @@ function examReferenceUrl(reference) {
 </script>
 
 <template>
-  <Head :title="pageTitle">
-    <meta name="description" :content="seoDescription" />
-    <script type="application/ld+json">
-      {{ JSON.stringify(jsonLd) }}
-    </script>
-  </Head>
+  <Head :title="pageTitle" />
 
   <AppLayout>
     <div class="mx-auto max-w-5xl">

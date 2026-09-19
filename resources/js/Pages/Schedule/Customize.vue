@@ -62,9 +62,7 @@ function submit() {
 <template>
   <Head
     :title="`自訂課表 - ${viewModel.scheduleName || '我的課表'} - NOU 小幫手`"
-  >
-    <meta name="robots" content="noindex, nofollow" />
-  </Head>
+  />
 
   <AppLayout>
     <div class="mx-auto max-w-4xl">

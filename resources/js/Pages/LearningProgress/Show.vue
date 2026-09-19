@@ -43,7 +43,7 @@ const pageTitle = computed(() => {
     ? ` - ${props.viewModel.scheduleName}`
     : ''
 
-  return `學習進度表 - ${semesterLabel.value}${suffix}- NOU 小幫手`
+  return `學習進度表 - ${semesterLabel.value}${suffix} - NOU 小幫手`
 })
 
 // --- derived progress state (ported from LearningProgressViewModel's
@@ -187,9 +187,7 @@ const csrfToken =
 </script>
 
 <template>
-  <Head :title="pageTitle">
-    <meta name="robots" content="noindex, nofollow" />
-  </Head>
+  <Head :title="pageTitle" />
 
   <AppLayout>
     <div class="mx-auto max-w-7xl">

@@ -26,15 +26,6 @@ const props = defineProps({
   },
 })
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: 'NOU 小幫手',
-  description:
-    '給 NOU 同學的非官方小工具：管理個人課表與學習進度。NOU 小幫手是一款由同學自行開發，專為國立空中大學同學設計的非官方小工具。通過 NOU 小幫手，同學可輕鬆管理自己的課表、學習進度，掌握視訊面授及考試時間，並隨時取得最新的學校公告。另外，NOU 小幫手也提供了優惠店家清單，讓同學在校園生活中享受更多便利與優惠。NOU 小幫手致力於為同學提供一個簡單、方便、實用的學習工具，讓同學能夠更好地規劃自己的學習生活。',
-  url: window.location.origin + '/',
-}
-
 // --- offline banner (same one-off pattern as Directory/Index.vue and
 // Schedule/Show.vue) ---
 const offline = ref(typeof navigator !== 'undefined' && !navigator.onLine)
@@ -118,11 +109,7 @@ const courses = computed(() =>
 </script>
 
 <template>
-  <Head title="NOU 小幫手">
-    <script type="application/ld+json">
-      {{ JSON.stringify(jsonLd) }}
-    </script>
-  </Head>
+  <Head title="NOU 小幫手" />
 
   <AppLayout>
     <div class="space-y-8">

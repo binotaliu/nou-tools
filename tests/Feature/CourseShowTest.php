@@ -38,9 +38,9 @@ test('course show page includes seo meta description', function () {
 
     $response = $this->get(route('course.show', $course));
 
-    // The <meta name="description"> is rendered client-side by
-    // Courses/Show.vue from viewModel.course; assert the underlying data
-    // instead of the rendered tag (there's no SSR yet).
+    // The <meta name="description"> itself is server-rendered from
+    // resources/views/open-graph/course/show.blade.php (asserted in
+    // SeoHeadTest); this checks the underlying data it is built from.
     $response->assertStatus(200);
     $response->assertInertia(function (Assert $page) {
         $courseData = $page->toArray()['props']['viewModel']['course'];

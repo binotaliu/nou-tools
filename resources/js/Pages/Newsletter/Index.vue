@@ -13,36 +13,10 @@ const props = defineProps({
 })
 
 const issues = computed(() => props.viewModel.issues.data ?? [])
-
-const jsonLd = computed(() => ({
-  '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  name: props.viewModel.title,
-  itemListElement: issues.value.map((issue, index) => ({
-    '@type': 'ListItem',
-    position: index + 1,
-    url: issue.url,
-    name: issue.title,
-  })),
-}))
 </script>
 
 <template>
-  <Head :title="`${viewModel.title} - NOU 小幫手`">
-    <meta
-      name="description"
-      content="每兩週整理一次空大各處室、學系與學習指導中心的公告，以及接下來兩週的校曆重點。"
-    />
-    <link
-      rel="alternate"
-      type="application/atom+xml"
-      :title="viewModel.title"
-      :href="viewModel.feedUrl"
-    />
-    <script type="application/ld+json">
-      {{ JSON.stringify(jsonLd) }}
-    </script>
-  </Head>
+  <Head :title="`${viewModel.title} - NOU 小幫手`" />
 
   <AppLayout>
     <div class="mx-auto max-w-3xl space-y-6">

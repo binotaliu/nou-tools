@@ -41,34 +41,13 @@ const centerGroups = computed(() => {
   return [...groups.values()]
 })
 
-const jsonLd = computed(() => ({
-  '@context': 'https://schema.org',
-  '@type': 'NewsArticle',
-  headline: issue.value.title,
-  datePublished: issue.value.publishedAt ?? issue.value.publishesOn,
-  isPartOf: {
-    '@type': 'Periodical',
-    name: props.viewModel.newsletterTitle,
-  },
-}))
-
 const contentRoot = ref(null)
 
 useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
 </script>
 
 <template>
-  <Head :title="pageTitle">
-    <link
-      rel="alternate"
-      type="application/atom+xml"
-      :title="viewModel.newsletterTitle"
-      :href="viewModel.feedUrl"
-    />
-    <script type="application/ld+json">
-      {{ JSON.stringify(jsonLd) }}
-    </script>
-  </Head>
+  <Head :title="pageTitle" />
 
   <AppLayout>
     <article

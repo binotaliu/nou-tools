@@ -312,9 +312,7 @@ function localHint(next) {
 </script>
 
 <template>
-  <Head :title="pageTitle">
-    <meta name="robots" content="noindex, nofollow" />
-  </Head>
+  <Head :title="pageTitle" />
 
   <AppLayout>
     <div class="mx-auto max-w-5xl">

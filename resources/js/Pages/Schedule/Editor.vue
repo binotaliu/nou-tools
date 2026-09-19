@@ -181,9 +181,7 @@ const csrfToken =
 </script>
 
 <template>
-  <Head :title="`${pageTitle} - NOU 小幫手`">
-    <meta name="robots" content="noindex, nofollow" />
-  </Head>
+  <Head :title="`${pageTitle} - NOU 小幫手`" />
 
   <AppLayout>
     <div class="mx-auto max-w-5xl">

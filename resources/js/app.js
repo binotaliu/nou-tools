@@ -37,6 +37,23 @@ createInertiaApp({
 // for every other route.
 router.on('navigate', event => trackPageView(event.detail.page))
 
+// The SEO tags in <head> (description, robots, Open Graph, JSON-LD, ...) are
+// rendered by the server per route (resources/views/open-graph/) and tagged
+// `data-seo`. They aren't managed by Inertia's <Head>, so once the user
+// navigates client-side they would describe the previous page; drop them then.
+// Crawlers only ever see the initial response, which still has them.
+let isInitialNavigation = true
+
+router.on('navigate', () => {
+  if (isInitialNavigation) {
+    isInitialNavigation = false
+
+    return
+  }
+
+  document.head.querySelectorAll('[data-seo]').forEach(tag => tag.remove())
+})
+
 function trackPageView(page) {
   if (typeof window.gtag !== 'function') {
     return

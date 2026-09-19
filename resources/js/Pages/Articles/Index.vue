@@ -27,13 +27,6 @@ const typeLabel = computed(
 
 const pageTitle = computed(() => `${typeLabel.value} - NOU 小幫手`)
 
-const jsonLd = computed(() => ({
-  '@context': 'https://schema.org',
-  '@type': 'CollectionPage',
-  name: pageTitle.value,
-  url: typeof window !== 'undefined' ? window.location.href : undefined,
-}))
-
 // The index is itself rendered Markdown, so it can carry the same
 // interactive containers an article can.
 const indexContentRoot = ref(null)
@@ -42,11 +35,7 @@ useMarkdownContainers(indexContentRoot, [() => props.viewModel.indexContent])
 </script>
 
 <template>
-  <Head :title="pageTitle">
-    <script type="application/ld+json">
-      {{ JSON.stringify(jsonLd) }}
-    </script>
-  </Head>
+  <Head :title="pageTitle" />
 
   <AppLayout>
     <div class="mx-auto max-w-4xl">
