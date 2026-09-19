@@ -669,3 +669,43 @@ it('returns a 404 for the discount store show markdown page when the store is no
 
     get(route('discount-stores.show.md', $store))->assertNotFound();
 });
+
+it('advertises a generated og:image card on the index and show pages', function () {
+    $store = DiscountStore::factory()
+        ->for($this->category, 'category')
+        ->create(['name' => '測試優惠店家', 'status' => DiscountStoreStatus::Online]);
+
+    get(route('discount-stores.index'))
+        ->assertSuccessful()
+        ->assertSee('<template data-og-image', false)
+        ->assertSee('優惠店家', false)
+        ->assertSee('已收錄 1 間店家', false)
+        ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
+        ->assertDontSee(asset('og-image.png'), false);
+
+    get(route('discount-stores.show', $store))
+        ->assertSuccessful()
+        ->assertSee('<template data-og-image', false)
+        ->assertSee('空大學生適用優惠', false)
+        ->assertSee('測試優惠店家', false)
+        ->assertSee($this->category->name, false)
+        ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
+        ->assertDontSee(asset('og-image.png'), false);
+});
+
+it('keeps the static og:image on discount store pages without a card', function () {
+    get(route('discount-stores.create'))
+        ->assertSuccessful()
+        ->assertDontSee('<template data-og-image', false)
+        ->assertSee('<meta property="og:image" content="'.asset('og-image.png').'"', false);
+});
+
+it('ships the recoloured food pattern the card uses as its background', function () {
+    $svg = file_get_contents(public_path('images/i-like-food.svg'));
+
+    expect($svg)
+        ->toContain('fill="#fff"')
+        ->not->toContain('#000')
+        ->toContain('Steve Schoger')
+        ->toContain('CC BY 4.0');
+});

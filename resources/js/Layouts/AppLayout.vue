@@ -307,6 +307,25 @@ const moreMenuItems = [
               AGPL
               授權條款，請在閱讀、參考、引用本網站原始碼時特別注意授權問題。
             </p>
+            <span class="mt-2 block font-semibold">圖樣授權聲明：</span>
+            <p class="text-justify text-xs md:text-left">
+              分享卡片背景圖樣「I Like Food」與「Plus」出自 Steve Schoger 的
+              <a
+                href="https://heropatterns.com/"
+                class="underline hover:text-theme-600 dark:hover:text-zinc-300"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Hero Patterns</a
+              >，依
+              <a
+                href="https://creativecommons.org/licenses/by/4.0/"
+                class="underline hover:text-theme-600 dark:hover:text-zinc-300"
+                target="_blank"
+                rel="noopener noreferrer"
+                >CC BY 4.0</a
+              >
+              授權使用，本站已調整其顏色與透明度。
+            </p>
           </div>
         </div>
       </div>
