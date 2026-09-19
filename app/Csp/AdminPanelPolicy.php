@@ -44,5 +44,9 @@ final class AdminPanelPolicy implements Preset
         if (($coverOrigin = NewsletterIssue::coverImageOrigin()) !== null) {
             $policy->add(Directive::IMG, $coverOrigin);
         }
+
+        if (($bucketOrigin = NewsletterIssue::coverBucketOrigin()) !== null) {
+            $policy->add(Directive::CONNECT, $bucketOrigin);
+        }
     }
 }

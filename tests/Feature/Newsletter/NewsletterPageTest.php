@@ -5,6 +5,7 @@ use App\Models\NewsletterColumn;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
 use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -90,6 +91,34 @@ it('serves covers from the S3 disk URL and allows its origin in the CSP', functi
 
 it('serves covers locally when no remote bucket is configured', function () {
     expect(NewsletterIssue::coverImageOrigin())->toBeNull();
+});
+
+it('lets the admin panel fetch Filament\'s presigned cover previews straight from the S3 bucket', function () {
+    config([
+        'filesystems.disks.'.NewsletterIssue::COVER_DISK.'.disk' => 's3',
+        'filesystems.disks.s3' => [
+            'driver' => 's3',
+            'bucket' => 'covers',
+            'region' => 'ap-northeast-1',
+            'key' => 'key',
+            'secret' => 'secret',
+            'url' => 'https://d111111abcdef8.cloudfront.net',
+        ],
+    ]);
+    /** @var User&Authenticatable $user */
+    $user = User::factory()->createOne();
+
+    $connectSrc = collect(explode(';', (string) actingAs($user)->get(route('filament.admin.auth.profile'))->headers->get('Content-Security-Policy')))
+        ->first(fn (string $directive) => str_starts_with(trim($directive), 'connect-src'));
+
+    expect(NewsletterIssue::coverBucketOrigin())->toBe('https://covers.s3.ap-northeast-1.amazonaws.com')
+        ->and($connectSrc)->toContain('https://covers.s3.ap-northeast-1.amazonaws.com');
+});
+
+it('has no bucket origin while covers are stored locally', function () {
+    config(['filesystems.disks.'.NewsletterIssue::COVER_DISK.'.disk' => 'public']);
+
+    expect(NewsletterIssue::coverBucketOrigin())->toBeNull();
 });
 
 it('has no highlight or past issues before the first issue is published', function () {

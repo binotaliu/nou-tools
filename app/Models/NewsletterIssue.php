@@ -38,6 +38,31 @@ final class NewsletterIssue extends Model
         return isset($parts['scheme'], $parts['host']) ? "{$parts['scheme']}://{$parts['host']}" : null;
     }
 
+    /**
+     * Origin of the S3 bucket itself while covers live on S3, else null.
+     *
+     * Filament's FileUpload previews private files through a presigned
+     * `temporaryUrl()`, which always targets the bucket (never AWS_URL) and is
+     * fetched by FilePond, so the admin panel needs it in `connect-src`.
+     */
+    public static function coverBucketOrigin(): ?string
+    {
+        $parent = config('filesystems.disks.'.self::COVER_DISK.'.disk');
+        $disk = config("filesystems.disks.{$parent}");
+
+        if (($disk['driver'] ?? null) !== 's3' || blank($disk['bucket'] ?? null)) {
+            return null;
+        }
+
+        if (filled($disk['endpoint'] ?? null)) {
+            $parts = parse_url((string) $disk['endpoint']);
+
+            return isset($parts['scheme'], $parts['host']) ? "{$parts['scheme']}://{$parts['host']}".(isset($parts['port']) ? ":{$parts['port']}" : '') : null;
+        }
+
+        return "https://{$disk['bucket']}.s3.{$disk['region']}.amazonaws.com";
+    }
+
     protected $fillable = [
         'issue_key',
         'publishes_on',
