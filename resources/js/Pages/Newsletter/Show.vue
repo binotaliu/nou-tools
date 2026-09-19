@@ -8,6 +8,7 @@ import { computed, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import HighlightsCalendar from '../../Components/Newsletter/HighlightsCalendar.vue'
 import useMarkdownContainers from '../../Composables/useMarkdownContainers'
 import {
   formatNewsletterDate,
@@ -121,6 +122,13 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
             class="prose max-w-none prose-theme dark:prose-invert"
             v-html="issue.highlightsIntro"
           ></div>
+          <HighlightsCalendar
+            v-if="issue.highlightEvents.length > 0"
+            class="mt-4"
+            :highlights-from="issue.highlightsFrom"
+            :highlights-to="issue.highlightsTo"
+            :events="issue.highlightEvents"
+          />
           <ul
             v-if="issue.highlightEvents.length > 0"
             class="mt-4 space-y-2 rounded-lg bg-theme-50 p-4 dark:bg-zinc-800"

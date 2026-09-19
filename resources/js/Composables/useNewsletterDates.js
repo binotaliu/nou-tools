@@ -41,3 +41,32 @@ export function formatNewsletterDateRange(start, end) {
 
   return `${formatShortNewsletterDate(start)} ～ ${formatShortNewsletterDate(end)}`
 }
+
+function toDateString(year, month, day) {
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+}
+
+export function addDays(value, amount) {
+  const { year, month, day } = parts(value)
+  const shifted = new Date(Date.UTC(year, month - 1, day + amount))
+
+  return toDateString(
+    shifted.getUTCFullYear(),
+    shifted.getUTCMonth() + 1,
+    shifted.getUTCDate()
+  )
+}
+
+export function dateRangeDays(start, end) {
+  const days = []
+
+  for (let date = start; date <= end; date = addDays(date, 1)) {
+    days.push(date)
+  }
+
+  return days
+}
+
+export function newsletterDateParts(value) {
+  return parts(value)
+}

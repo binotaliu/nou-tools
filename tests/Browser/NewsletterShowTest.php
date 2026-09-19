@@ -15,7 +15,10 @@ beforeEach(function (): void {
 
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->published()->create([
         'highlights_intro' => '這兩週要注意期中考報名。',
-        'highlights_events' => [['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '期中考報名截止']],
+        'highlights_events' => [
+            ['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '期中考報名截止'],
+            ['start' => '2026-09-21', 'end' => '2026-09-30', 'name' => '115上學期加退選'],
+        ],
     ]);
     NewsletterItem::factory()->for($issue, 'issue')->create(['headline' => '期中考開始報名', 'source_name' => '教務處']);
     NewsletterItem::factory()->for($issue, 'issue')->centers('臺北中心')->create(['headline' => '讀書會招募']);
@@ -46,6 +49,10 @@ it('renders every section of an issue', function () {
         ->assertSee('本期重點事項')
         ->assertSee('9/25（五）')
         ->assertSee('期中考報名截止')
+        ->assertPresent('[data-testid="calendar-day-2026-09-25"]')
+        ->assertSeeIn('[data-testid="calendar-day-2026-09-25"]', '期中考報名截止')
+        ->assertSeeIn('[data-testid="calendar-day-2026-09-25"]', '115上學期加退選')
+        ->assertSeeIn('[data-testid="calendar-day-2026-09-21"]', '115上學期加退選')
         ->assertSee('空大新消息')
         ->assertSee('期中考開始報名')
         ->assertSee('各中心消息')
