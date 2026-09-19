@@ -57,3 +57,32 @@ it('removes a deleted playlist\'s cover image but keeps its tracks', function ()
     expect(MusicPlaylistItem::count())->toBe(0)
         ->and(MusicTrack::find($item->music_track_id))->not->toBeNull();
 });
+
+it('removes a track\'s previous file when it is replaced', function (): void {
+    Storage::fake(MusicTrack::AUDIO_DISK);
+
+    $track = MusicTrack::factory()->create(['mp3_path' => 'old.mp3', 'ogg_path' => 'old.ogg']);
+    Storage::disk(MusicTrack::AUDIO_DISK)->put('old.mp3', 'mp3');
+    Storage::disk(MusicTrack::AUDIO_DISK)->put('old.ogg', 'ogg');
+
+    $track->update(['mp3_path' => 'new.mp3', 'title' => 'Renamed']);
+
+    Storage::disk(MusicTrack::AUDIO_DISK)->assertMissing('old.mp3');
+    Storage::disk(MusicTrack::AUDIO_DISK)->assertExists('old.ogg');
+});
+
+it('removes a playlist\'s previous cover when it is replaced or cleared', function (): void {
+    Storage::fake(MusicPlaylist::COVER_DISK);
+
+    $playlist = MusicPlaylist::factory()->create(['cover_image' => 'old.jpg']);
+    Storage::disk(MusicPlaylist::COVER_DISK)->put('old.jpg', 'img');
+    Storage::disk(MusicPlaylist::COVER_DISK)->put('new.jpg', 'img');
+
+    $playlist->update(['cover_image' => 'new.jpg']);
+
+    Storage::disk(MusicPlaylist::COVER_DISK)->assertMissing('old.jpg');
+
+    $playlist->update(['cover_image' => null]);
+
+    Storage::disk(MusicPlaylist::COVER_DISK)->assertMissing('new.jpg');
+});

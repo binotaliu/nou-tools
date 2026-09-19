@@ -32,6 +32,14 @@ final class MusicTrack extends Model
 
     protected static function booted(): void
     {
+        self::updated(function (MusicTrack $track): void {
+            foreach (['mp3_path', 'ogg_path'] as $attribute) {
+                if ($track->wasChanged($attribute)) {
+                    Storage::disk(self::AUDIO_DISK)->delete($track->getPrevious()[$attribute]);
+                }
+            }
+        });
+
         self::deleted(function (MusicTrack $track): void {
             Storage::disk(self::AUDIO_DISK)->delete([$track->mp3_path, $track->ogg_path]);
         });

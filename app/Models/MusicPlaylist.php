@@ -27,6 +27,14 @@ final class MusicPlaylist extends Model
 
     protected static function booted(): void
     {
+        self::updated(function (MusicPlaylist $playlist): void {
+            $previousCover = $playlist->getPrevious()['cover_image'] ?? null;
+
+            if ($playlist->wasChanged('cover_image') && $previousCover !== null) {
+                Storage::disk(self::COVER_DISK)->delete($previousCover);
+            }
+        });
+
         self::deleted(function (MusicPlaylist $playlist): void {
             if ($playlist->cover_image !== null) {
                 Storage::disk(self::COVER_DISK)->delete($playlist->cover_image);
