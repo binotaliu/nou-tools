@@ -114,6 +114,50 @@ it('saves a cover image', function () {
     Storage::disk('public')->assertExists($issue->cover_image);
 });
 
+it('saves the cover image credit alongside the image', function () {
+    Storage::fake('public');
+    $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create();
+    $file = UploadedFile::fake()->image('cover.jpg');
+
+    // The Unsplash picker's afterUpload hook stashes the credit in the
+    // session and cover_image's own afterStateUpdated consumes it into
+    // these two fields (see NewsletterIssueForm); simulate the end state
+    // here since driving the picker's own nested Livewire action isn't
+    // practical in a form test.
+    Livewire::test(EditNewsletterIssue::class, ['record' => $issue->getRouteKey()])
+        ->fillForm([
+            'cover_image' => $file,
+            'cover_image_credit_name' => 'Nathan Dumlao',
+            'cover_image_credit_url' => 'https://unsplash.com/@nate_dumlao',
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $issue->refresh();
+
+    expect($issue->cover_image_credit_name)->toBe('Nathan Dumlao')
+        ->and($issue->cover_image_credit_url)->toBe('https://unsplash.com/@nate_dumlao');
+});
+
+it('clears the cover image credit when the image is removed', function () {
+    Storage::fake('public');
+    $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create([
+        'cover_image' => 'newsletter-covers/old.jpg',
+        'cover_image_credit_name' => 'Nathan Dumlao',
+        'cover_image_credit_url' => 'https://unsplash.com/@nate_dumlao',
+    ]);
+
+    Livewire::test(EditNewsletterIssue::class, ['record' => $issue->getRouteKey()])
+        ->fillForm(['cover_image' => null])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $issue->refresh();
+
+    expect($issue->cover_image_credit_name)->toBeNull()
+        ->and($issue->cover_image_credit_url)->toBeNull();
+});
+
 it('fills source, url and headline when an announcement is picked', function () {
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create();
     $announcement = Announcement::factory()->create(['source_name' => '教務處', 'title' => '加退選公告', 'url' => 'https://studadm.nou.edu.tw/x']);

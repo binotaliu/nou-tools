@@ -26,6 +26,8 @@ final class NewsletterIssueViewModel extends Data
         public string $issueKey,
         public string $title,
         public ?string $coverImageUrl,
+        public ?string $coverImageCreditName,
+        public ?string $coverImageCreditUrl,
         public bool $isPublished,
         public string $statusLabel,
         public string $publishesOn,
@@ -64,6 +66,11 @@ final class NewsletterIssueViewModel extends Data
             issueKey: $issue->issue_key,
             title: $issue->displayTitle(),
             coverImageUrl: $issue->cover_image !== null ? Storage::disk('public')->url($issue->cover_image) : null,
+            coverImageCreditName: $issue->cover_image_credit_name,
+            // Unsplash's API guidelines require attribution links to carry utm_source/utm_medium.
+            coverImageCreditUrl: $issue->cover_image_credit_url !== null
+                ? $issue->cover_image_credit_url.'?utm_source=nou-tools&utm_medium=referral'
+                : null,
             isPublished: $issue->isPublished(),
             statusLabel: $issue->status->label(),
             publishesOn: $issue->publishes_on->toDateString(),

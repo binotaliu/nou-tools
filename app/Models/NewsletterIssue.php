@@ -22,6 +22,8 @@ final class NewsletterIssue extends Model
         'publishes_on',
         'title',
         'cover_image',
+        'cover_image_credit_name',
+        'cover_image_credit_url',
         'covers_from',
         'covers_to',
         'highlights_from',

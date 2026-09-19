@@ -9,7 +9,9 @@ use App\Models\Announcement;
 use Closure;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -18,7 +20,9 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Session;
 use Mansoor\UnsplashPicker\Actions\UnsplashPickerAction;
 use NouTools\Domains\Newsletter\Actions\QueryNewsletterCandidateAnnouncements;
 use NouTools\Domains\Newsletter\Schedule\NewsletterCadence;
@@ -56,8 +60,56 @@ class NewsletterIssueForm
                             ->image()
                             ->disk('public')
                             ->directory('newsletter-covers')
-                            ->hintAction(UnsplashPickerAction::make())
-                            ->columnSpanFull(),
+                            // The Unsplash picker attaches the file via a browser event
+                            // that FilePond picks up asynchronously, in a *separate* later
+                            // Livewire request than the one the picker's own afterUpload()
+                            // hook runs in, so setting the credit fields directly from
+                            // afterUpload() gets clobbered by that later request's stale
+                            // snapshot. Stash it in the session there and consume it here,
+                            // in cover_image's own afterStateUpdated — which fires in that
+                            // same later request that's already updating cover_image
+                            // itself — so the credit rides along in the same response and
+                            // dehydrates into $data normally at Save.
+                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                                if (blank($state)) {
+                                    $set('cover_image_credit_name', null);
+                                    $set('cover_image_credit_url', null);
+
+                                    return;
+                                }
+
+                                $credit = Session::pull('newsletter_issue_pending_unsplash_credit');
+
+                                if ($credit !== null) {
+                                    $set('cover_image_credit_name', $credit['name']);
+                                    $set('cover_image_credit_url', $credit['url']);
+                                }
+                            })
+                            ->hintAction(
+                                UnsplashPickerAction::make()
+                                    ->afterUpload(function (array $data): void {
+                                        $image = Arr::first(Arr::get($data, 'selectedImages', []));
+
+                                        if ($image === null) {
+                                            return;
+                                        }
+
+                                        Session::put('newsletter_issue_pending_unsplash_credit', [
+                                            'name' => Arr::get($image, 'user.name'),
+                                            'url' => Arr::get($image, 'user.links.html'),
+                                        ]);
+                                    })
+                            )
+                            ->columnSpanFull()
+                            ->hiddenOn('create'),
+                        Hidden::make('cover_image_credit_name'),
+                        Hidden::make('cover_image_credit_url'),
+                        Placeholder::make('cover_image_credit')
+                            ->hiddenLabel()
+                            ->visible(fn (Get $get): bool => filled($get('cover_image_credit_name')))
+                            ->content(fn (Get $get): string => '圖片來源：'.$get('cover_image_credit_name').'（Unsplash）')
+                            ->columnSpanFull()
+                            ->hiddenOn('create'),
                         Grid::make(4)
                             ->schema([
                                 DatePicker::make('covers_from')->label('公告起')->required(),

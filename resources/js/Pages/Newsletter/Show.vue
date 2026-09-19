@@ -79,13 +79,38 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
     <article
       class="mx-auto max-w-3xl rounded-lg border border-theme-200 bg-white p-6 shadow-sm sm:p-8 dark:border-zinc-700 dark:bg-zinc-900"
     >
-      <img
-        v-if="issue.coverImageUrl"
-        :src="issue.coverImageUrl"
-        :alt="issue.title"
-        class="mb-6 aspect-[3/1] w-full rounded-lg object-cover"
-        data-testid="newsletter-cover-image"
-      />
+      <figure v-if="issue.coverImageUrl" class="mb-6">
+        <img
+          :src="issue.coverImageUrl"
+          :alt="issue.title"
+          class="aspect-[3/1] w-full rounded-lg object-cover"
+          data-testid="newsletter-cover-image"
+        />
+        <figcaption
+          v-if="issue.coverImageCreditName"
+          class="mt-1 text-xs text-theme-500 dark:text-zinc-500"
+          data-testid="newsletter-cover-image-credit"
+        >
+          Photo by
+          <a
+            :href="issue.coverImageCreditUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="underline hover:no-underline"
+          >
+            {{ issue.coverImageCreditName }}
+          </a>
+          on
+          <a
+            href="https://unsplash.com/?utm_source=nou-tools&utm_medium=referral"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="underline hover:no-underline"
+          >
+            Unsplash
+          </a>
+        </figcaption>
+      </figure>
 
       <header
         class="mb-6 space-y-2 border-b border-theme-200 pb-6 dark:border-zinc-700"

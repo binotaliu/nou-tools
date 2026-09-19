@@ -70,7 +70,20 @@ it('shows a cover image only when one is set', function () {
     NewsletterIssue::query()->where('issue_key', '2026-W39')->sole()->update(['cover_image' => 'newsletter-covers/cover.jpg']);
 
     visit('/newsletter/2026-W39')
-        ->assertPresent('[data-testid="newsletter-cover-image"]');
+        ->assertPresent('[data-testid="newsletter-cover-image"]')
+        ->assertNotPresent('[data-testid="newsletter-cover-image-credit"]');
+});
+
+it('credits the Unsplash photographer when the cover image has one', function () {
+    NewsletterIssue::query()->where('issue_key', '2026-W39')->sole()->update([
+        'cover_image' => 'newsletter-covers/cover.jpg',
+        'cover_image_credit_name' => 'Nathan Dumlao',
+        'cover_image_credit_url' => 'https://unsplash.com/@nate_dumlao',
+    ]);
+
+    visit('/newsletter/2026-W39')
+        ->assertPresent('[data-testid="newsletter-cover-image-credit"]')
+        ->assertSeeIn('[data-testid="newsletter-cover-image-credit"]', 'Nathan Dumlao');
 });
 
 it('hydrates markdown containers inside columns', function () {
