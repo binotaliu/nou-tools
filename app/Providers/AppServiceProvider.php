@@ -8,6 +8,8 @@ use App\Models\Announcement;
 use App\Models\Course;
 use App\Models\DiscountStore;
 use App\Models\DiscountStoreCategory;
+use App\Models\MusicPlaylist;
+use App\Models\MusicTrack;
 use App\Models\NewsletterIssue;
 use App\Models\StudyRoomProfile;
 use App\Models\User;
@@ -15,6 +17,8 @@ use App\Policies\AnnouncementPolicy;
 use App\Policies\CoursePolicy;
 use App\Policies\DiscountStoreCategoryPolicy;
 use App\Policies\DiscountStorePolicy;
+use App\Policies\MusicPlaylistPolicy;
+use App\Policies\MusicTrackPolicy;
 use App\Policies\NewsletterIssuePolicy;
 use App\Policies\StudyRoomProfilePolicy;
 use App\Policies\UserPolicy;
@@ -90,6 +94,8 @@ final class AppServiceProvider extends ServiceProvider
         Gate::policy(DiscountStore::class, DiscountStorePolicy::class);
         Gate::policy(DiscountStoreCategory::class, DiscountStoreCategoryPolicy::class);
         Gate::policy(StudyRoomProfile::class, StudyRoomProfilePolicy::class);
+        Gate::policy(MusicTrack::class, MusicTrackPolicy::class);
+        Gate::policy(MusicPlaylist::class, MusicPlaylistPolicy::class);
 
         CarbonImmutable::setLocale(config('app.locale'));
         Date::use(CarbonImmutable::class);
