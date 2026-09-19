@@ -22,6 +22,16 @@ test('homepage returns Link headers for API discovery', function () {
         ]));
 });
 
+test('root view ships a launch splash that the og:image screenshot never sees', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('id="app-splash"', false)
+        ->assertSee('html[data-pwa] #app-splash', false);
+
+    $this->get(route('home', ['ogimage' => 1]))
+        ->assertDontSee('id="app-splash"', false);
+});
+
 test('homepage lists courses with in-person classes scheduled for the selected date', function () {
     $selectedDate = Carbon::now('Asia/Taipei')->format('Y-m-d');
 

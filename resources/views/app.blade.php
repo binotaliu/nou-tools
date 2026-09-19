@@ -34,6 +34,10 @@
     $openGraphView = $routeName && ! $isErrorPage && view()->exists('open-graph.'.$routeName)
         ? 'open-graph.'.$routeName
         : null;
+
+    // The splash covers the blank gap before Vue mounts; the og:image
+    // screenshot must never capture it.
+    $showSplash = ! request()->has(config('og-image.preview_parameter', 'ogimage'));
 @endphp
 <!DOCTYPE html>
 <html lang="zh-hant">
@@ -62,6 +66,15 @@
                 stored === 'dark' || (stored === 'system' && prefersDark)
 
             document.documentElement.classList.toggle('dark', isDark)
+
+            // Installed PWA (all browsers, incl. iOS's non-standard flag):
+            // gates the launch splash below.
+            if (
+                window.matchMedia('(display-mode: standalone)').matches ||
+                navigator.standalone === true
+            ) {
+                document.documentElement.dataset.pwa = ''
+            }
 
             const accent = localStorage.getItem('accent-color')
             if (accent) {
@@ -134,12 +147,104 @@
         </script>
     @endif
 
+    @if ($showSplash)
+        {{-- Launch splash (installed PWA only — hidden unless the head script
+        above sets html[data-pwa]): paints from the HTML alone (inline CSS, no
+        external assets on the critical path), so a cold-started PWA shows
+        something while the JS/CSS bundle loads instead of a blank screen.
+        app.js removes #app-splash once Vue has mounted. --}}
+        <style @cspNonce>
+            html {
+                --splash-hue: 40;
+            }
+            html[data-pwa] {
+                background: oklch(0.98 0.01 var(--splash-hue));
+            }
+            html[data-accent='ocean'] {
+                --splash-hue: 230;
+            }
+            html[data-accent='forest'] {
+                --splash-hue: 150;
+            }
+            html[data-accent='purple'] {
+                --splash-hue: 300;
+            }
+            html[data-pwa].dark {
+                background: oklch(0.141 0.005 285.823);
+            }
+            #app-splash {
+                display: none;
+                position: fixed;
+                inset: 0;
+                z-index: 9999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 1rem;
+                background: oklch(0.98 0.01 var(--splash-hue));
+                color: oklch(0.55 0.13 var(--splash-hue));
+                font-family: system-ui, sans-serif;
+                font-size: 1.125rem;
+                font-weight: 700;
+                transition: opacity 0.2s ease-out;
+            }
+            html[data-pwa] #app-splash {
+                display: flex;
+            }
+            html.dark #app-splash {
+                background: oklch(0.141 0.005 285.823);
+                color: oklch(0.967 0.001 286.375);
+            }
+            #app-splash.is-done {
+                opacity: 0;
+                pointer-events: none;
+            }
+            #app-splash img {
+                width: 5rem;
+                height: 5rem;
+                border-radius: 1.25rem;
+            }
+            #app-splash .spinner {
+                width: 1.5rem;
+                height: 1.5rem;
+                border: 3px solid currentColor;
+                border-top-color: transparent;
+                border-radius: 50%;
+                opacity: 0.6;
+                animation: app-splash-spin 0.8s linear infinite;
+            }
+            @keyframes app-splash-spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                #app-splash .spinner {
+                    animation-duration: 2.4s;
+                }
+            }
+        </style>
+    @endif
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body
     class="bg-theme-50 text-theme-900 dark:bg-zinc-950 dark:text-zinc-100"
     data-analytics-page="{{ $analyticsPage }}"
 >
+    @if ($showSplash)
+        <div id="app-splash" role="status" aria-live="polite">
+            <img
+                src="{{ asset('icons/icon-192.png') }}?v=1"
+                alt=""
+                width="80"
+                height="80"
+            />
+            <span>NOU 小幫手</span>
+            <span class="spinner" aria-hidden="true"></span>
+        </div>
+    @endif
     @inertia
     @if ($ogImageView)
         @include($ogImageView, ['props' => $page['props']])

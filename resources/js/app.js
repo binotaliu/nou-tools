@@ -11,6 +11,19 @@ const cspNonce = document
   .querySelector('meta[name="csp-nonce"]')
   ?.getAttribute('content')
 
+// The launch splash (#app-splash in app.blade.php) covers the blank gap
+// before the first page component resolves and Vue mounts.
+function dismissSplash() {
+  const splash = document.getElementById('app-splash')
+
+  if (!splash) {
+    return
+  }
+
+  splash.classList.add('is-done')
+  setTimeout(() => splash.remove(), 250)
+}
+
 createInertiaApp({
   resolve: name => {
     const pages = import.meta.glob('./Pages/**/*.vue', { eager: false })
@@ -20,6 +33,8 @@ createInertiaApp({
     createApp({ render: () => h(App, props) })
       .use(plugin)
       .mount(el)
+
+    dismissSplash()
   },
   nonce: cspNonce,
 })
