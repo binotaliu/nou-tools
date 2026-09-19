@@ -11,6 +11,7 @@ use App\Models\DiscountStoreReport;
 use App\Models\NewsletterColumn;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
+use App\Models\PushNotificationDelivery;
 use App\Models\StudentScheduleItem;
 use App\Models\User;
 use App\Providers\AppServiceProvider;
@@ -47,6 +48,7 @@ arch()->preset()->strict()
         NewsletterColumn::class,
         NewsletterIssue::class,
         NewsletterItem::class,
+        PushNotificationDelivery::class,
         StudentScheduleItem::class,
         User::class,
 
