@@ -100,14 +100,14 @@ onBeforeUnmount(() => {
         <p class="mb-2 text-xs font-medium text-theme-600 dark:text-zinc-400">
           主題色
         </p>
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <button
             v-for="option in ACCENTS"
             :key="option.value"
             type="button"
             :aria-pressed="(accent === option.value).toString()"
             :aria-label="option.label"
-            class="flex aspect-square size-5 shrink-0 items-center justify-center rounded-full ring-2 ring-offset-2 ring-offset-white transition dark:ring-offset-zinc-900"
+            class="flex aspect-square size-6 shrink-0 items-center justify-center rounded ring-2 ring-offset-2 ring-offset-white transition dark:ring-offset-zinc-900"
             :class="
               accent === option.value
                 ? 'ring-theme-500'
@@ -122,7 +122,7 @@ onBeforeUnmount(() => {
             <Icon
               v-if="accent === option.value"
               name="check"
-              class="size-3 text-white"
+              class="size-4 text-white"
             />
           </button>
         </div>
