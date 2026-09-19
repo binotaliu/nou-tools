@@ -139,7 +139,7 @@ class NewsletterIssueForm
                     ->columnSpanFull()
                     ->hiddenOn('create'),
 
-                Section::make('本期重點事項')
+                Section::make('本期行事曆')
                     ->key('highlightsSection')
                     ->headerActions([self::importCalendarEventsAction()])
                     ->schema([
@@ -150,6 +150,10 @@ class NewsletterIssueForm
                                 DatePicker::make('start')->label('開始')->required(),
                                 DatePicker::make('end')->label('結束')->required(),
                                 TextInput::make('name')->label('名稱')->required(),
+                                TextInput::make('description')
+                                    ->label('簡短說明')
+                                    ->maxLength(120)
+                                    ->columnSpanFull(),
                             ])
                             ->columns(3)
                             ->defaultItems(0)
@@ -162,7 +166,7 @@ class NewsletterIssueForm
                 Section::make('消息')
                     ->key('itemsSection')
                     ->headerActions([self::importAnnouncementsAction()])
-                    ->description('空大新消息與各中心消息。選擇公告會自動帶入來源、連結與標題。')
+                    ->description('空大新消息、藝文活動與各中心消息。選擇公告會自動帶入來源、連結與標題。')
                     ->schema([
                         Repeater::make('items')
                             ->hiddenLabel()
@@ -256,6 +260,8 @@ class NewsletterIssueForm
             ->action(function (array $data, Get $get, Set $set): void {
                 $ids = collect(NewsletterSection::cases())
                     ->flatMap(fn (NewsletterSection $section): array => $data[$section->value] ?? [])
+                    ->unique()
+                    ->values()
                     ->all();
 
                 if ($ids === []) {
@@ -265,13 +271,18 @@ class NewsletterIssueForm
                 $announcements = Announcement::query()->whereKey($ids)->get()->keyBy('id');
                 $items = $get('items') ?? [];
 
+                $importedIds = [];
+
                 foreach (NewsletterSection::cases() as $section) {
                     foreach ($data[$section->value] ?? [] as $id) {
                         $announcement = $announcements->get($id);
 
-                        if ($announcement === null) {
+                        // 藝文活動 and 空大新消息 list the same announcements; 空大新消息 takes precedence.
+                        if ($announcement === null || in_array($id, $importedIds, true)) {
                             continue;
                         }
+
+                        $importedIds[] = $id;
 
                         $items[(string) Str::uuid()] = [
                             'section' => $section->value,

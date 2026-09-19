@@ -55,19 +55,25 @@ it('creates a specific issue by key and rejects off-cadence keys', function () {
 
 it('drafts items and the intro with AI, dropping ids outside the candidate set', function () {
     $news = Announcement::factory()->create(['source_name' => '教務處', 'title' => '115上學期期中考報名', 'published_at' => '2026-09-10 00:00:00']);
+    $arts = Announcement::factory()->create(['source_name' => '學務處', 'title' => '校園攝影展徵件', 'published_at' => '2026-09-11 00:00:00']);
     $center = Announcement::factory()->create(['source_name' => '臺北中心', 'title' => '讀書會招募', 'published_at' => '2026-09-12 00:00:00']);
     $outsideWindow = Announcement::factory()->create(['source_name' => '教務處', 'published_at' => '2026-08-01 00:00:00']);
 
-    NewsletterItemCurator::fake(fn (string $prompt): array => str_contains($prompt, '空大新消息')
-        ? ['items' => [
+    NewsletterItemCurator::fake(fn (string $prompt): array => match (true) {
+        str_contains($prompt, '「藝文活動」') => ['items' => [
+            ['announcement_id' => $arts->id, 'headline' => '校園攝影展開始徵件', 'summary' => '歡迎投稿。'],
+        ]],
+        str_contains($prompt, '「空大新消息」') => ['items' => [
             ['announcement_id' => $news->id, 'headline' => '期中考開始報名', 'summary' => '記得報名。', 'read_source' => true],
+            ['announcement_id' => $arts->id, 'headline' => '已被藝文活動收錄', 'summary' => ''],
             ['announcement_id' => $outsideWindow->id, 'headline' => '不該出現', 'summary' => ''],
             ['announcement_id' => 999999, 'headline' => '編造的', 'summary' => ''],
             ['announcement_id' => $news->id, 'headline' => '重複', 'summary' => ''],
-        ]]
-        : ['items' => [
+        ]],
+        default => ['items' => [
             ['announcement_id' => $center->id, 'headline' => '臺北中心讀書會招募中', 'summary' => '歡迎參加。'],
-        ]]);
+        ]],
+    });
     NewsletterHighlightsWriter::fake([['intro' => '這兩週要注意 **9 月 25 日**。']]);
 
     $this->artisan('newsletter:draft', ['--issue' => '2026-W39'])->assertSuccessful();
@@ -80,8 +86,13 @@ it('drafts items and the intro with AI, dropping ids outside the candidate set',
         ->and($issue->newsItems->map->only(['announcement_id', 'headline', 'source_name', 'url', 'position'])->all())->toBe([
             ['announcement_id' => $news->id, 'headline' => '期中考開始報名', 'source_name' => '教務處', 'url' => $news->url, 'position' => 0],
         ])
+        ->and($issue->artItems->map->only(['announcement_id', 'headline', 'source_name'])->all())->toBe([
+            ['announcement_id' => $arts->id, 'headline' => '校園攝影展開始徵件', 'source_name' => '學務處'],
+        ])
         ->and($issue->centerItems->pluck('headline')->all())->toBe(['臺北中心讀書會招募中']);
 
+    NewsletterItemCurator::assertPrompted(fn ($prompt): bool => str_contains($prompt->prompt, '「空大新消息」')
+        && ! str_contains($prompt->prompt, '校園攝影展徵件'));
     NewsletterItemCurator::assertPrompted(fn ($prompt): bool => str_contains($prompt->prompt, '115上學期期中考報名')
         && str_contains($prompt->prompt, "url: {$news->url}\n") || str_ends_with($prompt->prompt, "url: {$news->url}"));
     NewsletterHighlightsWriter::assertPrompted(fn ($prompt): bool => str_contains($prompt->prompt, '期中考報名截止')

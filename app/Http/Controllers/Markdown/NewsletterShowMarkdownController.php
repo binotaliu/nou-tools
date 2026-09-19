@@ -25,6 +25,7 @@ final class NewsletterShowMarkdownController extends Controller
             ->view('newsletter.markdown.show', [
                 'issue' => $issue,
                 'newsItems' => $issue->items->where('section', NewsletterSection::News)->values(),
+                'artItems' => $issue->items->where('section', NewsletterSection::Arts)->values(),
                 'centerItemsBySource' => $issue->items->where('section', NewsletterSection::Centers)->groupBy('source_name'),
             ])
             ->header('Content-Type', 'text/markdown; charset=utf-8');

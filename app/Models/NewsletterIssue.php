@@ -73,6 +73,14 @@ final class NewsletterIssue extends Model
     /**
      * @return HasMany<NewsletterItem, $this>
      */
+    public function artItems(): HasMany
+    {
+        return $this->items()->where('section', NewsletterSection::Arts);
+    }
+
+    /**
+     * @return HasMany<NewsletterItem, $this>
+     */
     public function centerItems(): HasMany
     {
         return $this->items()->where('section', NewsletterSection::Centers);

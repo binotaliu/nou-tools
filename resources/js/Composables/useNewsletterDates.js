@@ -70,3 +70,10 @@ export function dateRangeDays(start, end) {
 export function newsletterDateParts(value) {
   return parts(value)
 }
+
+// Monday-first weekday index (Mon = 0 … Sun = 6), matching the calendar grid.
+export function newsletterWeekdayIndex(value) {
+  const { year, month, day } = parts(value)
+
+  return (new Date(Date.UTC(year, month - 1, day)).getUTCDay() + 6) % 7
+}

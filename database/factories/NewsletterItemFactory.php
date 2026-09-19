@@ -33,6 +33,14 @@ final class NewsletterItemFactory extends Factory
         ];
     }
 
+    public function arts(string $sourceName = '學務處'): static
+    {
+        return $this->state(fn (): array => [
+            'section' => NewsletterSection::Arts,
+            'source_name' => $sourceName,
+        ]);
+    }
+
     public function centers(string $sourceName = '臺北中心'): static
     {
         return $this->state(fn (): array => [

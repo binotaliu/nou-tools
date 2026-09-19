@@ -37,7 +37,7 @@ final class NewsletterSampleIssueSeeder extends Seeder
             // The real calendar has nothing in this window, so placeholder
             // events stand in to exercise the event list.
             $issue->highlights_events = [
-                ['start' => '2026-09-21', 'end' => '2026-09-30', 'name' => '【範例】115上學期加退選'],
+                ['start' => '2026-09-21', 'end' => '2026-09-30', 'name' => '【範例】115上學期加退選', 'description' => '至教務系統辦理，逾期不受理'],
                 ['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '【範例】期中考報名截止'],
                 ['start' => '2026-10-03', 'end' => '2026-10-04', 'name' => '【範例】第一次面授'],
             ];
@@ -49,6 +49,10 @@ final class NewsletterSampleIssueSeeder extends Seeder
 
             foreach ($this->newsItems() as $position => $item) {
                 $this->createItem($issue->id, NewsletterSection::News, $position, $item);
+            }
+
+            foreach ($this->artItems() as $position => $item) {
+                $this->createItem($issue->id, NewsletterSection::Arts, $position, $item);
             }
 
             foreach ($this->centerItems() as $position => $item) {
@@ -118,6 +122,21 @@ final class NewsletterSampleIssueSeeder extends Seeder
                 'headline' => '【範例】學系座談會：選課與學習規劃（沒有原文連結的消息）',
                 'summary' => '',
                 'url' => null,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<int, array{source_name: string, headline: string, summary: string, url: ?string}>
+     */
+    private function artItems(): array
+    {
+        return [
+            [
+                'source_name' => '學務處',
+                'headline' => '【範例】校園藝文展：同學攝影作品徵件',
+                'summary' => '即日起至 10 月 15 日收件，入選作品將於圖書館展出。',
+                'url' => 'https://www.nou.edu.tw/',
             ],
         ];
     }

@@ -2,13 +2,21 @@
 
 > {{ $issue->publishes_on->toDateString() }} 發刊｜本期重點涵蓋 {{ $issue->highlights_from->toDateString() }} 至 {{ $issue->highlights_to->toDateString() }}{{ $issue->isPublished() ? '' : '｜'.$issue->status->label().'（預覽）' }}
 
-## 本期重點事項
+@if (filled($issue->highlights_intro))
+
+## 前言
 
 {!! $issue->highlights_intro !!}
 
+@endif
+@if (filled($issue->highlights_events))
+
+## 本期行事曆
+
+@endif
 @foreach ($issue->highlights_events ?? [] as $event)
 
-- {{ $event['start'] === $event['end'] ? $event['start'] : $event['start'].' ～ '.$event['end'] }}：{{ $event['name'] }}
+- {{ $event['start'] === $event['end'] ? $event['start'] : $event['start'].' ～ '.$event['end'] }}：{{ $event['name'] }}{{ filled($event['description'] ?? null) ? '｜'.$event['description'] : '' }}
   @endforeach
 
 @if ($newsItems->isNotEmpty())
@@ -16,6 +24,20 @@
 ## 空大新消息
 
 @foreach ($newsItems as $item)
+
+### {{ $item->headline }}
+
+{{ $item->source_name }}{{ $item->url ? '｜原文：'.$item->url : '' }}
+
+{!! $item->summary !!}
+
+@endforeach
+@endif
+@if ($artItems->isNotEmpty())
+
+## 藝文活動
+
+@foreach ($artItems as $item)
 
 ### {{ $item->headline }}
 

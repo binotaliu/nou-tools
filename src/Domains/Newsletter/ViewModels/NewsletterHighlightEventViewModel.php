@@ -15,10 +15,11 @@ final class NewsletterHighlightEventViewModel extends Data
         public string $name,
         public string $startDate,
         public string $endDate,
+        public ?string $description = null,
     ) {}
 
     /**
-     * @param  array{name: string, start: string, end: string}  $event
+     * @param  array{name: string, start: string, end: string, description?: string|null}  $event
      */
     public static function fromSnapshot(array $event): self
     {
@@ -26,6 +27,7 @@ final class NewsletterHighlightEventViewModel extends Data
             name: $event['name'],
             startDate: $event['start'],
             endDate: $event['end'],
+            description: filled($event['description'] ?? null) ? $event['description'] : null,
         );
     }
 }

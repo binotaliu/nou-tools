@@ -69,6 +69,23 @@ it('rejects an off-cadence publish date', function () {
     expect(NewsletterIssue::count())->toBe(0);
 });
 
+it('saves an optional short description on calendar events', function () {
+    $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create(['highlights_events' => []]);
+
+    Livewire::test(EditNewsletterIssue::class, ['record' => $issue->getRouteKey()])
+        ->fillForm([
+            'highlights_events' => [
+                ['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '期中考報名截止', 'description' => '逾期不受理'],
+                ['start' => '2026-09-28', 'end' => '2026-09-28', 'name' => '教師節', 'description' => null],
+            ],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect(array_column($issue->refresh()->highlights_events, 'description', 'name'))
+        ->toBe(['期中考報名截止' => '逾期不受理', '教師節' => null]);
+});
+
 it('edits intro, items and columns', function () {
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create();
     $announcement = Announcement::factory()->create(['source_name' => '臺北中心', 'title' => '讀書會招募']);
@@ -257,6 +274,32 @@ it('imports the announcements picked in the modal as items', function () {
     expect($issue->items()->pluck('announcement_id')->all())->toContain($inWindow->id, $alreadyImported->id)
         ->and($issue->items()->where('announcement_id', $inWindow->id)->sole()->only(['section', 'source_name', 'headline']))
         ->toBe(['section' => NewsletterSection::News, 'source_name' => '教務處', 'headline' => '加退選公告']);
+});
+
+it('imports an announcement ticked under both news and arts only once, as news', function () {
+    $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create();
+    $announcement = Announcement::factory()->create([
+        'source_name' => '學務處',
+        'title' => '校園攝影展徵件',
+        'published_at' => $issue->covers_from->toDateString().' 10:00:00',
+    ]);
+    $artsOnly = Announcement::factory()->create([
+        'source_name' => '學務處',
+        'title' => '弦樂音樂會',
+        'published_at' => $issue->covers_from->toDateString().' 11:00:00',
+    ]);
+
+    Livewire::test(EditNewsletterIssue::class, ['record' => $issue->getRouteKey()])
+        ->callAction(TestAction::make('importAnnouncements')->schemaComponent('itemsSection'), [
+            'news' => [$announcement->id],
+            'arts' => [$announcement->id, $artsOnly->id],
+        ])
+        ->assertNotified()
+        ->call('save');
+
+    expect($issue->items()->count())->toBe(2)
+        ->and($issue->newsItems()->pluck('announcement_id')->all())->toBe([$announcement->id])
+        ->and($issue->artItems()->pluck('announcement_id')->all())->toBe([$artsOnly->id]);
 });
 
 it('hides the import actions on a published issue', function () {

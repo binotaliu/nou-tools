@@ -9,7 +9,6 @@ use App\Models\Announcement;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
 use DomainException;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -27,10 +26,13 @@ final readonly class DraftNewsletterWithAi
     ) {}
 
     /**
-     * Let the AI editor pick and summarise announcements for both news
-     * sections and write the highlights intro, then replace the issue's
+     * Let the AI editor pick and summarise announcements for every news
+     * section and write the highlights intro, then replace the issue's
      * items and intro with the result. Every AI call happens before
      * anything is written, so a failure leaves the issue untouched.
+     *
+     * 藝文活動 is curated first and its picks are withheld from 空大新消息,
+     * so no announcement is printed twice.
      *
      * Ids the model returns that weren't in its candidate list are dropped.
      *
@@ -45,9 +47,18 @@ final readonly class DraftNewsletterWithAi
         $candidatesBySection = ($this->listNewsletterCandidateAnnouncements)($issue->covers_from, $issue->covers_to);
 
         /** @var Collection<string, Collection<int, array{announcement: Announcement, headline: string, summary: string, read_source: bool}>> $curatedBySection */
-        $curatedBySection = $candidatesBySection->map(
-            fn (EloquentCollection $candidates, string $section): Collection => $this->curate(NewsletterSection::from($section), $candidates)
-        );
+        $curatedBySection = collect();
+        $claimedIds = [];
+
+        foreach ([NewsletterSection::Arts, NewsletterSection::News, NewsletterSection::Centers] as $section) {
+            $curated = $this->curate(
+                $section,
+                $candidatesBySection[$section->value]->reject(fn (Announcement $announcement): bool => in_array($announcement->id, $claimedIds, true)),
+            );
+
+            $claimedIds = [...$claimedIds, ...$curated->map(fn (array $item): int => $item['announcement']->id)->all()];
+            $curatedBySection[$section->value] = $curated;
+        }
 
         $intro = $this->writeIntro($issue, $curatedBySection);
 
@@ -80,10 +91,10 @@ final readonly class DraftNewsletterWithAi
     }
 
     /**
-     * @param  EloquentCollection<int, Announcement>  $candidates
+     * @param  Collection<int, Announcement>  $candidates
      * @return Collection<int, array{announcement: Announcement, headline: string, summary: string, read_source: bool}>
      */
-    private function curate(NewsletterSection $section, EloquentCollection $candidates): Collection
+    private function curate(NewsletterSection $section, Collection $candidates): Collection
     {
         if ($candidates->isEmpty()) {
             return collect();
@@ -138,9 +149,10 @@ final readonly class DraftNewsletterWithAi
     private function writeIntro(NewsletterIssue $issue, Collection $curatedBySection): string
     {
         $events = collect($issue->highlights_events ?? [])
-            ->map(fn (array $event): string => $event['start'] === $event['end']
+            ->map(fn (array $event): string => ($event['start'] === $event['end']
                 ? "- {$this->formatDate($event['start'])}：{$event['name']}"
                 : "- {$this->formatDate($event['start'])} 至 {$this->formatDate($event['end'])}：{$event['name']}")
+                .(filled($event['description'] ?? null) ? "（{$event['description']}）" : ''))
             ->implode("\n");
 
         $headlines = $curatedBySection

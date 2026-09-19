@@ -41,11 +41,6 @@ const centerGroups = computed(() => {
   return [...groups.values()]
 })
 
-const hasHighlights = computed(
-  () =>
-    issue.value.highlightsIntro !== '' || issue.value.highlightEvents.length > 0
-)
-
 const jsonLd = computed(() => ({
   '@context': 'https://schema.org',
   '@type': 'NewsArticle',
@@ -88,7 +83,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         />
         <figcaption
           v-if="issue.coverImageCreditName"
-          class="mt-1 text-xs text-theme-500 dark:text-zinc-500"
+          class="mt-1 text-right text-xs text-theme-500 dark:text-zinc-500"
           data-testid="newsletter-cover-image-credit"
         >
           Photo by
@@ -137,9 +132,30 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         </p>
       </header>
 
-      <div ref="contentRoot" class="space-y-10">
+      <div
+        ref="contentRoot"
+        class="divide-y divide-theme-200 dark:divide-zinc-700 [&>section]:py-8 [&>section:first-child]:pt-0 [&>section:last-child]:pb-0"
+      >
         <section
-          v-if="hasHighlights"
+          v-if="issue.highlightsIntro"
+          aria-labelledby="newsletter-preface"
+          data-testid="newsletter-preface"
+        >
+          <h2
+            id="newsletter-preface"
+            class="mb-3 flex items-center gap-2 text-2xl font-bold text-theme-700 dark:text-theme-300"
+          >
+            <Icon name="chat-bubble-left" class="size-6" />
+            前言
+          </h2>
+          <div
+            class="prose max-w-none prose-theme dark:prose-invert"
+            v-html="issue.highlightsIntro"
+          ></div>
+        </section>
+
+        <section
+          v-if="issue.highlightEvents.length > 0"
           aria-labelledby="newsletter-highlights"
           data-testid="newsletter-highlights"
         >
@@ -148,39 +164,47 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
             class="mb-3 flex items-center gap-2 text-2xl font-bold text-theme-700 dark:text-theme-300"
           >
             <Icon name="calendar-days" class="size-6" />
-            本期重點事項
+            本期行事曆
           </h2>
-          <div
-            v-if="issue.highlightsIntro"
-            class="prose max-w-none prose-theme dark:prose-invert"
-            v-html="issue.highlightsIntro"
-          ></div>
           <HighlightsCalendar
-            v-if="issue.highlightEvents.length > 0"
-            class="mt-4"
             :highlights-from="issue.highlightsFrom"
             :highlights-to="issue.highlightsTo"
             :events="issue.highlightEvents"
           />
-          <ul
-            v-if="issue.highlightEvents.length > 0"
+          <ol
             class="mt-4 space-y-2 rounded-lg bg-theme-50 p-4 dark:bg-zinc-800"
           >
             <li
-              v-for="event in issue.highlightEvents"
+              v-for="(event, index) in issue.highlightEvents"
               :key="`${event.startDate}-${event.name}`"
-              class="flex flex-col gap-x-3 sm:flex-row"
+              class="flex items-start gap-x-3"
             >
               <span
-                class="shrink-0 font-mono text-sm text-theme-700 sm:w-44 dark:text-zinc-300"
+                class="inline-flex size-5 shrink-0 items-center justify-center rounded bg-theme-200 text-xs font-medium text-theme-900 sm:hidden dark:bg-theme-800/70 dark:text-theme-100"
+                aria-hidden="true"
               >
-                {{ formatNewsletterDateRange(event.startDate, event.endDate) }}
+                {{ index + 1 }}
               </span>
-              <span class="text-theme-900 dark:text-zinc-100">
-                {{ event.name }}
-              </span>
+              <div class="flex min-w-0 flex-col gap-x-3 sm:flex-row">
+                <span
+                  class="shrink-0 font-mono text-sm text-theme-700 sm:w-44 dark:text-zinc-300"
+                >
+                  {{
+                    formatNewsletterDateRange(event.startDate, event.endDate)
+                  }}
+                </span>
+                <span class="text-theme-900 dark:text-zinc-100">
+                  {{ event.name }}
+                  <span
+                    v-if="event.description"
+                    class="block text-sm text-theme-600 dark:text-zinc-400"
+                  >
+                    {{ event.description }}
+                  </span>
+                </span>
+              </div>
             </li>
-          </ul>
+          </ol>
         </section>
 
         <section
@@ -190,7 +214,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         >
           <h2
             id="newsletter-news"
-            class="mb-4 flex items-center gap-2 text-2xl font-bold text-sky-700 dark:text-sky-300"
+            class="mb-4 flex items-center gap-2 text-2xl font-bold text-theme-700 dark:text-theme-300"
           >
             <Icon name="megaphone" class="size-6" />
             空大新消息
@@ -228,13 +252,57 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         </section>
 
         <section
+          v-if="issue.artItems.length > 0"
+          aria-labelledby="newsletter-arts"
+          data-testid="newsletter-arts"
+        >
+          <h2
+            id="newsletter-arts"
+            class="mb-4 flex items-center gap-2 text-2xl font-bold text-theme-700 dark:text-theme-300"
+          >
+            <Icon name="paint-brush" class="size-6" />
+            藝文活動
+          </h2>
+          <ul class="space-y-5">
+            <li v-for="item in issue.artItems" :key="item.id">
+              <h3
+                class="text-lg font-semibold text-theme-900 dark:text-zinc-100"
+              >
+                <a
+                  v-if="item.url"
+                  :href="item.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:underline"
+                >
+                  {{ item.headline }}
+                  <Icon
+                    name="arrow-top-right-on-square"
+                    class="inline size-4 align-baseline text-theme-500"
+                  />
+                </a>
+                <template v-else>{{ item.headline }}</template>
+              </h3>
+              <p class="text-sm text-theme-600 dark:text-zinc-400">
+                {{ item.sourceName }}
+              </p>
+              <div
+                v-if="item.summary"
+                class="prose mt-1 max-w-none prose-theme dark:prose-invert"
+                v-html="item.summary"
+              ></div>
+            </li>
+          </ul>
+        </section>
+
+        <section
           v-if="centerGroups.length > 0"
           aria-labelledby="newsletter-centers"
           data-testid="newsletter-centers"
         >
           <h2
             id="newsletter-centers"
-            class="mb-4 flex items-center gap-2 text-2xl font-bold text-amber-700 dark:text-amber-300"
+            class="mb-4 flex items-center gap-2 text-2xl font-bold text-theme-700 dark:text-theme-300"
           >
             <Icon name="building-storefront" class="size-6" />
             各中心消息
@@ -284,7 +352,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
           data-testid="newsletter-column"
         >
           <h2
-            class="flex items-center gap-2 text-2xl font-bold text-violet-700 dark:text-violet-300"
+            class="flex items-center gap-2 text-2xl font-bold text-theme-700 dark:text-theme-300"
           >
             <Icon name="pencil-square" class="size-6" />
             {{ column.title }}

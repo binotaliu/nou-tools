@@ -41,7 +41,7 @@ it('creates a draft with windows and a calendar snapshot, idempotently', functio
         ]);
 });
 
-it('splits candidate announcements into sections within the window', function () {
+it('splits candidate announcements into sections within the window, sharing the news pool with the arts section', function () {
     config(['announcements.source_groups' => [
         '教務處' => 'administrative',
         '臺北中心' => 'center',
@@ -61,6 +61,7 @@ it('splits candidate announcements into sections within the window', function ()
     );
 
     expect($candidates[NewsletterSection::News->value]->modelKeys())->toEqualCanonicalizing([$news->id, $department->id, $unlisted->id])
+        ->and($candidates[NewsletterSection::Arts->value]->modelKeys())->toEqualCanonicalizing([$news->id, $department->id, $unlisted->id])
         ->and($candidates[NewsletterSection::Centers->value]->modelKeys())->toBe([$center->id]);
 });
 

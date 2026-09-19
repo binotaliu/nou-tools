@@ -20,7 +20,7 @@ function publishedIssueWithContent(string $publishesOn = '2026-09-21'): Newslett
 {
     $issue = NewsletterIssue::factory()->publishingOn($publishesOn)->published()->create([
         'highlights_intro' => '這兩週要注意 **期中考報名**。<script>alert(1)</script>',
-        'highlights_events' => [['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '期中考報名截止']],
+        'highlights_events' => [['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '期中考報名截止', 'description' => '逾期不受理']],
     ]);
     NewsletterItem::factory()->for($issue, 'issue')->create([
         'headline' => '期中考開始報名',
@@ -28,6 +28,7 @@ function publishedIssueWithContent(string $publishesOn = '2026-09-21'): Newslett
         'source_name' => '教務處',
         'url' => 'https://studadm.nou.edu.tw/news/1',
     ]);
+    NewsletterItem::factory()->for($issue, 'issue')->arts('學務處')->create(['headline' => '校園攝影展徵件']);
     NewsletterItem::factory()->for($issue, 'issue')->centers('臺北中心')->create(['headline' => '讀書會招募']);
     NewsletterColumn::factory()->for($issue, 'issue')->create([
         'title' => '浣熊站長的自言自語',
@@ -66,9 +67,12 @@ it('renders an issue with sections and server-rendered markdown', function () {
             ->where('viewModel.issue.highlightsIntro', fn (string $html) => str_contains($html, '<strong>期中考報名</strong>')
                 && ! str_contains($html, '<script>'))
             ->where('viewModel.issue.highlightEvents.0.name', '期中考報名截止')
+            ->where('viewModel.issue.highlightEvents.0.description', '逾期不受理')
             ->where('viewModel.issue.newsItems.0.headline', '期中考開始報名')
             ->where('viewModel.issue.newsItems.0.summary', fn (string $html) => str_contains($html, '<em>期限內</em>'))
             ->where('viewModel.issue.newsItems.0.url', 'https://studadm.nou.edu.tw/news/1')
+            ->where('viewModel.issue.artItems.0.headline', '校園攝影展徵件')
+            ->has('viewModel.issue.artItems', 1)
             ->where('viewModel.issue.centerItems.0.sourceName', '臺北中心')
             ->where('viewModel.issue.columns.0.title', '浣熊站長的自言自語')
             ->where('viewModel.previousIssue', null)
@@ -114,10 +118,13 @@ it('serves markdown twins', function () {
     get('/newsletter/2026-W39.md')
         ->assertSuccessful()
         ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
-        ->assertSee('## 本期重點事項')
-        ->assertSee('2026-09-25：期中考報名截止', false)
+        ->assertSee('## 前言')
+        ->assertSee('## 本期行事曆')
+        ->assertSee('2026-09-25：期中考報名截止｜逾期不受理', false)
         ->assertSee('### 期中考開始報名')
         ->assertSee('請於 *期限內* 完成。', false)
+        ->assertSee('## 藝文活動')
+        ->assertSee('### 校園攝影展徵件')
         ->assertSee('### 臺北中心')
         ->assertSee('## 浣熊站長的自言自語');
 });
@@ -137,6 +144,7 @@ it('serves an Atom feed of published issues', function () {
     expect($entries)->toHaveCount(1)
         ->and((string) $entries[0]->title)->toBe('浣熊的空大雙週報 2026-W39')
         ->and((string) $entries[0]->content)->toContain('<h2>空大新消息</h2>')
+        ->toContain('<h2>藝文活動</h2>')
         ->toContain('<strong>期中考報名</strong>')
         ->not->toContain('<script>');
 });

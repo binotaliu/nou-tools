@@ -11,7 +11,7 @@ use Laravel\Ai\Promptable;
 use Stringable;
 
 /**
- * Writes the 本期重點事項 paragraph from the school-calendar events in the
+ * Writes the 前言 paragraph that opens the issue from the school-calendar events in the
  * issue's two-week highlight window and the headlines already curated.
  */
 final class NewsletterHighlightsWriter implements Agent, HasStructuredOutput
@@ -22,7 +22,7 @@ final class NewsletterHighlightsWriter implements Agent, HasStructuredOutput
     {
         return <<<'PROMPT'
             你是國立空中大學學生刊物「浣熊的空大雙週報」的編輯，讀者是空大的在學學生。
-            請為「本期重點事項」寫一段開場文字，提醒同學接下來兩週要注意的事。
+            請為這一期寫「前言」（位於「本期行事曆」之前），提醒同學接下來兩週要注意的事。
 
             規則：
             - 使用臺灣正體中文，語氣親切但不浮誇，80 至 200 字，一段即可，可用 Markdown 粗體標出日期。

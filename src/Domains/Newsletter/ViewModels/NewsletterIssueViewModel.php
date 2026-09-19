@@ -19,6 +19,7 @@ final class NewsletterIssueViewModel extends Data
     /**
      * @param  DataCollection<int, NewsletterHighlightEventViewModel>  $highlightEvents
      * @param  DataCollection<int, NewsletterItemViewModel>  $newsItems
+     * @param  DataCollection<int, NewsletterItemViewModel>  $artItems
      * @param  DataCollection<int, NewsletterItemViewModel>  $centerItems
      * @param  DataCollection<int, NewsletterColumnViewModel>  $columns
      */
@@ -42,6 +43,8 @@ final class NewsletterIssueViewModel extends Data
         public DataCollection $highlightEvents,
         #[DataCollectionOf(NewsletterItemViewModel::class)]
         public DataCollection $newsItems,
+        #[DataCollectionOf(NewsletterItemViewModel::class)]
+        public DataCollection $artItems,
         #[DataCollectionOf(NewsletterItemViewModel::class)]
         public DataCollection $centerItems,
         #[DataCollectionOf(NewsletterColumnViewModel::class)]
@@ -85,6 +88,7 @@ final class NewsletterIssueViewModel extends Data
                 DataCollection::class,
             ),
             newsItems: $itemsFor(NewsletterSection::News),
+            artItems: $itemsFor(NewsletterSection::Arts),
             centerItems: $itemsFor(NewsletterSection::Centers),
             columns: NewsletterColumnViewModel::collect(
                 $issue->columns

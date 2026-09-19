@@ -16,11 +16,12 @@ beforeEach(function (): void {
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->published()->create([
         'highlights_intro' => '這兩週要注意期中考報名。',
         'highlights_events' => [
-            ['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '期中考報名截止'],
+            ['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '期中考報名截止', 'description' => '逾期不受理'],
             ['start' => '2026-09-21', 'end' => '2026-09-30', 'name' => '115上學期加退選'],
         ],
     ]);
     NewsletterItem::factory()->for($issue, 'issue')->create(['headline' => '期中考開始報名', 'source_name' => '教務處']);
+    NewsletterItem::factory()->for($issue, 'issue')->arts('學務處')->create(['headline' => '校園攝影展徵件']);
     NewsletterItem::factory()->for($issue, 'issue')->centers('臺北中心')->create(['headline' => '讀書會招募']);
     NewsletterItem::factory()->for($issue, 'issue')->centers('臺中中心')->create(['headline' => '秋季健行活動報名']);
     NewsletterColumn::factory()->for($issue, 'issue')->create([
@@ -46,21 +47,44 @@ beforeEach(function (): void {
 it('renders every section of an issue', function () {
     visit('/newsletter/2026-W39')
         ->assertNoJavaScriptErrors()
-        ->assertSee('本期重點事項')
+        ->assertSee('前言')
+        ->assertSee('這兩週要注意期中考報名。')
+        ->assertSee('本期行事曆')
+        ->assertSeeIn('[data-testid="newsletter-highlights"]', '逾期不受理')
         ->assertSee('9/25（五）')
-        ->assertSee('期中考報名截止')
         ->assertPresent('[data-testid="calendar-day-2026-09-25"]')
-        ->assertSeeIn('[data-testid="calendar-day-2026-09-25"]', '期中考報名截止')
-        ->assertSeeIn('[data-testid="calendar-day-2026-09-25"]', '115上學期加退選')
-        ->assertSeeIn('[data-testid="calendar-day-2026-09-21"]', '115上學期加退選')
+        ->assertSeeIn('[data-testid="calendar-event-1-0"]', '期中考報名截止')
+        // The 9/21–9/30 event is one bar per week, not repeated in every day.
+        ->assertSeeIn('[data-testid="calendar-event-2-0"]', '115上學期加退選')
+        ->assertSeeIn('[data-testid="calendar-event-2-1"]', '115上學期加退選')
         ->assertSee('空大新消息')
         ->assertSee('期中考開始報名')
+        ->assertSee('藝文活動')
+        ->assertSee('校園攝影展徵件')
         ->assertSee('各中心消息')
         ->assertSee('讀書會招募')
         ->assertSee('臺北中心')
         ->assertSee('秋季健行活動報名')
         ->assertSee('臺中中心')
         ->assertSee('浣熊站長的自言自語');
+});
+
+it('draws weekends in red and keeps every calendar week the same height', function () {
+    $page = visit('/newsletter/2026-W39')->assertPresent('[data-testid="calendar-week-1"]');
+
+    $heights = json_decode($page->script(
+        "JSON.stringify([...document.querySelectorAll('[data-testid^=\"calendar-week-\"]')].map(week => Math.round(week.getBoundingClientRect().height)))"
+    ), true);
+
+    expect($heights)->toHaveCount(2)
+        ->and(count(array_unique($heights)))->toBe(1);
+
+    $colors = json_decode($page->script(
+        "JSON.stringify([0, 5, 6].map(i => getComputedStyle(document.querySelector('[data-testid=\"calendar-week-0\"]').children[7 + i]).color))"
+    ), true);
+
+    expect($colors[0])->not->toBe($colors[1])
+        ->and($colors[1])->toBe($colors[2]);
 });
 
 it('shows a cover image only when one is set', function () {

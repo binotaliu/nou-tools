@@ -1,17 +1,19 @@
-@if ($issue->highlightsIntro !== '' || $issue->highlightEvents->count() > 0)
-    <h2>本期重點事項</h2>
+@if ($issue->highlightsIntro !== '')
+    <h2>前言</h2>
     {!! $issue->highlightsIntro !!}
-    @if ($issue->highlightEvents->count() > 0)
-        <ul>
-            @foreach ($issue->highlightEvents as $event)
-                <li>
-                    {{ $event->startDate === $event->endDate ? $event->startDate : $event->startDate.' ～ '.$event->endDate }}：{{ $event->name }}
-                </li>
-            @endforeach
-        </ul>
-    @endif
 @endif
-@foreach (['空大新消息' => $issue->newsItems, '各中心消息' => $issue->centerItems] as $sectionLabel => $items)
+@if ($issue->highlightEvents->count() > 0)
+    <h2>本期行事曆</h2>
+    <ul>
+        @foreach ($issue->highlightEvents as $event)
+            <li>
+                {{ $event->startDate === $event->endDate ? $event->startDate : $event->startDate.' ～ '.$event->endDate }}：{{ $event->name }}
+                @if (filled($event->description)) ｜{{ $event->description }}@endif
+            </li>
+        @endforeach
+    </ul>
+@endif
+@foreach (['空大新消息' => $issue->newsItems, '藝文活動' => $issue->artItems, '各中心消息' => $issue->centerItems] as $sectionLabel => $items)
     @if ($items->count() > 0)
         <h2>{{ $sectionLabel }}</h2>
         @foreach ($items as $item)

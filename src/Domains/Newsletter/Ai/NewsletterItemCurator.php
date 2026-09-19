@@ -35,6 +35,7 @@ final class NewsletterItemCurator implements Agent, HasStructuredOutput, HasTool
 
         $sectionGuidance = match ($this->section) {
             NewsletterSection::News => '這一欄是「空大新消息」，來源是學校各處室與各學系。優先挑選影響大多數同學的事項：選課、考試、學費與減免、畢業、獎助學金、重要活動與制度變更。',
+            NewsletterSection::Arts => '這一欄是「藝文活動」，候選公告來自學校各處室與各學系，其中大多數與藝文無關。只挑選藝文與文化類的活動：展覽、音樂會與表演、影展與電影欣賞、藝文講座與工作坊、文學與藝術類的徵件與比賽、藝文社團成果發表。選課、考試、學費、行政通知等一律不收，沒有符合的公告時 items 回傳空陣列，不要為了湊數而收錄。',
             NewsletterSection::Centers => '這一欄是「各中心消息」，來源是各地學習指導中心。每則都要保留中心名稱。優先挑選同學可以參加或需要處理的事項：講座、社團與聯誼活動、面授與考試相關的在地安排、服務時間異動。',
         };
 

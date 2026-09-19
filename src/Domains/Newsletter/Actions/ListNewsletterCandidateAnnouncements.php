@@ -20,7 +20,8 @@ final readonly class ListNewsletterCandidateAnnouncements
     /**
      * Announcements published (or, lacking a publish date, first fetched)
      * within the inclusive Taipei-date window, split into newsletter
-     * sections by their source's group.
+     * sections by their source's group. The 藝文活動 section shares its
+     * candidates with 空大新消息, so those announcements appear under both.
      *
      * @return Collection<string, EloquentCollection<int, Announcement>> keyed by NewsletterSection value
      */
@@ -33,7 +34,7 @@ final readonly class ListNewsletterCandidateAnnouncements
                 $section->value => $announcements
                     ->filter(fn (Announcement $announcement): bool => NewsletterSection::forSourceGroup(
                         AnnouncementSourceGroup::forSource($announcement->source_name)
-                    ) === $section)
+                    ) === $section->candidatePool())
                     ->values(),
             ]);
     }
