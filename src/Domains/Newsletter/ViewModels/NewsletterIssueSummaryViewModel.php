@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\Newsletter\ViewModels;
 
 use App\Models\NewsletterIssue;
+use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelData\Data;
 
 final class NewsletterIssueSummaryViewModel extends Data
@@ -16,6 +17,7 @@ final class NewsletterIssueSummaryViewModel extends Data
         public string $highlightsFrom,
         public string $highlightsTo,
         public string $url,
+        public ?string $coverImageUrl,
     ) {}
 
     public static function fromModel(NewsletterIssue $issue): self
@@ -27,6 +29,7 @@ final class NewsletterIssueSummaryViewModel extends Data
             highlightsFrom: $issue->highlights_from->toDateString(),
             highlightsTo: $issue->highlights_to->toDateString(),
             url: route('newsletter.show', $issue->issue_key),
+            coverImageUrl: $issue->cover_image !== null ? Storage::disk('public')->url($issue->cover_image) : null,
         );
     }
 }

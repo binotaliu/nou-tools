@@ -51,7 +51,7 @@ const jsonLd = computed(() => ({
           {{ viewModel.title }}
         </h2>
         <p class="text-theme-700 dark:text-zinc-300">
-          學校的公告散落在各處室、學系與學習指導中心的網站上。雙週報每兩週整理一次，隔週一發刊，告訴你接下來兩週要注意什麼、最近有哪些新消息。
+          本站發行的數位刊物，（預計）每兩週發行一次。
         </p>
         <a
           :href="viewModel.feedUrl"
@@ -62,25 +62,41 @@ const jsonLd = computed(() => ({
         </a>
       </header>
 
-      <ol
-        v-if="issues.length > 0"
-        class="divide-y divide-theme-200 rounded-lg border border-theme-200 bg-white shadow-sm dark:divide-zinc-700 dark:border-zinc-700 dark:bg-zinc-900"
-        data-testid="newsletter-issue-list"
-      >
-        <li v-for="issue in issues" :key="issue.issueKey">
-          <Link
-            :href="issue.url"
-            class="flex flex-col gap-1 p-4 transition hover:bg-theme-50 sm:flex-row sm:items-center sm:justify-between dark:hover:bg-zinc-800"
+      <section v-if="viewModel.latestIssue" class="space-y-3">
+        <h3 class="text-xl font-bold text-theme-900 dark:text-zinc-100">
+          最新一期
+        </h3>
+        <Link
+          :href="viewModel.latestIssue.url"
+          class="group block overflow-hidden rounded-lg border border-theme-200 bg-white shadow-sm transition hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900"
+          data-testid="newsletter-highlight"
+        >
+          <img
+            v-if="viewModel.latestIssue.coverImageUrl"
+            :src="viewModel.latestIssue.coverImageUrl"
+            :alt="viewModel.latestIssue.title"
+            class="aspect-[3/1] w-full object-cover"
+            data-testid="newsletter-cover-image"
+          />
+          <div
+            v-else
+            class="flex aspect-[3/1] w-full items-center justify-center bg-theme-100 text-theme-400 dark:bg-zinc-800 dark:text-zinc-600"
+            data-testid="newsletter-cover-placeholder"
           >
-            <span class="font-semibold text-theme-900 dark:text-zinc-100">
-              {{ issue.title }}
-            </span>
-            <span class="text-sm text-theme-600 dark:text-zinc-400">
-              {{ formatNewsletterDate(issue.publishesOn) }} 發刊
-            </span>
-          </Link>
-        </li>
-      </ol>
+            <Icon name="book-open" class="size-12" />
+          </div>
+          <div class="space-y-1 p-4">
+            <p
+              class="text-xl font-semibold text-theme-900 group-hover:underline dark:text-zinc-100"
+            >
+              {{ viewModel.latestIssue.title }}
+            </p>
+            <p class="text-sm text-theme-600 dark:text-zinc-400">
+              {{ formatNewsletterDate(viewModel.latestIssue.publishesOn) }} 發刊
+            </p>
+          </div>
+        </Link>
+      </section>
 
       <p
         v-else
@@ -88,6 +104,49 @@ const jsonLd = computed(() => ({
       >
         第一期正在準備中，敬請期待。
       </p>
+
+      <section v-if="issues.length > 0" class="space-y-3">
+        <h3 class="text-xl font-bold text-theme-900 dark:text-zinc-100">
+          過往期刊
+        </h3>
+        <ol
+          class="grid gap-4 sm:grid-cols-2"
+          data-testid="newsletter-issue-list"
+        >
+          <li v-for="issue in issues" :key="issue.issueKey">
+            <Link
+              :href="issue.url"
+              class="group block h-full overflow-hidden rounded-lg border border-theme-200 bg-white shadow-sm transition hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900"
+            >
+              <img
+                v-if="issue.coverImageUrl"
+                :src="issue.coverImageUrl"
+                :alt="issue.title"
+                loading="lazy"
+                class="aspect-[3/1] w-full object-cover"
+                data-testid="newsletter-cover-image"
+              />
+              <div
+                v-else
+                class="flex aspect-[3/1] w-full items-center justify-center bg-theme-100 text-theme-400 dark:bg-zinc-800 dark:text-zinc-600"
+                data-testid="newsletter-cover-placeholder"
+              >
+                <Icon name="book-open" class="size-8" />
+              </div>
+              <div class="space-y-1 p-4">
+                <p
+                  class="font-semibold text-theme-900 group-hover:underline dark:text-zinc-100"
+                >
+                  {{ issue.title }}
+                </p>
+                <p class="text-sm text-theme-600 dark:text-zinc-400">
+                  {{ formatNewsletterDate(issue.publishesOn) }} 發刊
+                </p>
+              </div>
+            </Link>
+          </li>
+        </ol>
+      </section>
 
       <nav
         v-if="viewModel.issues.last_page > 1"

@@ -5,6 +5,7 @@ use App\Models\NewsletterColumn;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 use function Pest\Laravel\actingAs;
@@ -38,7 +39,7 @@ function publishedIssueWithContent(string $publishesOn = '2026-09-21'): Newslett
     return $issue;
 }
 
-it('lists only published issues, newest first', function () {
+it('highlights the latest published issue and lists the rest as past issues', function () {
     publishedIssueWithContent('2026-09-21');
     publishedIssueWithContent('2026-10-05');
     NewsletterIssue::factory()->publishingOn('2026-10-19')->ready()->create();
@@ -48,10 +49,29 @@ it('lists only published issues, newest first', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('Newsletter/Index')
             ->where('viewModel.title', '浣熊的空大雙週報')
-            ->where('viewModel.issues.data.0.issueKey', '2026-W41')
-            ->where('viewModel.issues.data.1.issueKey', '2026-W39')
-            ->where('viewModel.issues.data.1.title', '浣熊的空大雙週報 2026-W39')
-            ->has('viewModel.issues.data', 2));
+            ->where('viewModel.latestIssue.issueKey', '2026-W41')
+            ->where('viewModel.issues.data.0.issueKey', '2026-W39')
+            ->where('viewModel.issues.data.0.title', '浣熊的空大雙週報 2026-W39')
+            ->has('viewModel.issues.data', 1));
+});
+
+it('exposes cover image URLs for the highlight and past issues', function () {
+    NewsletterIssue::factory()->publishingOn('2026-09-21')->published()->create(['cover_image' => 'newsletter/old.jpg']);
+    NewsletterIssue::factory()->publishingOn('2026-10-05')->published()->create(['cover_image' => 'newsletter/new.jpg']);
+
+    get(route('newsletter.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('viewModel.latestIssue.coverImageUrl', Storage::disk('public')->url('newsletter/new.jpg'))
+            ->where('viewModel.issues.data.0.coverImageUrl', Storage::disk('public')->url('newsletter/old.jpg')));
+});
+
+it('has no highlight or past issues before the first issue is published', function () {
+    NewsletterIssue::factory()->publishingOn('2026-10-19')->ready()->create();
+
+    get(route('newsletter.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('viewModel.latestIssue', null)
+            ->has('viewModel.issues.data', 0));
 });
 
 it('renders an issue with sections and server-rendered markdown', function () {
