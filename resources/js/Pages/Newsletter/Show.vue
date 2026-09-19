@@ -111,8 +111,9 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         >
           <h2
             id="newsletter-highlights"
-            class="mb-3 text-2xl font-bold text-theme-900 dark:text-zinc-100"
+            class="mb-3 flex items-center gap-2 text-2xl font-bold text-theme-700 dark:text-theme-300"
           >
+            <Icon name="calendar-days" class="size-6" />
             本期重點事項
           </h2>
           <div
@@ -148,8 +149,9 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         >
           <h2
             id="newsletter-news"
-            class="mb-4 text-2xl font-bold text-theme-900 dark:text-zinc-100"
+            class="mb-4 flex items-center gap-2 text-2xl font-bold text-sky-700 dark:text-sky-300"
           >
+            <Icon name="megaphone" class="size-6" />
             空大新消息
           </h2>
           <ul class="space-y-5">
@@ -191,8 +193,9 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         >
           <h2
             id="newsletter-centers"
-            class="mb-4 text-2xl font-bold text-theme-900 dark:text-zinc-100"
+            class="mb-4 flex items-center gap-2 text-2xl font-bold text-amber-700 dark:text-amber-300"
           >
+            <Icon name="building-storefront" class="size-6" />
             各中心消息
           </h2>
           <div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
@@ -239,7 +242,10 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
           :aria-label="column.title"
           data-testid="newsletter-column"
         >
-          <h2 class="text-2xl font-bold text-theme-900 dark:text-zinc-100">
+          <h2
+            class="flex items-center gap-2 text-2xl font-bold text-violet-700 dark:text-violet-300"
+          >
+            <Icon name="pencil-square" class="size-6" />
             {{ column.title }}
           </h2>
           <p
