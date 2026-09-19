@@ -147,6 +147,11 @@ function toChineseNumber(n) {
 // --- scroll-gradient overlay + form submission (ported composable) ---
 const progressForm = ref(null)
 
+// Any edit inside the form marks it dirty; the phone PWA (which hides the
+// header save button) then shows a floating save button. Saving is a native
+// POST + redirect, so the flag never needs resetting.
+const hasUnsavedChanges = ref(false)
+
 const {
   showHorizontalGradient,
   showVerticalGradient,
@@ -192,7 +197,8 @@ const csrfToken =
   <AppLayout>
     <div class="mx-auto max-w-7xl">
       <div
-        class="mb-8 flex flex-col items-start justify-between gap-y-4 md:flex-row"
+        class="mb-8 flex flex-col items-start justify-between gap-y-4 md:flex-row bottom-nav:hidden"
+        data-testid="learning-progress-header"
       >
         <div>
           <h2 class="mb-2 text-3xl font-bold text-theme-900 dark:text-zinc-100">
@@ -267,6 +273,8 @@ const csrfToken =
             '--weeks-count': viewModel.weeks.length,
           }"
           @scroll="onFormScroll"
+          @input="hasUnsavedChanges = true"
+          @change="hasUnsavedChanges = true"
         >
           <input type="hidden" name="_method" value="PUT" />
           <input type="hidden" name="_token" :value="csrfToken" />
@@ -583,6 +591,23 @@ const csrfToken =
         >
           <Icon name="printer" class="inline size-4" />
           列印
+        </button>
+      </div>
+
+      <div
+        v-if="hasUnsavedChanges"
+        class="pointer-events-none fixed inset-x-0 bottom-(--pwa-nav-height) z-30 hidden justify-center px-4 pb-4 print:hidden bottom-nav:flex"
+      >
+        <button
+          type="button"
+          class="pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full bg-theme-700 px-6 py-3 text-sm font-medium text-white shadow-lg transition-colors hover:bg-theme-600"
+          data-testid="learning-progress-floating-save"
+          data-analytics-event="learning_progress_save"
+          data-analytics-feature="learning_progress"
+          @click="submitProgressForm()"
+        >
+          <Icon name="check" class="size-4" />
+          保存進度
         </button>
       </div>
     </div>

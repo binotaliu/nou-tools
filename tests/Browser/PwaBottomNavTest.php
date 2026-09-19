@@ -169,6 +169,29 @@ it('keeps the schedule page actions inline in an installed PWA on a tablet', fun
         ->assertVisible('a[data-analytics-event="calendar_subscribe_open"]');
 });
 
+it('hides the learning progress header in a phone PWA and offers a floating save button once edited', function () {
+    $schedule = StudentSchedule::factory()->create();
+    $courseClass = CourseClass::factory()
+        ->for(Course::factory()->state(['term' => config('app.current_semester')]))
+        ->create();
+    $schedule->items()->create(['course_id' => $courseClass->course_id, 'course_class_id' => $courseClass->id]);
+
+    $page = visit(route('learning-progress.show', ['schedule' => $schedule, 'term' => config('app.current_semester')], absolute: false))
+        ->resize(...PHONE);
+
+    $page->assertVisible('[data-testid="learning-progress-header"]')
+        ->assertMissing('[data-testid="learning-progress-floating-save"]');
+
+    enterPwaMode($page);
+
+    $page->assertMissing('[data-testid="learning-progress-header"]')
+        ->assertMissing('[data-testid="learning-progress-floating-save"]');
+
+    $page->script("(() => { const box = document.querySelector('#progress-form input[type=checkbox]'); box.click(); })()");
+
+    $page->assertVisible('[data-testid="learning-progress-floating-save"]');
+});
+
 it('hides the page footer in a phone PWA while About carries the disclaimer and contact info', function () {
     $page = visit('/announcements')->resize(...PHONE);
 
