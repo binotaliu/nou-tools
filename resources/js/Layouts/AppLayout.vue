@@ -7,6 +7,7 @@
 // route paths (there is no Ziggy route() helper on the frontend).
 import { computed, ref } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
+import BottomNav from '../Components/BottomNav.vue'
 import Icon from '../Components/Icon.vue'
 import Notification from '../Components/Notification.vue'
 import ThemeSwitcherPopover from '../Components/ThemeSwitcherPopover.vue'
@@ -31,6 +32,18 @@ function isActive(prefix) {
   )
 }
 
+// Learning progress lives under /schedules/..., so the plain '/schedules'
+// prefix would keep 我的課表 highlighted there too. Covers both the
+// /schedules/my/learning-progress shortcut and
+// /schedules/{schedule}/{term}/learning-progress.
+const LEARNING_PROGRESS_PATH =
+  /^\/schedules\/(?:my|[^/]+\/[^/]+)\/learning-progress$/
+
+// Items may carry their own `match(path)`; otherwise the route prefix decides.
+function isItemActive(item) {
+  return item.match ? item.match(currentPath.value) : isActive(item.prefix)
+}
+
 const mobileMenuOpen = ref(false)
 const moreMenuOpen = ref(false)
 
@@ -38,8 +51,17 @@ const navItems = [
   {
     href: '/schedules/my',
     prefix: '/schedules',
+    match: path =>
+      path.startsWith('/schedules') && !LEARNING_PROGRESS_PATH.test(path),
     label: '我的課表',
     icon: 'table-cells',
+  },
+  {
+    href: '/schedules/my/learning-progress',
+    prefix: '/schedules/my/learning-progress',
+    match: path => LEARNING_PROGRESS_PATH.test(path),
+    label: '學習進度',
+    icon: 'clipboard',
   },
   {
     href: '/study-room',
@@ -59,15 +81,15 @@ const navItems = [
     label: '優惠店家',
     icon: 'tag',
   },
+]
+
+const moreMenuItems = [
   {
     href: '/alt-uu',
     prefix: '/alt-uu',
     label: 'Alt UU',
     icon: 'device-phone-mobile',
   },
-]
-
-const moreMenuItems = [
   {
     href: '/newsletter',
     prefix: '/newsletter',
@@ -88,6 +110,30 @@ const moreMenuItems = [
     offlineAllow: true,
   },
 ]
+
+// Installed-PWA bottom tab bar (see BottomNav.vue): the first four primary
+// links become tabs (優惠店家, the fifth, moves into its "更多" sheet along
+// with everything else).
+const bottomTabs = computed(() =>
+  navItems.slice(0, 4).map(item => ({ ...item, active: isItemActive(item) }))
+)
+const bottomMoreItems = computed(() =>
+  [
+    { href: '/', prefix: '/', label: '首頁', icon: 'book-open' },
+    ...navItems.slice(4),
+    ...moreMenuItems,
+    {
+      href: '/about',
+      prefix: '/about',
+      label: '關於本站',
+      icon: 'information-circle',
+    },
+  ].map(item => ({
+    ...item,
+    active:
+      item.prefix === '/' ? currentPath.value === '/' : isItemActive(item),
+  }))
+)
 </script>
 
 <template>
@@ -114,14 +160,18 @@ const moreMenuItems = [
         </h1>
 
         <div class="flex min-h-9.5 items-center gap-2">
-          <nav class="hidden items-center gap-1 gap-x-6 md:flex print:hidden">
+          <nav
+            data-testid="header-nav"
+            class="hidden items-center gap-1 gap-x-6 md:flex print:hidden bottom-nav:hidden"
+          >
             <Link
               v-for="item in navItems"
               :key="item.href"
               :href="item.href"
+              :aria-current="isItemActive(item) ? 'page' : null"
               class="-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3"
               :class="
-                isActive(item.prefix)
+                isItemActive(item)
                   ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
                   : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
               "
@@ -135,7 +185,7 @@ const moreMenuItems = [
                 type="button"
                 class="-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3"
                 :class="
-                  moreMenuItems.some(item => isActive(item.prefix))
+                  moreMenuItems.some(item => isItemActive(item))
                     ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
                     : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
                 "
@@ -161,7 +211,7 @@ const moreMenuItems = [
                   :data-offline-allow="item.offlineAllow ? '' : null"
                   class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
                   :class="
-                    isActive(item.prefix)
+                    isItemActive(item)
                       ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
                       : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
                   "
@@ -177,7 +227,8 @@ const moreMenuItems = [
 
           <button
             type="button"
-            class="inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none md:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            data-testid="header-menu-toggle"
+            class="inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none md:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 bottom-nav:hidden"
             :aria-expanded="mobileMenuOpen.toString()"
             @click="mobileMenuOpen = !mobileMenuOpen"
           >
@@ -191,7 +242,7 @@ const moreMenuItems = [
 
       <div
         v-show="mobileMenuOpen"
-        class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-theme-200 bg-white p-3 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900 print:hidden"
+        class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-theme-200 bg-white p-3 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900 print:hidden bottom-nav:hidden"
       >
         <Link
           v-for="item in navItems"
@@ -199,7 +250,7 @@ const moreMenuItems = [
           :href="item.href"
           class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
           :class="
-            isActive(item.prefix)
+            isItemActive(item)
               ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
               : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
           "
@@ -215,7 +266,7 @@ const moreMenuItems = [
           :data-offline-allow="item.offlineAllow ? '' : null"
           class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
           :class="
-            isActive(item.prefix)
+            isItemActive(item)
               ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
               : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
           "
@@ -248,7 +299,7 @@ const moreMenuItems = [
   </main>
 
   <footer
-    class="mt-12 border-t border-theme-200 bg-theme-100 py-8 text-theme-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 print:bg-white print:text-black"
+    class="mt-12 border-t border-theme-200 bg-theme-100 py-8 text-theme-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 print:bg-white print:text-black bottom-nav:pb-[calc(var(--pwa-nav-height)+2rem)]"
   >
     <div class="mx-auto max-w-7xl px-6">
       <div class="hidden py-2 text-center text-xs text-theme-800 print:block">
@@ -350,4 +401,10 @@ const moreMenuItems = [
       </div>
     </div>
   </footer>
+
+  <BottomNav
+    :tabs="bottomTabs"
+    :more-items="bottomMoreItems"
+    :current-path="currentPath"
+  />
 </template>

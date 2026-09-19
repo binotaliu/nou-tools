@@ -32,6 +32,14 @@ test('root view ships a launch splash that the og:image screenshot never sees', 
         ->assertDontSee('id="app-splash"', false);
 });
 
+test('root view only opts into viewport-fit=cover for installed PWAs', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('<meta name="viewport" content="width=device-width, initial-scale=1" />', false)
+        ->assertSee("hasAttribute('data-pwa')", false)
+        ->assertSee('viewport-fit=cover', false);
+});
+
 test('homepage lists courses with in-person classes scheduled for the selected date', function () {
     $selectedDate = Carbon::now('Asia/Taipei')->format('Y-m-d');
 

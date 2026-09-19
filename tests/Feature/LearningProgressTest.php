@@ -244,3 +244,45 @@ test('unique constraint on student_schedule_id and term', function () {
         'term' => '2025B',
     ]);
 });
+
+function rememberedScheduleCookie(StudentSchedule $schedule): string
+{
+    return json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => $schedule->name,
+    ]);
+}
+
+test('/schedules/my/learning-progress redirects to the remembered schedule for the current semester', function () {
+    config(['app.current_semester' => '2025B']);
+
+    $schedule = StudentSchedule::factory()->create();
+    $courseClass = CourseClass::factory()
+        ->for(Course::factory()->state(['term' => '2025B']))
+        ->create();
+    $schedule->items()->create(['course_id' => $courseClass->course_id, 'course_class_id' => $courseClass->id]);
+
+    $this->withCookie('student_schedule', rememberedScheduleCookie($schedule))
+        ->get(route('schedules.my.learning-progress'))
+        ->assertRedirect(route('learning-progress.show', ['schedule' => $schedule, 'term' => '2025B']));
+});
+
+test('/schedules/my/learning-progress falls back to the schedule when it has no courses this semester', function () {
+    config(['app.current_semester' => '2025B']);
+
+    $schedule = StudentSchedule::factory()->create();
+    $oldClass = CourseClass::factory()
+        ->for(Course::factory()->state(['term' => '2024B']))
+        ->create();
+    $schedule->items()->create(['course_id' => $oldClass->course_id, 'course_class_id' => $oldClass->id]);
+
+    $this->withCookie('student_schedule', rememberedScheduleCookie($schedule))
+        ->get(route('schedules.my.learning-progress'))
+        ->assertRedirect(route('schedules.show', $schedule));
+});
+
+test('/schedules/my/learning-progress redirects to the create page when no schedule is remembered', function () {
+    $this->get(route('schedules.my.learning-progress'))
+        ->assertRedirect(route('schedules.create'));
+});

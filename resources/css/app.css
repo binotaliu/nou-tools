@@ -9,6 +9,20 @@
   }
 }
 
+/* Installed-PWA on a phone-sized screen (below `md`, where the header menu
+ * collapses to a hamburger anyway): the bottom tab bar takes over. Tablets and
+ * desktop PWAs keep the web header nav. `html[data-pwa]` is set by the inline
+ * head script in app.blade.php before first paint, so the layout never flashes
+ * the browser nav first. Higher specificity than a plain utility, so
+ * `bottom-nav:hidden` beats `md:flex` etc. */
+@custom-variant bottom-nav {
+  @media (width < 48rem) {
+    html[data-pwa] & {
+      @slot;
+    }
+  }
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
@@ -101,6 +115,28 @@
 }
 
 @layer base {
+  /* Space taken by the PWA bottom tab bar (0 in a normal browser tab), so
+   * fixed bottom UI can sit above it. */
+  :root {
+    --pwa-nav-height: 0px;
+    --safe-bottom: env(safe-area-inset-bottom);
+  }
+
+  @media (width < 48rem) {
+    html[data-pwa] {
+      --pwa-nav-height: calc(3.5rem + env(safe-area-inset-bottom));
+      /* The tab bar already clears the home indicator. */
+      --safe-bottom: 0px;
+    }
+  }
+
+  /* viewport-fit=cover (added for PWAs only, at any width) lets content run
+   * under the landscape notch, so keep it inside the side insets. */
+  html[data-pwa] body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
   /* Twemoji swaps emoji characters for <img class="emoji"> — without this
      the images render at their native size instead of matching the
      surrounding text. */

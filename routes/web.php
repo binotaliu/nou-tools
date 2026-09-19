@@ -37,6 +37,7 @@ use App\Http\Controllers\ScheduleCalendarSettingsUpdateController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ScheduleCustomizationController;
 use App\Http\Controllers\ScheduleMyController;
+use App\Http\Controllers\ScheduleMyLearningProgressController;
 use App\Http\Controllers\SchedulePushSubscriptionDestroyController;
 use App\Http\Controllers\SchedulePushSubscriptionStoreController;
 use App\Http\Controllers\ScheduleRememberController;
@@ -105,6 +106,7 @@ Route::permanentRedirect('/schedule/{schedule}/calendar', '/schedules/{schedule}
 Route::get('/schedules/create', [ScheduleController::class, 'create'])->name('schedules.create');
 Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
 Route::get('/schedules/my', ScheduleMyController::class)->name('schedules.my');
+Route::get('/schedules/my/learning-progress', ScheduleMyLearningProgressController::class)->name('schedules.my.learning-progress');
 Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show')
     ->withMarkdown(ScheduleShowMarkdownController::class);
 Route::get('/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('schedules.edit');

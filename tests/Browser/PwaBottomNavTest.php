@@ -1,0 +1,124 @@
+<?php
+
+use App\Models\Course;
+use App\Models\CourseClass;
+use App\Models\StudentSchedule;
+
+// The installed PWA swaps the web-style header menu for a bottom tab bar on
+// phone-sized screens. `html[data-pwa]` is what the root view's head script
+// sets for a standalone display mode; a headless browser tab isn't
+// standalone, so it's set by hand. Viewports are explicit because both the
+// header menu and the bottom bar depend on the `md` breakpoint (768px).
+
+const PHONE = [390, 844];
+const TABLET = [820, 1180];
+const DESKTOP = [1280, 800];
+
+// assertVisible() doesn't retry, so wait for the nav's own text (which does)
+// so Vue has mounted and the resize has been laid out before reading the DOM.
+function waitForHeaderNav($page)
+{
+    return $page->assertSee('自習室')->assertVisible('[data-testid="header-nav"]');
+}
+
+function enterPwaMode($page): void
+{
+    $page->script("document.documentElement.dataset.pwa = ''");
+}
+
+function linkTexts($page, string $selector): array
+{
+    return json_decode(
+        $page->script("JSON.stringify([...document.querySelectorAll('{$selector}')].map(a => a.textContent.trim()))"),
+        true,
+    );
+}
+
+it('shows the hamburger menu and no bottom tab bar in a normal phone browser tab', function () {
+    $page = visit('/announcements')->resize(...PHONE);
+
+    $page->assertSee('學校公告')
+        ->assertVisible('[data-testid="header-menu-toggle"]')
+        ->assertMissing('[data-testid="bottom-nav"]');
+});
+
+it('swaps the hamburger menu for a bottom tab bar when running as an installed PWA on a phone', function () {
+    $page = visit('/announcements')->resize(...PHONE);
+
+    enterPwaMode($page);
+
+    $page->assertVisible('[data-testid="bottom-nav"]')
+        ->assertMissing('[data-testid="header-menu-toggle"]')
+        ->assertMissing('[data-testid="bottom-nav-sheet"]');
+
+    $activeTab = $page->script('document.querySelector(\'[data-testid="bottom-nav"] [aria-current="page"]\').textContent.trim()');
+
+    expect($activeTab)->toBe('學校公告');
+
+    // The active tab carries a bar on its top edge (and only that tab).
+    $indicators = $page->script('document.querySelectorAll(\'[data-testid="bottom-nav-indicator"]\').length');
+    $indicatorInActiveTab = $page->script('document.querySelectorAll(\'[data-testid="bottom-nav"] [aria-current="page"] [data-testid="bottom-nav-indicator"]\').length');
+
+    expect($indicators)->toBe(1)->and($indicatorInActiveTab)->toBe(1);
+});
+
+it('keeps the header menu and hides the bottom tab bar in an installed PWA on tablet and desktop', function (array $viewport) {
+    $page = visit('/announcements')->resize(...$viewport);
+
+    enterPwaMode($page);
+
+    waitForHeaderNav($page)->assertMissing('[data-testid="bottom-nav"]');
+})->with([
+    'tablet' => [TABLET],
+    'desktop' => [DESKTOP],
+]);
+
+it('opens the more sheet from the tab bar and closes it again', function () {
+    $page = visit('/announcements')->resize(...PHONE);
+
+    enterPwaMode($page);
+
+    $page->screenshot(filename: 'pwa-bottom-nav-phone')
+        ->click('[data-testid="bottom-nav-more"]')
+        ->assertVisible('[data-testid="bottom-nav-sheet"]')
+        ->assertSee('浣熊的空大雙週報')
+        ->assertSee('關於本站');
+
+    // Let the 150ms leave transition finish before asserting it's gone.
+    $page->click('[data-testid="bottom-nav-backdrop"]')
+        ->wait(0.4)
+        ->assertMissing('[data-testid="bottom-nav-sheet"]');
+});
+
+it('puts learning progress after my schedule in both navs and moves Alt UU and discount stores into more', function () {
+    $page = waitForHeaderNav(visit('/announcements')->resize(...DESKTOP));
+
+    expect(linkTexts($page, '[data-testid="header-nav"] > a'))
+        ->toBe(['我的課表', '學習進度', '自習室', '學校公告', '優惠店家']);
+
+    $page->resize(...PHONE);
+    enterPwaMode($page);
+
+    expect(linkTexts($page, '[data-testid="bottom-nav"] a'))
+        ->toBe(['我的課表', '學習進度', '自習室', '學校公告']);
+
+    $page->click('[data-testid="bottom-nav-more"]');
+
+    expect(linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))
+        ->toContain('優惠店家', 'Alt UU');
+});
+
+it('highlights learning progress, not my schedule, on a learning progress page', function () {
+    $schedule = StudentSchedule::factory()->create();
+    $courseClass = CourseClass::factory()
+        ->for(Course::factory()->state(['term' => config('app.current_semester')]))
+        ->create();
+    $schedule->items()->create(['course_id' => $courseClass->course_id, 'course_class_id' => $courseClass->id]);
+
+    $page = waitForHeaderNav(
+        visit(route('learning-progress.show', ['schedule' => $schedule, 'term' => config('app.current_semester')], absolute: false))
+            ->resize(...DESKTOP)
+    );
+
+    expect(linkTexts($page, '[data-testid="header-nav"] > a[aria-current="page"]'))->toBe(['學習進度']);
+});

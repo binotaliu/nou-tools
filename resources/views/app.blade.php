@@ -85,6 +85,19 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {{-- The installed PWA's bottom tab bar needs env(safe-area-inset-bottom),
+    which is only non-zero with viewport-fit=cover. Browser tabs keep the
+    plain viewport so landscape notches don't clip content. --}}
+    <script @cspNonce>
+        if (document.documentElement.hasAttribute('data-pwa')) {
+            document
+                .querySelector('meta[name="viewport"]')
+                .setAttribute(
+                    'content',
+                    'width=device-width, initial-scale=1, viewport-fit=cover'
+                )
+        }
+    </script>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     {{-- Read by resources/js/app.js so Inertia's progress-bar <style> tag can
     carry the same nonce our CSP (style-src with no 'unsafe-inline') requires,

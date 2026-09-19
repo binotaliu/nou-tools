@@ -33,7 +33,7 @@ defineProps({
     >
       <div
         v-if="visible"
-        class="fixed inset-x-0 bottom-0 z-40 mb-0"
+        class="fixed inset-x-0 bottom-(--pwa-nav-height) z-40 mb-0"
         data-testid="study-room-control-panel"
       >
         <div class="mx-auto max-w-6xl sm:px-4">
@@ -47,7 +47,7 @@ defineProps({
             ></div>
 
             <div
-              class="relative px-4 pt-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:px-6 sm:pt-6 sm:pb-[calc(env(safe-area-inset-bottom)+1.25rem)]"
+              class="relative px-4 pt-5 pb-[calc(var(--safe-bottom)+1rem)] sm:px-6 sm:pt-6 sm:pb-[calc(var(--safe-bottom)+1.25rem)]"
             >
               <!-- Not timing yet: pick activity/subject/mode, then start -->
               <div
