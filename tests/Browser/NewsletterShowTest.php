@@ -91,7 +91,7 @@ it('shows a cover image only when one is set', function () {
     visit('/newsletter/2026-W39')
         ->assertNotPresent('[data-testid="newsletter-cover-image"]');
 
-    NewsletterIssue::query()->where('issue_key', '2026-W39')->sole()->update(['cover_image' => 'newsletter-covers/cover.jpg']);
+    NewsletterIssue::query()->where('issue_key', '2026-W39')->sole()->update(['cover_image' => 'cover.jpg']);
 
     visit('/newsletter/2026-W39')
         ->assertPresent('[data-testid="newsletter-cover-image"]')
@@ -100,7 +100,7 @@ it('shows a cover image only when one is set', function () {
 
 it('credits the Unsplash photographer when the cover image has one', function () {
     NewsletterIssue::query()->where('issue_key', '2026-W39')->sole()->update([
-        'cover_image' => 'newsletter-covers/cover.jpg',
+        'cover_image' => 'cover.jpg',
         'cover_image_credit_name' => 'Nathan Dumlao',
         'cover_image_credit_url' => 'https://unsplash.com/@nate_dumlao',
     ]);

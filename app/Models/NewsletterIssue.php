@@ -17,6 +17,27 @@ final class NewsletterIssue extends Model
     /** @use HasFactory<NewsletterIssueFactory> */
     use HasFactory;
 
+    /** Scoped filesystem disk (see config/filesystems.php) holding `cover_image` files, relative to its own directory. */
+    public const string COVER_DISK = 'newsletter_covers';
+
+    /**
+     * Origin (scheme://host) cover images are served from when the cover disk is
+     * remote, e.g. a CloudFront domain; null while they're served by this app.
+     */
+    public static function coverImageOrigin(): ?string
+    {
+        $parent = config('filesystems.disks.'.self::COVER_DISK.'.disk');
+        $disk = config("filesystems.disks.{$parent}");
+
+        if (($disk['driver'] ?? null) !== 's3' || blank($disk['url'] ?? null)) {
+            return null;
+        }
+
+        $parts = parse_url((string) $disk['url']);
+
+        return isset($parts['scheme'], $parts['host']) ? "{$parts['scheme']}://{$parts['host']}" : null;
+    }
+
     protected $fillable = [
         'issue_key',
         'publishes_on',

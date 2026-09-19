@@ -66,8 +66,7 @@ class NewsletterIssueForm
                         FileUpload::make('cover_image')
                             ->label('封面圖片')
                             ->image()
-                            ->disk('public')
-                            ->directory('newsletter-covers')
+                            ->disk(NewsletterIssue::COVER_DISK)
                             // The Unsplash picker attaches the file via a browser event
                             // that FilePond picks up asynchronously, in a *separate* later
                             // Livewire request than the one the picker's own afterUpload()

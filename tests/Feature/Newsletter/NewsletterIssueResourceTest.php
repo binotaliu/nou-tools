@@ -118,7 +118,7 @@ it('edits intro, items and columns', function () {
 });
 
 it('saves a cover image', function () {
-    Storage::fake('public');
+    Storage::fake(NewsletterIssue::COVER_DISK);
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create();
     $file = UploadedFile::fake()->image('cover.jpg');
 
@@ -130,11 +130,11 @@ it('saves a cover image', function () {
     $issue->refresh();
 
     expect($issue->cover_image)->not->toBeNull();
-    Storage::disk('public')->assertExists($issue->cover_image);
+    Storage::disk(NewsletterIssue::COVER_DISK)->assertExists($issue->cover_image);
 });
 
 it('saves the cover image credit alongside the image', function () {
-    Storage::fake('public');
+    Storage::fake(NewsletterIssue::COVER_DISK);
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create();
     $file = UploadedFile::fake()->image('cover.jpg');
 
@@ -159,9 +159,9 @@ it('saves the cover image credit alongside the image', function () {
 });
 
 it('clears the cover image credit when the image is removed', function () {
-    Storage::fake('public');
+    Storage::fake(NewsletterIssue::COVER_DISK);
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create([
-        'cover_image' => 'newsletter-covers/old.jpg',
+        'cover_image' => 'old.jpg',
         'cover_image_credit_name' => 'Nathan Dumlao',
         'cover_image_credit_url' => 'https://unsplash.com/@nate_dumlao',
     ]);

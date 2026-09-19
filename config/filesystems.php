@@ -60,6 +60,17 @@ return [
             'report' => false,
         ],
 
+        /*
+        | Newsletter cover images: a directory of another disk. Set
+        | NEWSLETTER_COVERS_DISK=s3 to keep them in the (CloudFront-fronted) S3
+        | bucket; by default they live under the "public" disk.
+        */
+        'newsletter_covers' => [
+            'driver' => 'scoped',
+            'disk' => env('NEWSLETTER_COVERS_DISK', 'public'),
+            'prefix' => 'newsletter-covers',
+        ],
+
     ],
 
     /*

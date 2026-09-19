@@ -29,7 +29,7 @@ final class NewsletterIssueSummaryViewModel extends Data
             highlightsFrom: $issue->highlights_from->toDateString(),
             highlightsTo: $issue->highlights_to->toDateString(),
             url: route('newsletter.show', $issue->issue_key),
-            coverImageUrl: $issue->cover_image !== null ? Storage::disk('public')->url($issue->cover_image) : null,
+            coverImageUrl: $issue->cover_image !== null ? Storage::disk(NewsletterIssue::COVER_DISK)->url($issue->cover_image) : null,
         );
     }
 }

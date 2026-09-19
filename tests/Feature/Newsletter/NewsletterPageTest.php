@@ -61,8 +61,35 @@ it('exposes cover image URLs for the highlight and past issues', function () {
 
     get(route('newsletter.index'))
         ->assertInertia(fn (Assert $page) => $page
-            ->where('viewModel.latestIssue.coverImageUrl', Storage::disk('public')->url('newsletter/new.jpg'))
-            ->where('viewModel.issues.data.0.coverImageUrl', Storage::disk('public')->url('newsletter/old.jpg')));
+            ->where('viewModel.latestIssue.coverImageUrl', Storage::disk(NewsletterIssue::COVER_DISK)->url('newsletter/new.jpg'))
+            ->where('viewModel.issues.data.0.coverImageUrl', Storage::disk(NewsletterIssue::COVER_DISK)->url('newsletter/old.jpg')));
+});
+
+it('serves covers from the S3 disk URL and allows its origin in the CSP', function () {
+    config([
+        'filesystems.disks.'.NewsletterIssue::COVER_DISK.'.disk' => 's3',
+        'filesystems.disks.s3' => [
+            'driver' => 's3',
+            'bucket' => 'covers',
+            'region' => 'ap-northeast-1',
+            'key' => 'key',
+            'secret' => 'secret',
+            'url' => 'https://d111111abcdef8.cloudfront.net',
+        ],
+    ]);
+    NewsletterIssue::factory()->publishingOn('2026-09-21')->published()->create(['cover_image' => 'new.jpg']);
+
+    $response = get(route('newsletter.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('viewModel.latestIssue.coverImageUrl', 'https://d111111abcdef8.cloudfront.net/newsletter-covers/new.jpg'));
+
+    expect(NewsletterIssue::coverImageOrigin())->toBe('https://d111111abcdef8.cloudfront.net')
+        ->and((string) $response->headers->get('Content-Security-Policy'))
+        ->toContain('https://d111111abcdef8.cloudfront.net');
+});
+
+it('serves covers locally when no remote bucket is configured', function () {
+    expect(NewsletterIssue::coverImageOrigin())->toBeNull();
 });
 
 it('has no highlight or past issues before the first issue is published', function () {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Csp;
 
+use App\Models\NewsletterIssue;
 use Spatie\Csp\Directive;
 use Spatie\Csp\Keyword;
 use Spatie\Csp\Policy;
@@ -39,5 +40,9 @@ final class AdminPanelPolicy implements Preset
             ->add(Directive::SCRIPT, [Keyword::SELF, Keyword::UNSAFE_EVAL, Keyword::UNSAFE_INLINE, 'blob:'])
             ->add(Directive::STYLE, [Keyword::SELF, Keyword::UNSAFE_INLINE])
             ->add(Directive::IMG, [Keyword::SELF, 'data:', 'blob:', '*.tile.openstreetmap.org', 'https://ui-avatars.com', 'https://images.unsplash.com']);
+
+        if (($coverOrigin = NewsletterIssue::coverImageOrigin()) !== null) {
+            $policy->add(Directive::IMG, $coverOrigin);
+        }
     }
 }

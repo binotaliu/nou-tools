@@ -73,7 +73,7 @@ final class NewsletterIssueViewModel extends Data
         return new self(
             issueKey: $issue->issue_key,
             title: $issue->displayTitle(),
-            coverImageUrl: $issue->cover_image !== null ? Storage::disk('public')->url($issue->cover_image) : null,
+            coverImageUrl: $issue->cover_image !== null ? Storage::disk(NewsletterIssue::COVER_DISK)->url($issue->cover_image) : null,
             coverImageCreditName: $issue->cover_image_credit_name,
             // Unsplash's API guidelines require attribution links to carry utm_source/utm_medium.
             coverImageCreditUrl: $issue->cover_image_credit_url !== null

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Csp;
 
+use App\Models\NewsletterIssue;
 use Spatie\Csp\Directive;
 use Spatie\Csp\Policy;
 use Spatie\Csp\Preset;
@@ -29,6 +30,10 @@ final class PublicSitePolicy implements Preset
         // are still fetched from jsDelivr's default CDN base at runtime, since
         // nicknames can contain arbitrary emoji beyond our fixed seat-choice list.
         $policy->add(Directive::IMG, 'cdn.jsdelivr.net');
+
+        if (($coverOrigin = NewsletterIssue::coverImageOrigin()) !== null) {
+            $policy->add(Directive::IMG, $coverOrigin);
+        }
 
         // The og-image card (spatie/laravel-og-image) loads Noto Sans TC from
         // Google Fonts, but only in the `?ogimage` screenshot document, so the

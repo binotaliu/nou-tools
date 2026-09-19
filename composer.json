@@ -21,6 +21,8 @@
     "laravel/reverb": "^1.11",
     "laravel/tinker": "^3.0.2",
     "league/commonmark": "^2.10.1",
+    "league/flysystem-aws-s3-v3": "^3.0",
+    "league/flysystem-path-prefixing": "^3.25.1",
     "mansoor/filament-unsplash-picker": "^5.0",
     "milon/barcode": "^13.1",
     "revolution/laravel-notification-discord-webhook": "^1.4.2",
