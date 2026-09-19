@@ -159,3 +159,27 @@ it('ships the recoloured plus pattern the course card uses as its background', f
         ->toContain('Steve Schoger')
         ->toContain('CC BY 4.0');
 });
+
+it('advertises a generated og:image card on an article page', function () {
+    $response = $this->get(route('articles.show', ['type' => ArticleType::MANUAL->value, 'slug' => 'welcome']))
+        ->assertSuccessful();
+
+    $article = $response->inertiaProps('viewModel.article');
+
+    $response
+        ->assertSee('<template data-og-image', false)
+        ->assertSee(e($article['title']), false)
+        ->assertSee('NOU 小幫手操作手冊', false)
+        ->assertSee('/images/plus.svg', false)
+        ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
+        ->assertDontSee(asset('og-image.png'), false);
+});
+
+it('advertises a generated og:image card on an article index page', function () {
+    $this->get(route('articles.index', ['type' => ArticleType::KNOWLEDGE_BASE->value]))
+        ->assertSuccessful()
+        ->assertSee('<template data-og-image', false)
+        ->assertSee('知識庫', false)
+        ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
+        ->assertDontSee(asset('og-image.png'), false);
+});
