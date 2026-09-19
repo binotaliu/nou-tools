@@ -149,6 +149,38 @@ const push = props.isLinkedSchedule
     })
   : null
 
+// --- installed-PWA phone: collapse the action buttons into one menu ---
+// The buttons and the push switch are hidden by CSS in that case (the
+// `bottom-nav:` variant), so this menu only ever opens where they are.
+const actionsOpen = ref(false)
+const actionsMenu = ref(null)
+
+function closeActions() {
+  actionsOpen.value = false
+}
+
+function onActionsPointerDown(event) {
+  if (actionsOpen.value && !actionsMenu.value?.contains(event.target)) {
+    closeActions()
+  }
+}
+
+function onActionsKeydown(event) {
+  if (actionsOpen.value && event.key === 'Escape') {
+    closeActions()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('pointerdown', onActionsPointerDown)
+  document.addEventListener('keydown', onActionsKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('pointerdown', onActionsPointerDown)
+  document.removeEventListener('keydown', onActionsKeydown)
+})
+
 // --- copy share link ---
 const shareInput = ref(null)
 const {
@@ -393,7 +425,10 @@ function localHint(next) {
         class="mb-8 flex flex-col items-start justify-between gap-y-4 lg:flex-row"
       >
         <div>
-          <h2 class="mb-2 text-3xl font-bold text-theme-900 dark:text-zinc-100">
+          <h2
+            data-testid="schedule-title"
+            class="mb-2 text-3xl font-bold text-theme-900 dark:text-zinc-100"
+          >
             {{ viewModel.name || '我的課表' }}
           </h2>
           <p
@@ -407,7 +442,7 @@ function localHint(next) {
 
         <div class="flex w-full flex-col items-end gap-2 lg:w-auto">
           <div
-            class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden"
+            class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden bottom-nav:hidden"
           >
             <div class="flex w-full shrink-0 gap-2 sm:w-1/2 lg:w-auto">
               <Link
@@ -453,12 +488,12 @@ function localHint(next) {
           </div>
 
           <div
-            class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden"
+            class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden bottom-nav:flex-row"
           >
             <form
               method="GET"
               :action="`/schedules/${viewModel.uuid}`"
-              class="w-full sm:w-1/2 lg:w-32"
+              class="w-full sm:w-1/2 lg:w-32 bottom-nav:flex-1"
             >
               <label for="term" class="sr-only">選擇學期</label>
               <div class="relative">
@@ -490,7 +525,7 @@ function localHint(next) {
             <div
               v-if="push"
               v-show="push.supported.value"
-              class="flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-theme-200 bg-white px-3 sm:w-1/2 lg:w-auto dark:border-zinc-700 dark:bg-zinc-900"
+              class="flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-theme-200 bg-white px-3 sm:w-1/2 lg:w-auto dark:border-zinc-700 dark:bg-zinc-900 bottom-nav:hidden"
             >
               <span
                 class="text-sm font-medium text-theme-800 dark:text-zinc-200"
@@ -520,6 +555,108 @@ function localHint(next) {
                   class="inline-block size-4 transform rounded-full bg-white shadow transition-transform dark:bg-zinc-900"
                 ></span>
               </button>
+            </div>
+
+            <div
+              ref="actionsMenu"
+              class="relative hidden bottom-nav:block"
+              data-testid="schedule-actions"
+            >
+              <button
+                type="button"
+                data-testid="schedule-actions-toggle"
+                class="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+                aria-haspopup="menu"
+                :aria-expanded="actionsOpen.toString()"
+                aria-controls="schedule-actions-menu"
+                @click="actionsOpen = !actionsOpen"
+              >
+                <Icon name="ellipsis-horizontal" class="size-5" />
+                更多
+              </button>
+
+              <div
+                v-if="actionsOpen"
+                id="schedule-actions-menu"
+                data-testid="schedule-actions-menu"
+                role="menu"
+                class="absolute top-full right-0 z-30 mt-2 w-64 space-y-1 rounded-lg border border-theme-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+              >
+                <Link
+                  :href="`/schedules/${viewModel.uuid}/${viewModel.selectedTerm}/learning-progress`"
+                  role="menuitem"
+                  data-analytics-event="learning_progress_open"
+                  data-analytics-feature="learning_progress"
+                  class="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-theme-800 transition-colors hover:bg-theme-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                >
+                  <Icon name="clipboard" class="size-5 shrink-0" />
+                  學習進度表
+                </Link>
+                <Link
+                  :href="`/schedules/${viewModel.uuid}/subscribe`"
+                  role="menuitem"
+                  data-analytics-event="calendar_subscribe_open"
+                  data-analytics-feature="schedule"
+                  class="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-theme-800 transition-colors hover:bg-theme-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                >
+                  <Icon name="calendar" class="size-5 shrink-0" />
+                  訂閱行事曆
+                </Link>
+                <Link
+                  :href="`/schedules/${viewModel.uuid}/edit?term=${viewModel.selectedTerm}`"
+                  role="menuitem"
+                  data-analytics-event="schedule_edit"
+                  data-analytics-feature="schedule"
+                  class="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-theme-800 transition-colors hover:bg-theme-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                >
+                  <Icon name="pencil-square" class="size-5 shrink-0" />
+                  編輯
+                </Link>
+                <Link
+                  :href="`/schedules/${viewModel.uuid}/customize`"
+                  role="menuitem"
+                  data-analytics-event="schedule_customize_open"
+                  data-analytics-feature="schedule"
+                  class="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-theme-800 transition-colors hover:bg-theme-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                >
+                  <Icon name="cog-6-tooth" class="size-5 shrink-0" />
+                  自訂
+                </Link>
+
+                <div
+                  v-if="push && push.supported.value"
+                  class="flex items-center justify-between gap-3 border-t border-theme-200 px-3 pt-3 pb-2 dark:border-zinc-700"
+                >
+                  <span
+                    class="text-sm font-medium text-theme-800 dark:text-zinc-200"
+                  >
+                    面授開始前接收桌面通知
+                  </span>
+                  <button
+                    type="button"
+                    role="switch"
+                    :aria-checked="push.enabled.value"
+                    aria-label="面授開始前接收桌面通知"
+                    :disabled="push.busy.value"
+                    :class="
+                      push.enabled.value
+                        ? 'bg-theme-700 dark:bg-zinc-300'
+                        : 'bg-theme-200 dark:bg-zinc-700'
+                    "
+                    class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                    data-analytics-event="schedule_push_toggle"
+                    data-analytics-feature="schedule"
+                    @click="push.toggle()"
+                  >
+                    <span
+                      :class="
+                        push.enabled.value ? 'translate-x-6' : 'translate-x-1'
+                      "
+                      class="inline-block size-4 transform rounded-full bg-white shadow transition-transform dark:bg-zinc-900"
+                    ></span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 

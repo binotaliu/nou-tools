@@ -122,3 +122,49 @@ it('highlights learning progress, not my schedule, on a learning progress page',
 
     expect(linkTexts($page, '[data-testid="header-nav"] > a[aria-current="page"]'))->toBe(['學習進度']);
 });
+
+it('collapses the schedule page actions into one menu in an installed PWA on a phone', function () {
+    $schedule = StudentSchedule::factory()->create();
+
+    $page = visit(route('schedules.show', $schedule, absolute: false))->resize(...PHONE);
+
+    $page->wait(1);
+
+    if ($page->script("!!document.querySelector('[data-testid=\"remember-schedule-dismiss\"]')")) {
+        $page->click('[data-testid="remember-schedule-dismiss"]');
+    }
+
+    // In a plain browser tab the buttons stay inline and there is no menu.
+    $page->assertMissing('[data-testid="schedule-actions-toggle"]');
+
+    enterPwaMode($page);
+
+    $page->assertVisible('[data-testid="schedule-actions-toggle"]')
+        ->assertMissing('[data-testid="schedule-actions-menu"]')
+        ->assertMissing('a[data-analytics-event="calendar_subscribe_open"]')
+        ->assertMissing('a[data-analytics-event="schedule_edit"]')
+        ->assertVisible('#term');
+
+    $page->screenshot(filename: 'pwa-schedule-actions-closed')
+        ->click('[data-testid="schedule-actions-toggle"]')
+        ->assertVisible('[data-testid="schedule-actions-menu"]')
+        ->screenshot(filename: 'pwa-schedule-actions-open');
+
+    expect(linkTexts($page, '[data-testid="schedule-actions-menu"] a'))
+        ->toBe(['學習進度表', '訂閱行事曆', '編輯', '自訂']);
+
+    // Tapping outside dismisses it.
+    $page->click('[data-testid="schedule-title"]')->assertMissing('[data-testid="schedule-actions-menu"]');
+});
+
+it('keeps the schedule page actions inline in an installed PWA on a tablet', function () {
+    $schedule = StudentSchedule::factory()->create();
+
+    $page = visit(route('schedules.show', $schedule, absolute: false))->resize(...TABLET);
+
+    $page->wait(1);
+    enterPwaMode($page);
+
+    $page->assertMissing('[data-testid="schedule-actions-toggle"]')
+        ->assertVisible('a[data-analytics-event="calendar_subscribe_open"]');
+});
