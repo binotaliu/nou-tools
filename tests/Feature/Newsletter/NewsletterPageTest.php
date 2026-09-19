@@ -189,6 +189,35 @@ it('advertises a generated og:image card for published issues', function () {
         ->assertDontSee(asset('og-image.png'), false);
 });
 
+it('advertises Open Graph and Twitter tags for published issues', function () {
+    publishedIssueWithContent();
+
+    get('/newsletter/2026-W39')
+        ->assertSuccessful()
+        ->assertSee('<meta property="og:type" content="article" />', false)
+        ->assertSee('<meta property="og:site_name" content="NOU 小幫手" />', false)
+        ->assertSee('<meta property="og:title" content="浣熊的空大雙週報 2026-W39" />', false)
+        ->assertSee('<meta property="og:url" content="'.url('/newsletter/2026-W39').'" />', false)
+        ->assertSee('<meta property="og:description" content="這兩週要注意 期中考報名。alert(1)" />', false)
+        ->assertSee('<meta name="description" content="這兩週要注意 期中考報名。alert(1)" />', false)
+        ->assertSee('property="article:published_time"', false)
+        ->assertSee('<meta name="twitter:card" content="summary_large_image" />', false);
+});
+
+it('falls back to a generic description when the issue has no intro', function () {
+    NewsletterIssue::factory()->publishingOn('2026-09-21')->published()->create(['highlights_intro' => null]);
+
+    get('/newsletter/2026-W39')
+        ->assertSuccessful()
+        ->assertSee('<meta property="og:description" content="浣熊的空大雙週報 2026-W39：', false);
+});
+
+it('does not emit issue Open Graph tags on pages without them', function () {
+    get(route('newsletter.index'))
+        ->assertSuccessful()
+        ->assertDontSee('<meta property="og:type"', false);
+});
+
 it('keeps the static og:image on pages without a card', function () {
     get(route('newsletter.index'))
         ->assertSuccessful()

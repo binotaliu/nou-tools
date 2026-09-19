@@ -25,6 +25,10 @@
     $ogImageView = $routeName && view()->exists('og-image.'.$routeName)
         ? 'og-image.'.$routeName
         : null;
+
+    $openGraphView = $routeName && view()->exists('open-graph.'.$routeName)
+        ? 'open-graph.'.$routeName
+        : null;
 @endphp
 <!DOCTYPE html>
 <html lang="zh-hant">
@@ -76,6 +80,12 @@
     @unless ($ogImageView)
         <meta property="og:image" content="{{ asset('og-image.png') }}" />
     @endunless
+
+    {{-- Pages with a resources/views/open-graph/{route name}.blade.php get
+    their own title/description/type tags. --}}
+    @if ($openGraphView)
+        @include($openGraphView, ['props' => $page['props']])
+    @endif
 
     <link id="favicon-ico" rel="icon" href="{{ asset('favicon.ico') }}?v=2" />
     <link
