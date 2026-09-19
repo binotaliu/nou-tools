@@ -307,8 +307,13 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
             <Icon name="building-storefront" class="size-6" />
             各中心消息
           </h2>
-          <div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
-            <div v-for="group in centerGroups" :key="group.sourceName">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div
+              v-for="group in centerGroups"
+              :key="group.sourceName"
+              class="rounded-lg border border-theme-200 p-4 dark:border-zinc-700"
+              data-testid="newsletter-center"
+            >
               <h3
                 class="mb-2 border-l-4 border-theme-400 pl-2 font-semibold text-theme-800 dark:border-zinc-500 dark:text-zinc-200"
               >

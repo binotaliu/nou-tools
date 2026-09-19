@@ -52,10 +52,15 @@ final class NewsletterIssueViewModel extends Data
     ) {}
 
     /**
-     * Expects `items` and `columns` to be loaded.
+     * Expects `items` and `columns` to be loaded. Centers' items follow the
+     * directory's center order (`$centerOrder`); unlisted sources go last.
+     *
+     * @param  list<string>  $centerOrder
      */
-    public static function fromModel(NewsletterIssue $issue, RenderNewsletterMarkdown $renderMarkdown): self
+    public static function fromModel(NewsletterIssue $issue, RenderNewsletterMarkdown $renderMarkdown, array $centerOrder = []): self
     {
+        $centerPosition = array_flip($centerOrder);
+
         $itemsFor = fn (NewsletterSection $section): DataCollection => NewsletterItemViewModel::collect(
             $issue->items
                 ->filter(fn (NewsletterItem $item): bool => $item->section === $section)
@@ -89,7 +94,15 @@ final class NewsletterIssueViewModel extends Data
             ),
             newsItems: $itemsFor(NewsletterSection::News),
             artItems: $itemsFor(NewsletterSection::Arts),
-            centerItems: $itemsFor(NewsletterSection::Centers),
+            centerItems: NewsletterItemViewModel::collect(
+                $issue->items
+                    ->filter(fn (NewsletterItem $item): bool => $item->section === NewsletterSection::Centers)
+                    ->sortBy(fn (NewsletterItem $item): int => $centerPosition[$item->source_name] ?? PHP_INT_MAX)
+                    ->map(fn (NewsletterItem $item): NewsletterItemViewModel => NewsletterItemViewModel::fromModel($item, $renderMarkdown))
+                    ->values()
+                    ->all(),
+                DataCollection::class,
+            ),
             columns: NewsletterColumnViewModel::collect(
                 $issue->columns
                     ->map(fn (NewsletterColumn $column): NewsletterColumnViewModel => NewsletterColumnViewModel::fromModel($column, $renderMarkdown))

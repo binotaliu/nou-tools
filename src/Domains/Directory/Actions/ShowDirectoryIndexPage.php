@@ -17,6 +17,8 @@ use Spatie\LaravelData\DataCollection;
 
 final readonly class ShowDirectoryIndexPage
 {
+    public function __construct(private ListCentersInDirectoryOrder $listCentersInDirectoryOrder) {}
+
     public function __invoke(): DirectoryIndexPageData
     {
         $links = collect(config('directory.links', []));
@@ -55,11 +57,7 @@ final readonly class ShowDirectoryIndexPage
 
     private function centerGroup(): ?CenterGroupViewModel
     {
-        $regionOrder = collect(CenterRegion::cases())
-            ->map(fn (CenterRegion $region): string => $region->value)
-            ->flip();
-
-        $items = collect(config('directory.centers', []))
+        $items = ($this->listCentersInDirectoryOrder)()
             ->map(fn (array $center): CenterItemViewModel => new CenterItemViewModel(
                 name: $center['name'],
                 url: $center['url'],
@@ -72,7 +70,6 @@ final readonly class ShowDirectoryIndexPage
                 transportUrl: $center['transport_url'] ?? null,
                 googleMapsUrl: $center['google_maps_url'] ?? null,
             ))
-            ->sortBy(fn (CenterItemViewModel $item): int => $regionOrder[$item->region] ?? PHP_INT_MAX)
             ->values();
 
         if ($items->isEmpty()) {

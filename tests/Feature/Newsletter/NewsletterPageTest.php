@@ -161,3 +161,18 @@ it('lists the newsletter and published issues in the sitemap and llms.txt', func
 
     get('/llms.txt')->assertSee(route('newsletter.feed'), false);
 });
+
+it('orders center items like the directory: by region, then configured order', function () {
+    $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->published()->create();
+
+    foreach (['金門中心', '高雄中心', '台中中心', '基隆中心', '花蓮中心', '桃園中心'] as $center) {
+        NewsletterItem::factory()->for($issue, 'issue')->centers($center)->create();
+    }
+
+    get(route('newsletter.show', $issue->issue_key))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('viewModel.issue.centerItems', fn ($items) => collect($items)->pluck('sourceName')->all() === [
+                '基隆中心', '桃園中心', '台中中心', '高雄中心', '花蓮中心', '金門中心',
+            ]));
+});
