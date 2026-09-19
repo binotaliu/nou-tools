@@ -87,15 +87,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {{-- The installed PWA's bottom tab bar needs env(safe-area-inset-bottom),
     which is only non-zero with viewport-fit=cover. Browser tabs keep the
-    plain viewport so landscape notches don't clip content. --}}
+    plain viewport so landscape notches don't clip content. The installed PWA
+    also disables pinch-zoom: it should feel like a native app. iOS ignores
+    user-scalable=no, so CSS touch-action (app.css) and a gesturestart guard
+    back it up. --}}
     <script @cspNonce>
         if (document.documentElement.hasAttribute('data-pwa')) {
             document
                 .querySelector('meta[name="viewport"]')
                 .setAttribute(
                     'content',
-                    'width=device-width, initial-scale=1, viewport-fit=cover'
+                    'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'
                 )
+            document.addEventListener('gesturestart', event =>
+                event.preventDefault()
+            )
         }
     </script>
     <meta name="csrf-token" content="{{ csrf_token() }}" />

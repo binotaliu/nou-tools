@@ -200,3 +200,14 @@ it('drops the About page title and subtitle in a phone PWA but keeps the brand b
         ->assertMissing('[data-testid="about-subtitle"]')
         ->assertVisible('[data-testid="about-brand"]');
 });
+
+it('disables pinch-zoom only in an installed PWA', function () {
+    $page = visit('/announcements')->resize(...PHONE);
+
+    $page->assertSee('學校公告');
+    expect($page->script('getComputedStyle(document.documentElement).touchAction'))->toBe('auto');
+
+    enterPwaMode($page);
+
+    expect($page->script('getComputedStyle(document.documentElement).touchAction'))->toBe('pan-x pan-y');
+});

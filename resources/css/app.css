@@ -137,6 +137,12 @@
     padding-right: env(safe-area-inset-right);
   }
 
+  /* No pinch-zoom in the installed PWA (iOS ignores user-scalable=no); panning
+   * and scrolling still work. */
+  html[data-pwa] {
+    touch-action: pan-x pan-y;
+  }
+
   /* Twemoji swaps emoji characters for <img class="emoji"> — without this
      the images render at their native size instead of matching the
      surrounding text. */
