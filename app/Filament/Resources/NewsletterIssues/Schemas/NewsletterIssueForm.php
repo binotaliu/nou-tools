@@ -8,6 +8,7 @@ use App\Enums\NewsletterSection;
 use App\Models\Announcement;
 use Closure;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -18,6 +19,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Date;
+use Mansoor\UnsplashPicker\Actions\UnsplashPickerAction;
 use NouTools\Domains\Newsletter\Actions\QueryNewsletterCandidateAnnouncements;
 use NouTools\Domains\Newsletter\Schedule\NewsletterCadence;
 
@@ -48,6 +50,13 @@ class NewsletterIssueForm
                             ->label('標題')
                             ->placeholder('留空則使用「浣熊的空大雙週報 期號」')
                             ->maxLength(255)
+                            ->columnSpanFull(),
+                        FileUpload::make('cover_image')
+                            ->label('封面圖片')
+                            ->image()
+                            ->disk('public')
+                            ->directory('newsletter-covers')
+                            ->hintAction(UnsplashPickerAction::make())
                             ->columnSpanFull(),
                         Grid::make(4)
                             ->schema([

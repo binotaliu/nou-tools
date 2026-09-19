@@ -63,6 +63,16 @@ it('renders every section of an issue', function () {
         ->assertSee('浣熊站長的自言自語');
 });
 
+it('shows a cover image only when one is set', function () {
+    visit('/newsletter/2026-W39')
+        ->assertNotPresent('[data-testid="newsletter-cover-image"]');
+
+    NewsletterIssue::query()->where('issue_key', '2026-W39')->sole()->update(['cover_image' => 'newsletter-covers/cover.jpg']);
+
+    visit('/newsletter/2026-W39')
+        ->assertPresent('[data-testid="newsletter-cover-image"]');
+});
+
 it('hydrates markdown containers inside columns', function () {
     $page = visit('/newsletter/2026-W39')->wait(1);
 

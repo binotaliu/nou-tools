@@ -79,6 +79,14 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
     <article
       class="mx-auto max-w-3xl rounded-lg border border-theme-200 bg-white p-6 shadow-sm sm:p-8 dark:border-zinc-700 dark:bg-zinc-900"
     >
+      <img
+        v-if="issue.coverImageUrl"
+        :src="issue.coverImageUrl"
+        :alt="issue.title"
+        class="mb-6 aspect-[3/1] w-full rounded-lg object-cover"
+        data-testid="newsletter-cover-image"
+      />
+
       <header
         class="mb-6 space-y-2 border-b border-theme-200 pb-6 dark:border-zinc-700"
       >

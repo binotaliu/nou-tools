@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f49335e5320b55519aee2bfd1860ccb8",
+    "content-hash": "5c875c972a26991e9e36963df1271fb9",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -4247,6 +4247,85 @@
                 }
             ],
             "time": "2026-09-07T16:02:43+00:00"
+        },
+        {
+            "name": "mansoor/filament-unsplash-picker",
+            "version": "v5.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mansoorkhan96/filament-unsplash-picker.git",
+                "reference": "4f64fca3580a4d4fd26f498f95a6bbf92226fc12"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mansoorkhan96/filament-unsplash-picker/zipball/4f64fca3580a4d4fd26f498f95a6bbf92226fc12",
+                "reference": "4f64fca3580a4d4fd26f498f95a6bbf92226fc12",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^5.0",
+                "illuminate/contracts": "^11.28 || ^12.0 || ^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16.4"
+            },
+            "require-dev": {
+                "filament/spatie-laravel-media-library-plugin": "^5.0",
+                "filament/upgrade": "^5.0",
+                "larastan/larastan": "3.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.1",
+                "orchestra/testbench": "^9.0|^10.0|^11.0",
+                "pestphp/pest": "^3.7",
+                "pestphp/pest-plugin-arch": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "UnsplashPicker": "Mansoor\\UnsplashPicker\\Facades\\UnsplashPicker"
+                    },
+                    "providers": [
+                        "Mansoor\\UnsplashPicker\\UnsplashPickerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mansoor\\UnsplashPicker\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mansoor Ahmed",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This is my package filament-unsplash-picker",
+            "homepage": "https://github.com/mansoor/filament-unsplash-picker",
+            "keywords": [
+                "Unsplash",
+                "filament",
+                "filament-unsplash-picker",
+                "image picker",
+                "laravel",
+                "mansoor"
+            ],
+            "support": {
+                "issues": "https://github.com/mansoor/filament-unsplash-picker/issues",
+                "source": "https://github.com/mansoor/filament-unsplash-picker"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/mansoor",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-04-10T15:51:16+00:00"
         },
         {
             "name": "milon/barcode",

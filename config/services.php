@@ -47,4 +47,10 @@ return [
         'tileLayer' => env('MAP_TILE_LAYER', 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
         'tileLayerAttribution' => env('MAP_TILE_LAYER_ATTRIBUTION', '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'),
     ],
+
+    // Unsplash calls the access key the OAuth "client ID"; UNSPLASH_SECRET_KEY
+    // is only needed for user-auth flows this plugin doesn't use.
+    'unsplash' => [
+        'client_id' => env('UNSPLASH_ACCESS_KEY'),
+    ],
 ];

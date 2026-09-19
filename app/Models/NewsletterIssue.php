@@ -21,6 +21,7 @@ final class NewsletterIssue extends Model
         'issue_key',
         'publishes_on',
         'title',
+        'cover_image',
         'covers_from',
         'covers_to',
         'highlights_from',

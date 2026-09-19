@@ -8,6 +8,7 @@ use App\Enums\NewsletterSection;
 use App\Models\NewsletterColumn;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
+use Illuminate\Support\Facades\Storage;
 use NouTools\Domains\Newsletter\Actions\RenderNewsletterMarkdown;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
@@ -24,6 +25,7 @@ final class NewsletterIssueViewModel extends Data
     public function __construct(
         public string $issueKey,
         public string $title,
+        public ?string $coverImageUrl,
         public bool $isPublished,
         public string $statusLabel,
         public string $publishesOn,
@@ -61,6 +63,7 @@ final class NewsletterIssueViewModel extends Data
         return new self(
             issueKey: $issue->issue_key,
             title: $issue->displayTitle(),
+            coverImageUrl: $issue->cover_image !== null ? Storage::disk('public')->url($issue->cover_image) : null,
             isPublished: $issue->isPublished(),
             statusLabel: $issue->status->label(),
             publishesOn: $issue->publishes_on->toDateString(),

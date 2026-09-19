@@ -11,8 +11,10 @@ use App\Models\Announcement;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
@@ -94,6 +96,22 @@ it('edits intro, items and columns', function () {
     expect($issue->highlights_intro)->toBe('新的開場')
         ->and($issue->centerItems()->sole()->only(['announcement_id', 'headline']))->toBe(['announcement_id' => $announcement->id, 'headline' => '讀書會招募中'])
         ->and($issue->columns()->sole()->body)->toBe('第一期！');
+});
+
+it('saves a cover image', function () {
+    Storage::fake('public');
+    $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->create();
+    $file = UploadedFile::fake()->image('cover.jpg');
+
+    Livewire::test(EditNewsletterIssue::class, ['record' => $issue->getRouteKey()])
+        ->fillForm(['cover_image' => $file])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $issue->refresh();
+
+    expect($issue->cover_image)->not->toBeNull();
+    Storage::disk('public')->assertExists($issue->cover_image);
 });
 
 it('fills source, url and headline when an announcement is picked', function () {
