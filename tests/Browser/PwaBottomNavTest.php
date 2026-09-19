@@ -168,3 +168,35 @@ it('keeps the schedule page actions inline in an installed PWA on a tablet', fun
     $page->assertMissing('[data-testid="schedule-actions-toggle"]')
         ->assertVisible('a[data-analytics-event="calendar_subscribe_open"]');
 });
+
+it('hides the page footer in a phone PWA while About carries the disclaimer and contact info', function () {
+    $page = visit('/announcements')->resize(...PHONE);
+
+    $page->assertSee('學校公告')->assertVisible('[data-testid="site-footer"]');
+
+    enterPwaMode($page);
+
+    $page->assertMissing('[data-testid="site-footer"]');
+
+    visit('/about')->resize(...PHONE)
+        ->assertSee('免責聲明')
+        ->assertVisible('[data-testid="about-brand"]')
+        ->assertVisible('[data-testid="about-title"]')
+        ->assertSee('給 NOU 同學的非官方小工具')
+        ->assertVisible('[data-testid="about-disclaimer"]')
+        ->assertVisible('[data-testid="about-contact"]')
+        ->assertSee('nou-tools-contact@binota.org');
+});
+
+it('drops the About page title and subtitle in a phone PWA but keeps the brand block', function () {
+    $page = visit('/about')->resize(...PHONE);
+
+    $page->assertVisible('[data-testid="about-title"]')
+        ->assertVisible('[data-testid="about-subtitle"]');
+
+    enterPwaMode($page);
+
+    $page->assertMissing('[data-testid="about-title"]')
+        ->assertMissing('[data-testid="about-subtitle"]')
+        ->assertVisible('[data-testid="about-brand"]');
+});

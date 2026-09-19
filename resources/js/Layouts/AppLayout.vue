@@ -278,7 +278,10 @@ const bottomMoreItems = computed(() =>
     </div>
   </header>
 
-  <main id="main-content" class="mx-auto max-w-7xl px-6 py-8">
+  <main
+    id="main-content"
+    class="mx-auto max-w-7xl px-6 py-8 bottom-nav:pb-[calc(var(--pwa-nav-height)+2rem)]"
+  >
     <!-- flash notifications use slide-in toasts instead of the old alert box -->
     <Notification
       v-if="successMessage"
@@ -299,7 +302,8 @@ const bottomMoreItems = computed(() =>
   </main>
 
   <footer
-    class="mt-12 border-t border-theme-200 bg-theme-100 py-8 text-theme-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 print:bg-white print:text-black bottom-nav:pb-[calc(var(--pwa-nav-height)+2rem)]"
+    class="mt-12 border-t border-theme-200 bg-theme-100 py-8 text-theme-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 print:bg-white print:text-black bottom-nav:hidden"
+    data-testid="site-footer"
   >
     <div class="mx-auto max-w-7xl px-6">
       <div class="hidden py-2 text-center text-xs text-theme-800 print:block">
