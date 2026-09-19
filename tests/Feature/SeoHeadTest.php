@@ -127,3 +127,34 @@ it('leaves the head untagged when a matched route renders the Error page', funct
         ->assertNotFound()
         ->assertDontSee('data-seo', false);
 });
+
+it('advertises a generated og:image card on a course page', function () {
+    $course = Course::factory()->create([
+        'name' => 'Test Course',
+        'credits' => 3,
+        'department' => 'Test Department',
+        'term' => '11401',
+        'media' => '網頁',
+    ]);
+
+    $this->get(route('course.show', $course))
+        ->assertSuccessful()
+        ->assertSee('<template data-og-image', false)
+        ->assertSee('Test Course', false)
+        ->assertSee('空中大學Test Department課程', false)
+        ->assertSee('課程・'.Str::toSemesterDisplay('11401'), false)
+        ->assertSee('3 學分・網頁課程', false)
+        ->assertSee('/images/plus.svg', false)
+        ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
+        ->assertDontSee(asset('og-image.png'), false);
+});
+
+it('ships the recoloured plus pattern the course card uses as its background', function () {
+    $svg = file_get_contents(public_path('images/plus.svg'));
+
+    expect($svg)
+        ->toContain('fill="#fff"')
+        ->not->toContain('#000')
+        ->toContain('Steve Schoger')
+        ->toContain('CC BY 4.0');
+});

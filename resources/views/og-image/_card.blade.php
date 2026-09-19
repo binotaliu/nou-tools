@@ -1,12 +1,14 @@
-{{-- Shared social card for the discount store pages, rendered into the Inertia
-root view (app.blade.php) and screenshotted by spatie/laravel-og-image. The
-background is the Hero Patterns "I Like Food" tile (public/images/i-like-food.svg,
-recoloured white at 10% opacity so it reads as texture, not content).
+{{-- Shared patterned social card (discount stores, courses), rendered into the
+Inertia root view (app.blade.php) and screenshotted by spatie/laravel-og-image.
+The background is a Hero Patterns tile from public/images/, recoloured white at
+10% opacity so it reads as texture, not content.
 
-Params: eyebrow, title, kicker (optional, above the title), subtitle (optional). --}}
+Params: pattern (Tailwind classes for the tile; must be literal in the caller so
+Tailwind picks them up), eyebrow, title, kicker (optional, above the title),
+subtitle (optional). --}}
 <x-og-image>
     <div
-        class="relative flex h-full w-full flex-col justify-between overflow-hidden bg-theme-700 bg-[url('/images/i-like-food.svg')] bg-[length:390px_390px] p-16 text-white"
+        class="relative flex h-full w-full flex-col justify-between overflow-hidden bg-theme-700 {{ $pattern }} p-16 text-white"
     >
         {{-- Darkens towards the bottom so the title stays legible over the pattern. --}}
         <div

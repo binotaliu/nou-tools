@@ -5,6 +5,6 @@ Repository: https://github.com/binotaliu/nou-tools
 Proundly made with Laravel, TailwindCSS, and Alpine.js.
 
 Background patterns of the social cards ("I Like Food" in the discount store
-cards, "Plus" in og-image.png): Hero Patterns (https://heropatterns.com/) by
+cards, "Plus" in the course cards and og-image.png): Hero Patterns (https://heropatterns.com/) by
 Steve Schoger, CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
 Modified: recoloured.
