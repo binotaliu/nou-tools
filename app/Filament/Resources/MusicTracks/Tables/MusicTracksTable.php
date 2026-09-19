@@ -29,7 +29,7 @@ class MusicTracksTable
                     ->searchable(),
                 TextColumn::make('duration_seconds')
                     ->label('長度')
-                    ->formatStateUsing(fn (int $state): string => gmdate($state >= 3600 ? 'G:i:s' : 'i:s', $state))
+                    ->formatStateUsing(fn (int $state): string => self::formatDuration($state))
                     ->sortable(),
                 TextColumn::make('playlists_count')
                     ->label('播放清單數')
@@ -39,5 +39,10 @@ class MusicTracksTable
             ->recordActions([
                 EditAction::make(),
             ]);
+    }
+
+    public static function formatDuration(int $seconds): string
+    {
+        return gmdate($seconds >= 3600 ? 'G:i:s' : 'i:s', $seconds);
     }
 }
