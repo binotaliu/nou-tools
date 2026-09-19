@@ -253,6 +253,7 @@
   animation: firefly 7s ease-in-out infinite;
 }
 
+/* Dark-mode (`prose-invert`) values alias Tailwind Typography's zinc palette; a theme-tinted invert reads oddly. */
 @utility prose-theme {
   --tw-prose-body: var(--color-theme-800);
   --tw-prose-headings: var(--color-theme-900);
@@ -270,22 +271,22 @@
   --tw-prose-pre-bg: var(--color-theme-900);
   --tw-prose-th-borders: var(--color-theme-300);
   --tw-prose-td-borders: var(--color-theme-200);
-  --tw-prose-invert-body: var(--color-theme-200);
+  --tw-prose-invert-body: var(--color-zinc-300);
   --tw-prose-invert-headings: var(--color-white);
-  --tw-prose-invert-lead: var(--color-theme-300);
+  --tw-prose-invert-lead: var(--color-zinc-400);
   --tw-prose-invert-links: var(--color-white);
   --tw-prose-invert-bold: var(--color-white);
-  --tw-prose-invert-counters: var(--color-theme-400);
-  --tw-prose-invert-bullets: var(--color-theme-600);
-  --tw-prose-invert-hr: var(--color-theme-700);
-  --tw-prose-invert-quotes: var(--color-theme-100);
-  --tw-prose-invert-quote-borders: var(--color-theme-700);
-  --tw-prose-invert-captions: var(--color-theme-400);
+  --tw-prose-invert-counters: var(--color-zinc-400);
+  --tw-prose-invert-bullets: var(--color-zinc-600);
+  --tw-prose-invert-hr: var(--color-zinc-700);
+  --tw-prose-invert-quotes: var(--color-zinc-100);
+  --tw-prose-invert-quote-borders: var(--color-zinc-700);
+  --tw-prose-invert-captions: var(--color-zinc-400);
   --tw-prose-invert-code: var(--color-white);
-  --tw-prose-invert-pre-code: var(--color-theme-300);
+  --tw-prose-invert-pre-code: var(--color-zinc-300);
   --tw-prose-invert-pre-bg: rgb(0 0 0 / 50%);
-  --tw-prose-invert-th-borders: var(--color-theme-600);
-  --tw-prose-invert-td-borders: var(--color-theme-700);
+  --tw-prose-invert-th-borders: var(--color-zinc-600);
+  --tw-prose-invert-td-borders: var(--color-zinc-700);
 }
 
 /**

@@ -233,7 +233,7 @@ useMarkdownContainers(sidebarContentRoot, [
             <!-- Article Content -->
             <div
               ref="articleContentRoot"
-              class="prose max-w-none prose-theme dark:prose-zinc dark:prose-invert"
+              class="prose max-w-none prose-theme dark:prose-invert"
               v-html="viewModel.article.content"
             ></div>
 
