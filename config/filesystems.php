@@ -71,6 +71,23 @@ return [
             'prefix' => 'newsletter-covers',
         ],
 
+        /*
+        | Music library: uploaded mp3/ogg files and playlist cover images. Like
+        | the newsletter covers, each lives under the "public" disk by default
+        | and can be pointed at "s3" via env.
+        */
+        'music_tracks' => [
+            'driver' => 'scoped',
+            'disk' => env('MUSIC_TRACKS_DISK', 'public'),
+            'prefix' => 'music-tracks',
+        ],
+
+        'music_playlist_covers' => [
+            'driver' => 'scoped',
+            'disk' => env('MUSIC_COVERS_DISK', 'public'),
+            'prefix' => 'music-playlist-covers',
+        ],
+
     ],
 
     /*
