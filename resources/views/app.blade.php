@@ -21,6 +21,14 @@
     $analyticsPage = $currentRoute
         ? '/'.ltrim(preg_replace('/\{(\w+)\??\}/', ':$1', $currentRoute->uri()), '/')
         : '/'.ltrim(request()->path(), '/');
+
+    $ogImageView = $routeName && view()->exists('og-image.'.$routeName)
+        ? 'og-image.'.$routeName
+        : null;
+
+    $openGraphView = $routeName && view()->exists('open-graph.'.$routeName)
+        ? 'open-graph.'.$routeName
+        : null;
 @endphp
 <!DOCTYPE html>
 <html lang="zh-hant">
@@ -67,7 +75,17 @@
 
     <title inertia>NOU 小幫手</title>
 
-    <meta property="og:image" content="{{ asset('og-image.png') }}" />
+    {{-- Pages with a resources/views/og-image/{route name}.blade.php card get
+    a generated og:image from spatie/laravel-og-image instead of the static one. --}}
+    @unless ($ogImageView)
+        <meta property="og:image" content="{{ asset('og-image.png') }}" />
+    @endunless
+
+    {{-- Pages with a resources/views/open-graph/{route name}.blade.php get
+    their own title/description/type tags. --}}
+    @if ($openGraphView)
+        @include($openGraphView, ['props' => $page['props']])
+    @endif
 
     <link id="favicon-ico" rel="icon" href="{{ asset('favicon.ico') }}?v=2" />
     <link
@@ -117,5 +135,8 @@
     data-analytics-page="{{ $analyticsPage }}"
 >
     @inertia
+    @if ($ogImageView)
+        @include($ogImageView, ['props' => $page['props']])
+    @endif
 </body>
 </html>

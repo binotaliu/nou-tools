@@ -38,6 +38,6 @@ final class AdminPanelPolicy implements Preset
             ->add(Directive::OBJECT, Keyword::NONE)
             ->add(Directive::SCRIPT, [Keyword::SELF, Keyword::UNSAFE_EVAL, Keyword::UNSAFE_INLINE, 'blob:'])
             ->add(Directive::STYLE, [Keyword::SELF, Keyword::UNSAFE_INLINE])
-            ->add(Directive::IMG, [Keyword::SELF, 'data:', '*.tile.openstreetmap.org', 'https://ui-avatars.com']);
+            ->add(Directive::IMG, [Keyword::SELF, 'data:', 'blob:', '*.tile.openstreetmap.org', 'https://ui-avatars.com', 'https://images.unsplash.com']);
     }
 }

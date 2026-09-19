@@ -38,4 +38,10 @@ test('admin panel CSP header allows unsafe-inline styles and scripts without a n
         ->toContain("'unsafe-inline'")
         ->toContain("'unsafe-eval'");
     expect($hasNonce($directives->get('script-src')))->toBeFalse();
+
+    // The Unsplash cover-image picker needs to load photos from Unsplash's
+    // CDN and render FilePond's local blob: preview thumbnails.
+    expect($directives->get('img-src'))
+        ->toContain('blob:')
+        ->toContain('https://images.unsplash.com');
 });

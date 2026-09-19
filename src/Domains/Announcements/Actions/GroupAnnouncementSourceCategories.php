@@ -19,12 +19,11 @@ final readonly class GroupAnnouncementSourceCategories
     public function __invoke(): Collection
     {
         $sourceCategories = ($this->listAnnouncementSourceCategories)();
-        $sourceGroups = config('announcements.source_groups', []);
 
         return collect(AnnouncementSourceGroup::cases())
-            ->mapWithKeys(function (AnnouncementSourceGroup $group) use ($sourceCategories, $sourceGroups): array {
+            ->mapWithKeys(function (AnnouncementSourceGroup $group) use ($sourceCategories): array {
                 $sourcesInGroup = $sourceCategories->filter(
-                    fn (Collection $categories, string $source): bool => ($sourceGroups[$source] ?? AnnouncementSourceGroup::Administrative->value) === $group->value
+                    fn (Collection $categories, string $source): bool => AnnouncementSourceGroup::forSource($source) === $group
                 );
 
                 return [$group->value => $sourcesInGroup];

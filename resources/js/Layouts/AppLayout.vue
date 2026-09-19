@@ -68,6 +68,13 @@ const navItems = [
 ]
 
 const moreMenuItems = [
+  // Temporarily hidden from the nav; restore to show the newsletter link again.
+  // {
+  //   href: '/newsletter',
+  //   prefix: '/newsletter',
+  //   label: '浣熊的空大雙週報',
+  //   icon: 'newspaper',
+  // },
   {
     href: '/courses/schedule',
     prefix: '/courses/schedule',

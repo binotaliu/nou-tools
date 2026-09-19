@@ -11,6 +11,7 @@ export default defineConfig({
         'resources/js/app.js',
         'resources/js/leaflet.js',
         'resources/js/echo.js',
+        'resources/css/filament/admin/theme.css',
       ],
       refresh: true,
     }),
