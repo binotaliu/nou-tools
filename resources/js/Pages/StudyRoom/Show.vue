@@ -27,6 +27,7 @@ import TableChair from '../../Components/StudyRoom/TableChair.vue'
 import Wall from '../../Components/StudyRoom/Wall.vue'
 import FloorSkeleton from '../../Components/StudyRoom/FloorSkeleton.vue'
 import useSeatGrid from '../../Composables/useSeatGrid'
+import useStudyRoomMusic from '../../Composables/useStudyRoomMusic'
 import useStudyRoomProfile from '../../Composables/useStudyRoomProfile'
 import usePushSubscription from '../../Composables/usePushSubscription'
 import useStudyRoomSky from '../../Composables/useStudyRoomSky'
@@ -51,6 +52,7 @@ const socket = useStudyRoomSocket(props.clientConfig)
 const grid = useSeatGrid(socket, props.clientConfig)
 const sky = useStudyRoomSky(props.clientConfig)
 const profile = useStudyRoomProfile(props.profile, props.emojiChoices)
+const music = useStudyRoomMusic()
 
 // Only `supported` and `enable` are used. `disable()` would call
 // subscription.unsubscribe(), and a browser holds one subscription that the
@@ -143,6 +145,7 @@ onMounted(async () => {
   timer.initTabIndicators()
   sky.startClock()
   socket.start()
+  music.load()
 
   document.addEventListener('visibilitychange', handleVisibilityChange)
 
@@ -151,7 +154,7 @@ onMounted(async () => {
   // overrides, injecting a realtime delta without a live Echo connection).
   // Exposed unconditionally since browser tests run against a built
   // (production) bundle. Never read by production code.
-  window.__studyRoomTest = { socket, timer, sky, profile, grid }
+  window.__studyRoomTest = { socket, timer, sky, profile, grid, music }
 
   // Separate Vite entry (see resources/js/echo.js) so pages that don't need
   // realtime don't pay for pusher-js/laravel-echo — dynamically imported
@@ -170,6 +173,7 @@ onMounted(async () => {
 onUnmounted(() => {
   sky.stopClock()
   socket.stop()
+  music.dispose()
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 
   if (twemojiObserver) {
@@ -275,6 +279,7 @@ onUnmounted(() => {
         <Wall
           :sky="sky"
           :profile="profile"
+          :music="music"
           :announcement-html="announcementHtml"
           :your-focus-seconds-today="
             socket.state ? socket.state.totals.yourFocusSecondsToday : 0

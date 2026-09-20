@@ -1,15 +1,18 @@
 <script setup>
-// The entrance wall — a window onto the garden scene, a wall clock running
-// on Taipei time, the announcement board, and the viewer's own nameplate
-// (click to edit nickname/emoji, or open the stats modal).
+// The entrance wall — a window onto the garden scene with the cassette
+// player under it, a wall clock running on Taipei time, the announcement
+// board, and the viewer's own nameplate (click to edit nickname/emoji, or
+// open the stats modal).
 import { ref } from 'vue'
 import { ChartBarIcon, PencilIcon } from '@heroicons/vue/24/outline'
+import CassettePlayer from './CassettePlayer.vue'
 import GardenScene from './GardenScene.vue'
 import useMarkdownContainers from '../../Composables/useMarkdownContainers'
 
 const props = defineProps({
   sky: { type: Object, required: true },
   profile: { type: Object, required: true },
+  music: { type: Object, required: true },
   announcementHtml: { type: String, required: true },
   yourFocusSecondsToday: { type: Number, required: true },
 })
@@ -32,10 +35,17 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
       aria-hidden="true"
     ></div>
 
+    <!--
+      Phone: window, then player and clock share a row, then the announcement.
+      sm+: window over the player in the first column, clock beside them, and
+      the announcement spanning both rows. One player instance serves both.
+    -->
     <div
-      class="relative flex flex-col gap-5 p-4 pb-7 sm:flex-row sm:items-start sm:gap-6 sm:p-6 sm:pb-9"
+      class="relative grid grid-cols-[1fr_auto] gap-x-4 gap-y-5 p-4 pb-7 sm:grid-cols-[14rem_auto_1fr] sm:items-start sm:gap-x-6 sm:gap-y-3 sm:p-6 sm:pb-9 md:grid-cols-[16rem_auto_1fr]"
     >
-      <div class="relative shrink-0 sm:w-56 md:w-64">
+      <div
+        class="relative col-span-2 min-w-0 sm:col-span-1 sm:col-start-1 sm:row-start-1"
+      >
         <div
           class="pointer-events-none absolute inset-x-0 top-6 h-32 transition-[background] duration-1000"
           :style="sky.windowLightStyle()"
@@ -70,8 +80,17 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
         </div>
       </div>
 
+      <CassettePlayer
+        v-if="music.available"
+        :music="music"
+        class="self-center sm:col-start-1 sm:row-start-2"
+      />
+
       <div
-        class="flex shrink-0 flex-col items-center gap-1.5 self-center sm:mt-2 sm:self-start"
+        class="flex shrink-0 flex-col items-center gap-1.5 self-center sm:col-start-2 sm:row-start-1 sm:mt-2 sm:self-start"
+        :class="
+          music.available ? '' : 'max-sm:col-span-2 max-sm:justify-self-center'
+        "
         data-testid="study-room-clock"
       >
         <div
@@ -120,7 +139,9 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
         </p>
       </div>
 
-      <div class="flex min-w-0 flex-1 flex-col gap-3">
+      <div
+        class="col-span-2 flex min-w-0 flex-col gap-3 sm:col-span-1 sm:col-start-3 sm:row-span-2 sm:row-start-1"
+      >
         <div
           class="rounded-xl border-2 border-b-4 border-theme-300 bg-theme-200 p-3 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
           data-testid="study-room-announcement"
