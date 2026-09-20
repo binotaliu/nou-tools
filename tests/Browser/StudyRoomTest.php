@@ -88,8 +88,11 @@ it('lets a student remember their schedule, set a profile, take a seat, and star
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
         // Only asserted, never clicked: ticking it asks for notification
-        // permission, which a headless browser answers unpredictably.
+        // permission, which a headless browser answers unpredictably. It must
+        // be enabled, though: the push composable's refs once reached the
+        // form un-unwrapped, leaving it permanently disabled.
         ->assertVisible('[data-testid="study-room-notify-checkbox"]')
+        ->assertEnabled('[data-testid="study-room-notify-checkbox"]')
         ->fill('nickname', '認真讀書中')
         // The radio inputs are visually hidden (sr-only) behind their
         // label, which is what's actually clickable — radio() targets the

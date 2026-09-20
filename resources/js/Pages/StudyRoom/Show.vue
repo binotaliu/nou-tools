@@ -7,7 +7,7 @@
 // session state is fetched from GET /study-room/state on mount and kept in
 // sync via the existing REST endpoints and Echo/Reverb broadcasts — never
 // through an Inertia prop or router.reload().
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, reactive } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import {
   ArrowUpIcon,
@@ -58,10 +58,15 @@ const music = useStudyRoomMusic()
 // subscription.unsubscribe(), and a browser holds one subscription that the
 // class-starting reminders share, so switching study-room notifications off
 // only clears the profile flag.
-const push = usePushSubscription({
-  vapidPublicKey: props.vapidPublicKey,
-  subscribeUrl: '/study-room/push-subscriptions',
-})
+// Wrapped in reactive() because it is handed to PersonalInfoForm as a prop,
+// where a plain object of refs would not be unwrapped (`push.busy` would be
+// an always-truthy Ref).
+const push = reactive(
+  usePushSubscription({
+    vapidPublicKey: props.vapidPublicKey,
+    subscribeUrl: '/study-room/push-subscriptions',
+  })
+)
 const timer = useStudyTimer(
   socket,
   props.clientConfig,
