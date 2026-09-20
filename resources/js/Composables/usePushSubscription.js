@@ -8,7 +8,12 @@ function urlBase64ToUint8Array(base64String) {
   return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)))
 }
 
-// `initial` mirrors { vapidPublicKey, subscribeUrl, unsubscribeUrl }.
+// `initial` mirrors { vapidPublicKey, subscribeUrl, unsubscribeUrl, enabled }.
+//
+// The browser's push subscription is shared by every feature that pushes, so
+// holding one does not mean this feature is on. `enabled` is the server's
+// opt-in for this feature (omit it to fall back to "a subscription exists"),
+// and `unsubscribeUrl` only clears that opt-in: the subscription is kept.
 export default function usePushSubscription(initial) {
   const supported = ref(false)
   const enabled = ref(false)
@@ -26,7 +31,7 @@ export default function usePushSubscription(initial) {
 
     navigator.serviceWorker.ready.then(registration =>
       registration.pushManager.getSubscription().then(subscription => {
-        enabled.value = !!subscription
+        enabled.value = !!subscription && (initial.enabled ?? true)
       })
     )
   })
@@ -77,15 +82,7 @@ export default function usePushSubscription(initial) {
     busy.value = true
 
     try {
-      const registration = await navigator.serviceWorker.ready
-      const subscription = await registration.pushManager.getSubscription()
-
-      if (subscription) {
-        await window.axios.delete(initial.unsubscribeUrl, {
-          data: { endpoint: subscription.endpoint },
-        })
-        await subscription.unsubscribe()
-      }
+      await window.axios.delete(initial.unsubscribeUrl)
 
       enabled.value = false
     } finally {

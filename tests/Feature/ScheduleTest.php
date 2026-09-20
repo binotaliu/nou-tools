@@ -1198,7 +1198,23 @@ it('shows the push notification toggle when the schedule is linked in the cookie
     $response->assertInertia(
         fn (Assert $page) => $page->component('Schedule/Show')
             ->where('isLinkedSchedule', true)
+            ->where('classRemindersEnabled', false)
     );
+});
+
+it('reports whether the schedule has opted into class reminders', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Opted In Schedule',
+    ]);
+    $schedule->notify_on_class_start = true;
+    $schedule->save();
+
+    $this->get(route('schedules.show', $schedule))
+        ->assertInertia(
+            fn (Assert $page) => $page->component('Schedule/Show')
+                ->where('classRemindersEnabled', true)
+        );
 });
 
 it('hides the push notification toggle when no schedule is linked in the cookie', function () {

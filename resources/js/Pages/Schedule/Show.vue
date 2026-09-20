@@ -37,6 +37,10 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  classRemindersEnabled: {
+    type: Boolean,
+    default: false,
+  },
   vapidPublicKey: {
     type: String,
     default: null,
@@ -146,6 +150,7 @@ const push = props.isLinkedSchedule
       vapidPublicKey: props.vapidPublicKey,
       subscribeUrl: `/schedules/${props.viewModel.uuid}/push-subscriptions`,
       unsubscribeUrl: `/schedules/${props.viewModel.uuid}/push-subscriptions`,
+      enabled: props.classRemindersEnabled,
     })
   : null
 

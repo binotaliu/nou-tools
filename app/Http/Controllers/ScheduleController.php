@@ -92,6 +92,7 @@ final class ScheduleController extends Controller
             'viewModel' => $viewModel,
             'shouldPromptRememberSchedule' => $linkedSchedule === null,
             'isLinkedSchedule' => $linkedSchedule?->id === $schedule->id,
+            'classRemindersEnabled' => $schedule->notify_on_class_start,
             'vapidPublicKey' => config('webpush.vapid.public_key'),
             'greeting' => [
                 'semesterLabel' => Str::toSemesterDisplay($currentSemester),
