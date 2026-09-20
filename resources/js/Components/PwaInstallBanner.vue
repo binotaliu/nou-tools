@@ -41,7 +41,7 @@ const { visible, isIos, showDismissedNotice, install, close, optOut } =
             data-testid="pwa-banner-notice"
           >
             好的，之後不會再顯示這個提示。想安裝時，可以到頁面最下方的「安裝 NOU
-            小幫手」查看安裝說明。
+            小幫手」檢視安裝說明。
           </p>
           <p v-else-if="!isIos" class="text-sm leading-6 md:text-base">
             將「NOU 小幫手」安裝到裝置上，即可像一般 App
@@ -60,7 +60,7 @@ const { visible, isIos, showDismissedNotice, install, close, optOut } =
               data-testid="pwa-banner-notice-ok"
               @click="close()"
             >
-              知道了
+              好
             </button>
             <template v-else>
               <button
