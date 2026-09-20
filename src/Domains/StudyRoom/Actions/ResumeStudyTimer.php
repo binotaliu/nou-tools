@@ -48,6 +48,7 @@ final readonly class ResumeStudyTimer
             $seat->timer_ends_at = $seat->timer_ends_at?->addSeconds($pausedSeconds);
             $seat->activity_started_at = $now;
             $seat->paused_at = null;
+            $seat->timer_end_notified_at = null;
             $seat->saveOrFail();
 
             return $seat;

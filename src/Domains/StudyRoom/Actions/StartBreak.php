@@ -76,6 +76,7 @@ final readonly class StartBreak
             $seat->timer_phase = StudyTimerPhase::Break;
             $seat->timer_started_at = $now;
             $seat->timer_ends_at = $now->addMinutes($breakMinutes);
+            $seat->timer_end_notified_at = null;
             $seat->saveOrFail();
 
             return $seat;

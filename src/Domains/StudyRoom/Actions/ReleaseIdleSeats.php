@@ -49,6 +49,7 @@ final readonly class ReleaseIdleSeats
                 $seat->timer_started_at = null;
                 $seat->timer_ends_at = null;
                 $seat->paused_at = null;
+                $seat->timer_end_notified_at = null;
                 $seat->saveOrFail();
             });
 
