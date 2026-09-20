@@ -6,6 +6,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import HeroCarousel from '../../Components/Home/HeroCarousel.vue'
 import Greeting from '../../Components/Greeting.vue'
 import CommonLinks from '../../Components/CommonLinks.vue'
 import SchoolCalendar from '../../Components/SchoolCalendar.vue'
@@ -127,6 +128,8 @@ const courses = computed(() =>
           </p>
         </div>
       </div>
+
+      <HeroCarousel v-if="!viewModel.previousSchedule" />
 
       <Greeting
         :semester-label="greeting.semesterLabel"
