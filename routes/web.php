@@ -45,6 +45,7 @@ use App\Http\Controllers\SchedulePushSubscriptionDestroyController;
 use App\Http\Controllers\SchedulePushSubscriptionStoreController;
 use App\Http\Controllers\ScheduleRememberController;
 use App\Http\Controllers\ScheduleSubscribeController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StudyRoomBreakController;
 use App\Http\Controllers\StudyRoomController;
@@ -81,6 +82,8 @@ Route::get('/alt-uu', AltUuController::class)->name('alt-uu');
 Route::get('/about', AboutController::class)->name('about');
 
 Route::get('/install', PwaInstallController::class)->name('pwa.install');
+
+Route::get('/settings', SettingsController::class)->name('settings');
 
 Route::view('/offline', 'offline')->name('offline');
 

@@ -113,7 +113,8 @@ const moreMenuItems = [
 
 // Installed-PWA bottom tab bar (see BottomNav.vue): the first four primary
 // links become tabs (優惠店家, the fifth, moves into its "更多" sheet along
-// with everything else).
+// with everything else). The header is hidden there, so 設定 (which holds the
+// theme controls the header popover offers) is reachable only from that sheet.
 const bottomTabs = computed(() =>
   navItems.slice(0, 4).map(item => ({ ...item, active: isItemActive(item) }))
 )
@@ -122,6 +123,12 @@ const bottomMoreItems = computed(() =>
     { href: '/', prefix: '/', label: '首頁', icon: 'book-open' },
     ...navItems.slice(4),
     ...moreMenuItems,
+    {
+      href: '/settings',
+      prefix: '/settings',
+      label: '設定',
+      icon: 'cog-6-tooth',
+    },
     {
       href: '/about',
       prefix: '/about',
@@ -145,7 +152,8 @@ const bottomMoreItems = computed(() =>
   </a>
 
   <header
-    class="sticky top-0 z-40 border-b border-theme-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 print:static"
+    data-testid="site-header"
+    class="sticky top-0 z-40 border-b border-theme-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 print:static bottom-nav:hidden"
   >
     <div class="relative mx-auto max-w-7xl px-3 py-2 md:px-6 md:py-4">
       <div class="flex items-center justify-between">

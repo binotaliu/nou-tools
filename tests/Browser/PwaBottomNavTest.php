@@ -84,9 +84,12 @@ it('opens the more sheet from the tab bar and closes it again', function () {
         ->assertSee('浣熊的空大雙週報')
         ->assertSee('關於本站');
 
-    // Let the 150ms leave transition finish before asserting it's gone.
-    $page->click('[data-testid="bottom-nav-backdrop"]')
-        ->wait(0.4)
+    // The sheet covers the middle of the backdrop, where a driver click would
+    // land, so dispatch the click on the backdrop itself. Then let the 150ms
+    // leave transition finish before asserting it's gone.
+    $page->script("document.querySelector('[data-testid=\"bottom-nav-backdrop\"]').click()");
+
+    $page->wait(0.4)
         ->assertMissing('[data-testid="bottom-nav-sheet"]');
 });
 
@@ -233,4 +236,44 @@ it('disables pinch-zoom only in an installed PWA', function () {
     enterPwaMode($page);
 
     expect($page->script('getComputedStyle(document.documentElement).touchAction'))->toBe('pan-x pan-y');
+});
+
+it('hides the header in a phone PWA and links 設定 from the more sheet', function () {
+    $page = visit('/announcements')->resize(...PHONE);
+
+    $page->assertSee('學校公告')->assertVisible('[data-testid="header-menu-toggle"]');
+
+    enterPwaMode($page);
+
+    $page->assertMissing('[data-testid="header-menu-toggle"]')
+        ->assertMissing('[data-testid="site-header"]')
+        ->click('[data-testid="bottom-nav-more"]');
+
+    expect(linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))->toContain('設定');
+
+    $page->click('[data-testid="bottom-nav-sheet"] a[href$="/settings"]')
+        ->waitForEvent('load')
+        ->assertVisible('[data-testid="settings-title"]');
+});
+
+it('keeps the header on a tablet PWA', function () {
+    $page = visit('/announcements')->resize(...TABLET);
+
+    enterPwaMode($page);
+
+    waitForHeaderNav($page)->assertVisible('[data-testid="site-header"]');
+});
+
+it('changes the theme and accent from the settings page', function () {
+    $page = visit('/settings')->resize(...PHONE);
+
+    $page->assertVisible('[data-testid="settings-appearance"]')
+        ->click('[data-testid="settings-appearance"] [role="tab"]:nth-child(3)');
+
+    expect($page->script("document.documentElement.classList.contains('dark')"))->toBeTrue();
+    expect($page->script("localStorage.getItem('theme')"))->toBe('dark');
+
+    $page->click('[data-testid="settings-appearance"] button[aria-label="海藍"]');
+
+    expect($page->script('document.documentElement.dataset.accent'))->toBe('ocean');
 });

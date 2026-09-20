@@ -17,14 +17,15 @@ export const ACCENTS = [
 // that resources/css/app.css matches to override --color-theme-*. The
 // anti-flash-of-wrong-theme inline script in app.blade.php reads the same
 // localStorage key on first paint, so this only needs to keep it in sync
-// after mount.
-export default function useAccentColor() {
-  const accent = ref(
-    (typeof localStorage !== 'undefined' &&
-      localStorage.getItem('accent-color')) ||
-      'warm'
-  )
+// after mount. The ref is module-level so every consumer (the header popover
+// and the 設定 page are mounted together) sees the same selection.
+const accent = ref(
+  (typeof localStorage !== 'undefined' &&
+    localStorage.getItem('accent-color')) ||
+    'warm'
+)
 
+export default function useAccentColor() {
   function apply() {
     document.documentElement.dataset.accent = accent.value
   }
