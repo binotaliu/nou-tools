@@ -31,6 +31,7 @@ use App\Http\Controllers\Markdown\StudyRoomMarkdownController;
 use App\Http\Controllers\MusicPlaylistController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NewsletterFeedController;
+use App\Http\Controllers\PwaInstallController;
 use App\Http\Controllers\PwaManifestController;
 use App\Http\Controllers\ScheduleAnnouncementPreferencesController;
 use App\Http\Controllers\ScheduleCalendarController;
@@ -78,6 +79,8 @@ Route::redirect('/ai.txt', '/llms.txt', 301);
 Route::get('/alt-uu', AltUuController::class)->name('alt-uu');
 
 Route::get('/about', AboutController::class)->name('about');
+
+Route::get('/install', PwaInstallController::class)->name('pwa.install');
 
 Route::view('/offline', 'offline')->name('offline');
 
