@@ -53,6 +53,7 @@ use App\Http\Controllers\StudyRoomHeartbeatController;
 use App\Http\Controllers\StudyRoomNextRoundController;
 use App\Http\Controllers\StudyRoomPauseController;
 use App\Http\Controllers\StudyRoomProfileController;
+use App\Http\Controllers\StudyRoomPushSubscriptionController;
 use App\Http\Controllers\StudyRoomResumeController;
 use App\Http\Controllers\StudyRoomSeatController;
 use App\Http\Controllers\StudyRoomSessionController;
@@ -169,6 +170,7 @@ Route::prefix('study-room')->name('study-room.')->group(function (): void {
     Route::post('/timer/next', StudyRoomNextRoundController::class)->name('timer.next')->middleware('throttle:60,1');
     Route::post('/timer/pause', StudyRoomPauseController::class)->name('timer.pause')->middleware('throttle:60,1');
     Route::post('/timer/resume', StudyRoomResumeController::class)->name('timer.resume')->middleware('throttle:60,1');
+    Route::post('/push-subscriptions', StudyRoomPushSubscriptionController::class)->name('push-subscriptions.store')->middleware('throttle:10,1');
     Route::post('/heartbeat', StudyRoomHeartbeatController::class)->name('heartbeat')->middleware('throttle:60,1');
 });
 
