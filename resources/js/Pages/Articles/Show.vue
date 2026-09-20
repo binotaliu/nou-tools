@@ -1,16 +1,16 @@
 <script setup>
-// The share button and modal are driven by the `useArticleShare`
-// composable. `viewModel.article.type` only survives
+// The share button and modal are the shared ShareButton component
+// (driven by `useArticleShare`). `viewModel.article.type` only survives
 // Inertia's JSON serialization as the enum's string value (`kb` / `manual`),
 // so `App\Enums\ArticleType::label()` is re-implemented here from that
 // value. `viewModel.article.content` / `viewModel.sidebarContent` are plain
 // HTML (rendered Markdown) straight from the ViewModel, rendered with
 // v-html.
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
-import useArticleShare from '../../Composables/useArticleShare'
+import ShareButton from '../../Components/ShareButton.vue'
 import useMarkdownContainers from '../../Composables/useMarkdownContainers'
 
 const props = defineProps({
@@ -50,25 +50,6 @@ function formatDate(value) {
 
   return `${date.getFullYear()} 年 ${String(date.getMonth() + 1).padStart(2, '0')} 月 ${String(date.getDate()).padStart(2, '0')} 日`
 }
-
-const shareInput = ref(null)
-
-const { showShareModal, copied, shareUrl, share, copy } = useArticleShare(
-  {
-    shareTitle: props.viewModel.article.title,
-    shareUrl: currentUrl.value,
-  },
-  shareInput
-)
-
-function handleEscape(event) {
-  if (event.key === 'Escape') {
-    showShareModal.value = false
-  }
-}
-
-onMounted(() => window.addEventListener('keydown', handleEscape))
-onUnmounted(() => window.removeEventListener('keydown', handleEscape))
 
 // Two separate v-html roots, hydrated independently — the sidebar is
 // _sidebar.md and can carry the same containers the body can.
@@ -135,15 +116,13 @@ useMarkdownContainers(sidebarContentRoot, [
                   {{ viewModel.article.title }}
                 </h1>
 
-                <button
-                  type="button"
-                  class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-theme-200 bg-white px-3 py-1 text-sm font-semibold text-theme-900 transition hover:bg-theme-50 disabled:border-theme-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:disabled:border-zinc-800"
-                  data-testid="article-share-button"
-                  @click="share()"
-                >
-                  <Icon name="share" class="size-4" />
-                  分享
-                </button>
+                <ShareButton
+                  :title="viewModel.article.title"
+                  :url="currentUrl"
+                  dialog-title="分享這篇文章"
+                  input-label="文章連結"
+                  test-id-prefix="article-share"
+                />
               </div>
 
               <div
@@ -157,77 +136,6 @@ useMarkdownContainers(sidebarContentRoot, [
                   更新於：{{ formatDate(viewModel.article.updatedAt) }}
                 </span>
               </div>
-
-              <Teleport to="body">
-                <div
-                  v-if="showShareModal"
-                  class="fixed inset-0 z-50 flex items-start justify-center p-4 sm:items-center sm:p-0"
-                >
-                  <div
-                    class="fixed inset-0 bg-black/40"
-                    aria-hidden="true"
-                    @click="showShareModal = false"
-                  ></div>
-
-                  <div
-                    role="dialog"
-                    aria-modal="true"
-                    data-testid="article-share-modal"
-                    class="relative max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-lg bg-white p-6 shadow-lg sm:max-h-[calc(100vh-2rem)] dark:bg-zinc-900"
-                    @click.self="showShareModal = false"
-                  >
-                    <h3
-                      class="mb-2 text-lg font-semibold text-theme-900 dark:text-zinc-100"
-                    >
-                      分享這篇文章
-                    </h3>
-
-                    <div
-                      class="flex items-stretch gap-3 rounded border border-theme-300 bg-white text-sm text-theme-600 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
-                    >
-                      <input
-                        ref="shareInput"
-                        class="flex-1 px-3 py-2 font-mono break-all text-theme-600 dark:text-zinc-400"
-                        :value="shareUrl"
-                        readonly
-                        aria-label="文章連結"
-                        @click="$event.target.select()"
-                      />
-
-                      <button
-                        type="button"
-                        class="my-1 mr-1 inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-theme-200 bg-theme-200 px-3 py-1 text-sm font-semibold whitespace-nowrap text-theme-900 transition hover:bg-theme-300 disabled:bg-theme-100 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600 dark:disabled:bg-zinc-900"
-                        :aria-pressed="copied.toString()"
-                        data-testid="article-share-copy"
-                        @click="copy()"
-                      >
-                        <span v-show="!copied">
-                          <Icon
-                            name="clipboard-document"
-                            class="inline size-4"
-                          />
-                          複製連結
-                        </span>
-                        <span v-show="copied">
-                          <Icon name="check" class="inline size-4" />
-                          已複製！
-                        </span>
-                      </button>
-                    </div>
-
-                    <div class="mt-4 flex justify-end">
-                      <button
-                        type="button"
-                        class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 text-sm font-semibold text-theme-900 transition hover:bg-theme-50 disabled:border-theme-200 disabled:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:disabled:border-zinc-700 dark:disabled:bg-zinc-950"
-                        data-testid="article-share-close"
-                        @click="showShareModal = false"
-                      >
-                        關閉
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Teleport>
             </header>
 
             <!-- Article Content -->

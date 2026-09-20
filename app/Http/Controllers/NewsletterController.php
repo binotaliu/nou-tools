@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\NewsletterIssue;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -20,9 +21,9 @@ final class NewsletterController extends Controller
         ]);
     }
 
-    public function show(string $issueKey, ShowNewsletterIssuePage $showNewsletterIssuePage): Response
+    public function show(string $issueKey, Request $request, ShowNewsletterIssuePage $showNewsletterIssuePage): Response
     {
-        $page = $showNewsletterIssuePage($issueKey, includeUnpublished: Gate::allows('viewAny', NewsletterIssue::class));
+        $page = $showNewsletterIssuePage($issueKey, $request->session(), includeUnpublished: Gate::allows('viewAny', NewsletterIssue::class));
 
         abort_if($page === null, 404);
 

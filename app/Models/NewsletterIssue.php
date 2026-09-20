@@ -110,6 +110,14 @@ final class NewsletterIssue extends Model
     }
 
     /**
+     * @return HasMany<NewsletterReaction, $this>
+     */
+    public function reactions(): HasMany
+    {
+        return $this->hasMany(NewsletterReaction::class);
+    }
+
+    /**
      * @return HasMany<NewsletterColumn, $this>
      */
     public function columns(): HasMany

@@ -8,8 +8,10 @@ import { computed, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import ShareButton from '../../Components/ShareButton.vue'
 import HighlightsCalendar from '../../Components/Newsletter/HighlightsCalendar.vue'
 import useMarkdownContainers from '../../Composables/useMarkdownContainers'
+import useNewsletterReactions from '../../Composables/useNewsletterReactions'
 import {
   formatNewsletterDate,
   formatNewsletterDateRange,
@@ -40,6 +42,13 @@ const centerGroups = computed(() => {
 
   return [...groups.values()]
 })
+
+const {
+  options: reactionOptions,
+  mine: myReaction,
+  pending: reactionPending,
+  react,
+} = useNewsletterReactions(() => props.viewModel)
 
 const contentRoot = ref(null)
 
@@ -109,6 +118,25 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
           <Icon name="eye" class="size-4" />
           預覽：{{ issue.statusLabel }}，尚未公開
         </p>
+        <div
+          v-else
+          class="flex items-center justify-between gap-4 pt-1 text-sm text-theme-600 dark:text-zinc-400"
+        >
+          <span
+            class="inline-flex items-center gap-1"
+            data-testid="newsletter-view-count"
+          >
+            <Icon name="eye" class="size-4" />
+            {{ viewModel.viewCount.toLocaleString() }} 次瀏覽
+          </span>
+          <ShareButton
+            :title="issue.title"
+            :url="viewModel.shareUrl"
+            dialog-title="分享這期雙週報"
+            input-label="雙週報連結"
+            test-id-prefix="newsletter-share"
+          />
+        </div>
       </header>
 
       <div
@@ -354,8 +382,60 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         </section>
       </div>
 
+      <section
+        v-if="issue.isPublished"
+        class="mt-10 border-t border-theme-200 pt-6 text-center dark:border-zinc-700"
+        aria-labelledby="newsletter-reactions"
+        data-testid="newsletter-reactions"
+      >
+        <h2
+          id="newsletter-reactions"
+          class="mb-3 text-base font-semibold text-theme-800 dark:text-zinc-200"
+        >
+          這期雙週報，你覺得怎麼樣？
+        </h2>
+        <div class="flex flex-wrap justify-center gap-2">
+          <button
+            v-for="option in reactionOptions"
+            :key="option.key"
+            type="button"
+            class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition disabled:opacity-60"
+            :class="
+              myReaction === option.key
+                ? 'border-theme-500 bg-theme-100 font-semibold text-theme-900 dark:border-theme-400 dark:bg-theme-900/50 dark:text-zinc-100'
+                : 'border-theme-200 bg-white text-theme-700 hover:bg-theme-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800'
+            "
+            :aria-pressed="myReaction === option.key"
+            :disabled="reactionPending"
+            :data-testid="`newsletter-reaction-${option.key}`"
+            @click="react(option.key)"
+          >
+            <span aria-hidden="true">{{ option.emoji }}</span>
+            {{ option.label }}
+            <span
+              class="tabular-nums"
+              data-testid="newsletter-reaction-count"
+              >{{ option.count }}</span
+            >
+          </button>
+        </div>
+        <div class="mt-4 flex items-center justify-center gap-3">
+          <span class="text-sm text-theme-600 dark:text-zinc-400">
+            覺得有用？分享給同學吧
+          </span>
+          <ShareButton
+            :title="issue.title"
+            :url="viewModel.shareUrl"
+            dialog-title="分享這期雙週報"
+            input-label="雙週報連結"
+            test-id-prefix="newsletter-share-end"
+          />
+        </div>
+      </section>
+
       <footer
-        class="mt-10 flex flex-col gap-3 border-t border-theme-200 pt-6 text-sm sm:flex-row sm:justify-between dark:border-zinc-700"
+        v-if="viewModel.previousIssue || viewModel.nextIssue"
+        class="mt-6 flex flex-col gap-3 border-t border-theme-200 pt-6 text-sm sm:flex-row sm:justify-between dark:border-zinc-700"
       >
         <Link
           v-if="viewModel.previousIssue"
@@ -375,6 +455,32 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
           <Icon name="chevron-right" class="size-4" />
         </Link>
       </footer>
+
+      <!-- License Footer -->
+      <div
+        class="mt-8 flex items-start gap-3 border-t border-theme-200 pt-6 text-sm text-theme-600 dark:border-zinc-700 dark:text-zinc-400"
+        data-testid="newsletter-license"
+      >
+        <Icon name="information-circle" class="mt-0.5 size-5 shrink-0" />
+        <div class="space-y-1">
+          <p>
+            本期雙週報的原創內容（前言、專欄及編輯撰寫的摘要）採用
+            <a
+              href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-theme-700 underline transition hover:text-theme-900 hover:no-underline dark:text-zinc-300 dark:hover:text-zinc-100"
+            >
+              創用 CC 姓名標示─非商業性─相同方式分享 4.0 國際版授權條款 (CC
+              BY-NC-SA 4.0)
+            </a>
+            釋出。
+          </p>
+          <p>
+            所引用的各單位公告與連結內容、封面照片，著作權仍屬原作者或原發布單位，不適用前述授權。
+          </p>
+        </div>
+      </div>
     </article>
   </AppLayout>
 </template>

@@ -31,6 +31,7 @@ use App\Http\Controllers\Markdown\StudyRoomMarkdownController;
 use App\Http\Controllers\MusicPlaylistController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NewsletterFeedController;
+use App\Http\Controllers\NewsletterReactionController;
 use App\Http\Controllers\PwaInstallController;
 use App\Http\Controllers\PwaManifestController;
 use App\Http\Controllers\ScheduleAnnouncementPreferencesController;
@@ -100,6 +101,9 @@ Route::get('/newsletter/feed.xml', NewsletterFeedController::class)->name('newsl
 Route::get('/newsletter/{issueKey}', [NewsletterController::class, 'show'])->name('newsletter.show')
     ->withMarkdown(NewsletterShowMarkdownController::class)
     ->where('issueKey', '\d{4}-W\d{2}');
+Route::put('/newsletter/{issueKey}/reaction', NewsletterReactionController::class)->name('newsletter.reaction.update')
+    ->where('issueKey', '\d{4}-W\d{2}')
+    ->middleware('throttle:30,1');
 
 Route::get('/directory', [DirectoryController::class, 'index'])->name('directory.index')
     ->withMarkdown(DirectoryIndexMarkdownController::class);

@@ -123,3 +123,79 @@ it('hydrates markdown containers inside columns', function () {
         ->assertChecked($firstCheckbox)
         ->assertDataAttribute($firstItem, 'checked', 'true');
 });
+
+it('shows how many sessions have opened the issue', function () {
+    visit('/newsletter/2026-W39')
+        ->assertNoJavaScriptErrors()
+        ->assertSeeIn('[data-testid="newsletter-view-count"]', '1 次瀏覽');
+});
+
+it('falls back to a copy-link dialog when the browser cannot share', function () {
+    $page = visit('/newsletter/2026-W39');
+
+    // Some desktop browsers ship navigator.share; the dialog is the fallback.
+    $page->script('Object.defineProperty(navigator, "share", { value: undefined, configurable: true })');
+
+    $page->click('[data-testid="newsletter-share-button"]')
+        ->assertPresent('[data-testid="newsletter-share-modal"]')
+        ->assertValue('[data-testid="newsletter-share-modal"] input', url('/newsletter/2026-W39'))
+        ->click('[data-testid="newsletter-share-close"]')
+        ->assertNotPresent('[data-testid="newsletter-share-modal"]');
+});
+
+it('offers the same share button again at the end of the issue', function () {
+    $page = visit('/newsletter/2026-W39');
+
+    $page->script('Object.defineProperty(navigator, "share", { value: undefined, configurable: true })');
+
+    $page->click('[data-testid="newsletter-share-end-button"]')
+        ->assertValue('[data-testid="newsletter-share-end-modal"] input', url('/newsletter/2026-W39'))
+        ->click('[data-testid="newsletter-share-end-close"]')
+        ->assertNotPresent('[data-testid="newsletter-share-end-modal"]');
+});
+
+it('lets a reader react, switch and withdraw a reaction', function () {
+    $count = fn (string $key): string => "[data-testid=\"newsletter-reaction-{$key}\"] [data-testid=\"newsletter-reaction-count\"]";
+
+    $page = visit('/newsletter/2026-W39')
+        ->assertNoJavaScriptErrors()
+        ->assertSeeIn($count('like'), '0')
+        ->click('[data-testid="newsletter-reaction-like"]')
+        ->assertSeeIn($count('like'), '1')
+        ->assertAttribute('[data-testid="newsletter-reaction-like"]', 'aria-pressed', 'true')
+        ->click('[data-testid="newsletter-reaction-love"]')
+        ->assertSeeIn($count('like'), '0')
+        ->assertSeeIn($count('love'), '1')
+        ->assertAttribute('[data-testid="newsletter-reaction-love"]', 'aria-pressed', 'true');
+
+    // The choice survives a reload because it belongs to the session.
+    $page->refresh()
+        ->assertSeeIn($count('love'), '1')
+        ->assertAttribute('[data-testid="newsletter-reaction-love"]', 'aria-pressed', 'true')
+        ->click('[data-testid="newsletter-reaction-love"]')
+        ->assertSeeIn($count('love'), '0')
+        ->assertAttribute('[data-testid="newsletter-reaction-love"]', 'aria-pressed', 'false');
+});
+
+it('licenses only the original content under CC BY-NC-SA', function () {
+    visit('/newsletter/2026-W39')
+        ->assertNoJavaScriptErrors()
+        ->assertSeeIn('[data-testid="newsletter-license"]', 'CC BY-NC-SA 4.0')
+        ->assertSeeIn('[data-testid="newsletter-license"]', '原創內容')
+        ->assertSeeIn('[data-testid="newsletter-license"]', '不適用前述授權')
+        ->assertAttribute('[data-testid="newsletter-license"] a', 'href', 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hant');
+});
+
+it('draws no empty navigation bar above the license on a lone issue', function () {
+    visit('/newsletter/2026-W39')
+        ->assertNotPresent('article > footer')
+        ->assertPresent('[data-testid="newsletter-license"]');
+});
+
+it('keeps the previous and next links when neighbouring issues exist', function () {
+    NewsletterIssue::factory()->publishingOn('2026-10-05')->published()->create();
+
+    visit('/newsletter/2026-W39')
+        ->assertPresent('article > footer')
+        ->assertPresent('[data-testid="newsletter-license"]');
+});
