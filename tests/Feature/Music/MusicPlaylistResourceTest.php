@@ -126,3 +126,27 @@ it('deletes a playlist but keeps its tracks', function () {
 
     expect(MusicPlaylist::count())->toBe(0)->and(MusicTrack::count())->toBe(1);
 });
+
+it('adds several tracks at once, after the existing ones', function () {
+    $playlist = MusicPlaylist::factory()->create();
+    [$existing, $second, $third, $fourth] = MusicTrack::factory()->count(4)->create()->all();
+    MusicPlaylistItem::factory()->for($playlist, 'playlist')->for($existing, 'track')->create(['position' => 0]);
+
+    Livewire::test(EditMusicPlaylist::class, ['record' => $playlist->getRouteKey()])
+        ->callAction(TestAction::make('addMultipleTracks')->schemaComponent('tracks'), ['track_ids' => [$third->id, $second->id]])
+        ->assertHasNoActionErrors()
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($playlist->refresh()->tracks->pluck('id')->all())->toBe([$existing->id, $third->id, $second->id]);
+});
+
+it('does not offer tracks already in the playlist when adding several', function () {
+    $playlist = MusicPlaylist::factory()->create();
+    [$existing, $other] = MusicTrack::factory()->count(2)->create()->all();
+    MusicPlaylistItem::factory()->for($playlist, 'playlist')->for($existing, 'track')->create(['position' => 0]);
+
+    Livewire::test(EditMusicPlaylist::class, ['record' => $playlist->getRouteKey()])
+        ->mountAction(TestAction::make('addMultipleTracks')->schemaComponent('tracks'))
+        ->assertSchemaComponentExists('track_ids', 'mountedActionSchema0', fn ($select) => array_keys($select->getOptions()) === [$other->id]);
+});

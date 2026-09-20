@@ -6,13 +6,18 @@ namespace App\Filament\Resources\MusicPlaylists\Schemas;
 
 use App\Models\MusicPlaylist;
 use App\Models\MusicTrack;
+use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
+use Livewire\Component;
 
 class MusicPlaylistForm
 {
@@ -47,7 +52,9 @@ class MusicPlaylistForm
                     ->columnSpanFull(),
 
                 Section::make('曲目')
+                    ->key('tracks')
                     ->description('依序播放，可拖曳調整順序。同一首曲目在一個清單中只能出現一次。')
+                    ->headerActions([self::addMultipleTracksAction()])
                     ->schema([
                         Repeater::make('items')
                             ->hiddenLabel()
@@ -72,5 +79,57 @@ class MusicPlaylistForm
                     ])
                     ->columnSpanFull(),
             ]);
+    }
+
+    private static function addMultipleTracksAction(): Action
+    {
+        return Action::make('addMultipleTracks')
+            ->label('批次加入曲目')
+            ->icon('heroicon-o-queue-list')
+            ->color('gray')
+            ->modalHeading('批次加入曲目')
+            ->modalSubmitActionLabel('加入')
+            ->schema([
+                Select::make('track_ids')
+                    ->label('曲目')
+                    ->helperText('已在清單中的曲目不會顯示。選取的曲目會依選取順序接在清單最後。')
+                    ->multiple()
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->options(fn (Component $livewire): array => self::availableTrackOptions(self::selectedTrackIds($livewire->data['items'] ?? []))),
+            ])
+            ->action(function (array $data, Get $get, Set $set): void {
+                $items = $get('items') ?? [];
+
+                foreach ($data['track_ids'] as $trackId) {
+                    $items[(string) Str::uuid()] = ['music_track_id' => $trackId];
+                }
+
+                $set('items', $items);
+            });
+    }
+
+    /**
+     * @param  array<array-key, array{music_track_id?: int|string|null}>|null  $items
+     * @return list<int|string>
+     */
+    private static function selectedTrackIds(?array $items): array
+    {
+        return collect($items ?? [])->pluck('music_track_id')->filter()->values()->all();
+    }
+
+    /**
+     * @param  list<int|string>  $excludedIds
+     * @return array<int, string>
+     */
+    private static function availableTrackOptions(array $excludedIds): array
+    {
+        return MusicTrack::query()
+            ->whereNotIn('id', $excludedIds)
+            ->orderBy('title')
+            ->get()
+            ->mapWithKeys(fn (MusicTrack $track): array => [$track->id => "{$track->title}｜{$track->author}"])
+            ->all();
     }
 }
