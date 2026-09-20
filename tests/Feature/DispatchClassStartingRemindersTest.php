@@ -25,6 +25,9 @@ function subscribedStudentSchedule(CourseClass $courseClass, string $endpoint = 
         'name' => '提醒測試',
     ]);
 
+    $schedule->notify_on_class_start = true;
+    $schedule->save();
+
     StudentScheduleItem::create([
         'student_schedule_id' => $schedule->id,
         'course_id' => $courseClass->course_id,
@@ -110,6 +113,26 @@ it('does not send a reminder for a class without a video link', function () {
 
     expect($sentCount)->toBe(0);
     $this->assertDatabaseCount('class_schedule_reminders', 0);
+});
+
+it('does not send a reminder to a schedule that has a subscription but has not opted in', function () {
+    $courseClass = CourseClass::factory()->create(['link' => 'https://meet.example.com/abc']);
+    $schedule = subscribedStudentSchedule($courseClass);
+    $schedule->notify_on_class_start = false;
+    $schedule->save();
+
+    ClassSchedule::factory()->create([
+        'class_id' => $courseClass->id,
+        'date' => today('Asia/Taipei'),
+        'start_time' => '10:00',
+    ]);
+
+    $sentCount = app(DispatchClassStartingReminders::class)();
+
+    expect($sentCount)->toBe(0);
+    $this->assertDatabaseCount('class_schedule_reminders', 0);
+    $this->assertDatabaseCount('push_notification_deliveries', 0);
+    Http::assertNothingSent();
 });
 
 it('does not send a reminder for a class outside the ten minute window', function () {

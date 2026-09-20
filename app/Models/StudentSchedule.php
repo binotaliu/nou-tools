@@ -77,6 +77,7 @@ final class StudentSchedule extends Model
         'custom_links' => 'json',
         'announcement_categories' => 'json',
         'last_calendar_sync_at' => 'datetime',
+        'notify_on_class_start' => 'boolean',
     ];
 
     /**

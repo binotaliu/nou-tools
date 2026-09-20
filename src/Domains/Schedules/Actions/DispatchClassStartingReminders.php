@@ -46,6 +46,7 @@ final class DispatchClassStartingReminders
 
             $subscribedSchedules = StudentSchedule::query()
                 ->whereHas('items', fn ($query) => $query->where('course_class_id', $classSchedule->class_id))
+                ->where('notify_on_class_start', true)
                 ->whereHas('pushSubscriptions')
                 ->get();
 
