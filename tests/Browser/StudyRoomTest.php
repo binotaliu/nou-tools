@@ -279,7 +279,7 @@ it('lets a student tune their pomodoro cycle and walks them through break and ne
         ->wait(1)
         ->assertSeeIn('[data-testid="study-room-timer-phase"]', '休息一下')
         ->assertVisible('[data-testid="study-room-next-round"]')
-        ->assertSeeIn('[data-testid="study-room-next-round"]', '第 2 輪');
+        ->assertSeeIn('[data-testid="study-room-next-round"]', '跳過休息');
 
     // Cutting the break short goes straight into round 2.
     $page->click('[data-testid="study-room-next-round"]')
@@ -293,7 +293,7 @@ it('lets a student tune their pomodoro cycle and walks them through break and ne
     $seat->update(['timer_ends_at' => now()->subSecond()]);
     $page->script($component.'.refresh()');
     $page->wait(1)
-        ->assertSeeIn('[data-testid="study-room-start-break"]', '開始長休息')
+        ->assertSeeIn('[data-testid="study-room-start-break"]', '開始休息')
         ->click('[data-testid="study-room-start-break"]')
         ->wait(1)
         ->assertSeeIn('[data-testid="study-room-timer-phase"]', '長休息');

@@ -461,15 +461,11 @@ export default function useStudyTimer(
   }
 
   function startBreakLabel() {
-    const label = isLongBreakRound() ? '長休息' : '休息'
-
-    return (isFocusFinished() ? '開始' : '跳過專注，開始') + label
+    return isFocusFinished() ? '開始休息' : '立即開始休息'
   }
 
   function nextRoundLabel() {
-    const next = currentRound() + 1
-
-    return (isBreakFinished() ? '開始第 ' : '跳過休息，開始第 ') + next + ' 輪'
+    return isBreakFinished() ? '開始專注' : '跳過休息'
   }
 
   function cycleDots() {

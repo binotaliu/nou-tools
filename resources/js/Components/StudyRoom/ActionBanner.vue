@@ -248,18 +248,22 @@ defineProps({
                           :class="timer.cycleDotClass(dot)"
                         ></span>
                       </span>
-                      <span data-testid="study-room-round-label">{{
-                        timer.roundLabel()
-                      }}</span>
+                      <span
+                        data-testid="study-room-round-label"
+                        class="truncate"
+                        >{{ timer.roundLabel() }}</span
+                      >
                       <span aria-hidden="true">·</span>
-                      <span>{{ timer.timerEndsAtLabel() }}</span>
+                      <span class="truncate">{{
+                        timer.timerEndsAtLabel()
+                      }}</span>
                     </div>
                   </div>
                 </div>
 
                 <div class="text-center lg:px-4">
                   <p
-                    class="font-mono text-5xl leading-none font-bold text-theme-900 tabular-nums sm:text-6xl dark:text-zinc-100"
+                    class="text-5xl leading-none font-bold text-theme-900 tabular-nums sm:text-6xl dark:text-zinc-100"
                     data-testid="study-room-your-countdown"
                   >
                     {{ timer.myRemainingLabel() }}
