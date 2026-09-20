@@ -17,9 +17,9 @@ return new class extends Migration
      * class reminders. `notify_on_class_start` is the reminders' own opt-in,
      * the counterpart of `study_room_profiles.notify_on_timer_end`.
      *
-     * Existing subscribers keep their reminders, except schedules that have
-     * already opted into the study-room notification: that shipped the same
-     * day, so their subscription most likely came from the study room.
+     * Every existing subscriber keeps their reminders: until now a
+     * subscription could only have come from the schedule page's toggle,
+     * because the study-room notification has not been deployed yet.
      */
     public function up(): void
     {
@@ -35,11 +35,6 @@ return new class extends Migration
                 ->from($subscriptionTable)
                 ->where("{$subscriptionTable}.subscribable_type", 'App\Models\StudentSchedule')
                 ->whereColumn("{$subscriptionTable}.subscribable_id", 'student_schedules.id'))
-            ->whereNotExists(fn ($query) => $query
-                ->select(DB::raw(1))
-                ->from('study_room_profiles')
-                ->whereColumn('study_room_profiles.student_schedule_id', 'student_schedules.id')
-                ->where('study_room_profiles.notify_on_timer_end', true))
             ->update(['notify_on_class_start' => true]);
     }
 
