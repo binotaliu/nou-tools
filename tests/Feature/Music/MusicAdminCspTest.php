@@ -69,3 +69,7 @@ it('adds no music origins to the admin CSP while files are stored locally', func
     expect($directives['connect-src'])->not->toContain('amazonaws.com')
         ->and($directives['img-src'])->not->toContain('example-cdn.net');
 });
+
+it('lets the admin panel play a just-picked audio file from its blob: preview', function () {
+    expect(adminCspDirectives()['media-src'])->toContain('blob:');
+});

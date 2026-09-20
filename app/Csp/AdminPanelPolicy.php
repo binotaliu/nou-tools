@@ -37,7 +37,7 @@ final class AdminPanelPolicy implements Preset
             ->add(Directive::FONT, Keyword::SELF)
             ->add(Directive::FORM_ACTION, Keyword::SELF)
             ->add(Directive::FRAME, Keyword::SELF)
-            ->add(Directive::MEDIA, Keyword::SELF)
+            ->add(Directive::MEDIA, [Keyword::SELF, 'blob:'])
             ->add(Directive::OBJECT, Keyword::NONE)
             ->add(Directive::SCRIPT, [Keyword::SELF, Keyword::UNSAFE_EVAL, Keyword::UNSAFE_INLINE, 'blob:'])
             ->add(Directive::STYLE, [Keyword::SELF, Keyword::UNSAFE_INLINE])
