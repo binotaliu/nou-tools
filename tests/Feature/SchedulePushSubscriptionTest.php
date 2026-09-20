@@ -28,6 +28,7 @@ it('subscribes a schedule to push notifications', function () {
         'public_key' => 'p256dh-key',
         'auth_token' => 'auth-token',
     ]);
+    expect($schedule->fresh()->notify_on_class_start)->toBeTrue();
 });
 
 it('rejects an invalid push subscription payload', function () {
@@ -48,11 +49,13 @@ it('rejects an invalid push subscription payload', function () {
         ->assertJsonValidationErrors(['keys.auth']);
 });
 
-it('unsubscribes a schedule from push notifications', function () {
+it('turns class reminders off without removing the browser subscription', function () {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
         'name' => '推播測試',
     ]);
+    $schedule->notify_on_class_start = true;
+    $schedule->save();
 
     $schedule->updatePushSubscription(
         endpoint: 'https://fcm.googleapis.com/fcm/send/abc123',
@@ -60,13 +63,12 @@ it('unsubscribes a schedule from push notifications', function () {
         token: 'auth-token',
     );
 
-    $this->deleteJson(route('schedules.push-subscriptions.destroy', $schedule), [
-        'endpoint' => 'https://fcm.googleapis.com/fcm/send/abc123',
-    ])
+    $this->deleteJson(route('schedules.push-subscriptions.destroy', $schedule))
         ->assertStatus(200)
         ->assertJson(['success' => true]);
 
-    $this->assertDatabaseMissing('push_subscriptions', [
+    expect($schedule->fresh()->notify_on_class_start)->toBeFalse();
+    $this->assertDatabaseHas('push_subscriptions', [
         'endpoint' => 'https://fcm.googleapis.com/fcm/send/abc123',
     ]);
 });

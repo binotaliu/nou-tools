@@ -32,6 +32,20 @@ it('subscribes the viewer resolved from the study room cookie', function () {
     ]);
 });
 
+it('does not opt the viewer into class reminders by subscribing for the study room', function () {
+    $schedule = StudentSchedule::factory()->create();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyRoomPushCookie($schedule))
+        ->postJson(route('study-room.push-subscriptions.store'), [
+            'endpoint' => 'https://fcm.googleapis.com/fcm/send/study-room-4',
+            'keys' => ['p256dh' => 'p256dh-key', 'auth' => 'auth-token'],
+        ])
+        ->assertOk();
+
+    expect($schedule->fresh()->notify_on_class_start)->toBeFalse();
+});
+
 it('rejects a visitor without a study room cookie', function () {
     $this->postJson(route('study-room.push-subscriptions.store'), [
         'endpoint' => 'https://fcm.googleapis.com/fcm/send/study-room-2',

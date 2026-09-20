@@ -6,14 +6,13 @@ namespace App\Http\Controllers;
 
 use App\Models\StudentSchedule;
 use Illuminate\Http\JsonResponse;
-use NouTools\Domains\Schedules\Actions\UnsubscribeScheduleFromPush;
-use NouTools\Domains\Schedules\DataTransferObjects\PushUnsubscribeData;
+use NouTools\Domains\Schedules\Actions\DisableClassStartingReminders;
 
 final class SchedulePushSubscriptionDestroyController extends Controller
 {
-    public function __invoke(StudentSchedule $schedule, PushUnsubscribeData $input, UnsubscribeScheduleFromPush $unsubscribeScheduleFromPush): JsonResponse
+    public function __invoke(StudentSchedule $schedule, DisableClassStartingReminders $disableClassStartingReminders): JsonResponse
     {
-        $unsubscribeScheduleFromPush($schedule, $input);
+        $disableClassStartingReminders($schedule);
 
         return response()->json(['success' => true]);
     }
