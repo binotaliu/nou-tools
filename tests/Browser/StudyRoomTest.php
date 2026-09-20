@@ -396,11 +396,76 @@ it('opens a fullscreen focus mode over the sky and leaves it when the timer stop
         ->assertVisible('[data-testid="study-room-focus-stop-timer"]')
         ->screenshot(filename: 'study-room-focus-mode-mobile');
 
+    // Everything in focus mode sits on screen, and the countdown and buttons
+    // stay clear of the window above them.
+    $layout = $page->script(<<<'JS'
+        (() => {
+            const rect = (id) => document
+                .querySelector(`[data-testid="${id}"]`)
+                .getBoundingClientRect();
+            const window = rect('study-room-focus-window');
+            const stop = rect('study-room-focus-stop-timer');
+
+            return {
+                countdownTop: rect('study-room-focus-countdown').top,
+                windowBottom: window.bottom,
+                stopBottom: stop.bottom,
+                stopRight: stop.right,
+                viewportHeight: innerHeight,
+                viewportWidth: innerWidth,
+            };
+        })()
+        JS);
+
+    expect($layout['countdownTop'])->toBeGreaterThan($layout['windowBottom']);
+    expect($layout['stopBottom'])->toBeLessThan($layout['viewportHeight']);
+    expect($layout['stopRight'])->toBeLessThanOrEqual($layout['viewportWidth']);
+
     // Stopping the timer from inside focus mode closes it as well.
     $page->click('[data-testid="study-room-focus-stop-timer"]')
         ->wait(1)
         ->assertMissing('[data-testid="study-room-focus-mode"]')
         ->assertVisible('[data-testid="study-room-timer-form"]');
+});
+
+it('minimizes the action banner to a slim bar and expands it again', function () {
+    $schedule = createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->waitForEvent('load');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]')
+        ->wait(1);
+
+    $page->assertVisible('[data-testid="study-room-root"]')
+        ->click('[data-testid="seat-1-S01"]')
+        ->wait(1)
+        ->assertVisible('[data-testid="study-room-timer-form"]')
+        ->assertMissing('[data-testid="study-room-banner-expand"]')
+        ->click('[data-testid="study-room-banner-minimize"]')
+        ->assertMissing('[data-testid="study-room-timer-form"]')
+        ->assertVisible('[data-testid="study-room-banner-expand"]');
+
+    // The choice is remembered across a reload.
+    $page->navigate(route('study-room.show'))
+        ->wait(1)
+        ->assertMissing('[data-testid="study-room-timer-form"]')
+        ->click('[data-testid="study-room-banner-expand"]')
+        ->assertVisible('[data-testid="study-room-timer-form"]')
+        ->click('[data-testid="study-room-start-timer"]')
+        ->wait(1)
+        ->click('[data-testid="study-room-banner-minimize"]')
+        ->assertMissing('[data-testid="study-room-timer-panel"]')
+        ->assertVisible('[data-testid="study-room-banner-mini-countdown"]')
+        ->click('[data-testid="study-room-banner-expand"]')
+        ->assertVisible('[data-testid="study-room-your-countdown"]');
 });
 
 it('shows the PersonalInfo modal for editing nickname/emoji, without the session log', function () {

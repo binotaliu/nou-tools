@@ -2,9 +2,12 @@
 // The control panel fixed to the bottom of the page while the viewer holds
 // a seat — the "start timer" form, the running-timer countdown/controls,
 // the pomodoro cycle settings modal, and the change-activity modal.
+import { ref } from 'vue'
 import {
   ArrowRightStartOnRectangleIcon,
   ArrowsPointingOutIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
   PauseIcon,
   PencilSquareIcon,
   PlayIcon,
@@ -15,6 +18,31 @@ import { PlayIcon as PlaySolidIcon } from '@heroicons/vue/24/solid'
 import ActivityPicker from './ActivityPicker.vue'
 import DeskLamp from './DeskLamp.vue'
 import Modal from './Modal.vue'
+
+const MINIMIZED_KEY = 'nou:study-room:banner-minimized:v1'
+
+// Minimizing leaves a slim bar so the floor map gets the screen back. It is a
+// per-viewer convenience, so it lives in localStorage and the banner still
+// works (expanded) when storage is unavailable.
+function readMinimized() {
+  try {
+    return localStorage.getItem(MINIMIZED_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+const minimized = ref(readMinimized())
+
+function setMinimized(value) {
+  minimized.value = value
+
+  try {
+    localStorage.setItem(MINIMIZED_KEY, value ? '1' : '0')
+  } catch {
+    // Storage blocked: the choice just doesn't outlive the page.
+  }
+}
 
 defineProps({
   visible: { type: Boolean, required: true },
@@ -47,8 +75,55 @@ defineProps({
               aria-hidden="true"
             ></div>
 
+            <button
+              v-show="!minimized"
+              type="button"
+              class="relative flex h-5 w-full items-center justify-center text-theme-500 transition hover:text-theme-800 sm:absolute sm:top-1 sm:right-3 sm:z-10 sm:size-7 sm:rounded-lg sm:hover:bg-white/70 dark:text-zinc-400 dark:hover:text-zinc-100 dark:sm:hover:bg-zinc-800"
+              title="收合"
+              aria-label="收合控制列"
+              data-testid="study-room-banner-minimize"
+              @click="setMinimized(true)"
+            >
+              <ChevronDownIcon class="size-5" />
+            </button>
+
+            <!-- Minimized: one line with what's running, tap to expand -->
+            <button
+              v-show="minimized"
+              type="button"
+              class="relative flex w-full items-center gap-3 px-4 pt-3 pb-[calc(var(--safe-bottom)+0.75rem)] text-left sm:px-6"
+              aria-label="展開控制列"
+              data-testid="study-room-banner-expand"
+              @click="setMinimized(false)"
+            >
+              <span v-if="timer.hasTimer()" class="min-w-0 flex-1">
+                <span
+                  class="block text-xs font-semibold tracking-wide"
+                  :class="timer.timerPhaseClass()"
+                  >{{ timer.timerPhaseLabel() }}</span
+                >
+                <span
+                  class="block truncate font-semibold text-theme-900 dark:text-zinc-100"
+                  >{{ timer.myActivityLabel() }}</span
+                >
+              </span>
+              <span
+                v-else
+                class="min-w-0 flex-1 truncate font-semibold text-theme-900 dark:text-zinc-100"
+                >尚未開始專注</span
+              >
+              <span
+                v-if="timer.hasTimer()"
+                class="text-2xl leading-none font-bold text-theme-900 tabular-nums dark:text-zinc-100"
+                data-testid="study-room-banner-mini-countdown"
+                >{{ timer.myRemainingLabel() }}</span
+              >
+              <ChevronUpIcon class="size-5 shrink-0 text-theme-500" />
+            </button>
+
             <div
-              class="relative px-4 pt-5 pb-[calc(var(--safe-bottom)+1rem)] sm:px-6 sm:pt-6 sm:pb-[calc(var(--safe-bottom)+1.25rem)]"
+              v-show="!minimized"
+              class="relative max-h-[70dvh] overflow-y-auto overscroll-contain px-4 pt-0 pb-[calc(var(--safe-bottom)+1rem)] sm:px-6 sm:pt-6 sm:pb-[calc(var(--safe-bottom)+1.25rem)]"
             >
               <!-- Not timing yet: pick activity/subject/mode, then start -->
               <div
@@ -57,7 +132,7 @@ defineProps({
                 data-testid="study-room-timer-form"
               >
                 <div
-                  class="flex items-center gap-3 lg:w-12 lg:shrink-0 lg:self-center"
+                  class="hidden items-center gap-3 lg:flex lg:w-12 lg:shrink-0 lg:self-center"
                 >
                   <DeskLamp
                     :has-timer="timer.hasTimer()"
@@ -80,7 +155,7 @@ defineProps({
                         <select
                           v-model="timer.selectedSubjectCourseId"
                           data-testid="study-room-subject-select"
-                          class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                          class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-base focus:border-orange-300 focus:ring-orange-300 sm:text-sm dark:border-zinc-700 dark:bg-zinc-900"
                         >
                           <option
                             v-for="subject in subjects"
@@ -100,7 +175,7 @@ defineProps({
                       >
                       <div class="flex flex-wrap items-center gap-2">
                         <div
-                          class="inline-flex rounded-lg border border-theme-200 bg-white p-0.5 dark:border-zinc-700 dark:bg-zinc-900"
+                          class="grid w-full grid-cols-3 rounded-lg border border-theme-200 bg-white p-0.5 text-center sm:inline-flex sm:w-auto dark:border-zinc-700 dark:bg-zinc-900"
                           role="radiogroup"
                           aria-label="計時方式"
                         >
@@ -162,7 +237,7 @@ defineProps({
                             :min="clientConfig.timerCustomMinMinutes"
                             :max="clientConfig.timerCustomMaxMinutes"
                             data-testid="study-room-custom-minutes"
-                            class="w-20 rounded-lg border border-theme-200 bg-white px-2 py-1.5 text-sm tabular-nums dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                            class="w-20 rounded-lg border border-theme-200 bg-white px-2 py-1.5 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                           />
                           分鐘
                         </label>
@@ -176,7 +251,7 @@ defineProps({
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-start-timer"
-                    class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-theme-700 px-6 py-3 text-base font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 lg:flex-none dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
+                    class="inline-flex flex-[2] items-center justify-center gap-2 rounded-xl bg-theme-700 px-6 py-3 text-base font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 lg:flex-none dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
                     @click="timer.startTimer()"
                   >
                     <PlaySolidIcon class="size-5" />
@@ -187,7 +262,7 @@ defineProps({
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-leave-seat"
-                    class="inline-flex items-center justify-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-4 py-3 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                    class="inline-flex flex-1 items-center justify-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-4 py-3 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 lg:flex-none dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
                     @click="timer.leave()"
                   >
                     <ArrowRightStartOnRectangleIcon class="size-4" />
@@ -199,13 +274,13 @@ defineProps({
               <!-- Timing: countdown, round, start-break / next-round / stop -->
               <div
                 v-show="timer.hasTimer()"
-                class="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6"
+                class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 lg:flex lg:flex-row lg:gap-6"
                 data-testid="study-room-timer-panel"
               >
-                <div class="flex min-w-0 flex-1 items-center gap-4">
+                <div class="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
                   <DeskLamp
                     :has-timer="timer.hasTimer()"
-                    size-class="size-14 shrink-0"
+                    size-class="size-10 shrink-0 sm:size-14"
                   />
                   <div class="min-w-0">
                     <p
@@ -217,7 +292,7 @@ defineProps({
                     </p>
                     <p class="flex min-w-0 items-center gap-1.5">
                       <span
-                        class="truncate text-xl font-semibold text-theme-900 dark:text-zinc-100"
+                        class="truncate text-lg font-semibold text-theme-900 sm:text-xl dark:text-zinc-100"
                         data-testid="study-room-timer-activity"
                         >{{ timer.myActivityLabel() }}</span
                       >
@@ -233,7 +308,7 @@ defineProps({
                       </button>
                     </p>
                     <div
-                      class="mt-1.5 flex items-center gap-2 text-xs text-theme-500 dark:text-zinc-400"
+                      class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-theme-500 sm:mt-1.5 dark:text-zinc-400"
                     >
                       <span
                         v-show="timer.isPomodoro()"
@@ -248,33 +323,31 @@ defineProps({
                           :class="timer.cycleDotClass(dot)"
                         ></span>
                       </span>
-                      <span
-                        data-testid="study-room-round-label"
-                        class="truncate"
-                        >{{ timer.roundLabel() }}</span
-                      >
-                      <span aria-hidden="true">·</span>
-                      <span class="truncate">{{
-                        timer.timerEndsAtLabel()
+                      <span data-testid="study-room-round-label">{{
+                        timer.roundLabel()
                       }}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>{{ timer.timerEndsAtLabel() }}</span>
                     </div>
                   </div>
                 </div>
 
-                <div class="text-center lg:px-4">
+                <div class="text-right lg:px-4 lg:text-center">
                   <p
-                    class="text-5xl leading-none font-bold text-theme-900 tabular-nums sm:text-6xl dark:text-zinc-100"
+                    class="text-4xl leading-none font-bold text-theme-900 tabular-nums sm:text-6xl dark:text-zinc-100"
                     data-testid="study-room-your-countdown"
                   >
                     {{ timer.myRemainingLabel() }}
                   </p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2 lg:justify-end">
+                <div
+                  class="col-span-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center lg:justify-end"
+                >
                   <button
                     type="button"
                     data-testid="study-room-focus-mode-open"
-                    class="inline-flex items-center gap-1.5 rounded-xl border border-theme-300 bg-white/70 px-3 py-2.5 text-sm font-medium text-theme-800 transition hover:bg-white dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-theme-300 bg-white/70 px-3 py-3 text-sm font-medium text-theme-800 transition hover:bg-white sm:py-2.5 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
                     title="全螢幕專注"
                     @click="timer.openFocusMode()"
                   >
@@ -287,7 +360,7 @@ defineProps({
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-pause-timer"
-                    class="inline-flex items-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-3 py-2.5 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                    class="inline-flex items-center justify-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-3 py-3 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 sm:py-2.5 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
                     @click="timer.pauseTimer()"
                   >
                     <PauseIcon class="size-4" />
@@ -299,7 +372,7 @@ defineProps({
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-resume-timer"
-                    class="inline-flex items-center gap-1.5 rounded-xl bg-theme-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
+                    class="order-first col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-theme-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 sm:order-none sm:col-span-1 sm:py-2.5 dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
                     @click="timer.resumeTimer()"
                   >
                     <PlaySolidIcon class="size-4" />
@@ -311,7 +384,7 @@ defineProps({
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-start-break"
-                    class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700 disabled:opacity-50"
+                    class="order-first col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700 disabled:opacity-50 sm:order-none sm:col-span-1 sm:py-2.5"
                     @click="timer.startBreak()"
                   >
                     <SparklesIcon class="size-4" />
@@ -323,7 +396,7 @@ defineProps({
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-next-round"
-                    class="inline-flex items-center gap-1.5 rounded-xl bg-theme-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
+                    class="order-first col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-theme-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 sm:order-none sm:col-span-1 sm:py-2.5 dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
                     @click="timer.startNextRound()"
                   >
                     <PlaySolidIcon class="size-4" />
@@ -334,7 +407,7 @@ defineProps({
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-stop-timer"
-                    class="inline-flex items-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-3 py-2.5 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                    class="inline-flex items-center justify-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-3 py-3 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 sm:py-2.5 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
                     @click="timer.stopTimer()"
                   >
                     <StopIcon class="size-4" />
@@ -345,7 +418,7 @@ defineProps({
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-leave-seat-running"
-                    class="inline-flex items-center gap-1 rounded-xl px-3 py-2.5 text-sm font-medium text-theme-600 transition hover:bg-white/70 hover:text-theme-900 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                    class="inline-flex items-center justify-center gap-1 rounded-xl px-3 py-3 text-sm font-medium text-theme-600 transition hover:bg-white/70 hover:text-theme-900 disabled:opacity-50 sm:py-2.5 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
                     @click="timer.leave()"
                   >
                     <ArrowRightStartOnRectangleIcon class="size-4" />
@@ -396,7 +469,7 @@ defineProps({
             :min="timer.cycleBound('focus', 0)"
             :max="timer.cycleBound('focus', 1)"
             data-testid="study-room-cycle-focus"
-            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm tabular-nums dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </label>
         <label class="block">
@@ -410,7 +483,7 @@ defineProps({
             :min="timer.cycleBound('break', 0)"
             :max="timer.cycleBound('break', 1)"
             data-testid="study-room-cycle-short-break"
-            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm tabular-nums dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </label>
         <label class="block">
@@ -424,7 +497,7 @@ defineProps({
             :min="timer.cycleBound('break', 0)"
             :max="timer.cycleBound('break', 1)"
             data-testid="study-room-cycle-long-break"
-            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm tabular-nums dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </label>
         <label class="block">
@@ -438,7 +511,7 @@ defineProps({
             :min="timer.cycleBound('rounds', 0)"
             :max="timer.cycleBound('rounds', 1)"
             data-testid="study-room-cycle-rounds"
-            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm tabular-nums dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </label>
       </div>
@@ -495,7 +568,7 @@ defineProps({
           <select
             v-model="timer.changeSubjectCourseId"
             data-testid="study-room-change-subject-select"
-            class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+            class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-base focus:border-orange-300 focus:ring-orange-300 sm:text-sm dark:border-zinc-700 dark:bg-zinc-900"
           >
             <option
               v-for="subject in subjects"

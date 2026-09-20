@@ -32,6 +32,15 @@
   }
 }
 
+/* A short viewport: a phone held sideways, or a squat browser window. Width
+ * breakpoints can't see it (a landscape phone is wider than `sm`), so layouts
+ * that stack by percentage of the screen's height use this to tighten up. */
+@custom-variant short {
+  @media (height < 32rem) {
+    @slot;
+  }
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';

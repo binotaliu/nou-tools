@@ -43,7 +43,7 @@ onUnmounted(() => {
 <template>
   <div
     v-if="timer.focusMode"
-    class="fixed inset-0 z-50 animate-focus-in overflow-hidden select-none"
+    class="fixed inset-0 z-50 animate-focus-in overflow-hidden select-none [--win-h:31%] [--win-top:max(8%,calc(env(safe-area-inset-top)+3.5rem))] sm:[--win-h:37%] sm:[--win-top:max(9%,calc(env(safe-area-inset-top)+3.5rem))] short:[--win-h:24%] short:[--win-top:calc(env(safe-area-inset-top)+3rem)]"
     :style="sky.carrelVars(timer.hasTimer())"
     :data-sky-phase="sky.sky.phase"
     role="dialog"
@@ -57,7 +57,7 @@ onUnmounted(() => {
     ></div>
 
     <div
-      class="absolute top-[46%] left-1/2 h-[30%] w-[80%] max-w-5xl -translate-x-1/2 opacity-70 blur-2xl transition-[background] duration-1000"
+      class="absolute top-[calc(var(--win-top)+var(--win-h))] left-1/2 h-[30%] w-[80%] max-w-5xl -translate-x-1/2 opacity-70 blur-2xl transition-[background] duration-1000"
       :style="sky.windowLightStyle()"
       aria-hidden="true"
     ></div>
@@ -72,7 +72,7 @@ onUnmounted(() => {
     ></div>
 
     <div
-      class="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 px-4 py-3 sm:px-6"
+      class="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-3 pl-[max(1rem,env(safe-area-inset-left))] sm:pr-[max(1.5rem,env(safe-area-inset-right))] sm:pl-[max(1.5rem,env(safe-area-inset-left))]"
       :style="sky.focusInkStyle()"
     >
       <div class="flex min-w-0 items-center gap-2 text-sm">
@@ -107,7 +107,7 @@ onUnmounted(() => {
     </div>
 
     <div
-      class="absolute top-[9%] left-1/2 h-[37%] w-[88%] max-w-5xl -translate-x-1/2 rounded-md shadow-[0_12px_40px_rgba(0,0,0,0.25)] transition-[background-color] transition-[background] duration-1000"
+      class="absolute top-(--win-top) left-1/2 h-(--win-h) w-[88%] max-w-5xl -translate-x-1/2 rounded-md shadow-[0_12px_40px_rgba(0,0,0,0.25)] transition-[background-color] transition-[background] duration-1000"
       :style="sky.frameStyle()"
       role="img"
       :aria-label="sky.gardenAriaLabel()"
@@ -277,13 +277,13 @@ onUnmounted(() => {
     </div>
 
     <div
-      class="absolute top-[46%] left-1/2 h-2.5 w-[92%] max-w-[calc(64rem+2rem)] -translate-x-1/2 rounded-sm shadow-[0_4px_10px_rgba(0,0,0,0.25)] transition-[background-color] transition-[background] duration-1000 sm:h-3.5"
+      class="absolute top-[calc(var(--win-top)+var(--win-h))] left-1/2 h-2.5 w-[92%] max-w-[calc(64rem+2rem)] -translate-x-1/2 rounded-sm shadow-[0_4px_10px_rgba(0,0,0,0.25)] transition-[background-color] transition-[background] duration-1000 sm:h-3.5"
       :style="sky.frameStyle()"
       aria-hidden="true"
     ></div>
 
     <div
-      class="absolute inset-x-0 top-[50%] bottom-[18%] flex flex-col items-center justify-center gap-1.5 px-6 text-center sm:gap-2"
+      class="absolute inset-x-0 top-[calc(var(--win-top)+var(--win-h)+4%)] bottom-[18%] flex flex-col items-center justify-center gap-1.5 px-6 text-center sm:gap-2 short:gap-1"
       :style="sky.focusInkStyle()"
     >
       <p
@@ -294,7 +294,7 @@ onUnmounted(() => {
       </p>
 
       <p
-        class="font-mono text-[clamp(3.25rem,min(11vw,16vh),7rem)] leading-none font-bold tracking-tight tabular-nums"
+        class="font-mono text-[clamp(3.25rem,min(11vw,16vh),7rem)] leading-none font-bold tracking-tight tabular-nums short:text-[clamp(2.5rem,13vh,4rem)]"
         data-testid="study-room-focus-countdown"
       >
         {{ timer.myRemainingLabel() }}
@@ -341,13 +341,13 @@ onUnmounted(() => {
       </div>
 
       <div
-        class="mt-1 flex flex-wrap items-center justify-center gap-2 sm:mt-2"
+        class="mt-1 flex flex-wrap items-center justify-center gap-2 sm:mt-2 short:mt-0"
       >
         <button
           v-show="timer.canPause()"
           type="button"
           :disabled="timer.panelBusy"
-          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-2.5 text-sm font-medium backdrop-blur transition disabled:opacity-50"
+          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-3 text-sm font-medium backdrop-blur transition disabled:opacity-50 sm:py-2.5 short:py-2"
           :class="sky.focusChromeClass()"
           data-testid="study-room-focus-pause-timer"
           @click="timer.pauseTimer()"
@@ -359,7 +359,7 @@ onUnmounted(() => {
           v-show="timer.isPaused()"
           type="button"
           :disabled="timer.panelBusy"
-          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-2.5 text-sm font-semibold backdrop-blur transition disabled:opacity-50"
+          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-3 text-sm font-semibold backdrop-blur transition disabled:opacity-50 sm:py-2.5 short:py-2"
           :class="sky.focusChromeClass()"
           data-testid="study-room-focus-resume-timer"
           @click="timer.resumeTimer()"
@@ -371,7 +371,7 @@ onUnmounted(() => {
           v-show="timer.canStartBreak()"
           type="button"
           :disabled="timer.panelBusy"
-          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-2.5 text-sm font-semibold backdrop-blur transition disabled:opacity-50"
+          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-3 text-sm font-semibold backdrop-blur transition disabled:opacity-50 sm:py-2.5 short:py-2"
           :class="sky.focusChromeClass()"
           data-testid="study-room-focus-start-break"
           @click="timer.startBreak()"
@@ -383,7 +383,7 @@ onUnmounted(() => {
           v-show="timer.canStartNextRound()"
           type="button"
           :disabled="timer.panelBusy"
-          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-2.5 text-sm font-semibold backdrop-blur transition disabled:opacity-50"
+          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-3 text-sm font-semibold backdrop-blur transition disabled:opacity-50 sm:py-2.5 short:py-2"
           :class="sky.focusChromeClass()"
           data-testid="study-room-focus-next-round"
           @click="timer.startNextRound()"
@@ -394,7 +394,7 @@ onUnmounted(() => {
         <button
           type="button"
           :disabled="timer.panelBusy"
-          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-2.5 text-sm font-medium backdrop-blur transition disabled:opacity-50"
+          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-3 text-sm font-medium backdrop-blur transition disabled:opacity-50 sm:py-2.5 short:py-2"
           :class="sky.focusChromeClass()"
           data-testid="study-room-focus-stop-timer"
           @click="timer.stopTimer()"
@@ -447,13 +447,13 @@ onUnmounted(() => {
     -->
     <div
       v-if="music.available"
-      class="absolute bottom-3 left-1/2 z-10 w-64 max-w-[calc(100%-2rem)] -translate-x-1/2"
+      class="absolute bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-1/2 z-10 w-64 max-w-[calc(100%-2rem)] -translate-x-1/2"
     >
       <CassettePlayer :music="music" />
     </div>
 
     <svg
-      class="pointer-events-none absolute right-[6%] bottom-[12%] h-[22%] w-auto overflow-visible"
+      class="pointer-events-none absolute right-[4%] bottom-[12%] h-[9%] w-auto overflow-visible sm:right-[6%] sm:h-[22%] short:h-[24%]"
       viewBox="0 0 48 48"
       aria-hidden="true"
     >
