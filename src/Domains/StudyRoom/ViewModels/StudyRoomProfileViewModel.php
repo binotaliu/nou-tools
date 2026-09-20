@@ -23,5 +23,6 @@ final class StudyRoomProfileViewModel extends Data
         public bool $canChangeNickname,
         public StudyRoomPomodoroCycleViewModel $pomodoroCycle,
         public bool $playSoundOnTimerEnd,
+        public bool $notifyOnTimerEnd,
     ) {}
 }

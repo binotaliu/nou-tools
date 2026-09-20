@@ -16,6 +16,7 @@ final class SetStudyRoomProfileData extends Data
         public string $nickname,
         public string $emoji,
         public bool $playSoundOnTimerEnd,
+        public bool $notifyOnTimerEnd,
     ) {}
 
     public static function rules(ValidationContext $context): array
@@ -37,6 +38,7 @@ final class SetStudyRoomProfileData extends Data
             ],
             'emoji' => ['required', 'string', Rule::in(config('study-room.emojis'))],
             'playSoundOnTimerEnd' => ['required', 'boolean'],
+            'notifyOnTimerEnd' => ['required', 'boolean'],
         ];
     }
 
@@ -46,6 +48,7 @@ final class SetStudyRoomProfileData extends Data
             'nickname' => '暱稱',
             'emoji' => '表情符號',
             'playSoundOnTimerEnd' => '時間到時播放音效',
+            'notifyOnTimerEnd' => '時間到時傳送通知',
         ];
     }
 

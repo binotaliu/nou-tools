@@ -22,6 +22,7 @@ it('creates a profile on the happy path', function () {
             'nickname' => '認真讀書中',
             'emoji' => config('study-room.emojis')[0],
             'playSoundOnTimerEnd' => true,
+            'notifyOnTimerEnd' => false,
         ]);
 
     $response->assertOk()->assertJsonPath('ok', true)->assertJsonPath('message', '暱稱已更新');
@@ -42,11 +43,41 @@ it('saves the play-sound-on-timer-end preference, including turning it off', fun
         'nickname' => '愛聽音效',
         'emoji' => config('study-room.emojis')[0],
         'playSoundOnTimerEnd' => false,
+        'notifyOnTimerEnd' => false,
     ])->assertOk();
 
     $this->assertDatabaseHas(StudyRoomProfile::class, [
         'student_schedule_id' => $schedule->id,
         'play_sound_on_timer_end' => false,
+    ]);
+});
+
+it('saves the notify-on-timer-end preference, including turning it back off', function () {
+    $schedule = StudentSchedule::factory()->create();
+    $cookie = studyRoomProfileCookie($schedule);
+
+    $this->withCredentials()->withCookie('student_schedule', $cookie)->postJson(route('study-room.profile.update'), [
+        'nickname' => '想收通知',
+        'emoji' => config('study-room.emojis')[0],
+        'playSoundOnTimerEnd' => true,
+        'notifyOnTimerEnd' => true,
+    ])->assertOk();
+
+    $this->assertDatabaseHas(StudyRoomProfile::class, [
+        'student_schedule_id' => $schedule->id,
+        'notify_on_timer_end' => true,
+    ]);
+
+    $this->withCredentials()->withCookie('student_schedule', $cookie)->postJson(route('study-room.profile.update'), [
+        'nickname' => '想收通知',
+        'emoji' => config('study-room.emojis')[0],
+        'playSoundOnTimerEnd' => true,
+        'notifyOnTimerEnd' => false,
+    ])->assertOk();
+
+    $this->assertDatabaseHas(StudyRoomProfile::class, [
+        'student_schedule_id' => $schedule->id,
+        'notify_on_timer_end' => false,
     ]);
 });
 
@@ -59,6 +90,7 @@ it('rejects an emoji outside the allowlist', function () {
             'nickname' => '認真讀書中',
             'emoji' => '💀',
             'playSoundOnTimerEnd' => true,
+            'notifyOnTimerEnd' => false,
         ]);
 
     $response->assertStatus(422)->assertJsonValidationErrors('emoji');
@@ -79,6 +111,7 @@ it('rejects a forbidden nickname, including a whitespace-evasion variant', funct
             'nickname' => '我是壞字詞啦',
             'emoji' => config('study-room.emojis')[0],
             'playSoundOnTimerEnd' => true,
+            'notifyOnTimerEnd' => false,
         ]);
 
     $response->assertStatus(422)->assertJsonValidationErrors('nickname');
@@ -89,6 +122,7 @@ it('rejects a forbidden nickname, including a whitespace-evasion variant', funct
             'nickname' => '我是 壞 字 詞 啦',
             'emoji' => config('study-room.emojis')[0],
             'playSoundOnTimerEnd' => true,
+            'notifyOnTimerEnd' => false,
         ]);
 
     $evasionResponse->assertStatus(422)->assertJsonValidationErrors('nickname');
@@ -103,12 +137,14 @@ it('blocks a second nickname change within the cooldown, then allows it after th
         'nickname' => '第一個暱稱',
         'emoji' => config('study-room.emojis')[0],
         'playSoundOnTimerEnd' => true,
+        'notifyOnTimerEnd' => false,
     ])->assertOk();
 
     $blocked = $this->withCredentials()->withCookie('student_schedule', $cookie)->postJson(route('study-room.profile.update'), [
         'nickname' => '第二個暱稱',
         'emoji' => config('study-room.emojis')[0],
         'playSoundOnTimerEnd' => true,
+        'notifyOnTimerEnd' => false,
     ]);
 
     $blocked->assertStatus(422)->assertJsonValidationErrors('nickname');
@@ -123,6 +159,7 @@ it('blocks a second nickname change within the cooldown, then allows it after th
         'nickname' => '第二個暱稱',
         'emoji' => config('study-room.emojis')[0],
         'playSoundOnTimerEnd' => true,
+        'notifyOnTimerEnd' => false,
     ]);
 
     $allowed->assertOk()->assertJsonPath('ok', true);
@@ -140,12 +177,14 @@ it('allows an emoji-only change during the nickname cooldown', function () {
         'nickname' => '保持不變的暱稱',
         'emoji' => config('study-room.emojis')[0],
         'playSoundOnTimerEnd' => true,
+        'notifyOnTimerEnd' => false,
     ])->assertOk();
 
     $response = $this->withCredentials()->withCookie('student_schedule', $cookie)->postJson(route('study-room.profile.update'), [
         'nickname' => '保持不變的暱稱',
         'emoji' => config('study-room.emojis')[1],
         'playSoundOnTimerEnd' => true,
+        'notifyOnTimerEnd' => false,
     ]);
 
     $response->assertOk()->assertJsonPath('ok', true);
@@ -164,12 +203,14 @@ it('allows re-submitting the identical nickname during the cooldown', function (
         'nickname' => '相同的暱稱',
         'emoji' => config('study-room.emojis')[0],
         'playSoundOnTimerEnd' => true,
+        'notifyOnTimerEnd' => false,
     ])->assertOk();
 
     $response = $this->withCredentials()->withCookie('student_schedule', $cookie)->postJson(route('study-room.profile.update'), [
         'nickname' => '相同的暱稱',
         'emoji' => config('study-room.emojis')[0],
         'playSoundOnTimerEnd' => true,
+        'notifyOnTimerEnd' => false,
     ]);
 
     $response->assertOk()->assertJsonPath('ok', true);
@@ -180,6 +221,7 @@ it('returns a redirect hint to schedule creation when there is no cookie', funct
         'nickname' => '沒有課表',
         'emoji' => config('study-room.emojis')[0],
         'playSoundOnTimerEnd' => true,
+        'notifyOnTimerEnd' => false,
     ]);
 
     $response->assertStatus(403)->assertJsonPath('redirect', route('schedules.create'));

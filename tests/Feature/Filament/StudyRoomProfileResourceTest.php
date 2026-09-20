@@ -72,6 +72,7 @@ test('force-resetting a nickname clears the cooldown and lets the user set a new
             'nickname' => '新暱稱',
             'emoji' => config('study-room.emojis')[0],
             'playSoundOnTimerEnd' => true,
+            'notifyOnTimerEnd' => false,
         ]);
 
     $response->assertSessionHasNoErrors();
