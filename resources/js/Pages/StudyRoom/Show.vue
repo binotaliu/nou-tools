@@ -28,6 +28,7 @@ import Wall from '../../Components/StudyRoom/Wall.vue'
 import FloorSkeleton from '../../Components/StudyRoom/FloorSkeleton.vue'
 import useSeatGrid from '../../Composables/useSeatGrid'
 import useStudyRoomProfile from '../../Composables/useStudyRoomProfile'
+import usePushSubscription from '../../Composables/usePushSubscription'
 import useStudyRoomSky from '../../Composables/useStudyRoomSky'
 import useStudyRoomSocket from '../../Composables/useStudyRoomSocket'
 import useStudyTimer from '../../Composables/useStudyTimer'
@@ -43,12 +44,22 @@ const props = defineProps({
   verbs: { type: Array, required: true },
   profile: { type: Object, required: true },
   clientConfig: { type: Object, required: true },
+  vapidPublicKey: { type: String, default: null },
 })
 
 const socket = useStudyRoomSocket(props.clientConfig)
 const grid = useSeatGrid(socket, props.clientConfig)
 const sky = useStudyRoomSky(props.clientConfig)
 const profile = useStudyRoomProfile(props.profile, props.emojiChoices)
+
+// Only `supported` and `enable` are used. `disable()` would call
+// subscription.unsubscribe(), and a browser holds one subscription that the
+// class-starting reminders share, so switching study-room notifications off
+// only clears the profile flag.
+const push = usePushSubscription({
+  vapidPublicKey: props.vapidPublicKey,
+  subscribeUrl: '/study-room/push-subscriptions',
+})
 const timer = useStudyTimer(
   socket,
   props.clientConfig,
@@ -284,6 +295,7 @@ onUnmounted(() => {
             :nickname-min-length="clientConfig.nicknameMinLength"
             :nickname-max-length="clientConfig.nicknameMaxLength"
             :nickname-cooldown-days="clientConfig.nicknameCooldownDays"
+            :push="push"
           />
         </Modal>
 

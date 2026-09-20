@@ -38,6 +38,7 @@ final class StudyRoomController extends Controller
             'verbs' => $viewModel->verbs,
             'profile' => $viewModel->profile,
             'clientConfig' => $viewModel->clientConfig,
+            'vapidPublicKey' => $viewModel->vapidPublicKey,
         ]);
     }
 }

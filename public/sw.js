@@ -1,7 +1,7 @@
 // Minimal offline support: keeps a previously-visited home/schedule/directory
 // page (and the assets it needs) available when the network is down, and
 // shows a generic offline page for any other route that isn't cached.
-const CACHE_VERSION = 'v4'
+const CACHE_VERSION = 'v5'
 const PAGE_CACHE = `nou-schedule-pages-${CACHE_VERSION}`
 const RUNTIME_CACHE = `nou-runtime-${CACHE_VERSION}`
 
@@ -237,6 +237,9 @@ self.addEventListener('push', event => {
     body: payload.body || '',
     icon: payload.icon || '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
+    // A tagged notification replaces the previous one with the same tag
+    // instead of stacking, so a study timer's rounds don't pile up.
+    tag: payload.tag || undefined,
     data: { url: (payload.data && payload.data.url) || '/' },
   }
 

@@ -98,6 +98,22 @@ it('auto-syncs seats from zero on first visit', function () {
     expect(StudyRoomSeat::query()->count())->toBe(24 * config('study-room.floors.max'));
 });
 
+it('passes the VAPID public key so the page can subscribe to timer notifications', function () {
+    config(['webpush.vapid.public_key' => 'test-vapid-public-key']);
+
+    $this->get(route('study-room.show'))->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('vapidPublicKey', 'test-vapid-public-key')
+    );
+});
+
+it('defaults the timer notification opt-in to off for a visitor with no profile', function () {
+    $this->get(route('study-room.show'))->assertOk()->assertInertia(
+        fn (Assert $page) => $page->component('StudyRoom/Show')
+            ->where('profile.notifyOnTimerEnd', false)
+    );
+});
+
 it('passes the maximum floor count to the client so the stairs can explain when the next floor opens', function () {
     config(['study-room.floors.max' => 5]);
 

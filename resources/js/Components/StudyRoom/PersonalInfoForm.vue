@@ -11,17 +11,46 @@ const props = defineProps({
   nicknameMinLength: { type: Number, required: true },
   nicknameMaxLength: { type: Number, required: true },
   nicknameCooldownDays: { type: Number, required: true },
+  push: { type: Object, required: true },
 })
 
 const nicknameInput = ref(props.profile.nickname || '')
 const emojiInput = ref(props.profile.emoji)
 const playSoundInput = ref(props.profile.playSoundOnTimerEnd)
+const notifyInput = ref(props.profile.notifyOnTimerEnd)
+const notifyError = ref('')
+
+// Switching notifications on needs the browser's permission and a push
+// subscription, both of which must be asked for from a user gesture, so it
+// happens here on change rather than on submit. Switching them off only
+// clears the flag: the subscription is shared with the class-starting
+// reminders, so unsubscribing would quietly switch those off too.
+async function onNotifyChange() {
+  notifyError.value = ''
+
+  if (!notifyInput.value) {
+    return
+  }
+
+  if (!props.push.supported) {
+    notifyInput.value = false
+    notifyError.value = '這個瀏覽器不支援通知。'
+
+    return
+  }
+
+  if (!(await props.push.enable())) {
+    notifyInput.value = false
+    notifyError.value = '沒有取得通知權限，請在瀏覽器設定中允許本站通知。'
+  }
+}
 
 async function submit() {
   await props.profile.submitProfile({
     nickname: nicknameInput.value,
     emoji: emojiInput.value,
     playSoundOnTimerEnd: playSoundInput.value,
+    notifyOnTimerEnd: notifyInput.value,
   })
 }
 </script>
@@ -119,6 +148,33 @@ async function submit() {
         />
         時間到時播放音效
       </label>
+    </div>
+
+    <div>
+      <label
+        class="flex cursor-pointer items-center gap-2 text-sm text-theme-700 dark:text-zinc-300"
+      >
+        <input
+          v-model="notifyInput"
+          type="checkbox"
+          name="notifyOnTimerEnd"
+          :disabled="push.busy"
+          class="size-4 rounded border-theme-300 text-theme-600 focus:ring-orange-300 disabled:opacity-50 dark:border-zinc-600"
+          data-testid="study-room-notify-checkbox"
+          @change="onNotifyChange"
+        />
+        時間到時傳送通知
+      </label>
+      <p class="mt-1 text-xs text-theme-600 dark:text-zinc-400">
+        關掉分頁或切到其他 App 時也收得到。iPhone 需先將本站加入主畫面。
+      </p>
+      <p
+        v-if="notifyError"
+        class="mt-1 text-xs text-red-600 dark:text-red-400"
+        data-testid="study-room-notify-error"
+      >
+        {{ notifyError }}
+      </p>
     </div>
 
     <button

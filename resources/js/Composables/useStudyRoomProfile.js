@@ -10,6 +10,7 @@ export default function useStudyRoomProfile(initialProfile, emojiChoices) {
   const canChangeNickname = ref(initialProfile.canChangeNickname)
   const canChangeNicknameAt = ref(initialProfile.canChangeNicknameAt)
   const playSoundOnTimerEnd = ref(initialProfile.playSoundOnTimerEnd)
+  const notifyOnTimerEnd = ref(initialProfile.notifyOnTimerEnd)
 
   const personalInfoOpen = ref(false)
   const profileErrors = ref({})
@@ -35,6 +36,7 @@ export default function useStudyRoomProfile(initialProfile, emojiChoices) {
     canChangeNickname.value = viewModel.canChangeNickname
     canChangeNicknameAt.value = viewModel.canChangeNicknameAt
     playSoundOnTimerEnd.value = viewModel.playSoundOnTimerEnd
+    notifyOnTimerEnd.value = viewModel.notifyOnTimerEnd
   }
 
   async function submitProfile(form) {
@@ -146,6 +148,7 @@ export default function useStudyRoomProfile(initialProfile, emojiChoices) {
     canChangeNickname,
     canChangeNicknameAt,
     playSoundOnTimerEnd,
+    notifyOnTimerEnd,
     personalInfoOpen,
     profileErrors,
     profileSubmitting,

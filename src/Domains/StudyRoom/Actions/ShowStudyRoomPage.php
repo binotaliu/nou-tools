@@ -56,6 +56,7 @@ final readonly class ShowStudyRoomPage
             emojiChoices: (array) config('study-room.emojis'),
             isOpen: $this->studyRoomSettings->isOpen,
             clientConfig: $this->buildClientConfig(),
+            vapidPublicKey: config('webpush.vapid.public_key'),
         );
     }
 

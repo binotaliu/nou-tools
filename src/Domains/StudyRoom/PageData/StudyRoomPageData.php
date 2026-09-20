@@ -33,5 +33,6 @@ final class StudyRoomPageData extends Resource
         public array $emojiChoices,
         public bool $isOpen,
         public array $clientConfig,
+        public ?string $vapidPublicKey,
     ) {}
 }

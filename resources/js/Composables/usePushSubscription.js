@@ -35,9 +35,12 @@ export default function usePushSubscription(initial) {
     return enabled.value ? disable() : enable()
   }
 
+  // Resolves to whether a subscription is now registered, so a caller that
+  // renders the state as a control can put it back when permission is
+  // refused or the subscribe call fails.
   async function enable() {
     if (busy.value) {
-      return
+      return false
     }
 
     busy.value = true
@@ -45,7 +48,7 @@ export default function usePushSubscription(initial) {
     try {
       const permission = await Notification.requestPermission()
       if (permission !== 'granted') {
-        return
+        return false
       }
 
       const registration = await navigator.serviceWorker.ready
@@ -57,6 +60,10 @@ export default function usePushSubscription(initial) {
       await window.axios.post(initial.subscribeUrl, subscription.toJSON())
 
       enabled.value = true
+
+      return true
+    } catch (error) {
+      return false
     } finally {
       busy.value = false
     }
