@@ -707,10 +707,50 @@ it('redirects /schedules/my to the remembered schedule when cookie exists', func
     $response->assertRedirect(route('schedules.show', $schedule));
 });
 
-it('redirects /schedules/my to the create page when no cookie exists', function () {
-    $response = $this->get(route('schedules.my'));
+it('shows the find-your-schedule page at /schedules/my when no cookie exists', function () {
+    $this->get(route('schedules.my'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('Schedule/Find'));
+});
 
-    $response->assertRedirect(route('schedules.create'));
+it('remembers a schedule from its shared link and redirects to it', function (string $format) {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Recovered Schedule',
+    ]);
+
+    $link = match ($format) {
+        'url' => url(route('schedules.show', $schedule)),
+        'legacy url' => 'https://nou.tools/schedule/'.$schedule->getRouteKey().'?term=2026A',
+        'canonical uuid url' => 'https://nou.tools/schedules/'.$schedule->uuid,
+        'bare token' => $schedule->getRouteKey(),
+    };
+
+    $response = $this->post(route('schedules.my.store'), ['url' => "  {$link}  "]);
+
+    $response->assertRedirect(route('schedules.show', $schedule));
+    $response->assertCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => 'Recovered Schedule',
+    ]));
+})->with(['url', 'legacy url', 'canonical uuid url', 'bare token']);
+
+it('rejects links that do not point at a schedule', function (string $link) {
+    $this->from(route('schedules.my'))
+        ->post(route('schedules.my.store'), ['url' => $link])
+        ->assertRedirect(route('schedules.my'))
+        ->assertSessionHasErrors('url')
+        ->assertCookieMissing('student_schedule');
+})->with([
+    'unknown token' => 'https://nou.tools/schedules/AAAAAAAAAAAAAAAAAAAAAA',
+    'other page' => 'https://nou.tools/schedules/create',
+    'garbage' => 'hello',
+]);
+
+it('requires a link when remembering a schedule', function () {
+    $this->post(route('schedules.my.store'), ['url' => ''])
+        ->assertSessionHasErrors('url');
 });
 
 it('updates the stored cookie when schedule is updated', function () {

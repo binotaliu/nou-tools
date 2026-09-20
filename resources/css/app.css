@@ -23,6 +23,15 @@
   }
 }
 
+/* Installed PWA at any width (unlike `bottom-nav`, which is phone-only): for
+ * copy that should say 裝置 instead of 瀏覽器. Same head-script flag, so no
+ * flash of the browser wording. */
+@custom-variant pwa {
+  html[data-pwa] & {
+    @slot;
+  }
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
