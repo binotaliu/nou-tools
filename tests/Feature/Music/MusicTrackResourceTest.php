@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\UserRole;
+use App\Filament\Resources\MusicTracks\MusicTrackResource;
 use App\Filament\Resources\MusicTracks\Pages\CreateMusicTrack;
 use App\Filament\Resources\MusicTracks\Pages\EditMusicTrack;
 use App\Filament\Resources\MusicTracks\Pages\ListMusicTracks;
@@ -133,4 +134,41 @@ it('falls back to the ogg duration when the mp3 is unreadable', function () {
             'ogg_path' => fakeAudio('ogg'),
         ])
         ->assertSet('data.duration_seconds', 2);
+});
+
+it('links to a create page prefilled with the track\'s shared details', function () {
+    $track = MusicTrack::factory()->create();
+
+    Livewire::test(ListMusicTracks::class)
+        ->assertTableActionHasUrl('duplicate', MusicTrackResource::getUrl('create', ['duplicate' => $track->getKey()]), $track);
+    Livewire::test(EditMusicTrack::class, ['record' => $track->getRouteKey()])
+        ->assertActionHasUrl('duplicate', MusicTrackResource::getUrl('create', ['duplicate' => $track->getKey()]));
+});
+
+it('prefills author and license details, but not per-track fields, when duplicating', function () {
+    $track = MusicTrack::factory()->create([
+        'author' => 'Some Composer',
+        'license' => 'CC BY 4.0',
+        'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
+        'source_url' => 'https://example.com/album',
+    ]);
+
+    get(MusicTrackResource::getUrl('create', ['duplicate' => $track->getKey()]))->assertOk();
+
+    Livewire::withQueryParams(['duplicate' => $track->getKey()])
+        ->test(CreateMusicTrack::class)
+        ->assertSet('data.author', 'Some Composer')
+        ->assertSet('data.license', 'CC BY 4.0')
+        ->assertSet('data.license_url', 'https://creativecommons.org/licenses/by/4.0/')
+        ->assertSet('data.source_url', 'https://example.com/album')
+        ->assertSet('data.title', null)
+        ->assertSet('data.duration_seconds', null)
+        ->assertSet('data.mp3_path', [])
+        ->assertSet('data.ogg_path', []);
+});
+
+it('starts with a blank form when the duplicated track does not exist', function () {
+    Livewire::withQueryParams(['duplicate' => 999999])
+        ->test(CreateMusicTrack::class)
+        ->assertSet('data.author', null);
 });

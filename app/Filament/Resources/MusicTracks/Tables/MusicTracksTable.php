@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\MusicTracks\Tables;
 
+use App\Filament\Resources\MusicTracks\Actions\DuplicateMusicTrackAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -38,6 +39,7 @@ class MusicTracksTable
             ->defaultSort('created_at', 'desc')
             ->recordActions([
                 EditAction::make(),
+                DuplicateMusicTrackAction::make(),
             ]);
     }
 

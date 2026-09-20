@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\MusicTracks\Pages;
 
+use App\Filament\Resources\MusicTracks\Actions\DuplicateMusicTrackAction;
 use App\Filament\Resources\MusicTracks\MusicTrackResource;
 use App\Models\MusicTrack;
 use Filament\Actions\DeleteAction;
@@ -19,6 +20,7 @@ class EditMusicTrack extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            DuplicateMusicTrackAction::make(),
             DeleteAction::make()
                 ->modalDescription(fn (MusicTrack $record): string => $record->playlistItems()->exists()
                     ? '這首曲目正在播放清單中使用，刪除後會一併從所有播放清單移除，並刪除 mp3 / ogg 檔案。'
