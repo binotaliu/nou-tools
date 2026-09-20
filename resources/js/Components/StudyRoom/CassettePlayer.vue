@@ -4,7 +4,7 @@
 // next. Tapping the track opens a popover above it with the playlists,
 // previous/next, eject, volume and the track's credits. A cassette is only in
 // the deck while a tape is loaded.
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, useId } from 'vue'
 import {
   BackwardIcon,
   ForwardIcon,
@@ -19,6 +19,8 @@ const props = defineProps({
 
 const root = ref(null)
 const open = ref(false)
+// The Wall and focus mode each mount a deck, so the popover id can't be fixed.
+const popoverId = useId()
 
 // How much tape has wound onto the right reel; the left one has the rest.
 const leftTapeRadius = computed(() => 4.5 + 5 * (1 - props.music.progress))
@@ -45,9 +47,12 @@ function closeOnOutsidePointer(event) {
   }
 }
 
+// Escape closes an open popover first and stops there, so inside focus mode it
+// doesn't also leave the fullscreen (which listens on window).
 function closeOnEscape(event) {
-  if (event.key === 'Escape') {
+  if (event.key === 'Escape' && open.value) {
     open.value = false
+    event.stopPropagation()
   }
 }
 
@@ -76,7 +81,7 @@ const linkClass =
   >
     <div
       v-if="open"
-      id="study-room-music-popover"
+      :id="popoverId"
       class="absolute inset-x-0 bottom-full z-20 mb-2 flex flex-col gap-2 rounded-xl border-2 border-b-4 border-theme-300 bg-theme-100 p-2 shadow-md dark:border-zinc-600 dark:bg-zinc-800"
       data-testid="study-room-music-popover"
     >
@@ -306,7 +311,7 @@ const linkClass =
         type="button"
         class="min-w-0 flex-1 rounded-md px-1 py-0.5 text-left focus-visible:ring-2 focus-visible:ring-theme-500 focus-visible:outline-none"
         :aria-expanded="open ? 'true' : 'false'"
-        aria-controls="study-room-music-popover"
+        :aria-controls="popoverId"
         aria-label="選擇卡帶與更多控制"
         data-testid="study-room-music-toggle"
         @click="open = !open"

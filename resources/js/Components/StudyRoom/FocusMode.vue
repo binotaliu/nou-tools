@@ -2,7 +2,8 @@
 // The action banner blown up to fill the whole browser window — the view
 // from your carrel. Only shown while a timer is running (timer.hasTimer());
 // closes itself if the timer ends or the seat is released underneath you
-// (see useStudyTimer's onRoomStateChanged).
+// (see useStudyTimer's onRoomStateChanged). The cassette player sits on the
+// desk.
 import { onUnmounted } from 'vue'
 import {
   ArrowsPointingInIcon,
@@ -11,6 +12,7 @@ import {
   StopIcon,
 } from '@heroicons/vue/24/outline'
 import { PlayIcon as PlaySolidIcon } from '@heroicons/vue/24/solid'
+import CassettePlayer from './CassettePlayer.vue'
 import SceneSkyline from './SceneSkyline.vue'
 import SkyLayers from './SkyLayers.vue'
 
@@ -18,6 +20,7 @@ const props = defineProps({
   sky: { type: Object, required: true },
   timer: { type: Object, required: true },
   profile: { type: Object, required: true },
+  music: { type: Object, required: true },
 })
 
 function handleEscape(event) {
@@ -435,6 +438,18 @@ onUnmounted(() => {
           class="absolute inset-x-1.5 top-1 h-1.5 rounded-full bg-theme-700/70"
         ></div>
       </div>
+    </div>
+
+    <!--
+      The same deck as on the Wall, standing on the desk. It shares the page's
+      music state, so a tape keeps playing straight through entering and
+      leaving focus mode.
+    -->
+    <div
+      v-if="music.available"
+      class="absolute bottom-3 left-1/2 z-10 w-64 max-w-[calc(100%-2rem)] -translate-x-1/2"
+    >
+      <CassettePlayer :music="music" />
     </div>
 
     <svg

@@ -235,3 +235,47 @@ it('puts the player left of the clock on a phone and under the window on a deskt
         ->and(abs($desktop['player']['left'] - $desktop['garden']['left']))->toBeLessThanOrEqual(4.5)
         ->and($desktop['clock']['left'])->toBeGreaterThanOrEqual($desktop['player']['right']);
 });
+
+it('keeps the tape playing on the desk in focus mode, and Esc closes the popover before the fullscreen', function () {
+    studyRoomPlaylist('雨聲', ['Rain Tape', 'Cafe Tape']);
+
+    $page = openStudyRoomForMusic();
+    stubMediaElement($page);
+
+    $focus = '[data-testid="study-room-focus-mode"] ';
+
+    $page->wait(1)
+        ->click('[data-testid="study-room-music-play"]')
+        ->wait(1)
+        ->click('[data-testid="seat-1-S01"]')
+        ->wait(1)
+        ->click('[data-testid="study-room-start-timer"]')
+        ->wait(1)
+        ->click('[data-testid="study-room-focus-mode-open"]')
+        ->wait(1)
+        ->assertVisible($focus.'[data-testid="study-room-music-player"]')
+        // Same playback state as the Wall's deck: the tape is already in.
+        ->assertVisible($focus.'[data-testid="study-room-music-cassette"]')
+        ->assertAttribute($focus.'[data-testid="study-room-music-play"]', 'aria-pressed', 'true')
+        ->assertSeeIn($focus.'[data-testid="study-room-music-title"]', 'Rain Tape')
+        ->screenshot(filename: 'study-room-focus-mode-music');
+
+    $page->click($focus.'[data-testid="study-room-music-next"]')
+        ->wait(1)
+        ->assertSeeIn($focus.'[data-testid="study-room-music-title"]', 'Cafe Tape');
+
+    // The first Esc only closes the popover; the second leaves focus mode.
+    $page->click($focus.'[data-testid="study-room-music-toggle"]')
+        ->assertVisible($focus.'[data-testid="study-room-music-popover"]')
+        ->keys($focus, ['Escape'])
+        ->wait(1)
+        ->assertMissing($focus.'[data-testid="study-room-music-popover"]')
+        ->assertVisible('[data-testid="study-room-focus-mode"]')
+        ->keys($focus, ['Escape'])
+        ->wait(1)
+        ->assertMissing('[data-testid="study-room-focus-mode"]');
+
+    // Back on the Wall the same tape is still playing.
+    $page->assertAttribute('[data-testid="study-room-music-play"]', 'aria-pressed', 'true')
+        ->assertSeeIn('[data-testid="study-room-music-title"]', 'Cafe Tape');
+});

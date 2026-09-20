@@ -744,7 +744,12 @@ onUnmounted(() => {
           :client-config="clientConfig"
         />
 
-        <FocusMode :sky="sky" :timer="timer" :profile="profile" />
+        <FocusMode
+          :sky="sky"
+          :timer="timer"
+          :profile="profile"
+          :music="music"
+        />
       </div>
     </div>
   </AppLayout>
