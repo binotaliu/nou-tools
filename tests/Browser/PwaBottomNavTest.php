@@ -277,3 +277,12 @@ it('changes the theme and accent from the settings page', function () {
 
     expect($page->script('document.documentElement.dataset.accent'))->toBe('ocean');
 });
+
+it('points a visitor without a remembered schedule to their schedule instead of showing notification switches', function () {
+    $page = visit('/settings')->resize(...PHONE);
+
+    $page->assertVisible('[data-testid="settings-notifications"]')
+        ->assertVisible('[data-testid="settings-notifications-no-schedule"]')
+        ->assertMissing('[data-testid="settings-notify-class-reminders"]')
+        ->assertMissing('[data-testid="settings-notify-timer-end"]');
+});
