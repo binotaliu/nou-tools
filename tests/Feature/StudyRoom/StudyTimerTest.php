@@ -9,6 +9,7 @@ use App\Models\StudentScheduleItem;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
 use App\Models\StudyRoomSession;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Date;
 use Inertia\Testing\AssertableInertia as Assert;
 use NouTools\Domains\StudyRoom\Actions\ReleaseIdleSeats;
@@ -835,6 +836,132 @@ it('resumes by shifting the timer forward by the pause and measuring only the re
         ->and($sessions->last()->focus_seconds)->toBe(15 * 60)
         ->and($sessions->last()->overtime_seconds)->toBe(3 * 60)
         ->and($sessions->last()->was_completed)->toBeTrue();
+
+    Date::setTestNow();
+});
+
+it('does not record the overtime twice when pausing past the planned end and carrying on', function () {
+    [$schedule] = seatedStudent();
+
+    Date::setTestNow(Date::now());
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'custom',
+            'minutes' => 20,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $this->travel(25)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.pause'))
+        ->assertOk();
+
+    $this->travel(10)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.resume'))
+        ->assertOk();
+
+    $this->travel(5)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->deleteJson(route('study-room.timer.stop'))
+        ->assertOk();
+
+    $sessions = StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->orderBy('id')->get();
+    expect($sessions)->toHaveCount(2)
+        ->and($sessions->first()->focus_seconds)->toBe(25 * 60)
+        ->and($sessions->first()->overtime_seconds)->toBe(5 * 60)
+        // The 5 minutes of overtime before the pause are already in the first
+        // session; the segment after resuming is overtime in full, no more.
+        ->and($sessions->last()->focus_seconds)->toBe(5 * 60)
+        ->and($sessions->last()->overtime_seconds)->toBe(5 * 60)
+        ->and($sessions->last()->was_completed)->toBeTrue();
+
+    Date::setTestNow();
+});
+
+it('does not record the overtime twice when changing activity past the planned end', function () {
+    [$schedule] = seatedStudent();
+
+    Date::setTestNow(Date::now());
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'custom',
+            'minutes' => 20,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $this->travel(25)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->patchJson(route('study-room.timer.activity'), [
+            'verb' => StudyActivityVerb::Homework->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $this->travel(5)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->deleteJson(route('study-room.timer.stop'))
+        ->assertOk();
+
+    $sessions = StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->orderBy('id')->get();
+    expect($sessions->first()->overtime_seconds)->toBe(5 * 60)
+        ->and($sessions->last()->focus_seconds)->toBe(5 * 60)
+        ->and($sessions->last()->overtime_seconds)->toBe(5 * 60);
+
+    Date::setTestNow();
+});
+
+it('keeps the progress bar continuous across repeated pauses', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    Date::setTestNow(Date::now());
+
+    $call = fn (string $route, array $body = []) => $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route($route), $body)
+        ->assertOk();
+
+    $progressAt = fn (CarbonInterface $at): float => ($at->getTimestamp() - $seat->refresh()->timer_started_at->getTimestamp())
+        / ($seat->timer_ends_at->getTimestamp() - $seat->timer_started_at->getTimestamp());
+
+    $call('study-room.timer.start', [
+        'mode' => 'custom',
+        'minutes' => 20,
+        'verb' => StudyActivityVerb::Review->value,
+        'subjectCourseId' => null,
+    ]);
+
+    $this->travel(5)->minutes();
+    $call('study-room.timer.pause');
+    $frozenAt = $progressAt($seat->refresh()->paused_at);
+
+    $this->travel(10)->minutes();
+    $call('study-room.timer.resume');
+    expect($progressAt(now()))->toEqualWithDelta($frozenAt, 0.0001);
+
+    $this->travel(5)->minutes();
+    $call('study-room.timer.pause');
+    $frozenAt = $progressAt($seat->refresh()->paused_at);
+
+    $this->travel(20)->minutes();
+    $call('study-room.timer.resume');
+    expect($progressAt(now()))->toEqualWithDelta($frozenAt, 0.0001)
+        ->and($frozenAt)->toEqualWithDelta(0.5, 0.0001);
 
     Date::setTestNow();
 });

@@ -32,7 +32,11 @@ use Illuminate\Support\Facades\Date;
  * `timer_ends_at` no longer caps the result: a countdown keeps ticking
  * (and being credited) past its planned end until the student acts, and
  * the portion beyond the plan is broken out separately as
- * `overtime_seconds`. A count-up timer has no plan (`timer_ends_at` is
+ * `overtime_seconds`. A segment that starts after the planned end (a pause
+ * or activity change during overtime, then carrying on) has no plan left,
+ * so the remaining plan is floored at zero and the whole segment counts as
+ * overtime — the overtime before the split was already recorded by the
+ * previous segment. A count-up timer has no plan (`timer_ends_at` is
  * null) — its whole elapsed time is ordinary focus time, never overtime.
  */
 final readonly class RecordStudySession
@@ -65,7 +69,7 @@ final readonly class RecordStudySession
             $plannedSeconds = $focusSeconds;
             $wasCompleted = true;
         } else {
-            $plannedSeconds = $seat->timer_ends_at->getTimestamp() - $segmentStartedAt->getTimestamp();
+            $plannedSeconds = max(0, $seat->timer_ends_at->getTimestamp() - $segmentStartedAt->getTimestamp());
             $wasCompleted = $focusSeconds >= $plannedSeconds;
         }
 
