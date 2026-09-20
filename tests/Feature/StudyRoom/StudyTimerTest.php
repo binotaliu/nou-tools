@@ -11,6 +11,7 @@ use App\Models\StudyRoomSeat;
 use App\Models\StudyRoomSession;
 use Illuminate\Support\Facades\Date;
 use Inertia\Testing\AssertableInertia as Assert;
+use NouTools\Domains\StudyRoom\Actions\ReleaseIdleSeats;
 
 function studyTimerCookie(StudentSchedule $schedule): string
 {
@@ -678,4 +679,326 @@ it('leaves a custom timer without a round and stopping clears it', function () {
 
     $seat->refresh();
     expect($seat->timer_round)->toBeNull();
+});
+
+it('pauses a running timer, recording the elapsed segment while the progress bar anchors stay put', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    Date::setTestNow(Date::now());
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'pomodoro',
+            'minutes' => null,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $originalStartedAt = $seat->refresh()->timer_started_at;
+    $originalEndsAt = $seat->timer_ends_at;
+
+    $this->travel(10)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.pause'))
+        ->assertOk()
+        ->assertJsonPath('state.floors.0.soloSeats.0.pausedAt', now()->toIso8601String());
+
+    $session = StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->sole();
+    expect($session->activity_verb)->toBe(StudyActivityVerb::Review)
+        ->and($session->focus_seconds)->toBe(600)
+        ->and($session->was_completed)->toBeFalse();
+
+    $seat->refresh();
+    expect($seat->paused_at->getTimestamp())->toBe(now()->getTimestamp())
+        ->and($seat->timer_phase)->toBe(StudyTimerPhase::Focus)
+        ->and($seat->timer_started_at->equalTo($originalStartedAt))->toBeTrue()
+        ->and($seat->timer_ends_at->equalTo($originalEndsAt))->toBeTrue();
+
+    Date::setTestNow();
+});
+
+it('resumes by shifting the timer forward by the pause and measuring only the remaining plan', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    Date::setTestNow(Date::now());
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'custom',
+            'minutes' => 20,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $originalStartedAt = $seat->refresh()->timer_started_at;
+    $originalEndsAt = $seat->timer_ends_at;
+
+    $this->travel(8)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.pause'))
+        ->assertOk();
+
+    $this->travel(30)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.resume'))
+        ->assertOk()
+        ->assertJsonPath('state.floors.0.soloSeats.0.pausedAt', null);
+
+    $seat->refresh();
+    expect($seat->paused_at)->toBeNull()
+        ->and($seat->timer_started_at->equalTo($originalStartedAt->addMinutes(30)))->toBeTrue()
+        ->and($seat->timer_ends_at->equalTo($originalEndsAt->addMinutes(30)))->toBeTrue()
+        ->and($seat->activity_started_at->getTimestamp())->toBe(now()->getTimestamp());
+
+    // 12 minutes of the plan remain; run 15 (3 overtime).
+    $this->travel(15)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->deleteJson(route('study-room.timer.stop'))
+        ->assertOk();
+
+    $sessions = StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->orderBy('id')->get();
+    expect($sessions)->toHaveCount(2)
+        ->and($sessions->first()->focus_seconds)->toBe(8 * 60)
+        ->and($sessions->last()->focus_seconds)->toBe(15 * 60)
+        ->and($sessions->last()->overtime_seconds)->toBe(3 * 60)
+        ->and($sessions->last()->was_completed)->toBeTrue();
+
+    Date::setTestNow();
+});
+
+it('keeps a count-up timer open-ended when resuming', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    Date::setTestNow(Date::now());
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'count_up',
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $originalStartedAt = $seat->refresh()->timer_started_at;
+
+    $this->travel(5)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.pause'))
+        ->assertOk();
+
+    $this->travel(10)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.resume'))
+        ->assertOk();
+
+    $seat->refresh();
+    expect($seat->timer_ends_at)->toBeNull()
+        ->and($seat->timer_started_at->equalTo($originalStartedAt->addMinutes(10)))->toBeTrue();
+
+    Date::setTestNow();
+});
+
+it('does not record the pause as study time when stopping while paused', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    Date::setTestNow(Date::now());
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'pomodoro',
+            'minutes' => null,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $this->travel(10)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.pause'))
+        ->assertOk();
+
+    $this->travel(20)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->deleteJson(route('study-room.timer.stop'))
+        ->assertOk();
+
+    expect(StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->sole()->focus_seconds)->toBe(600);
+
+    $seat->refresh();
+    expect($seat->paused_at)->toBeNull()
+        ->and($seat->timer_mode)->toBeNull();
+
+    Date::setTestNow();
+});
+
+it('does not record the pause as study time when a paused seat is released for being idle', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    Date::setTestNow(Date::now());
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'custom',
+            'minutes' => 30,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $this->travel(10)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.pause'))
+        ->assertOk();
+
+    $this->travel(2)->hours();
+
+    expect(app(ReleaseIdleSeats::class)())->toBe(1);
+
+    expect(StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->sole()->focus_seconds)->toBe(600);
+
+    $seat->refresh();
+    expect($seat->student_schedule_id)->toBeNull()
+        ->and($seat->paused_at)->toBeNull();
+
+    Date::setTestNow();
+});
+
+it('lets the activity be changed while paused, applying it to the resumed segment without a new session', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    Date::setTestNow(Date::now());
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'custom',
+            'minutes' => 30,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $this->travel(10)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.pause'))
+        ->assertOk();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->patchJson(route('study-room.timer.activity'), [
+            'verb' => StudyActivityVerb::Homework->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    expect(StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->count())->toBe(1);
+
+    $this->travel(5)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.resume'))
+        ->assertOk();
+
+    $this->travel(20)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->deleteJson(route('study-room.timer.stop'))
+        ->assertOk();
+
+    $sessions = StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->orderBy('id')->get();
+    expect($sessions)->toHaveCount(2)
+        ->and($sessions->first()->activity_verb)->toBe(StudyActivityVerb::Review)
+        ->and($sessions->last()->activity_verb)->toBe(StudyActivityVerb::Homework)
+        ->and($sessions->last()->focus_seconds)->toBe(20 * 60)
+        ->and($sessions->last()->was_completed)->toBeTrue();
+
+    Date::setTestNow();
+});
+
+it('refuses to pause when no timer is running, on a break, or already paused', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $pause = fn () => $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.pause'));
+
+    $pause()->assertStatus(422);
+
+    $seat->update([
+        'activity_verb' => StudyActivityVerb::Review,
+        'timer_mode' => 'pomodoro',
+        'timer_phase' => StudyTimerPhase::Break,
+        'timer_started_at' => now(),
+        'timer_ends_at' => now()->addMinutes(5),
+    ]);
+
+    $pause()->assertStatus(422);
+    expect($seat->refresh()->paused_at)->toBeNull();
+
+    $seat->update([
+        'timer_phase' => StudyTimerPhase::Focus,
+        'paused_at' => now(),
+    ]);
+
+    $pause()->assertStatus(422);
+});
+
+it('refuses to resume a timer that is not paused', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $seat->update([
+        'activity_verb' => StudyActivityVerb::Review,
+        'timer_mode' => 'pomodoro',
+        'timer_phase' => StudyTimerPhase::Focus,
+        'timer_started_at' => now(),
+        'timer_ends_at' => now()->addMinutes(25),
+    ]);
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.resume'))
+        ->assertStatus(422);
+});
+
+it('refuses to start a break while paused, even past the planned end', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $seat->update([
+        'activity_verb' => StudyActivityVerb::Review,
+        'timer_mode' => 'pomodoro',
+        'timer_phase' => StudyTimerPhase::Focus,
+        'timer_round' => 1,
+        'timer_started_at' => now()->subMinutes(30),
+        'timer_ends_at' => now()->subMinutes(5),
+        'paused_at' => now()->subMinutes(2),
+    ]);
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.break'))
+        ->assertStatus(422);
+
+    expect($seat->refresh()->timer_phase)->toBe(StudyTimerPhase::Focus);
 });

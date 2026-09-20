@@ -65,9 +65,15 @@ export default function useStudyTimer(
     return hours + ':' + pad2(minutes % 60) + ':' + pad2(seconds)
   }
 
+  // A paused timer's clock is frozen at the moment it was paused, so its
+  // countdown, count-up and progress bar all stop there instead of ticking.
+  function clockNow(seat) {
+    return seat.pausedAt ? Date.parse(seat.pausedAt) : now.value
+  }
+
   function remainingLabel(seat) {
     if (seat.timerEndsAt) {
-      const diffMs = Date.parse(seat.timerEndsAt) - now.value
+      const diffMs = Date.parse(seat.timerEndsAt) - clockNow(seat)
 
       if (diffMs > 0) {
         return clockLabel(Math.ceil(diffMs / 1000))
@@ -79,7 +85,7 @@ export default function useStudyTimer(
     if (seat.timerStartedAt) {
       const elapsedSeconds = Math.max(
         0,
-        Math.floor((now.value - Date.parse(seat.timerStartedAt)) / 1000)
+        Math.floor((clockNow(seat) - Date.parse(seat.timerStartedAt)) / 1000)
       )
 
       return clockLabel(elapsedSeconds)
@@ -99,6 +105,7 @@ export default function useStudyTimer(
   function isSeatFinishedFocus(seat) {
     return (
       seat.timerPhase === 'focus' &&
+      !seat.pausedAt &&
       seat.timerEndsAt !== null &&
       Date.parse(seat.timerEndsAt) <= now.value
     )
@@ -146,7 +153,7 @@ export default function useStudyTimer(
 
     const seat = socket.mySeat()
 
-    if (!seat || !seat.timerEndsAt) {
+    if (!seat || !seat.timerEndsAt || seat.pausedAt) {
       return
     }
 
@@ -304,6 +311,18 @@ export default function useStudyTimer(
     )
   }
 
+  function isPaused() {
+    const seat = socket.mySeat()
+
+    return !!seat && !!seat.pausedAt
+  }
+
+  function canPause() {
+    const seat = socket.mySeat()
+
+    return !!seat && seat.timerPhase === 'focus' && !seat.pausedAt
+  }
+
   function canStartBreak() {
     const seat = socket.mySeat()
 
@@ -362,7 +381,7 @@ export default function useStudyTimer(
       return 1
     }
 
-    return clamp01((now.value - startedAt) / (endsAt - startedAt))
+    return clamp01((clockNow(seat) - startedAt) / (endsAt - startedAt))
   }
 
   function progressStyle() {
@@ -384,6 +403,10 @@ export default function useStudyTimer(
       }
 
       return isLongBreakRound() ? '長休息' : '休息一下'
+    }
+
+    if (isPaused()) {
+      return '已暫停'
     }
 
     if (canStartBreak()) {
@@ -414,6 +437,10 @@ export default function useStudyTimer(
 
     if (!seat || !seat.timerEndsAt) {
       return ''
+    }
+
+    if (seat.pausedAt) {
+      return '時間已停止'
     }
 
     const { hour, minute } = window.NouTime.taipeiHM(
@@ -624,6 +651,14 @@ export default function useStudyTimer(
     await runPanelAction(() => window.axios.delete('/study-room/timer'))
   }
 
+  async function pauseTimer() {
+    await runPanelAction(() => window.axios.post('/study-room/timer/pause'))
+  }
+
+  async function resumeTimer() {
+    await runPanelAction(() => window.axios.post('/study-room/timer/resume'))
+  }
+
   async function startBreak() {
     await runPanelAction(() => window.axios.post('/study-room/timer/break'))
   }
@@ -709,6 +744,8 @@ export default function useStudyTimer(
     hasCountdownEnd,
     isOnBreak,
     isBreakFinished,
+    isPaused,
+    canPause,
     canStartBreak,
     canStartNextRound,
     canChangeActivity,
@@ -741,6 +778,8 @@ export default function useStudyTimer(
     formatDurationLabel,
     startTimer,
     stopTimer,
+    pauseTimer,
+    resumeTimer,
     startBreak,
     startNextRound,
     changeActivity,

@@ -63,6 +63,7 @@ final readonly class StartStudyTimer
             $seat->timer_started_at = $now;
             $seat->activity_started_at = $now;
             $seat->timer_ends_at = $minutes === null ? null : $now->addMinutes($minutes);
+            $seat->paused_at = null;
             $seat->saveOrFail();
 
             return $seat;

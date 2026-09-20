@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Date;
  * The single place that turns a seat's running timer state into a
  * `study_room_sessions` row. A no-op (returns null, no row written) when
  * the seat has no running Focus-phase timer — in particular a Break-phase
- * timer never produces a session.
+ * timer never produces a session, and neither does a paused one:
+ * `PauseStudyTimer` already recorded the segment up to the pause, and the
+ * pause itself isn't study time.
  *
  * Focus seconds are computed server-side, never trusted from the client:
  * `min(now, last_seen_at) - segmentStartedAt`, clamped to
@@ -42,6 +44,10 @@ final readonly class RecordStudySession
         }
 
         if ($seat->timer_phase !== StudyTimerPhase::Focus || $seat->timer_started_at === null) {
+            return null;
+        }
+
+        if ($seat->paused_at !== null) {
             return null;
         }
 

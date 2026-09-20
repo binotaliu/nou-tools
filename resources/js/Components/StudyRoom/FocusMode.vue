@@ -6,6 +6,7 @@
 import { onUnmounted } from 'vue'
 import {
   ArrowsPointingInIcon,
+  PauseIcon,
   SparklesIcon,
   StopIcon,
 } from '@heroicons/vue/24/outline'
@@ -339,6 +340,30 @@ onUnmounted(() => {
       <div
         class="mt-1 flex flex-wrap items-center justify-center gap-2 sm:mt-2"
       >
+        <button
+          v-show="timer.canPause()"
+          type="button"
+          :disabled="timer.panelBusy"
+          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-2.5 text-sm font-medium backdrop-blur transition disabled:opacity-50"
+          :class="sky.focusChromeClass()"
+          data-testid="study-room-focus-pause-timer"
+          @click="timer.pauseTimer()"
+        >
+          <PauseIcon class="size-4" />
+          暫停
+        </button>
+        <button
+          v-show="timer.isPaused()"
+          type="button"
+          :disabled="timer.panelBusy"
+          class="inline-flex items-center gap-1.5 rounded-full border px-5 py-2.5 text-sm font-semibold backdrop-blur transition disabled:opacity-50"
+          :class="sky.focusChromeClass()"
+          data-testid="study-room-focus-resume-timer"
+          @click="timer.resumeTimer()"
+        >
+          <PlaySolidIcon class="size-4" />
+          繼續
+        </button>
         <button
           v-show="timer.canStartBreak()"
           type="button"

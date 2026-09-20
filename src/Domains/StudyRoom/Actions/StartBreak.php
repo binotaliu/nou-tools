@@ -46,6 +46,7 @@ final readonly class StartBreak
             $now = Date::now();
 
             $hasFinishedFocusTimer = $seat->timer_phase === StudyTimerPhase::Focus
+                && $seat->paused_at === null
                 && $seat->timer_ends_at !== null
                 && $now->greaterThanOrEqualTo($seat->timer_ends_at);
 

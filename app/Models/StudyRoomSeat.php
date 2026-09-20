@@ -37,6 +37,7 @@ final class StudyRoomSeat extends Model
         'timer_started_at',
         'activity_started_at',
         'timer_ends_at',
+        'paused_at',
     ];
 
     protected $casts = [
@@ -50,6 +51,7 @@ final class StudyRoomSeat extends Model
         'timer_started_at' => 'datetime',
         'activity_started_at' => 'datetime',
         'timer_ends_at' => 'datetime',
+        'paused_at' => 'datetime',
     ];
 
     /**

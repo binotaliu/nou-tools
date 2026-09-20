@@ -32,6 +32,10 @@ export default function useSeatGrid(socket, config) {
       return '休息中'
     }
 
+    if (seat.pausedAt) {
+      return '暫停中'
+    }
+
     return seat.activity || '專注中'
   }
 

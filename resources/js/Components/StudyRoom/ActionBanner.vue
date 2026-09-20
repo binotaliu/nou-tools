@@ -5,6 +5,7 @@
 import {
   ArrowRightStartOnRectangleIcon,
   ArrowsPointingOutIcon,
+  PauseIcon,
   PencilSquareIcon,
   PlayIcon,
   SparklesIcon,
@@ -275,6 +276,30 @@ defineProps({
                   >
                     <ArrowsPointingOutIcon class="size-4" />
                     全螢幕
+                  </button>
+
+                  <button
+                    v-show="timer.canPause()"
+                    type="button"
+                    :disabled="timer.panelBusy"
+                    data-testid="study-room-pause-timer"
+                    class="inline-flex items-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-3 py-2.5 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                    @click="timer.pauseTimer()"
+                  >
+                    <PauseIcon class="size-4" />
+                    暫停
+                  </button>
+
+                  <button
+                    v-show="timer.isPaused()"
+                    type="button"
+                    :disabled="timer.panelBusy"
+                    data-testid="study-room-resume-timer"
+                    class="inline-flex items-center gap-1.5 rounded-xl bg-theme-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
+                    @click="timer.resumeTimer()"
+                  >
+                    <PlaySolidIcon class="size-4" />
+                    繼續
                   </button>
 
                   <button

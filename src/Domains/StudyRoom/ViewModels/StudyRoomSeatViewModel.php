@@ -40,6 +40,7 @@ final class StudyRoomSeatViewModel extends Data
         public ?int $roundsPerCycle,
         public ?DateTimeInterface $timerEndsAt,
         public ?DateTimeInterface $timerStartedAt,
+        public ?DateTimeInterface $pausedAt,
     ) {}
 
     public static function fromModel(StudyRoomSeat $seat, ?int $viewerScheduleId): self
@@ -66,6 +67,7 @@ final class StudyRoomSeatViewModel extends Data
             roundsPerCycle: $seat->timer_round === null ? null : PomodoroCycle::forProfile($profile)->roundsPerCycle,
             timerEndsAt: $seat->timer_ends_at,
             timerStartedAt: $seat->timer_started_at,
+            pausedAt: $seat->paused_at,
         );
     }
 }

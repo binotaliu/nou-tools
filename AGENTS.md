@@ -75,6 +75,11 @@ Lives in `src/Domains/StudyRoom/` (Actions, DTOs, ViewModels, PageData) plus `Ap
 1. **Seats co-locate definition and occupancy.** A `study_room_seats` row is both "this seat exists" and "who's sitting in it right now" — there's no separate occupancy table. That means claiming a seat is one conditional `UPDATE ... WHERE student_schedule_id IS NULL`, not a read-then-write. Splitting occupancy into its own table would reopen the race two students taking the same seat simultaneously were supposed to be immune to.
 2. **Open floor counts are derived, never stored.** Which floors are "open" is computed from current occupancy (`ResolveOpenFloorCount`) each time state is built, not persisted as a flag. Storing it would let it drift from the actual seat rows after a release, a sync, or a crash mid-write.
 
+Pausing a Focus timer (`PauseStudyTimer` / `ResumeStudyTimer`, `seat.paused_at`) splits the record the same way `ChangeStudyActivity` does, and keeps the progress bar continuous:
+
+- Pause records the elapsed segment but leaves `timer_started_at`/`timer_ends_at` alone; the client measures the frozen countdown and bar up to `pausedAt`. Resume shifts both forward by the paused duration and restarts `activity_started_at`, so the next session measures only what is left of the plan.
+- `RecordStudySession` is a **no-op while `paused_at` is set** — that is what keeps stopping, leaving or idle-release from crediting the pause as study time. Anything that resets the timer columns must also clear `paused_at`.
+
 ## 背景音樂 (Music Library)
 
 Lives in `src/Domains/Music/` plus `App\Models\MusicTrack`/`MusicPlaylist`/`MusicPlaylistItem`; managed in Filament (`MusicTrackResource`, `MusicPlaylistResource`, group 自習室). The player UI is not built yet; `GET /study-room/music/playlists` (`ListMusicPlaylists` → `MusicPlaylistListViewModel`) is what it will consume.

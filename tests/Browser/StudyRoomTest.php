@@ -843,3 +843,62 @@ it('draws the garden and windows from the real Taiwan sky, day and night', funct
 
     expect($page->script($component.'.clockTimeLabel()'))->toBe('15:20');
 });
+
+it('pauses and resumes a running timer, freezing the countdown while paused', function () {
+    $schedule = createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->waitForEvent('load');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '暫停一下')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]')
+        ->wait(1);
+
+    $page->assertVisible('[data-testid="study-room-root"]')
+        ->click('[data-testid="seat-1-S01"]')
+        ->wait(1)
+        ->click('[data-testid="study-room-start-timer"]')
+        ->wait(1)
+        ->assertSeeIn('[data-testid="study-room-timer-phase"]', '專注中')
+        ->assertVisible('[data-testid="study-room-pause-timer"]')
+        ->assertMissing('[data-testid="study-room-resume-timer"]');
+
+    $page->click('[data-testid="study-room-pause-timer"]')
+        ->wait(1)
+        ->assertSeeIn('[data-testid="study-room-timer-phase"]', '已暫停')
+        ->assertVisible('[data-testid="study-room-resume-timer"]')
+        ->assertMissing('[data-testid="study-room-pause-timer"]');
+
+    // The pause is recorded server-side, and the elapsed segment became a session.
+    $seat = StudyRoomSeat::query()->where('student_schedule_id', $schedule->id)->sole();
+    expect($seat->paused_at)->not->toBeNull()
+        ->and(StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->count())->toBe(1);
+
+    // Frozen: the countdown doesn't move while the clock keeps running.
+    $countdown = static fn (): string => $page->script(
+        'document.querySelector(\'[data-testid="study-room-your-countdown"]\').textContent.trim()'
+    );
+
+    $frozen = $countdown();
+    $page->wait(2);
+    expect($countdown())->toBe($frozen);
+
+    $page->click('[data-testid="study-room-resume-timer"]')
+        ->wait(1)
+        ->assertSeeIn('[data-testid="study-room-timer-phase"]', '專注中')
+        ->assertVisible('[data-testid="study-room-pause-timer"]')
+        ->assertMissing('[data-testid="study-room-resume-timer"]');
+
+    expect($seat->refresh()->paused_at)->toBeNull();
+
+    // ...and it ticks again once resumed.
+    $running = $countdown();
+    $page->wait(2);
+    expect($countdown())->not->toBe($running);
+});
