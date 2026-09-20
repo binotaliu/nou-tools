@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Csp;
 
+use App\Models\MusicPlaylist;
+use App\Models\MusicTrack;
 use App\Models\NewsletterIssue;
 use Spatie\Csp\Directive;
 use Spatie\Csp\Policy;
@@ -33,6 +35,18 @@ final class PublicSitePolicy implements Preset
 
         if (($coverOrigin = NewsletterIssue::coverImageOrigin()) !== null) {
             $policy->add(Directive::IMG, $coverOrigin);
+        }
+
+        // The study room's cassette player streams tracks through an <audio>
+        // element (media-src) and shows playlist covers (img-src). Both stay
+        // same-origin while the disks are local, so this only adds the
+        // CDN origin once they move to S3.
+        if (($audioOrigin = ScopedDiskOrigins::serving(MusicTrack::AUDIO_DISK)) !== null) {
+            $policy->add(Directive::MEDIA, $audioOrigin);
+        }
+
+        if (($musicCoverOrigin = ScopedDiskOrigins::serving(MusicPlaylist::COVER_DISK)) !== null) {
+            $policy->add(Directive::IMG, $musicCoverOrigin);
         }
 
         // The og-image card (spatie/laravel-og-image) loads Noto Sans TC from
