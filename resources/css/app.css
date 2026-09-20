@@ -102,6 +102,12 @@
   }
 }
 
+@keyframes reel {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes focus-in {
   from {
     opacity: 0;
@@ -286,6 +292,13 @@
 
 @utility animate-marquee {
   animation: marquee 12s linear infinite;
+}
+
+/* Rotates an SVG hub around its own centre; pause it with `animation-play-state`. */
+@utility animate-reel {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: reel 2.4s linear infinite;
 }
 
 @utility animate-focus-in {
