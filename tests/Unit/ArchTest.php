@@ -13,6 +13,7 @@ use App\Models\MusicTrack;
 use App\Models\NewsletterColumn;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
+use App\Models\NewsletterReaction;
 use App\Models\PushNotificationDelivery;
 use App\Models\StudentScheduleItem;
 use App\Models\User;
@@ -52,6 +53,7 @@ arch()->preset()->strict()
         NewsletterColumn::class,
         NewsletterIssue::class,
         NewsletterItem::class,
+        NewsletterReaction::class,
         PushNotificationDelivery::class,
         StudentScheduleItem::class,
         User::class,

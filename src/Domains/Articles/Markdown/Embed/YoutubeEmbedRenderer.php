@@ -13,7 +13,9 @@ final class YoutubeEmbedRenderer implements NodeRendererInterface
 {
     public function render(Node $node, ChildNodeRendererInterface $childRenderer): \Stringable
     {
-        \assert($node instanceof YoutubeEmbedNode);
+        if (! $node instanceof YoutubeEmbedNode) {
+            throw new \InvalidArgumentException('Incompatible node type: '.$node::class);
+        }
 
         $src = YoutubeEmbedProcessor::EMBED_ORIGIN.'/embed/'.$node->videoId
             .($node->startSeconds !== null ? '?start='.$node->startSeconds : '');
