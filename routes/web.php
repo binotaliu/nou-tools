@@ -60,6 +60,7 @@ use App\Http\Controllers\StudyRoomSessionController;
 use App\Http\Controllers\StudyRoomSessionStatsController;
 use App\Http\Controllers\StudyRoomStateController;
 use App\Http\Controllers\StudyRoomTimerController;
+use App\Http\Controllers\StudyRoomTimerEndNotificationController;
 use Illuminate\Support\Facades\Route;
 use Spatie\Csp\AddCspHeaders;
 
@@ -171,6 +172,7 @@ Route::prefix('study-room')->name('study-room.')->group(function (): void {
     Route::post('/timer/pause', StudyRoomPauseController::class)->name('timer.pause')->middleware('throttle:60,1');
     Route::post('/timer/resume', StudyRoomResumeController::class)->name('timer.resume')->middleware('throttle:60,1');
     Route::post('/push-subscriptions', StudyRoomPushSubscriptionController::class)->name('push-subscriptions.store')->middleware('throttle:10,1');
+    Route::put('/timer-end-notification', StudyRoomTimerEndNotificationController::class)->name('timer-end-notification.update')->middleware('throttle:10,1');
     Route::post('/heartbeat', StudyRoomHeartbeatController::class)->name('heartbeat')->middleware('throttle:60,1');
 });
 
