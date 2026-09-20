@@ -1,7 +1,7 @@
 // Minimal offline support: keeps a previously-visited home/schedule/directory
 // page (and the assets it needs) available when the network is down, and
 // shows a generic offline page for any other route that isn't cached.
-const CACHE_VERSION = 'v5'
+const CACHE_VERSION = 'v6'
 const PAGE_CACHE = `nou-schedule-pages-${CACHE_VERSION}`
 const RUNTIME_CACHE = `nou-runtime-${CACHE_VERSION}`
 
@@ -136,6 +136,15 @@ function isJsonRequest(request) {
   return accept.startsWith('application/json')
 }
 
+// Audio/video element loads, plus any ranged request (seeking).
+function isMediaRequest(request) {
+  return (
+    request.destination === 'audio' ||
+    request.destination === 'video' ||
+    request.headers.has('range')
+  )
+}
+
 // Inertia's own client-side page visits (<Link>, router.visit — used for
 // every in-app navigation since the Blade+Alpine → Inertia+Vue migration).
 // These are `fetch()` calls, so `request.mode` is never 'navigate' (only a
@@ -178,6 +187,14 @@ self.addEventListener('fetch', event => {
   }
 
   if (isInertiaRequest(request)) {
+    return
+  }
+
+  // Streamed media (the study room's cassette player). <audio> asks for
+  // `Range: bytes=0-` and gets a 206, which cache.put() rejects, so the
+  // stale-while-revalidate bucket below would turn playback and seeking into
+  // errors. Let the browser talk to the network directly.
+  if (isMediaRequest(request)) {
     return
   }
 
