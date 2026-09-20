@@ -41,7 +41,6 @@ export default function useStudyRoomMusic() {
   const currentTime = ref(0)
   const duration = ref(0)
   const volume = ref(clamp01(readStorage(VOLUME_KEY) ?? DEFAULT_VOLUME))
-  const shelfOpen = ref(false)
   const errored = ref(false)
 
   const available = computed(() => playlists.value.length > 0)
@@ -210,29 +209,24 @@ export default function useStudyRoomMusic() {
     }
 
     playlistIndex.value = index
-    shelfOpen.value = false
     writeStorage(PLAYLIST_KEY, playlists.value[index].id)
 
     return insertTrack(0)
   }
 
-  // Takes the tape out and opens the shelf to choose another; with nothing
-  // loaded it just toggles the shelf.
+  // Takes the tape out, leaving the deck empty until a playlist is chosen.
   function eject() {
-    if (loaded.value) {
-      pause()
-      audio.removeAttribute('src')
-      audio.load()
-      loaded.value = false
-      currentTime.value = 0
-      duration.value = 0
-      errored.value = false
-      shelfOpen.value = true
-
+    if (!loaded.value) {
       return
     }
 
-    shelfOpen.value = !shelfOpen.value
+    pause()
+    audio.removeAttribute('src')
+    audio.load()
+    loaded.value = false
+    currentTime.value = 0
+    duration.value = 0
+    errored.value = false
   }
 
   function seek(seconds) {
@@ -300,7 +294,6 @@ export default function useStudyRoomMusic() {
     currentTime,
     duration,
     volume,
-    shelfOpen,
     errored,
     available,
     playlist,

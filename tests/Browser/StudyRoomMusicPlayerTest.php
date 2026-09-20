@@ -90,7 +90,7 @@ it('leaves the wall without a player while no playlists exist', function () {
         ->assertMissing('[data-testid="study-room-music-player"]');
 });
 
-it('plays a tape, skips tracks, and swaps playlists from the shelf', function () {
+it('plays a tape, skips tracks, and swaps playlists from the popover', function () {
     $rain = studyRoomPlaylist('雨聲', ['Rain Tape', 'Cafe Tape']);
     $night = studyRoomPlaylist('夜間', ['Night Tape']);
 
@@ -121,18 +121,58 @@ it('plays a tape, skips tracks, and swaps playlists from the shelf', function ()
         ->assertAttribute('[data-testid="study-room-music-play"]', 'aria-pressed', 'false')
         ->assertVisible('[data-testid="study-room-music-cassette"]');
 
-    // Ejecting takes it out and offers the other playlists.
+    // The popover holds the playlists and the less-used controls.
+    $page->assertMissing('[data-testid="study-room-music-popover"]')
+        ->click('[data-testid="study-room-music-toggle"]')
+        ->assertVisible('[data-testid="study-room-music-popover"]')
+        ->assertVisible('[data-testid="study-room-music-playlist-'.$rain->id.'"]')
+        ->assertVisible('[data-testid="study-room-music-credit"]');
+
+    // Ejecting takes the cassette out of the deck.
     $page->click('[data-testid="study-room-music-eject"]')
         ->wait(1)
         ->assertMissing('[data-testid="study-room-music-cassette"]')
-        ->assertVisible('[data-testid="study-room-music-shelf"]')
-        ->assertVisible('[data-testid="study-room-music-playlist-'.$rain->id.'"]');
+        ->assertVisible('[data-testid="study-room-music-empty"]');
 
     $page->click('[data-testid="study-room-music-playlist-'.$night->id.'"]')
         ->wait(1)
-        ->assertMissing('[data-testid="study-room-music-shelf"]')
+        ->assertMissing('[data-testid="study-room-music-popover"]')
         ->assertVisible('[data-testid="study-room-music-cassette"]')
         ->assertSeeIn('[data-testid="study-room-music-title"]', 'Night Tape');
+
+    // Tapping elsewhere on the wall closes the popover again.
+    $page->click('[data-testid="study-room-music-toggle"]')
+        ->assertVisible('[data-testid="study-room-music-popover"]')
+        ->click('[data-testid="study-room-clock"]')
+        ->assertMissing('[data-testid="study-room-music-popover"]');
+});
+
+it('scrolls a track title that does not fit, and leaves a short one still', function () {
+    studyRoomPlaylist('長短', [
+        'Short',
+        'An extremely long track title that can never fit inside the strip',
+    ]);
+
+    $page = openStudyRoomForMusic();
+    stubMediaElement($page);
+
+    $page->wait(1)
+        ->click('[data-testid="study-room-music-play"]')
+        ->wait(1)
+        ->assertSeeIn('[data-testid="study-room-music-title"]', 'Short')
+        ->assertMissing('[data-testid="study-room-marquee"]');
+
+    $page->click('[data-testid="study-room-music-next"]')
+        ->wait(1)
+        ->assertVisible('[data-testid="study-room-marquee"]');
+
+    expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"study-room-marquee\"]')).animationName"))
+        ->toBe('marquee');
+
+    // Back to a title that fits: the scrolling copy goes away.
+    $page->click('[data-testid="study-room-music-next"]')
+        ->wait(1)
+        ->assertMissing('[data-testid="study-room-marquee"]');
 });
 
 it('saves the volume the listener picks', function () {
@@ -140,7 +180,9 @@ it('saves the volume the listener picks', function () {
 
     $page = openStudyRoomForMusic();
 
-    $page->wait(1)->assertVisible('[data-testid="study-room-music-volume"]');
+    $page->wait(1)
+        ->click('[data-testid="study-room-music-toggle"]')
+        ->assertVisible('[data-testid="study-room-music-volume"]');
 
     $page->script(<<<'JS'
         const slider = document.querySelector('[data-testid="study-room-music-volume"]')
@@ -173,6 +215,10 @@ it('puts the player left of the clock on a phone and under the window on a deskt
 
     $page->resize(...MUSIC_PHONE)->wait(1);
     $phone = $page->script($rects);
+
+    // Width is tight beside the clock, so the strip drops its next button
+    // (the popover still has one).
+    $page->assertMissing('[data-testid="study-room-music-next"]');
 
     expect($phone['player']['right'])->toBeLessThanOrEqual($phone['clock']['left'])
         // Same row: the two boxes overlap vertically.
