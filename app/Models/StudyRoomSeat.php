@@ -52,6 +52,7 @@ final class StudyRoomSeat extends Model
         'activity_started_at' => 'datetime',
         'timer_ends_at' => 'datetime',
         'paused_at' => 'datetime',
+        'timer_end_notified_at' => 'datetime',
     ];
 
     /**

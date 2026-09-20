@@ -25,6 +25,7 @@ final class StudyRoomProfileFactory extends Factory
             'nickname' => $this->faker->firstName(),
             'emoji' => $this->faker->randomElement(config('study-room.emojis')),
             'play_sound_on_timer_end' => true,
+            'notify_on_timer_end' => false,
         ];
     }
 }
