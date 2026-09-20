@@ -89,14 +89,23 @@ Pausing a Focus timer (`PauseStudyTimer` / `ResumeStudyTimer`, `seat.paused_at`)
 
 ## 背景音樂 (Music Library)
 
-Lives in `src/Domains/Music/` plus `App\Models\MusicTrack`/`MusicPlaylist`/`MusicPlaylistItem`; managed in Filament (`MusicTrackResource`, `MusicPlaylistResource`, group 自習室). The player UI is not built yet; `GET /study-room/music/playlists` (`ListMusicPlaylists` → `MusicPlaylistListViewModel`) is what it will consume.
+Lives in `src/Domains/Music/` plus `App\Models\MusicTrack`/`MusicPlaylist`/`MusicPlaylistItem`; managed in Filament (`MusicTrackResource`, `MusicPlaylistResource`, group 自習室). The cassette player on the study room Wall consumes `GET /study-room/music/playlists` (`ListMusicPlaylists` → `MusicPlaylistListViewModel`).
 
 - **Every track has both an mp3 and an ogg file** (both required); the browser picks whichever it can play. Duration is stored in seconds and read from the uploaded file by `ReadAudioDuration` (getID3): the mp3 fills it, the ogg only fills a blank, and the field stays editable.
 - **Files live on scoped, env-switchable disks** like the newsletter covers: `music_tracks` (`MUSIC_TRACKS_DISK`) and `music_playlist_covers` (`MUSIC_COVERS_DISK`), both `public` by default.
 - **Filament never deletes stored files it replaces**, so the models do it: replacing an mp3/ogg/cover on update, or deleting the record, removes the old file (`booted()` hooks).
 - **Playlist order is `music_playlist_items.position`**, edited via a `Repeater->relationship()->orderColumn('position')`. It's a real model rather than a bare pivot because that Repeater only works on `HasMany`; `MusicPlaylist::tracks()` is the ordered read side. A track can appear once per playlist.
 - **Uploads are capped at 30MB** (`config/livewire.php` `temporary_file_upload.rules` and `MusicTrackForm::MAX_AUDIO_KB`, keep them in step); PHP's `upload_max_filesize`/`post_max_size` and any web-server body limit must allow it too.
-- **CSP:** `AdminPanelPolicy` allows the S3/CDN origins of these disks via `ScopedDiskOrigins`. `PublicSitePolicy` does not yet: when the player ships, add `Directive::MEDIA` for the audio disk's origin and `IMG` for the cover disk's if they move to S3.
+- **CSP:** `AdminPanelPolicy` allows the S3/CDN origins of these disks via `ScopedDiskOrigins`. `PublicSitePolicy` adds `Directive::MEDIA` for the audio disk's origin and `IMG` for the cover disk's, only once they are on S3 (local disks are same-origin). `<audio>` needs no `connect-src`.
+- **Player:** `Components/StudyRoom/CassettePlayer.vue`, driven by `Composables/useStudyRoomMusic.js` (created in `Show.vue`, passed to `Wall.vue`, exposed on `window.__studyRoomTest.music`). Playback is local to the listener, never synced through the socket, and never autoplays: the single `Audio` is created on the first press of play, and `dispose()` stops it when the page unmounts. The deck renders only once the endpoint returns a playlist.
+  - **It is a slim strip on purpose** (a fuller deck with bay, progress bar and controls took ~200px of the Wall and was cut down): mini cassette, title, play and next. Tapping the title opens a popover above it (playlists, previous/next, eject, volume, credits; closes on outside click or Escape). Keep new controls in the popover rather than growing the strip. Next is hidden in the strip below `sm` because the row shares width with the clock; the popover always has one (`-popover-next`).
+  - **Layout:** `Wall.vue` is a grid so one player instance sits under the window from `sm` up and to the left of the clock on phones. Keep it a single DOM node; do not add a second copy per breakpoint.
+  - **A tape is "loaded" while playing or paused**; the cassette is only in the deck then, and eject or a fresh page shows an empty slot. The reel animation is `animate-reel` (`app.css`) with `motion-reduce:animate-none`.
+  - **The title scrolls when it doesn't fit** via `Components/StudyRoom/MarqueeText.vue`: same `animate-marquee` slide as the seat status bubbles, but it measures the real overflow (the bubbles use a character count) at a constant 15px/s, and falls back to truncation under reduced motion.
+  - **Attribution is part of the UI:** the tracks are CC-licensed, so the popover shows `author · license`, linked to `sourceUrl`/`licenseUrl`. Keep it when restyling.
+  - Volume and the last playlist live in `localStorage` (`nou:study-room:music-volume:v1`, `nou:study-room:music-playlist:v1`).
+  - The timer-end chime is a separate `Audio` and plays over the music; there is no ducking.
+- **Service worker:** `public/sw.js` lets media requests (`destination` audio/video, or any `Range` request) go straight to the network. `<audio>` gets 206 responses that `cache.put()` rejects, so the same-origin stale-while-revalidate bucket would break playback and seeking. Bump `CACHE_VERSION` when changing this.
 
 <laravel-boost-guidelines>
 === foundation rules ===
