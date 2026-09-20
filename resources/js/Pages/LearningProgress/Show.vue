@@ -11,6 +11,7 @@ import { Head, Link } from '@inertiajs/vue3'
 import { CheckIcon } from '@heroicons/vue/24/solid'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import DateField from '../../Components/DateField.vue'
 import Greeting from '../../Components/Greeting.vue'
 import useLearningProgress from '../../Composables/useLearningProgress'
 
@@ -379,12 +380,13 @@ const csrfToken =
                     <td
                       class="border border-theme-300 bg-white p-0 text-center last:border-r-0 dark:border-zinc-600 dark:bg-zinc-900"
                     >
-                      <input
-                        type="date"
+                      <DateField
                         :name="`homework[${course.id}][${number}][deadline]`"
-                        :value="findHomework(course.id, number)?.deadline ?? ''"
-                        :aria-label="`${course.name} ${number === 1 ? '作業一' : '作業二'}的截止日期`"
-                        class="m-0 h-full w-full border-0 bg-transparent px-2 py-2 text-xs text-theme-900 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-inset dark:text-zinc-100"
+                        :model-value="findHomework(course.id, number)?.deadline"
+                        :label="`${course.name} ${number === 1 ? '作業一' : '作業二'}的截止日期`"
+                        :today="viewModel.now"
+                        :initial-month="viewModel.semesterStart"
+                        @change="hasUnsavedChanges = true"
                       />
                     </td>
                   </template>
