@@ -104,7 +104,7 @@ const rows = computed(() => [
   {
     key: 'class-reminders',
     label: '面授開始前通知',
-    description: '有影片連結的面授課程開始前 10 分鐘提醒你。',
+    description: '面授開始前 10 分鐘接收推播通知。',
     enabled: classReminders.enabled.value,
     disabled: classReminders.busy.value,
     toggle: toggleClassReminders,
@@ -113,7 +113,7 @@ const rows = computed(() => [
     key: 'timer-end',
     label: '自習室時間到通知',
     description: props.notifications?.hasStudyRoomProfile
-      ? '計時器結束時通知你，關掉分頁也收得到。'
+      ? '計時器時間到時接收推播通知。'
       : '要先到自習室設定暱稱才能開啟。',
     enabled: timerEnd.enabled.value,
     disabled:
@@ -175,20 +175,16 @@ const rows = computed(() => [
         </p>
 
         <template v-else>
-          <p class="mt-1 mb-2 text-sm text-theme-600 dark:text-zinc-400">
-            兩種通知各自獨立，開關只影響你的課表。
-          </p>
-
           <p
             v-if="!supported"
-            class="mb-2 text-sm text-red-600 dark:text-red-400"
+            class="mt-1 text-sm text-red-600 dark:text-red-400"
             data-testid="settings-notifications-unsupported"
           >
             這個瀏覽器不支援網頁通知。iPhone 需先將本站加入主畫面。
           </p>
 
           <ul
-            class="divide-y divide-theme-100 dark:divide-zinc-800"
+            class="mt-2 divide-y divide-theme-100 dark:divide-zinc-800"
             :class="{ 'pointer-events-none opacity-50': !supported }"
           >
             <li
