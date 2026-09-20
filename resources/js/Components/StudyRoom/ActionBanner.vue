@@ -311,9 +311,7 @@ defineProps({
                     @click="timer.startBreak()"
                   >
                     <SparklesIcon class="size-4" />
-                    <span>{{
-                      timer.isLongBreakRound() ? '開始長休息' : '開始休息'
-                    }}</span>
+                    <span>{{ timer.startBreakLabel() }}</span>
                   </button>
 
                   <button

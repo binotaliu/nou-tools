@@ -323,10 +323,20 @@ export default function useStudyTimer(
     return !!seat && seat.timerPhase === 'focus' && !seat.pausedAt
   }
 
-  function canStartBreak() {
+  function isFocusFinished() {
     const seat = socket.mySeat()
 
     return !!seat && isSeatFinishedFocus(seat)
+  }
+
+  function canStartBreak() {
+    const seat = socket.mySeat()
+
+    return (
+      !!seat &&
+      (isSeatFinishedFocus(seat) ||
+        (isPomodoro() && seat.timerPhase === 'focus' && !seat.pausedAt))
+    )
   }
 
   function canStartNextRound() {
@@ -409,7 +419,7 @@ export default function useStudyTimer(
       return '已暫停'
     }
 
-    if (canStartBreak()) {
+    if (isFocusFinished()) {
       return '這一輪完成了'
     }
 
@@ -448,6 +458,12 @@ export default function useStudyTimer(
     )
 
     return (isOnBreak() ? '休息到 ' : '預計 ') + hour + ':' + minute
+  }
+
+  function startBreakLabel() {
+    const label = isLongBreakRound() ? '長休息' : '休息'
+
+    return (isFocusFinished() ? '開始' : '跳過專注，開始') + label
   }
 
   function nextRoundLabel() {
@@ -747,6 +763,7 @@ export default function useStudyTimer(
     isPaused,
     canPause,
     canStartBreak,
+    startBreakLabel,
     canStartNextRound,
     canChangeActivity,
     currentRound,

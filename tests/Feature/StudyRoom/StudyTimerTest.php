@@ -377,6 +377,69 @@ it('runs a short break after a mid-cycle round and the long break after the last
     expect(StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->where('was_completed', true)->count())->toBe(2);
 });
 
+it('lets a pomodoro round be skipped into its break, recording the elapsed focus as unfinished', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    StudyRoomProfile::query()->where('student_schedule_id', $schedule->id)->update([
+        'pomodoro_focus_minutes' => 25,
+        'pomodoro_short_break_minutes' => 5,
+        'pomodoro_long_break_minutes' => 30,
+        'pomodoro_rounds_per_cycle' => 2,
+    ]);
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'pomodoro',
+            'minutes' => null,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    // Ten minutes into a 25-minute round.
+    $this->travel(10)->minutes();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.break'))
+        ->assertOk();
+
+    $seat->refresh();
+    expect($seat->timer_phase)->toBe(StudyTimerPhase::Break)
+        ->and($seat->timer_round)->toBe(1)
+        ->and((int) $seat->timer_started_at->diffInMinutes($seat->timer_ends_at))->toBe(5);
+
+    $session = StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->sole();
+    expect($session->was_completed)->toBeFalse()
+        ->and($session->focus_seconds)->toBe(600)
+        ->and($session->overtime_seconds)->toBe(0);
+});
+
+it('refuses to skip a paused pomodoro round into its break', function () {
+    [$schedule, $seat] = seatedStudent();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.start'), [
+            'mode' => 'pomodoro',
+            'minutes' => null,
+            'verb' => StudyActivityVerb::Review->value,
+            'subjectCourseId' => null,
+        ])->assertOk();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.pause'))
+        ->assertOk();
+
+    $this->withCredentials()
+        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->postJson(route('study-room.timer.break'))
+        ->assertStatus(422);
+
+    expect($seat->refresh()->timer_phase)->toBe(StudyTimerPhase::Focus);
+});
+
 it('refuses to start the next round unless the seat is on a pomodoro break', function () {
     [$schedule, $seat] = seatedStudent();
 

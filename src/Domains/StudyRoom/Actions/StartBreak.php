@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\StudyRoom\Actions;
 
+use App\Enums\StudyTimerMode;
 use App\Enums\StudyTimerPhase;
 use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Date;
@@ -14,9 +15,11 @@ use NouTools\Domains\StudyRoom\Exceptions\TimerNotFinishedException;
 use NouTools\Domains\StudyRoom\ValueObjects\PomodoroCycle;
 
 /**
- * Starts the break after a finished focus timer. The break is manual by
- * product decision — there's no auto-advance from Focus to Break, so this
- * only succeeds once the focus timer has actually run out. Its length
+ * Starts the break after a focus timer. The break is manual by product
+ * decision — there's no auto-advance from Focus to Break. A pomodoro round
+ * may be cut short at any point (the mirror of skipping a break in
+ * `StartNextRound`), the elapsed part being recorded as an unfinished
+ * session; any other timer must have run out first. Its length
  * comes from the student's own cycle: the short break after most rounds,
  * the long one after the last round of a cycle. A finished custom timer
  * gets the short break (it has no round to be the last of).
@@ -45,12 +48,18 @@ final readonly class StartBreak
 
             $now = Date::now();
 
-            $hasFinishedFocusTimer = $seat->timer_phase === StudyTimerPhase::Focus
-                && $seat->paused_at === null
+            $isRunningFocus = $seat->timer_phase === StudyTimerPhase::Focus
+                && $seat->paused_at === null;
+
+            $canSkipFocus = $isRunningFocus
+                && $seat->timer_mode === StudyTimerMode::Pomodoro
+                && $seat->timer_round !== null;
+
+            $hasFinishedFocusTimer = $isRunningFocus
                 && $seat->timer_ends_at !== null
                 && $now->greaterThanOrEqualTo($seat->timer_ends_at);
 
-            if (! $hasFinishedFocusTimer) {
+            if (! $canSkipFocus && ! $hasFinishedFocusTimer) {
                 throw new TimerNotFinishedException;
             }
 

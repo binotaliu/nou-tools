@@ -7,9 +7,9 @@ namespace NouTools\Domains\StudyRoom\Exceptions;
 use RuntimeException;
 
 /**
- * Thrown by `StartBreak` when the viewer's focus timer hasn't finished yet
- * — the break is manual (the student presses 開始休息 themselves), so it
- * can never be started early.
+ * Thrown by `StartBreak` when the viewer has no running focus timer to
+ * end — a non-pomodoro timer that hasn't run out yet, a paused one, or
+ * one that's already on its break.
  */
 final class TimerNotFinishedException extends RuntimeException
 {
