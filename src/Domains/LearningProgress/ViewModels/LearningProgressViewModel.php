@@ -44,7 +44,8 @@ final class LearningProgressViewModel extends Data
         $progressData = $learningProgress->progress ?? [];
         $notesData = $learningProgress->notes ?? [];
         $homeworkData = $learningProgress->homework ?? [];
-        $total = count($courses) * count($weeks) * 2;
+        $homeworkLabels = [1 => '作業一', 2 => '作業二'];
+        $total = count($courses) * (count($weeks) * 2 + count($homeworkLabels));
         $completed = 0;
 
         $entries = [];
@@ -73,12 +74,16 @@ final class LearningProgressViewModel extends Data
             }
         }
 
-        $homeworkLabels = [1 => '作業一', 2 => '作業二'];
         $homeworkEntries = [];
 
         foreach ($courses as $course) {
             foreach ($homeworkLabels as $number => $label) {
                 $slot = $homeworkData[$course['id']][$number] ?? [];
+                $homeworkCompleted = (bool) ($slot['completed'] ?? false);
+
+                if ($homeworkCompleted) {
+                    $completed++;
+                }
 
                 $homeworkEntries[] = new LearningProgressHomeworkEntryViewModel(
                     courseId: $course['id'],
@@ -86,7 +91,7 @@ final class LearningProgressViewModel extends Data
                     label: $label,
                     deadline: $slot['deadline'] ?? null,
                     note: (string) ($slot['note'] ?? ''),
-                    completed: (bool) ($slot['completed'] ?? false),
+                    completed: $homeworkCompleted,
                 );
             }
         }

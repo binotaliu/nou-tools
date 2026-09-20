@@ -41,6 +41,16 @@ test('viewmodel calculates completion percentage correctly', function () {
     $learning->term = '2025B';
     $learning->progress = $progressData;
     $learning->notes = [];
+    $learning->homework = [
+        1 => [
+            1 => ['completed' => '1'],
+            2 => ['deadline' => '2026-10-08'],
+        ],
+        2 => [
+            1 => ['completed' => '1'],
+            2 => ['completed' => '1'],
+        ],
+    ];
 
     $semesterStart = Carbon::parse('2026-01-01');
     $semesterEnd = Carbon::parse('2026-05-01');
@@ -54,11 +64,11 @@ test('viewmodel calculates completion percentage correctly', function () {
         $semesterEnd,
     );
 
-    // two courses × two weeks × 2 items (video + textbook) = 8 total
-    expect($vm->totalCount)->toEqual(8);
-    // above progress data contains seven completed items
-    expect($vm->completedCount)->toEqual(7);
-    expect($vm->percentage)->toBe(87.5);
+    // two courses × (two weeks × 2 items (video + textbook) + 2 homeworks) = 12 total
+    expect($vm->totalCount)->toEqual(12);
+    // seven completed video/textbook items plus three completed homeworks
+    expect($vm->completedCount)->toEqual(10);
+    expect($vm->percentage)->toBe(10 / 12 * 100);
 });
 
 test('viewmodel builds homework entries from homework data', function () {
