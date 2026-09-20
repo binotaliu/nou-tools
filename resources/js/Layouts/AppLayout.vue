@@ -371,6 +371,16 @@ const bottomMoreItems = computed(() =>
             </Link>
           </div>
           <div class="text-xs">
+            <Link
+              href="/install"
+              data-testid="footer-install-link"
+              class="inline-flex items-center gap-1 text-theme-500 hover:text-theme-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+            >
+              <Icon name="device-phone-mobile" class="size-3" />
+              安裝 NOU 小幫手
+            </Link>
+          </div>
+          <div class="text-xs">
             <a
               href="https://kuma.binota.org/status/nou"
               class="inline-flex items-center gap-1 text-theme-500 hover:text-theme-600 dark:text-zinc-400 dark:hover:text-zinc-300"
