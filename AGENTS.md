@@ -73,6 +73,17 @@ Lives in `src/Domains/StudyRoom/` (Actions, DTOs, ViewModels, PageData) plus `Ap
 1. **Seats co-locate definition and occupancy.** A `study_room_seats` row is both "this seat exists" and "who's sitting in it right now" — there's no separate occupancy table. That means claiming a seat is one conditional `UPDATE ... WHERE student_schedule_id IS NULL`, not a read-then-write. Splitting occupancy into its own table would reopen the race two students taking the same seat simultaneously were supposed to be immune to.
 2. **Open floor counts are derived, never stored.** Which floors are "open" is computed from current occupancy (`ResolveOpenFloorCount`) each time state is built, not persisted as a flag. Storing it would let it drift from the actual seat rows after a release, a sync, or a crash mid-write.
 
+## 背景音樂 (Music Library)
+
+Lives in `src/Domains/Music/` plus `App\Models\MusicTrack`/`MusicPlaylist`/`MusicPlaylistItem`; managed in Filament (`MusicTrackResource`, `MusicPlaylistResource`, group 自習室). The player UI is not built yet; `GET /study-room/music/playlists` (`ListMusicPlaylists` → `MusicPlaylistListViewModel`) is what it will consume.
+
+- **Every track has both an mp3 and an ogg file** (both required); the browser picks whichever it can play. Duration is stored in seconds and read from the uploaded file by `ReadAudioDuration` (getID3): the mp3 fills it, the ogg only fills a blank, and the field stays editable.
+- **Files live on scoped, env-switchable disks** like the newsletter covers: `music_tracks` (`MUSIC_TRACKS_DISK`) and `music_playlist_covers` (`MUSIC_COVERS_DISK`), both `public` by default.
+- **Filament never deletes stored files it replaces**, so the models do it: replacing an mp3/ogg/cover on update, or deleting the record, removes the old file (`booted()` hooks).
+- **Playlist order is `music_playlist_items.position`**, edited via a `Repeater->relationship()->orderColumn('position')`. It's a real model rather than a bare pivot because that Repeater only works on `HasMany`; `MusicPlaylist::tracks()` is the ordered read side. A track can appear once per playlist.
+- **Uploads are capped at 30MB** (`config/livewire.php` `temporary_file_upload.rules` and `MusicTrackForm::MAX_AUDIO_KB`, keep them in step); PHP's `upload_max_filesize`/`post_max_size` and any web-server body limit must allow it too.
+- **CSP:** `AdminPanelPolicy` allows the S3/CDN origins of these disks via `ScopedDiskOrigins`. `PublicSitePolicy` does not yet: when the player ships, add `Directive::MEDIA` for the audio disk's origin and `IMG` for the cover disk's if they move to S3.
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

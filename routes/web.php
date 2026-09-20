@@ -28,6 +28,7 @@ use App\Http\Controllers\Markdown\NewsletterIndexMarkdownController;
 use App\Http\Controllers\Markdown\NewsletterShowMarkdownController;
 use App\Http\Controllers\Markdown\ScheduleShowMarkdownController;
 use App\Http\Controllers\Markdown\StudyRoomMarkdownController;
+use App\Http\Controllers\MusicPlaylistController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NewsletterFeedController;
 use App\Http\Controllers\PwaManifestController;
@@ -147,6 +148,7 @@ Route::prefix('study-room')->name('study-room.')->group(function (): void {
     Route::get('/state', StudyRoomStateController::class)->name('state')->middleware('throttle:120,1');
     Route::get('/sessions', StudyRoomSessionController::class)->name('sessions')->middleware('throttle:60,1');
     Route::get('/sessions/stats', StudyRoomSessionStatsController::class)->name('sessions.stats')->middleware('throttle:60,1');
+    Route::get('/music/playlists', MusicPlaylistController::class)->name('music.playlists')->middleware('throttle:60,1');
     Route::post('/profile', StudyRoomProfileController::class)->name('profile.update')->middleware('throttle:5,1');
     Route::post('/seats/{seat}/take', [StudyRoomSeatController::class, 'store'])->name('seats.take')->middleware('throttle:60,1');
     Route::post('/seat/leave', [StudyRoomSeatController::class, 'destroy'])->name('seat.leave')->middleware('throttle:60,1');

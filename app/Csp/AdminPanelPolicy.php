@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Csp;
 
+use App\Models\MusicPlaylist;
+use App\Models\MusicTrack;
 use App\Models\NewsletterIssue;
 use Spatie\Csp\Directive;
 use Spatie\Csp\Keyword;
@@ -41,12 +43,16 @@ final class AdminPanelPolicy implements Preset
             ->add(Directive::STYLE, [Keyword::SELF, Keyword::UNSAFE_INLINE])
             ->add(Directive::IMG, [Keyword::SELF, 'data:', 'blob:', '*.tile.openstreetmap.org', 'https://ui-avatars.com', 'https://images.unsplash.com']);
 
-        if (($coverOrigin = NewsletterIssue::coverImageOrigin()) !== null) {
-            $policy->add(Directive::IMG, $coverOrigin);
+        foreach ([NewsletterIssue::COVER_DISK, MusicPlaylist::COVER_DISK] as $coverDisk) {
+            if (($coverOrigin = ScopedDiskOrigins::serving($coverDisk)) !== null) {
+                $policy->add(Directive::IMG, $coverOrigin);
+            }
         }
 
-        if (($bucketOrigin = NewsletterIssue::coverBucketOrigin()) !== null) {
-            $policy->add(Directive::CONNECT, $bucketOrigin);
+        foreach ([NewsletterIssue::COVER_DISK, MusicPlaylist::COVER_DISK, MusicTrack::AUDIO_DISK] as $uploadDisk) {
+            if (($bucketOrigin = ScopedDiskOrigins::bucket($uploadDisk)) !== null) {
+                $policy->add(Directive::CONNECT, $bucketOrigin);
+            }
         }
     }
 }

@@ -14,6 +14,7 @@
     "filament/spatie-laravel-settings-plugin": "^5.8",
     "genealabs/laravel-caffeine": "^13.0",
     "inertiajs/inertia-laravel": "^3.3",
+    "james-heinrich/getid3": "^1.9",
     "laravel-notification-channels/webpush": "^13.0",
     "laravel/ai": "^0.11.2",
     "laravel/framework": "^13.31",

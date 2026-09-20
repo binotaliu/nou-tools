@@ -8,6 +8,8 @@ use App\Models\CourseClass;
 use App\Models\DiscountStore;
 use App\Models\DiscountStoreComment;
 use App\Models\DiscountStoreReport;
+use App\Models\MusicPlaylist;
+use App\Models\MusicTrack;
 use App\Models\NewsletterColumn;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
@@ -37,7 +39,7 @@ arch()->preset()->strict()
         // Base controller class, meant to be extended.
         Controller::class,
 
-        // Override Eloquent's protected `casts()` hook, per Laravel convention.
+        // Override Eloquent's protected `casts()` / `booted()` hooks, per Laravel convention.
         Announcement::class,
         ClassSchedule::class,
         Course::class,
@@ -45,6 +47,8 @@ arch()->preset()->strict()
         DiscountStore::class,
         DiscountStoreComment::class,
         DiscountStoreReport::class,
+        MusicPlaylist::class,
+        MusicTrack::class,
         NewsletterColumn::class,
         NewsletterIssue::class,
         NewsletterItem::class,
