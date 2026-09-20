@@ -704,6 +704,15 @@
     @apply mt-2 text-sm text-theme-600 dark:text-zinc-400;
   }
 
+  /* YouTube embed (pasted iframe snippet, rebuilt by YoutubeEmbedRenderer) */
+  .md-video {
+    @apply my-6 aspect-video overflow-hidden rounded-2xl bg-black;
+  }
+
+  .md-video :where(iframe) {
+    @apply h-full w-full border-0;
+  }
+
   /* 2.11 Checklist */
   .md-checklist {
     @apply my-6 rounded-2xl border border-theme-200 bg-theme-50/70 p-4 dark:border-zinc-700 dark:bg-zinc-800/60;

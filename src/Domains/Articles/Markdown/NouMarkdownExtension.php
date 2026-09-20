@@ -30,6 +30,9 @@ use NouTools\Domains\Articles\Markdown\Dialogue\DialogueIndentedParagraphStartPa
 use NouTools\Domains\Articles\Markdown\Dialogue\DialogueRenderer;
 use NouTools\Domains\Articles\Markdown\Dialogue\DialogueSpeakerStartParser;
 use NouTools\Domains\Articles\Markdown\Dialogue\PersonaResolver;
+use NouTools\Domains\Articles\Markdown\Embed\YoutubeEmbedNode;
+use NouTools\Domains\Articles\Markdown\Embed\YoutubeEmbedProcessor;
+use NouTools\Domains\Articles\Markdown\Embed\YoutubeEmbedRenderer;
 use NouTools\Domains\Articles\Markdown\Heading\HeadingAnchorNode;
 use NouTools\Domains\Articles\Markdown\Heading\HeadingAnchorRenderer;
 use NouTools\Domains\Articles\Markdown\Heading\HeadingSlugProcessor;
@@ -46,7 +49,8 @@ use NouTools\Domains\Articles\Markdown\Toc\TocPlaceholderStartParser;
  * Registers every NOU 小幫手 custom Markdown block/inline extension:
  * `:::` fenced containers (dialogue, callouts, steps, faq, tabs, cards,
  * timeline, summary, cta, figure, checklist, countdown), the GitHub-style
- * `[!TYPE]` alert callouts, `==mark==`, `[[toc]]`, and heading anchors.
+ * `[!TYPE]` alert callouts, `==mark==`, `[[toc]]`, heading anchors, and pasted
+ * YouTube embed iframes (the only raw HTML that is kept, rebuilt from its id).
  */
 final readonly class NouMarkdownExtension implements ExtensionInterface
 {
@@ -105,6 +109,10 @@ final readonly class NouMarkdownExtension implements ExtensionInterface
         // priority than GFM's UrlAutolinkParser (priority 0) so it only ever
         // gets a turn when GFM's declines the match.
         $environment->addInlineParser(new CjkAutolinkParser, -10);
+
+        // A pasted YouTube `<iframe>` embed snippet becomes a rebuilt, allow-listed iframe
+        $environment->addEventListener(DocumentParsedEvent::class, new YoutubeEmbedProcessor);
+        $environment->addRenderer(YoutubeEmbedNode::class, new YoutubeEmbedRenderer);
 
         // Heading anchors (h2-h4): `id` + trailing `#` permalink
         $environment->addEventListener(DocumentParsedEvent::class, new HeadingSlugProcessor, -100);

@@ -7,6 +7,7 @@ namespace App\Csp;
 use App\Models\MusicPlaylist;
 use App\Models\MusicTrack;
 use App\Models\NewsletterIssue;
+use NouTools\Domains\Articles\Markdown\Embed\YoutubeEmbedProcessor;
 use Spatie\Csp\Directive;
 use Spatie\Csp\Policy;
 use Spatie\Csp\Preset;
@@ -32,6 +33,10 @@ final class PublicSitePolicy implements Preset
         // are still fetched from jsDelivr's default CDN base at runtime, since
         // nicknames can contain arbitrary emoji beyond our fixed seat-choice list.
         $policy->add(Directive::IMG, 'cdn.jsdelivr.net');
+
+        // Markdown (articles, newsletter) turns a pasted YouTube embed into an
+        // iframe on the privacy-enhanced domain; nothing else may be framed.
+        $policy->add(Directive::FRAME, YoutubeEmbedProcessor::EMBED_ORIGIN);
 
         if (($coverOrigin = NewsletterIssue::coverImageOrigin()) !== null) {
             $policy->add(Directive::IMG, $coverOrigin);

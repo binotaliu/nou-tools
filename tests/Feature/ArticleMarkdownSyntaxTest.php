@@ -725,3 +725,50 @@ MD);
         ->assertSee('新生：這段語法應該原封不動地出現。', false)
         ->assertDontSee('md-dialogue', false);
 });
+
+// --- YouTube embed ----------------------------------------------------------
+
+test('a pasted YouTube embed snippet becomes a rebuilt privacy-enhanced iframe', function () {
+    $html = ($this->convert)(<<<'MD'
+前言文字
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=abc&amp;start=42" title="YouTube video player" frameborder="0" allow="autoplay; clipboard-write" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+後續文字
+MD);
+
+    expect($html)
+        ->toContain('<div class="md-video"><iframe src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?start=42" title="YouTube video player"')
+        ->toContain('allowfullscreen')
+        ->not->toContain('autoplay')
+        ->not->toContain('frameborder')
+        ->toContain('<p>前言文字</p>')
+        ->toContain('<p>後續文字</p>');
+});
+
+test('a youtube-nocookie embed is accepted and a missing title falls back', function () {
+    $html = ($this->convert)('<iframe src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"></iframe>');
+
+    expect($html)->toContain('src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ" title="YouTube 影片"');
+});
+
+test('iframes that are not a plain YouTube embed are still dropped', function (string $markdown) {
+    expect(($this->convert)($markdown))->not->toContain('iframe');
+})->with([
+    'other host' => '<iframe src="https://evil.example/embed/dQw4w9WgXcQ"></iframe>',
+    'lookalike host' => '<iframe src="https://youtube.com.evil.example/embed/dQw4w9WgXcQ"></iframe>',
+    'http scheme' => '<iframe src="http://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>',
+    'javascript scheme' => '<iframe src="javascript:alert(1)"></iframe>',
+    'not an embed path' => '<iframe src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></iframe>',
+    'bad video id' => '<iframe src="https://www.youtube.com/embed/short"></iframe>',
+    'playlist embed' => '<iframe src="https://www.youtube.com/embed/videoseries?list=PL123"></iframe>',
+    'extra markup' => '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe><script>alert(1)</script>',
+]);
+
+test('a hostile title cannot break out of the rebuilt iframe', function () {
+    $html = ($this->convert)('<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="&quot; onload=&quot;alert(1)"></iframe>');
+
+    expect($html)
+        ->toContain('title="&quot; onload=&quot;alert(1)"')
+        ->not->toContain(' onload="');
+});

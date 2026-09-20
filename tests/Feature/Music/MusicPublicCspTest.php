@@ -72,3 +72,11 @@ it('adds no music origins to the public CSP while files are stored locally', fun
     expect($directives['media-src'])->not->toContain('example-cdn.net')
         ->and($directives['img-src'])->not->toContain('example-cdn.net');
 });
+
+it('lets pages frame YouTube embeds from the privacy-enhanced domain only', function () {
+    $frameSrc = explode(' ', publicCspDirectives()['frame-src']);
+
+    expect($frameSrc)
+        ->toContain("'self'", 'https://www.youtube-nocookie.com')
+        ->not->toContain('https://www.youtube.com');
+});
