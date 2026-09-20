@@ -6,6 +6,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import DateField from '../../Components/DateField.vue'
 import HeroCarousel from '../../Components/Home/HeroCarousel.vue'
 import Greeting from '../../Components/Greeting.vue'
 import CommonLinks from '../../Components/CommonLinks.vue'
@@ -50,6 +51,11 @@ onUnmounted(() => {
 })
 
 const { date, navigate } = useDatePicker({ date: props.viewModel.selectedDate })
+
+function selectDate(next) {
+  date.value = next
+  navigate()
+}
 
 const typeLabels = {
   morning: '上午班',
@@ -236,13 +242,15 @@ const courses = computed(() =>
             >
               選擇日期
             </label>
-            <input
+            <DateField
               id="video-course-date"
-              v-model="date"
-              type="date"
-              class="rounded border px-3 py-1 text-sm"
+              :model-value="date"
+              label="選擇日期"
+              variant="field"
+              :clearable="false"
+              :today="viewModel.today"
               data-offline-disable
-              @change="navigate()"
+              @change="selectDate"
             />
           </div>
         </div>

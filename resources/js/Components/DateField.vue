@@ -9,8 +9,13 @@
 // popover.
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
+// `id`, `class` and attributes like `data-offline-disable` belong on the
+// trigger button (so a <label for> works), not the wrapper.
+defineOptions({ inheritAttrs: false })
+
 const props = defineProps({
-  name: { type: String, required: true },
+  // Omit for a field that isn't part of a native form submission.
+  name: { type: String, default: null },
   modelValue: { type: String, default: null },
   label: { type: String, required: true },
   // ISO dates (`YYYY-MM-DD` or a longer ISO string, the date part is used).
@@ -19,6 +24,10 @@ const props = defineProps({
   today: { type: String, default: null },
   initialMonth: { type: String, default: null },
   placeholder: { type: String, default: '未設定' },
+  // `cell` fills a table cell and shows `M/D`; `field` is a bordered
+  // standalone control that shows the full date including the year.
+  variant: { type: String, default: 'cell' },
+  clearable: { type: Boolean, default: true },
 })
 
 const emit = defineEmits(['change'])
@@ -87,9 +96,17 @@ watch(
 const selected = computed(() => parseIso(value.value))
 const todayDate = computed(() => parseIso(props.today))
 
-const buttonText = computed(() =>
-  selected.value ? `${selected.value.month}/${selected.value.day}` : ''
-)
+const buttonText = computed(() => {
+  if (!selected.value) {
+    return props.placeholder
+  }
+
+  const { year, month, day } = selected.value
+
+  return props.variant === 'field'
+    ? `${year}/${month}/${day}（${WEEKDAYS[weekdayOf(selected.value)]}）`
+    : `${month}/${day}`
+})
 
 const buttonTitle = computed(() =>
   selected.value ? describe(selected.value) : props.placeholder
@@ -299,12 +316,22 @@ function onOutsidePointerDown(event) {
 }
 
 function onViewportChange(event) {
-  // Scrolling inside the popover itself must not dismiss it.
+  // Scrolling inside the popover itself must not move or dismiss it.
   if (popover.value?.contains(event.target)) {
     return
   }
 
-  closePopover()
+  const rect = trigger.value?.getBoundingClientRect()
+
+  // The popover is `position: fixed`, so follow the trigger while the page or
+  // the table scrolls, and dismiss once the trigger has scrolled out of view.
+  if (!rect || rect.bottom < 0 || rect.top > window.innerHeight) {
+    closePopover()
+
+    return
+  }
+
+  placePopover()
 }
 
 watch(open, isOpen => {
@@ -323,14 +350,20 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="h-full w-full">
-    <input type="hidden" :name="name" :value="value" />
+  <div :class="variant === 'cell' ? 'h-full w-full' : 'inline-block'">
+    <input v-if="name" type="hidden" :name="name" :value="value" />
 
     <button
       ref="trigger"
       type="button"
-      class="m-0 h-full w-full cursor-pointer px-2 py-2 text-center text-xs whitespace-nowrap text-theme-900 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-inset dark:text-zinc-100"
-      :class="{ 'text-gray-400 print:text-transparent': !selected }"
+      v-bind="$attrs"
+      class="cursor-pointer whitespace-nowrap text-theme-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-zinc-100"
+      :class="[
+        variant === 'cell'
+          ? 'm-0 h-full w-full px-2 py-2 text-center text-xs focus:ring-inset'
+          : 'rounded border border-theme-200 bg-white px-3 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-900',
+        { 'text-gray-400 print:text-transparent': !selected },
+      ]"
       :aria-label="`${label}：${selected ? describe(selected) : placeholder}`"
       :title="buttonTitle"
       aria-haspopup="dialog"
@@ -338,7 +371,7 @@ onBeforeUnmount(() => {
       data-testid="date-field-trigger"
       @click="open ? closePopover() : openPopover()"
     >
-      {{ selected ? buttonText : placeholder }}
+      {{ buttonText }}
     </button>
 
     <Teleport to="body">
@@ -417,6 +450,7 @@ onBeforeUnmount(() => {
           class="mt-2 flex justify-between border-t border-theme-100 pt-2 dark:border-zinc-800"
         >
           <button
+            v-if="clearable"
             type="button"
             class="rounded px-2 py-1 text-xs text-theme-700 hover:bg-theme-100 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-zinc-300 dark:hover:bg-zinc-800"
             data-testid="date-field-clear"

@@ -39,6 +39,7 @@ final readonly class ShowHomePage
 
         return new HomePageData(
             selectedDate: $selectedDate,
+            today: Date::now('Asia/Taipei')->format('Y-m-d'),
             courses: HomeCourseViewModel::collect(
                 $courses->map(fn (Course $course) => HomeCourseViewModel::fromModel($course)),
                 DataCollection::class,

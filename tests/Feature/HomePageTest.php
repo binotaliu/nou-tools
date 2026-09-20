@@ -56,7 +56,8 @@ test('homepage lists courses with in-person classes scheduled for the selected d
 
     $response->assertStatus(200);
     $response->assertInertia(function (Assert $page) {
-        $page->component('Home/Index');
+        $page->component('Home/Index')
+            ->where('viewModel.today', Carbon::now('Asia/Taipei')->format('Y-m-d'));
 
         $props = $page->toArray()['props'];
         $courseNames = collect($props['viewModel']['courses'])->pluck('name');

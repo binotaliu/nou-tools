@@ -14,6 +14,7 @@ final class HomePageData extends Resource
 {
     public function __construct(
         public string $selectedDate,
+        public string $today,
         #[DataCollectionOf(HomeCourseViewModel::class)]
         public DataCollection $courses,
         public ?StudentScheduleCookie $previousSchedule,
