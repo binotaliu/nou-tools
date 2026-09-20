@@ -165,9 +165,6 @@ async function submit() {
         />
         時間到時傳送通知
       </label>
-      <p class="mt-1 text-xs text-theme-600 dark:text-zinc-400">
-        關掉分頁或切到其他 App 時也收得到。iPhone 需先將本站加入主畫面。
-      </p>
       <p
         v-if="notifyError"
         class="mt-1 text-xs text-red-600 dark:text-red-400"
