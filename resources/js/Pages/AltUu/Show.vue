@@ -6,6 +6,44 @@ import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import IconAppStoreDownload from '../../Components/IconAppStoreDownload.vue'
 import IconGooglePlayDownload from '../../Components/IconGooglePlayDownload.vue'
+
+const faqs = [
+  {
+    question: 'Alt UU 是空大官方的 App 嗎？',
+    answer:
+      '不是。Alt UU 是由學生開發的第三方 App，與國立空中大學官方沒有任何隸屬或合作關係。',
+  },
+  {
+    question: '支援哪些裝置？',
+    answer:
+      'App Store 版本支援 iPhone、iPad，以及搭載 Apple Silicon 的 Mac；Google Play 版本支援 Android 手機與平板。',
+  },
+  {
+    question: '學習時數會同步到學校的數位學習平台嗎？',
+    answer:
+      '會的。開啟教材後，畫面右上方會顯示本次學習計時器。觀看完畢後按一下返回按鈕，就會自動保存本次的學習時數。\n顯示在教材目錄中的數字，即為學校數位學習平台裡所記錄的學習時數。',
+  },
+  {
+    question: '可以從上次看到的地方繼續嗎？',
+    answer:
+      '可以。Alt UU 會記住你上次觀看的位置，再次開啟教材時會直接從上次離開的地方繼續。',
+  },
+  {
+    question: 'Alt UU 和 NOU 小幫手有什麼關係？',
+    answer:
+      'Alt UU 與 NOU 小幫手是兩個分開的產品。Alt UU 支援整合部分「NOU 小幫手」，開啟後可以在 App 內直接檢視學校行事曆、視訊面授資訊與考古題等，這些資料是 Alt UU 從 NOU 小幫手的公開 API 取得的。\n製作 Alt UU 的目的是為了讓同學在行動裝置上更方便地瀏覽數位學習平台；而 NOU 小幫手則是提供各種學校沒提供的實用工具，例如課表、學習進度管理、自習室等。',
+  },
+  {
+    question: 'Alt UU 是如何運作的？我的資料安全嗎？',
+    answer:
+      '運作方式請參閱下方的《Alt UU 運作原理說明》，資料的處理方式則請見《隱私權政策》。Alt UU 的原始碼也完整公開，任何人都能自行檢視。你的帳號密碼只會傳送給學校，不會傳送給 Alt UU 的伺服器或任何第三方。',
+  },
+  {
+    question: '可以檢視或參與 Alt UU 的開發嗎？',
+    answer:
+      '可以。Alt UU 是自由且開放的軟體，原始碼以 AGPL-3.0-or-later 授權條款公開於 GitHub，歡迎檢視、修改或貢獻程式碼。',
+  },
+]
 </script>
 
 <template>
@@ -206,6 +244,40 @@ import IconGooglePlayDownload from '../../Components/IconGooglePlayDownload.vue'
           >
             前往 Google Play
           </a>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div data-testid="alt-uu-faq">
+        <h3
+          class="mb-4 text-xl font-semibold text-theme-800 dark:text-zinc-200"
+        >
+          常見問題
+        </h3>
+
+        <div class="space-y-2">
+          <details
+            v-for="(faq, index) in faqs"
+            :key="index"
+            class="group rounded-lg border border-theme-200 bg-white px-5 py-3 dark:border-zinc-700 dark:bg-zinc-900"
+            :data-testid="`alt-uu-faq-${index}`"
+          >
+            <summary
+              class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-theme-900 dark:text-zinc-100 [&::-webkit-details-marker]:hidden"
+            >
+              {{ faq.question }}
+              <Icon
+                name="chevron-down"
+                class="size-5 shrink-0 text-theme-400 transition-transform group-open:rotate-180 dark:text-zinc-500"
+                aria-hidden="true"
+              />
+            </summary>
+            <p
+              class="mt-2 text-sm whitespace-pre-line text-theme-600 dark:text-zinc-400"
+            >
+              {{ faq.answer }}
+            </p>
+          </details>
         </div>
       </div>
 
