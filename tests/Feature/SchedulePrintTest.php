@@ -7,6 +7,7 @@ use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
 use Illuminate\Support\Str;
 use NouTools\Domains\Schedules\Actions\BuildSchedulePrintPage;
+use NouTools\Domains\Shared\Pdf\HtmlToPdf;
 
 function printableSchedule(array $courseAttributes = [], string $term = '2025B'): StudentSchedule
 {
@@ -183,4 +184,70 @@ it('renders an empty schedule without errors', function () {
 
 it('returns 404 for an unknown schedule', function () {
     $this->get(route('schedules.print', ['schedule' => (string) Str::uuid()]))->assertNotFound();
+});
+
+/**
+ * Stands in for Chromium so tests never launch a browser.
+ */
+function fakeHtmlToPdf(): object
+{
+    $fake = new class implements HtmlToPdf
+    {
+        /** @var array<int, string> */
+        public array $rendered = [];
+
+        public function landscapeA4(string $html): string
+        {
+            $this->rendered[] = $html;
+
+            return "%PDF-fake\x00\xff";
+        }
+    };
+
+    app()->instance(HtmlToPdf::class, $fake);
+
+    return $fake;
+}
+
+it('serves the sheet as a PDF', function () {
+    $fake = fakeHtmlToPdf();
+    $schedule = printableSchedule(['name' => '會計學']);
+
+    $response = $this->get(route('schedules.print.pdf', ['schedule' => $schedule, 'term' => '2025B']));
+
+    $response->assertOk()
+        ->assertHeader('Content-Type', 'application/pdf')
+        ->assertHeader('X-Robots-Tag', 'noindex');
+    expect($response->getContent())->toBe("%PDF-fake\x00\xff")
+        ->and($fake->rendered)->toHaveCount(1)
+        // Inlined, so the PDF renderer needs no origin to fetch assets from.
+        ->and($fake->rendered[0])->toContain('會計學')->toContain('<style>')->not->toContain('nonce=');
+});
+
+it('reuses the rendered PDF while the sheet is unchanged', function () {
+    $fake = fakeHtmlToPdf();
+    $schedule = printableSchedule();
+
+    $url = route('schedules.print.pdf', ['schedule' => $schedule, 'term' => '2025B']);
+
+    $this->get($url)->assertOk();
+    $this->get($url)->assertOk();
+
+    expect($fake->rendered)->toHaveCount(1);
+
+    ClassSchedule::factory()->create(['class_id' => $schedule->items->first()->course_class_id, 'date' => '2026-03-08']);
+    $this->get($url)->assertOk();
+
+    expect($fake->rendered)->toHaveCount(2);
+});
+
+it('throttles PDF generation', function () {
+    fakeHtmlToPdf();
+    $schedule = printableSchedule();
+
+    foreach (range(1, 6) as $ignored) {
+        $this->get(route('schedules.print.pdf', $schedule))->assertOk();
+    }
+
+    $this->get(route('schedules.print.pdf', $schedule))->assertStatus(429);
 });

@@ -20,7 +20,8 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=block"
     />
     @if ($inlineAssets)
-        <style @cspNonce>
+        {{-- No CSP nonce: the PDF has no CSP header, and a per-request nonce would change the HTML and defeat RenderSchedulePdf's cache. --}}
+        <style>
             {!! \Illuminate\Support\Facades\Vite::content('resources/css/schedule-print.css') !!}
         </style>
     @else

@@ -138,6 +138,7 @@ Route::get('/schedules/{schedule}/subscribe', ScheduleSubscribeController::class
 Route::put('/schedules/{schedule}/calendar-settings', ScheduleCalendarSettingsUpdateController::class)->name('schedules.calendar-settings.update');
 Route::get('/schedules/{schedule}/calendar', ScheduleCalendarController::class)->name('schedules.calendar');
 Route::get('/schedules/{schedule}/print', [SchedulePrintController::class, 'show'])->name('schedules.print');
+Route::get('/schedules/{schedule}/print.pdf', [SchedulePrintController::class, 'pdf'])->name('schedules.print.pdf')->middleware('throttle:6,1');
 Route::post('/schedules/{schedule}/push-subscriptions', SchedulePushSubscriptionStoreController::class)->name('schedules.push-subscriptions.store');
 Route::delete('/schedules/{schedule}/push-subscriptions', SchedulePushSubscriptionDestroyController::class)->name('schedules.push-subscriptions.destroy');
 
