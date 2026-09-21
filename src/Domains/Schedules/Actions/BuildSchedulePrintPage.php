@@ -19,7 +19,10 @@ use NouTools\Domains\Schedules\ViewModels\ScheduleViewModel;
 
 final readonly class BuildSchedulePrintPage
 {
-    public function __construct(private ShowSchedulePage $showSchedulePage) {}
+    public function __construct(
+        private ShowSchedulePage $showSchedulePage,
+        private ResolvePrintMonthColumns $resolveMonthColumns,
+    ) {}
 
     public function __invoke(StudentSchedule $schedule, ?string $term = null): SchedulePrintPageData
     {
@@ -31,6 +34,7 @@ final readonly class BuildSchedulePrintPage
             ->values();
         $shareUrl = route('schedules.show', $viewModel->uuid);
         $sittings = $this->sittings($viewModel);
+        $months = $this->months($viewModel, $sittings);
 
         return new SchedulePrintPageData(
             name: $viewModel->name ?: '我的課表',
@@ -42,7 +46,8 @@ final readonly class BuildSchedulePrintPage
                 ->all(),
             hasMidterm: ! str_ends_with($viewModel->selectedTerm, 'C'),
             exams: $this->examRows($sittings),
-            months: $this->months($viewModel, $sittings),
+            months: $months,
+            monthColumns: ($this->resolveMonthColumns)($months),
         );
     }
 
@@ -137,7 +142,7 @@ final readonly class BuildSchedulePrintPage
                     ];
                 }
 
-                usort($courses, fn (array $a, array $b) => strcmp((string) $a['time'], (string) $b['time']));
+                usort($courses, fn (array $a, array $b) => $this->minutesSinceMidnight($a['time']) <=> $this->minutesSinceMidnight($b['time']));
 
                 $classDays[$date->dateKey] = ['label' => $date->formattedDate, 'courses' => $courses];
             }
@@ -192,6 +197,19 @@ final readonly class BuildSchedulePrintPage
         }
 
         return $months;
+    }
+
+    /**
+     * A class start time as minutes into the day, so "9:00" sorts before
+     * "14:00" (a string comparison would not). Classes without a time go last.
+     */
+    private function minutesSinceMidnight(?string $time): int
+    {
+        if ($time === null || ! preg_match('/^(\d{1,2}):(\d{2})/', $time, $parts)) {
+            return PHP_INT_MAX;
+        }
+
+        return (int) $parts[1] * 60 + (int) $parts[2];
     }
 
     /**

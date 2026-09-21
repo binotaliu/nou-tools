@@ -115,9 +115,11 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
 
             {{-- The QR code takes the empty cell after the last month when there
             is one (a 2-row grid of 4 or 5 months); a full last row pushes it
-            below the calendars instead. --}}
+            below the calendars instead. Three columns is the norm; a term with
+            long per-date course lists gets four so it still fits the page
+            (ResolvePrintMonthColumns). --}}
             @php
-                $monthColumns = count($page->months) > 6 ? 4 : 3;
+                $monthColumns = $page->monthColumns;
                 $qrInGrid = count($page->months) % $monthColumns !== 0;
                 // Months span 4-6 week rows; pad them all to the tallest one so
                 // the course lists underneath start at the same height.

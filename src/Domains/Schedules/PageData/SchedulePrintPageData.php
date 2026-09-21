@@ -23,5 +23,7 @@ final class SchedulePrintPageData extends Resource
         public array $exams,
         /** @var array<int, SchedulePrintMonthViewModel> */
         public array $months,
+        /** Calendar columns on the right half: 3, or 4 when the course lists are too long for 3 to fit the page. */
+        public int $monthColumns,
     ) {}
 }

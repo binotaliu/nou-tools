@@ -151,6 +151,31 @@ it('builds monthly calendars with gap months and Monday-first weeks', function (
         ->and(collect($may->weeks)->flatten(1)->filter()->count())->toBe(31);
 });
 
+it('orders the courses on one class date by start time, not alphabetically', function () {
+    $schedule = printableSchedule(['name' => '下午班']);
+    $afternoon = $schedule->items->first()->courseClass;
+    $afternoon->update(['start_time' => '14:00', 'end_time' => '15:50']);
+
+    foreach ([['name' => '晚間班', 'start' => '19:00'], ['name' => '早上班', 'start' => '9:00']] as $extra) {
+        $course = Course::factory()->create(['name' => $extra['name'], 'term' => '2025B']);
+        $class = CourseClass::factory()->create(['course_id' => $course->id, 'start_time' => $extra['start'], 'end_time' => '23:00']);
+        StudentScheduleItem::create([
+            'student_schedule_id' => $schedule->id,
+            'course_id' => $course->id,
+            'course_class_id' => $class->id,
+        ]);
+        ClassSchedule::factory()->create(['class_id' => $class->id, 'date' => '2026-09-14']);
+    }
+
+    ClassSchedule::factory()->create(['class_id' => $afternoon->id, 'date' => '2026-09-14']);
+
+    $page = app(BuildSchedulePrintPage::class)($schedule->refresh(), '2025B');
+
+    // "9:00" sorts after "14:00" and "19:00" as a string, so this fails on strcmp.
+    expect(collect($page->months[0]->classDays[0]['courses'])->pluck('time')->all())
+        ->toBe(['9:00', '14:00', '19:00']);
+});
+
 it('pads every month to the same number of week rows', function () {
     $schedule = printableSchedule();
     $class = $schedule->items->first()->courseClass;
