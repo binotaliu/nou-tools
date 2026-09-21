@@ -31,6 +31,10 @@ its courses and start times, so the sheet works without the QR code. --}}
                 </span>
             @endforeach
         @endforeach
+
+        @for ($blank = count($month->weeks) * 7; $blank < $weekRows * 7; $blank++)
+            <span class="h-[5mm]"></span>
+        @endfor
     </div>
 
     @if ($month->classDays !== [] || $month->examDays !== [])

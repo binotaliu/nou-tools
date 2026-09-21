@@ -151,6 +151,23 @@ it('builds monthly calendars with gap months and Monday-first weeks', function (
         ->and(collect($may->weeks)->flatten(1)->filter()->count())->toBe(31);
 });
 
+it('pads every month to the same number of week rows', function () {
+    $schedule = printableSchedule();
+    $class = $schedule->items->first()->courseClass;
+
+    // March 2026 needs six week rows, April and May five.
+    foreach (['2026-03-08', '2026-05-02'] as $date) {
+        ClassSchedule::factory()->create(['class_id' => $class->id, 'date' => $date]);
+    }
+
+    $html = $this->get(route('schedules.print', ['schedule' => $schedule->refresh(), 'term' => '2025B']))
+        ->assertOk()
+        ->getContent();
+
+    // Three months, each six rows of seven day cells.
+    expect(substr_count($html, 'h-[5mm]'))->toBe(3 * 6 * 7);
+});
+
 it('lists the courses held on each class date under its month', function () {
     $schedule = printableSchedule(['name' => '心理學']);
     $morning = $schedule->items->first()->courseClass;

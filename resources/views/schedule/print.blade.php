@@ -119,6 +119,9 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
             @php
                 $monthColumns = count($page->months) > 6 ? 4 : 3;
                 $qrInGrid = count($page->months) % $monthColumns !== 0;
+                // Months span 4-6 week rows; pad them all to the tallest one so
+                // the course lists underneath start at the same height.
+                $weekRows = max(array_map(fn ($month) => count($month->weeks), $page->months) ?: [0]);
             @endphp
             <div class="relative flex-1">
                 <div
@@ -129,7 +132,7 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
                     ])
                 >
                     @foreach ($page->months as $month)
-                        @include('schedule.print._month', ['month' => $month])
+                        @include('schedule.print._month', ['month' => $month, 'weekRows' => $weekRows])
                     @endforeach
                 </div>
 
