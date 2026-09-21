@@ -19,6 +19,7 @@ import CommonLinks from '../../Components/CommonLinks.vue'
 import SchoolCalendar from '../../Components/SchoolCalendar.vue'
 import AnnouncementsWidget from '../../Components/AnnouncementsWidget.vue'
 import ClassCode from '../../Components/ClassCode.vue'
+import ClassDates from '../../Components/Schedule/ClassDates.vue'
 import PwaInstallBanner from '../../Components/PwaInstallBanner.vue'
 import usePwaStandalone from '../../Composables/usePwaStandalone'
 import usePushSubscription from '../../Composables/usePushSubscription'
@@ -1145,77 +1146,14 @@ function localHint(next) {
       <div
         v-if="
           viewModel.displayOptions.show_class_dates &&
-          viewModel.items.length > 0
+          viewModel.months.length > 0
         "
         class="mb-8"
       >
-        <h3 class="mb-4 text-2xl font-bold text-theme-900 dark:text-zinc-100">
-          面授日期
-        </h3>
-        <p
-          v-if="viewModel.hasAnyOverride"
-          class="mb-4 flex items-center gap-1 text-sm text-theme-600 dark:text-zinc-400"
-        >
-          <Icon name="exclamation-triangle" class="size-4 text-orange-600" />
-          表示該次面授時間與一般時間不同
-        </p>
-
-        <div
-          class="mb-4 grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 print:grid-cols-1"
-        >
-          <div
-            v-for="month in viewModel.months"
-            :key="month.monthKey"
-            class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
-          >
-            <div class="mb-4">
-              <h2
-                class="text-xl font-semibold text-theme-900 dark:text-zinc-100"
-              >
-                {{ month.monthDisplay }}
-              </h2>
-            </div>
-            <div
-              class="grid grid-cols-1 space-y-3 gap-x-6 gap-y-1 print:grid-cols-2"
-            >
-              <div
-                v-for="date in month.dates"
-                :key="date.dateKey"
-                class="break-inside-avoid-page border-l-4 border-theme-500 py-2 pl-4"
-              >
-                <div
-                  class="mb-1 font-semibold text-theme-900 dark:text-zinc-100"
-                >
-                  {{ date.formattedDate }}
-                </div>
-                <div class="space-y-1">
-                  <div
-                    v-for="(course, i) in date.courses"
-                    :key="i"
-                    class="text-sm text-theme-700 dark:text-zinc-300"
-                  >
-                    <span class="font-semibold">{{ course.courseName }}</span>
-                    <ClassCode
-                      :code="course.isTentative ? '尚未分班' : course.code"
-                    />
-                    <br />
-                    <span
-                      class="inline-flex items-center gap-1 text-theme-600 dark:text-zinc-400"
-                    >
-                      {{ course.time }}
-                      <Icon
-                        v-if="course.hasOverride"
-                        name="exclamation-triangle"
-                        class="size-4 text-theme-500 dark:text-zinc-400"
-                        title="該次課程時間與一般時間不同"
-                      />
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ClassDates
+          :months="viewModel.months"
+          :has-any-override="viewModel.hasAnyOverride"
+        />
       </div>
 
       <!-- School Calendar -->
