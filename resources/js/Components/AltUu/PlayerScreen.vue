@@ -2,7 +2,6 @@
 import { useId } from 'vue'
 import Icon from '../Icon.vue'
 
-const scrimId = useId()
 const clipId = useId()
 </script>
 
@@ -27,171 +26,109 @@ const clipId = useId()
     </span>
   </div>
 
-  <!-- A lecture video still: studio backdrop, lecturer and player scrubber -->
+  <!-- A lecture slide (title, key points, a balance-scale diagram) with the player bar underneath -->
   <svg
     viewBox="0 0 224 126"
     class="mx-2 mt-2.5 aspect-video w-[calc(100%-1rem)] rounded-lg"
     role="presentation"
   >
     <defs>
-      <linearGradient :id="scrimId" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#000" stop-opacity="0" />
-        <stop offset="1" stop-color="#000" stop-opacity="0.45" />
-      </linearGradient>
       <clipPath :id="clipId">
         <rect width="224" height="126" rx="8" />
       </clipPath>
     </defs>
 
     <g :clip-path="`url(#${clipId})`">
-      <!-- Backdrop -->
+      <!-- Slide -->
+      <rect width="224" height="126" class="fill-white dark:fill-zinc-900" />
+      <rect width="224" height="4" class="fill-theme-500" />
+
       <rect
-        width="224"
-        height="126"
+        x="14"
+        y="13"
+        width="34"
+        height="12"
+        rx="6"
         class="fill-theme-100 dark:fill-theme-900"
       />
-      <path
-        d="M14 126V72a32 32 0 0 1 64 0v54Z"
-        class="fill-theme-200 dark:fill-theme-800"
-      />
-      <circle cx="44" cy="32" r="16" class="fill-amber-300/80" />
-      <ellipse
-        cx="26"
-        cy="118"
-        rx="38"
-        ry="22"
-        class="fill-sky-300/60 dark:fill-sky-700/50"
-      />
-
-      <!-- Shelf, vase and plant -->
-      <rect
-        x="168"
-        width="56"
-        height="126"
-        class="fill-theme-200 dark:fill-theme-800"
-      />
-      <rect
-        x="178"
-        y="14"
-        width="32"
-        height="22"
-        rx="2"
-        class="fill-white stroke-theme-300 dark:fill-zinc-900 dark:stroke-theme-700"
-      />
-      <path
-        d="M182 32l8-9 6 6 5-4 9 7Z"
-        class="fill-theme-300 dark:fill-theme-700"
-      />
-      <rect
-        x="170"
-        y="86"
-        width="54"
-        height="3"
-        class="fill-theme-400 dark:fill-theme-600"
-      />
-      <path
-        d="M186 86c-8 0-9-10-4-16l2-2h8l2 2c5 6 4 16-4 16Z"
-        class="fill-orange-300"
-      />
-      <rect x="186" y="60" width="4" height="9" class="fill-orange-300" />
-      <path
-        d="M210 86V54"
-        class="stroke-emerald-600/70 dark:stroke-emerald-400/70"
-        stroke-width="1.5"
-        stroke-linecap="round"
-      />
-      <ellipse
-        cx="205"
-        cy="60"
-        rx="3.5"
-        ry="8"
-        transform="rotate(-35 205 60)"
-        class="fill-emerald-500/70"
-      />
-      <ellipse
-        cx="215"
-        cy="66"
-        rx="3.5"
-        ry="8"
-        transform="rotate(35 215 66)"
-        class="fill-emerald-500/70"
-      />
-      <ellipse cx="210" cy="52" rx="3" ry="7" class="fill-emerald-500/70" />
-
-      <!-- Lecturer -->
-      <path
-        d="M62 126c2-26 20-34 50-34s48 8 50 34Z"
-        class="fill-stone-200 dark:fill-stone-300"
-      />
-      <path d="M97 93l15 26 15-26Z" class="fill-white" />
-      <path
-        d="M97 93l11 33M127 93l-11 33"
-        class="stroke-stone-300 dark:stroke-stone-400"
-        stroke-width="1.5"
-        stroke-linecap="round"
-      />
-      <rect
-        x="104"
-        y="78"
-        width="16"
-        height="18"
-        rx="6"
-        class="fill-orange-200"
-      />
-      <ellipse cx="112" cy="63" rx="17" ry="20" class="fill-orange-200" />
-      <path
-        d="M90 76c-5-32 9-46 24-46 20 0 26 20 20 46-2-16-8-27-22-28-12 1-19 12-22 28Z"
-        class="fill-zinc-800"
-      />
-      <circle cx="105" cy="66" r="1.5" class="fill-zinc-800" />
-      <circle cx="119" cy="66" r="1.5" class="fill-zinc-800" />
-      <path
-        d="M108 75q4 3 8 0"
-        class="stroke-rose-400"
-        fill="none"
-        stroke-width="1.5"
-        stroke-linecap="round"
-      />
-      <rect
-        x="126"
-        y="100"
-        width="2.5"
-        height="6"
-        rx="1"
-        class="fill-zinc-700"
-      />
-      <path
-        d="M152 126c2-14-3-22-12-25"
-        class="stroke-stone-200 dark:stroke-stone-300"
-        fill="none"
-        stroke-width="13"
-        stroke-linecap="round"
-      />
-      <ellipse
-        cx="137"
-        cy="99"
-        rx="6.5"
-        ry="5.5"
-        transform="rotate(-25 137 99)"
-        class="fill-orange-200"
-      />
-
-      <!-- Player scrubber -->
-      <rect y="84" width="224" height="42" :fill="`url(#${scrimId})`" />
-      <text x="8" y="112" font-size="7" class="fill-white">04:53</text>
-      <text x="216" y="112" font-size="7" text-anchor="end" class="fill-white">
-        33:14
+      <text
+        x="31"
+        y="21.5"
+        font-size="6.5"
+        text-anchor="middle"
+        class="fill-theme-700 dark:fill-theme-300"
+      >
+        第 08 講
       </text>
+
+      <text
+        x="14"
+        y="41"
+        font-size="11"
+        font-weight="700"
+        class="fill-theme-900 dark:fill-zinc-100"
+      >
+        日常生活中的性別偏見
+      </text>
+      <rect x="14" y="47" width="22" height="2" rx="1" class="fill-theme-500" />
+
+      <!-- Key points -->
+      <g class="fill-theme-800 dark:fill-zinc-300" font-size="7.5">
+        <circle cx="16" cy="61" r="2" class="fill-theme-500" />
+        <text x="24" y="63.5">刻板印象與角色期待</text>
+        <circle cx="16" cy="74" r="2" class="fill-theme-500" />
+        <text x="24" y="76.5">職場中的隱性偏見</text>
+        <circle cx="16" cy="87" r="2" class="fill-theme-500" />
+        <text x="24" y="89.5">教育現場的性別平等</text>
+      </g>
+
+      <!-- Balance scale -->
+      <g
+        fill="none"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="stroke-theme-500"
+      >
+        <path d="M176 40v40M150 40h52" />
+        <path d="M150 40l-9 22M150 40l9 22M202 40l-9 22M202 40l9 22" />
+        <path d="M139 62h22a11 11 0 0 1-22 0ZM191 62h22a11 11 0 0 1-22 0Z" />
+      </g>
+      <circle cx="176" cy="38" r="3" class="fill-theme-500" />
       <rect
-        x="8"
-        y="117"
-        width="208"
+        x="165"
+        y="80"
+        width="22"
+        height="4"
+        rx="2"
+        class="fill-theme-500"
+      />
+      <circle cx="150" cy="56" r="5" class="fill-rose-400" />
+      <circle cx="202" cy="56" r="5" class="fill-sky-400" />
+
+      <!-- Player bar -->
+      <rect y="100" width="224" height="26" class="fill-zinc-900/85" />
+      <path d="M10 106v14l11-7Z" class="fill-white" />
+      <text x="28" y="116" font-size="6.5" class="fill-white">04:53</text>
+      <rect
+        x="54"
+        y="112"
+        width="136"
         height="3"
         rx="1.5"
-        class="fill-white/40"
+        class="fill-white/30"
       />
-      <rect x="8" y="117" width="62" height="3" rx="1.5" class="fill-white" />
-      <circle cx="70" cy="118.5" r="4" class="fill-white" />
+      <rect x="54" y="112" width="20" height="3" rx="1.5" class="fill-white" />
+      <circle cx="74" cy="113.5" r="3.5" class="fill-white" />
+      <text
+        x="216"
+        y="116"
+        font-size="6.5"
+        text-anchor="end"
+        class="fill-white"
+      >
+        33:14
+      </text>
     </g>
   </svg>
 
