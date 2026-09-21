@@ -1,8 +1,9 @@
 {{-- Exam table, one row per course. Midterm and final share a time slot (only
 the dates differ), so the time appears once and the dates sit under the weekday
-they fall on. The 班級代碼 line is once per course: the exam room asks for it,
+they fall on. The 班級代碼 field is once per course: the exam room asks for it,
 and the class sat isn't always the one on the schedule.
 
+$hasMidterm: summer terms have no midterm, so no 期中教室 field.
 $dense: tighter rows when the semester has many courses, so the strip still
 fits on the page. --}}
 <div class="text-[8.5pt]">
@@ -43,11 +44,19 @@ fits on the page. --}}
                 </p>
             @endforeach
 
-            <div class="mt-0.5 flex items-end gap-1 text-[7pt] text-zinc-500">
-                <span class="shrink-0">班級代碼</span>
-                <span
-                    @class(['flex-1 border-b border-zinc-800', 'h-3' => ! $dense, 'h-2.5' => $dense])
-                ></span>
+            {{-- Write-in fields: the exam room asks for the 班級代碼, and the classroom
+            is announced separately for each exam. --}}
+            <div
+                @class(['mt-0.5 grid gap-x-2', 'grid-cols-3' => $hasMidterm, 'grid-cols-2' => ! $hasMidterm])
+            >
+                @foreach (array_filter(['班級代碼', $hasMidterm ? '期中教室' : null, '期末教室']) as $label)
+                    <div class="flex items-end gap-1 text-[7pt] text-zinc-500">
+                        <span class="shrink-0">{{ $label }}</span>
+                        <span
+                            @class(['min-w-0 flex-1 border-b border-zinc-800', 'h-3' => ! $dense, 'h-2.5' => $dense])
+                        ></span>
+                    </div>
+                @endforeach
             </div>
         </div>
     @empty

@@ -39,6 +39,7 @@ final readonly class BuildSchedulePrintPage
             courses: $courseModels
                 ->map(fn ($course) => new SchedulePrintCourseViewModel(name: $course->name, credits: $course->credits))
                 ->all(),
+            hasMidterm: ! str_ends_with($viewModel->selectedTerm, 'C'),
             exams: $this->examRows($viewModel),
             months: $this->months($viewModel),
         );

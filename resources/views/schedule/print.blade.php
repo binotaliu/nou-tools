@@ -76,7 +76,7 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
                     考試時間表
                 </h2>
 
-                @include('schedule.print._exam-table', ['exams' => $page->exams, 'dense' => count($page->exams) > 9])
+                @include('schedule.print._exam-table', ['exams' => $page->exams, 'hasMidterm' => $page->hasMidterm, 'dense' => count($page->exams) > 9])
             </div>
         </section>
 

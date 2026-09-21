@@ -18,6 +18,7 @@ final class SchedulePrintPageData extends Resource
         public string $qrCodeSvg,
         /** @var array<int, SchedulePrintCourseViewModel> */
         public array $courses,
+        public bool $hasMidterm,
         /** @var array<int, SchedulePrintExamRowViewModel> Earliest exam first; only courses with an exam date. */
         public array $exams,
         /** @var array<int, SchedulePrintMonthViewModel> */

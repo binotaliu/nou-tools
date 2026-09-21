@@ -213,9 +213,20 @@ it('renders the printable sheet', function () {
         ->assertSee('期末')
         ->assertSee('4/25')
         ->assertSee('班級代碼')
+        ->assertSee('期中教室')
+        ->assertSee('期末教室')
         ->assertSee('<svg', false)
         ->assertSee(route('schedules.show', $schedule))
         ->assertSee('noindex', false);
+});
+
+it('only asks for the final exam classroom in summer terms', function () {
+    $schedule = printableSchedule(['final_date' => '2026-08-23'], '2025C');
+
+    $this->get(route('schedules.print', ['schedule' => $schedule, 'term' => '2025C']))
+        ->assertOk()
+        ->assertSee('期末教室')
+        ->assertDontSee('期中教室');
 });
 
 it('renders an empty schedule without errors', function () {
