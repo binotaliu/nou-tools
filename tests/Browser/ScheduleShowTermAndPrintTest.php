@@ -7,7 +7,7 @@ use App\Models\StudentScheduleItem;
 use Illuminate\Support\Str;
 use Pest\Browser\Api\PendingAwaitablePage;
 
-// The semester `<select>` and the print button are wired up client-side, so
+// The semester `<select>` and the print button's link are built client-side, so
 // the markup alone looks correct to a server-rendered Feature test whether
 // or not the listeners actually attached. This regressed exactly that way
 // once before, so it's checked in a real browser.
@@ -70,17 +70,18 @@ it('submits the term form and navigates when a different semester is selected', 
     expect($page->url())->toContain('term=2025B');
 });
 
-it('calls window.print() when the print button is clicked', function () {
+it('links the print button to the schedule PDF for the selected term', function () {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
         'name' => 'Print Schedule',
     ]);
 
-    $page = visit(route('schedules.show', $schedule));
+    $page = visit(route('schedules.show', ['schedule' => $schedule, 'term' => '2025B']));
     dismissRememberModalIfPresent($page);
 
-    $page->script('window.__printed = false; window.print = () => { window.__printed = true; };');
-    $page->click('[data-testid="schedule-print-button"]');
-
-    expect($page->script('window.__printed'))->toBe(true);
+    $page->assertAttribute(
+        '[data-testid="schedule-print-button"]',
+        'href',
+        '/schedules/'.$schedule->getRouteKey().'/print.pdf?term=2025B',
+    )->assertAttribute('[data-testid="schedule-print-button"]', 'target', '_blank');
 });

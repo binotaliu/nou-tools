@@ -195,10 +195,6 @@ const {
   copy,
 } = useCopyLink({ shareUrl: props.shareUrl }, shareInput)
 
-function print() {
-  window.print()
-}
-
 // --- schedule items table (port of resources/js/schedule-items.js /
 // nouToolsScheduleItems) ---
 const itemsPayload = computed(() =>
@@ -376,7 +372,7 @@ function localHint(next) {
 
       <div
         v-show="offline"
-        class="mb-6 flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200 print:hidden"
+        class="mb-6 flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
         role="status"
         aria-live="polite"
       >
@@ -459,7 +455,7 @@ function localHint(next) {
           </h2>
           <p
             v-show="!isPwa"
-            class="mt-1 flex items-center gap-1 text-sm text-theme-600 dark:text-zinc-400 print:hidden"
+            class="mt-1 flex items-center gap-1 text-sm text-theme-600 dark:text-zinc-400"
           >
             <Icon name="information-circle" class="inline size-4" />
             小提示：將此頁加入瀏覽器書籤，下次即可快速開啟課表。
@@ -468,7 +464,7 @@ function localHint(next) {
 
         <div class="flex w-full flex-col items-end gap-2 lg:w-auto">
           <div
-            class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden bottom-nav:hidden"
+            class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto bottom-nav:hidden"
           >
             <div class="flex w-full shrink-0 gap-2 sm:w-1/2 lg:w-auto">
               <Link
@@ -514,7 +510,7 @@ function localHint(next) {
           </div>
 
           <div
-            class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto print:hidden bottom-nav:flex-row"
+            class="flex w-full flex-col-reverse gap-2 sm:flex-row lg:w-auto bottom-nav:flex-row"
           >
             <form
               method="GET"
@@ -685,18 +681,12 @@ function localHint(next) {
               </div>
             </div>
           </div>
-
-          <span
-            class="hidden text-sm text-theme-600 dark:text-zinc-400 print:inline"
-          >
-            {{ toSemesterDisplay(viewModel.selectedTerm) }}
-          </span>
         </div>
       </div>
 
       <Greeting
         v-if="viewModel.displayOptions.show_greeting"
-        class="mb-4 print:hidden"
+        class="mb-4"
         :semester-label="greeting.semesterLabel"
         :semester-code="greeting.semesterCode"
         :semester-start="greeting.semesterStart"
@@ -737,10 +727,10 @@ function localHint(next) {
       <!-- Schedule Items - Responsive Table/Cards -->
       <div
         v-if="viewModel.displayOptions.show_schedule_items && hasCourses"
-        class="mb-4 md:overflow-hidden md:rounded-lg md:border md:border-theme-200 md:bg-white dark:md:border-zinc-700 dark:md:bg-zinc-900 print:overflow-hidden print:rounded-lg print:border print:border-theme-200"
+        class="mb-4 md:overflow-hidden md:rounded-lg md:border md:border-theme-200 md:bg-white dark:md:border-zinc-700 dark:md:bg-zinc-900"
       >
         <!-- 桌面版表格 -->
-        <div class="hidden overflow-x-auto md:block print:block">
+        <div class="hidden overflow-x-auto md:block">
           <table
             class="w-full border-collapse text-left text-theme-700 dark:text-zinc-300"
             aria-describedby="schedule-items-caption"
@@ -767,13 +757,13 @@ function localHint(next) {
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100 print:hidden"
+                  class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                 >
                   下次上課
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100 print:hidden"
+                  class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                 >
                   時間
                 </th>
@@ -785,7 +775,7 @@ function localHint(next) {
                 </th>
                 <th
                   scope="col"
-                  class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100 print:hidden"
+                  class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                 >
                   <span class="sr-only">動作</span>
                 </th>
@@ -810,7 +800,7 @@ function localHint(next) {
                 >
                   <span
                     v-if="!row.item.isTentative"
-                    class="inline-block rounded bg-theme-100 px-2 py-1 font-mono text-xs font-normal text-theme-800 dark:bg-zinc-800 dark:text-zinc-200 print:bg-transparent print:p-0"
+                    class="inline-block rounded bg-theme-100 px-2 py-1 font-mono text-xs font-normal text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
                   >
                     <span v-if="row.item.code === 'ZZZ000'">統一面授</span>
                     <template v-else>
@@ -820,14 +810,14 @@ function localHint(next) {
                   </span>
                   <span
                     v-else
-                    class="ml-1 inline-block rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-200 print:bg-transparent print:p-0"
+                    class="ml-1 inline-block rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
                   >
                     尚未分班
                   </span>
                 </td>
 
                 <td
-                  class="px-4 py-3 text-theme-800 tabular-nums dark:text-zinc-200 print:hidden"
+                  class="px-4 py-3 text-theme-800 tabular-nums dark:text-zinc-200"
                 >
                   <span v-if="row.next">{{ taipeiDate(row.next) }}</span>
                   <span v-else class="text-sm text-theme-500 dark:text-zinc-400"
@@ -836,7 +826,7 @@ function localHint(next) {
                 </td>
 
                 <td
-                  class="px-4 py-3 text-theme-800 tabular-nums dark:text-zinc-200 print:hidden"
+                  class="px-4 py-3 text-theme-800 tabular-nums dark:text-zinc-200"
                 >
                   <div v-if="row.next && taipeiTime(row.next)">
                     <span class="inline-flex items-center gap-1">
@@ -884,9 +874,7 @@ function localHint(next) {
                   <span v-else>−</span>
                 </td>
 
-                <td
-                  class="px-4 py-3 text-theme-800 dark:text-zinc-200 print:hidden"
-                >
+                <td class="px-4 py-3 text-theme-800 dark:text-zinc-200">
                   <Link
                     :href="row.item.courseInfoUrl"
                     class="mr-3 inline-flex items-center gap-1 font-semibold text-theme-800 underline underline-offset-4 hover:text-theme-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
@@ -931,7 +919,7 @@ function localHint(next) {
         </div>
 
         <!-- 手機版卡片列表 -->
-        <div class="space-y-3 md:hidden print:hidden">
+        <div class="space-y-3 md:hidden">
           <article
             v-for="row in itemRows"
             :key="row.i"
@@ -1087,7 +1075,7 @@ function localHint(next) {
 
         <div
           v-if="viewModel.hasAnyOverride"
-          class="mt-3 flex items-center gap-1 px-1 text-xs text-theme-600 md:mt-0 md:border-t md:border-theme-200 md:bg-theme-50 md:px-4 md:py-2 dark:text-zinc-400 dark:md:border-zinc-700 dark:md:bg-zinc-950 print:mt-0 print:border-t print:border-theme-200 print:px-4 print:py-2"
+          class="mt-3 flex items-center gap-1 px-1 text-xs text-theme-600 md:mt-0 md:border-t md:border-theme-200 md:bg-theme-50 md:px-4 md:py-2 dark:text-zinc-400 dark:md:border-zinc-700 dark:md:bg-zinc-950"
         >
           <Icon
             name="exclamation-triangle"
@@ -1099,7 +1087,7 @@ function localHint(next) {
 
       <div
         v-if="hasTentative"
-        class="mb-8 flex items-start justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200 print:hidden"
+        class="mb-8 flex items-start justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200"
         role="status"
       >
         <div class="flex items-start gap-3">
@@ -1138,7 +1126,7 @@ function localHint(next) {
 
       <CommonLinks
         v-if="viewModel.displayOptions.show_common_links"
-        class="mb-8 print:hidden"
+        class="mb-8"
         :custom-links="viewModel.customLinks"
       />
 
@@ -1194,7 +1182,7 @@ function localHint(next) {
 
                   <Link
                     :href="`/courses/${exam.courseId}#previous-exams`"
-                    class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-theme-800 underline underline-offset-4 hover:text-theme-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100 print:hidden"
+                    class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-theme-800 underline underline-offset-4 hover:text-theme-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
                     :aria-label="exam.courseName + ' 的課程資訊'"
                   >
                     <Icon name="information-circle" class="inline size-4" />
@@ -1302,7 +1290,7 @@ function localHint(next) {
 
                     <Link
                       :href="`/courses/${exam.courseId}#previous-exams`"
-                      class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-theme-800 underline underline-offset-4 hover:text-theme-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100 print:hidden"
+                      class="mr-3 inline-flex items-center gap-1 text-sm font-semibold text-theme-800 underline underline-offset-4 hover:text-theme-900 hover:no-underline dark:text-zinc-200 dark:hover:text-zinc-100"
                       :aria-label="exam.courseName + ' 的課程資訊'"
                     >
                       <Icon name="information-circle" class="inline size-4" />
@@ -1357,7 +1345,7 @@ function localHint(next) {
       <!-- Announcements -->
       <div v-if="viewModel.displayOptions.show_announcements" v-show="!offline">
         <AnnouncementsWidget
-          class="mb-8 print:hidden"
+          class="mb-8"
           :schedule-uuid="viewModel.uuid"
           :has-any-selection="announcementsWidget.hasAnySelection"
           :announcements="announcementsWidget.announcements"
@@ -1370,8 +1358,8 @@ function localHint(next) {
         v-if="viewModel.displayOptions.show_share_section"
         class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
-        <div class="flex items-center justify-between gap-4 print:flex">
-          <div class="w-full md:w-auto md:flex-1 print:flex-1">
+        <div class="flex items-center justify-between gap-4">
+          <div class="w-full md:w-auto md:flex-1">
             <p class="mb-3 text-theme-700 dark:text-zinc-300">
               您可以使用以下連結來編輯或檢視此課表，請妥善保管此連結。
               <br />
@@ -1389,23 +1377,18 @@ function localHint(next) {
               <div class="flex items-stretch gap-3">
                 <input
                   ref="shareInput"
-                  class="flex-1 px-3 py-2 font-mono break-all text-theme-600 dark:text-zinc-400 print:hidden"
+                  class="flex-1 px-3 py-2 font-mono break-all text-theme-600 dark:text-zinc-400"
                   :value="copyShareUrl"
                   readonly
                   aria-label="我的課表連結"
                   @click="$event.target.select()"
                 />
-                <div
-                  class="hidden items-center px-3 py-2 font-mono break-all text-theme-600 dark:text-zinc-400 print:flex"
-                >
-                  {{ copyShareUrl }}
-                </div>
 
                 <div class="shrink-0">
                   <button
                     type="button"
                     :aria-pressed="copied.toString()"
-                    class="ml-2 h-full rounded-l-none rounded-r border border-theme-200 bg-theme-200 px-3 py-1 text-sm font-semibold whitespace-nowrap text-theme-900 transition hover:bg-theme-300 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600 print:hidden"
+                    class="ml-2 h-full rounded-l-none rounded-r border border-theme-200 bg-theme-200 px-3 py-1 text-sm font-semibold whitespace-nowrap text-theme-900 transition hover:bg-theme-300 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
                     @click="copy()"
                   >
                     <span v-show="!copied">
@@ -1426,9 +1409,7 @@ function localHint(next) {
             </div>
           </div>
 
-          <div
-            class="hidden w-28 flex-col items-center justify-center md:flex print:flex"
-          >
+          <div class="hidden w-28 flex-col items-center justify-center md:flex">
             <div
               class="rounded border border-theme-200 bg-white p-2"
               v-html="qrCodeSvg"
@@ -1439,17 +1420,20 @@ function localHint(next) {
 
       <div
         v-if="viewModel.displayOptions.show_print_button"
-        class="mt-6 flex justify-end print:hidden"
+        class="mt-6 flex justify-end"
       >
-        <button
-          type="button"
+        <!-- The PDF is rendered on the server (Blade + Browsershot), so this is a
+        plain link, not an Inertia visit. -->
+        <a
+          :href="`/schedules/${viewModel.uuid}/print.pdf?term=${viewModel.selectedTerm}`"
+          target="_blank"
+          rel="noopener"
           data-testid="schedule-print-button"
           class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-200 bg-theme-200 px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-300 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
-          @click="print()"
         >
           <Icon name="printer" class="inline size-4" />
           列印
-        </button>
+        </a>
       </div>
     </div>
   </AppLayout>

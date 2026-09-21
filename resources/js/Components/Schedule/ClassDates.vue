@@ -2,8 +2,7 @@
 // The 面授日期 card on the schedule page: one card with its title, a month picker, a calendar
 // with a dot on every date that has a class, and the selected month's
 // courses underneath. Every month's list stays in the DOM (hidden unless
-// selected) so printing can still show the whole semester; the picker and
-// the calendar are screen-only.
+// selected).
 import { computed, ref, watch } from 'vue'
 import ClassCode from '../ClassCode.vue'
 import Icon from '../Icon.vue'
@@ -137,7 +136,7 @@ const cells = computed(() => {
     <div
       role="group"
       aria-label="選擇月份"
-      class="-mx-1 mb-4 flex gap-1 overflow-x-auto px-1 pb-1 print:hidden"
+      class="-mx-1 mb-4 flex gap-1 overflow-x-auto px-1 pb-1"
     >
       <button
         v-for="tab in monthTabs"
@@ -161,7 +160,7 @@ const cells = computed(() => {
     </div>
 
     <div class="grid gap-6 md:grid-cols-[auto_1fr] md:gap-8">
-      <div v-if="selectedTab" class="mx-auto w-full max-w-xs print:hidden">
+      <div v-if="selectedTab" class="mx-auto w-full max-w-xs">
         <div
           class="mb-2 text-center text-sm font-semibold text-theme-900 dark:text-zinc-100"
         >
@@ -213,17 +212,11 @@ const cells = computed(() => {
           v-for="tab in monthTabs"
           :key="tab.key"
           :data-testid="`class-dates-list-${tab.key}`"
-          :class="tab.key === selectedKey ? '' : 'hidden print:block'"
+          :class="tab.key === selectedKey ? '' : 'hidden'"
         >
-          <h4
-            class="mb-3 hidden text-lg font-semibold text-theme-900 dark:text-zinc-100 print:block"
-          >
-            {{ tab.year }} 年 {{ tab.month }} 月
-          </h4>
-
           <p
             v-if="!tab.data"
-            class="py-6 text-center text-sm text-theme-500 dark:text-zinc-400 print:hidden"
+            class="py-6 text-center text-sm text-theme-500 dark:text-zinc-400"
           >
             這個月沒有面授
           </p>
