@@ -317,6 +317,24 @@ function taipeiDate(next) {
   return `${T.monthDay(next.ymd)} (${T.weekdayFromYmd(next.ymd)})`
 }
 
+function monthDay(next) {
+  return window.NouTime.monthDay(next.ymd)
+}
+
+function weekday(next) {
+  return window.NouTime.weekdayFromYmd(next.ymd)
+}
+
+// A class is "in progress" between its start and end instants; a class with
+// no time set has no window to be in.
+function isOngoing(next) {
+  return (
+    Boolean(next.startTime) &&
+    Date.parse(next.instantStart) <= now.value &&
+    now.value < Date.parse(next.instantEnd)
+  )
+}
+
 function taipeiTime(next) {
   return next.startTime ? `${next.startTime} ~ ${next.endTime}` : null
 }
@@ -718,7 +736,7 @@ function localHint(next) {
       <!-- Schedule Items - Responsive Table/Cards -->
       <div
         v-if="viewModel.displayOptions.show_schedule_items && hasCourses"
-        class="mb-4 overflow-hidden rounded-lg border border-theme-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+        class="mb-4 md:overflow-hidden md:rounded-lg md:border md:border-theme-200 md:bg-white dark:md:border-zinc-700 dark:md:bg-zinc-900 print:overflow-hidden print:rounded-lg print:border print:border-theme-200"
       >
         <!-- 桌面版表格 -->
         <div class="hidden overflow-x-auto md:block print:block">
@@ -912,137 +930,163 @@ function localHint(next) {
         </div>
 
         <!-- 手機版卡片列表 -->
-        <div class="md:hidden print:hidden">
-          <div
+        <div class="space-y-3 md:hidden print:hidden">
+          <article
             v-for="row in itemRows"
             :key="row.i"
-            class="border-b border-theme-200 last:border-b-0 dark:border-zinc-700"
+            data-testid="schedule-item-card"
+            class="rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
           >
-            <div
-              class="m-0 border-0 border-b border-theme-200 bg-white p-4 transition hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900"
-            >
-              <h3
-                class="mb-2 text-lg font-semibold text-theme-900 dark:text-zinc-100"
+            <div class="flex items-center gap-3">
+              <div
+                class="flex w-20 shrink-0 flex-col items-center justify-center rounded-lg bg-theme-100 px-2 py-2 text-center dark:bg-zinc-800"
               >
-                {{ row.item.courseName }}
-              </h3>
-
-              <div class="mb-3 flex items-center gap-2">
-                <span
-                  v-if="!row.item.isTentative"
-                  class="inline-block rounded bg-theme-100 px-2 py-1 font-mono text-xs font-normal text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
-                >
-                  <span v-if="row.item.code === 'ZZZ000'">統一面授</span>
-                  <template v-else>
-                    <span class="sr-only">班級代碼：</span>
-                    <span>{{ row.item.code }}</span>
-                  </template>
-                </span>
-                <span
-                  v-else
-                  class="inline-block rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
-                >
-                  尚未分班
-                </span>
-
-                <p
-                  v-if="teacher(row.item)"
-                  class="inline-flex items-baseline gap-1 text-theme-900 dark:text-zinc-100"
-                >
-                  <span v-show="teacher(row.item).base" class="text-sm">{{
-                    teacher(row.item).base
-                  }}</span>
-                  <span
-                    v-show="teacher(row.item).suffix"
-                    class="text-xs text-theme-700 dark:text-zinc-300"
-                    >{{ teacher(row.item).suffix }}</span
+                <template v-if="row.next">
+                  <p
+                    class="text-lg font-bold text-theme-700 dark:text-zinc-200"
                   >
+                    {{ monthDay(row.next) }}
+                  </p>
+                  <p class="mt-0.5 text-base text-theme-600 dark:text-zinc-400">
+                    {{ weekday(row.next) }}
+                  </p>
+                </template>
+                <p
+                  v-else
+                  class="text-lg font-bold text-theme-400 dark:text-zinc-500"
+                >
+                  —
                 </p>
               </div>
 
-              <div class="mb-4 space-y-3">
-                <div>
-                  <p
-                    class="mb-1 text-xs font-semibold tracking-wide text-theme-600 uppercase dark:text-zinc-400"
+              <div class="min-w-0 flex-1">
+                <div class="flex items-start justify-between gap-2">
+                  <h3
+                    class="line-clamp-2 min-w-0 flex-1 text-sm font-semibold text-theme-900 dark:text-zinc-100"
                   >
-                    下次上課
-                  </p>
+                    {{ row.item.courseName }}
+                  </h3>
 
-                  <div v-if="row.next">
+                  <span
+                    v-if="row.next && isOngoing(row.next)"
+                    class="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
+                  >
+                    進行中
+                  </span>
+                </div>
+
+                <div class="flex flex-wrap items-end justify-between gap-y-2">
+                  <div class="flex shrink-0 flex-col gap-1">
                     <p
-                      class="inline-flex items-center gap-1 font-semibold text-theme-900 dark:text-zinc-100"
+                      class="flex items-center gap-1.5 text-xs text-theme-600 dark:text-zinc-400"
                     >
-                      <span>{{ taipeiDate(row.next) }}</span>
                       <span
-                        v-if="taipeiTime(row.next)"
-                        class="inline-flex items-center gap-1"
+                        v-if="!row.item.isTentative"
+                        class="inline-block rounded bg-theme-100 px-1.5 py-0.5 font-mono text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
                       >
-                        <span>{{ taipeiTime(row.next) }}</span>
+                        <span v-if="row.item.code === 'ZZZ000'">統一面授</span>
+                        <template v-else>
+                          <span class="sr-only">班級代碼：</span>
+                          <span>{{ row.item.code }}</span>
+                        </template>
+                      </span>
+                      <span
+                        v-else
+                        class="inline-block rounded bg-amber-100 px-1.5 py-0.5 font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+                      >
+                        尚未分班
+                      </span>
+
+                      <span v-if="teacher(row.item)">
+                        {{ teacher(row.item).base }}
+                        <small v-if="teacher(row.item).suffix">{{
+                          teacher(row.item).suffix
+                        }}</small>
+                      </span>
+                    </p>
+
+                    <div v-if="row.next">
+                      <p
+                        v-if="taipeiTime(row.next)"
+                        class="mt-1 inline-flex items-center gap-1 text-sm font-medium text-theme-800 tabular-nums dark:text-zinc-200"
+                      >
+                        {{ taipeiTime(row.next) }}
                         <Icon
                           v-if="row.next.hasOverride"
                           name="exclamation-triangle"
                           class="size-4 text-theme-500 dark:text-zinc-400"
                           title="該次課程時間與一般時間不同"
                         />
-                      </span>
-                    </p>
+                      </p>
+                      <p
+                        v-else
+                        class="mt-1 text-sm text-theme-400 dark:text-zinc-500"
+                      >
+                        時間未設定
+                      </p>
+                      <p
+                        v-if="localHint(row.next)"
+                        class="text-xs text-theme-500 dark:text-zinc-400"
+                      >
+                        {{ localHint(row.next) }}
+                      </p>
+                    </div>
                     <p
-                      v-if="localHint(row.next)"
-                      class="text-xs text-theme-500 dark:text-zinc-400"
+                      v-else
+                      class="mt-1 text-sm font-medium text-theme-500 dark:text-zinc-400"
                     >
-                      {{ localHint(row.next) }}
+                      無未來課程
                     </p>
                   </div>
-                  <p
-                    v-else
-                    class="font-semibold text-theme-500 dark:text-zinc-400"
-                  >
-                    無未來課程
-                  </p>
+
+                  <div class="flex shrink-0 flex-col items-end gap-1">
+                    <a
+                      v-show="row.item.videoLink"
+                      :href="row.item.videoLink"
+                      target="_blank"
+                      rel="noopener"
+                      data-offline-allow
+                      class="inline-flex shrink-0 items-center gap-1 rounded-lg border border-theme-300 px-3 py-1.5 text-base font-medium text-theme-700 transition hover:bg-theme-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                      :aria-label="
+                        '前往 ' + row.item.courseName + ' 的視訊上課連結'
+                      "
+                    >
+                      <Icon name="video-camera" class="size-5" />
+                      進入教室
+                    </a>
+
+                    <div class="flex items-center">
+                      <a
+                        v-show="row.item.backupClassroomUrl"
+                        :href="row.item.backupClassroomUrl"
+                        target="_blank"
+                        rel="noopener"
+                        title="主教室人數已滿時可改用此備用連結"
+                        class="rounded-lg px-2 py-1 text-xs font-medium text-theme-500 transition hover:text-theme-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                        :aria-label="
+                          '前往 ' + row.item.courseName + ' 的備用教室連結'
+                        "
+                      >
+                        備用教室
+                      </a>
+                      <Link
+                        :href="row.item.courseInfoUrl"
+                        class="rounded-lg px-2 py-1 text-xs font-medium text-theme-500 transition hover:text-theme-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                        :aria-label="row.item.courseName + ' 的課程資訊'"
+                      >
+                        課程資訊
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              <div
-                class="flex gap-2 border-t border-theme-100 pt-3 dark:border-zinc-800"
-              >
-                <Link
-                  :href="row.item.courseInfoUrl"
-                  class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-theme-800 underline underline-offset-4 transition hover:bg-theme-50 hover:text-theme-900 dark:text-zinc-200 dark:hover:bg-zinc-950 dark:hover:text-zinc-100"
-                >
-                  <Icon name="information-circle" class="mr-1 inline size-4" />
-                  課程資訊
-                </Link>
-
-                <a
-                  v-show="row.item.videoLink"
-                  :href="row.item.videoLink"
-                  target="_blank"
-                  rel="noopener"
-                  data-offline-allow
-                  class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-theme-500 underline underline-offset-4 transition hover:bg-orange-50 hover:text-theme-400 dark:text-zinc-400 dark:hover:text-zinc-500"
-                >
-                  <Icon name="video-camera" class="mr-1 inline size-4" />
-                  視訊上課
-                </a>
-
-                <a
-                  v-show="row.item.backupClassroomUrl"
-                  :href="row.item.backupClassroomUrl"
-                  target="_blank"
-                  rel="noopener"
-                  class="flex-1 rounded px-2 py-2 text-center text-sm font-semibold text-theme-600 underline underline-offset-4 transition hover:bg-theme-50 hover:text-theme-500 dark:text-zinc-400 dark:hover:bg-zinc-950 dark:hover:text-zinc-400"
-                >
-                  <Icon name="squares-plus" class="mr-1 inline size-4" />
-                  備用教室
-                </a>
-              </div>
             </div>
-          </div>
+          </article>
         </div>
 
         <div
           v-if="viewModel.hasAnyOverride"
-          class="flex items-center gap-1 border-t border-theme-200 bg-theme-50 px-4 py-2 text-xs text-theme-600 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-400"
+          class="mt-3 flex items-center gap-1 px-1 text-xs text-theme-600 md:mt-0 md:border-t md:border-theme-200 md:bg-theme-50 md:px-4 md:py-2 dark:text-zinc-400 dark:md:border-zinc-700 dark:md:bg-zinc-950 print:mt-0 print:border-t print:border-theme-200 print:px-4 print:py-2"
         >
           <Icon
             name="exclamation-triangle"

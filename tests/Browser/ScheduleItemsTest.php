@@ -140,3 +140,28 @@ it('shows "無未來課程" when a course only has past class occurrences', func
         ->assertSee('無未來課程')
         ->screenshot();
 });
+
+it('renders the next class as a card on a phone, with the date tile, time and classroom link', function () {
+    config()->set('app.current_semester', '2025B');
+
+    $date = now('Asia/Taipei')->addDays(3)->toDateString();
+    [$schedule, $course, $courseClass] = createScheduleWithClass($date, '09:00', '10:00');
+    $courseClass->update(['link' => 'https://example.com/live', 'backup_classroom_url' => 'https://example.com/backup']);
+
+    $classDate = Carbon::parse($date, 'Asia/Taipei');
+
+    $page = visit(route('schedules.show', $schedule))
+        ->withTimezone('Asia/Taipei')
+        ->resize(390, 844)
+        ->assertSee($course->name);
+
+    $card = '[data-testid="schedule-item-card"]';
+
+    $page->assertVisible($card)
+        ->assertSeeIn($card, $classDate->format('n').'/'.$classDate->format('j'))
+        ->assertSeeIn($card, chineseWeekdayChar($classDate))
+        ->assertSeeIn($card, '09:00 ~ 10:00')
+        ->assertSeeIn($card, '進入教室')
+        ->assertSeeIn($card, '備用教室')
+        ->assertDontSee('進行中');
+});
