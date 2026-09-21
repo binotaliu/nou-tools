@@ -27,12 +27,21 @@ it('server-renders title, description and Open Graph tags on static pages', func
     'announcements' => ['announcements.index', '學校公告 - NOU 小幫手'],
     'directory' => ['directory.index', '連結 / 學習指導中心目錄 - NOU 小幫手'],
     'course schedule' => ['course.schedule', '本學期開課表 - NOU 小幫手'],
-    'alt uu' => ['alt-uu', 'Alt UU - NOU 小幫手'],
     'about' => ['about', '關於本站 - NOU 小幫手'],
     'pwa install' => ['pwa.install', '安裝成 App - NOU 小幫手'],
     'study room' => ['study-room.show', '自習室 - NOU 小幫手'],
     'new discount store' => ['discount-stores.create', '新增優惠店家 - NOU 小幫手'],
 ]);
+
+it('advertises a generated og:image card on the Alt UU page', function () {
+    $this->get(route('alt-uu'))
+        ->assertSuccessful()
+        ->assertSee('<title>Alt UU - NOU 小幫手</title>', false)
+        ->assertSee('<template data-og-image', false)
+        ->assertSee('給 NOU 同學的 UU 平台瀏覽器 App', false)
+        ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
+        ->assertDontSee(asset('og-image.png'), false);
+});
 
 it('server-renders the newsletter index with its Atom feed link', function () {
     $this->get(route('newsletter.index'))
