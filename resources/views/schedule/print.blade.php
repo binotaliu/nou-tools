@@ -84,10 +84,10 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
         <section class="flex min-h-0 flex-col gap-3 p-[8mm]">
             <div class="flex items-center justify-between gap-4">
                 @include('schedule.print._header')
-                <p class="flex items-center gap-1.5 text-[8pt] text-zinc-600">
-                    <span class="size-2.5 rounded-full bg-zinc-900"></span>
-                    有視訊面授
-                </p>
+                <div class="text-right">
+                    <p class="text-[11pt] leading-tight font-bold">{{ $page->name }}</p>
+                    <p class="text-[8pt] text-zinc-500">{{ $page->semesterLabel }}</p>
+                </div>
             </div>
 
             <div
@@ -110,6 +110,21 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
                     <p class="text-[10pt] font-bold">掃描 QR Code，開啟線上課表</p>
                     <p class="text-[8.5pt] text-zinc-600">在線上課表可查看每堂課的時間，並進入視訊教室上課。</p>
                     <p class="mt-1 text-[7.5pt] break-all text-zinc-500">{{ $page->shareUrl }}</p>
+                </div>
+                <div
+                    class="ml-auto shrink-0 space-y-1 text-[7.5pt] text-zinc-600"
+                >
+                    <p class="flex items-center gap-1.5">
+                        <span class="size-2.5 rounded-full bg-zinc-900"></span>
+                        有視訊面授
+                    </p>
+                    <p class="flex items-center gap-1.5">
+                        <span
+                            class="w-2.5 text-center font-bold text-zinc-900 underline decoration-2 underline-offset-2"
+                            >9</span
+                        >
+                        考試日（期中／期末）
+                    </p>
                 </div>
             </div>
         </section>

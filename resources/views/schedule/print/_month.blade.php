@@ -1,5 +1,6 @@
 {{-- A month grid, Monday first. A class date is a filled dark circle with a white
-number so it survives a black-and-white printer. Under the grid, each class date
+number so it survives a black-and-white printer; an exam date is underlined
+(bold when there is no class that day). Under the grid, each class date
 lists its courses and start times, so the sheet works without the QR code. --}}
 <div class="break-inside-avoid">
     <p class="mb-1 text-[11pt] font-bold text-theme-900">{{ $month->title }}</p>
@@ -13,13 +14,16 @@ lists its courses and start times, so the sheet works without the QR code. --}}
 
         @foreach ($month->weeks as $week)
             @foreach ($week as $cell)
-                <span class="flex h-[5.2mm] items-center justify-center">
+                <span class="flex h-[5mm] items-center justify-center">
                     @if ($cell)
                         <span
                             @class([
-                                'flex size-[4.6mm] items-center justify-center rounded-full tabular-nums',
+                                'flex size-[4.4mm] items-center justify-center tabular-nums',
+                                'rounded-full',
                                 'bg-zinc-900 font-bold text-white' => $cell['hasClass'],
-                                'text-zinc-600' => ! $cell['hasClass'],
+                                'font-bold text-zinc-900' => $cell['isExam'] && ! $cell['hasClass'],
+                                'text-zinc-600' => ! $cell['hasClass'] && ! $cell['isExam'],
+                                'underline decoration-2 underline-offset-2' => $cell['isExam'],
                             ])
                             >{{ $cell['day'] }}</span
                         >
@@ -29,7 +33,7 @@ lists its courses and start times, so the sheet works without the QR code. --}}
         @endforeach
     </div>
 
-    @if ($month->classDays !== [])
+    @if ($month->classDays !== [] || $month->examDays !== [])
         <ul
             class="mt-1 space-y-px border-t border-zinc-300 pt-1 text-[7pt] leading-tight text-zinc-700"
         >
@@ -53,8 +57,23 @@ lists its courses and start times, so the sheet works without the QR code. --}}
                     </span>
                 </li>
             @endforeach
+            @foreach ($month->examDays as $day)
+                <li class="flex gap-1.5">
+                    <span
+                        class="w-[13mm] shrink-0 font-bold tabular-nums"
+                        >{{ $day['label'] }}</span
+                    >
+                    <span class="min-w-0">
+                        <span
+                            class="mr-0.5 font-bold underline decoration-2 underline-offset-2"
+                            >{{ $day['kind'] }}</span
+                        >
+                        {{ implode('、', $day['courses']) }}
+                    </span>
+                </li>
+            @endforeach
         </ul>
     @else
-        <p class="mt-1 border-t border-zinc-300 pt-1 text-[7.5pt] text-zinc-400">本月沒有視訊面授</p>
+        <p class="mt-1 border-t border-zinc-300 pt-1 text-[7.5pt] text-zinc-400">本月沒有視訊面授或考試</p>
     @endif
 </div>

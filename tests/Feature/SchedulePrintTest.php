@@ -138,9 +138,9 @@ it('builds monthly calendars with gap months and Monday-first weeks', function (
         ->and($march->title)->toContain('3 月')
         ->and($march->weeks[0])->toHaveCount(7)
         ->and(array_filter(array_slice($march->weeks[0], 0, 6)))->toBe([])
-        ->and($march->weeks[0][6])->toBe(['day' => 1, 'hasClass' => false])
-        ->and($march->weeks[1][0])->toBe(['day' => 2, 'hasClass' => false])
-        ->and($march->weeks[1][6])->toBe(['day' => 8, 'hasClass' => true]);
+        ->and($march->weeks[0][6])->toBe(['day' => 1, 'hasClass' => false, 'isExam' => false])
+        ->and($march->weeks[1][0])->toBe(['day' => 2, 'hasClass' => false, 'isExam' => false])
+        ->and($march->weeks[1][6])->toBe(['day' => 8, 'hasClass' => true, 'isExam' => false]);
 
     $april = $page->months[1];
     $daysWithClass = collect($april->weeks)->flatten(1)->filter()->where('hasClass', true);
@@ -181,6 +181,47 @@ it('lists the courses held on each class date under its month', function () {
                 ['name' => '婦女健康', 'time' => '19:00'],
             ]],
         ]);
+});
+
+it('marks exam dates and extends the calendars to the final exam month', function () {
+    // 2026-03-08 is the only class; the midterm (2026-04-25, Saturday) and the
+    // final (2026-05-30, Saturday) fall in later months.
+    $schedule = printableSchedule(['name' => '會計學', 'midterm_date' => '2026-04-25', 'final_date' => '2026-05-30']);
+    ClassSchedule::factory()->create(['class_id' => $schedule->items->first()->course_class_id, 'date' => '2026-03-08']);
+
+    $page = app(BuildSchedulePrintPage::class)($schedule->refresh(), '2025B');
+
+    expect($page->months)->toHaveCount(3);
+
+    [$march, $april, $may] = $page->months;
+    $cell = fn ($month, int $day) => collect($month->weeks)->flatten(1)->filter()->firstWhere('day', $day);
+
+    expect($cell($march, 8))->toBe(['day' => 8, 'hasClass' => true, 'isExam' => false])
+        ->and($cell($april, 25))->toBe(['day' => 25, 'hasClass' => false, 'isExam' => true])
+        ->and($cell($may, 30))->toBe(['day' => 30, 'hasClass' => false, 'isExam' => true])
+        ->and($march->examDays)->toBe([])
+        ->and($april->examDays)->toBe([['label' => '4/25 (六)', 'kind' => '期中考', 'courses' => ['會計學']]])
+        ->and($may->examDays)->toBe([['label' => '5/30 (六)', 'kind' => '期末考', 'courses' => ['會計學']]]);
+});
+
+it('marks a date that has both a class and an exam', function () {
+    $schedule = printableSchedule(['midterm_date' => '2026-03-08']);
+    ClassSchedule::factory()->create(['class_id' => $schedule->items->first()->course_class_id, 'date' => '2026-03-08']);
+
+    $march = app(BuildSchedulePrintPage::class)($schedule->refresh(), '2025B')->months[0];
+
+    expect(collect($march->weeks)->flatten(1)->filter()->firstWhere('day', 8))
+        ->toBe(['day' => 8, 'hasClass' => true, 'isExam' => true]);
+});
+
+it('draws calendars for exams even when no class dates exist', function () {
+    $schedule = printableSchedule(['final_date' => '2026-06-28']);
+
+    $page = app(BuildSchedulePrintPage::class)($schedule, '2025B');
+
+    expect($page->months)->toHaveCount(1)
+        ->and($page->months[0]->title)->toContain('6 月')
+        ->and($page->months[0]->classDays)->toBe([]);
 });
 
 it('has no calendars when the schedule has no classes', function () {
@@ -227,6 +268,15 @@ it('only asks for the final exam classroom in summer terms', function () {
         ->assertOk()
         ->assertSee('期末教室')
         ->assertDontSee('期中教室');
+});
+
+it('shows the schedule name and semester on both halves of the sheet', function () {
+    $schedule = printableSchedule();
+
+    $html = $this->get(route('schedules.print', ['schedule' => $schedule, 'term' => '2025B']))->assertOk()->getContent();
+
+    expect(substr_count($html, '列印課表'))->toBeGreaterThanOrEqual(3) // <title> plus each half's heading
+        ->and(substr_count($html, '114 學年度下學期'))->toBeGreaterThanOrEqual(3);
 });
 
 it('renders an empty schedule without errors', function () {
