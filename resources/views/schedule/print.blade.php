@@ -28,19 +28,19 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
         @vite('resources/css/schedule-print.css')
     @endif
 </head>
+@php
+    // Above 9 courses the course list goes two columns (credits as bare
+    // numbers) to leave the exam table its height.
+    $manyCourses = count($page->courses) > 9;
+@endphp
 <body class="m-0 font-sans text-zinc-900">
     <main
         class="mx-auto grid h-[210mm] w-[297mm] grid-cols-[96mm_1fr] overflow-hidden bg-white"
     >
         {{-- Left: the strip to cut off and bring to the exam. --}}
         <section
-            class="relative flex min-h-0 flex-col gap-3 border-r border-dashed border-zinc-500 p-[8mm]"
+            class="flex min-h-0 flex-col gap-3 border-r border-dashed border-zinc-500 p-[8mm]"
         >
-            <span
-                class="absolute top-1/2 -right-[2.6mm] -translate-y-1/2 bg-white text-[9pt] leading-none text-zinc-500"
-                >✂</span
-            >
-
             @include('schedule.print._header')
 
             <div>
@@ -52,21 +52,31 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
 
             <div>
                 <h2
-                    class="mb-1 border-b border-zinc-900 pb-0.5 text-[9pt] font-bold"
+                    class="mb-1 flex items-baseline justify-between border-b border-zinc-900 pb-0.5 text-[9pt] font-bold"
                 >
-                    本學期課程
-                </h2>
-                @forelse ($page->courses as $course)
-                    <p class="flex items-baseline justify-between gap-2 py-px text-[8.5pt] leading-tight">
-                        <span>{{ $course->name }}</span>
-                        <span
-                            class="shrink-0 text-zinc-500 tabular-nums"
-                            >{{ $course->credits !== null ? $course->credits.' 學分' : '—' }}</span
+                    <span>本學期課程</span>
+                    @if ($manyCourses)
+                        <span class="text-[7pt] font-normal text-zinc-500"
+                            >數字為學分</span
                         >
-                    </p>
-                @empty
-                    <p class="text-[8.5pt] text-zinc-400">此學期尚無課程</p>
-                @endforelse
+                    @endif
+                </h2>
+                <div @class(['grid gap-x-3', 'grid-cols-2' => $manyCourses])>
+                    @forelse ($page->courses as $course)
+                        <p class="flex items-baseline justify-between gap-1.5 py-px text-[8.5pt] leading-tight">
+                            <span>{{ $course->name }}</span>
+                            <span class="shrink-0 text-zinc-500 tabular-nums">
+                                @if ($course->credits === null)
+                                    —
+                                @else
+                                    {{ $course->credits }}{{ $manyCourses ? '' : ' 學分' }}
+                                @endif
+                            </span>
+                        </p>
+                    @empty
+                        <p class="text-[8.5pt] text-zinc-400">此學期尚無課程</p>
+                    @endforelse
+                </div>
             </div>
 
             <div class="min-h-0 flex-1">
@@ -84,36 +94,7 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
         <section class="flex min-h-0 flex-col gap-3 p-[8mm]">
             <div class="flex items-center justify-between gap-4">
                 @include('schedule.print._header')
-                <div class="text-right">
-                    <p class="text-[11pt] leading-tight font-bold">{{ $page->name }}</p>
-                    <p class="text-[8pt] text-zinc-500">{{ $page->semesterLabel }}</p>
-                </div>
-            </div>
-
-            <div
-                @class([
-                'grid flex-1 content-start gap-x-6 gap-y-3',
-                'grid-cols-3' => count($page->months) <= 6,
-                'grid-cols-4' => count($page->months) > 6,
-            ])
-            >
-                @foreach ($page->months as $month)
-                    @include('schedule.print._month', ['month' => $month])
-                @endforeach
-            </div>
-
-            <div class="flex items-center gap-4 border-t border-zinc-300 pt-3">
-                <div class="[&_svg]:h-full [&_svg]:w-full size-[26mm] shrink-0">
-                    {!! $page->qrCodeSvg !!}
-                </div>
-                <div class="min-w-0">
-                    <p class="text-[10pt] font-bold">掃描 QR Code，開啟線上課表</p>
-                    <p class="text-[8.5pt] text-zinc-600">在線上課表可查看每堂課的時間，並進入視訊教室上課。</p>
-                    <p class="mt-1 text-[7.5pt] break-all text-zinc-500">{{ $page->shareUrl }}</p>
-                </div>
-                <div
-                    class="ml-auto shrink-0 space-y-1 text-[7.5pt] text-zinc-600"
-                >
+                <div class="flex items-center gap-4 text-[7.5pt] text-zinc-600">
                     <p class="flex items-center gap-1.5">
                         <span class="size-2.5 rounded-full bg-zinc-900"></span>
                         有視訊面授
@@ -123,10 +104,47 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
                             class="w-2.5 text-center font-bold text-zinc-900 underline decoration-2 underline-offset-2"
                             >9</span
                         >
-                        考試日（期中／期末）
+                        期中／期末考
                     </p>
                 </div>
+                <div class="text-right">
+                    <p class="text-[11pt] leading-tight font-bold">{{ $page->name }}</p>
+                    <p class="text-[8pt] text-zinc-500">{{ $page->semesterLabel }}</p>
+                </div>
             </div>
+
+            {{-- The QR code takes the empty cell after the last month when there
+            is one (a 2-row grid of 4 or 5 months); a full last row pushes it
+            below the calendars instead. --}}
+            @php
+                $monthColumns = count($page->months) > 6 ? 4 : 3;
+                $qrInGrid = count($page->months) % $monthColumns !== 0;
+            @endphp
+            <div class="relative flex-1">
+                <div
+                    @class([
+                        'grid content-start gap-x-6 gap-y-3',
+                        'grid-cols-3' => $monthColumns === 3,
+                        'grid-cols-4' => $monthColumns === 4,
+                    ])
+                >
+                    @foreach ($page->months as $month)
+                        @include('schedule.print._month', ['month' => $month])
+                    @endforeach
+                </div>
+
+                @if ($qrInGrid)
+                    <div class="absolute right-0 bottom-0">
+                        @include('schedule.print._qr')
+                    </div>
+                @endif
+            </div>
+
+            @unless ($qrInGrid)
+                <div class="self-end">
+                    @include('schedule.print._qr')
+                </div>
+            @endunless
         </section>
     </main>
 </body>

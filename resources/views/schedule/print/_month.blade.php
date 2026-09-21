@@ -1,7 +1,7 @@
 {{-- A month grid, Monday first. A class date is a filled dark circle with a white
 number so it survives a black-and-white printer; an exam date is underlined
-(bold when there is no class that day). Under the grid, each class date
-lists its courses and start times, so the sheet works without the QR code. --}}
+(bold when there is no class that day). Under the grid, each class date lists
+its courses and start times, so the sheet works without the QR code. --}}
 <div class="break-inside-avoid">
     <p class="mb-1 text-[11pt] font-bold text-theme-900">{{ $month->title }}</p>
     <div class="grid grid-cols-7 text-center text-[8pt]">
@@ -52,7 +52,9 @@ lists its courses and start times, so the sheet works without the QR code. --}}
                                     >{{ $course['time'] }}</span
                                 >
                             @endif
-                            {{ $loop->last ? '' : '、' }}
+                            @if (! $loop->last)
+                                <br />
+                            @endif
                         @endforeach
                     </span>
                 </li>
@@ -64,11 +66,7 @@ lists its courses and start times, so the sheet works without the QR code. --}}
                         >{{ $day['label'] }}</span
                     >
                     <span class="min-w-0">
-                        <span
-                            class="mr-0.5 font-bold underline decoration-2 underline-offset-2"
-                            >{{ $day['kind'] }}</span
-                        >
-                        {{ implode('、', $day['courses']) }}
+                        <span class="mr-0.5 font-bold">{{ $day['kind'] }}</span>
                     </span>
                 </li>
             @endforeach

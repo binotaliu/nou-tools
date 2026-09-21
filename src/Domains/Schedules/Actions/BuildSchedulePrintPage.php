@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace NouTools\Domains\Schedules\Actions;
 
 use App\Models\StudentSchedule;
-use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Milon\Barcode\Facades\DNS2DFacade as DNS2D;
 use NouTools\Domains\Schedules\PageData\SchedulePrintPageData;
@@ -168,8 +168,8 @@ final readonly class BuildSchedulePrintPage
         sort($keys);
 
         $examDateKeys = array_flip(array_column($examDays, 'dateKey'));
-        $cursor = CarbonImmutable::parse($keys[0])->startOfMonth();
-        $last = CarbonImmutable::parse(end($keys))->startOfMonth();
+        $cursor = Date::parse($keys[0])->startOfMonth();
+        $last = Date::parse(end($keys))->startOfMonth();
         $months = [];
 
         while ($cursor <= $last) {
@@ -199,7 +199,7 @@ final readonly class BuildSchedulePrintPage
      * @param  array<string, int>  $examDateKeys  Keyed by Y-m-d.
      * @return array<int, array<int, array{day: int, hasClass: bool, isExam: bool}|null>>
      */
-    private function weeks(CarbonImmutable $firstOfMonth, array $classDays, array $examDateKeys): array
+    private function weeks(CarbonInterface $firstOfMonth, array $classDays, array $examDateKeys): array
     {
         $cells = array_fill(0, $firstOfMonth->isoWeekday() - 1, null);
 

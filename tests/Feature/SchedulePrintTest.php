@@ -253,7 +253,7 @@ it('renders the printable sheet', function () {
         ->assertSee('期中')
         ->assertSee('期末')
         ->assertSee('4/25')
-        ->assertSee('班級代碼')
+        ->assertSee('考試班級')
         ->assertSee('期中教室')
         ->assertSee('期末教室')
         ->assertSee('<svg', false)

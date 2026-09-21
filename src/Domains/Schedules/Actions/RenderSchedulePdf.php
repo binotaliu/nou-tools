@@ -24,7 +24,7 @@ final readonly class RenderSchedulePdf
     public function __invoke(string $html): string
     {
         $encoded = Cache::remember(
-            'schedule-print-pdf:'.sha1((string) preg_replace('#<svg\b.*?</svg>#s', '', $html)),
+            'schedule-print-pdf:'.hash('sha256', (string) preg_replace('#<svg\b.*?</svg>#s', '', $html)),
             now()->addDay(),
             fn (): string => base64_encode($this->htmlToPdf->landscapeA4($html)),
         );
