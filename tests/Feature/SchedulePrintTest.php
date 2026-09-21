@@ -50,18 +50,18 @@ it('places exams on the Saturday and Sunday columns', function () {
     $page = app(BuildSchedulePrintPage::class)($schedule, '2025B');
 
     expect($page->saturdayExams)->toHaveCount(1)
-        ->and($page->saturdayExams[0]->kind)->toBe('期中考')
-        ->and($page->saturdayExams[0]->time)->toBe('09:00 - 10:30')
-        ->and($page->saturdayExams[0]->courseNames)->toBe(['會計學'])
+        ->and($page->saturdayExams[0]->entries)->toBe([
+            ['kind' => '期中考', 'time' => '09:00 - 10:30', 'courseName' => '會計學'],
+        ])
         ->and($page->sundayExams)->toHaveCount(1)
-        ->and($page->sundayExams[0]->kind)->toBe('期末考')
+        ->and($page->sundayExams[0]->entries[0]['kind'])->toBe('期末考')
         ->and($page->otherExams)->toBe([])
         ->and($page->undatedCourseNames)->toBe([]);
 });
 
-it('groups courses sharing an exam session into one slot', function () {
-    $first = printableSchedule(['name' => '國文', 'final_date' => '2026-06-28']);
-    $second = Course::factory()->create(['name' => '英文', 'term' => '2025B', 'final_date' => '2026-06-28']);
+it('groups every exam on the same date under one day', function () {
+    $first = printableSchedule(['name' => '國文', 'final_date' => '2026-06-28', 'exam_time_start' => '13:30', 'exam_time_end' => '14:40']);
+    $second = Course::factory()->create(['name' => '英文', 'term' => '2025B', 'final_date' => '2026-06-28', 'exam_time_start' => '08:30', 'exam_time_end' => '09:40']);
     $class = CourseClass::factory()->create(['course_id' => $second->id]);
     StudentScheduleItem::create([
         'student_schedule_id' => $first->id,
@@ -72,7 +72,7 @@ it('groups courses sharing an exam session into one slot', function () {
     $page = app(BuildSchedulePrintPage::class)($first->refresh(), '2025B');
 
     expect($page->sundayExams)->toHaveCount(1)
-        ->and($page->sundayExams[0]->courseNames)->toEqualCanonicalizing(['國文', '英文']);
+        ->and(array_column($page->sundayExams[0]->entries, 'courseName'))->toBe(['英文', '國文']);
 });
 
 it('keeps weekday exams visible in their own bucket', function () {
@@ -84,7 +84,7 @@ it('keeps weekday exams visible in their own bucket', function () {
     expect($page->saturdayExams)->toBe([])
         ->and($page->sundayExams)->toBe([])
         ->and($page->otherExams)->toHaveCount(1)
-        ->and($page->otherExams[0]->courseNames)->toBe(['統計學']);
+        ->and($page->otherExams[0]->entries[0]['courseName'])->toBe('統計學');
 });
 
 it('omits the midterm for summer terms', function () {
@@ -97,7 +97,7 @@ it('omits the midterm for summer terms', function () {
 
     expect($page->saturdayExams)->toBe([])
         ->and($page->sundayExams)->toHaveCount(1)
-        ->and($page->sundayExams[0]->kind)->toBe('期末考');
+        ->and($page->sundayExams[0]->entries[0]['kind'])->toBe('期末考');
 });
 
 it('lists courses without an exam date as undated', function () {
@@ -144,4 +144,43 @@ it('has no calendars when the schedule has no classes', function () {
     $page = app(BuildSchedulePrintPage::class)(printableSchedule(), '2025B');
 
     expect($page->months)->toBe([]);
+});
+
+it('renders the printable sheet', function () {
+    $schedule = printableSchedule([
+        'name' => '會計學',
+        'credits' => 3,
+        'midterm_date' => '2026-04-25',
+        'final_date' => '2026-06-28',
+    ]);
+    ClassSchedule::factory()->create([
+        'class_id' => $schedule->items->first()->course_class_id,
+        'date' => '2026-03-08',
+    ]);
+
+    $this->get(route('schedules.print', ['schedule' => $schedule, 'term' => '2025B']))
+        ->assertOk()
+        ->assertSee('列印課表')
+        ->assertSee('114 學年度下學期')
+        ->assertSee('會計學')
+        ->assertSee('3 學分')
+        ->assertSee('週六')
+        ->assertSee('期中考')
+        ->assertSee('期末考')
+        ->assertSee('班級代碼')
+        ->assertSee('<svg', false)
+        ->assertSee(route('schedules.show', $schedule))
+        ->assertSee('noindex', false);
+});
+
+it('renders an empty schedule without errors', function () {
+    $schedule = StudentSchedule::create(['uuid' => Str::uuid(), 'name' => '空課表']);
+
+    $this->get(route('schedules.print', $schedule))
+        ->assertOk()
+        ->assertSee('此學期尚無課程');
+});
+
+it('returns 404 for an unknown schedule', function () {
+    $this->get(route('schedules.print', ['schedule' => (string) Str::uuid()]))->assertNotFound();
 });

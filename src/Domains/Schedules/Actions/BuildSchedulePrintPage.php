@@ -12,7 +12,7 @@ use Milon\Barcode\Facades\DNS2DFacade as DNS2D;
 use NouTools\Domains\Schedules\PageData\SchedulePrintPageData;
 use NouTools\Domains\Schedules\ViewModels\ScheduleExamViewModel;
 use NouTools\Domains\Schedules\ViewModels\SchedulePrintCourseViewModel;
-use NouTools\Domains\Schedules\ViewModels\SchedulePrintExamSlotViewModel;
+use NouTools\Domains\Schedules\ViewModels\SchedulePrintExamDayViewModel;
 use NouTools\Domains\Schedules\ViewModels\SchedulePrintMonthViewModel;
 use NouTools\Domains\Schedules\ViewModels\ScheduleViewModel;
 
@@ -25,8 +25,8 @@ final readonly class BuildSchedulePrintPage
         $viewModel = ($this->showSchedulePage)($schedule, $term);
 
         $courses = $this->courses($schedule);
-        $slots = $this->examSlots($viewModel);
-        $datedCourseNames = collect($slots)->flatMap(fn (SchedulePrintExamSlotViewModel $slot) => $slot->courseNames)->all();
+        $days = $this->examDays($viewModel);
+        $datedCourseNames = collect($days)->flatMap(fn (SchedulePrintExamDayViewModel $day) => array_column($day->entries, 'courseName'))->all();
         $shareUrl = route('schedules.show', $viewModel->uuid);
 
         return new SchedulePrintPageData(
@@ -35,11 +35,11 @@ final readonly class BuildSchedulePrintPage
             shareUrl: $shareUrl,
             qrCodeSvg: DNS2D::getBarcodeSVG($shareUrl, 'QRCODE'),
             courses: $courses,
-            saturdayExams: $this->slotsOn($slots, CarbonInterface::SATURDAY),
-            sundayExams: $this->slotsOn($slots, CarbonInterface::SUNDAY),
+            saturdayExams: $this->daysOn($days, CarbonInterface::SATURDAY),
+            sundayExams: $this->daysOn($days, CarbonInterface::SUNDAY),
             otherExams: array_values(array_filter(
-                $slots,
-                fn (SchedulePrintExamSlotViewModel $slot) => ! in_array(CarbonImmutable::parse($slot->dateKey)->dayOfWeek, [CarbonInterface::SATURDAY, CarbonInterface::SUNDAY], true),
+                $days,
+                fn (SchedulePrintExamDayViewModel $day) => ! in_array(CarbonImmutable::parse($day->dateKey)->dayOfWeek, [CarbonInterface::SATURDAY, CarbonInterface::SUNDAY], true),
             )),
             undatedCourseNames: array_values(array_diff(
                 array_map(fn (SchedulePrintCourseViewModel $course) => $course->name, $courses),
@@ -63,55 +63,58 @@ final readonly class BuildSchedulePrintPage
     }
 
     /**
-     * One slot per (date, kind, time) so courses sharing a session sit together.
-     * Summer terms have no midterm, matching the schedule page.
+     * One entry per date, listing each course sitting on it, so a date reads as
+     * a single heading however many exams share the day. Summer terms have no
+     * midterm, matching the schedule page.
      *
-     * @return array<int, SchedulePrintExamSlotViewModel>
+     * @return array<int, SchedulePrintExamDayViewModel>
      */
-    private function examSlots(ScheduleViewModel $viewModel): array
+    private function examDays(ScheduleViewModel $viewModel): array
     {
         $hasMidterm = ! str_ends_with($viewModel->selectedTerm, 'C');
-        $groups = [];
+        $days = [];
 
         /** @var ScheduleExamViewModel $exam */
         foreach ($viewModel->exams as $exam) {
-            $entries = [];
+            $sittings = [];
 
             if ($hasMidterm && $exam->midtermDate) {
-                $entries[] = [$exam->midtermDate, $exam->formattedMidtermDate, '期中考'];
+                $sittings[] = [$exam->midtermDate, $exam->formattedMidtermDate, '期中考'];
             }
 
             if ($exam->finalDate) {
-                $entries[] = [$exam->finalDate, $exam->formattedFinalDate, '期末考'];
+                $sittings[] = [$exam->finalDate, $exam->formattedFinalDate, '期末考'];
             }
 
-            foreach ($entries as [$date, $label, $kind]) {
+            foreach ($sittings as [$date, $label, $kind]) {
                 $dateKey = $date->format('Y-m-d');
-                $groups[$dateKey.'|'.$kind.'|'.$exam->formattedExamTime] ??= new SchedulePrintExamSlotViewModel(
-                    dateKey: $dateKey,
-                    dateLabel: (string) $label,
-                    kind: $kind,
-                    time: $exam->formattedExamTime,
-                    courseNames: [],
-                );
-                $groups[$dateKey.'|'.$kind.'|'.$exam->formattedExamTime]->courseNames[] = $exam->courseName;
+                $days[$dateKey] ??= new SchedulePrintExamDayViewModel(dateKey: $dateKey, dateLabel: (string) $label, entries: []);
+                $days[$dateKey]->entries[] = [
+                    'kind' => $kind,
+                    'time' => $exam->formattedExamTime,
+                    'courseName' => $exam->courseName,
+                ];
             }
         }
 
-        ksort($groups);
+        ksort($days);
 
-        return array_values($groups);
+        foreach ($days as $day) {
+            usort($day->entries, fn (array $a, array $b) => strcmp((string) $a['time'], (string) $b['time']));
+        }
+
+        return array_values($days);
     }
 
     /**
-     * @param  array<int, SchedulePrintExamSlotViewModel>  $slots
-     * @return array<int, SchedulePrintExamSlotViewModel>
+     * @param  array<int, SchedulePrintExamDayViewModel>  $days
+     * @return array<int, SchedulePrintExamDayViewModel>
      */
-    private function slotsOn(array $slots, int $dayOfWeek): array
+    private function daysOn(array $days, int $dayOfWeek): array
     {
         return array_values(array_filter(
-            $slots,
-            fn (SchedulePrintExamSlotViewModel $slot) => CarbonImmutable::parse($slot->dateKey)->dayOfWeek === $dayOfWeek,
+            $days,
+            fn (SchedulePrintExamDayViewModel $day) => CarbonImmutable::parse($day->dateKey)->dayOfWeek === $dayOfWeek,
         ));
     }
 

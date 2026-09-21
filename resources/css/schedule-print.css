@@ -1,0 +1,33 @@
+/* Styles for the printable schedule sheet (resources/views/schedule/print*).
+ * Kept apart from app.css so the PDF only inlines what the sheet uses. The
+ * palette is the default accent's, fixed: a printed sheet should not follow
+ * the reader's theme. */
+@import 'tailwindcss' source(none);
+
+@source '../views/schedule/print.blade.php';
+@source '../views/schedule/print';
+
+@theme {
+  --font-sans: 'Noto Sans TC', system-ui, sans-serif;
+  --color-theme-100: oklch(0.96 0.02 40);
+  --color-theme-200: oklch(0.93 0.04 40);
+  --color-theme-700: oklch(0.55 0.13 35);
+  --color-theme-900: oklch(0.35 0.08 35);
+}
+
+@page {
+  size: A4 landscape;
+  margin: 0;
+}
+
+html {
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+@media screen {
+  body {
+    background: #d4d4d8;
+    padding: 1.5rem;
+  }
+}

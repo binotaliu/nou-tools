@@ -57,7 +57,8 @@ final class PublicSitePolicy implements Preset
         // The og-image card (spatie/laravel-og-image) loads Noto Sans TC from
         // Google Fonts, but only in the `?ogimage` screenshot document, so the
         // rest of the site's CSP stays untouched.
-        if (request()->has(config('og-image.preview_parameter', 'ogimage'))) {
+        // The printable schedule sheet's HTML preview loads the same font.
+        if (request()->has(config('og-image.preview_parameter', 'ogimage')) || request()->routeIs('schedules.print')) {
             $policy->add(Directive::STYLE, 'https://fonts.googleapis.com');
             $policy->add(Directive::FONT, 'https://fonts.gstatic.com');
         }

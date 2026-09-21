@@ -42,6 +42,7 @@ use App\Http\Controllers\ScheduleCustomizationController;
 use App\Http\Controllers\ScheduleMyController;
 use App\Http\Controllers\ScheduleMyLearningProgressController;
 use App\Http\Controllers\ScheduleMyStoreController;
+use App\Http\Controllers\SchedulePrintController;
 use App\Http\Controllers\SchedulePushSubscriptionDestroyController;
 use App\Http\Controllers\SchedulePushSubscriptionStoreController;
 use App\Http\Controllers\ScheduleRememberController;
@@ -136,6 +137,7 @@ Route::put('/schedules/{schedule}/announcement-preferences', [ScheduleAnnounceme
 Route::get('/schedules/{schedule}/subscribe', ScheduleSubscribeController::class)->name('schedules.subscribe');
 Route::put('/schedules/{schedule}/calendar-settings', ScheduleCalendarSettingsUpdateController::class)->name('schedules.calendar-settings.update');
 Route::get('/schedules/{schedule}/calendar', ScheduleCalendarController::class)->name('schedules.calendar');
+Route::get('/schedules/{schedule}/print', [SchedulePrintController::class, 'show'])->name('schedules.print');
 Route::post('/schedules/{schedule}/push-subscriptions', SchedulePushSubscriptionStoreController::class)->name('schedules.push-subscriptions.store');
 Route::delete('/schedules/{schedule}/push-subscriptions', SchedulePushSubscriptionDestroyController::class)->name('schedules.push-subscriptions.destroy');
 
