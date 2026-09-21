@@ -43,6 +43,33 @@ const centerGroups = computed(() => {
   return [...groups.values()]
 })
 
+// Jump links to each section. Only sections that render appear, and columns
+// get an id from the column record since their titles are editor-written.
+const tableOfContents = computed(() => {
+  const entries = []
+
+  if (issue.value.highlightsIntro) {
+    entries.push({ id: 'newsletter-preface', label: '前言' })
+  }
+  if (issue.value.highlightEvents.length > 0) {
+    entries.push({ id: 'newsletter-highlights', label: '本期行事曆' })
+  }
+  if (issue.value.newsItems.length > 0) {
+    entries.push({ id: 'newsletter-news', label: '空大新消息' })
+  }
+  if (issue.value.artItems.length > 0) {
+    entries.push({ id: 'newsletter-arts', label: '藝文活動' })
+  }
+  if (centerGroups.value.length > 0) {
+    entries.push({ id: 'newsletter-centers', label: '各中心消息' })
+  }
+  issue.value.columns.forEach(column => {
+    entries.push({ id: `newsletter-column-${column.id}`, label: column.title })
+  })
+
+  return entries
+})
+
 const {
   options: reactionOptions,
   mine: myReaction,
@@ -139,9 +166,34 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         </div>
       </header>
 
+      <nav
+        v-if="tableOfContents.length > 1"
+        class="mb-8 rounded-lg bg-theme-50 p-4 dark:bg-zinc-800"
+        aria-labelledby="newsletter-toc-title"
+        data-testid="newsletter-toc"
+      >
+        <h2
+          id="newsletter-toc-title"
+          class="mb-2 text-sm font-semibold text-theme-700 dark:text-zinc-300"
+        >
+          本期內容
+        </h2>
+        <ol class="flex flex-wrap gap-x-4 gap-y-1.5">
+          <li v-for="entry in tableOfContents" :key="entry.id">
+            <a
+              :href="`#${entry.id}`"
+              class="text-theme-800 underline decoration-theme-300 underline-offset-4 hover:decoration-theme-700 dark:text-zinc-200 dark:decoration-zinc-600 dark:hover:decoration-zinc-300"
+              data-testid="newsletter-toc-link"
+            >
+              {{ entry.label }}
+            </a>
+          </li>
+        </ol>
+      </nav>
+
       <div
         ref="contentRoot"
-        class="divide-y divide-theme-200 dark:divide-zinc-700 [&>section]:py-8 [&>section:first-child]:pt-0 [&>section:last-child]:pb-0"
+        class="divide-y divide-theme-200 dark:divide-zinc-700 [&_h2]:scroll-mt-[6.45rem] [&>section]:py-8 [&>section:first-child]:pt-0 [&>section:last-child]:pb-0"
       >
         <section
           v-if="issue.highlightsIntro"
@@ -360,10 +412,11 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         <section
           v-for="column in issue.columns"
           :key="column.id"
-          :aria-label="column.title"
+          :aria-labelledby="`newsletter-column-${column.id}`"
           data-testid="newsletter-column"
         >
           <h2
+            :id="`newsletter-column-${column.id}`"
             class="flex items-center gap-2 text-2xl font-bold text-theme-700 dark:text-theme-300"
           >
             <Icon name="pencil-square" class="size-6" />

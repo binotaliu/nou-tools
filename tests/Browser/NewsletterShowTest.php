@@ -69,6 +69,39 @@ it('renders every section of an issue', function () {
         ->assertSee('浣熊站長的自言自語');
 });
 
+it('lists every section in a table of contents whose links all land on a heading', function () {
+    $page = visit('/newsletter/2026-W39')
+        ->assertPresent('[data-testid="newsletter-toc"]')
+        ->assertNoJavaScriptErrors();
+
+    $result = json_decode($page->script(<<<'JS'
+        JSON.stringify({
+            labels: [...document.querySelectorAll('[data-testid="newsletter-toc-link"]')].map(a => a.textContent.trim()),
+            resolved: [...document.querySelectorAll('[data-testid="newsletter-toc-link"]')].every(a => {
+                const target = document.getElementById(a.getAttribute('href').slice(1))
+                return target !== null && target.tagName === 'H2'
+            }),
+        })
+        JS), true);
+
+    expect($result['labels'])->toBe(['前言', '本期行事曆', '空大新消息', '藝文活動', '各中心消息', '浣熊站長的自言自語'])
+        ->and($result['resolved'])->toBeTrue();
+});
+
+it('leaves out table of contents entries for sections the issue does not have', function () {
+    NewsletterIssue::query()->where('issue_key', '2026-W39')->sole()->items()->delete();
+
+    $page = visit('/newsletter/2026-W39')
+        ->assertPresent('[data-testid="newsletter-toc"]')
+        ->assertNoJavaScriptErrors();
+
+    $labels = json_decode($page->script(
+        "JSON.stringify([...document.querySelectorAll('[data-testid=\"newsletter-toc-link\"]')].map(a => a.textContent.trim()))"
+    ), true);
+
+    expect($labels)->toBe(['前言', '本期行事曆', '浣熊站長的自言自語']);
+});
+
 it('draws weekends in red and keeps every calendar week the same height', function () {
     $page = visit('/newsletter/2026-W39')->assertPresent('[data-testid="calendar-week-1"]');
 
