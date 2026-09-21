@@ -7,5 +7,5 @@ of months leaves one, otherwise below the calendars. --}}
     </div>
     <p class="text-[9pt] font-bold">掃描 QR Code，開啟線上課表</p>
     <p class="text-[7.5pt] text-zinc-600">查看每堂課的時間，並進入視訊教室上課</p>
-    <p class="max-w-[70mm] text-[6.5pt] break-all text-zinc-500">{{ $page->shareUrl }}</p>
+    <p class="max-w-[80mm] text-[6.5pt] break-all text-zinc-500">{{ $page->shareUrl }}</p>
 </div>
