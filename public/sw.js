@@ -1,13 +1,14 @@
 // Minimal offline support: keeps a previously-visited home/schedule/directory
 // page (and the assets it needs) available when the network is down, and
 // shows a generic offline page for any other route that isn't cached.
-const CACHE_VERSION = 'v6'
+const CACHE_VERSION = 'v7'
 const PAGE_CACHE = `nou-schedule-pages-${CACHE_VERSION}`
 const RUNTIME_CACHE = `nou-runtime-${CACHE_VERSION}`
 
 // Matches /schedules/{token} only — not /schedules/create or nested routes
 // like /schedules/{token}/edit, which aren't meant to work offline.
 const SCHEDULE_SHOW_PATTERN = /^\/schedules\/([^/]+)$/
+const SCHEDULE_PDF_PATTERN = /^\/schedules\/[^/]+\/print\.pdf$/
 
 // Generic fallback shown for any other page when it isn't cached and the
 // network is unreachable. Precached below so it's always available, even if
@@ -187,6 +188,17 @@ self.addEventListener('fetch', event => {
   }
 
   if (isInertiaRequest(request)) {
+    return
+  }
+
+  // The schedule's PDF is fetched by the page in an installed PWA to hand to
+  // the share sheet. It reflects the schedule as it is now (the server caches
+  // it by content), so the stale-while-revalidate bucket below would share
+  // the previous PDF after an edit.
+  if (
+    url.origin === self.location.origin &&
+    SCHEDULE_PDF_PATTERN.test(url.pathname)
+  ) {
     return
   }
 

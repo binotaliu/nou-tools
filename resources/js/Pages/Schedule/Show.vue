@@ -24,6 +24,7 @@ import PwaInstallBanner from '../../Components/PwaInstallBanner.vue'
 import usePwaStandalone from '../../Composables/usePwaStandalone'
 import usePushSubscription from '../../Composables/usePushSubscription'
 import useCopyLink from '../../Composables/useCopyLink'
+import useSchedulePdfShare from '../../Composables/useSchedulePdfShare'
 
 const props = defineProps({
   viewModel: {
@@ -105,6 +106,45 @@ const pageTitle = computed(
   () => `${props.viewModel.name || '我的課表'} - NOU 小幫手`
 )
 
+// The printed calendars can start their weeks on Monday or Sunday; the print
+// button opens a menu to pick one.
+const printOptions = [
+  { weekStart: 'monday', label: '一週從週一開始' },
+  { weekStart: 'sunday', label: '一週從週日開始' },
+]
+const printOpen = ref(false)
+const printMenu = ref(null)
+const pdfShare = useSchedulePdfShare()
+
+function printUrl(option) {
+  return `/schedules/${props.viewModel.uuid}/print.pdf?term=${props.viewModel.selectedTerm}&week_start=${option.weekStart}`
+}
+
+// In an installed PWA the link would open the PDF inside the app with no way
+// back (iOS has no back button), so hand the file to the share sheet instead.
+// Everywhere else the link works as a plain new-tab link.
+function onPrintOption(event, option) {
+  printOpen.value = false
+
+  if (!pdfShare.canHandle()) {
+    return
+  }
+
+  event.preventDefault()
+  pdfShare.start(
+    printUrl(option),
+    `nou-schedule-${props.viewModel.selectedTerm}.pdf`
+  )
+}
+
+function onPrintButton() {
+  if (pdfShare.state.value === 'ready') {
+    pdfShare.share()
+  } else if (pdfShare.state.value !== 'loading') {
+    printOpen.value = !printOpen.value
+  }
+}
+
 const hasCourses = computed(() => props.viewModel.items.length > 0)
 
 const hasTentative = computed(() =>
@@ -169,11 +209,23 @@ function onActionsPointerDown(event) {
   if (actionsOpen.value && !actionsMenu.value?.contains(event.target)) {
     closeActions()
   }
+
+  if (printOpen.value && !printMenu.value?.contains(event.target)) {
+    printOpen.value = false
+  }
 }
 
 function onActionsKeydown(event) {
-  if (actionsOpen.value && event.key === 'Escape') {
+  if (event.key !== 'Escape') {
+    return
+  }
+
+  if (actionsOpen.value) {
     closeActions()
+  }
+
+  if (printOpen.value) {
+    printOpen.value = false
   }
 }
 
@@ -1422,18 +1474,76 @@ function localHint(next) {
         v-if="viewModel.displayOptions.show_print_button"
         class="mt-6 flex justify-end"
       >
-        <!-- The PDF is rendered on the server (Blade + Browsershot), so this is a
-        plain link, not an Inertia visit. -->
-        <a
-          :href="`/schedules/${viewModel.uuid}/print.pdf?term=${viewModel.selectedTerm}`"
-          target="_blank"
-          rel="noopener"
-          data-testid="schedule-print-button"
-          class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-200 bg-theme-200 px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-300 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
+        <div
+          ref="printMenu"
+          class="relative flex flex-col items-end gap-2"
+          data-testid="schedule-print"
         >
-          <Icon name="printer" class="inline size-4" />
-          列印
-        </a>
+          <button
+            type="button"
+            data-testid="schedule-print-button"
+            :disabled="pdfShare.state.value === 'loading'"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-200 bg-theme-200 px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-300 disabled:cursor-wait disabled:opacity-70 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
+            aria-haspopup="menu"
+            :aria-expanded="printOpen.toString()"
+            aria-controls="schedule-print-menu"
+            @click="onPrintButton"
+          >
+            <template v-if="pdfShare.state.value === 'loading'">
+              <Icon name="arrow-path" class="size-4 animate-spin" />
+              產生 PDF 中…
+            </template>
+            <template v-else-if="pdfShare.state.value === 'ready'">
+              <Icon name="share" class="size-4" />
+              分享 PDF
+            </template>
+            <template v-else>
+              <Icon name="printer" class="inline size-4" />
+              列印
+              <Icon name="chevron-down" class="size-4" />
+            </template>
+          </button>
+
+          <p
+            v-if="pdfShare.state.value === 'failed'"
+            role="alert"
+            data-testid="schedule-print-error"
+            class="text-sm text-red-600"
+          >
+            無法產生 PDF，請稍後再試一次。
+          </p>
+
+          <div class="sr-only" role="status" aria-live="polite">
+            {{ pdfShare.state.value === 'loading' ? '正在產生 PDF' : '' }}
+          </div>
+
+          <div
+            v-if="printOpen"
+            id="schedule-print-menu"
+            data-testid="schedule-print-menu"
+            role="menu"
+            class="absolute right-0 bottom-full z-30 mb-2 w-48 rounded-lg border border-theme-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+          >
+            <p class="px-3 pt-1 pb-2 text-xs text-theme-600 dark:text-zinc-400">
+              選擇月曆版本
+            </p>
+            <!-- The PDF is rendered on the server (Blade + Browsershot), so
+            these are plain links, not Inertia visits. -->
+            <a
+              v-for="option in printOptions"
+              :key="option.weekStart"
+              :href="printUrl(option)"
+              target="_blank"
+              rel="noopener"
+              role="menuitem"
+              :data-testid="`schedule-print-${option.weekStart}`"
+              class="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-theme-800 transition-colors hover:bg-theme-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              @click="onPrintOption($event, option)"
+            >
+              {{ option.label }}
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </AppLayout>

@@ -1,11 +1,11 @@
-{{-- A month grid, Monday first. A class date is a filled dark circle with a white
+{{-- A month grid, starting the week on Monday or Sunday ($weekdayLabels). A class date is a filled dark circle with a white
 number so it survives a black-and-white printer; an exam date is underlined
 (bold when there is no class that day). Under the grid, each class date lists
 its courses and start times, so the sheet works without the QR code. --}}
 <div class="break-inside-avoid">
     <p class="mb-1 text-[11pt] font-bold text-theme-900">{{ $month->title }}</p>
     <div class="grid grid-cols-7 text-center text-[8pt]">
-        @foreach (['一', '二', '三', '四', '五', '六', '日'] as $weekday)
+        @foreach ($weekdayLabels as $weekday)
             <span
                 class="border-b border-zinc-300 pb-0.5 text-zinc-500"
                 >{{ $weekday }}</span

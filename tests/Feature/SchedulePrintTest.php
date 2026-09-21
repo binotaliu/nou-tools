@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PrintWeekStart;
 use App\Models\ClassSchedule;
 use App\Models\Course;
 use App\Models\CourseClass;
@@ -149,6 +150,65 @@ it('builds monthly calendars with gap months and Monday-first weeks', function (
     $may = $page->months[2];
     expect(collect($may->weeks)->flatten(1)->filter()->where('hasClass', true)->pluck('day')->all())->toBe([2])
         ->and(collect($may->weeks)->flatten(1)->filter()->count())->toBe(31);
+});
+
+it('can start the calendar weeks on Sunday', function () {
+    $schedule = printableSchedule();
+    $class = $schedule->items->first()->courseClass;
+
+    // March 2026 starts on a Sunday; May 2026 starts on a Friday.
+    foreach (['2026-03-08', '2026-05-02'] as $date) {
+        ClassSchedule::factory()->create(['class_id' => $class->id, 'date' => $date]);
+    }
+
+    $page = app(BuildSchedulePrintPage::class)($schedule->refresh(), '2025B', PrintWeekStart::Sunday);
+
+    expect($page->weekdayLabels)->toBe(['日', '一', '二', '三', '四', '五', '六']);
+
+    [$march, , $may] = $page->months;
+    // Sunday the 1st opens the first row; the 8th (also a Sunday) opens the second.
+    expect($march->weeks[0][0])->toBe(['day' => 1, 'hasClass' => false, 'isExam' => false])
+        ->and($march->weeks[1][0])->toBe(['day' => 8, 'hasClass' => true, 'isExam' => false])
+        // Friday the 1st sits in the sixth column, two days before Sunday the 3rd.
+        ->and(array_filter(array_slice($may->weeks[0], 0, 5)))->toBe([])
+        ->and($may->weeks[0][5])->toBe(['day' => 1, 'hasClass' => false, 'isExam' => false])
+        ->and($may->weeks[1][0]['day'])->toBe(3);
+});
+
+it('defaults to Monday-first weeks', function () {
+    $page = app(BuildSchedulePrintPage::class)(printableSchedule(), '2025B');
+
+    expect($page->weekdayLabels)->toBe(['一', '二', '三', '四', '五', '六', '日']);
+});
+
+it('renders the sheet with the week start from the query', function (?string $weekStart, string $firstWeekday) {
+    $schedule = printableSchedule();
+    ClassSchedule::factory()->create(['class_id' => $schedule->items->first()->course_class_id, 'date' => '2026-03-08']);
+
+    $html = $this->get(route('schedules.print', array_filter(['schedule' => $schedule->refresh(), 'term' => '2025B', 'week_start' => $weekStart])))
+        ->assertOk()
+        ->getContent();
+
+    preg_match_all('/text-zinc-500"\s*>(.)<\/span/u', $html, $headers);
+
+    expect(array_slice($headers[1], 0, 7)[0])->toBe($firstWeekday);
+})->with([
+    'default' => [null, '一'],
+    'monday' => ['monday', '一'],
+    'sunday' => ['sunday', '日'],
+    'unknown' => ['friday', '一'],
+]);
+
+it('passes the week start on to the PDF', function () {
+    $fake = fakeHtmlToPdf();
+    $schedule = printableSchedule();
+    ClassSchedule::factory()->create(['class_id' => $schedule->items->first()->course_class_id, 'date' => '2026-03-08']);
+
+    $this->get(route('schedules.print.pdf', ['schedule' => $schedule->refresh(), 'term' => '2025B', 'week_start' => 'sunday']))->assertOk();
+    $this->get(route('schedules.print.pdf', ['schedule' => $schedule, 'term' => '2025B']))->assertOk();
+
+    // Different layouts, so the second request is not served from the first one's cache entry.
+    expect($fake->rendered)->toHaveCount(2);
 });
 
 it('orders the courses on one class date by start time, not alphabetically', function () {

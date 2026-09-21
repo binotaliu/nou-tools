@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\PrintWeekStart;
 use App\Models\StudentSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -15,7 +16,7 @@ final class SchedulePrintPdfController extends Controller
     public function __invoke(StudentSchedule $schedule, Request $request, BuildSchedulePrintPage $buildSchedulePrintPage, RenderSchedulePdf $renderSchedulePdf): Response
     {
         $html = view('schedule.print', [
-            'page' => $buildSchedulePrintPage($schedule, $request->query('term')),
+            'page' => $buildSchedulePrintPage($schedule, $request->query('term'), PrintWeekStart::fromQuery($request->query('week_start'))),
             'inlineAssets' => true,
         ])->render();
 

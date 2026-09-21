@@ -6,6 +6,7 @@
 import {
   AcademicCapIcon,
   ArrowLeftIcon,
+  ArrowPathIcon,
   ArrowTopRightOnSquareIcon,
   Bars3Icon,
   BookOpenIcon,
@@ -69,6 +70,7 @@ import {
 const ICONS = {
   'academic-cap': AcademicCapIcon,
   'arrow-left': ArrowLeftIcon,
+  'arrow-path': ArrowPathIcon,
   'arrow-top-right-on-square': ArrowTopRightOnSquareIcon,
   'bars-3': Bars3Icon,
   'book-open': BookOpenIcon,

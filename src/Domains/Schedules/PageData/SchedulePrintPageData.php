@@ -25,5 +25,7 @@ final class SchedulePrintPageData extends Resource
         public array $months,
         /** Calendar columns on the right half: 3, or 4 when the course lists are too long for 3 to fit the page. */
         public int $monthColumns,
+        /** @var array<int, string> Column headings of the calendar grids, in the week's order. */
+        public array $weekdayLabels,
     ) {}
 }

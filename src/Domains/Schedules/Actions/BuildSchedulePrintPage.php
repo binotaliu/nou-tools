@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Schedules\Actions;
 
+use App\Enums\PrintWeekStart;
 use App\Models\StudentSchedule;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Date;
@@ -24,7 +25,7 @@ final readonly class BuildSchedulePrintPage
         private ResolvePrintMonthColumns $resolveMonthColumns,
     ) {}
 
-    public function __invoke(StudentSchedule $schedule, ?string $term = null): SchedulePrintPageData
+    public function __invoke(StudentSchedule $schedule, ?string $term = null, PrintWeekStart $weekStart = PrintWeekStart::Monday): SchedulePrintPageData
     {
         $viewModel = ($this->showSchedulePage)($schedule, $term);
 
@@ -34,7 +35,7 @@ final readonly class BuildSchedulePrintPage
             ->values();
         $shareUrl = route('schedules.show', $viewModel->uuid);
         $sittings = $this->sittings($viewModel);
-        $months = $this->months($viewModel, $sittings);
+        $months = $this->months($viewModel, $sittings, $weekStart);
 
         return new SchedulePrintPageData(
             name: $viewModel->name ?: '我的課表',
@@ -48,6 +49,7 @@ final readonly class BuildSchedulePrintPage
             exams: $this->examRows($sittings),
             months: $months,
             monthColumns: ($this->resolveMonthColumns)($months),
+            weekdayLabels: $weekStart->weekdayLabels(),
         );
     }
 
@@ -126,7 +128,7 @@ final readonly class BuildSchedulePrintPage
      * @param  array<int, array{courseId: int, courseName: string, time: ?string, kind: string, date: CarbonInterface}>  $sittings
      * @return array<int, SchedulePrintMonthViewModel>
      */
-    private function months(ScheduleViewModel $viewModel, array $sittings): array
+    private function months(ScheduleViewModel $viewModel, array $sittings, PrintWeekStart $weekStart): array
     {
         $classDays = [];
 
@@ -182,7 +184,7 @@ final readonly class BuildSchedulePrintPage
 
             $months[] = new SchedulePrintMonthViewModel(
                 title: $cursor->isoFormat('Y 年 M 月'),
-                weeks: $this->weeks($cursor, $classDays, $examDateKeys),
+                weeks: $this->weeks($cursor, $classDays, $examDateKeys, $weekStart),
                 classDays: array_values(array_filter(
                     $classDays,
                     fn (string $dateKey) => str_starts_with($dateKey, $prefix),
@@ -217,9 +219,9 @@ final readonly class BuildSchedulePrintPage
      * @param  array<string, int>  $examDateKeys  Keyed by Y-m-d.
      * @return array<int, array<int, array{day: int, hasClass: bool, isExam: bool}|null>>
      */
-    private function weeks(CarbonInterface $firstOfMonth, array $classDays, array $examDateKeys): array
+    private function weeks(CarbonInterface $firstOfMonth, array $classDays, array $examDateKeys, PrintWeekStart $weekStart): array
     {
-        $cells = array_fill(0, $firstOfMonth->isoWeekday() - 1, null);
+        $cells = array_fill(0, $weekStart->leadingBlanks($firstOfMonth), null);
 
         for ($day = 1; $day <= $firstOfMonth->daysInMonth; $day++) {
             $dateKey = $firstOfMonth->day($day)->format('Y-m-d');

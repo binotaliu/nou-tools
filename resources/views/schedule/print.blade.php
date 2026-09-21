@@ -134,7 +134,7 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
                     ])
                 >
                     @foreach ($page->months as $month)
-                        @include('schedule.print._month', ['month' => $month, 'weekRows' => $weekRows])
+                        @include('schedule.print._month', ['month' => $month, 'weekRows' => $weekRows, 'weekdayLabels' => $page->weekdayLabels])
                     @endforeach
                 </div>
 

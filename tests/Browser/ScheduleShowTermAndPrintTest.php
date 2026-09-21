@@ -70,7 +70,7 @@ it('submits the term form and navigates when a different semester is selected', 
     expect($page->url())->toContain('term=2025B');
 });
 
-it('links the print button to the schedule PDF for the selected term', function () {
+it('offers each week start for the schedule PDF from the print menu', function () {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
         'name' => 'Print Schedule',
@@ -79,9 +79,112 @@ it('links the print button to the schedule PDF for the selected term', function 
     $page = visit(route('schedules.show', ['schedule' => $schedule, 'term' => '2025B']));
     dismissRememberModalIfPresent($page);
 
-    $page->assertAttribute(
-        '[data-testid="schedule-print-button"]',
-        'href',
-        '/schedules/'.$schedule->getRouteKey().'/print.pdf?term=2025B',
-    )->assertAttribute('[data-testid="schedule-print-button"]', 'target', '_blank');
+    $page->assertMissing('[data-testid="schedule-print-menu"]')
+        ->click('[data-testid="schedule-print-button"]')
+        ->assertPresent('[data-testid="schedule-print-menu"]');
+
+    foreach (['monday', 'sunday'] as $weekStart) {
+        $page->assertAttribute(
+            '[data-testid="schedule-print-'.$weekStart.'"]',
+            'href',
+            '/schedules/'.$schedule->getRouteKey().'/print.pdf?term=2025B&week_start='.$weekStart,
+        )->assertAttribute('[data-testid="schedule-print-'.$weekStart.'"]', 'target', '_blank');
+    }
+});
+
+// In an installed PWA the PDF would open inside the app with no way back on
+// iOS, so the print menu fetches it and hands it to the share sheet. A
+// headless tab isn't standalone and can't share files, so both are stubbed
+// (the head script's `html[data-pwa]` flag, `navigator.share`), and so is the
+// PDF request, which is held until the test releases it to see the loading state.
+function stubPwaPdfShare($page, array $shareFailures = [], int $pdfStatus = 200): void
+{
+    $failures = json_encode($shareFailures);
+
+    $page->script(<<<JS
+        (() => {
+            document.documentElement.dataset.pwa = '';
+            window.__shared = [];
+            const failures = {$failures};
+            navigator.canShare = () => true;
+            navigator.share = async data => {
+                if (failures.length) {
+                    throw new DOMException('refused', failures.shift());
+                }
+                window.__shared.push(data.files[0].name + '|' + data.files[0].type);
+            };
+            const realFetch = window.fetch;
+            window.fetch = (url, ...rest) => String(url).includes('print.pdf')
+                ? new Promise(resolve => {
+                    window.__releasePdf = () => resolve(new Response(new Blob(['%PDF-1.7'], { type: 'application/pdf' }), { status: {$pdfStatus} }));
+                })
+                : realFetch(url, ...rest);
+        })()
+        JS);
+}
+
+function openPrintMenuAndChoose($page, string $weekStart): void
+{
+    $page->click('[data-testid="schedule-print-button"]')
+        ->click('[data-testid="schedule-print-'.$weekStart.'"]');
+}
+
+function sharedFiles($page): array
+{
+    return json_decode($page->script('JSON.stringify(window.__shared)'), true);
+}
+
+function visitPrintableSchedule(): PendingAwaitablePage
+{
+    $schedule = StudentSchedule::create(['uuid' => Str::uuid(), 'name' => 'Print Schedule']);
+    $page = visit(route('schedules.show', ['schedule' => $schedule, 'term' => '2025B']));
+    dismissRememberModalIfPresent($page);
+
+    return $page;
+}
+
+it('shares the PDF from an installed PWA instead of navigating to it, showing a loading state meanwhile', function () {
+    $page = visitPrintableSchedule();
+    stubPwaPdfShare($page);
+    $url = $page->url();
+
+    openPrintMenuAndChoose($page, 'sunday');
+
+    $page->assertSee('產生 PDF 中…');
+    expect($page->script('document.querySelector(\'[data-testid="schedule-print-button"]\').disabled'))->toBeTrue();
+    expect(sharedFiles($page))->toBe([]);
+
+    $page->script('window.__releasePdf()');
+    $page->wait(1);
+
+    expect(sharedFiles($page))->toBe(['nou-schedule-2025B.pdf|application/pdf'])
+        ->and($page->url())->toBe($url);
+    $page->assertDontSee('產生 PDF 中…')->assertSee('列印');
+});
+
+it('asks for another tap when the browser refuses to share after the wait', function () {
+    $page = visitPrintableSchedule();
+    stubPwaPdfShare($page, ['NotAllowedError']);
+
+    openPrintMenuAndChoose($page, 'monday');
+    $page->script('window.__releasePdf()');
+    $page->wait(1);
+
+    expect(sharedFiles($page))->toBe([]);
+    $page->assertSee('分享 PDF')->click('[data-testid="schedule-print-button"]')->wait(1);
+
+    expect(sharedFiles($page))->toBe(['nou-schedule-2025B.pdf|application/pdf']);
+    $page->assertDontSee('分享 PDF')->assertSee('列印');
+});
+
+it('says so when the PDF cannot be produced', function () {
+    $page = visitPrintableSchedule();
+    stubPwaPdfShare($page, [], 500);
+
+    openPrintMenuAndChoose($page, 'monday');
+    $page->script('window.__releasePdf()');
+    $page->wait(1);
+
+    $page->assertPresent('[data-testid="schedule-print-error"]')->assertSee('無法產生 PDF');
+    expect(sharedFiles($page))->toBe([]);
 });
