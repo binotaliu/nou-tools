@@ -4,6 +4,7 @@
 import { Head } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import HeroIllustration from '../../Components/AltUu/HeroIllustration.vue'
 import IconAppStoreDownload from '../../Components/IconAppStoreDownload.vue'
 import IconGooglePlayDownload from '../../Components/IconGooglePlayDownload.vue'
 
@@ -52,58 +53,59 @@ const faqs = [
   <AppLayout>
     <div class="space-y-10">
       <div
-        class="rounded-xl border border-theme-200 bg-white px-8 py-12 text-center dark:border-zinc-700 dark:bg-zinc-900"
+        class="overflow-hidden rounded-xl border border-theme-200 bg-white px-8 pt-12 dark:border-zinc-700 dark:bg-zinc-900"
       >
-        <div class="flex w-full justify-center" aria-hidden="true">
-          <Icon
-            name="academic-cap"
-            class="size-16 text-theme-600 dark:text-zinc-400"
-          />
-        </div>
-        <h2
-          class="mt-2 text-4xl font-bold tracking-tight text-theme-600 dark:text-zinc-400"
-        >
-          Alt UU
-        </h2>
-        <p
-          class="mx-auto mt-4 max-w-xl text-lg text-theme-600 dark:text-zinc-400"
-        >
-          專為 NOU 同學打造的 UU 平台瀏覽器 App。
-          <br class="hidden sm:inline" />
-          隨時隨地在行動裝置上輕鬆學習。
-        </p>
-
-        <div
-          class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
-        >
-          <div class="flex w-47.25 justify-center sm:justify-end">
-            <a
-              href="https://apps.apple.com/tw/app/alt-uu/id6760690577"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <IconAppStoreDownload
-                class="h-14"
-                aria-label="在 App Store 上下載"
+        <div class="grid items-center gap-10 md:grid-cols-2">
+          <div class="text-left md:pb-12" data-testid="alt-uu-hero-copy">
+            <div class="flex items-center gap-3">
+              <Icon
+                name="academic-cap"
+                class="size-12 text-theme-600 dark:text-zinc-400"
+                aria-hidden="true"
               />
-            </a>
+              <h2
+                class="text-4xl font-bold tracking-tight text-theme-600 dark:text-zinc-400"
+              >
+                Alt UU
+              </h2>
+            </div>
+            <p class="mt-4 max-w-xl text-lg text-theme-600 dark:text-zinc-400">
+              專為 NOU 同學打造的 UU 平台瀏覽器 App。
+              <br class="hidden lg:inline" />
+              隨時隨地在行動裝置上輕鬆學習。
+            </p>
+
+            <div class="mt-8 flex flex-wrap items-center gap-3">
+              <a
+                href="https://apps.apple.com/tw/app/alt-uu/id6760690577"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <IconAppStoreDownload
+                  class="h-14"
+                  aria-label="在 App Store 上下載"
+                />
+              </a>
+
+              <a
+                href="https://play.google.com/store/apps/details?id=org.binota.alt_uu"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <IconGooglePlayDownload
+                  class="h-14"
+                  aria-label="在 Google Play 上下載"
+                />
+              </a>
+            </div>
+
+            <p class="mt-3 text-xs text-theme-400 dark:text-zinc-500">
+              App Store 支援 iPhone、iPad 及 Mac（Apple Silicon）
+            </p>
           </div>
 
-          <a
-            href="https://play.google.com/store/apps/details?id=org.binota.alt_uu"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <IconGooglePlayDownload
-              class="h-14"
-              aria-label="在 Google Play 上下載"
-            />
-          </a>
+          <HeroIllustration />
         </div>
-
-        <p class="mt-3 text-xs text-theme-400 dark:text-zinc-500">
-          App Store 支援 iPhone、iPad 及 Mac（Apple Silicon）
-        </p>
       </div>
 
       <!-- Features -->
