@@ -15,11 +15,16 @@ final readonly class RenderSchedulePdf
      * Launching Chromium takes seconds, so an unchanged sheet is served from
      * the cache, keyed by its HTML. The PDF is stored base64-encoded because
      * the default database cache store can't hold raw bytes.
+     *
+     * The key ignores inline SVGs: the QR code's bytes differ from one PHP
+     * process to the next for the same URL (it is valid every time), which
+     * would defeat the cache. The share URL is printed as text too, so two
+     * schedules never share a key.
      */
     public function __invoke(string $html): string
     {
         $encoded = Cache::remember(
-            'schedule-print-pdf:'.sha1($html),
+            'schedule-print-pdf:'.sha1((string) preg_replace('#<svg\b.*?</svg>#s', '', $html)),
             now()->addDay(),
             fn (): string => base64_encode($this->htmlToPdf->landscapeA4($html)),
         );

@@ -38,8 +38,8 @@ it('lists courses with their credits', function () {
         ->and($page->qrCodeSvg)->toContain('<svg');
 });
 
-it('places exams on the Saturday and Sunday columns', function () {
-    // 2026-04-25 is a Saturday, 2026-06-28 a Sunday.
+it('gives each course one exam row with its dates under the weekday they fall on', function () {
+    // 2026-04-25 is a Saturday, 2026-06-28 a Sunday; both exams share the time slot.
     $schedule = printableSchedule([
         'name' => '會計學',
         'midterm_date' => '2026-04-25',
@@ -50,42 +50,52 @@ it('places exams on the Saturday and Sunday columns', function () {
 
     $page = app(BuildSchedulePrintPage::class)($schedule, '2025B');
 
-    expect($page->saturdayExams)->toHaveCount(1)
-        ->and($page->saturdayExams[0]->entries)->toBe([
-            ['kind' => '期中考', 'time' => '09:00 - 10:30', 'courseName' => '會計學'],
-        ])
-        ->and($page->sundayExams)->toHaveCount(1)
-        ->and($page->sundayExams[0]->entries[0]['kind'])->toBe('期末考')
-        ->and($page->otherExams)->toBe([])
-        ->and($page->undatedCourseNames)->toBe([]);
+    expect($page->exams)->toHaveCount(1);
+
+    $row = $page->exams[0];
+    expect($row->courseName)->toBe('會計學')
+        ->and($row->time)->toBe('09:00 - 10:30')
+        ->and($row->saturday)->toBe([['kind' => '期中考', 'label' => '4/25']])
+        ->and($row->sunday)->toBe([['kind' => '期末考', 'label' => '6/28']])
+        ->and($row->other)->toBe([]);
 });
 
-it('groups every exam on the same date under one day', function () {
-    $first = printableSchedule(['name' => '國文', 'final_date' => '2026-06-28', 'exam_time_start' => '13:30', 'exam_time_end' => '14:40']);
-    $second = Course::factory()->create(['name' => '英文', 'term' => '2025B', 'final_date' => '2026-06-28', 'exam_time_start' => '08:30', 'exam_time_end' => '09:40']);
-    $class = CourseClass::factory()->create(['course_id' => $second->id]);
-    StudentScheduleItem::create([
-        'student_schedule_id' => $first->id,
-        'course_id' => $second->id,
-        'course_class_id' => $class->id,
-    ]);
+it('lists both exams in one column when they fall on the same weekday', function () {
+    // 2026-04-25 and 2026-06-27 are both Saturdays.
+    $schedule = printableSchedule(['midterm_date' => '2026-04-25', 'final_date' => '2026-06-27']);
 
-    $page = app(BuildSchedulePrintPage::class)($first->refresh(), '2025B');
+    $row = app(BuildSchedulePrintPage::class)($schedule, '2025B')->exams[0];
 
-    expect($page->sundayExams)->toHaveCount(1)
-        ->and(array_column($page->sundayExams[0]->entries, 'courseName'))->toBe(['英文', '國文']);
+    expect(array_column($row->saturday, 'label'))->toBe(['4/25', '6/27'])
+        ->and($row->sunday)->toBe([]);
 });
 
-it('keeps weekday exams visible in their own bucket', function () {
+it('orders rows by earliest exam and leaves out courses without a date', function () {
+    $schedule = printableSchedule(['name' => '期末在後', 'final_date' => '2026-06-28']);
+    foreach ([['name' => '未公布'], ['name' => '期中在前', 'midterm_date' => '2026-04-25']] as $attributes) {
+        $course = Course::factory()->create(array_merge(['term' => '2025B'], $attributes));
+        StudentScheduleItem::create([
+            'student_schedule_id' => $schedule->id,
+            'course_id' => $course->id,
+            'course_class_id' => CourseClass::factory()->create(['course_id' => $course->id])->id,
+        ]);
+    }
+
+    $page = app(BuildSchedulePrintPage::class)($schedule->refresh(), '2025B');
+
+    expect(array_map(fn ($row) => $row->courseName, $page->exams))->toBe(['期中在前', '期末在後']);
+});
+
+it('keeps weekday exams visible', function () {
     // 2026-04-27 is a Monday.
     $schedule = printableSchedule(['name' => '統計學', 'midterm_date' => '2026-04-27']);
 
-    $page = app(BuildSchedulePrintPage::class)($schedule, '2025B');
+    $row = app(BuildSchedulePrintPage::class)($schedule, '2025B')->exams[0];
 
-    expect($page->saturdayExams)->toBe([])
-        ->and($page->sundayExams)->toBe([])
-        ->and($page->otherExams)->toHaveCount(1)
-        ->and($page->otherExams[0]->entries[0]['courseName'])->toBe('統計學');
+    expect($row->saturday)->toBe([])
+        ->and($row->sunday)->toBe([])
+        ->and($row->other)->toHaveCount(1)
+        ->and($row->other[0]['kind'])->toBe('期中考');
 });
 
 it('omits the midterm for summer terms', function () {
@@ -94,20 +104,19 @@ it('omits the midterm for summer terms', function () {
         'final_date' => '2026-08-23',
     ], '2025C');
 
-    $page = app(BuildSchedulePrintPage::class)($schedule, '2025C');
+    $row = app(BuildSchedulePrintPage::class)($schedule, '2025C')->exams[0];
 
-    expect($page->saturdayExams)->toBe([])
-        ->and($page->sundayExams)->toHaveCount(1)
-        ->and($page->sundayExams[0]->entries[0]['kind'])->toBe('期末考');
+    expect($row->saturday)->toBe([])
+        ->and($row->sunday)->toBe([['kind' => '期末考', 'label' => '8/23']]);
 });
 
-it('lists courses without an exam date as undated', function () {
+it('hides courses without an exam date from the exam table but not the course list', function () {
     $schedule = printableSchedule(['name' => '哲學']);
 
     $page = app(BuildSchedulePrintPage::class)($schedule, '2025B');
 
-    expect($page->undatedCourseNames)->toBe(['哲學'])
-        ->and($page->saturdayExams)->toBe([]);
+    expect($page->exams)->toBe([])
+        ->and($page->courses[0]->name)->toBe('哲學');
 });
 
 it('builds monthly calendars with gap months and Monday-first weeks', function () {
@@ -125,7 +134,8 @@ it('builds monthly calendars with gap months and Monday-first weeks', function (
 
     $march = $page->months[0];
     // Sunday the 1st sits in the last column of the first week.
-    expect($march->title)->toContain('3 月')
+    expect($march->classDays)->toHaveCount(1)
+        ->and($march->title)->toContain('3 月')
         ->and($march->weeks[0])->toHaveCount(7)
         ->and(array_filter(array_slice($march->weeks[0], 0, 6)))->toBe([])
         ->and($march->weeks[0][6])->toBe(['day' => 1, 'hasClass' => false])
@@ -134,11 +144,43 @@ it('builds monthly calendars with gap months and Monday-first weeks', function (
 
     $april = $page->months[1];
     $daysWithClass = collect($april->weeks)->flatten(1)->filter()->where('hasClass', true);
-    expect($april->title)->toContain('4 月')->and($daysWithClass)->toBeEmpty();
+    expect($april->title)->toContain('4 月')->and($daysWithClass)->toBeEmpty()->and($april->classDays)->toBe([]);
 
     $may = $page->months[2];
     expect(collect($may->weeks)->flatten(1)->filter()->where('hasClass', true)->pluck('day')->all())->toBe([2])
         ->and(collect($may->weeks)->flatten(1)->filter()->count())->toBe(31);
+});
+
+it('lists the courses held on each class date under its month', function () {
+    $schedule = printableSchedule(['name' => '心理學']);
+    $morning = $schedule->items->first()->courseClass;
+    $morning->update(['start_time' => '09:00', 'end_time' => '10:50']);
+
+    $other = Course::factory()->create(['name' => '婦女健康', 'term' => '2025B']);
+    $evening = CourseClass::factory()->create(['course_id' => $other->id, 'start_time' => '19:00', 'end_time' => '20:50']);
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_id' => $other->id,
+        'course_class_id' => $evening->id,
+    ]);
+
+    // 2026-09-14 is a Monday: both courses meet; 2026-09-16 only the evening class.
+    ClassSchedule::factory()->create(['class_id' => $evening->id, 'date' => '2026-09-14']);
+    ClassSchedule::factory()->create(['class_id' => $morning->id, 'date' => '2026-09-14']);
+    ClassSchedule::factory()->create(['class_id' => $evening->id, 'date' => '2026-09-16']);
+
+    $page = app(BuildSchedulePrintPage::class)($schedule->refresh(), '2025B');
+
+    expect($page->months)->toHaveCount(1)
+        ->and($page->months[0]->classDays)->toBe([
+            ['label' => '9/14 (一)', 'courses' => [
+                ['name' => '心理學', 'time' => '09:00'],
+                ['name' => '婦女健康', 'time' => '19:00'],
+            ]],
+            ['label' => '9/16 (三)', 'courses' => [
+                ['name' => '婦女健康', 'time' => '19:00'],
+            ]],
+        ]);
 });
 
 it('has no calendars when the schedule has no classes', function () {
@@ -166,8 +208,10 @@ it('renders the printable sheet', function () {
         ->assertSee('會計學')
         ->assertSee('3 學分')
         ->assertSee('週六')
-        ->assertSee('期中考')
-        ->assertSee('期末考')
+        ->assertSee('週日')
+        ->assertSee('期中')
+        ->assertSee('期末')
+        ->assertSee('4/25')
         ->assertSee('班級代碼')
         ->assertSee('<svg', false)
         ->assertSee(route('schedules.show', $schedule))

@@ -76,22 +76,7 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
                     考試時間表
                 </h2>
 
-                <div class="grid grid-cols-2 gap-x-2">
-                    @include('schedule.print._exam-column', ['title' => '週六', 'days' => $page->saturdayExams])
-                    @include('schedule.print._exam-column', ['title' => '週日', 'days' => $page->sundayExams])
-                </div>
-
-                @if ($page->otherExams !== [])
-                    <div class="mt-2">
-                        @include('schedule.print._exam-column', ['title' => '其他日期', 'days' => $page->otherExams])
-                    </div>
-                @endif
-
-                @if ($page->undatedCourseNames !== [])
-                    <p class="mt-2 text-[7.5pt] text-zinc-500">
-                        考試日期未公布：{{ implode('、', $page->undatedCourseNames) }}
-                    </p>
-                @endif
+                @include('schedule.print._exam-table', ['exams' => $page->exams, 'dense' => count($page->exams) > 9])
             </div>
         </section>
 
@@ -113,7 +98,7 @@ the built CSS is inlined instead of linked (needs `npm run build`). --}}
             ])
             >
                 @foreach ($page->months as $month)
-                    @include('schedule.print._month', ['month' => $month, 'compact' => count($page->months) > 6])
+                    @include('schedule.print._month', ['month' => $month])
                 @endforeach
             </div>
 
