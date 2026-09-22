@@ -163,6 +163,20 @@
             gtag('js', new Date())
 
             gtag('config', 'G-1B65SQ4673', { send_page_view: false })
+
+            {{-- User properties for the display-mode/theme signals the
+                        anti-flash-of-wrong-theme script above already computed. Each
+                        must also be registered as a custom dimension in GA4 Admin
+                        before it shows up in reports. --}}
+            gtag('set', 'user_properties', {
+                display_mode: document.documentElement.hasAttribute('data-pwa')
+                    ? 'pwa'
+                    : 'browser',
+                color_scheme: document.documentElement.classList.contains('dark')
+                    ? 'dark'
+                    : 'light',
+                accent_color: document.documentElement.dataset.accent || 'default',
+            })
         </script>
     @endif
 
