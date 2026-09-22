@@ -5,6 +5,7 @@ import { Head } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import HeroIllustration from '../../Components/AltUu/HeroIllustration.vue'
+import ArchitectureIllustration from '../../Components/AltUu/ArchitectureIllustration.vue'
 import IconAppStoreDownload from '../../Components/IconAppStoreDownload.vue'
 import IconGooglePlayDownload from '../../Components/IconGooglePlayDownload.vue'
 
@@ -247,6 +248,34 @@ const faqs = [
             前往 Google Play
           </a>
         </div>
+      </div>
+
+      <!-- Architecture / safety explainer -->
+      <div data-testid="alt-uu-architecture">
+        <h3
+          class="mb-1 text-xl font-semibold text-theme-800 dark:text-zinc-200"
+        >
+          Alt UU 安全嗎？公開透明的運作方式
+        </h3>
+        <p class="mb-4 text-sm text-theme-600 dark:text-zinc-400">
+          你是否會擔心，對於一個非官方 App，要輸入帳號密碼是否安全？下圖說明了
+          Alt UU 的運作原理，帶你瞭解此一過程。
+        </p>
+
+        <ArchitectureIllustration />
+
+        <p class="mt-3 text-xs text-theme-400 dark:text-zinc-500">
+          完整的技術說明請見《
+          <a
+            href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/app-architecture"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-theme-600 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+          >
+            Alt UU 運作原理說明
+          </a>
+          》。
+        </p>
       </div>
 
       <!-- FAQ -->
