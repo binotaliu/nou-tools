@@ -23,13 +23,14 @@ test('course schedule page includes seo meta description for the selected term',
     });
 });
 
-// Course grouping (by exam time / department / credits) and the split
-// between 一般課程 and 微學分與全遠距 are rendered entirely client-side by Vue
-// from the `viewModel.groups` / `viewModel.microCreditOrRemoteCourses` props,
-// so ordering and grouping are only observable with a real browser. See
-// tests/Browser/CourseScheduleTest.php.
+// Course grouping (by exam time / department / credits) is rendered entirely
+// client-side by Vue from the `viewModel.groups` prop, so ordering is only
+// observable with a real browser. See tests/Browser/CourseScheduleTest.php.
+// `microCreditOrRemoteCourses` holds every course excluded from the general
+// (has exam data) section — micro-credit/remote classes and courses with no
+// exam data at all — so nothing is silently dropped from the page.
 
-test('courses without a final exam time are excluded from the general section', function () {
+test('courses without a final exam time are excluded from the general section but still listed as micro/remote', function () {
     $term = config('app.current_semester');
 
     Course::factory()->create([
@@ -42,11 +43,12 @@ test('courses without a final exam time are excluded from the general section', 
     $response->assertStatus(200);
     $response->assertInertia(function (Assert $page) {
         $viewModel = $page->toArray()['props']['viewModel'];
-        $names = collect($viewModel['groups'])
-            ->flatMap(fn (array $group) => collect($group['courses'])->pluck('name'))
-            ->merge(collect($viewModel['microCreditOrRemoteCourses'])->pluck('name'));
+        $generalNames = collect($viewModel['groups'])
+            ->flatMap(fn (array $group) => collect($group['courses'])->pluck('name'));
 
-        expect($names)->not->toContain('No Exam Course');
+        expect($generalNames)->not->toContain('No Exam Course');
+        expect(collect($viewModel['microCreditOrRemoteCourses'])->pluck('name'))
+            ->toContain('No Exam Course');
     });
 });
 

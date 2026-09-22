@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Courses\Actions;
 
-use App\Enums\CourseClassType;
 use App\Models\Course;
-use App\Models\CourseClass;
 use Illuminate\Support\Collection;
 use NouTools\Domains\Courses\PageData\CourseSchedulePageData;
 use NouTools\Domains\Courses\ViewModels\CourseScheduleCourseViewModel;
@@ -22,17 +20,12 @@ final readonly class BuildCourseSchedulePage
 
         $courses = Course::query()
             ->where('term', $selectedTerm)
-            ->with('classes')
             ->orderBy('name')
             ->get();
 
-        $microCreditOrRemote = $courses->filter(
-            fn (Course $course) => $this->hasClassType($course, CourseClassType::FullRemote)
-                || $this->hasClassType($course, CourseClassType::MicroCredit)
-        );
+        $general = $courses->filter(fn (Course $course) => $course->final_date && $course->exam_time_start);
 
-        $general = $courses->diff($microCreditOrRemote)
-            ->filter(fn (Course $course) => $course->final_date && $course->exam_time_start);
+        $microCreditOrRemote = $courses->diff($general);
 
         $groups = $general
             ->groupBy(fn (Course $course) => sprintf(
@@ -55,11 +48,6 @@ final readonly class BuildCourseSchedulePage
                 DataCollection::class,
             ),
         );
-    }
-
-    private function hasClassType(Course $course, CourseClassType $type): bool
-    {
-        return $course->classes->contains(fn (CourseClass $class) => $class->type === $type);
     }
 
     /**
