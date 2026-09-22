@@ -65,14 +65,14 @@ it('moves between slides with the arrows and dots, wrapping at both ends', funct
     expect(activeHeroSlide($page))->toBe('hero-slide-study-room');
 });
 
-it('links each slide to its feature', function () {
+it('links each slide to schedule creation', function () {
     $page = visit(route('home'))->assertPresent('[data-testid="home-hero"]');
 
     $hrefs = $page->script(<<<'JS'
         [...document.querySelectorAll('[data-testid^="hero-slide-"] a')].map(a => a.getAttribute('href'))
     JS);
 
-    expect($hrefs)->toBe(['/schedules/create', '/schedules/my/learning-progress', '/study-room']);
+    expect($hrefs)->toBe(['/schedules/my', '/schedules/my', '/schedules/my']);
 });
 
 it('hides the hero from visitors who already saved a schedule', function () {
