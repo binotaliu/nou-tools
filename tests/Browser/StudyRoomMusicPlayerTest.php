@@ -61,6 +61,8 @@ function openStudyRoomForMusic(): mixed
         ->click('[data-testid="study-room-profile-submit"]')
         ->wait(1);
 
+    dismissCookieConsentBanner($page);
+
     $page->assertVisible('[data-testid="study-room-root"]');
 
     return $page;

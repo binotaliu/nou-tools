@@ -101,6 +101,8 @@ it('lets a student remember their schedule, set a profile, take a seat, and star
         ->click('[data-testid="study-room-profile-submit"]')
         ->wait(1);
 
+    dismissCookieConsentBanner($page);
+
     $page->assertVisible('[data-testid="study-room-root"]')
         ->assertMissing('[data-testid="study-room-profile-form"]')
         ->click('[data-testid="seat-1-S01"]')
@@ -154,6 +156,8 @@ it('prepends the countdown and phase to the tab title, and swaps the favicon, on
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
         ->wait(1);
+
+    dismissCookieConsentBanner($page);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->click('[data-testid="seat-1-S01"]')
@@ -245,6 +249,8 @@ it('lets a student tune their pomodoro cycle and walks them through break and ne
         ->click('[data-testid="study-room-profile-submit"]')
         ->wait(1);
 
+    dismissCookieConsentBanner($page);
+
     $page->assertVisible('[data-testid="study-room-root"]')
         ->click('[data-testid="seat-1-S01"]')
         ->wait(1)
@@ -323,6 +329,8 @@ it('opens a fullscreen focus mode over the sky and leaves it when the timer stop
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
         ->wait(1);
+
+    dismissCookieConsentBanner($page);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->click('[data-testid="seat-1-S01"]')
@@ -443,6 +451,8 @@ it('minimizes the action banner to a slim bar and expands it again', function ()
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
         ->wait(1);
+
+    dismissCookieConsentBanner($page);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->click('[data-testid="seat-1-S01"]')
@@ -930,6 +940,8 @@ it('pauses and resumes a running timer, freezing the countdown while paused', fu
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
         ->click('[data-testid="study-room-profile-submit"]')
         ->wait(1);
+
+    dismissCookieConsentBanner($page);
 
     $page->assertVisible('[data-testid="study-room-root"]')
         ->click('[data-testid="seat-1-S01"]')

@@ -126,3 +126,40 @@ function chineseWeekdayChar(Carbon $date): string
 {
     return ['日', '一', '二', '三', '四', '五', '六'][(int) $date->format('w')];
 }
+
+/**
+ * The cookie-consent banner is fixed to the viewport bottom and, until a
+ * choice is made, can overlap other fixed/bottom-of-page controls that
+ * browser tests click through. Dismissed via JS rather than click() since
+ * it may not be showing at all (an explicit choice was already made, or
+ * the resolved country doesn't require one), in which case this polls
+ * briefly then gives up rather than blocking. The poll (rather than a
+ * single querySelector) is needed because this runs right after visit(),
+ * before Vue has necessarily hydrated the banner in.
+ */
+function dismissCookieConsentBanner(mixed $page): mixed
+{
+    $page->script(<<<'JS'
+        new Promise((resolve) => {
+            const deadline = Date.now() + 2000;
+
+            (function tryClick() {
+                const button = document.querySelector('[data-testid="cookie-consent-accept"]');
+
+                if (button) {
+                    button.click();
+
+                    return resolve();
+                }
+
+                if (Date.now() > deadline) {
+                    return resolve();
+                }
+
+                setTimeout(tryClick, 100);
+            })();
+        })
+        JS);
+
+    return $page;
+}

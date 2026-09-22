@@ -106,8 +106,11 @@ it('only hides the banner for this visit when it is closed with the X', function
 });
 
 it('links to the install page from the footer', function () {
-    visit(route('about'))
-        ->assertVisible('[data-testid="footer-install-link"]')
+    $page = visit(route('about'));
+
+    dismissCookieConsentBanner($page);
+
+    $page->assertVisible('[data-testid="footer-install-link"]')
         ->assertSeeIn('[data-testid="footer-install-link"]', '安裝 NOU 小幫手')
         ->click('[data-testid="footer-install-link"]')
         ->assertPathIs('/install');

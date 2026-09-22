@@ -241,6 +241,8 @@ it('disables pinch-zoom only in an installed PWA', function () {
 it('hides the header in a phone PWA and links 設定 from the more sheet', function () {
     $page = visit('/announcements')->resize(...PHONE);
 
+    dismissCookieConsentBanner($page);
+
     $page->assertSee('學校公告')->assertVisible('[data-testid="header-menu-toggle"]');
 
     enterPwaMode($page);

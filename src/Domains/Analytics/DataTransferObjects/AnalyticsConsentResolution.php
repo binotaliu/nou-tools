@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace NouTools\Domains\Analytics\DataTransferObjects;
 
 use App\Enums\AnalyticsConsentState;
+use Spatie\LaravelData\Data;
 
-final readonly class AnalyticsConsentResolution
+final class AnalyticsConsentResolution extends Data
 {
-    private function __construct(
+    public function __construct(
         public AnalyticsConsentState $state,
         public bool $showBanner,
     ) {}
