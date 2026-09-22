@@ -6,6 +6,7 @@ import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import HeroCarousel from '../../Components/Home/HeroCarousel.vue'
+import SiteIntro from '../../Components/Home/SiteIntro.vue'
 import VideoCourses from '../../Components/Home/VideoCourses.vue'
 import Greeting from '../../Components/Greeting.vue'
 import CommonLinks from '../../Components/CommonLinks.vue'
@@ -69,7 +70,10 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <HeroCarousel v-if="!viewModel.previousSchedule" />
+      <template v-if="!viewModel.previousSchedule">
+        <HeroCarousel />
+        <SiteIntro />
+      </template>
 
       <Greeting
         :semester-label="greeting.semesterLabel"
