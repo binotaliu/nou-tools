@@ -164,10 +164,7 @@
 
             gtag('config', 'G-1B65SQ4673', { send_page_view: false })
 
-            {{-- User properties for the display-mode/theme signals the
-                        anti-flash-of-wrong-theme script above already computed. Each
-                        must also be registered as a custom dimension in GA4 Admin
-                        before it shows up in reports. --}}
+            {{-- User properties for the theme signals computed above; each also needs a GA4 Admin custom dimension to show in reports. --}}
             gtag('set', 'user_properties', {
                 display_mode: document.documentElement.hasAttribute('data-pwa')
                     ? 'pwa'
