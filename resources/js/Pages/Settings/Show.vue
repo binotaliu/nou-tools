@@ -153,6 +153,47 @@ const rows = computed(() => [
 
       <section
         class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        data-testid="settings-schedule"
+      >
+        <h3 class="text-lg font-semibold text-theme-800 dark:text-zinc-100">
+          課表
+        </h3>
+
+        <p
+          v-if="!notifications"
+          class="mt-1 text-sm text-theme-600 dark:text-zinc-400"
+          data-testid="settings-schedule-no-schedule"
+        >
+          請先
+          <Link
+            href="/schedules/my"
+            class="font-medium underline underline-offset-2"
+          >
+            建立或找回你的課表
+          </Link>
+          。
+        </p>
+
+        <div v-else class="mt-3 flex flex-col gap-2 sm:flex-row">
+          <Link
+            :href="`/schedules/${notifications.scheduleToken}/edit`"
+            data-testid="settings-schedule-edit"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          >
+            編輯課表
+          </Link>
+          <Link
+            :href="`/schedules/${notifications.scheduleToken}/customize`"
+            data-testid="settings-schedule-customize"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          >
+            自訂課表頁顯示
+          </Link>
+        </div>
+      </section>
+
+      <section
+        class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         data-testid="settings-notifications"
       >
         <h3 class="text-lg font-semibold text-theme-800 dark:text-zinc-100">
