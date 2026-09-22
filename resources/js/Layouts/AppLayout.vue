@@ -368,7 +368,9 @@ const bottomMoreItems = computed(() =>
         class="mt-6 flex flex-col-reverse items-center justify-between gap-6 border-t border-theme-200 pt-4 text-xs text-theme-500 md:flex-row md:gap-3 dark:border-zinc-700 dark:text-zinc-400 print:hidden"
       >
         <div>&copy; {{ new Date().getFullYear() }} NOU 小幫手</div>
-        <div class="flex items-center gap-x-8 gap-y-2">
+        <div
+          class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:flex-nowrap md:gap-y-2"
+        >
           <div class="text-xs">
             <Link
               href="/about"
