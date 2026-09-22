@@ -1,9 +1,14 @@
 <script setup>
 // Purely static content (no ViewModel/props): the licensing notices that
-// used to live in the footer.
+// used to live in the footer, plus the analytics-consent toggle (state comes
+// from HandleInertiaRequests' shared `analyticsConsent` prop, same as the
+// cookie-consent banner).
 import { Head } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import useAnalyticsConsent from '../../Composables/useAnalyticsConsent'
+
+const { granted, toggle, error } = useAnalyticsConsent()
 </script>
 
 <template>
@@ -85,6 +90,57 @@ import Icon from '../../Components/Icon.vue'
             >
           </li>
         </ul>
+      </section>
+
+      <section
+        class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        data-testid="about-analytics-consent"
+      >
+        <h3 class="text-lg font-semibold text-theme-800 dark:text-zinc-100">
+          隱私與 Cookie
+        </h3>
+        <p
+          class="mt-3 text-justify text-sm leading-relaxed text-theme-700 dark:text-zinc-300"
+        >
+          本站使用 Cookie 透過 Google Analytics
+          蒐集匿名使用資料，以了解使用情形並改善服務。您可以隨時在這裡調整。
+        </p>
+
+        <div class="mt-4 flex items-center justify-between gap-4">
+          <p
+            id="about-analytics-consent-label"
+            class="text-sm font-medium text-theme-800 dark:text-zinc-200"
+          >
+            分析 Cookie（Google Analytics）
+          </p>
+          <button
+            type="button"
+            role="switch"
+            :aria-checked="granted"
+            aria-labelledby="about-analytics-consent-label"
+            :class="
+              granted
+                ? 'bg-theme-700 dark:bg-zinc-300'
+                : 'bg-theme-200 dark:bg-zinc-700'
+            "
+            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors"
+            data-testid="about-analytics-consent-toggle"
+            @click="toggle"
+          >
+            <span
+              :class="granted ? 'translate-x-6' : 'translate-x-1'"
+              class="inline-block size-4 transform rounded-full bg-white shadow transition-transform dark:bg-zinc-900"
+            ></span>
+          </button>
+        </div>
+
+        <p
+          v-if="error"
+          class="mt-2 text-sm text-red-600 dark:text-red-400"
+          data-testid="about-analytics-consent-error"
+        >
+          {{ error }}
+        </p>
       </section>
 
       <section

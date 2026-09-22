@@ -8,6 +8,7 @@
 import { computed, ref } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import BottomNav from '../Components/BottomNav.vue'
+import CookieConsentBanner from '../Components/CookieConsentBanner.vue'
 import Icon from '../Components/Icon.vue'
 import Notification from '../Components/Notification.vue'
 import ThemeSwitcherPopover from '../Components/ThemeSwitcherPopover.vue'
@@ -431,4 +432,6 @@ const bottomMoreItems = computed(() =>
     :more-items="bottomMoreItems"
     :current-path="currentPath"
   />
+
+  <CookieConsentBanner />
 </template>
