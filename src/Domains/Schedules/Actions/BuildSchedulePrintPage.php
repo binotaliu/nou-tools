@@ -41,7 +41,7 @@ final readonly class BuildSchedulePrintPage
             name: $viewModel->name ?: '我的課表',
             semesterLabel: Str::toSemesterDisplay($viewModel->selectedTerm),
             shareUrl: $shareUrl,
-            qrCodeSvg: DNS2D::getBarcodeSVG($shareUrl, 'QRCODE'),
+            qrCodeSvg: $this->addSvgViewBox(DNS2D::getBarcodeSVG($shareUrl, 'QRCODE')),
             courses: $courseModels
                 ->map(fn ($course) => new SchedulePrintCourseViewModel(name: $course->name, credits: $course->credits))
                 ->all(),
@@ -51,6 +51,18 @@ final readonly class BuildSchedulePrintPage
             monthColumns: ($this->resolveMonthColumns)($months),
             weekdayLabels: $weekStart->weekdayLabels(),
         );
+    }
+
+    /**
+     * milon/barcode's SVG carries a `width`/`height` but no `viewBox`. Without
+     * one, CSS-driven resizing (`size-[19mm]` on the print sheet) doesn't
+     * rescale the coordinate system — it just moves the viewport, cropping
+     * the code to its top-left corner and leaving it unscannable. Deriving
+     * the viewBox from the declared size fixes that.
+     */
+    private function addSvgViewBox(string $svg): string
+    {
+        return preg_replace('/<svg width="(\d+)" height="(\d+)"/', '<svg viewBox="0 0 $1 $2" width="$1" height="$2"', $svg, 1) ?? $svg;
     }
 
     /**

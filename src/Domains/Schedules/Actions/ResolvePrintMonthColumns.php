@@ -32,7 +32,7 @@ final readonly class ResolvePrintMonthColumns
     private const float ROW_GAP = 3.18;
 
     /** The QR block, when it sits below the calendars, plus the gap above it. */
-    private const float QR_BLOCK = 43.2;
+    private const float QR_BLOCK = 36.5;
 
     private const float CALENDAR_WIDTH = 185.0;
 

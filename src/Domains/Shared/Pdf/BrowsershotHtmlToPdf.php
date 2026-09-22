@@ -19,7 +19,12 @@ final readonly class BrowsershotHtmlToPdf implements HtmlToPdf
             ->landscape()
             ->margins(0, 0, 0, 0)
             ->showBackground()
-            ->waitUntilNetworkIdle();
+            ->waitUntilNetworkIdle()
+            // The sheet is meant to clip at 210mm (`overflow-hidden` on
+            // <main>), but Chromium's print pagination ignores CSS overflow
+            // clipping and still emits overflow content onto a second PDF
+            // page. Restricting the output to page 1 makes it actually clip.
+            ->pages('1');
 
         /** @var array<string, mixed> $config */
         $config = config('laravel-screenshot.browsershot', []);
