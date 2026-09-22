@@ -13,15 +13,16 @@ it('renders the grouped announcement source catalog', function () {
         'name' => 'Preferences Test',
     ]);
 
-    $response = get(route('schedules.announcement-preferences', $schedule));
+    $response = get(route('schedules.customize', $schedule));
 
-    // The group/source labels are rendered client-side (AnnouncementPreferences.vue)
-    // from `viewModel.sourceGroups`, so verify the catalog data itself.
+    // The group/source labels are rendered client-side (Customize.vue's
+    // announcement-preferences tab) from `announcementPreferences.sourceGroups`,
+    // so verify the catalog data itself.
     $response->assertSuccessful();
     $response->assertInertia(function (Assert $page) {
-        $page->component('Schedule/AnnouncementPreferences');
+        $page->component('Schedule/Customize');
 
-        $sourceGroups = $page->toArray()['props']['viewModel']['sourceGroups'];
+        $sourceGroups = $page->toArray()['props']['announcementPreferences']['sourceGroups'];
         $groupLabels = collect($sourceGroups)->pluck('groupLabel');
         $sourceNames = collect($sourceGroups)
             ->flatMap(fn (array $group) => collect($group['sources'])->pluck('source'));
@@ -50,16 +51,16 @@ it('defaults to all 各處室 sources selected when announcement_categories is n
 
     expect($administrativeCategories)->not->toBeEmpty();
 
-    $response = get(route('schedules.announcement-preferences', $schedule));
+    $response = get(route('schedules.customize', $schedule));
 
     // The selected-category checkboxes are rendered client-side from
-    // `viewModel.sourceGroups[].sources[].selectedCategories`, so verify
-    // that the 教務處 source is selected with all of its categories.
+    // `announcementPreferences.sourceGroups[].sources[].selectedCategories`,
+    // so verify that the 教務處 source is selected with all of its categories.
     $response->assertSuccessful();
     $response->assertInertia(function (Assert $page) use ($administrativeCategories) {
-        $page->component('Schedule/AnnouncementPreferences');
+        $page->component('Schedule/Customize');
 
-        $sourceGroups = $page->toArray()['props']['viewModel']['sourceGroups'];
+        $sourceGroups = $page->toArray()['props']['announcementPreferences']['sourceGroups'];
         $source = collect($sourceGroups)
             ->flatMap(fn (array $group) => $group['sources'])
             ->firstWhere('source', '教務處');

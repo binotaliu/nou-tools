@@ -78,7 +78,6 @@ final class HandleInertiaRequests extends Middleware
         return match ($request->route()?->getName()) {
             'schedules.show' => '我的課表 - NOU 小幫手',
             'schedules.customize' => '自訂課表 - NOU 小幫手',
-            'schedules.announcement-preferences' => '公告分類設定 - NOU 小幫手',
             'schedules.subscribe' => '訂閱行事曆 - NOU 小幫手',
             'learning-progress.show' => '學習進度表 - NOU 小幫手',
             default => null,

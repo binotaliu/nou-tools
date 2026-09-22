@@ -32,19 +32,6 @@ it('masks the schedule token in data-analytics-page for schedules.customize', fu
     $response->assertDontSee((string) $schedule->uuid);
 });
 
-it('masks the schedule token in data-analytics-page for schedules.announcement-preferences', function () {
-    $schedule = StudentSchedule::create([
-        'uuid' => Str::uuid(),
-        'name' => 'Analytics Test',
-    ]);
-
-    $response = get(route('schedules.announcement-preferences', $schedule));
-
-    $response->assertSuccessful();
-    $response->assertSee('data-analytics-page="/schedules/:schedule/announcement-preferences"', false);
-    $response->assertDontSee((string) $schedule->uuid);
-});
-
 it('shares the same masked path as an analyticsPage Inertia prop, so client-side navigations can track it', function () {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),

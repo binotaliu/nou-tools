@@ -44,7 +44,7 @@ function relativeLabel(announcement) {
       >
         尚未選擇任何公告分類。
         <Link
-          :href="`/schedules/${scheduleUuid}/announcement-preferences`"
+          :href="`/schedules/${scheduleUuid}/customize`"
           class="font-medium text-orange-700 hover:underline dark:text-orange-400"
         >
           立即選擇
@@ -113,7 +113,7 @@ function relativeLabel(announcement) {
         </Link>
 
         <Link
-          :href="`/schedules/${scheduleUuid}/announcement-preferences`"
+          :href="`/schedules/${scheduleUuid}/customize`"
           class="text-sm text-theme-600 hover:underline dark:text-zinc-400"
         >
           選擇公告分類
