@@ -38,6 +38,12 @@
     // The splash covers the blank gap before Vue mounts; the og:image
     // screenshot must never capture it.
     $showSplash = ! request()->has(config('og-image.preview_parameter', 'ogimage'));
+
+    // Consent Mode v2 default: Taiwan is opt-out (granted unless the visitor
+    // said otherwise), everywhere else is opt-in (denied by default). See
+    // NouTools\Domains\Analytics\Actions\ResolveAnalyticsConsent.
+    $analyticsConsentGranted = app(\NouTools\Domains\Analytics\Actions\ResolveAnalyticsConsent::class)(request())->state
+        === \App\Enums\AnalyticsConsentState::Granted;
 @endphp
 <!DOCTYPE html>
 <html lang="zh-hant">
@@ -160,6 +166,15 @@
             function gtag() {
                 dataLayer.push(arguments)
             }
+
+            {{-- Consent Mode v2 default, set before the first config/event call per Google's required ordering. Only analytics_storage is meaningful here (no ads product is in use); the ad_* signals stay permanently denied. --}}
+            gtag('consent', 'default', {
+                ad_storage: 'denied',
+                ad_user_data: 'denied',
+                ad_personalization: 'denied',
+                analytics_storage: '{{ $analyticsConsentGranted ? 'granted' : 'denied' }}',
+            })
+
             gtag('js', new Date())
 
             gtag('config', 'G-1B65SQ4673', { send_page_view: false })

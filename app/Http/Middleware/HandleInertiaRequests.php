@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Enums\AnalyticsConsentState;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use NouTools\Domains\Analytics\Actions\ResolveAnalyticsConsent;
 
 final class HandleInertiaRequests extends Middleware
 {
@@ -41,6 +43,7 @@ final class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'analyticsPage' => self::analyticsPagePath($request),
             'analyticsTitle' => self::analyticsTitle($request),
+            'analyticsConsent' => self::analyticsConsent($request),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
             ],
@@ -82,5 +85,23 @@ final class HandleInertiaRequests extends Middleware
             'learning-progress.show' => '學習進度表 - NOU 小幫手',
             default => null,
         };
+    }
+
+    /**
+     * Taiwan is opt-out (GA granted by default, no banner); everywhere else
+     * — including when the country can't be determined, e.g. local dev
+     * which isn't behind Cloudflare — is opt-in (denied by default, banner
+     * shown), unless the visitor already made an explicit choice.
+     *
+     * @return array{granted: bool, showBanner: bool}
+     */
+    private static function analyticsConsent(Request $request): array
+    {
+        $resolution = app(ResolveAnalyticsConsent::class)($request);
+
+        return [
+            'granted' => $resolution->state === AnalyticsConsentState::Granted,
+            'showBanner' => $resolution->showBanner,
+        ];
     }
 }
