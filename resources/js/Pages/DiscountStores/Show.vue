@@ -510,7 +510,7 @@ onUnmounted(() => {
             <div class="flex items-center gap-2">
               <button
                 type="button"
-                class="inline-flex items-center gap-1 rounded-lg border border-green-500 px-3 py-1.5 text-sm text-green-600 transition hover:bg-green-50"
+                class="inline-flex items-center gap-1 rounded-lg border border-green-500 px-3 py-1.5 text-sm text-green-700 transition hover:bg-green-50 dark:text-green-400"
                 title="回報有效"
                 @click="openReportModal(true)"
               >
@@ -519,7 +519,7 @@ onUnmounted(() => {
               </button>
               <button
                 type="button"
-                class="inline-flex items-center gap-1 rounded-lg border border-red-500 px-3 py-1.5 text-sm text-red-500 transition hover:bg-red-50"
+                class="inline-flex items-center gap-1 rounded-lg border border-red-500 px-3 py-1.5 text-sm text-red-600 transition hover:bg-red-50 dark:text-red-400"
                 title="回報無效"
                 @click="openReportModal(false)"
               >
@@ -565,7 +565,7 @@ onUnmounted(() => {
                 <div ref="reportTurnstileContainer"></div>
                 <p
                   v-if="reportForm.errors['cf-turnstile-response']"
-                  class="mt-1 text-xs text-red-500"
+                  class="mt-1 text-xs text-red-600 dark:text-red-400"
                 >
                   {{ reportForm.errors['cf-turnstile-response'] }}
                 </p>
@@ -741,7 +741,7 @@ onUnmounted(() => {
                 <div ref="commentTurnstileContainer"></div>
                 <p
                   v-if="commentForm.errors['cf-turnstile-response']"
-                  class="mt-1 text-xs text-red-500"
+                  class="mt-1 text-xs text-red-600 dark:text-red-400"
                 >
                   {{ commentForm.errors['cf-turnstile-response'] }}
                 </p>

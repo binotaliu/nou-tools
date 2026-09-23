@@ -37,13 +37,13 @@ defineProps({
           <div class="mt-4 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/discount-stores"
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-orange-500 bg-orange-500 px-4 py-2 font-semibold text-white transition hover:bg-orange-600"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-orange-700 bg-orange-700 px-4 py-2 font-semibold text-white transition hover:bg-orange-800"
             >
               回到優惠店家列表
             </Link>
             <Link
               href="/discount-stores/create"
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-orange-500 bg-orange-500 px-4 py-2 font-semibold text-white transition hover:bg-orange-600"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-orange-700 bg-orange-700 px-4 py-2 font-semibold text-white transition hover:bg-orange-800"
             >
               繼續送出其他店家
             </Link>
