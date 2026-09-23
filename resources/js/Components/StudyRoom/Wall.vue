@@ -4,6 +4,7 @@
 // board, and the viewer's own nameplate (click to edit nickname/emoji, or
 // open the stats modal).
 import { ref } from 'vue'
+import { Link } from '@inertiajs/vue3'
 import { ChartBarIcon, PencilIcon } from '@heroicons/vue/24/outline'
 import CassettePlayer from './CassettePlayer.vue'
 import GardenScene from './GardenScene.vue'
@@ -15,6 +16,8 @@ const props = defineProps({
   music: { type: Object, required: true },
   announcementHtml: { type: String, required: true },
   yourFocusSecondsToday: { type: Number, required: true },
+  // The visitor has no schedule, so there is no profile to show or edit.
+  demo: { type: Boolean, default: false },
 })
 
 // The announcement is admin-authored Markdown run through the same
@@ -174,6 +177,38 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
         </div>
 
         <div
+          v-if="demo"
+          class="relative -rotate-1 rounded-lg border-2 border-b-4 border-theme-300 bg-white px-4 py-2.5 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
+          data-testid="study-room-guest-card"
+        >
+          <span
+            class="absolute -top-1 left-1/2 size-2 -translate-x-1/2 rounded-full bg-amber-400 shadow-sm"
+            aria-hidden="true"
+          ></span>
+
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">👋</span>
+            <div class="min-w-0 flex-1">
+              <p
+                class="text-sm font-semibold text-theme-900 dark:text-zinc-100"
+              >
+                想加入嗎？
+              </p>
+              <p class="text-xs text-theme-700 dark:text-zinc-400">
+                建立課表後就有自己的座位和暱稱。
+              </p>
+            </div>
+            <Link
+              href="/schedules/create"
+              class="shrink-0 rounded-lg bg-theme-800 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-theme-900 dark:bg-theme-600 dark:hover:bg-theme-500"
+            >
+              建立課表
+            </Link>
+          </div>
+        </div>
+
+        <div
+          v-else
           class="relative -rotate-1 cursor-pointer rounded-lg border-2 border-b-4 border-theme-300 bg-white px-4 py-2.5 shadow-sm transition hover:rotate-0 hover:border-theme-400 dark:border-zinc-600 dark:bg-zinc-800 dark:hover:border-zinc-500"
           data-testid="study-room-personal-info"
           @click="profile.openPersonalInfo()"

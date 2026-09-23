@@ -7,7 +7,7 @@
 // session state is fetched from GET /study-room/state on mount and kept in
 // sync via the existing REST endpoints and Echo/Reverb broadcasts — never
 // through an Inertia prop or router.reload().
-import { computed, onMounted, onUnmounted, reactive } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import {
   ArrowUpIcon,
@@ -27,6 +27,7 @@ import TableChair from '../../Components/StudyRoom/TableChair.vue'
 import Wall from '../../Components/StudyRoom/Wall.vue'
 import FloorSkeleton from '../../Components/StudyRoom/FloorSkeleton.vue'
 import useSeatGrid from '../../Composables/useSeatGrid'
+import useStudyRoomDemo from '../../Composables/useStudyRoomDemo'
 import useStudyRoomMusic from '../../Composables/useStudyRoomMusic'
 import useStudyRoomProfile from '../../Composables/useStudyRoomProfile'
 import usePushSubscription from '../../Composables/usePushSubscription'
@@ -48,7 +49,12 @@ const props = defineProps({
   vapidPublicKey: { type: String, default: null },
 })
 
-const socket = useStudyRoomSocket(props.clientConfig)
+// Visitors without a schedule get a preview of the room filled with fictional
+// occupants (useStudyRoomDemo) instead of the live state, which they could not
+// act on anyway. It has the socket's shape, so the markup below is shared.
+const socket = props.hasSchedule
+  ? useStudyRoomSocket(props.clientConfig)
+  : useStudyRoomDemo(props.clientConfig)
 const grid = useSeatGrid(socket, props.clientConfig)
 const sky = useStudyRoomSky(props.clientConfig)
 const profile = useStudyRoomProfile(props.profile, props.emojiChoices)
@@ -79,7 +85,29 @@ const timer = useStudyTimer(
 // Derived client-side, not from the initial server prop: the profile
 // updates in place (see useStudyRoomProfile.submitProfile), so once the
 // viewer has a nickname, they no longer need the profile prompt.
-const needsProfile = computed(() => !profile.nickname)
+const needsProfile = computed(() => props.hasSchedule && !profile.nickname)
+
+// Taking a seat in the preview points at the sign-up banner instead.
+const signUpBanner = ref(null)
+const signUpHighlighted = ref(false)
+let signUpHighlightHandle = null
+
+watch(
+  () => socket.promptOpen,
+  open => {
+    if (!open) {
+      return
+    }
+
+    socket.promptOpen = false
+    signUpHighlighted.value = true
+    signUpBanner.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    clearTimeout(signUpHighlightHandle)
+    signUpHighlightHandle = setTimeout(() => {
+      signUpHighlighted.value = false
+    }, 2500)
+  }
+)
 
 socket.onStateChange(() => {
   timer.onRoomStateChanged(() => sky.unmountSkyCanvas('focus'))
@@ -164,7 +192,10 @@ onMounted(async () => {
   // Separate Vite entry (see resources/js/echo.js) so pages that don't need
   // realtime don't pay for pusher-js/laravel-echo — dynamically imported
   // here instead of loaded globally, since it's only needed on this page.
-  import('../../echo')
+  // The preview has nothing to subscribe to.
+  if (props.hasSchedule) {
+    import('../../echo')
+  }
 
   await socket.load()
 
@@ -179,6 +210,7 @@ onUnmounted(() => {
   sky.stopClock()
   socket.stop()
   music.dispose()
+  clearTimeout(signUpHighlightHandle)
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 
   if (twemojiObserver) {
@@ -197,8 +229,15 @@ onUnmounted(() => {
         class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
       >
         <div class="space-y-2">
-          <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
+          <h2
+            class="flex items-center gap-2 text-3xl font-bold text-theme-900 dark:text-zinc-100"
+          >
             自習室
+            <span
+              v-if="!hasSchedule"
+              class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-950/50 dark:text-amber-300"
+              >預覽</span
+            >
           </h2>
           <p class="text-sm text-theme-700 dark:text-zinc-400">
             找個座位跟其他同學一起用功。自習室 {{ openHoursLabel }} 開放。
@@ -206,7 +245,7 @@ onUnmounted(() => {
         </div>
 
         <div
-          v-if="socket.state"
+          v-if="socket.state && hasSchedule"
           class="inline-flex items-center gap-2 self-start rounded-full bg-theme-100 px-4 py-2 text-sm font-medium text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
           data-testid="study-room-site-total"
         >
@@ -220,23 +259,36 @@ onUnmounted(() => {
 
       <div
         v-if="!hasSchedule"
+        ref="signUpBanner"
         data-testid="study-room-needs-schedule"
-        class="rounded-lg border border-theme-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+        class="rounded-lg border border-theme-200 bg-white p-5 shadow-sm transition dark:border-zinc-700 dark:bg-zinc-900"
+        :class="
+          signUpHighlighted ? 'ring-2 ring-amber-400 dark:ring-amber-500' : ''
+        "
       >
-        <div class="flex flex-col items-center gap-3 py-6 text-center">
-          <TableCellsIcon class="size-10 text-theme-700 dark:text-zinc-400" />
-          <div class="space-y-1">
-            <h3 class="text-xl font-semibold text-theme-800 dark:text-zinc-200">
-              先建立課表才能進自習室
-            </h3>
-            <p class="text-sm text-theme-700 dark:text-zinc-400">
-              自習室會用你的課表列出「你在讀什麼」的選項，所以需要先有一份儲存好的課表。
-            </p>
+        <div
+          class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div class="flex items-start gap-3">
+            <TableCellsIcon
+              class="mt-0.5 size-8 shrink-0 text-theme-700 dark:text-zinc-400"
+            />
+            <div class="space-y-1">
+              <h3
+                class="text-lg font-semibold text-theme-800 dark:text-zinc-200"
+              >
+                這是自習室的預覽
+              </h3>
+              <p class="text-sm text-theme-700 dark:text-zinc-400">
+                座位上的同學都是虛構的。建立課表後就能入座，自習室會用你的課表列出「你在讀什麼」的選項。
+              </p>
+            </div>
           </div>
-          <div class="flex flex-wrap justify-center gap-2 pt-2">
+          <div class="flex flex-wrap gap-2 sm:shrink-0 sm:justify-end">
             <Link
               href="/schedules/create"
               class="inline-flex items-center gap-1.5 rounded-lg bg-theme-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-theme-900 dark:bg-theme-600 dark:hover:bg-theme-500"
+              data-testid="study-room-create-schedule"
             >
               <PlusIcon class="size-4" />
               建立我的課表
@@ -244,15 +296,15 @@ onUnmounted(() => {
             <Link
               href="/schedules/my"
               class="inline-flex items-center gap-1.5 rounded-lg border border-theme-300 bg-white px-4 py-2 text-sm font-semibold text-theme-800 transition hover:bg-theme-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              data-testid="study-room-find-schedule"
             >
-              我已經有課表了
+              以前建立過？找回課表
             </Link>
           </div>
         </div>
       </div>
 
       <div
-        v-else
         class="space-y-4"
         :class="socket.heldSeatCode ? 'pb-96 sm:pb-72 lg:pb-48' : ''"
         :data-testid="rootTestidValue"
@@ -283,6 +335,7 @@ onUnmounted(() => {
           :sky="sky"
           :profile="profile"
           :music="music"
+          :demo="!hasSchedule"
           :announcement-html="announcementHtml"
           :your-focus-seconds-today="
             socket.state ? socket.state.totals.yourFocusSecondsToday : 0
@@ -290,6 +343,7 @@ onUnmounted(() => {
         />
 
         <Modal
+          v-if="hasSchedule"
           :open="profile.personalInfoOpen"
           title="你的自習室資料"
           max-width="max-w-lg"
@@ -308,6 +362,7 @@ onUnmounted(() => {
         </Modal>
 
         <Modal
+          v-if="hasSchedule"
           :open="profile.statsOpen"
           title="專注紀錄與統計"
           max-width="max-w-lg"
@@ -742,6 +797,7 @@ onUnmounted(() => {
         </div>
 
         <ActionBanner
+          v-if="hasSchedule"
           :visible="!!socket.heldSeatCode"
           :timer="timer"
           :verbs="verbs"
@@ -750,6 +806,7 @@ onUnmounted(() => {
         />
 
         <FocusMode
+          v-if="hasSchedule"
           :sky="sky"
           :timer="timer"
           :profile="profile"
