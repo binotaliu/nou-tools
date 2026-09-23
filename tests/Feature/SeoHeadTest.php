@@ -9,7 +9,7 @@ use App\Models\StudentSchedule;
 use Illuminate\Support\Str;
 
 // Inertia's <Head> only runs in the browser, so crawlers depend on these tags
-// being in the server-rendered HTML (resources/views/open-graph/).
+// being in the server-rendered HTML (resources/views/seo/).
 
 it('server-renders title, description and Open Graph tags on static pages', function (string $routeName, string $title) {
     $this->get(route($routeName))
@@ -129,7 +129,7 @@ it('marks personal schedule pages noindex in the server-rendered head', function
         ->assertSee('<meta data-seo name="robots" content="noindex, nofollow" />', false);
 });
 
-it('does not tag pages without an open-graph view', function () {
+it('does not tag pages without a seo view', function () {
     $this->get(route('offline'))->assertDontSee('data-seo', false);
 });
 

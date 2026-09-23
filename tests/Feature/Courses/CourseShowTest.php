@@ -39,7 +39,7 @@ test('course show page includes seo meta description', function () {
     $response = $this->get(route('course.show', $course));
 
     // The <meta name="description"> itself is server-rendered from
-    // resources/views/open-graph/course/show.blade.php (asserted in
+    // resources/views/seo/course/show.blade.php (asserted in
     // SeoHeadTest); this checks the underlying data it is built from.
     $response->assertStatus(200);
     $response->assertInertia(function (Assert $page) {

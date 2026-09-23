@@ -31,8 +31,8 @@
         ? 'og-image.'.$routeName
         : null;
 
-    $openGraphView = $routeName && ! $isErrorPage && view()->exists('open-graph.'.$routeName)
-        ? 'open-graph.'.$routeName
+    $seoView = $routeName && ! $isErrorPage && view()->exists('seo.'.$routeName)
+        ? 'seo.'.$routeName
         : null;
 
     // The splash covers the blank gap before Vue mounts; the og:image
@@ -116,11 +116,11 @@
     otherwise the browser silently drops that inline stylesheet. --}}
     <meta name="csp-nonce" content="{{ app('csp-nonce') }}" />
 
-    {{-- Pages with a resources/views/open-graph/{route name}.blade.php get
+    {{-- Pages with a resources/views/seo/{route name}.blade.php get
     their own <title>, description, robots, Open Graph/Twitter tags and JSON-LD
-    (see open-graph/_meta.blade.php); everything else falls back to this title. --}}
-    @if ($openGraphView)
-        @include($openGraphView, ['props' => $page['props']])
+    (see seo/_meta.blade.php); everything else falls back to this title. --}}
+    @if ($seoView)
+        @include($seoView, ['props' => $page['props']])
     @else
         <title inertia>NOU 小幫手</title>
     @endif
