@@ -24,6 +24,8 @@ use Carbon\CarbonImmutable;
 use NouTools\Domains\Schedules\Actions\GenerateScheduleCalendar;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Resource;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 arch()->preset()->php();
 arch()->preset()->security()
@@ -102,3 +104,16 @@ arch('No use of Carbon/CarbonImmutable directly: use the Date facade instead')
         // Have `Date::use(CarbonImmutable::class)`
         AppServiceProvider::class,
     ]);
+
+test('No named functions in test files: assign a closure to a variable and pass it with `use` instead', function () {
+    $violations = collect(Finder::create()->files()->in(dirname(__DIR__))->name('*.php')
+        // Pest.php is loaded once, so its shared helpers cannot collide.
+        ->notName('Pest.php'))
+        ->flatMap(fn (SplFileInfo $file) => collect(preg_split('/\R/', $file->getContents()))
+            ->filter(fn (string $line) => preg_match('/^\s*function\s+&?\w+\s*\(/', $line) === 1)
+            ->map(fn (string $line) => $file->getRelativePathname().': '.trim($line)))
+        ->values()
+        ->all();
+
+    expect($violations)->toBeEmpty();
+});
