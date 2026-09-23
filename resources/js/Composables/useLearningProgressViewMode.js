@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 
 const STORAGE_KEY = 'nou:learning-progress:view-mode:v1'
-const MODES = ['table', 'week', 'subject']
+const MODES = ['table', 'homework', 'week', 'subject']
 
 function readStorage() {
   try {

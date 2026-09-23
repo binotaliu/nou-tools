@@ -196,6 +196,7 @@ const { viewMode, setViewMode } = useLearningProgressViewMode()
 
 const viewModeTabs = [
   { value: 'table', label: '表格' },
+  { value: 'homework', label: '作業' },
   { value: 'week', label: '依週次' },
   { value: 'subject', label: '依科目' },
 ]
@@ -374,7 +375,7 @@ const csrfToken =
           >
             <div
               role="tablist"
-              class="grid grid-cols-3 gap-1 rounded-md bg-theme-100 p-1 dark:bg-zinc-800"
+              class="grid grid-cols-4 gap-1 rounded-md bg-theme-100 p-1 dark:bg-zinc-800"
             >
               <button
                 v-for="tab in viewModeTabs"
@@ -672,6 +673,63 @@ const csrfToken =
           </div>
 
           <div
+            v-if="viewMode === 'homework' && isMobileViewport"
+            class="p-2 md:hidden"
+            data-testid="learning-progress-homework-view"
+          >
+            <div class="space-y-3">
+              <article
+                v-for="course in viewModel.courses"
+                :key="course.id"
+                class="rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+                data-testid="learning-progress-homework-view-course-card"
+                :data-course-id="course.id"
+              >
+                <h3
+                  class="mb-2 line-clamp-2 text-sm font-semibold text-theme-900 dark:text-zinc-100"
+                >
+                  {{ course.name }}
+                </h3>
+
+                <div
+                  v-for="number in [1, 2]"
+                  :key="number"
+                  class="mb-2 last:mb-0"
+                >
+                  <div class="mb-1 flex items-center justify-between gap-2">
+                    <label
+                      class="flex items-center gap-2 text-sm text-theme-700 dark:text-zinc-300"
+                    >
+                      <input
+                        v-model="homework[course.id][number].completed"
+                        type="checkbox"
+                        class="size-4 rounded border-gray-500"
+                      />
+                      {{ homeworkLabel(number) }}
+                    </label>
+                    <DateField
+                      :model-value="homework[course.id][number].deadline"
+                      :label="`${course.name} ${homeworkLabel(number)}的截止日期`"
+                      :today="viewModel.now"
+                      :initial-month="viewModel.semesterStart"
+                      @change="
+                        value =>
+                          updateHomeworkDeadline(course.id, number, value)
+                      "
+                    />
+                  </div>
+                  <textarea
+                    v-model="homework[course.id][number].note"
+                    placeholder="（尚未設定備註）"
+                    rows="1"
+                    class="w-full resize-none rounded border border-theme-200 px-2 py-1 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
+                  ></textarea>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div
             v-if="viewMode === 'week' && isMobileViewport"
             class="p-2 md:hidden"
             data-testid="learning-progress-week-view"
@@ -732,52 +790,8 @@ const csrfToken =
                   v-model="progress[course.id][selectedWeekNum].note"
                   placeholder="（尚未設定目標）"
                   rows="2"
-                  class="mb-3 w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
+                  class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
                 ></textarea>
-
-                <div
-                  class="border-t border-theme-200 pt-3 dark:border-zinc-700"
-                >
-                  <p
-                    class="mb-2 text-xs font-semibold text-theme-700 dark:text-zinc-400"
-                  >
-                    作業
-                  </p>
-                  <div
-                    v-for="number in [1, 2]"
-                    :key="number"
-                    class="mb-2 last:mb-0"
-                  >
-                    <div class="mb-1 flex items-center justify-between gap-2">
-                      <label
-                        class="flex items-center gap-2 text-sm text-theme-700 dark:text-zinc-300"
-                      >
-                        <input
-                          v-model="homework[course.id][number].completed"
-                          type="checkbox"
-                          class="size-4 rounded border-gray-500"
-                        />
-                        {{ homeworkLabel(number) }}
-                      </label>
-                      <DateField
-                        :model-value="homework[course.id][number].deadline"
-                        :label="`${course.name} ${homeworkLabel(number)}的截止日期`"
-                        :today="viewModel.now"
-                        :initial-month="viewModel.semesterStart"
-                        @change="
-                          value =>
-                            updateHomeworkDeadline(course.id, number, value)
-                        "
-                      />
-                    </div>
-                    <textarea
-                      v-model="homework[course.id][number].note"
-                      placeholder="（尚未設定備註）"
-                      rows="1"
-                      class="w-full resize-none rounded border border-theme-200 px-2 py-1 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
-                    ></textarea>
-                  </div>
-                </div>
               </article>
             </div>
           </div>
@@ -800,51 +814,6 @@ const csrfToken =
                 {{ course.name }}
               </option>
             </select>
-
-            <div
-              class="mb-3 rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
-              data-testid="learning-progress-subject-view-homework"
-            >
-              <p
-                class="mb-2 text-xs font-semibold text-theme-700 dark:text-zinc-400"
-              >
-                作業
-              </p>
-              <div
-                v-for="number in [1, 2]"
-                :key="number"
-                class="mb-2 last:mb-0"
-              >
-                <div class="mb-1 flex items-center justify-between gap-2">
-                  <label
-                    class="flex items-center gap-2 text-sm text-theme-700 dark:text-zinc-300"
-                  >
-                    <input
-                      v-model="homework[selectedCourseId][number].completed"
-                      type="checkbox"
-                      class="size-4 rounded border-gray-500"
-                    />
-                    {{ homeworkLabel(number) }}
-                  </label>
-                  <DateField
-                    :model-value="homework[selectedCourseId][number].deadline"
-                    :label="`${homeworkLabel(number)}的截止日期`"
-                    :today="viewModel.now"
-                    :initial-month="viewModel.semesterStart"
-                    @change="
-                      value =>
-                        updateHomeworkDeadline(selectedCourseId, number, value)
-                    "
-                  />
-                </div>
-                <textarea
-                  v-model="homework[selectedCourseId][number].note"
-                  placeholder="（尚未設定備註）"
-                  rows="1"
-                  class="w-full resize-none rounded border border-theme-200 px-2 py-1 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
-                ></textarea>
-              </div>
-            </div>
 
             <div class="space-y-3">
               <article
