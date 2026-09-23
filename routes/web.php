@@ -7,6 +7,7 @@ use App\Http\Controllers\AltUuController;
 use App\Http\Controllers\AnalyticsConsentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\ChangelogController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseScheduleController;
 use App\Http\Controllers\DirectoryController;
@@ -101,6 +102,9 @@ Route::view('/offline', 'offline')->name('offline');
 
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index')
     ->withMarkdown(AnnouncementIndexMarkdownController::class);
+
+Route::get('/changelog', [ChangelogController::class, 'index'])->name('changelog.index');
+Route::get('/changelog/{post:slug}', [ChangelogController::class, 'show'])->name('changelog.show');
 
 Route::get('/newsletter', [NewsletterController::class, 'index'])->name('newsletter.index')
     ->withMarkdown(NewsletterIndexMarkdownController::class);

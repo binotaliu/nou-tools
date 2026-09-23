@@ -26,17 +26,21 @@ final readonly class ShowChangelogPostPage
             return null;
         }
 
-        $previousPost = ChangelogPost::query()
-            ->published()
-            ->where('published_at', '<', $post->published_at)
-            ->orderByDesc('published_at')
-            ->first();
+        $previousPost = $post->published_at !== null
+            ? ChangelogPost::query()
+                ->published()
+                ->where('published_at', '<', $post->published_at)
+                ->orderByDesc('published_at')
+                ->first()
+            : null;
 
-        $nextPost = ChangelogPost::query()
-            ->published()
-            ->where('published_at', '>', $post->published_at)
-            ->orderBy('published_at')
-            ->first();
+        $nextPost = $post->published_at !== null
+            ? ChangelogPost::query()
+                ->published()
+                ->where('published_at', '>', $post->published_at)
+                ->orderBy('published_at')
+                ->first()
+            : null;
 
         return new ChangelogPostPageData(
             title: (string) config('changelog.title'),

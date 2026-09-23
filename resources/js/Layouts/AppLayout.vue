@@ -383,6 +383,15 @@ const bottomMoreItems = computed(() =>
           </div>
           <div class="text-xs">
             <Link
+              href="/changelog"
+              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
+            >
+              <Icon name="sparkles" class="size-3" />
+              更新日誌
+            </Link>
+          </div>
+          <div class="text-xs">
+            <Link
               href="/install"
               data-testid="footer-install-link"
               class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"

@@ -3,7 +3,7 @@
 // used to live in the footer, plus the analytics-consent toggle (state comes
 // from HandleInertiaRequests' shared `analyticsConsent` prop, same as the
 // cookie-consent banner).
-import { Head } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import useAnalyticsConsent from '../../Composables/useAnalyticsConsent'
@@ -72,6 +72,13 @@ const { granted, toggle, error } = useAnalyticsConsent()
           聯絡與相關連結
         </h3>
         <ul class="mt-3 space-y-2 text-sm text-theme-700 dark:text-zinc-300">
+          <li>
+            <Link
+              href="/changelog"
+              class="underline hover:text-theme-900 dark:hover:text-zinc-100"
+              >更新日誌</Link
+            >
+          </li>
           <li>
             聯絡作者：
             <a
