@@ -653,12 +653,12 @@ const csrfToken =
                       class="sticky left-0 z-10 break-inside-avoid border border-b-0 border-l-0 border-theme-300 px-0 py-0 font-semibold text-theme-900 dark:border-zinc-600 dark:text-zinc-100 print:static print:bg-theme-50"
                       :class="
                         currentWeek === week.num
-                          ? 'bg-blue-50 dark:bg-blue-950/60'
+                          ? 'bg-blue-50 dark:bg-blue-950'
                           : isWeekFullyComplete(week.num)
                             ? 'bg-white dark:bg-zinc-900 [&>div]:text-gray-600 dark:[&>div]:text-zinc-500'
                             : isWeekPassed(week.num) &&
                                 hasIncompleteCourseInWeek(week.num)
-                              ? 'bg-red-50 dark:bg-red-950/60'
+                              ? 'bg-red-50 dark:bg-red-950'
                               : 'bg-theme-50 dark:bg-zinc-950'
                       "
                       rowspan="2"
