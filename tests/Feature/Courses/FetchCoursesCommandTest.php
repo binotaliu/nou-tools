@@ -17,9 +17,9 @@ it('fails with missing semester letter', function () {
 });
 
 it('fetches and stores courses from HTML pages', function () {
-    $vc1Html = file_get_contents(__DIR__.'/../fixtures/vc1_sample.html');
-    $vc3Html = file_get_contents(__DIR__.'/../fixtures/vc3_sample.html');
-    $vc4Html = file_get_contents(__DIR__.'/../fixtures/vc4_sample.html');
+    $vc1Html = file_get_contents(__DIR__.'/../../fixtures/vc1_sample.html');
+    $vc3Html = file_get_contents(__DIR__.'/../../fixtures/vc3_sample.html');
+    $vc4Html = file_get_contents(__DIR__.'/../../fixtures/vc4_sample.html');
 
     Http::fake([
         'vc.nou.edu.tw/vc1/*' => Http::response($vc1Html, 200),
@@ -50,7 +50,7 @@ it('fetches and stores courses from HTML pages', function () {
 });
 
 it('creates schedules with correct dates for B semester', function () {
-    $vc1Html = file_get_contents(__DIR__.'/../fixtures/vc1_sample.html');
+    $vc1Html = file_get_contents(__DIR__.'/../../fixtures/vc1_sample.html');
 
     Http::fake([
         'vc.nou.edu.tw/vc1/*' => Http::response($vc1Html, 200),
@@ -74,7 +74,7 @@ it('creates schedules with correct dates for B semester', function () {
 });
 
 it('creates schedules with correct dates for A semester', function () {
-    $vc1Html = file_get_contents(__DIR__.'/../fixtures/vc1_sample.html');
+    $vc1Html = file_get_contents(__DIR__.'/../../fixtures/vc1_sample.html');
 
     Http::fake([
         'vc.nou.edu.tw/vc1/*' => Http::response($vc1Html, 200),
@@ -146,7 +146,7 @@ it('rolls January dates into the following calendar year for A semester', functi
 });
 
 it('does not duplicate courses on re-run', function () {
-    $vc1Html = file_get_contents(__DIR__.'/../fixtures/vc1_sample.html');
+    $vc1Html = file_get_contents(__DIR__.'/../../fixtures/vc1_sample.html');
 
     Http::fake([
         'vc.nou.edu.tw/vc1/*' => Http::response($vc1Html, 200),
@@ -166,7 +166,7 @@ it('does not duplicate courses on re-run', function () {
 });
 
 it('does not duplicate course classes on re-run and preserves IDs', function () {
-    $vc1Html = file_get_contents(__DIR__.'/../fixtures/vc1_sample.html');
+    $vc1Html = file_get_contents(__DIR__.'/../../fixtures/vc1_sample.html');
 
     Http::fake([
         'vc.nou.edu.tw/vc1/*' => Http::response($vc1Html, 200),
@@ -215,7 +215,7 @@ it('handles HTTP failures gracefully', function () {
 });
 
 it('stores full remote courses with custom time slots', function () {
-    $vc4Html = file_get_contents(__DIR__.'/../fixtures/vc4_sample.html');
+    $vc4Html = file_get_contents(__DIR__.'/../../fixtures/vc4_sample.html');
 
     Http::fake([
         'vc.nou.edu.tw/vc1/*' => Http::response('<html><body></body></html>', 200),
@@ -241,7 +241,7 @@ it('stores full remote courses with custom time slots', function () {
 });
 
 it('stores micro-credit courses separately from full remote', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4_micro_sample.html');
 
     Http::fake([
         'vc.nou.edu.tw/vc1/*' => Http::response('<html><body></body></html>', 200),
@@ -262,7 +262,7 @@ it('stores micro-credit courses separately from full remote', function () {
 });
 
 it('stores schedule time overrides for courses with irregular times', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4_micro_sample.html');
 
     Http::fake([
         'vc.nou.edu.tw/vc1/*' => Http::response('<html><body></body></html>', 200),
@@ -305,7 +305,7 @@ it('stores schedule time overrides for courses with irregular times', function (
 });
 
 it('fetches summer courses from vc0 and keeps backup classrooms on the same class', function () {
-    $vc0Html = file_get_contents(__DIR__.'/../fixtures/vc0_sample.html');
+    $vc0Html = file_get_contents(__DIR__.'/../../fixtures/vc0_sample.html');
 
     Http::fake([
         'vc.nou.edu.tw/vc0/*' => Http::response($vc0Html, 200),

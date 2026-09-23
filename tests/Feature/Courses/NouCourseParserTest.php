@@ -8,7 +8,7 @@ beforeEach(function () {
 });
 
 it('parses morning class courses from vc1 sample', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc1_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc1_sample.html');
 
     $courses = ($this->parser)($html, CourseClassType::Morning);
 
@@ -30,7 +30,7 @@ it('parses morning class courses from vc1 sample', function () {
 });
 
 it('parses evening class courses with multiple classes per course from vc3 sample', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc3_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc3_sample.html');
 
     $courses = ($this->parser)($html, CourseClassType::Evening);
 
@@ -51,7 +51,7 @@ it('parses evening class courses with multiple classes per course from vc3 sampl
 });
 
 it('parses full remote courses with custom time from vc4 sample', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4_sample.html');
 
     $courses = ($this->parser)($html, CourseClassType::FullRemote);
 
@@ -71,7 +71,7 @@ it('parses full remote courses with custom time from vc4 sample', function () {
 });
 
 it('extracts teacher name correctly even with complex format', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4_sample.html');
 
     $courses = ($this->parser)($html, CourseClassType::FullRemote);
 
@@ -80,7 +80,7 @@ it('extracts teacher name correctly even with complex format', function () {
 });
 
 it('parses real vc1 HTML file', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc1.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc1.html');
 
     $courses = ($this->parser)($html, CourseClassType::Morning);
 
@@ -102,7 +102,7 @@ it('parses real vc1 HTML file', function () {
 })->skip();
 
 it('parses real vc3 HTML file with multiple classes per course', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc3.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc3.html');
 
     $courses = ($this->parser)($html, CourseClassType::Evening);
 
@@ -120,7 +120,7 @@ it('parses real vc3 HTML file with multiple classes per course', function () {
 })->skip();
 
 it('parses real vc4 HTML file with varied time slots', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4.html');
 
     $courses = ($this->parser)($html, CourseClassType::FullRemote);
 
@@ -136,7 +136,7 @@ it('parses real vc4 HTML file with varied time slots', function () {
 })->skip();
 
 it('parses unified in-person (統一面授) classes whose icon alt has no zzz code', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc_unified_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc_unified_sample.html');
 
     $courses = ($this->parser)($html, CourseClassType::Evening);
 
@@ -168,7 +168,7 @@ it('returns empty array for HTML without course cards', function () {
 });
 
 it('parses micro-credit courses from vc4 micro sample', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4_micro_sample.html');
 
     $courses = ($this->parser)($html, CourseClassType::MicroCredit);
 
@@ -189,7 +189,7 @@ it('parses micro-credit courses from vc4 micro sample', function () {
 });
 
 it('filters sections correctly so full remote does not include micro-credit', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4_micro_sample.html');
 
     $fullRemoteCourses = ($this->parser)($html, CourseClassType::FullRemote);
     $microCreditCourses = ($this->parser)($html, CourseClassType::MicroCredit);
@@ -202,7 +202,7 @@ it('filters sections correctly so full remote does not include micro-credit', fu
 });
 
 it('parses session time overrides for micro-credit courses', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4_micro_sample.html');
 
     $courses = ($this->parser)($html, CourseClassType::MicroCredit);
 
@@ -222,7 +222,7 @@ it('parses session time overrides for micro-credit courses', function () {
 });
 
 it('strips class-time-slot suffixes so cards for the same course share one name', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4_split_time_slot_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4_split_time_slot_sample.html');
 
     $courses = ($this->parser)($html, CourseClassType::FullRemote);
 
@@ -249,7 +249,7 @@ it('strips class-time-slot suffixes so cards for the same course share one name'
 });
 
 it('does not strip a full-width parenthetical suffix that is not a class-time slot', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4_micro_sample.html');
 
     $courses = ($this->parser)($html, CourseClassType::MicroCredit);
 
@@ -257,7 +257,7 @@ it('does not strip a full-width parenthetical suffix that is not a class-time sl
 });
 
 it('parses summer courses from vc0 sample and keeps backup classrooms on the same class', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc0_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc0_sample.html');
 
     $courses = ($this->parser)($html, CourseClassType::Evening);
 
@@ -281,7 +281,7 @@ it('parses summer courses from vc0 sample and keeps backup classrooms on the sam
 });
 
 it('does not have time overrides for courses with single time', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4_micro_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4_micro_sample.html');
 
     $courses = ($this->parser)($html, CourseClassType::MicroCredit);
 
@@ -293,7 +293,7 @@ it('does not have time overrides for courses with single time', function () {
 });
 
 it('parses real vc4 HTML file for micro-credit courses', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4.html');
 
     $courses = ($this->parser)($html, CourseClassType::MicroCredit);
 
@@ -314,7 +314,7 @@ it('parses real vc4 HTML file for micro-credit courses', function () {
 })->skip();
 
 it('parses real vc4 HTML file with time overrides for 法學德文（三）', function () {
-    $html = file_get_contents(__DIR__.'/../fixtures/vc4.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/vc4.html');
 
     $courses = ($this->parser)($html, CourseClassType::MicroCredit);
 
