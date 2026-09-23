@@ -44,6 +44,22 @@ uses()->beforeEach(function (): void {
 
 /*
 |--------------------------------------------------------------------------
+| Keep CSP Headers On While A Vite Dev Server Runs
+|--------------------------------------------------------------------------
+|
+| spatie/laravel-csp switches the policy off when Vite is hot (public/hot
+| exists), so CSP assertions would depend on whether the developer happens to
+| have `npm run dev` running. Browser tests share this container, so the
+| override covers them too.
+|
+*/
+
+uses()->beforeEach(function (): void {
+    config(['csp.enabled_while_hot_reloading' => true]);
+})->in('Feature', 'Browser');
+
+/*
+|--------------------------------------------------------------------------
 | Browser Tests - Chrome Process Cleanup
 |--------------------------------------------------------------------------
 |

@@ -7,12 +7,6 @@ use App\Models\MusicTrack;
 
 use function Pest\Laravel\get;
 
-// A running `vite` dev server (public/hot) switches the CSP off, which would
-// make these assertions depend on the machine they run on.
-beforeEach(function () {
-    config(['csp.enabled_while_hot_reloading' => true]);
-});
-
 /**
  * @return array<string, string>
  */
