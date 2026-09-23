@@ -335,6 +335,7 @@ onUnmounted(() => {
           :sky="sky"
           :profile="profile"
           :music="music"
+          :demo="!hasSchedule"
           :announcement-html="announcementHtml"
           :your-focus-seconds-today="
             socket.state ? socket.state.totals.yourFocusSecondsToday : 0
