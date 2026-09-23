@@ -151,7 +151,7 @@ const cells = computed(() => {
             ? 'bg-theme-700 text-white dark:bg-zinc-200 dark:text-zinc-900'
             : tab.data
               ? 'text-theme-800 hover:bg-theme-100 dark:text-zinc-200 dark:hover:bg-zinc-800'
-              : 'text-theme-700 hover:bg-theme-100 dark:text-zinc-500 dark:hover:bg-zinc-800'
+              : 'text-theme-700 hover:bg-theme-100 dark:text-zinc-400 dark:hover:bg-zinc-800'
         "
         @click="selectedKey = tab.key"
       >

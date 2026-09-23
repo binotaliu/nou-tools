@@ -205,7 +205,7 @@ const classTotal = computed(() =>
                   </div>
                   <Icon
                     name="arrow-top-right-on-square"
-                    class="size-4 shrink-0 text-theme-700 transition group-hover:text-theme-800 dark:text-zinc-500 dark:group-hover:text-zinc-300"
+                    class="size-4 shrink-0 text-theme-700 transition group-hover:text-theme-800 dark:text-zinc-400 dark:group-hover:text-zinc-300"
                   />
                 </a>
                 <div

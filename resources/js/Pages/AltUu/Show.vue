@@ -100,7 +100,7 @@ const faqs = [
               </a>
             </div>
 
-            <p class="mt-3 text-xs text-theme-700 dark:text-zinc-500">
+            <p class="mt-3 text-xs text-theme-700 dark:text-zinc-400">
               App Store 支援 iPhone、iPad 及 Mac（Apple Silicon）
             </p>
           </div>
@@ -200,7 +200,7 @@ const faqs = [
           class="flex flex-col items-start gap-4 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div>
-            <p class="text-xs font-semibold text-theme-700 dark:text-zinc-500">
+            <p class="text-xs font-semibold text-theme-700 dark:text-zinc-400">
               iPhone / iPad / Mac
             </p>
             <h4
@@ -226,7 +226,7 @@ const faqs = [
           class="flex flex-col items-start gap-4 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div>
-            <p class="text-xs font-semibold text-theme-700 dark:text-zinc-500">
+            <p class="text-xs font-semibold text-theme-700 dark:text-zinc-400">
               Android
             </p>
             <h4
@@ -264,7 +264,7 @@ const faqs = [
 
         <ArchitectureIllustration />
 
-        <p class="mt-3 text-xs text-theme-700 dark:text-zinc-500">
+        <p class="mt-3 text-xs text-theme-700 dark:text-zinc-400">
           完整的技術說明請見《
           <a
             href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/app-architecture"
@@ -299,7 +299,7 @@ const faqs = [
               {{ faq.question }}
               <Icon
                 name="chevron-down"
-                class="size-5 shrink-0 text-theme-700 transition-transform group-open:rotate-180 dark:text-zinc-500"
+                class="size-5 shrink-0 text-theme-700 transition-transform group-open:rotate-180 dark:text-zinc-400"
                 aria-hidden="true"
               />
             </summary>
@@ -314,7 +314,7 @@ const faqs = [
 
       <!-- Trademark Credit -->
       <div
-        class="flex flex-col gap-2 text-xs text-theme-700 dark:text-zinc-500"
+        class="flex flex-col gap-2 text-xs text-theme-700 dark:text-zinc-400"
       >
         <p>
           使用 Alt UU，你必須同意並遵守 Alt UU 的《

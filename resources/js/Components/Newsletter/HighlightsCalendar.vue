@@ -90,7 +90,7 @@ function dayLabelClass(day, dayIndex) {
 
   return day.inWindow
     ? 'text-theme-800 dark:text-zinc-200'
-    : 'text-theme-700 dark:text-zinc-500'
+    : 'text-theme-700 dark:text-zinc-400'
 }
 
 const weeks = computed(() => {

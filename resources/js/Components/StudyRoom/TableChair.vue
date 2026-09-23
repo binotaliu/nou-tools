@@ -55,7 +55,7 @@ onUnmounted(() => {
     >
       <span
         v-if="!seat.isOccupied"
-        class="text-[10px] font-medium text-theme-700 dark:text-zinc-500"
+        class="text-[10px] font-medium text-theme-700 dark:text-zinc-400"
         >{{ seat.seatNumber }}</span
       >
       <span v-else class="text-base leading-none">{{ seat.emoji }}</span>

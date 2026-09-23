@@ -257,7 +257,7 @@ onMounted(() => {
               <span class="truncate">{{ link.name }}</span>
               <Icon
                 name="arrow-top-right-on-square"
-                class="size-4 shrink-0 text-theme-700 dark:text-zinc-500"
+                class="size-4 shrink-0 text-theme-700 dark:text-zinc-400"
               />
             </a>
           </div>
@@ -307,7 +307,7 @@ onMounted(() => {
                 class="space-y-1"
               >
                 <p
-                  class="px-3 text-xs font-semibold tracking-wide text-theme-700 uppercase dark:text-zinc-500"
+                  class="px-3 text-xs font-semibold tracking-wide text-theme-700 uppercase dark:text-zinc-400"
                 >
                   {{ region.label }}
                 </p>
@@ -409,7 +409,7 @@ onMounted(() => {
                     <span class="truncate">開啟中心網站</span>
                     <Icon
                       name="arrow-top-right-on-square"
-                      class="size-4 shrink-0 text-theme-700 dark:text-zinc-500"
+                      class="size-4 shrink-0 text-theme-700 dark:text-zinc-400"
                     />
                   </a>
 
@@ -425,7 +425,7 @@ onMounted(() => {
                     <span class="truncate">交通資訊</span>
                     <Icon
                       name="truck"
-                      class="size-4 shrink-0 text-theme-700 dark:text-zinc-500"
+                      class="size-4 shrink-0 text-theme-700 dark:text-zinc-400"
                     />
                   </a>
                 </div>
@@ -434,7 +434,7 @@ onMounted(() => {
               <div
                 v-else
                 data-testid="center-placeholder"
-                class="flex h-80 w-full items-center justify-center rounded-lg border border-theme-100 text-theme-700 md:text-lg dark:border-zinc-800 dark:text-zinc-500"
+                class="flex h-80 w-full items-center justify-center rounded-lg border border-theme-100 text-theme-700 md:text-lg dark:border-zinc-800 dark:text-zinc-400"
               >
                 <span class="hidden md:inline"
                   >從左側選擇一個學習指導中心來檢視詳情</span

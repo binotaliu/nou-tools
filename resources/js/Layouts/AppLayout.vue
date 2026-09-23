@@ -355,7 +355,7 @@ const bottomMoreItems = computed(() =>
 
         <div class="flex flex-col items-center gap-6 sm:flex-row">
           <div
-            class="max-w-lg text-center text-sm text-theme-700 md:text-left dark:text-zinc-500"
+            class="max-w-lg text-center text-sm text-theme-700 md:text-left dark:text-zinc-400"
           >
             <span class="font-semibold">免責聲明：</span>
             <p class="text-justify text-xs md:text-left">

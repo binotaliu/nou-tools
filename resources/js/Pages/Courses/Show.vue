@@ -135,7 +135,7 @@ function examReferenceUrl(reference) {
       <div class="mb-8">
         <Link
           :href="backUrl"
-          class="mb-4 inline-flex items-center justify-center gap-2 text-orange-700 hover:text-orange-800"
+          class="mb-4 inline-flex items-center justify-center gap-2 text-orange-700 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300"
         >
           <Icon name="chevron-left" class="size-4" />
           回到我的課表
@@ -176,7 +176,7 @@ function examReferenceUrl(reference) {
                 rel="noopener"
                 data-analytics-event="course_description_open"
                 data-analytics-feature="course"
-                class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
               >
                 檢視詳細內容
                 <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -259,7 +259,7 @@ function examReferenceUrl(reference) {
                 :href="viewModel.multimediaUrl"
                 target="_blank"
                 rel="noopener"
-                class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
               >
                 檢視簡介
                 <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -399,7 +399,7 @@ function examReferenceUrl(reference) {
                 :href="course.textbook.referenceUrl"
                 target="_blank"
                 rel="noopener"
-                class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
               >
                 開啟
                 <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -591,7 +591,7 @@ function examReferenceUrl(reference) {
                   rel="noopener"
                   :aria-label="`${exam.term}的期中考正參`"
                   :download="`${examSubjectName}_${exam.term}_期中考正參.${fileExtension(exam.midtermReferencePrimary)}`"
-                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
                 >
                   正參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -610,7 +610,7 @@ function examReferenceUrl(reference) {
                   rel="noopener"
                   :aria-label="`${exam.term}的期中考副參`"
                   :download="`${examSubjectName}_${exam.term}_期中考副參.${fileExtension(exam.midtermReferenceSecondary)}`"
-                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
                 >
                   副參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -629,7 +629,7 @@ function examReferenceUrl(reference) {
                   rel="noopener"
                   :aria-label="`${exam.term}的期末考正參`"
                   :download="`${examSubjectName}_${exam.term}_期末考正參.${fileExtension(exam.finalReferencePrimary)}`"
-                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
                 >
                   正參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -648,7 +648,7 @@ function examReferenceUrl(reference) {
                   rel="noopener"
                   :aria-label="`${exam.term}的期末考副參`"
                   :download="`${examSubjectName}_${exam.term}_期末考副參.${fileExtension(exam.finalReferenceSecondary)}`"
-                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
                 >
                   副參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -726,7 +726,7 @@ function examReferenceUrl(reference) {
                     rel="noopener"
                     :aria-label="`${exam.term}的期中考正參`"
                     :download="`${examSubjectName}_${exam.term}_期中考正參.${fileExtension(exam.midtermReferencePrimary)}`"
-                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
                   >
                     正參
                     <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -743,7 +743,7 @@ function examReferenceUrl(reference) {
                     rel="noopener"
                     :aria-label="`${exam.term}的期中考副參`"
                     :download="`${examSubjectName}_${exam.term}_期中考副參.${fileExtension(exam.midtermReferenceSecondary)}`"
-                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
                   >
                     副參
                     <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -760,7 +760,7 @@ function examReferenceUrl(reference) {
                     rel="noopener"
                     :aria-label="`${exam.term}的期末考正參`"
                     :download="`${examSubjectName}_${exam.term}_期末考正參.${fileExtension(exam.finalReferencePrimary)}`"
-                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
                   >
                     正參
                     <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -777,7 +777,7 @@ function examReferenceUrl(reference) {
                     rel="noopener"
                     :aria-label="`${exam.term}的期末考副參`"
                     :download="`${examSubjectName}_${exam.term}_期末考副參.${fileExtension(exam.finalReferenceSecondary)}`"
-                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
                   >
                     副參
                     <Icon name="arrow-top-right-on-square" class="size-4" />

@@ -676,7 +676,7 @@ onUnmounted(() => {
             <p class="wrap-break-word whitespace-pre-line">
               {{ comment.content }}
             </p>
-            <span class="text-xs text-theme-700 dark:text-zinc-500">
+            <span class="text-xs text-theme-700 dark:text-zinc-400">
               — {{ comment.createdAtHuman }}
             </span>
           </div>

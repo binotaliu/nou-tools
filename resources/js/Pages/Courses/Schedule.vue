@@ -581,7 +581,7 @@ const creditsDropdown = useDropdown()
                     >
                       <Link
                         :href="course.url"
-                        class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                        class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
                       >
                         {{ course.name }}
                       </Link>
@@ -615,7 +615,7 @@ const creditsDropdown = useDropdown()
               >
                 <Link
                   :href="course.url"
-                  class="text-base font-semibold text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
+                  class="text-base font-semibold text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
                 >
                   {{ course.name }}
                 </Link>

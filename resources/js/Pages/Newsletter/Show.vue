@@ -98,7 +98,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         />
         <figcaption
           v-if="issue.coverImageCreditName"
-          class="mt-1 text-right text-xs text-theme-700 dark:text-zinc-500"
+          class="mt-1 text-right text-xs text-theme-700 dark:text-zinc-400"
           data-testid="newsletter-cover-image-credit"
         >
           Photo by

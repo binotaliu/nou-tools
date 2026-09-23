@@ -246,7 +246,7 @@ function goToPage(target) {
           >
             <Icon
               name="building-storefront"
-              class="size-10 text-theme-700 dark:text-zinc-500"
+              class="size-10 text-theme-700 dark:text-zinc-400"
             />
             <div class="space-y-1">
               <h3

@@ -224,7 +224,7 @@ onUnmounted(() => {
         class="rounded-lg border border-theme-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="flex flex-col items-center gap-3 py-6 text-center">
-          <TableCellsIcon class="size-10 text-theme-700 dark:text-zinc-500" />
+          <TableCellsIcon class="size-10 text-theme-700 dark:text-zinc-400" />
           <div class="space-y-1">
             <h3 class="text-xl font-semibold text-theme-800 dark:text-zinc-200">
               先建立課表才能進自習室
@@ -534,11 +534,11 @@ onUnmounted(() => {
                       class="flex flex-col items-center gap-1"
                     >
                       <span
-                        class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-300 bg-white text-[10px] font-medium text-theme-700 transition group-hover:border-theme-400 group-hover:text-theme-800 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-500"
+                        class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-300 bg-white text-[10px] font-medium text-theme-700 transition group-hover:border-theme-400 group-hover:text-theme-800 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
                         >{{ seat.seatNumber }}</span
                       >
                       <span
-                        class="text-[10px] text-theme-700 opacity-0 transition group-hover:opacity-100 dark:text-zinc-500"
+                        class="text-[10px] text-theme-700 opacity-0 transition group-hover:opacity-100 dark:text-zinc-400"
                         >點擊入座</span
                       >
                     </div>

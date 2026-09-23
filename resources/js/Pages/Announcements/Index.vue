@@ -369,7 +369,7 @@ function isExpired(announcement) {
               >
                 <Icon
                   name="inbox"
-                  class="size-10 text-theme-700 dark:text-zinc-500"
+                  class="size-10 text-theme-700 dark:text-zinc-400"
                 />
                 <div class="space-y-1">
                   <h3
@@ -401,7 +401,7 @@ function isExpired(announcement) {
               <div class="flex items-center gap-3">
                 <span
                   v-if="!viewModel.announcements.prev_page_url"
-                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 dark:border-zinc-700 dark:text-zinc-500"
+                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 dark:border-zinc-700 dark:text-zinc-400"
                 >
                   <Icon name="chevron-left" class="size-4" />
                   上一頁
@@ -417,7 +417,7 @@ function isExpired(announcement) {
 
                 <span
                   v-if="!viewModel.announcements.next_page_url"
-                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 dark:border-zinc-700 dark:text-zinc-500"
+                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 dark:border-zinc-700 dark:text-zinc-400"
                 >
                   下一頁
                   <Icon name="chevron-right" class="size-4" />

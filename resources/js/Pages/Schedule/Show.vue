@@ -903,7 +903,7 @@ function localHint(next) {
                   </div>
                   <span
                     v-else-if="row.next"
-                    class="text-sm text-theme-700 dark:text-zinc-500"
+                    class="text-sm text-theme-700 dark:text-zinc-400"
                     >未設定</span
                   >
                 </td>
@@ -994,7 +994,7 @@ function localHint(next) {
                 </template>
                 <p
                   v-else
-                  class="text-lg font-bold text-theme-700 dark:text-zinc-500"
+                  class="text-lg font-bold text-theme-700 dark:text-zinc-400"
                 >
                   —
                 </p>
@@ -1061,7 +1061,7 @@ function localHint(next) {
                       </p>
                       <p
                         v-else
-                        class="mt-1 text-sm text-theme-700 dark:text-zinc-500"
+                        class="mt-1 text-sm text-theme-700 dark:text-zinc-400"
                       >
                         時間未設定
                       </p>
@@ -1416,7 +1416,7 @@ function localHint(next) {
               您可以使用以下連結來編輯或檢視此課表，請妥善保管此連結。
               <br />
               <span
-                class="inline-flex items-center gap-1 font-semibold text-red-600"
+                class="inline-flex items-center gap-1 font-semibold text-red-600 dark:text-red-400"
               >
                 <Icon name="exclamation-triangle" class="size-4" />
                 注意：任何擁有此連結的人都可以編輯您的課表。
@@ -1508,7 +1508,7 @@ function localHint(next) {
             v-if="pdfShare.state.value === 'failed'"
             role="alert"
             data-testid="schedule-print-error"
-            class="text-sm text-red-600"
+            class="text-sm text-red-600 dark:text-red-400"
           >
             無法產生 PDF，請稍後再試一次。
           </p>
