@@ -89,6 +89,8 @@ it('serves covers from the S3 disk URL and allows its origin in the CSP', functi
 });
 
 it('serves covers locally when no remote bucket is configured', function () {
+    config(['filesystems.disks.'.NewsletterIssue::COVER_DISK.'.disk' => 'public']);
+
     expect(NewsletterIssue::coverImageOrigin())->toBeNull();
 });
 
