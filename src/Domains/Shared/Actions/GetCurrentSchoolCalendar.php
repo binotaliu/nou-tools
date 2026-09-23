@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Shared\SchoolCalendar\Actions;
+namespace NouTools\Domains\Shared\Actions;
 
-use NouTools\Domains\Shared\SchoolCalendar\ViewModels\SchoolCalendarEventViewModel;
+use NouTools\Domains\Shared\ViewModels\SchoolCalendarEventViewModel;
 use Spatie\LaravelData\DataCollection;
 
 /**

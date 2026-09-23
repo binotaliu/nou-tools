@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use NouTools\Domains\Music\Actions\ReadAudioDuration;
+use NouTools\Domains\StudyRoom\Actions\ReadAudioDuration;
 
 it('reads the duration of an mp3 and an ogg file', function (string $file): void {
     expect(app(ReadAudioDuration::class)(base_path("tests/fixtures/audio/{$file}")))->toBe(2);

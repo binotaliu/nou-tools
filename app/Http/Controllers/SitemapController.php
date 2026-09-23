@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Response;
-use NouTools\Domains\Shared\Sitemap\Actions\GenerateSitemap;
+use NouTools\Domains\Shared\Actions\GenerateSitemap;
 
 final class SitemapController extends Controller
 {

@@ -7,7 +7,7 @@ namespace NouTools\Domains\Newsletter\Actions;
 use App\Models\NewsletterIssue;
 use Illuminate\Support\Facades\DB;
 use NouTools\Domains\Newsletter\DataTransferObjects\NewsletterIssueScheduleDTO;
-use NouTools\Domains\Shared\SchoolCalendar\Actions\ListSchoolEventsBetween;
+use NouTools\Domains\Shared\Actions\ListSchoolEventsBetween;
 
 final readonly class CreateNewsletterDraft
 {

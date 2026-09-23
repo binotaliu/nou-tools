@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Shared\Pdf;
+namespace NouTools\Domains\Shared\Contracts;
 
 interface HtmlToPdf
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Analytics\Actions;
+namespace NouTools\Domains\Shared\Actions;
 
 use App\Enums\AnalyticsConsentState;
 use Symfony\Component\HttpFoundation\Cookie;

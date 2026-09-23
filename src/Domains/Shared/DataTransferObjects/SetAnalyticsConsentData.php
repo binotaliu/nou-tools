@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Analytics\DataTransferObjects;
+namespace NouTools\Domains\Shared\DataTransferObjects;
 
 use Spatie\LaravelData\Data;
 

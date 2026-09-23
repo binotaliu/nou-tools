@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Analytics\Actions;
+namespace NouTools\Domains\Shared\Actions;
 
 use App\Enums\AnalyticsConsentState;
 use Illuminate\Http\Request;
-use NouTools\Domains\Analytics\DataTransferObjects\AnalyticsConsentResolution;
-use NouTools\Domains\Shared\Geo\Actions\ResolveVisitorCountry;
+use NouTools\Domains\Shared\DataTransferObjects\AnalyticsConsentResolution;
 
 /**
  * Single source of truth for whether GA analytics should be granted and

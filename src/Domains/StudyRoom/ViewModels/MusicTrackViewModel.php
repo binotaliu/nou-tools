@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Music\ViewModels;
+namespace NouTools\Domains\StudyRoom\ViewModels;
 
 use App\Models\MusicTrack;
 use Illuminate\Support\Facades\Storage;

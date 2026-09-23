@@ -41,8 +41,8 @@
 
     // Consent Mode v2 default: Taiwan is opt-out (granted unless the visitor
     // said otherwise), everywhere else is opt-in (denied by default). See
-    // NouTools\Domains\Analytics\Actions\ResolveAnalyticsConsent.
-    $analyticsConsentGranted = app(\NouTools\Domains\Analytics\Actions\ResolveAnalyticsConsent::class)(request())->state
+    // NouTools\Domains\Shared\Actions\ResolveAnalyticsConsent.
+    $analyticsConsentGranted = app(\NouTools\Domains\Shared\Actions\ResolveAnalyticsConsent::class)(request())->state
         === \App\Enums\AnalyticsConsentState::Granted;
 @endphp
 <!DOCTYPE html>

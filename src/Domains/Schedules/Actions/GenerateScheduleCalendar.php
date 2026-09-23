@@ -10,7 +10,7 @@ use App\Models\StudentSchedule;
 use DateTimeInterface;
 use Illuminate\Support\Facades\Date;
 use NouTools\Domains\Schedules\PageData\ScheduleCustomizationPageData;
-use NouTools\Domains\Shared\SchoolCalendar\Actions\GetCurrentSchoolCalendar;
+use NouTools\Domains\Shared\Actions\GetCurrentSchoolCalendar;
 
 final readonly class GenerateScheduleCalendar
 {

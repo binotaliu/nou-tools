@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Shared\Sitemap\Actions;
+namespace NouTools\Domains\Shared\Actions;
 
 use App\Enums\ArticleType;
 use App\Enums\DiscountStoreStatus;
@@ -12,7 +12,7 @@ use App\Models\NewsletterIssue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use NouTools\Domains\Articles\Actions\ShowArticlePage;
-use NouTools\Domains\Shared\Sitemap\ViewModels\SitemapUrlViewModel;
+use NouTools\Domains\Shared\ViewModels\SitemapUrlViewModel;
 
 final readonly class GenerateSitemap
 {

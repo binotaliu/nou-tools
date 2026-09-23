@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Shared\SchoolCalendar\Actions;
+namespace NouTools\Domains\Shared\Actions;
 
 final readonly class ListSchoolEventsBetween
 {

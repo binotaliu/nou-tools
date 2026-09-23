@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Shared\Geo\Actions;
+namespace NouTools\Domains\Shared\Actions;
 
 use Illuminate\Http\Request;
 

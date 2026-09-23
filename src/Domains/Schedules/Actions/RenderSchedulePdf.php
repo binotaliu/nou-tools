@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\Schedules\Actions;
 
 use Illuminate\Support\Facades\Cache;
-use NouTools\Domains\Shared\Pdf\HtmlToPdf;
+use NouTools\Domains\Shared\Contracts\HtmlToPdf;
 
 final readonly class RenderSchedulePdf
 {

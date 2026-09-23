@@ -19,7 +19,7 @@ use NouTools\Domains\Schedules\Actions\CreateSchedule;
 use NouTools\Domains\Schedules\Actions\ShowSchedulePage;
 use NouTools\Domains\Schedules\Actions\UpdateSchedule;
 use NouTools\Domains\Schedules\DataTransferObjects\StudentScheduleUpsertData;
-use NouTools\Domains\Shared\SchoolCalendar\Actions\ListUpcomingSchoolEvents;
+use NouTools\Domains\Shared\Actions\ListUpcomingSchoolEvents;
 
 final class ScheduleController extends Controller
 {

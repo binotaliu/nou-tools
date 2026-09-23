@@ -1,6 +1,6 @@
 <?php
 
-use NouTools\Domains\Shared\SchoolCalendar\Actions\ListUpcomingSchoolEvents;
+use NouTools\Domains\Shared\Actions\ListUpcomingSchoolEvents;
 
 // Status/daysUntil/which-event-is-the-countdown used to be computed here,
 // but now happen client-side (see window.nouToolsSchoolCalendar in

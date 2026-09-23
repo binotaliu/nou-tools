@@ -98,7 +98,7 @@ Pausing a Focus timer (`PauseStudyTimer` / `ResumeStudyTimer`, `seat.paused_at`)
 
 ## 背景音樂 (Music Library)
 
-Lives in `src/Domains/Music/` plus `App\Models\MusicTrack`/`MusicPlaylist`/`MusicPlaylistItem`; managed in Filament (`MusicTrackResource`, `MusicPlaylistResource`, group 自習室). The cassette player on the study room Wall consumes `GET /study-room/music/playlists` (`ListMusicPlaylists` → `MusicPlaylistListViewModel`).
+Lives in `src/Domains/StudyRoom/` (Actions/ViewModels, alongside the rest of the study room) plus `App\Models\MusicTrack`/`MusicPlaylist`/`MusicPlaylistItem`; managed in Filament (`MusicTrackResource`, `MusicPlaylistResource`, group 自習室). The cassette player on the study room Wall consumes `GET /study-room/music/playlists` (`ListMusicPlaylists` → `MusicPlaylistListViewModel`).
 
 - **Every track has both an mp3 and an ogg file** (both required); the browser picks whichever it can play. Duration is stored in seconds and read from the uploaded file by `ReadAudioDuration` (getID3): the mp3 fills it, the ogg only fills a blank, and the field stays editable.
 - **Files live on scoped, env-switchable disks** like the newsletter covers: `music_tracks` (`MUSIC_TRACKS_DISK`) and `music_playlist_covers` (`MUSIC_COVERS_DISK`), both `public` by default.

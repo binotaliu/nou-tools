@@ -33,7 +33,7 @@ use Mansoor\UnsplashPicker\Actions\UnsplashPickerAction;
 use NouTools\Domains\Newsletter\Actions\ListNewsletterCandidateAnnouncements;
 use NouTools\Domains\Newsletter\Actions\QueryNewsletterCandidateAnnouncements;
 use NouTools\Domains\Newsletter\Schedule\NewsletterCadence;
-use NouTools\Domains\Shared\SchoolCalendar\Actions\ListSchoolEventsBetween;
+use NouTools\Domains\Shared\Actions\ListSchoolEventsBetween;
 
 class NewsletterIssueForm
 {

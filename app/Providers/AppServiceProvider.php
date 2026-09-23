@@ -34,8 +34,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use NouTools\Domains\Schedules\Actions\ReadStudentScheduleCookie;
-use NouTools\Domains\Shared\Pdf\BrowsershotHtmlToPdf;
-use NouTools\Domains\Shared\Pdf\HtmlToPdf;
+use NouTools\Domains\Shared\Contracts\BrowsershotHtmlToPdf;
+use NouTools\Domains\Shared\Contracts\HtmlToPdf;
 
 final class AppServiceProvider extends ServiceProvider
 {

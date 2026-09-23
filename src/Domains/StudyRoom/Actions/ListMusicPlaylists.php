@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Music\Actions;
+namespace NouTools\Domains\StudyRoom\Actions;
 
 use App\Models\MusicPlaylist;
-use NouTools\Domains\Music\ViewModels\MusicPlaylistViewModel;
+use NouTools\Domains\StudyRoom\ViewModels\MusicPlaylistViewModel;
 
 /**
  * Every playlist that has at least one track, oldest first, with its tracks in

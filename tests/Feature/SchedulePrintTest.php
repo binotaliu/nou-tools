@@ -8,7 +8,7 @@ use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
 use Illuminate\Support\Str;
 use NouTools\Domains\Schedules\Actions\BuildSchedulePrintPage;
-use NouTools\Domains\Shared\Pdf\HtmlToPdf;
+use NouTools\Domains\Shared\Contracts\HtmlToPdf;
 
 function printableSchedule(array $courseAttributes = [], string $term = '2025B'): StudentSchedule
 {

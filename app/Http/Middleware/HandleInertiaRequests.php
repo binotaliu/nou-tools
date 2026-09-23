@@ -7,7 +7,7 @@ namespace App\Http\Middleware;
 use App\Enums\AnalyticsConsentState;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-use NouTools\Domains\Analytics\Actions\ResolveAnalyticsConsent;
+use NouTools\Domains\Shared\Actions\ResolveAnalyticsConsent;
 
 final class HandleInertiaRequests extends Middleware
 {

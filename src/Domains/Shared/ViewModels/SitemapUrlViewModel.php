@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Shared\Sitemap\ViewModels;
+namespace NouTools\Domains\Shared\ViewModels;
 
 use Carbon\CarbonInterface;
 use Spatie\LaravelData\Data;

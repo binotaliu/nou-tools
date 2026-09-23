@@ -1,6 +1,6 @@
 <?php
 
-use NouTools\Domains\Shared\SchoolCalendar\Actions\ListSchoolEventsBetween;
+use NouTools\Domains\Shared\Actions\ListSchoolEventsBetween;
 
 beforeEach(function () {
     config(['school-schedules' => [

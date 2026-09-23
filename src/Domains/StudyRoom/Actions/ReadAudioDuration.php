@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Music\Actions;
+namespace NouTools\Domains\StudyRoom\Actions;
 
 use getID3;
 use Throwable;

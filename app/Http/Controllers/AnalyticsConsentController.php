@@ -6,9 +6,9 @@ namespace App\Http\Controllers;
 
 use App\Enums\AnalyticsConsentState;
 use Illuminate\Http\JsonResponse;
-use NouTools\Domains\Analytics\Actions\BuildAnalyticsConsentCookie;
-use NouTools\Domains\Analytics\Actions\SetAnalyticsConsent;
-use NouTools\Domains\Analytics\DataTransferObjects\SetAnalyticsConsentData;
+use NouTools\Domains\Shared\Actions\BuildAnalyticsConsentCookie;
+use NouTools\Domains\Shared\Actions\SetAnalyticsConsent;
+use NouTools\Domains\Shared\DataTransferObjects\SetAnalyticsConsentData;
 
 final class AnalyticsConsentController extends Controller
 {

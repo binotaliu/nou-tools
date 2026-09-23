@@ -13,7 +13,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Arr;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
-use NouTools\Domains\Music\Actions\ReadAudioDuration;
+use NouTools\Domains\StudyRoom\Actions\ReadAudioDuration;
 
 class MusicTrackForm
 {

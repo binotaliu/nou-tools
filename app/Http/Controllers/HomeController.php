@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use NouTools\Domains\Home\Actions\ShowHomePage;
 use NouTools\Domains\Home\DataTransferObjects\ShowHomePageData;
-use NouTools\Domains\Shared\SchoolCalendar\Actions\ListUpcomingSchoolEvents;
+use NouTools\Domains\Shared\Actions\ListUpcomingSchoolEvents;
 use Symfony\Component\HttpFoundation\Response;
 
 final class HomeController extends Controller
