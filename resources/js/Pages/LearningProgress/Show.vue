@@ -21,6 +21,7 @@ import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import DateField from '../../Components/DateField.vue'
 import Greeting from '../../Components/Greeting.vue'
+import Select from '../../Components/Select.vue'
 import useLearningProgress from '../../Composables/useLearningProgress'
 import useLearningProgressViewMode from '../../Composables/useLearningProgressViewMode'
 
@@ -734,9 +735,9 @@ const csrfToken =
             class="p-2 md:hidden"
             data-testid="learning-progress-week-view"
           >
-            <select
+            <Select
               v-model.number="selectedWeekNum"
-              class="mb-3 w-full rounded-md border border-theme-200 bg-white px-3 py-2 text-sm text-theme-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              class="mb-3"
               data-testid="learning-progress-week-picker"
             >
               <option
@@ -747,7 +748,7 @@ const csrfToken =
                 第{{ toChineseNumber(week.num) }}週（{{ week.start }} -
                 {{ week.end }}）
               </option>
-            </select>
+            </Select>
 
             <div class="space-y-3">
               <article
@@ -801,9 +802,9 @@ const csrfToken =
             class="p-2 md:hidden"
             data-testid="learning-progress-subject-view"
           >
-            <select
+            <Select
               v-model.number="selectedCourseId"
-              class="mb-3 w-full rounded-md border border-theme-200 bg-white px-3 py-2 text-sm text-theme-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              class="mb-3"
               data-testid="learning-progress-subject-picker"
             >
               <option
@@ -813,7 +814,7 @@ const csrfToken =
               >
                 {{ course.name }}
               </option>
-            </select>
+            </Select>
 
             <div class="space-y-3">
               <article
