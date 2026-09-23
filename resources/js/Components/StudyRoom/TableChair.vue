@@ -55,13 +55,13 @@ onUnmounted(() => {
     >
       <span
         v-if="!seat.isOccupied"
-        class="text-[10px] font-medium text-theme-700 dark:text-zinc-400"
+        class="text-[0.625rem] font-medium text-theme-700 dark:text-zinc-400"
         >{{ seat.seatNumber }}</span
       >
       <span v-else class="text-base leading-none">{{ seat.emoji }}</span>
       <span
         v-show="grid.isMine(seat)"
-        class="absolute -top-1.5 -right-2 rounded-full bg-amber-500 px-1 text-[9px] leading-4 font-semibold text-white shadow-sm"
+        class="absolute -top-1.5 -right-2 rounded-full bg-amber-500 px-1 text-[0.5625rem] leading-4 font-semibold text-white shadow-sm"
         >你</span
       >
     </button>
@@ -69,7 +69,7 @@ onUnmounted(() => {
     <!-- Always rendered (not v-show'd out entirely) so the chair's height is
     reserved whether or not the seat is occupied. -->
     <span
-      class="font-mono text-[9px] tabular-nums"
+      class="font-mono text-[0.5625rem] tabular-nums"
       :class="seat.isOccupied ? grid.seatTimerLabelClass(seat) : 'invisible'"
       :data-testid="grid.seatTestId(seat) + '-timer'"
       >{{ seat.isOccupied ? timer.timerLabel(seat) : '00:00' }}</span
@@ -87,12 +87,12 @@ onUnmounted(() => {
         <span class="truncate">{{ seat.nickname }}</span>
       </p>
       <p
-        class="mt-1 text-[11px] leading-snug text-theme-700 dark:text-zinc-300"
+        class="mt-1 text-[0.6875rem] leading-snug text-theme-700 dark:text-zinc-300"
       >
         {{ grid.thoughtBubbleText(seat) }}
       </p>
       <p
-        class="mt-1 font-mono text-[11px] text-theme-700 tabular-nums dark:text-zinc-400"
+        class="mt-1 font-mono text-[0.6875rem] text-theme-700 tabular-nums dark:text-zinc-400"
       >
         剩餘 {{ timer.timerLabel(seat) }}
       </p>

@@ -61,7 +61,7 @@ function iconFor(value) {
           @change="$emit('update:modelValue', verb.value)"
         />
         <component :is="iconFor(verb.value)" class="size-5 sm:size-6" />
-        <span class="text-[11px] leading-tight font-medium sm:text-sm">{{
+        <span class="text-[0.6875rem] leading-tight font-medium sm:text-sm">{{
           verb.label
         }}</span>
       </label>
