@@ -3,6 +3,7 @@
 use App\Csp\DocsApiPolicy;
 use App\Enums\ArticleType;
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\AccessibilityController;
 use App\Http\Controllers\AltUuController;
 use App\Http\Controllers\AnalyticsConsentController;
 use App\Http\Controllers\AnnouncementController;
@@ -91,6 +92,8 @@ Route::redirect('/ai.txt', '/llms.txt', 301);
 Route::get('/alt-uu', AltUuController::class)->name('alt-uu');
 
 Route::get('/about', AboutController::class)->name('about');
+
+Route::get('/accessibility', AccessibilityController::class)->name('accessibility');
 
 Route::put('/analytics-consent', AnalyticsConsentController::class)
     ->name('analytics-consent.update')

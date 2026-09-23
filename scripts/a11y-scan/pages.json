@@ -9,6 +9,10 @@
     "path": "/about"
   },
   {
+    "name": "accessibility",
+    "path": "/accessibility"
+  },
+  {
     "name": "announcements",
     "path": "/announcements"
   },
