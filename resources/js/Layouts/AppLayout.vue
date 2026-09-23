@@ -177,7 +177,7 @@ const bottomMoreItems = computed(() =>
         <div class="flex min-h-9.5 items-center gap-2">
           <nav
             data-testid="header-nav"
-            class="hidden items-center gap-1 gap-x-6 md:flex print:hidden bottom-nav:hidden"
+            class="hidden flex-wrap items-center justify-end gap-1 gap-x-6 lg:flex print:hidden bottom-nav:hidden"
           >
             <Link
               v-for="item in navItems"
@@ -243,7 +243,7 @@ const bottomMoreItems = computed(() =>
           <button
             type="button"
             data-testid="header-menu-toggle"
-            class="inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none md:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 bottom-nav:hidden"
+            class="inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none lg:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 bottom-nav:hidden"
             :aria-expanded="mobileMenuOpen.toString()"
             @click="mobileMenuOpen = !mobileMenuOpen"
           >
@@ -257,7 +257,7 @@ const bottomMoreItems = computed(() =>
 
       <div
         v-show="mobileMenuOpen"
-        class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-theme-200 bg-white p-3 shadow-lg md:hidden dark:border-zinc-700 dark:bg-zinc-900 print:hidden bottom-nav:hidden"
+        class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-theme-200 bg-white p-3 shadow-lg lg:hidden dark:border-zinc-700 dark:bg-zinc-900 print:hidden bottom-nav:hidden"
       >
         <Link
           v-for="item in navItems"
