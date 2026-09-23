@@ -7,11 +7,20 @@
 //   node scripts/a11y-scan/scan.mjs --schedule="https://nou-tools.test/schedules/yXvI..." --only=home,study-room-authed
 //   node scripts/a11y-scan/scan.mjs --base-url=https://nou-tools.test --tags=wcag2a,wcag2aa,wcag21aa
 //   node scripts/a11y-scan/scan.mjs --no-html   # skip HTML report generation, JSON only
+//   node scripts/a11y-scan/scan.mjs --themes=light   # skip the dark-mode pass
 //
 // Writes results/index.html (an aggregated overview linking each page's own
 // axe-html-reporter report under results/html/, and its Playwright
 // ariaSnapshot() tree under results/a11y-tree/) unless --no-html is passed.
 // Each page's raw ariaSnapshot() is also written to results/{name}.snapshot.txt.
+//
+// Every page is scanned once per --themes entry (default: light,dark) by
+// emulating prefers-color-scheme before navigating — app.blade.php's
+// anti-flash-of-wrong-theme script honors that media query whenever
+// localStorage has no explicit override, which is the case here since each
+// scan runs in a fresh browser context. The light pass keeps each page's
+// bare name (e.g. `home`); the dark pass is suffixed (`home-dark`) so
+// existing filenames/tooling for the light results are unaffected.
 //
 // Pages are declared in scripts/a11y-scan/pages.json:
 //   - plain entries just need a `path`.
@@ -45,6 +54,7 @@ function parseArgs(argv) {
     only: null,
     tags: ['wcag2a', 'wcag2aa', 'wcag21aa'],
     html: true,
+    themes: ['light', 'dark'],
   }
 
   for (const arg of argv) {
@@ -56,6 +66,7 @@ function parseArgs(argv) {
     else if (key === 'only') args.only = value.split(',').map(s => s.trim())
     else if (key === 'tags') args.tags = value.split(',').map(s => s.trim())
     else if (key === 'no-html') args.html = false
+    else if (key === 'themes') args.themes = value.split(',').map(s => s.trim())
   }
 
   return args
@@ -93,9 +104,15 @@ function loadPages(only) {
   return only ? all.filter(p => only.includes(p.name)) : all
 }
 
-async function scanPage(context, axeSource, tags, baseUrl, page) {
+async function scanPage(context, axeSource, tags, baseUrl, page, theme) {
   const tab = await context.newPage()
   try {
+    // Must be set before goto(): app.blade.php's anti-flash-of-wrong-theme
+    // script reads prefers-color-scheme synchronously on first paint, and it
+    // only wins over an explicit choice when localStorage has none — true
+    // here since every scan starts a fresh, storage-less browser context.
+    await tab.emulateMedia({ colorScheme: theme })
+
     // 'load' rather than 'networkidle': pages with a live map (Leaflet tile
     // requests) or other persistent polling never go network-idle, so
     // networkidle would time out on those pages. A short settle delay after
@@ -209,6 +226,7 @@ function renderIndexHtml({ summary, contrastPairs, baseUrl, generatedAt }) {
       if (!s.ok) {
         return `<tr class="error-row">
           <td>${escapeHtml(s.page)}</td>
+          <td>${escapeHtml(s.theme ?? '')}</td>
           <td><code>${escapeHtml(s.url)}</code></td>
           <td colspan="3" class="error-cell">${escapeHtml(s.error)}</td>
         </tr>`
@@ -221,6 +239,7 @@ function renderIndexHtml({ summary, contrastPairs, baseUrl, generatedAt }) {
         .join(' ')
       return `<tr>
         <td><a href="html/${encodeURIComponent(s.page)}.html">${escapeHtml(s.page)}</a></td>
+        <td>${escapeHtml(s.theme ?? '')}</td>
         <td><code>${escapeHtml(s.url)}</code></td>
         <td>${s.violations.length}</td>
         <td>${impactBadges || '<span class="ok">—</span>'}</td>
@@ -285,7 +304,7 @@ function renderIndexHtml({ summary, contrastPairs, baseUrl, generatedAt }) {
 
   <h2>Pages</h2>
   <table>
-    <thead><tr><th>Page</th><th>URL</th><th>Violation types</th><th>Details</th><th>A11y tree</th></tr></thead>
+    <thead><tr><th>Page</th><th>Theme</th><th>URL</th><th>Violation types</th><th>Details</th><th>A11y tree</th></tr></thead>
     <tbody>
 ${pageRows}
     </tbody>
@@ -331,6 +350,17 @@ async function main() {
     )
   }
 
+  // Cartesian product of runnable pages × themes. The light pass keeps each
+  // page's bare name so existing filenames/tooling are unaffected; other
+  // themes get a `-{theme}` suffix.
+  const runs = runnable.flatMap(p =>
+    args.themes.map(theme => ({
+      ...p,
+      theme,
+      resultName: theme === 'light' ? p.name : `${p.name}-${theme}`,
+    }))
+  )
+
   fs.mkdirSync(args.out, { recursive: true })
 
   const browser = await chromium.launch({ headless: true })
@@ -347,27 +377,28 @@ async function main() {
   const axeSource = fs.readFileSync(axeSourcePath, 'utf8')
   const perPageResults = []
 
-  for (const p of runnable) {
+  for (const run of runs) {
     const outcome = await scanPage(
       context,
       axeSource,
       args.tags,
       args.baseUrl,
-      p
+      run,
+      run.theme
     )
-    perPageResults.push([p.name, outcome])
+    perPageResults.push([run.resultName, outcome])
 
     if (!outcome.ok) {
-      console.log(`✘ ${p.name} (${p.url}): ${outcome.error}`)
+      console.log(`✘ ${run.resultName} (${run.url}): ${outcome.error}`)
       continue
     }
 
     fs.writeFileSync(
-      path.join(args.out, `${p.name}.json`),
+      path.join(args.out, `${run.resultName}.json`),
       JSON.stringify(outcome.results, null, 2)
     )
     fs.writeFileSync(
-      path.join(args.out, `${p.name}.snapshot.txt`),
+      path.join(args.out, `${run.resultName}.snapshot.txt`),
       outcome.snapshot
     )
 
@@ -375,10 +406,10 @@ async function main() {
       createHtmlReport({
         results: outcome.results,
         options: {
-          projectKey: p.name,
+          projectKey: run.resultName,
           outputDirPath: args.out,
           outputDir: 'html',
-          reportFileName: `${p.name}.html`,
+          reportFileName: `${run.resultName}.html`,
           doNotCreateReportFile: false,
         },
       })
@@ -386,17 +417,17 @@ async function main() {
       const snapshotDir = path.join(args.out, 'a11y-tree')
       fs.mkdirSync(snapshotDir, { recursive: true })
       fs.writeFileSync(
-        path.join(snapshotDir, `${p.name}.html`),
+        path.join(snapshotDir, `${run.resultName}.html`),
         renderSnapshotHtml({
-          pageName: p.name,
-          url: p.url,
+          pageName: run.resultName,
+          url: run.url,
           snapshot: outcome.snapshot,
         })
       )
     }
 
     console.log(
-      `✔ ${p.name} (${p.url}) — ${outcome.results.violations.length} violation type(s)`
+      `✔ ${run.resultName} (${run.url}) — ${outcome.results.violations.length} violation type(s)`
     )
   }
 
@@ -404,7 +435,8 @@ async function main() {
 
   const summary = perPageResults.map(([name, outcome]) => ({
     page: name,
-    url: runnable.find(p => p.name === name).url,
+    url: runs.find(r => r.resultName === name).url,
+    theme: runs.find(r => r.resultName === name).theme,
     ok: outcome.ok,
     error: outcome.ok ? undefined : outcome.error,
     violations: outcome.ok
