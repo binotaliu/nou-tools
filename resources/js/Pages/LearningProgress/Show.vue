@@ -260,6 +260,60 @@ function homeworkLabel(number) {
   return number === 1 ? '作業一' : '作業二'
 }
 
+// --- 依週次/依科目 prev/next switches ---
+// Weeks clamp at the semester's edges (no wrap); subjects wrap around, since
+// there's no "first"/"last" ordering meaningful to the reader the way weeks
+// have.
+const selectedWeekIndex = computed(() =>
+  props.viewModel.weeks.findIndex(week => week.num === selectedWeekNum.value)
+)
+
+const previousWeek = computed(() => {
+  const index = selectedWeekIndex.value
+
+  return index > 0 ? props.viewModel.weeks[index - 1] : null
+})
+
+const nextWeek = computed(() => {
+  const index = selectedWeekIndex.value
+
+  return index >= 0 && index < props.viewModel.weeks.length - 1
+    ? props.viewModel.weeks[index + 1]
+    : null
+})
+
+function weekNavLabel(week) {
+  return `第${toChineseNumber(week.num)}週`
+}
+
+const selectedCourseIndex = computed(() =>
+  props.viewModel.courses.findIndex(
+    course => course.id === selectedCourseId.value
+  )
+)
+
+const previousCourse = computed(() => {
+  const courses = props.viewModel.courses
+  const index = selectedCourseIndex.value
+
+  if (index < 0 || courses.length === 0) {
+    return null
+  }
+
+  return courses[(index - 1 + courses.length) % courses.length]
+})
+
+const nextCourse = computed(() => {
+  const courses = props.viewModel.courses
+  const index = selectedCourseIndex.value
+
+  if (index < 0 || courses.length === 0) {
+    return null
+  }
+
+  return courses[(index + 1) % courses.length]
+})
+
 function updateHomeworkDeadline(courseId, number, value) {
   homework[courseId][number].deadline = value
   hasUnsavedChanges.value = true
@@ -812,6 +866,47 @@ const csrfToken =
               </Select>
             </div>
 
+            <div
+              class="mb-3 flex items-center gap-2"
+              data-testid="learning-progress-week-nav"
+            >
+              <button
+                type="button"
+                class="flex flex-1 items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
+                data-testid="learning-progress-week-prev"
+                aria-label="上一週"
+                :disabled="!previousWeek"
+                @click="previousWeek && (selectedWeekNum = previousWeek.num)"
+              >
+                <Icon name="chevron-left" class="size-4 shrink-0" />
+                <span class="truncate">{{
+                  previousWeek ? weekNavLabel(previousWeek) : '—'
+                }}</span>
+              </button>
+              <button
+                v-if="currentWeek !== null && currentWeek !== selectedWeekNum"
+                type="button"
+                class="shrink-0 rounded-md border border-theme-200 px-3 py-2 text-sm font-medium text-theme-700 dark:border-zinc-700 dark:text-zinc-300"
+                data-testid="learning-progress-week-current"
+                @click="selectedWeekNum = currentWeek"
+              >
+                本週
+              </button>
+              <button
+                type="button"
+                class="flex flex-1 items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
+                data-testid="learning-progress-week-next"
+                aria-label="下一週"
+                :disabled="!nextWeek"
+                @click="nextWeek && (selectedWeekNum = nextWeek.num)"
+              >
+                <span class="truncate">{{
+                  nextWeek ? weekNavLabel(nextWeek) : '—'
+                }}</span>
+                <Icon name="chevron-right" class="size-4 shrink-0" />
+              </button>
+            </div>
+
             <div class="space-y-3">
               <article
                 v-for="course in viewModel.courses"
@@ -879,6 +974,40 @@ const csrfToken =
                   {{ course.name }}
                 </option>
               </Select>
+            </div>
+
+            <div
+              class="mb-3 grid grid-cols-2 gap-2"
+              data-testid="learning-progress-subject-nav"
+            >
+              <button
+                type="button"
+                class="flex items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
+                data-testid="learning-progress-subject-prev"
+                aria-label="上一科"
+                :disabled="!previousCourse"
+                @click="
+                  previousCourse && (selectedCourseId = previousCourse.id)
+                "
+              >
+                <Icon name="chevron-left" class="size-4 shrink-0" />
+                <span class="truncate">{{
+                  previousCourse ? previousCourse.name : '—'
+                }}</span>
+              </button>
+              <button
+                type="button"
+                class="flex items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
+                data-testid="learning-progress-subject-next"
+                aria-label="下一科"
+                :disabled="!nextCourse"
+                @click="nextCourse && (selectedCourseId = nextCourse.id)"
+              >
+                <span class="truncate">{{
+                  nextCourse ? nextCourse.name : '—'
+                }}</span>
+                <Icon name="chevron-right" class="size-4 shrink-0" />
+              </button>
             </div>
 
             <div class="space-y-3">
