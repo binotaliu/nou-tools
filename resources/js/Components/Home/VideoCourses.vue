@@ -9,6 +9,7 @@ import { Link } from '@inertiajs/vue3'
 import Icon from '../Icon.vue'
 import DateField from '../DateField.vue'
 import useDatePicker from '../../Composables/useDatePicker'
+import { localTimeHint } from '../../Composables/useLocalTimeHint'
 import useSessionClock, {
   sessionState,
 } from '../../Composables/useSessionClock'
@@ -142,6 +143,9 @@ const statusBadges = {
       'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300',
   },
 }
+
+const localHintOf = slot =>
+  localTimeHint(props.selectedDate, slot.startTime, slot.endTime)
 
 const stateOf = slot =>
   sessionState(props.selectedDate, slot.startTime, slot.endTime, now.value)
@@ -291,6 +295,13 @@ const classTotal = computed(() =>
               >
                 <Icon name="clock" class="size-3.5" />
                 {{ slot.timeLabel }}
+              </span>
+              <span
+                v-if="localHintOf(slot)"
+                class="text-xs text-theme-700 dark:text-zinc-400"
+                data-testid="video-course-local-time"
+              >
+                {{ localHintOf(slot) }}
               </span>
             </div>
 

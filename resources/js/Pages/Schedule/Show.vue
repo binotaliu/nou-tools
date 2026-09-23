@@ -25,6 +25,7 @@ import usePwaStandalone from '../../Composables/usePwaStandalone'
 import usePushSubscription from '../../Composables/usePushSubscription'
 import useCopyLink from '../../Composables/useCopyLink'
 import useSchedulePdfShare from '../../Composables/useSchedulePdfShare'
+import { localTimeHint } from '../../Composables/useLocalTimeHint'
 
 const props = defineProps({
   viewModel: {
@@ -392,26 +393,7 @@ function taipeiTime(next) {
 // Taipei. Includes the local date when it lands on a different day than
 // the Taipei date.
 function localHint(next) {
-  if (!next.startTime) {
-    return null
-  }
-
-  const T = window.NouTime
-  const start = new Date(next.instantStart)
-  const end = new Date(next.instantEnd)
-
-  if (!T.differsFromTaipei(start)) {
-    return null
-  }
-
-  let datePrefix = ''
-  const localStartYmd = T.localYmd(start)
-
-  if (localStartYmd !== next.ymd) {
-    datePrefix = `${T.monthDay(localStartYmd)} (${T.weekdayFromYmd(localStartYmd)}) `
-  }
-
-  return `你的時間 · ${datePrefix}${T.localHM(start)} ~ ${T.localHM(end)} (${T.gmtLabel(start)})`
+  return localTimeHint(next.ymd, next.startTime, next.endTime)
 }
 </script>
 

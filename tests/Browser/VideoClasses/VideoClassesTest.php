@@ -88,3 +88,23 @@ it('shows no badge for a class hours away', function () {
         ->assertSee('還很久的課')
         ->assertMissing('[data-testid="video-course-status"]');
 });
+
+it('shows a "your time" hint to a viewer outside UTC+8', function () {
+    $date = Carbon::now('Asia/Taipei')->addDays(3)->toDateString();
+    videoClassAt('海外同學的課', $date, '09:00', '10:50');
+
+    // Asia/Kolkata is a fixed UTC+5:30, so 09:00-10:50 in Taipei is 06:30-08:20.
+    visit(route('video-classes.index', ['date' => $date]))
+        ->withTimezone('Asia/Kolkata')
+        ->assertSeeIn('[data-testid="video-course-local-time"]', '你的時間 · 06:30 ~ 08:20 (GMT+5:30)');
+});
+
+it('shows no "your time" hint to a viewer in Taipei time', function () {
+    $date = Carbon::now('Asia/Taipei')->addDays(3)->toDateString();
+    videoClassAt('本地同學的課', $date, '09:00', '10:50');
+
+    visit(route('video-classes.index', ['date' => $date]))
+        ->withTimezone('Asia/Taipei')
+        ->assertSee('本地同學的課')
+        ->assertMissing('[data-testid="video-course-local-time"]');
+});
