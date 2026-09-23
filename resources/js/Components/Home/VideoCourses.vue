@@ -130,6 +130,19 @@ const groupedCourses = computed(() =>
   })
 )
 
+const statusBadges = {
+  live: {
+    label: '上課中',
+    classes:
+      'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300',
+  },
+  soon: {
+    label: '即將開始',
+    classes:
+      'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300',
+  },
+}
+
 const stateOf = slot =>
   sessionState(props.selectedDate, slot.startTime, slot.endTime, now.value)
 
@@ -253,10 +266,25 @@ const classTotal = computed(() =>
             <div
               class="flex shrink-0 items-center gap-2 sm:w-36 sm:flex-col sm:items-start sm:gap-1 sm:pt-1.5"
             >
-              <span
-                class="rounded-full bg-theme-100 px-2 py-0.5 text-xs font-medium text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
-              >
-                {{ slot.label }}
+              <span class="flex flex-wrap items-center gap-1">
+                <span
+                  class="rounded-full bg-theme-100 px-2 py-0.5 text-xs font-medium text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
+                >
+                  {{ slot.label }}
+                </span>
+                <span
+                  v-if="statusBadges[stateOf(slot)]"
+                  class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
+                  :class="statusBadges[stateOf(slot)].classes"
+                  :data-state="stateOf(slot)"
+                  data-testid="video-course-status"
+                >
+                  <span
+                    class="size-1.5 rounded-full bg-current motion-safe:animate-pulse"
+                    aria-hidden="true"
+                  />
+                  {{ statusBadges[stateOf(slot)].label }}
+                </span>
               </span>
               <span
                 class="inline-flex items-center gap-1 text-sm text-theme-700 tabular-nums dark:text-zinc-400"

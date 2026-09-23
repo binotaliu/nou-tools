@@ -50,3 +50,41 @@ it('never hides courses on a future date', function () {
         ->assertSee('未來的課')
         ->assertMissing('[data-testid="video-courses-all-ended"]');
 });
+
+// The badges follow the browser's real clock, so the class is placed around
+// "now" in Taipei time. Near midnight the window would spill into another
+// date, so those runs are skipped rather than made flaky.
+function videoClassAroundNow(string $courseName, int $startOffsetMinutes, int $endOffsetMinutes): void
+{
+    $now = Carbon::now('Asia/Taipei');
+    $start = $now->copy()->addMinutes($startOffsetMinutes);
+    $end = $now->copy()->addMinutes($endOffsetMinutes);
+
+    if ($start->toDateString() !== $now->toDateString() || $end->toDateString() !== $now->toDateString()) {
+        test()->markTestSkipped('Too close to midnight in Taipei.');
+    }
+
+    videoClassAt($courseName, $now->toDateString(), $start->format('H:i'), $end->format('H:i'));
+}
+
+it('marks a class that is running as 上課中', function () {
+    videoClassAroundNow('進行中的課', -20, 80);
+
+    visit(route('video-classes.index'))
+        ->assertSeeIn('[data-testid="video-course-status"][data-state="live"]', '上課中');
+});
+
+it('marks a class about to begin as 即將開始', function () {
+    videoClassAroundNow('快開始的課', 15, 115);
+
+    visit(route('video-classes.index'))
+        ->assertSeeIn('[data-testid="video-course-status"][data-state="soon"]', '即將開始');
+});
+
+it('shows no badge for a class hours away', function () {
+    videoClassAroundNow('還很久的課', 180, 280);
+
+    visit(route('video-classes.index'))
+        ->assertSee('還很久的課')
+        ->assertMissing('[data-testid="video-course-status"]');
+});
