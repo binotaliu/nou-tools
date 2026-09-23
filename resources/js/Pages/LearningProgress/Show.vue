@@ -513,7 +513,7 @@ const csrfToken =
             @scroll="onFormScroll"
           >
             <table
-              class="w-full min-w-4xl table-fixed border-collapse rounded print:min-w-0"
+              class="w-[max(100%,calc(6rem+var(--courses-count)*9rem))] table-fixed border-collapse rounded print:w-full print:min-w-0"
             >
               <thead class="print:table-header-group">
                 <tr
@@ -582,7 +582,7 @@ const csrfToken =
                       :key="course.id"
                     >
                       <td
-                        class="border border-theme-300 bg-white text-center last:border-r-0 dark:border-zinc-600 dark:bg-zinc-900 [&:has(input:checked)]:bg-theme-50 dark:[&:has(input:checked)]:bg-zinc-950"
+                        class="border border-theme-300 bg-white text-center last:border-r-0 dark:border-zinc-600 dark:bg-zinc-900 [&:has(input:checked)]:bg-white dark:[&:has(input:checked)]:bg-zinc-900"
                       >
                         <label
                           class="group flex h-full w-full cursor-pointer items-center justify-center gap-1 px-2 py-3"
