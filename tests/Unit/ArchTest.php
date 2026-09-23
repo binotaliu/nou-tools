@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use App\Models\ChangelogPost;
 use App\Models\ClassSchedule;
 use App\Models\Course;
 use App\Models\CourseClass;
@@ -42,6 +43,7 @@ arch()->preset()->strict()
 
         // Override Eloquent's protected `casts()` / `booted()` hooks, per Laravel convention.
         Announcement::class,
+        ChangelogPost::class,
         ClassSchedule::class,
         Course::class,
         CourseClass::class,
