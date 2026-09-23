@@ -202,6 +202,20 @@
     color-scheme: dark;
   }
 
+  /* Reader-chosen text size (useFontSize). Percentages keep the browser's own
+   * default size as the base; every rem-based utility scales with it. */
+  html[data-font-size='large'] {
+    font-size: 112.5%;
+  }
+
+  html[data-font-size='xlarge'] {
+    font-size: 125%;
+  }
+
+  html[data-font-size='xxlarge'] {
+    font-size: 150%;
+  }
+
   html[data-accent='ocean'] {
     --color-theme-50: oklch(0.98 0.01 230);
     --color-theme-100: oklch(0.96 0.02 230);

@@ -86,6 +86,11 @@
             if (accent) {
                 document.documentElement.dataset.accent = accent
             }
+
+            const fontSize = localStorage.getItem('font-size')
+            if (fontSize) {
+                document.documentElement.dataset.fontSize = fontSize
+            }
         })()
     </script>
 
