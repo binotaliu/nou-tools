@@ -1,0 +1,54 @@
+[
+  { "name": "home", "path": "/" },
+  { "name": "about", "path": "/about" },
+  { "name": "announcements", "path": "/announcements" },
+  { "name": "newsletter", "path": "/newsletter" },
+  { "name": "discount-stores", "path": "/discount-stores" },
+  { "name": "discount-stores-create", "path": "/discount-stores/create" },
+  { "name": "course-schedule", "path": "/courses/schedule" },
+  { "name": "directory", "path": "/directory" },
+  { "name": "settings", "path": "/settings" },
+  { "name": "schedules-create", "path": "/schedules/create" },
+  { "name": "schedules-find", "path": "/schedules/my" },
+  { "name": "study-room-guest", "path": "/study-room" },
+
+  {
+    "name": "schedule-show",
+    "path": "/schedules/{schedule}",
+    "needsSchedule": true
+  },
+  {
+    "name": "schedule-customize",
+    "path": "/schedules/{schedule}/customize",
+    "needsSchedule": true
+  },
+  {
+    "name": "schedule-edit",
+    "path": "/schedules/{schedule}/edit",
+    "needsSchedule": true
+  },
+  {
+    "name": "schedule-print",
+    "path": "/schedules/{schedule}/print",
+    "needsSchedule": true
+  },
+
+  {
+    "name": "schedules-my-remembered",
+    "path": "/schedules/my",
+    "needsSchedule": true,
+    "auth": true
+  },
+  {
+    "name": "schedules-my-learning-progress",
+    "path": "/schedules/my/learning-progress",
+    "needsSchedule": true,
+    "auth": true
+  },
+  {
+    "name": "study-room-authed",
+    "path": "/study-room",
+    "needsSchedule": true,
+    "auth": true
+  }
+]
