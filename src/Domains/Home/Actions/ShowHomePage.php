@@ -15,11 +15,12 @@ final readonly class ShowHomePage
     public function __construct(
         private ReadStudentScheduleCookie $readStudentScheduleCookie,
         private ListVideoCourses $listVideoCourses,
+        private ResolveVideoCourseDate $resolveVideoCourseDate,
     ) {}
 
     public function __invoke(ShowHomePageData $input, Request $request): HomePageData
     {
-        $selectedDate = $this->listVideoCourses->resolveSelectedDate($input->date);
+        $selectedDate = ($this->resolveVideoCourseDate)($input->date);
 
         return new HomePageData(
             selectedDate: $selectedDate,

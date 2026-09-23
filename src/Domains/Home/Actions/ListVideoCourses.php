@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace NouTools\Domains\Home\Actions;
 
 use App\Models\Course;
-use Illuminate\Support\Facades\Date;
 use NouTools\Domains\Home\ViewModels\HomeCourseViewModel;
 use Spatie\LaravelData\DataCollection;
 
@@ -38,16 +37,5 @@ final readonly class ListVideoCourses
             $courses->map(fn (Course $course) => HomeCourseViewModel::fromModel($course)),
             DataCollection::class,
         );
-    }
-
-    public function resolveSelectedDate(?string $date): string
-    {
-        try {
-            return $date
-                ? Date::createFromFormat('Y-m-d', $date, 'Asia/Taipei')->format('Y-m-d')
-                : Date::now('Asia/Taipei')->format('Y-m-d');
-        } catch (\Exception) {
-            return Date::now('Asia/Taipei')->format('Y-m-d');
-        }
     }
 }
