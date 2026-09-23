@@ -6,6 +6,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import Select from '../../Components/Select.vue'
 
 const props = defineProps({
   viewModel: {
@@ -327,29 +328,21 @@ const creditsDropdown = useDropdown()
         </div>
 
         <div class="w-full sm:w-auto sm:min-w-40">
-          <div class="relative">
-            <select
-              id="term"
-              name="term"
-              aria-label="選擇學期"
-              class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
-              :value="viewModel.selectedTerm"
-              @change="selectTerm($event.target.value)"
+          <Select
+            id="term"
+            name="term"
+            aria-label="選擇學期"
+            :model-value="viewModel.selectedTerm"
+            @update:model-value="selectTerm"
+          >
+            <option
+              v-for="term in viewModel.availableTerms"
+              :key="term"
+              :value="term"
             >
-              <option
-                v-for="term in viewModel.availableTerms"
-                :key="term"
-                :value="term"
-              >
-                {{ toSemesterDisplay(term) }}
-              </option>
-            </select>
-            <div
-              class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
-            >
-              <Icon name="chevron-down" class="size-5 text-gray-400" />
-            </div>
-          </div>
+              {{ toSemesterDisplay(term) }}
+            </option>
+          </Select>
         </div>
       </div>
 
@@ -384,24 +377,16 @@ const creditsDropdown = useDropdown()
             >
               分組方式
             </label>
-            <div class="relative">
-              <select
-                id="groupBy"
-                v-model="groupBy"
-                aria-label="分組方式"
-                data-testid="group-by-select"
-                class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
-              >
-                <option value="exam">考試時間</option>
-                <option value="department">學系</option>
-                <option value="credits">學分數</option>
-              </select>
-              <div
-                class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
-              >
-                <Icon name="chevron-down" class="size-5 text-gray-400" />
-              </div>
-            </div>
+            <Select
+              id="groupBy"
+              v-model="groupBy"
+              aria-label="分組方式"
+              data-testid="group-by-select"
+            >
+              <option value="exam">考試時間</option>
+              <option value="department">學系</option>
+              <option value="credits">學分數</option>
+            </Select>
           </div>
           <div>
             <label
