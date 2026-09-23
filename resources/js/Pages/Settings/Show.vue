@@ -1,5 +1,5 @@
 <script setup>
-// Appearance is stored per device in localStorage by the theme composables, so
+// Appearance (theme, accent, font size) is stored per device in localStorage by the composables, so
 // the server sends nothing for it. The installed phone PWA hides the header's
 // theme popover, so this page (linked from the bottom bar's 更多 sheet) is
 // where it lives there.

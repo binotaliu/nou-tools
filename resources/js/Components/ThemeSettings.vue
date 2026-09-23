@@ -1,9 +1,10 @@
 <script setup>
-// The light/dark/system tab-list and accent-color swatch picker. Shared by the
-// header's ThemeSwitcherPopover and the 設定 page so both stay identical.
+// The light/dark/system tab-list, accent-color swatch picker and font-size
+// picker. Shared by the header's ThemeSwitcherPopover and the 設定 page so both stay identical.
 import Icon from './Icon.vue'
 import useThemeSwitcher from '../Composables/useThemeSwitcher'
 import useAccentColor, { ACCENTS } from '../Composables/useAccentColor'
+import useFontSize, { FONT_SIZES } from '../Composables/useFontSize'
 
 defineProps({
   // Bigger swatches for the full 設定 page; the header popover stays compact.
@@ -12,6 +13,7 @@ defineProps({
 
 const { theme, setTheme } = useThemeSwitcher()
 const { accent, setAccent } = useAccentColor()
+const { fontSize, setFontSize } = useFontSize()
 
 const MODES = [
   { value: 'system', label: '系統' },
@@ -82,6 +84,41 @@ const MODES = [
             :class="large ? 'size-5 sm:size-6' : 'size-4'"
             class="text-white"
           />
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <p
+        id="theme-font-size-label"
+        class="mb-2 text-xs font-medium text-theme-700 dark:text-zinc-400"
+      >
+        文字大小
+      </p>
+      <div
+        role="radiogroup"
+        aria-labelledby="theme-font-size-label"
+        class="grid grid-cols-4 gap-1 rounded-md bg-theme-100 p-1 dark:bg-zinc-800"
+      >
+        <button
+          v-for="size in FONT_SIZES"
+          :key="size.value"
+          type="button"
+          role="radio"
+          :aria-checked="(fontSize === size.value).toString()"
+          class="rounded px-1 py-1.5 text-sm font-medium transition-colors"
+          :class="
+            fontSize === size.value
+              ? 'bg-white text-theme-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100'
+              : 'text-theme-700 hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+          "
+          :data-testid="`font-size-${size.value}`"
+          data-analytics-event="theme_font_size_change"
+          data-analytics-feature="theme"
+          :data-analytics-label="size.value"
+          @click="setFontSize(size.value)"
+        >
+          {{ size.label }}
         </button>
       </div>
     </div>

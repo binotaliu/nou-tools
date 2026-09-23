@@ -1,5 +1,6 @@
 <script setup>
-// Header trigger that opens a panel with the theme controls (ThemeSettings).
+// Header trigger that opens a panel with the appearance controls (ThemeSettings:
+// mode, accent color, font size).
 // Replaces the old icon-only cycle button.
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import Icon from './Icon.vue'
@@ -47,14 +48,14 @@ onBeforeUnmount(() => {
       :aria-expanded="open.toString()"
       @click="toggle()"
     >
-      <span class="sr-only">切換佈景主題</span>
+      <span class="sr-only">外觀與文字大小設定</span>
 
       <Icon name="paint-brush" class="size-5" />
     </button>
 
     <div
       v-show="open"
-      class="absolute top-full right-0 z-10 mt-2 w-64 rounded-md border border-theme-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+      class="absolute top-full right-0 z-10 mt-2 w-72 rounded-md border border-theme-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
     >
       <ThemeSettings />
     </div>
