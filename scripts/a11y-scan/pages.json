@@ -5,12 +5,23 @@
   { "name": "newsletter", "path": "/newsletter" },
   { "name": "discount-stores", "path": "/discount-stores" },
   { "name": "discount-stores-create", "path": "/discount-stores/create" },
+  { "name": "discount-stores-submitted", "path": "/discount-stores/submitted" },
+  { "name": "discount-stores-show", "path": "/discount-stores/1" },
   { "name": "course-schedule", "path": "/courses/schedule" },
+  { "name": "course-show", "path": "/courses/117" },
   { "name": "directory", "path": "/directory" },
   { "name": "settings", "path": "/settings" },
   { "name": "schedules-create", "path": "/schedules/create" },
   { "name": "schedules-find", "path": "/schedules/my" },
   { "name": "study-room-guest", "path": "/study-room" },
+  { "name": "newsletter-show", "path": "/newsletter/2026-W39" },
+  { "name": "article-kb-index", "path": "/kb" },
+  { "name": "article-kb-show", "path": "/kb/about-nou" },
+  { "name": "article-manual-index", "path": "/manual" },
+  { "name": "article-manual-show", "path": "/manual/welcome" },
+  { "name": "pwa-install", "path": "/install" },
+  { "name": "offline", "path": "/offline" },
+  { "name": "alt-uu", "path": "/alt-uu" },
 
   {
     "name": "schedule-show",
@@ -32,7 +43,6 @@
     "path": "/schedules/{schedule}/print",
     "needsSchedule": true
   },
-
   {
     "name": "schedules-my-remembered",
     "path": "/schedules/my",
@@ -48,6 +58,12 @@
   {
     "name": "study-room-authed",
     "path": "/study-room",
+    "needsSchedule": true,
+    "auth": true
+  },
+  {
+    "name": "course-show-authed",
+    "path": "/courses/117",
     "needsSchedule": true,
     "auth": true
   }

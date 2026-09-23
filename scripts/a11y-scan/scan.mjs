@@ -9,7 +9,9 @@
 //   node scripts/a11y-scan/scan.mjs --no-html   # skip HTML report generation, JSON only
 //
 // Writes results/index.html (an aggregated overview linking each page's own
-// axe-html-reporter report under results/html/) unless --no-html is passed.
+// axe-html-reporter report under results/html/, and its Playwright
+// ariaSnapshot() tree under results/a11y-tree/) unless --no-html is passed.
+// Each page's raw ariaSnapshot() is also written to results/{name}.snapshot.txt.
 //
 // Pages are declared in scripts/a11y-scan/pages.json:
 //   - plain entries just need a `path`.
@@ -109,7 +111,8 @@ async function scanPage(context, axeSource, tags, baseUrl, page) {
         window.axe.run(document, { runOnly: { type: 'tag', values: tags } }),
       tags
     )
-    return { ok: true, results }
+    const snapshot = await tab.locator('body').ariaSnapshot()
+    return { ok: true, results, snapshot }
   } catch (error) {
     return { ok: false, error: error.message }
   } finally {
@@ -166,6 +169,33 @@ function escapeHtml(value) {
     .replace(/"/g, '&quot;')
 }
 
+function renderSnapshotHtml({ pageName, url, snapshot }) {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>${escapeHtml(pageName)} — accessibility tree</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 2rem auto; max-width: 60rem; padding: 0 1rem; }
+  .meta { color: #667085; margin-bottom: 1.5rem; }
+  pre { border: 1px solid #d0d5dd; border-radius: 8px; padding: 1rem; overflow-x: auto; white-space: pre; font-size: 0.85rem; line-height: 1.5; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #101828; color: #eaecf0; }
+    pre { border-color: #344054; background: #1d2939; }
+    .meta { color: #98a2b3; }
+  }
+</style>
+</head>
+<body>
+  <h1>${escapeHtml(pageName)}</h1>
+  <p class="meta"><code>${escapeHtml(url)}</code> — Playwright <code>ariaSnapshot()</code> of &lt;body&gt;</p>
+  <pre>${escapeHtml(snapshot)}</pre>
+</body>
+</html>
+`
+}
+
 function renderIndexHtml({ summary, contrastPairs, baseUrl, generatedAt }) {
   const totalViolationInstances = summary
     .filter(s => s.ok)
@@ -180,7 +210,7 @@ function renderIndexHtml({ summary, contrastPairs, baseUrl, generatedAt }) {
         return `<tr class="error-row">
           <td>${escapeHtml(s.page)}</td>
           <td><code>${escapeHtml(s.url)}</code></td>
-          <td colspan="2" class="error-cell">${escapeHtml(s.error)}</td>
+          <td colspan="3" class="error-cell">${escapeHtml(s.error)}</td>
         </tr>`
       }
       const impactBadges = s.violations
@@ -194,6 +224,7 @@ function renderIndexHtml({ summary, contrastPairs, baseUrl, generatedAt }) {
         <td><code>${escapeHtml(s.url)}</code></td>
         <td>${s.violations.length}</td>
         <td>${impactBadges || '<span class="ok">—</span>'}</td>
+        <td><a href="a11y-tree/${encodeURIComponent(s.page)}.html">tree</a></td>
       </tr>`
     })
     .join('\n')
@@ -254,7 +285,7 @@ function renderIndexHtml({ summary, contrastPairs, baseUrl, generatedAt }) {
 
   <h2>Pages</h2>
   <table>
-    <thead><tr><th>Page</th><th>URL</th><th>Violation types</th><th>Details</th></tr></thead>
+    <thead><tr><th>Page</th><th>URL</th><th>Violation types</th><th>Details</th><th>A11y tree</th></tr></thead>
     <tbody>
 ${pageRows}
     </tbody>
@@ -335,6 +366,10 @@ async function main() {
       path.join(args.out, `${p.name}.json`),
       JSON.stringify(outcome.results, null, 2)
     )
+    fs.writeFileSync(
+      path.join(args.out, `${p.name}.snapshot.txt`),
+      outcome.snapshot
+    )
 
     if (args.html) {
       createHtmlReport({
@@ -347,6 +382,17 @@ async function main() {
           doNotCreateReportFile: false,
         },
       })
+
+      const snapshotDir = path.join(args.out, 'a11y-tree')
+      fs.mkdirSync(snapshotDir, { recursive: true })
+      fs.writeFileSync(
+        path.join(snapshotDir, `${p.name}.html`),
+        renderSnapshotHtml({
+          pageName: p.name,
+          url: p.url,
+          snapshot: outcome.snapshot,
+        })
+      )
     }
 
     console.log(
