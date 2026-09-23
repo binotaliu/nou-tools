@@ -8,6 +8,7 @@
 //   node scripts/a11y-scan/scan.mjs --base-url=https://nou-tools.test --tags=wcag2a,wcag2aa,wcag21aa
 //   node scripts/a11y-scan/scan.mjs --no-html   # skip HTML report generation, JSON only
 //   node scripts/a11y-scan/scan.mjs --themes=light   # skip the dark-mode pass
+//   node scripts/a11y-scan/scan.mjs --viewports=desktop,mobile   # force both on every page
 //
 // Writes results/index.html (an aggregated overview linking each page's own
 // axe-html-reporter report under results/html/, and its Playwright
@@ -22,8 +23,18 @@
 // bare name (e.g. `home`); the dark pass is suffixed (`home-dark`) so
 // existing filenames/tooling for the light results are unaffected.
 //
+// Every page is also scanned once per viewport. By default that is just
+// `desktop` (1280x720); a page whose layout differs on phones opts in with
+// `"viewports": ["desktop", "mobile"]` (mobile = iPhone 14 profile, 390px wide,
+// so it stays below Tailwind's `md`). --viewports overrides it for every page.
+// Mobile results are suffixed `-mobile` (`home-mobile`, `home-mobile-dark`).
+// axe skips hidden content, so a layout that is hidden at a given width is only
+// tested by scanning at the width where it shows.
+//
 // Pages are declared in scripts/a11y-scan/pages.json:
 //   - plain entries just need a `path`.
+//   - `pwa: true` fakes navigator.standalone so the installed-PWA head script
+//     sets html[data-pwa], so the phone-only bottom nav renders (use with mobile).
 //   - `needsSchedule: true` entries have `{schedule}` in their path substituted
 //     with --schedule/A11Y_SCHEDULE_TOKEN, or (with `auth: true`) require a
 //     `student_schedule` cookie, which this script obtains by driving the real
@@ -35,7 +46,7 @@
 // grabbing any schedule's share link/token from a seeded dev record, e.g.:
 //   php artisan tinker --execute 'echo App\Models\StudentSchedule::first()?->getRouteKey();'
 
-import { chromium } from 'playwright'
+import { chromium, devices } from 'playwright'
 import { createHtmlReport } from 'axe-html-reporter'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -55,6 +66,7 @@ function parseArgs(argv) {
     tags: ['wcag2a', 'wcag2aa', 'wcag21aa'],
     html: true,
     themes: ['light', 'dark'],
+    viewports: null,
   }
 
   for (const arg of argv) {
@@ -67,6 +79,8 @@ function parseArgs(argv) {
     else if (key === 'tags') args.tags = value.split(',').map(s => s.trim())
     else if (key === 'no-html') args.html = false
     else if (key === 'themes') args.themes = value.split(',').map(s => s.trim())
+    else if (key === 'viewports')
+      args.viewports = value.split(',').map(s => s.trim())
   }
 
   return args
@@ -104,9 +118,30 @@ function loadPages(only) {
   return only ? all.filter(p => only.includes(p.name)) : all
 }
 
+const VIEWPORT_OPTIONS = {
+  desktop: {},
+  mobile: devices['iPhone 14'],
+}
+
+function newViewportContext(browser, viewport) {
+  return browser.newContext({
+    ignoreHTTPSErrors: true,
+    ...VIEWPORT_OPTIONS[viewport],
+  })
+}
+
 async function scanPage(context, axeSource, tags, baseUrl, page, theme) {
   const tab = await context.newPage()
   try {
+    if (page.pwa) {
+      // The head script in app.blade.php treats iOS's navigator.standalone
+      // as an installed PWA, so faking it drives the real detection path.
+      // (documentElement doesn't exist yet when init scripts run.)
+      await tab.addInitScript(() => {
+        Object.defineProperty(navigator, 'standalone', { get: () => true })
+      })
+    }
+
     // Must be set before goto(): app.blade.php's anti-flash-of-wrong-theme
     // script reads prefers-color-scheme synchronously on first paint, and it
     // only wins over an explicit choice when localStorage has none — true
@@ -226,6 +261,7 @@ function renderIndexHtml({ summary, contrastPairs, baseUrl, generatedAt }) {
       if (!s.ok) {
         return `<tr class="error-row">
           <td>${escapeHtml(s.page)}</td>
+          <td>${escapeHtml(s.viewport ?? '')}</td>
           <td>${escapeHtml(s.theme ?? '')}</td>
           <td><code>${escapeHtml(s.url)}</code></td>
           <td colspan="3" class="error-cell">${escapeHtml(s.error)}</td>
@@ -239,6 +275,7 @@ function renderIndexHtml({ summary, contrastPairs, baseUrl, generatedAt }) {
         .join(' ')
       return `<tr>
         <td><a href="html/${encodeURIComponent(s.page)}.html">${escapeHtml(s.page)}</a></td>
+        <td>${escapeHtml(s.viewport ?? '')}</td>
         <td>${escapeHtml(s.theme ?? '')}</td>
         <td><code>${escapeHtml(s.url)}</code></td>
         <td>${s.violations.length}</td>
@@ -304,7 +341,7 @@ function renderIndexHtml({ summary, contrastPairs, baseUrl, generatedAt }) {
 
   <h2>Pages</h2>
   <table>
-    <thead><tr><th>Page</th><th>Theme</th><th>URL</th><th>Violation types</th><th>Details</th><th>A11y tree</th></tr></thead>
+    <thead><tr><th>Page</th><th>Viewport</th><th>Theme</th><th>URL</th><th>Violation types</th><th>Details</th><th>A11y tree</th></tr></thead>
     <tbody>
 ${pageRows}
     </tbody>
@@ -354,24 +391,45 @@ async function main() {
   // page's bare name so existing filenames/tooling are unaffected; other
   // themes get a `-{theme}` suffix.
   const runs = runnable.flatMap(p =>
-    args.themes.map(theme => ({
-      ...p,
-      theme,
-      resultName: theme === 'light' ? p.name : `${p.name}-${theme}`,
-    }))
+    (args.viewports ?? p.viewports ?? ['desktop']).flatMap(viewport =>
+      args.themes.map(theme => ({
+        ...p,
+        viewport,
+        theme,
+        resultName: [
+          p.name,
+          viewport === 'desktop' ? null : viewport,
+          theme === 'light' ? null : theme,
+        ]
+          .filter(Boolean)
+          .join('-'),
+      }))
+    )
   )
+
+  const unknownViewport = runs.find(r => !(r.viewport in VIEWPORT_OPTIONS))
+  if (unknownViewport) {
+    throw new Error(
+      `Unknown viewport "${unknownViewport.viewport}" (known: ${Object.keys(VIEWPORT_OPTIONS).join(', ')})`
+    )
+  }
 
   fs.mkdirSync(args.out, { recursive: true })
 
   const browser = await chromium.launch({ headless: true })
-  const context = await browser.newContext({ ignoreHTTPSErrors: true })
 
-  const needsAuth = runnable.some(p => p.auth)
-  if (needsAuth) {
-    console.log(
-      `Establishing student_schedule cookie via POST ${args.baseUrl}/schedules/my ...`
-    )
-    await establishScheduleCookie(context, args.baseUrl, args.schedule)
+  // One browser context per viewport, each with its own remembered-schedule
+  // cookie when any of its pages needs one.
+  const contexts = {}
+  for (const viewport of new Set(runs.map(r => r.viewport))) {
+    const context = await newViewportContext(browser, viewport)
+    if (runs.some(r => r.viewport === viewport && r.auth)) {
+      console.log(
+        `Establishing student_schedule cookie (${viewport}) via POST ${args.baseUrl}/schedules/my ...`
+      )
+      await establishScheduleCookie(context, args.baseUrl, args.schedule)
+    }
+    contexts[viewport] = context
   }
 
   const axeSource = fs.readFileSync(axeSourcePath, 'utf8')
@@ -379,7 +437,7 @@ async function main() {
 
   for (const run of runs) {
     const outcome = await scanPage(
-      context,
+      contexts[run.viewport],
       axeSource,
       args.tags,
       args.baseUrl,
@@ -437,6 +495,7 @@ async function main() {
     page: name,
     url: runs.find(r => r.resultName === name).url,
     theme: runs.find(r => r.resultName === name).theme,
+    viewport: runs.find(r => r.resultName === name).viewport,
     ok: outcome.ok,
     error: outcome.ok ? undefined : outcome.error,
     violations: outcome.ok
