@@ -5,7 +5,6 @@
 // right, so there are no boxes nested in boxes. The date filter is driven by
 // useDatePicker.js and navigates with ?date=.
 import { computed, ref } from 'vue'
-import { Link } from '@inertiajs/vue3'
 import Icon from '../Icon.vue'
 import DateField from '../DateField.vue'
 import useDatePicker from '../../Composables/useDatePicker'
@@ -27,11 +26,6 @@ const props = defineProps({
   today: {
     type: String,
     required: true,
-  },
-  // On the standalone /video-classes page the "full page" link is redundant.
-  standalone: {
-    type: Boolean,
-    default: false,
   },
 })
 
@@ -188,14 +182,6 @@ const classTotal = computed(() =>
         >
           共 {{ visibleCourses.length }} 門課程、{{ classTotal }} 個班級
         </p>
-        <Link
-          v-if="!standalone"
-          href="/video-classes"
-          class="mt-1 inline-block text-sm text-theme-700 underline dark:text-zinc-400"
-          data-testid="video-courses-full-page-link"
-        >
-          查看完整頁面
-        </Link>
       </div>
 
       <div class="flex items-center gap-2">

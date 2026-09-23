@@ -65,7 +65,7 @@ Public-facing pages are Inertia.js+Vue. The Blade+Alpine.js UI they replaced is 
 
 ## 今日視訊面授 (Video Classes)
 
-Shown on the homepage (`Components/Home/VideoCourses.vue`) and on its own page, `/video-classes` (`src/Domains/VideoClasses/`, `VideoClassController`, plus a `.md` twin). Both read the same `ListVideoCourses` action; the component takes `standalone` to drop the "查看完整頁面" link.
+Shown on the homepage (`Components/Home/VideoCourses.vue`) and on its own page, `/video-classes` (`src/Domains/VideoClasses/`, `VideoClassController`, plus a `.md` twin). Both read the same `ListVideoCourses` action.
 
 - **Ended / live state is decided in the browser** (`useSessionClock.js`, a 30s ticker over `Date.now()`), not the server, so the state follows the viewer's clock and needs no polling. A course is `ended` once 30 minutes past its **end** time (hidden unless 顯示已結束課程 is ticked, remembered in `nou:video-classes:show-ended:v1`), `live` between start and end (上課中), `soon` within 30 minutes before start (即將開始). Classes without a time never count as ended. UI copy says 課程, not 場次.
 - **Times are Taipei time**; `useLocalTimeHint.js` (shared with `Schedule/Show.vue`) adds the 你的時間 line when the viewer's zone differs.

@@ -20,7 +20,6 @@ defineProps({
         :courses="viewModel.courses"
         :selected-date="viewModel.selectedDate"
         :today="viewModel.today"
-        standalone
       />
     </div>
   </AppLayout>
