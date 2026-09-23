@@ -89,8 +89,9 @@ it('opens the more sheet from the tab bar and closes it again', function () {
     // leave transition finish before asserting it's gone.
     $page->script("document.querySelector('[data-testid=\"bottom-nav-backdrop\"]').click()");
 
-    $page->wait(0.4)
-        ->assertMissing('[data-testid="bottom-nav-sheet"]');
+    waitUntil($page, 'document.querySelector(\'[data-testid="bottom-nav-sheet"]\') === null');
+
+    $page->assertMissing('[data-testid="bottom-nav-sheet"]');
 });
 
 it('puts learning progress after my schedule in both navs and moves Alt UU and discount stores into more', function () {
@@ -131,7 +132,11 @@ it('collapses the schedule page actions into one menu in an installed PWA on a p
 
     $page = visit(route('schedules.show', $schedule, absolute: false))->resize(...PHONE);
 
-    $page->wait(1);
+    waitUntil(
+        $page,
+        'document.querySelector(\'[data-testid="remember-schedule-dismiss"]\') !== null'.
+        ' || document.querySelector(\'#term\') !== null'
+    );
 
     if ($page->script("!!document.querySelector('[data-testid=\"remember-schedule-dismiss\"]')")) {
         $page->click('[data-testid="remember-schedule-dismiss"]');
@@ -165,7 +170,7 @@ it('keeps the schedule page actions inline in an installed PWA on a tablet', fun
 
     $page = visit(route('schedules.show', $schedule, absolute: false))->resize(...TABLET);
 
-    $page->wait(1);
+    waitUntil($page, 'document.querySelector(\'#term\') !== null');
     enterPwaMode($page);
 
     $page->assertMissing('[data-testid="schedule-actions-toggle"]')

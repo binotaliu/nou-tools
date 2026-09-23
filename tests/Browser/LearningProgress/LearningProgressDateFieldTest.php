@@ -13,7 +13,11 @@ use Pest\Browser\Api\PendingAwaitablePage;
 
 function dismissRememberModalIfPresentForDateField(PendingAwaitablePage $page): void
 {
-    $page->wait(1);
+    waitUntil(
+        $page,
+        'document.querySelector(\'[data-testid="remember-schedule-dismiss"]\') !== null'.
+        ' || document.querySelector(\'[data-testid="date-field-trigger"]\') !== null'
+    );
 
     if ($page->script("!!document.querySelector('[data-testid=\"remember-schedule-dismiss\"]')")) {
         $page->click('[data-testid="remember-schedule-dismiss"]');

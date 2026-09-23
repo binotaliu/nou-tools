@@ -128,6 +128,40 @@ function chineseWeekdayChar(Carbon $date): string
 }
 
 /**
+ * Polls a JS boolean expression in-browser until it's truthy, instead of a
+ * fixed ->wait(N) sleep. Runs as a single Promise-based evaluate() round
+ * trip (Playwright awaits the returned promise), so it resolves as soon as
+ * the condition is actually met rather than after a guessed delay, and
+ * still gives slow CI runs up to $timeoutMs before failing the assertion
+ * that follows. $jsCondition is a JS expression, not a statement (e.g.
+ * `document.querySelector('[data-testid="foo"]') !== null`).
+ */
+function waitUntil(mixed $page, string $jsCondition, int $timeoutMs = 5000): mixed
+{
+    $errorMessage = json_encode('waitUntil() timed out after '.$timeoutMs.'ms waiting for: '.$jsCondition);
+
+    $page->script(<<<JS
+        new Promise((resolve, reject) => {
+            const deadline = Date.now() + {$timeoutMs};
+
+            (function check() {
+                if ({$jsCondition}) {
+                    return resolve(true);
+                }
+
+                if (Date.now() > deadline) {
+                    return reject(new Error({$errorMessage}));
+                }
+
+                setTimeout(check, 50);
+            })();
+        })
+        JS);
+
+    return $page;
+}
+
+/**
  * The cookie-consent banner is fixed to the viewport bottom and, until a
  * choice is made, can overlap other fixed/bottom-of-page controls that
  * browser tests click through. Dismissed via JS rather than click() since

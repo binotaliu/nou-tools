@@ -58,8 +58,9 @@ function openStudyRoomForMusic(): mixed
         ->assertVisible('[data-testid="study-room-profile-form"]')
         ->fill('nickname', '聽音樂的人')
         ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
-        ->click('[data-testid="study-room-profile-submit"]')
-        ->wait(1);
+        ->click('[data-testid="study-room-profile-submit"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-root"]\') !== null');
 
     dismissCookieConsentBanner($page);
 
@@ -99,28 +100,35 @@ it('plays a tape, skips tracks, and swaps playlists from the popover', function 
     $page = openStudyRoomForMusic();
     stubMediaElement($page);
 
-    $page->wait(1)
-        ->assertVisible('[data-testid="study-room-music-player"]')
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-player"]\') !== null');
+
+    $page->assertVisible('[data-testid="study-room-music-player"]')
         ->assertVisible('[data-testid="study-room-music-empty"]')
         ->assertMissing('[data-testid="study-room-music-cassette"]')
         ->assertAttribute('[data-testid="study-room-music-play"]', 'aria-pressed', 'false');
 
     // Pressing play slides the cassette in and starts the first track.
-    $page->click('[data-testid="study-room-music-play"]')
-        ->wait(1)
-        ->assertVisible('[data-testid="study-room-music-cassette"]')
+    $page->click('[data-testid="study-room-music-play"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-cassette"]\') !== null');
+
+    $page->assertVisible('[data-testid="study-room-music-cassette"]')
         ->assertMissing('[data-testid="study-room-music-empty"]')
         ->assertAttribute('[data-testid="study-room-music-play"]', 'aria-pressed', 'true')
         ->assertSeeIn('[data-testid="study-room-music-title"]', 'Rain Tape');
 
-    $page->click('[data-testid="study-room-music-next"]')
-        ->wait(1)
-        ->assertSeeIn('[data-testid="study-room-music-title"]', 'Cafe Tape');
+    $page->click('[data-testid="study-room-music-next"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-title"]\')?.textContent.includes(\'Cafe Tape\')');
+
+    $page->assertSeeIn('[data-testid="study-room-music-title"]', 'Cafe Tape');
 
     // Pausing keeps the tape in the deck.
-    $page->click('[data-testid="study-room-music-play"]')
-        ->wait(1)
-        ->assertAttribute('[data-testid="study-room-music-play"]', 'aria-pressed', 'false')
+    $page->click('[data-testid="study-room-music-play"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-play"]\')?.getAttribute(\'aria-pressed\') === \'false\'');
+
+    $page->assertAttribute('[data-testid="study-room-music-play"]', 'aria-pressed', 'false')
         ->assertVisible('[data-testid="study-room-music-cassette"]');
 
     // The popover holds the playlists and the less-used controls.
@@ -131,14 +139,18 @@ it('plays a tape, skips tracks, and swaps playlists from the popover', function 
         ->assertVisible('[data-testid="study-room-music-credit"]');
 
     // Ejecting takes the cassette out of the deck.
-    $page->click('[data-testid="study-room-music-eject"]')
-        ->wait(1)
-        ->assertMissing('[data-testid="study-room-music-cassette"]')
+    $page->click('[data-testid="study-room-music-eject"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-cassette"]\') === null');
+
+    $page->assertMissing('[data-testid="study-room-music-cassette"]')
         ->assertVisible('[data-testid="study-room-music-empty"]');
 
-    $page->click('[data-testid="study-room-music-playlist-'.$night->id.'"]')
-        ->wait(1)
-        ->assertMissing('[data-testid="study-room-music-popover"]')
+    $page->click('[data-testid="study-room-music-playlist-'.$night->id.'"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-title"]\')?.textContent.includes(\'Night Tape\')');
+
+    $page->assertMissing('[data-testid="study-room-music-popover"]')
         ->assertVisible('[data-testid="study-room-music-cassette"]')
         ->assertSeeIn('[data-testid="study-room-music-title"]', 'Night Tape');
 
@@ -158,23 +170,30 @@ it('scrolls a track title that does not fit, and leaves a short one still', func
     $page = openStudyRoomForMusic();
     stubMediaElement($page);
 
-    $page->wait(1)
-        ->click('[data-testid="study-room-music-play"]')
-        ->wait(1)
-        ->assertSeeIn('[data-testid="study-room-music-title"]', 'Short')
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-player"]\') !== null');
+
+    $page->click('[data-testid="study-room-music-play"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-title"]\')?.textContent.includes(\'Short\')');
+
+    $page->assertSeeIn('[data-testid="study-room-music-title"]', 'Short')
         ->assertMissing('[data-testid="study-room-marquee"]');
 
-    $page->click('[data-testid="study-room-music-next"]')
-        ->wait(1)
-        ->assertVisible('[data-testid="study-room-marquee"]');
+    $page->click('[data-testid="study-room-music-next"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-marquee"]\') !== null');
+
+    $page->assertVisible('[data-testid="study-room-marquee"]');
 
     expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"study-room-marquee\"]')).animationName"))
         ->toBe('marquee');
 
     // Back to a title that fits: the scrolling copy goes away.
-    $page->click('[data-testid="study-room-music-next"]')
-        ->wait(1)
-        ->assertMissing('[data-testid="study-room-marquee"]');
+    $page->click('[data-testid="study-room-music-next"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-marquee"]\') === null');
+
+    $page->assertMissing('[data-testid="study-room-marquee"]');
 });
 
 it('saves the volume the listener picks', function () {
@@ -182,8 +201,9 @@ it('saves the volume the listener picks', function () {
 
     $page = openStudyRoomForMusic();
 
-    $page->wait(1)
-        ->click('[data-testid="study-room-music-toggle"]')
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-toggle"]\') !== null');
+
+    $page->click('[data-testid="study-room-music-toggle"]')
         ->assertVisible('[data-testid="study-room-music-volume"]');
 
     $page->script(<<<'JS'
@@ -215,7 +235,8 @@ it('puts the player left of the clock on a phone and under the window on a deskt
         })()
     JS;
 
-    $page->resize(...MUSIC_PHONE)->wait(1);
+    $page->resize(...MUSIC_PHONE);
+    waitUntil($page, 'innerWidth === '.MUSIC_PHONE[0]);
     $phone = $page->script($rects);
 
     // Width is tight beside the clock, so the strip drops its next button
@@ -229,7 +250,8 @@ it('puts the player left of the clock on a phone and under the window on a deskt
         // ...and that row is below the window.
         ->and($phone['player']['top'])->toBeGreaterThanOrEqual($phone['garden']['bottom']);
 
-    $page->resize(...MUSIC_DESKTOP)->wait(1);
+    $page->resize(...MUSIC_DESKTOP);
+    waitUntil($page, 'innerWidth === '.MUSIC_DESKTOP[0]);
     $desktop = $page->script($rects);
 
     expect($desktop['player']['top'])->toBeGreaterThanOrEqual($desktop['garden']['bottom'])
@@ -246,36 +268,51 @@ it('keeps the tape playing on the desk in focus mode, and Esc closes the popover
 
     $focus = '[data-testid="study-room-focus-mode"] ';
 
-    $page->wait(1)
-        ->click('[data-testid="study-room-music-play"]')
-        ->wait(1)
-        ->click('[data-testid="seat-1-S01"]')
-        ->wait(1)
-        ->click('[data-testid="study-room-start-timer"]')
-        ->wait(1)
-        ->click('[data-testid="study-room-focus-mode-open"]')
-        ->wait(1)
-        ->assertVisible($focus.'[data-testid="study-room-music-player"]')
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-player"]\') !== null');
+
+    $page->click('[data-testid="study-room-music-play"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-cassette"]\') !== null');
+
+    $page->click('[data-testid="seat-1-S01"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-start-timer"]\') !== null');
+
+    $page->click('[data-testid="study-room-start-timer"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-focus-mode-open"]\') !== null');
+
+    $page->click('[data-testid="study-room-focus-mode-open"]');
+
+    waitUntil($page, 'document.querySelector(\''.$focus.'[data-testid="study-room-music-player"]\') !== null');
+
+    $page->assertVisible($focus.'[data-testid="study-room-music-player"]')
         // Same playback state as the Wall's deck: the tape is already in.
         ->assertVisible($focus.'[data-testid="study-room-music-cassette"]')
         ->assertAttribute($focus.'[data-testid="study-room-music-play"]', 'aria-pressed', 'true')
         ->assertSeeIn($focus.'[data-testid="study-room-music-title"]', 'Rain Tape')
         ->screenshot(filename: 'study-room-focus-mode-music');
 
-    $page->click($focus.'[data-testid="study-room-music-next"]')
-        ->wait(1)
-        ->assertSeeIn($focus.'[data-testid="study-room-music-title"]', 'Cafe Tape');
+    $page->click($focus.'[data-testid="study-room-music-next"]');
+
+    waitUntil($page, 'document.querySelector(\''.$focus.'[data-testid="study-room-music-title"]\')?.textContent.includes(\'Cafe Tape\')');
+
+    $page->assertSeeIn($focus.'[data-testid="study-room-music-title"]', 'Cafe Tape');
 
     // The first Esc only closes the popover; the second leaves focus mode.
     $page->click($focus.'[data-testid="study-room-music-toggle"]')
         ->assertVisible($focus.'[data-testid="study-room-music-popover"]')
-        ->keys($focus, ['Escape'])
-        ->wait(1)
-        ->assertMissing($focus.'[data-testid="study-room-music-popover"]')
+        ->keys($focus, ['Escape']);
+
+    waitUntil($page, 'document.querySelector(\''.$focus.'[data-testid="study-room-music-popover"]\') === null');
+
+    $page->assertMissing($focus.'[data-testid="study-room-music-popover"]')
         ->assertVisible('[data-testid="study-room-focus-mode"]')
-        ->keys($focus, ['Escape'])
-        ->wait(1)
-        ->assertMissing('[data-testid="study-room-focus-mode"]');
+        ->keys($focus, ['Escape']);
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-focus-mode"]\') === null');
+
+    $page->assertMissing('[data-testid="study-room-focus-mode"]');
 
     // Back on the Wall the same tape is still playing.
     $page->assertAttribute('[data-testid="study-room-music-play"]', 'aria-pressed', 'true')

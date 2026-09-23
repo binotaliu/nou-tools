@@ -83,7 +83,8 @@ it('remembers "不再提示我安裝", points to the footer, and stays hidden af
 
     $page->navigate(route('schedules.show', $schedule))->assertSee('Install Banner Schedule');
     makeInstallable($page);
-    $page->wait(1);
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="pwa-banner"]\') !== null');
 
     expect(bannerIsShown($page))->toBeFalse();
 });

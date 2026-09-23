@@ -82,7 +82,13 @@ it('shows only the active tab panel and keeps nested tabs independent', function
     // Without JavaScript every panel is visible (that's the intended no-JS
     // fallback), so the "not visible" assertions below only mean anything
     // once hydration has run.
-    $page = visit(markdownContainerFixtureUrl())->wait(1);
+    $page = visit(markdownContainerFixtureUrl());
+
+    // useMarkdownContainers() enhances tabs, checklists and countdowns in one
+    // mount pass, so data-enhanced (set by enhanceTabs()) confirms the whole
+    // pass — including the checklist/countdown enhancers other tests below
+    // depend on — has run.
+    waitUntil($page, 'document.querySelector(\'.md-tabs[data-enhanced]\') !== null');
 
     $page->assertNoJavaScriptErrors()
         ->assertSee('外層甲內容')
@@ -113,7 +119,9 @@ it('shows only the active tab panel and keeps nested tabs independent', function
 });
 
 it('persists checklist ticks across a reload', function () {
-    $page = visit(markdownContainerFixtureUrl())->wait(1);
+    $page = visit(markdownContainerFixtureUrl());
+
+    waitUntil($page, 'document.querySelector(\'.md-tabs[data-enhanced]\') !== null');
 
     $firstItem = '.md-checklist ul li:nth-child(1)';
     $firstCheckbox = $firstItem.' input[type="checkbox"]';
@@ -139,7 +147,8 @@ it('persists checklist ticks across a reload', function () {
     // Reload via setTimeout so the script() call returns before the
     // execution context is torn down by the navigation.
     $page->script('setTimeout(() => window.location.reload(), 50)');
-    $page->wait(2);
+
+    waitUntil($page, 'document.querySelector(\'.md-tabs[data-enhanced]\') !== null', 3000);
 
     $page->assertChecked($firstCheckbox)
         ->assertDataAttribute($firstItem, 'checked', 'true')

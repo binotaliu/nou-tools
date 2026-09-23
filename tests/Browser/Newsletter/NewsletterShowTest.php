@@ -144,10 +144,16 @@ it('credits the Unsplash photographer when the cover image has one', function ()
 });
 
 it('hydrates markdown containers inside columns', function () {
-    $page = visit('/newsletter/2026-W39')->wait(1);
+    $page = visit('/newsletter/2026-W39');
 
     $firstItem = '.md-checklist ul li:nth-child(1)';
     $firstCheckbox = $firstItem.' input[type="checkbox"]';
+
+    // enhanceChecklists() stamps data-checked on every item once it hydrates
+    // (see useMarkdownContainers.js), so its presence confirms the composable
+    // ran and the click below will be persisted rather than just toggling the
+    // native checkbox.
+    waitUntil($page, "document.querySelector('{$firstItem}')?.dataset.checked !== undefined");
 
     $page->assertNoJavaScriptErrors()
         ->assertSee('甲頁內容')

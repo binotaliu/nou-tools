@@ -20,12 +20,16 @@ use Pest\Browser\Api\PendingAwaitablePage;
 //
 // The Inertia page only mounts the modal into the DOM once client-side
 // hydration completes, so a `script()` check run immediately after `visit()`
-// can race it and find nothing — give it a brief moment first (mirrors the
-// `->wait(1)` idiom used elsewhere for async client state, e.g.
-// tests/Browser/StudyRoomTest.php).
+// can race it and find nothing. Rather than guessing how long hydration
+// takes, poll until either the modal shows up or the print button (always
+// present once hydrated, modal or not) confirms hydration finished.
 function dismissRememberModalIfPresent(PendingAwaitablePage $page): void
 {
-    $page->wait(1);
+    waitUntil(
+        $page,
+        'document.querySelector(\'[data-testid="remember-schedule-dismiss"]\') !== null'.
+        ' || document.querySelector(\'[data-testid="schedule-print-button"]\') !== null'
+    );
 
     if ($page->script("!!document.querySelector('[data-testid=\"remember-schedule-dismiss\"]')")) {
         $page->click('[data-testid="remember-schedule-dismiss"]');
@@ -64,8 +68,9 @@ it('submits the term form and navigates when a different semester is selected', 
     // which navigates the page. Give that navigation a moment to land before
     // reading the URL — and don't screenshot() here, since racing the
     // in-flight navigation can hang the browser driver.
-    $page->select('#term', '2025B')
-        ->wait(1);
+    $page->select('#term', '2025B');
+
+    waitUntil($page, "location.href.includes('term=2025B')");
 
     expect($page->url())->toContain('term=2025B');
 });
@@ -155,7 +160,8 @@ it('shares the PDF from an installed PWA instead of navigating to it, showing a 
     expect(sharedFiles($page))->toBe([]);
 
     $page->script('window.__releasePdf()');
-    $page->wait(1);
+
+    waitUntil($page, 'window.__shared.length > 0');
 
     expect(sharedFiles($page))->toBe(['nou-schedule-2025B.pdf|application/pdf'])
         ->and($page->url())->toBe($url);
@@ -168,10 +174,13 @@ it('asks for another tap when the browser refuses to share after the wait', func
 
     openPrintMenuAndChoose($page, 'monday');
     $page->script('window.__releasePdf()');
-    $page->wait(1);
+
+    waitUntil($page, "document.body.textContent.includes('分享 PDF')");
 
     expect(sharedFiles($page))->toBe([]);
-    $page->assertSee('分享 PDF')->click('[data-testid="schedule-print-button"]')->wait(1);
+    $page->assertSee('分享 PDF')->click('[data-testid="schedule-print-button"]');
+
+    waitUntil($page, 'window.__shared.length > 0');
 
     expect(sharedFiles($page))->toBe(['nou-schedule-2025B.pdf|application/pdf']);
     $page->assertDontSee('分享 PDF')->assertSee('列印');
@@ -183,7 +192,8 @@ it('says so when the PDF cannot be produced', function () {
 
     openPrintMenuAndChoose($page, 'monday');
     $page->script('window.__releasePdf()');
-    $page->wait(1);
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="schedule-print-error"]\') !== null');
 
     $page->assertPresent('[data-testid="schedule-print-error"]')->assertSee('無法產生 PDF');
     expect(sharedFiles($page))->toBe([]);
