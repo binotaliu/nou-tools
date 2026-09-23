@@ -290,6 +290,31 @@
         </div>
     @endif
     @inertia
+    <noscript>
+        <div
+            class="fixed inset-0 z-9999 flex flex-col items-center justify-center gap-4 bg-theme-50 p-8 text-center text-theme-900"
+        >
+            <strong class="text-xl">NOU 小幫手需要 JavaScript</strong>
+            <span
+                >請在瀏覽器設定中啟用 JavaScript
+                後重新整理頁面，才能使用本網站。</span
+            >
+            <span
+                >不喜歡 JavaScript？請參考
+                <a href="{{ route('llms-txt') }}" class="underline"
+                    >Markdown 版本</a
+                >。</span
+            >
+            <span
+                >作者有計劃要提供無 JavaScript 的簡單 HTML
+                版本，但目前還沒有時間做。如果你想，可以<a
+                    href="https://github.com/binotaliu/nou-tools"
+                    class="underline"
+                    >前往 GitHub 幫忙開發</a
+                >。</span
+            >
+        </div>
+    </noscript>
     @if ($ogImageView)
         @include($ogImageView, ['props' => $page['props']])
     @endif
