@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\Announcement;
+use App\Models\ChangelogPost;
 use App\Models\Course;
 use App\Models\DiscountStore;
 use App\Models\DiscountStoreCategory;
@@ -14,6 +15,7 @@ use App\Models\NewsletterIssue;
 use App\Models\StudyRoomProfile;
 use App\Models\User;
 use App\Policies\AnnouncementPolicy;
+use App\Policies\ChangelogPostPolicy;
 use App\Policies\CoursePolicy;
 use App\Policies\DiscountStoreCategoryPolicy;
 use App\Policies\DiscountStorePolicy;
@@ -93,6 +95,7 @@ final class AppServiceProvider extends ServiceProvider
         Gate::policy(Announcement::class, AnnouncementPolicy::class);
         Gate::policy(Course::class, CoursePolicy::class);
         Gate::policy(NewsletterIssue::class, NewsletterIssuePolicy::class);
+        Gate::policy(ChangelogPost::class, ChangelogPostPolicy::class);
         Gate::policy(DiscountStore::class, DiscountStorePolicy::class);
         Gate::policy(DiscountStoreCategory::class, DiscountStoreCategoryPolicy::class);
         Gate::policy(StudyRoomProfile::class, StudyRoomProfilePolicy::class);
