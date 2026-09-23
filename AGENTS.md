@@ -63,6 +63,14 @@ Public-facing pages are Inertia.js+Vue. The Blade+Alpine.js UI they replaced is 
   - **`RenderSchedulePdf` caches the PDF by HTML with SVGs stripped**: the QR code's bytes differ between PHP processes for the same URL, so hashing it would never hit. It goes through the `Shared/Pdf/HtmlToPdf` interface (Browsershot implementation, sharing the `LARAVEL_SCREENSHOT_*` Chromium config); tests fake that interface instead of launching Chromium.
 - `resources/views/offline.blade.php` (PWA offline fallback) and the machine-readable exports (`sitemap.blade.php`, `redocly.blade.php`, `llms-txt.md.blade.php`, `*/markdown/*.md.blade.php`) stay plain Blade by design — no Inertia, no client-side framework.
 
+## 今日視訊面授 (Video Classes)
+
+Shown on the homepage (`Components/Home/VideoCourses.vue`) and on its own page, `/video-classes` (`src/Domains/VideoClasses/`, `VideoClassController`, plus a `.md` twin). Both read the same `ListVideoCourses` action; the component takes `standalone` to drop the "查看完整頁面" link.
+
+- **Ended / live state is decided in the browser** (`useSessionClock.js`, a 30s ticker over `Date.now()`), not the server, so the state follows the viewer's clock and needs no polling. A course is `ended` once 30 minutes past its **end** time (hidden unless 顯示已結束課程 is ticked, remembered in `nou:video-classes:show-ended:v1`), `live` between start and end (上課中), `soon` within 30 minutes before start (即將開始). Classes without a time never count as ended. UI copy says 課程, not 場次.
+- **Times are Taipei time**; `useLocalTimeHint.js` (shared with `Schedule/Show.vue`) adds the 你的時間 line when the viewer's zone differs.
+- Browser tests place classes around the real "now" (skipping near Taipei midnight) rather than mocking the clock.
+
 ## 浣熊的空大雙週報 (Newsletter)
 
 Lives in `src/Domains/Newsletter/` plus `App\Models\NewsletterIssue`/`NewsletterItem`/`NewsletterColumn`; edited in Filament (`NewsletterIssueResource`).
