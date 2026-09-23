@@ -169,9 +169,11 @@ function isExpired(announcement) {
                           class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600 dark:text-zinc-300"
                           :checked="isSourceChecked(source)"
                           :indeterminate="isSourceIndeterminate(source)"
+                          :aria-label="source"
                           @change="toggleSource(source, $event.target.checked)"
                         />
                         <span
+                          aria-hidden="true"
                           class="min-w-0 truncate text-sm font-semibold text-theme-900 dark:text-zinc-100"
                         >
                           {{ source }}
@@ -210,6 +212,7 @@ function isExpired(announcement) {
                           :value="category"
                           class="size-4 rounded border-theme-300 text-orange-700 focus:ring-orange-300 dark:border-zinc-600"
                           :checked="isCategoryChecked(source, category)"
+                          :aria-label="category"
                           @change="
                             toggleCategory(
                               source,
@@ -218,7 +221,9 @@ function isExpired(announcement) {
                             )
                           "
                         />
-                        <span class="wrap-break-word">{{ category }}</span>
+                        <span aria-hidden="true" class="wrap-break-word">{{
+                          category
+                        }}</span>
                       </label>
                     </div>
                   </section>
@@ -399,13 +404,16 @@ function isExpired(announcement) {
               </p>
 
               <div class="flex items-center gap-3">
-                <span
+                <button
                   v-if="!viewModel.announcements.prev_page_url"
+                  type="button"
+                  disabled
+                  aria-disabled="true"
                   class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 dark:border-zinc-700 dark:text-zinc-400"
                 >
                   <Icon name="chevron-left" class="size-4" />
                   上一頁
-                </span>
+                </button>
                 <Link
                   v-else
                   :href="viewModel.announcements.prev_page_url"

@@ -2,6 +2,7 @@
 // Purely static marketing content (no ViewModel/props), so this page only
 // needs the layout chrome and its own inline markup.
 import { Head } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import HeroIllustration from '../../Components/AltUu/HeroIllustration.vue'
@@ -46,6 +47,12 @@ const faqs = [
       '可以。Alt UU 是自由且開放的軟體，原始碼以 AGPL-3.0-or-later 授權條款公開於 GitHub，歡迎檢視、修改或貢獻程式碼。',
   },
 ]
+
+// Chromium exposes native <details>/<summary> as a plain "group" with no
+// button/expanded semantics unless the summary carries an explicit button
+// role, so this state mirrors the native `open` attribute onto
+// `aria-expanded` via the `toggle` event.
+const faqOpenState = ref(faqs.map(() => false))
 </script>
 
 <template>
@@ -292,8 +299,12 @@ const faqs = [
             :key="index"
             class="group rounded-lg border border-theme-200 bg-white px-5 py-3 dark:border-zinc-700 dark:bg-zinc-900"
             :data-testid="`alt-uu-faq-${index}`"
+            @toggle="faqOpenState[index] = $event.target.open"
           >
             <summary
+              role="button"
+              :aria-expanded="faqOpenState[index] ? 'true' : 'false'"
+              :aria-controls="`alt-uu-faq-answer-${index}`"
               class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-theme-900 dark:text-zinc-100 [&::-webkit-details-marker]:hidden"
             >
               {{ faq.question }}
@@ -304,6 +315,7 @@ const faqs = [
               />
             </summary>
             <p
+              :id="`alt-uu-faq-answer-${index}`"
               class="mt-2 text-sm whitespace-pre-line text-theme-700 dark:text-zinc-400"
             >
               {{ faq.answer }}

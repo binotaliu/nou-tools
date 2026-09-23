@@ -43,7 +43,7 @@ it('groups general courses by exam time slot and keeps micro-credit/remote cours
     $page = visit(route('course.schedule'));
 
     $page->assertNoJavaScriptErrors()
-        ->assertSeeIn('[data-testid="schedule-section-general"]', '15:00 - 16:10')
+        ->assertSeeIn('[data-testid="schedule-section-general"] h3', '15:00 - 16:10')
         ->assertSeeIn('[data-testid="schedule-section-general"] [data-testid="schedule-desktop-table"]', 'Course A')
         ->assertSeeIn('[data-testid="schedule-section-general"] [data-testid="schedule-desktop-table"]', 'Course B')
         ->assertDontSeeIn('[data-testid="schedule-section-general"]', 'Micro Credit Course')
@@ -76,7 +76,7 @@ it('regroups courses by department when 學系 is selected, dropping the exam-ti
 
     $page->select('[data-testid="group-by-select"]', 'department')
         ->assertNoJavaScriptErrors()
-        ->assertSeeIn('[data-testid="schedule-section-department"]', '資訊工程學系')
+        ->assertSeeIn('[data-testid="schedule-section-department"] h3', '資訊工程學系')
         ->assertSeeIn('[data-testid="schedule-section-department"] [data-testid="schedule-desktop-table"]', 'Networking Fundamentals')
         ->assertSeeIn('[data-testid="schedule-section-department"] [data-testid="schedule-desktop-table"]', 'Remote Database Systems')
         ->assertMissing('[data-testid="schedule-section-general"]')

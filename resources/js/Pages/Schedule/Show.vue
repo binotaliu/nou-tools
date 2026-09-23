@@ -1462,8 +1462,10 @@ function localHint(next) {
           </div>
 
           <div class="hidden w-28 flex-col items-center justify-center md:flex">
+            <!-- Decorative: the same URL is already exposed via the readonly input above. -->
             <div
               class="rounded border border-theme-200 bg-white p-2"
+              aria-hidden="true"
               v-html="qrCodeSvg"
             ></div>
           </div>

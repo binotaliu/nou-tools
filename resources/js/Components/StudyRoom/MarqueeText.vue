@@ -71,7 +71,7 @@ watch(
       data-testid="study-room-marquee"
     >
       <span class="pr-6">{{ text }}</span>
-      <span class="pr-6">{{ text }}</span>
+      <span class="pr-6" aria-hidden="true">{{ text }}</span>
     </span>
   </span>
 </template>

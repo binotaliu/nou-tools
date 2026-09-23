@@ -500,8 +500,39 @@ test('heading anchors get chinese-safe deduped slugs', function () {
     $html = ($this->convert)("## 第一段\n\n## 第一段\n");
 
     expect($html)
-        ->toContain('<h2 id="第一段"><a class="md-heading-anchor" href="#第一段" aria-label="連結到此段落">#</a>第一段</h2>')
+        ->toContain('<h2 id="第一段"><a class="md-heading-anchor" href="#第一段" aria-label="連結到此段落" aria-hidden="true" tabindex="-1">#</a>第一段</h2>')
         ->toContain('id="第一段-2"');
+});
+
+test('heading anchor is hidden from assistive tech so it does not pollute the heading name', function () {
+    $html = ($this->convert)("## 文章列表\n");
+
+    expect($html)
+        ->toContain('aria-hidden="true"')
+        ->toContain('tabindex="-1"');
+
+    // Naive text extraction (as a screen reader's accessible-name
+    // computation would concatenate) must not include the anchor's label.
+    preg_match('/<h2[^>]*>(.*?)<\/h2>/s', $html, $matches);
+    $headingHtml = $matches[1];
+    $text = trim(strip_tags(preg_replace('/<a[^>]*aria-hidden="true"[^>]*>.*?<\/a>/', '', $headingHtml)));
+
+    expect($text)->toBe('文章列表');
+});
+
+test('a level-1 heading inside markdown body content is demoted to h2', function () {
+    $html = ($this->convert)("# 關於國立空中大學\n\n內文。\n");
+
+    expect($html)
+        ->not->toContain('<h1')
+        ->toContain('<h2 id="關於國立空中大學">')
+        ->toContain('關於國立空中大學</h2>');
+});
+
+test('a demoted h1 still gets its heading anchor at the new level', function () {
+    $html = ($this->convert)("# 標題\n");
+
+    expect($html)->toContain('<h2 id="標題"><a class="md-heading-anchor" href="#標題"');
 });
 
 test('[[toc]] builds a nav from h2/h3 headings', function () {
@@ -527,7 +558,7 @@ test('[[toc]] excludes headings nested inside a blockquote, but they keep their 
 ## 第二段
 MD);
 
-    expect($html)->toContain('<h3 id="巢狀標題"><a class="md-heading-anchor" href="#巢狀標題" aria-label="連結到此段落">#</a>巢狀標題</h3>');
+    expect($html)->toContain('<h3 id="巢狀標題"><a class="md-heading-anchor" href="#巢狀標題" aria-label="連結到此段落" aria-hidden="true" tabindex="-1">#</a>巢狀標題</h3>');
 
     preg_match('/<nav class="md-toc"[^>]*>.*?<\/nav>/s', $html, $matches);
     expect($matches)->not->toBeEmpty();
@@ -764,6 +795,18 @@ test('iframes that are not a plain YouTube embed are still dropped', function (s
     'playlist embed' => '<iframe src="https://www.youtube.com/embed/videoseries?list=PL123"></iframe>',
     'extra markup' => '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe><script>alert(1)</script>',
 ]);
+
+test('the rebuilt youtube iframe always has a non-empty title', function () {
+    $withTitle = ($this->convert)('<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="示範影片"></iframe>');
+    $withoutTitle = ($this->convert)('<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>');
+
+    preg_match('/<iframe[^>]*title="([^"]*)"/', $withTitle, $m1);
+    preg_match('/<iframe[^>]*title="([^"]*)"/', $withoutTitle, $m2);
+
+    expect($m1[1] ?? '')->toBe('示範影片')
+        ->and($m2[1] ?? '')->not->toBe('')
+        ->and($m2[1] ?? '')->toBe('YouTube 影片');
+});
 
 test('a hostile title cannot break out of the rebuilt iframe', function () {
     $html = ($this->convert)('<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="&quot; onload=&quot;alert(1)"></iframe>');

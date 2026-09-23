@@ -58,8 +58,8 @@ function relativeLabel(announcement) {
         目前沒有符合條件的最新公告。
       </div>
 
-      <template v-else>
-        <div
+      <ul v-else class="list-none">
+        <li
           v-for="(announcement, index) in announcements"
           :key="index"
           class="flex flex-col gap-1 border-b border-theme-100 py-2 last:border-0 dark:border-zinc-800"
@@ -99,8 +99,8 @@ function relativeLabel(announcement) {
           >
             {{ announcement.title }}
           </a>
-        </div>
-      </template>
+        </li>
+      </ul>
 
       <div
         class="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between"

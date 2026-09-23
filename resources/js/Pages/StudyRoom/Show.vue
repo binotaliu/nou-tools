@@ -558,7 +558,7 @@ onUnmounted(() => {
                           <span class="pr-4">{{
                             grid.thoughtBubbleText(seat)
                           }}</span>
-                          <span class="pr-4">{{
+                          <span class="pr-4" aria-hidden="true">{{
                             grid.thoughtBubbleText(seat)
                           }}</span>
                         </span>
@@ -653,6 +653,7 @@ onUnmounted(() => {
                   >
                     <span
                       class="max-w-16 text-[10px] leading-tight text-theme-700 dark:text-zinc-400"
+                      aria-hidden="true"
                       >{{ grid.stairHint(floor) }}</span
                     >
                     <div
@@ -688,6 +689,7 @@ onUnmounted(() => {
                   >
                     <span
                       class="max-w-16 text-[10px] leading-tight text-theme-700 dark:text-zinc-400"
+                      aria-hidden="true"
                       >{{ grid.stairDownHint(floor) }}</span
                     >
                     <div
@@ -714,29 +716,29 @@ onUnmounted(() => {
             </div>
           </section>
 
-          <p
+          <ul
             class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-theme-700 dark:text-zinc-400"
           >
-            <span class="inline-flex items-center gap-1.5">
+            <li class="inline-flex items-center gap-1.5">
               <span
                 class="size-3 rounded-full border-2 border-b-[3px] border-theme-300 bg-white dark:border-zinc-600 dark:bg-zinc-800"
               ></span>
               空位
-            </span>
-            <span class="inline-flex items-center gap-1.5">
+            </li>
+            <li class="inline-flex items-center gap-1.5">
               <span
                 class="size-3 rounded-full bg-amber-400 shadow-[0_0_6px_2px_rgba(251,191,36,0.5)]"
               ></span>
               有人（檯燈亮著）
-            </span>
-            <span class="inline-flex items-center gap-1.5">
+            </li>
+            <li class="inline-flex items-center gap-1.5">
               <span
                 class="rounded-full bg-amber-500 px-1 text-[9px] leading-4 font-semibold text-white"
                 >你</span
               >
               你的座位
-            </span>
-          </p>
+            </li>
+          </ul>
         </div>
 
         <ActionBanner

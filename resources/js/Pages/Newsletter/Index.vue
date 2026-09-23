@@ -48,7 +48,7 @@ const issues = computed(() => props.viewModel.issues.data ?? [])
           <img
             v-if="viewModel.latestIssue.coverImageUrl"
             :src="viewModel.latestIssue.coverImageUrl"
-            :alt="viewModel.latestIssue.title"
+            alt=""
             class="aspect-[3/1] w-full object-cover"
             data-testid="newsletter-cover-image"
           />
@@ -95,7 +95,7 @@ const issues = computed(() => props.viewModel.issues.data ?? [])
               <img
                 v-if="issue.coverImageUrl"
                 :src="issue.coverImageUrl"
-                :alt="issue.title"
+                alt=""
                 loading="lazy"
                 class="aspect-[3/1] w-full object-cover"
                 data-testid="newsletter-cover-image"

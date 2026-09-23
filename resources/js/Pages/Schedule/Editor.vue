@@ -138,6 +138,31 @@ function getTypeLabel(type) {
   return TYPE_LABELS[type] || type
 }
 
+// Mirrors the visible content of a class-option label (code/type label,
+// tentative note, time range, teacher name) so the radio's aria-label
+// carries the same information the sighted layout shows, instead of the
+// class option's text content leaking into the tree as a duplicate node
+// (see the aria-hidden wrapper below it).
+function classOptionAriaLabel(courseClass) {
+  const parts = [
+    courseClass.is_tentative ? courseClass.type_label : courseClass.code,
+  ]
+
+  if (courseClass.is_tentative) {
+    parts.push('尚未正式分班')
+  }
+
+  if (courseClass.start_time) {
+    parts.push(`${courseClass.start_time} - ${courseClass.end_time}`)
+  }
+
+  if (courseClass.teacher_name) {
+    parts.push(courseClass.teacher_name)
+  }
+
+  return parts.join(' ')
+}
+
 function closeDropdownOnOutsideClick(event) {
   if (!event.target.closest('.relative')) {
     showResults.value = false
@@ -261,9 +286,19 @@ const csrfToken =
             class="w-full rounded-lg border-2 border-theme-300 px-4 py-3 text-lg focus:border-orange-500 focus:outline-none dark:border-zinc-600"
             autocomplete="off"
             :disabled="selectedItems.length >= 14"
+            :aria-describedby="
+              selectedItems.length >= 14 ? 'course-search-limit-note' : null
+            "
             @input="filterCourses()"
           />
         </div>
+        <p
+          v-if="selectedItems.length >= 14"
+          id="course-search-limit-note"
+          class="mt-1 text-sm text-theme-700 dark:text-zinc-400"
+        >
+          已選滿 14 門課程上限，請先移除課程後再搜尋新增。
+        </p>
 
         <div
           v-show="showResults && filteredCourses.length > 0"
@@ -319,14 +354,13 @@ const csrfToken =
           >
             <div class="mb-3 flex items-start justify-between">
               <div>
-                <div
-                  class="text-lg font-bold text-theme-900 dark:text-zinc-100"
-                >
+                <h3 class="text-lg font-bold text-theme-900 dark:text-zinc-100">
                   {{ item.course.name }}
-                </div>
+                </h3>
               </div>
               <button
                 type="button"
+                :aria-label="`移除 ${item.course.name}`"
                 class="inline-flex items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-100 px-3 py-1 text-sm font-semibold text-red-700 transition hover:bg-red-200"
                 @click="removeItem(index)"
               >
@@ -388,9 +422,10 @@ const csrfToken =
                             type="radio"
                             :name="'class_' + index"
                             :value="courseClass.id"
+                            :aria-label="classOptionAriaLabel(courseClass)"
                             class="mt-1 mr-3 h-5 w-5 cursor-pointer"
                           />
-                          <div class="min-w-0 flex-1">
+                          <div aria-hidden="true" class="min-w-0 flex-1">
                             <div
                               class="font-semibold text-theme-900 dark:text-zinc-100"
                             >
@@ -458,9 +493,10 @@ const csrfToken =
                           type="radio"
                           :name="'class_' + index"
                           :value="courseClass.id"
+                          :aria-label="classOptionAriaLabel(courseClass)"
                           class="mt-1 mr-3 h-5 w-5 cursor-pointer"
                         />
-                        <div class="min-w-0 flex-1">
+                        <div aria-hidden="true" class="min-w-0 flex-1">
                           <div
                             class="font-semibold text-theme-900 dark:text-zinc-100"
                           >

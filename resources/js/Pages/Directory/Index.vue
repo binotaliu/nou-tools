@@ -323,6 +323,7 @@ onMounted(() => {
                     "
                     class="truncate rounded-lg px-3 py-2 text-left text-sm font-medium transition"
                     :data-testid="'center-button-' + center.key"
+                    :aria-label="'檢視 ' + center.name + ' 詳情'"
                     @click="selectCenter(center.key)"
                   >
                     {{ center.name }}

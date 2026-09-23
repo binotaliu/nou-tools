@@ -259,6 +259,32 @@
             .getElementById('back-button')
             .addEventListener('click', () => history.back())
 
+        // Reads the cached schedule page's own <title> (SSR-rendered, e.g.
+        // "我的課表 - NOU 小幫手") so the link reads as a page name instead
+        // of a random-looking token. Falls back to the raw path on any
+        // failure, matching the surrounding script's error handling.
+        async function resolveScheduleLinkLabel(pathname) {
+            try {
+                const response = await caches.match(pathname)
+
+                if (!response) {
+                    return pathname
+                }
+
+                const html = await response.text()
+                const doc = new DOMParser().parseFromString(html, 'text/html')
+                const title = doc.querySelector('title')?.textContent?.trim()
+
+                if (!title) {
+                    return pathname
+                }
+
+                return title.replace(/\s*-\s*NOU 小幫手\s*$/, '') || pathname
+            } catch (error) {
+                return pathname
+            }
+        }
+
         // Looks through the Cache API (populated by /sw.js) for any
         // previously-visited /schedules/{token} pages, so this fallback
         // can tell the visitor whether they actually have anything
@@ -307,7 +333,7 @@
                     const link = document.createElement('a')
 
                     link.href = pathname
-                    link.textContent = pathname
+                    link.textContent = await resolveScheduleLinkLabel(pathname)
                     item.appendChild(link)
                     listEl.appendChild(item)
                 }

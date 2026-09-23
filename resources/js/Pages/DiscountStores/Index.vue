@@ -274,6 +274,7 @@ function goToPage(target) {
                 <span
                   class="inline-flex items-center gap-1 rounded-full bg-theme-100 px-3 py-1 font-medium text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
                 >
+                  <span class="sr-only">分類：</span>
                   <template v-if="store.category">
                     <DynamicHeroIcon
                       :name="store.category.icon"
@@ -286,14 +287,15 @@ function goToPage(target) {
                 <span
                   class="rounded-full bg-orange-100 px-3 py-1 font-medium text-orange-700 dark:bg-orange-950/60 dark:text-orange-300"
                 >
-                  {{ store.typeLabel }}
+                  <span class="sr-only">類型：</span>{{ store.typeLabel }}
                 </span>
 
                 <span
                   v-if="store.city"
                   class="text-theme-700 dark:text-zinc-400"
                 >
-                  {{ store.city }} {{ store.district }}
+                  <span class="sr-only">地點：</span>{{ store.city }}
+                  {{ store.district }}
                 </span>
 
                 <span
@@ -322,17 +324,13 @@ function goToPage(target) {
                   <p
                     class="line-clamp-2 text-sm text-theme-700 dark:text-zinc-400"
                   >
-                    <Link
-                      :href="`/discount-stores/${store.id}`"
-                      class="hover:underline"
-                    >
-                      {{ store.discountDetails }}
-                    </Link>
+                    {{ store.discountDetails }}
                   </p>
                 </div>
 
                 <Link
                   :href="`/discount-stores/${store.id}`"
+                  :aria-label="`檢視 ${store.name} 詳情`"
                   class="hidden! items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 text-theme-900 transition hover:bg-theme-50 md:inline-flex! dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
                 >
                   <Icon name="eye" class="size-4" />
@@ -347,6 +345,7 @@ function goToPage(target) {
                 class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800 dark:bg-zinc-800 dark:text-zinc-300"
               >
                 <Icon name="question-mark-circle" class="size-4" />
+                <span class="sr-only">狀態：</span>
                 尚無回報
               </span>
               <span
@@ -354,6 +353,7 @@ function goToPage(target) {
                 class="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800 dark:bg-green-950/60 dark:text-green-300"
               >
                 <Icon name="check-circle" class="size-4" />
+                <span class="sr-only">狀態：</span>
                 有效 –
                 <span :title="store.latestReportCreatedAtDateTime">
                   {{ store.latestReportCreatedAtDate }}
@@ -364,12 +364,14 @@ function goToPage(target) {
                 class="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800 dark:bg-red-950/60 dark:text-red-300"
               >
                 <Icon name="x-circle" class="size-4" />
+                <span class="sr-only">狀態：</span>
                 此優惠似乎無法使用
               </span>
             </div>
 
             <Link
               :href="`/discount-stores/${store.id}`"
+              :aria-label="`檢視 ${store.name} 詳情`"
               class="flex! items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 text-theme-900 transition hover:bg-theme-50 md:hidden! dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
             >
               <Icon name="eye" class="size-4" />

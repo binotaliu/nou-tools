@@ -52,7 +52,7 @@ test('can get an article from markdown file', function () {
         ->and($page->article->author)->toBe('Test Author')
         ->and($page->article->type)->toBe($type)
         ->and($page->article->slug)->toBe($slug)
-        ->and((string) $page->article->content)->toContain('<h1>Heading</h1>');
+        ->and((string) $page->article->content)->toContain('Heading</h2>');
 });
 
 test('article updated_at is parsed from front matter when present', function () {
@@ -133,8 +133,9 @@ MD;
     $article = ($this->showArticlePage)($type, $slug);
 
     expect((string) $article->article->content)
-        ->toContain('<h1>')
-        ->toContain('</h1>')
+        ->toContain('<h2')
+        ->toContain('</h2>')
+        ->not->toContain('<h1>')
         ->toContain('<p>')
         ->toContain('</p>');
 });
@@ -152,7 +153,8 @@ test('can get index content', function () {
     expect($indexContent)
         ->toBeInstanceOf(ArticleIndexPageData::class)
         ->and((string) $indexContent->indexContent)
-        ->toContain('<h1>操作手冊</h1>')
+        ->not->toContain('<h1>')
+        ->toContain('操作手冊')
         ->toContain('歡迎使用 NOU 小幫手');
 });
 

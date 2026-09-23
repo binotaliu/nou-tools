@@ -35,6 +35,7 @@ use NouTools\Domains\Articles\Markdown\Embed\YoutubeEmbedProcessor;
 use NouTools\Domains\Articles\Markdown\Embed\YoutubeEmbedRenderer;
 use NouTools\Domains\Articles\Markdown\Heading\HeadingAnchorNode;
 use NouTools\Domains\Articles\Markdown\Heading\HeadingAnchorRenderer;
+use NouTools\Domains\Articles\Markdown\Heading\HeadingLevelClampProcessor;
 use NouTools\Domains\Articles\Markdown\Heading\HeadingSlugProcessor;
 use NouTools\Domains\Articles\Markdown\Image\ImageDimensionProcessor;
 use NouTools\Domains\Articles\Markdown\Inline\CjkAutolinkParser;
@@ -113,6 +114,11 @@ final readonly class NouMarkdownExtension implements ExtensionInterface
         // A pasted YouTube `<iframe>` embed snippet becomes a rebuilt, allow-listed iframe
         $environment->addEventListener(DocumentParsedEvent::class, new YoutubeEmbedProcessor);
         $environment->addRenderer(YoutubeEmbedNode::class, new YoutubeEmbedRenderer);
+
+        // The page template always supplies its own single h1, so a body
+        // heading can never emit one (h1 -> h2). Must run before
+        // HeadingSlugProcessor so the demoted level is what gets anchored.
+        $environment->addEventListener(DocumentParsedEvent::class, new HeadingLevelClampProcessor, -90);
 
         // Heading anchors (h2-h4): `id` + trailing `#` permalink
         $environment->addEventListener(DocumentParsedEvent::class, new HeadingSlugProcessor, -100);

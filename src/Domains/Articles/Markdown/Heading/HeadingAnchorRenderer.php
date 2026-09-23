@@ -21,6 +21,8 @@ final class HeadingAnchorRenderer implements NodeRendererInterface
             'class' => 'md-heading-anchor',
             'href' => '#'.$node->getSlug(),
             'aria-label' => '連結到此段落',
+            'aria-hidden' => 'true',
+            'tabindex' => '-1',
         ], '#');
     }
 }

@@ -229,9 +229,11 @@ function submitAnnouncementPreferences() {
               <input
                 v-model="displayOptions[key]"
                 type="checkbox"
+                :aria-label="label"
                 class="size-4 rounded border-theme-400 text-theme-700 focus:ring-theme-500 dark:border-zinc-600 dark:text-zinc-300"
               />
               <span
+                aria-hidden="true"
                 class="text-sm font-medium text-theme-800 dark:text-zinc-200"
               >
                 {{ label }}
@@ -380,12 +382,14 @@ function submitAnnouncementPreferences() {
               >
                 <input
                   type="checkbox"
+                  :aria-label="`${groupLabel}（全選）`"
                   class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600 dark:text-zinc-300"
                   :checked="isGroupChecked(groupValue)"
                   :indeterminate="isGroupIndeterminate(groupValue)"
                   @change="toggleGroup(groupValue, $event.target.checked)"
                 />
                 <span
+                  aria-hidden="true"
                   class="min-w-0 truncate text-sm font-semibold text-theme-900 dark:text-zinc-100"
                 >
                   {{ groupLabel }}（全選）
@@ -430,12 +434,13 @@ function submitAnnouncementPreferences() {
                   <label class="flex cursor-pointer items-center gap-2">
                     <input
                       type="checkbox"
+                      :aria-label="source"
                       class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600 dark:text-zinc-300"
                       :checked="isSourceChecked(source)"
                       :indeterminate="isSourceIndeterminate(source)"
                       @change="toggleSource(source, $event.target.checked)"
                     />
-                    {{ source }}
+                    <span aria-hidden="true">{{ source }}</span>
                   </label>
 
                   <button
@@ -472,12 +477,13 @@ function submitAnnouncementPreferences() {
                     <input
                       type="checkbox"
                       class="sr-only"
+                      :aria-label="category"
                       :checked="isCategoryChecked(source, category)"
                       @change="
                         toggleCategory(source, category, $event.target.checked)
                       "
                     />
-                    {{ category }}
+                    <span aria-hidden="true">{{ category }}</span>
                   </label>
                 </div>
               </div>

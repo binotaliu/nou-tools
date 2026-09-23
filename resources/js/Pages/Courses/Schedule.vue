@@ -327,7 +327,6 @@ const creditsDropdown = useDropdown()
         </div>
 
         <div class="w-full sm:w-auto sm:min-w-40">
-          <label for="term" class="sr-only">選擇學期</label>
           <div class="relative">
             <select
               id="term"
@@ -362,6 +361,7 @@ const creditsDropdown = useDropdown()
           <div>
             <label
               for="search"
+              aria-hidden="true"
               class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               搜尋
@@ -371,6 +371,7 @@ const creditsDropdown = useDropdown()
               v-model="search"
               type="text"
               name="search"
+              aria-label="搜尋"
               placeholder="課程名稱..."
               class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
             />
@@ -378,6 +379,7 @@ const creditsDropdown = useDropdown()
           <div>
             <label
               for="groupBy"
+              aria-hidden="true"
               class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               分組方式
@@ -403,6 +405,7 @@ const creditsDropdown = useDropdown()
           </div>
           <div>
             <label
+              aria-hidden="true"
               class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               學系
@@ -413,6 +416,12 @@ const creditsDropdown = useDropdown()
             >
               <button
                 type="button"
+                :aria-label="
+                  '學系：' +
+                  (department.length
+                    ? '已選 ' + department.length + ' 項'
+                    : '全部學系')
+                "
                 class="flex w-full items-center justify-between rounded-lg border border-theme-200 px-3 py-2 text-left text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                 @click="
                   departmentDropdown.open.value = !departmentDropdown.open.value
@@ -449,6 +458,7 @@ const creditsDropdown = useDropdown()
           </div>
           <div>
             <label
+              aria-hidden="true"
               class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
             >
               學分
@@ -456,6 +466,12 @@ const creditsDropdown = useDropdown()
             <div :ref="el => (creditsDropdown.el.value = el)" class="relative">
               <button
                 type="button"
+                :aria-label="
+                  '學分：' +
+                  (credits.length
+                    ? '已選 ' + credits.length + ' 項'
+                    : '全部學分')
+                "
                 class="flex w-full items-center justify-between rounded-lg border border-theme-200 px-3 py-2 text-left text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
                 @click="
                   creditsDropdown.open.value = !creditsDropdown.open.value
@@ -524,12 +540,12 @@ const creditsDropdown = useDropdown()
 
         <div v-show="section.groups.length > 0" class="space-y-6">
           <div v-for="group in section.groups" :key="group.key">
-            <div
+            <h3
               v-show="group.label"
               class="mb-3 font-semibold text-theme-900 dark:text-zinc-100"
             >
               {{ group.label }}
-            </div>
+            </h3>
 
             <!-- 桌面版表格 -->
             <div
@@ -540,7 +556,9 @@ const creditsDropdown = useDropdown()
                 class="w-full border-collapse overflow-hidden rounded text-left text-theme-700 dark:text-zinc-300"
               >
                 <caption class="sr-only">
-                  課程列表
+                  {{
+                    group.label ? '課程列表－' + group.label : '課程列表'
+                  }}
                 </caption>
                 <thead
                   class="border-b-2 border-theme-300 bg-theme-100 dark:border-zinc-600 dark:bg-zinc-900"
