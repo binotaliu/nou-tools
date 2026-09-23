@@ -8,6 +8,7 @@ NOU 小幫手是給國立空中大學（NOU）學生使用的非官方工具，�
 
 - [首頁]({{ route('home') }}): 功能選單與快速入口
 - [建立課表]({{ route('schedules.create') }}): 依課程建立個人課表
+- [今日視訊面授]({{ route('video-classes.index') }}): 當日視訊面授課程與上課連結（Markdown 版本：[{{ route('video-classes.index.md') }}]({{ route('video-classes.index.md') }})）
 - [課程查詢]({{ route('course.schedule') }}): 依學期查詢課程開課時間表（Markdown 版本：[{{ route('course.schedule.md') }}]({{ route('course.schedule.md') }})）
 - [校園公告]({{ route('announcements.index') }}): 最新校園公告列表（Markdown 版本：[{{ route('announcements.index.md') }}]({{ route('announcements.index.md') }})）
 - [{{ config('newsletter.title') }}]({{ route('newsletter.index') }}): 每兩週整理一次的空大消息與校曆重點（Markdown 版本：[{{ route('newsletter.index.md') }}]({{ route('newsletter.index.md') }})；Atom 訂閱：{{ route('newsletter.feed') }}）

@@ -15,6 +15,7 @@ test('sitemap returns xml with static and dynamic pages', function () {
         ->assertHeader('Content-Type', 'application/xml; charset=utf-8')
         ->assertSee(route('home'), false)
         ->assertSee(route('announcements.index'), false)
+        ->assertSee(route('video-classes.index'), false)
         ->assertSee(route('discount-stores.index'), false)
         ->assertSee(route('course.show', $course), false)
         ->assertSee(route('articles.index', 'kb'), false)
@@ -45,5 +46,6 @@ test('llms.txt returns markdown with key links', function () {
         ->assertSee('# NOU 小幫手', false)
         ->assertSee(route('home'), false)
         ->assertSee(route('discount-stores.index'), false)
-        ->assertSee(route('discount-stores.index.md'), false);
+        ->assertSee(route('discount-stores.index.md'), false)
+        ->assertSee(route('video-classes.index.md'), false);
 });

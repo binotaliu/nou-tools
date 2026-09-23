@@ -98,6 +98,12 @@ const moreMenuItems = [
     icon: 'newspaper',
   },
   {
+    href: '/video-classes',
+    prefix: '/video-classes',
+    label: '今日視訊面授',
+    icon: 'video-camera',
+  },
+  {
     href: '/courses/schedule',
     prefix: '/courses/schedule',
     label: '本學期開課表',

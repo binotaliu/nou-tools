@@ -109,7 +109,7 @@ it('puts learning progress after my schedule in both navs and moves Alt UU and d
     $page->click('[data-testid="bottom-nav-more"]');
 
     expect(linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))
-        ->toContain('優惠店家', 'Alt UU');
+        ->toContain('優惠店家', 'Alt UU', '今日視訊面授');
 });
 
 it('highlights learning progress, not my schedule, on a learning progress page', function () {
