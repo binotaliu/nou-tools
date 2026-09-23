@@ -6,8 +6,7 @@ use NouTools\Domains\Announcements\Actions\SyncAnnouncements;
 use NouTools\Domains\Announcements\DataTransferObjects\AnnouncementSourceConfigDTO;
 use NouTools\Domains\Announcements\Fetchers\SchoolHpFetcher;
 
-function schoolHpSourceConfig(array $overrides = []): AnnouncementSourceConfigDTO
-{
+$schoolHpSourceConfig = function (array $overrides = []): AnnouncementSourceConfigDTO {
     return AnnouncementSourceConfigDTO::fromConfig(
         $overrides['key'] ?? 'school-homepage-source',
         array_merge([
@@ -20,10 +19,10 @@ function schoolHpSourceConfig(array $overrides = []): AnnouncementSourceConfigDT
             'is_active' => true,
         ], $overrides),
     );
-}
+};
 
-it('parses tab list items across every news tab', function () {
-    $source = schoolHpSourceConfig();
+it('parses tab list items across every news tab', function () use ($schoolHpSourceConfig) {
+    $source = $schoolHpSourceConfig();
 
     $html = <<<'HTML'
     <html><body>
@@ -80,8 +79,8 @@ it('parses tab list items across every news tab', function () {
         ->and($results[2]->url)->toBe('https://studadm.nou.edu.tw/FileManage/download?categoryId=12');
 });
 
-it('skips tab items without href, title, or date', function () {
-    $source = schoolHpSourceConfig([
+it('skips tab items without href, title, or date', function () use ($schoolHpSourceConfig) {
+    $source = $schoolHpSourceConfig([
         'fetch_url' => 'https://example.com/',
         'fetcher_config' => ['base_url' => 'https://example.com'],
     ]);
@@ -131,8 +130,8 @@ it('skips tab items without href, title, or date', function () {
         ->and($results[0]->url)->toBe('https://example.com/news/3');
 });
 
-it('syncs school homepage announcements', function () {
-    $source = schoolHpSourceConfig();
+it('syncs school homepage announcements', function () use ($schoolHpSourceConfig) {
+    $source = $schoolHpSourceConfig();
 
     $html = <<<'HTML'
     <html><body>

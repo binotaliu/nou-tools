@@ -14,8 +14,7 @@ use function Pest\Laravel\get;
  *
  * @return array<string, array<int, string>>
  */
-function selectedSourceCategoriesFromResponse(TestResponse $response): array
-{
+$selectedSourceCategoriesFromResponse = function (TestResponse $response): array {
     $props = null;
 
     $response->assertInertia(function (Assert $page) use (&$props) {
@@ -26,7 +25,7 @@ function selectedSourceCategoriesFromResponse(TestResponse $response): array
         ->filter(fn (array $selection) => $selection['selectedCategories'] !== [])
         ->mapWithKeys(fn (array $selection) => [$selection['source'] => $selection['selectedCategories']])
         ->all();
-}
+};
 
 it('shows announcement entry points on home page', function () {
     $response = get(route('home'));
@@ -62,7 +61,7 @@ it('shows latest announcements with filter options', function () {
     });
 });
 
-it('filters announcements by source and category', function () {
+it('filters announcements by source and category', function () use ($selectedSourceCategoriesFromResponse) {
     Announcement::factory()->create([
         'source_name' => '教務處',
         'category' => '考試資訊',
@@ -97,7 +96,7 @@ it('filters announcements by source and category', function () {
     expect($titles)->toContain('保留的公告');
     expect($titles)->not->toContain('錯誤分類公告', '錯誤來源公告');
 
-    $currentFilters = selectedSourceCategoriesFromResponse($response);
+    $currentFilters = $selectedSourceCategoriesFromResponse($response);
 
     expect($currentFilters)->toHaveKey('教務處');
     expect($currentFilters['教務處'])->toContain('考試資訊');
@@ -131,7 +130,7 @@ it('keeps filtered results paginated', function () {
     });
 });
 
-it('filters announcements by selected source categories tree', function () {
+it('filters announcements by selected source categories tree', function () use ($selectedSourceCategoriesFromResponse) {
     Announcement::factory()->create([
         'source_name' => '教務處',
         'category' => '考試資訊',
@@ -167,13 +166,13 @@ it('filters announcements by selected source categories tree', function () {
     expect($titles)->toContain('教務處考試公告');
     expect($titles)->not->toContain('教務處選課公告', '台北中心公告');
 
-    $currentFilters = selectedSourceCategoriesFromResponse($response);
+    $currentFilters = $selectedSourceCategoriesFromResponse($response);
 
     expect($currentFilters)->toHaveKey('教務處');
     expect($currentFilters['教務處'])->toContain('考試資訊');
 });
 
-it('filters announcements by multiple sources', function () {
+it('filters announcements by multiple sources', function () use ($selectedSourceCategoriesFromResponse) {
     Announcement::factory()->create([
         'source_name' => '教務處',
         'category' => '考試資訊',
@@ -207,7 +206,7 @@ it('filters announcements by multiple sources', function () {
     expect($titles)->toContain('教務處公告', '台北中心公告');
     expect($titles)->not->toContain('其他來源公告');
 
-    $currentFilters = selectedSourceCategoriesFromResponse($response);
+    $currentFilters = $selectedSourceCategoriesFromResponse($response);
 
     expect($currentFilters)->toHaveKeys(['教務處', '台北中心']);
 });

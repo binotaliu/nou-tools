@@ -8,8 +8,7 @@ use NotificationChannels\WebPush\Events\NotificationSent;
 use NotificationChannels\WebPush\PushSubscription;
 use NotificationChannels\WebPush\WebPushMessage;
 
-function pushSubscriptionFor(string $endpoint): PushSubscription
-{
+$pushSubscriptionFor = function (string $endpoint): PushSubscription {
     $subscription = new PushSubscription;
     $subscription->forceFill([
         'subscribable_type' => 'App\\Models\\StudentSchedule',
@@ -20,10 +19,10 @@ function pushSubscriptionFor(string $endpoint): PushSubscription
     ]);
 
     return $subscription;
-}
+};
 
-it('records a successful web push delivery', function () {
-    $subscription = pushSubscriptionFor('https://fcm.googleapis.com/fcm/send/success');
+it('records a successful web push delivery', function () use ($pushSubscriptionFor) {
+    $subscription = $pushSubscriptionFor('https://fcm.googleapis.com/fcm/send/success');
     $report = new MessageSentReport(new PsrRequest('POST', $subscription->endpoint));
 
     event(new NotificationSent($report, $subscription, new WebPushMessage));
@@ -37,8 +36,8 @@ it('records a successful web push delivery', function () {
     ]);
 });
 
-it('records a failed web push delivery with its reason', function () {
-    $subscription = pushSubscriptionFor('https://fcm.googleapis.com/fcm/send/failure');
+it('records a failed web push delivery with its reason', function () use ($pushSubscriptionFor) {
+    $subscription = $pushSubscriptionFor('https://fcm.googleapis.com/fcm/send/failure');
     $report = new MessageSentReport(new PsrRequest('POST', $subscription->endpoint), success: false, reason: 'Gone');
 
     event(new NotificationFailed($report, $subscription, new WebPushMessage));

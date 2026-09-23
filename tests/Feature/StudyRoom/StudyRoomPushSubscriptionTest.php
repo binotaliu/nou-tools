@@ -2,20 +2,19 @@
 
 use App\Models\StudentSchedule;
 
-function studyRoomPushCookie(StudentSchedule $schedule): string
-{
+$studyRoomPushCookie = function (StudentSchedule $schedule): string {
     return json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
     ]);
-}
+};
 
-it('subscribes the viewer resolved from the study room cookie', function () {
+it('subscribes the viewer resolved from the study room cookie', function () use ($studyRoomPushCookie) {
     $schedule = StudentSchedule::factory()->create();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomPushCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomPushCookie($schedule))
         ->postJson(route('study-room.push-subscriptions.store'), [
             'endpoint' => 'https://fcm.googleapis.com/fcm/send/study-room-1',
             'keys' => ['p256dh' => 'p256dh-key', 'auth' => 'auth-token'],
@@ -32,11 +31,11 @@ it('subscribes the viewer resolved from the study room cookie', function () {
     ]);
 });
 
-it('does not opt the viewer into class reminders by subscribing for the study room', function () {
+it('does not opt the viewer into class reminders by subscribing for the study room', function () use ($studyRoomPushCookie) {
     $schedule = StudentSchedule::factory()->create();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomPushCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomPushCookie($schedule))
         ->postJson(route('study-room.push-subscriptions.store'), [
             'endpoint' => 'https://fcm.googleapis.com/fcm/send/study-room-4',
             'keys' => ['p256dh' => 'p256dh-key', 'auth' => 'auth-token'],
@@ -55,11 +54,11 @@ it('rejects a visitor without a study room cookie', function () {
     $this->assertDatabaseCount('push_subscriptions', 0);
 });
 
-it('rejects an incomplete subscription payload', function () {
+it('rejects an incomplete subscription payload', function () use ($studyRoomPushCookie) {
     $schedule = StudentSchedule::factory()->create();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomPushCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomPushCookie($schedule))
         ->postJson(route('study-room.push-subscriptions.store'), [
             'endpoint' => 'https://fcm.googleapis.com/fcm/send/study-room-3',
             'keys' => ['p256dh' => 'p256dh-key'],
@@ -68,7 +67,7 @@ it('rejects an incomplete subscription payload', function () {
         ->assertJsonValidationErrors(['keys.auth']);
 });
 
-it('reuses the one subscription a browser holds rather than adding a second', function () {
+it('reuses the one subscription a browser holds rather than adding a second', function () use ($studyRoomPushCookie) {
     $schedule = StudentSchedule::factory()->create();
 
     $schedule->updatePushSubscription(
@@ -78,7 +77,7 @@ it('reuses the one subscription a browser holds rather than adding a second', fu
     );
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomPushCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomPushCookie($schedule))
         ->postJson(route('study-room.push-subscriptions.store'), [
             'endpoint' => 'https://fcm.googleapis.com/fcm/send/shared',
             'keys' => ['p256dh' => 'new-key', 'auth' => 'new-token'],

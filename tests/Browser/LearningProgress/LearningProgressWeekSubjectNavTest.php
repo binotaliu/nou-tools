@@ -11,8 +11,7 @@ use Illuminate\Support\Carbon;
 
 afterEach(fn () => Carbon::setTestNow());
 
-function dismissRememberModalIfPresentForNav($page): void
-{
+$dismissRememberModalIfPresentForNav = function ($page): void {
     waitUntil(
         $page,
         'document.querySelector(\'[data-testid="remember-schedule-dismiss"]\') !== null'.
@@ -22,10 +21,9 @@ function dismissRememberModalIfPresentForNav($page): void
     if ($page->script("!!document.querySelector('[data-testid=\"remember-schedule-dismiss\"]')")) {
         $page->click('[data-testid="remember-schedule-dismiss"]');
     }
-}
+};
 
-function scheduleWithTwoCourses(): StudentSchedule
-{
+$scheduleWithTwoCourses = function (): StudentSchedule {
     config()->set('app.current_semester', '2025B');
     config()->set('app.current_semester_range', ['2026-02-23', '2026-06-28']);
 
@@ -43,16 +41,16 @@ function scheduleWithTwoCourses(): StudentSchedule
     }
 
     return $schedule;
-}
+};
 
-it('clamps the week switch at the semester edges and offers a jump back to the current week', function () {
+it('clamps the week switch at the semester edges and offers a jump back to the current week', function () use ($dismissRememberModalIfPresentForNav, $scheduleWithTwoCourses) {
     Carbon::setTestNow('2026-02-23 09:00:00'); // the semester's first Monday: week 1
 
-    $schedule = scheduleWithTwoCourses();
+    $schedule = $scheduleWithTwoCourses();
 
     $page = visit(route('learning-progress.show', ['schedule' => $schedule, 'term' => '2025B']))
         ->resize(390, 844);
-    dismissRememberModalIfPresentForNav($page);
+    $dismissRememberModalIfPresentForNav($page);
 
     $page->click('[data-testid="learning-progress-view-tab-week"]');
 
@@ -74,12 +72,12 @@ it('clamps the week switch at the semester edges and offers a jump back to the c
     ))->toBeTrue();
 });
 
-it('wraps the subject switch around and always shows a target name', function () {
-    $schedule = scheduleWithTwoCourses();
+it('wraps the subject switch around and always shows a target name', function () use ($dismissRememberModalIfPresentForNav, $scheduleWithTwoCourses) {
+    $schedule = $scheduleWithTwoCourses();
 
     $page = visit(route('learning-progress.show', ['schedule' => $schedule, 'term' => '2025B']))
         ->resize(390, 844);
-    dismissRememberModalIfPresentForNav($page);
+    $dismissRememberModalIfPresentForNav($page);
 
     $page->click('[data-testid="learning-progress-view-tab-subject"]')
         ->assertSeeIn('[data-testid="learning-progress-subject-prev"]', '統計學')

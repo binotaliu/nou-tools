@@ -21,21 +21,19 @@ use Illuminate\Support\Facades\File;
 // fixture and removes it again afterwards.
 const FIXTURE_SLUG = 'browser-markdown-containers-fixture';
 
-function markdownContainerFixturePath(): string
-{
+$markdownContainerFixturePath = function (): string {
     return resource_path('articles/manual/'.FIXTURE_SLUG.'.md');
-}
+};
 
-function markdownContainerFixtureUrl(): string
-{
+$markdownContainerFixtureUrl = function (): string {
     return route('articles.show', ['type' => 'manual', 'slug' => FIXTURE_SLUG]);
-}
+};
 
-beforeEach(function (): void {
+beforeEach(function () use ($markdownContainerFixturePath): void {
     // The countdown's day count is anchored to "today" in Asia/Taipei, so
     // the dates here are far enough either side of now to stay stable: the
     // first item is permanently 已結束, the second permanently counting down.
-    File::put(markdownContainerFixturePath(), <<<'MD'
+    File::put($markdownContainerFixturePath(), <<<'MD'
 ---
 title: Markdown 容器測試
 author: 測試
@@ -74,15 +72,15 @@ description: 瀏覽器測試專用的臨時文章。
 MD);
 });
 
-afterEach(function (): void {
-    File::delete(markdownContainerFixturePath());
+afterEach(function () use ($markdownContainerFixturePath): void {
+    File::delete($markdownContainerFixturePath());
 });
 
-it('shows only the active tab panel and keeps nested tabs independent', function () {
+it('shows only the active tab panel and keeps nested tabs independent', function () use ($markdownContainerFixtureUrl) {
     // Without JavaScript every panel is visible (that's the intended no-JS
     // fallback), so the "not visible" assertions below only mean anything
     // once hydration has run.
-    $page = visit(markdownContainerFixtureUrl());
+    $page = visit($markdownContainerFixtureUrl());
 
     // useMarkdownContainers() enhances tabs, checklists and countdowns in one
     // mount pass, so data-enhanced (set by enhanceTabs()) confirms the whole
@@ -118,8 +116,8 @@ it('shows only the active tab panel and keeps nested tabs independent', function
         ->assertDontSee('內層甲內容');
 });
 
-it('persists checklist ticks across a reload', function () {
-    $page = visit(markdownContainerFixtureUrl());
+it('persists checklist ticks across a reload', function () use ($markdownContainerFixtureUrl) {
+    $page = visit($markdownContainerFixtureUrl());
 
     waitUntil($page, 'document.querySelector(\'.md-tabs[data-enhanced]\') !== null');
 
@@ -155,8 +153,8 @@ it('persists checklist ticks across a reload', function () {
         ->assertNotChecked('.md-checklist ul li:nth-child(2) input[type="checkbox"]');
 });
 
-it('renders countdown day counts against Asia/Taipei today', function () {
-    $page = visit(markdownContainerFixtureUrl())->wait(1);
+it('renders countdown day counts against Asia/Taipei today', function () use ($markdownContainerFixtureUrl) {
+    $page = visit($markdownContainerFixtureUrl())->wait(1);
 
     $page->assertNoJavaScriptErrors();
 

@@ -23,8 +23,7 @@ use Pest\Browser\Api\PendingAwaitablePage;
 // can race it and find nothing. Rather than guessing how long hydration
 // takes, poll until either the modal shows up or the print button (always
 // present once hydrated, modal or not) confirms hydration finished.
-function dismissRememberModalIfPresent(PendingAwaitablePage $page): void
-{
+$dismissRememberModalIfPresent = function (PendingAwaitablePage $page): void {
     waitUntil(
         $page,
         'document.querySelector(\'[data-testid="remember-schedule-dismiss"]\') !== null'.
@@ -34,9 +33,9 @@ function dismissRememberModalIfPresent(PendingAwaitablePage $page): void
     if ($page->script("!!document.querySelector('[data-testid=\"remember-schedule-dismiss\"]')")) {
         $page->click('[data-testid="remember-schedule-dismiss"]');
     }
-}
+};
 
-it('submits the term form and navigates when a different semester is selected', function () {
+it('submits the term form and navigates when a different semester is selected', function () use ($dismissRememberModalIfPresent) {
     config()->set('app.current_semester', '2026C');
 
     $currentCourse = Course::factory()->create(['term' => '2026C']);
@@ -62,7 +61,7 @@ it('submits the term form and navigates when a different semester is selected', 
     ]);
 
     $page = visit(route('schedules.show', $schedule));
-    dismissRememberModalIfPresent($page);
+    $dismissRememberModalIfPresent($page);
 
     // select() submits the form (@change="$event.target.form.submit()"),
     // which navigates the page. Give that navigation a moment to land before
@@ -75,14 +74,14 @@ it('submits the term form and navigates when a different semester is selected', 
     expect($page->url())->toContain('term=2025B');
 });
 
-it('offers each week start for the schedule PDF from the print menu', function () {
+it('offers each week start for the schedule PDF from the print menu', function () use ($dismissRememberModalIfPresent) {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
         'name' => 'Print Schedule',
     ]);
 
     $page = visit(route('schedules.show', ['schedule' => $schedule, 'term' => '2025B']));
-    dismissRememberModalIfPresent($page);
+    $dismissRememberModalIfPresent($page);
 
     $page->assertMissing('[data-testid="schedule-print-menu"]')
         ->click('[data-testid="schedule-print-button"]')
@@ -102,8 +101,7 @@ it('offers each week start for the schedule PDF from the print menu', function (
 // headless tab isn't standalone and can't share files, so both are stubbed
 // (the head script's `html[data-pwa]` flag, `navigator.share`), and so is the
 // PDF request, which is held until the test releases it to see the loading state.
-function stubPwaPdfShare($page, array $shareFailures = [], int $pdfStatus = 200): void
-{
+$stubPwaPdfShare = function ($page, array $shareFailures = [], int $pdfStatus = 200): void {
     $failures = json_encode($shareFailures);
 
     $page->script(<<<JS
@@ -126,75 +124,72 @@ function stubPwaPdfShare($page, array $shareFailures = [], int $pdfStatus = 200)
                 : realFetch(url, ...rest);
         })()
         JS);
-}
+};
 
-function openPrintMenuAndChoose($page, string $weekStart): void
-{
+$openPrintMenuAndChoose = function ($page, string $weekStart): void {
     $page->click('[data-testid="schedule-print-button"]')
         ->click('[data-testid="schedule-print-'.$weekStart.'"]');
-}
+};
 
-function sharedFiles($page): array
-{
+$sharedFiles = function ($page): array {
     return json_decode($page->script('JSON.stringify(window.__shared)'), true);
-}
+};
 
-function visitPrintableSchedule(): PendingAwaitablePage
-{
+$visitPrintableSchedule = function () use ($dismissRememberModalIfPresent): PendingAwaitablePage {
     $schedule = StudentSchedule::create(['uuid' => Str::uuid(), 'name' => 'Print Schedule']);
     $page = visit(route('schedules.show', ['schedule' => $schedule, 'term' => '2025B']));
-    dismissRememberModalIfPresent($page);
+    $dismissRememberModalIfPresent($page);
 
     return $page;
-}
+};
 
-it('shares the PDF from an installed PWA instead of navigating to it, showing a loading state meanwhile', function () {
-    $page = visitPrintableSchedule();
-    stubPwaPdfShare($page);
+it('shares the PDF from an installed PWA instead of navigating to it, showing a loading state meanwhile', function () use ($stubPwaPdfShare, $openPrintMenuAndChoose, $sharedFiles, $visitPrintableSchedule) {
+    $page = $visitPrintableSchedule();
+    $stubPwaPdfShare($page);
     $url = $page->url();
 
-    openPrintMenuAndChoose($page, 'sunday');
+    $openPrintMenuAndChoose($page, 'sunday');
 
     $page->assertSee('產生 PDF 中…');
     expect($page->script('document.querySelector(\'[data-testid="schedule-print-button"]\').disabled'))->toBeTrue();
-    expect(sharedFiles($page))->toBe([]);
+    expect($sharedFiles($page))->toBe([]);
 
     $page->script('window.__releasePdf()');
 
     waitUntil($page, 'window.__shared.length > 0');
 
-    expect(sharedFiles($page))->toBe(['nou-schedule-2025B.pdf|application/pdf'])
+    expect($sharedFiles($page))->toBe(['nou-schedule-2025B.pdf|application/pdf'])
         ->and($page->url())->toBe($url);
     $page->assertDontSee('產生 PDF 中…')->assertSee('列印');
 });
 
-it('asks for another tap when the browser refuses to share after the wait', function () {
-    $page = visitPrintableSchedule();
-    stubPwaPdfShare($page, ['NotAllowedError']);
+it('asks for another tap when the browser refuses to share after the wait', function () use ($stubPwaPdfShare, $openPrintMenuAndChoose, $sharedFiles, $visitPrintableSchedule) {
+    $page = $visitPrintableSchedule();
+    $stubPwaPdfShare($page, ['NotAllowedError']);
 
-    openPrintMenuAndChoose($page, 'monday');
+    $openPrintMenuAndChoose($page, 'monday');
     $page->script('window.__releasePdf()');
 
     waitUntil($page, "document.body.textContent.includes('分享 PDF')");
 
-    expect(sharedFiles($page))->toBe([]);
+    expect($sharedFiles($page))->toBe([]);
     $page->assertSee('分享 PDF')->click('[data-testid="schedule-print-button"]');
 
     waitUntil($page, 'window.__shared.length > 0');
 
-    expect(sharedFiles($page))->toBe(['nou-schedule-2025B.pdf|application/pdf']);
+    expect($sharedFiles($page))->toBe(['nou-schedule-2025B.pdf|application/pdf']);
     $page->assertDontSee('分享 PDF')->assertSee('列印');
 });
 
-it('says so when the PDF cannot be produced', function () {
-    $page = visitPrintableSchedule();
-    stubPwaPdfShare($page, [], 500);
+it('says so when the PDF cannot be produced', function () use ($stubPwaPdfShare, $openPrintMenuAndChoose, $sharedFiles, $visitPrintableSchedule) {
+    $page = $visitPrintableSchedule();
+    $stubPwaPdfShare($page, [], 500);
 
-    openPrintMenuAndChoose($page, 'monday');
+    $openPrintMenuAndChoose($page, 'monday');
     $page->script('window.__releasePdf()');
 
     waitUntil($page, 'document.querySelector(\'[data-testid="schedule-print-error"]\') !== null');
 
     $page->assertPresent('[data-testid="schedule-print-error"]')->assertSee('無法產生 PDF');
-    expect(sharedFiles($page))->toBe([]);
+    expect($sharedFiles($page))->toBe([]);
 });

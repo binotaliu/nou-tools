@@ -8,14 +8,13 @@ use Illuminate\Support\Str;
 // read from that attribute rather than from visible text. Autoplay is
 // stopped first with the pause control so slide timing can't race the checks.
 
-function activeHeroSlide($page): mixed
-{
+$activeHeroSlide = function ($page): mixed {
     return $page->script(<<<'JS'
         [...document.querySelectorAll('[data-testid^="hero-slide-"]')]
             .find(slide => !slide.inert)
             ?.dataset.testid
     JS);
-}
+};
 
 it('promotes the three features, each with an illustration and the unofficial tagline', function () {
     $page = visit(route('home'))->assertPresent('[data-testid="home-hero"]');
@@ -46,23 +45,23 @@ it('promotes the three features, each with an illustration and the unofficial ta
     }
 });
 
-it('moves between slides with the arrows and dots, wrapping at both ends', function () {
+it('moves between slides with the arrows and dots, wrapping at both ends', function () use ($activeHeroSlide) {
     $page = visit(route('home'))->assertPresent('[data-testid="home-hero"]');
     $page->script("document.querySelector('[data-testid=\"hero-toggle-autoplay\"]').click()");
 
-    expect(activeHeroSlide($page))->toBe('hero-slide-schedule');
+    expect($activeHeroSlide($page))->toBe('hero-slide-schedule');
 
     $page->script("document.querySelector('[data-testid=\"hero-next\"]').click()");
-    expect(activeHeroSlide($page))->toBe('hero-slide-learning-progress');
+    expect($activeHeroSlide($page))->toBe('hero-slide-learning-progress');
 
     $page->script("document.querySelector('[data-testid=\"hero-dot-study-room\"]').click()");
-    expect(activeHeroSlide($page))->toBe('hero-slide-study-room');
+    expect($activeHeroSlide($page))->toBe('hero-slide-study-room');
 
     $page->script("document.querySelector('[data-testid=\"hero-next\"]').click()");
-    expect(activeHeroSlide($page))->toBe('hero-slide-schedule');
+    expect($activeHeroSlide($page))->toBe('hero-slide-schedule');
 
     $page->script("document.querySelector('[data-testid=\"hero-previous\"]').click()");
-    expect(activeHeroSlide($page))->toBe('hero-slide-study-room');
+    expect($activeHeroSlide($page))->toBe('hero-slide-study-room');
 });
 
 it('links each slide to schedule creation', function () {

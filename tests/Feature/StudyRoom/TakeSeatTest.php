@@ -6,30 +6,28 @@ use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Event;
 
-function studyRoomCookie(StudentSchedule $schedule): string
-{
+$studyRoomCookie = function (StudentSchedule $schedule): string {
     return json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
     ]);
-}
+};
 
-function withStudyRoomProfile(StudentSchedule $schedule): StudentSchedule
-{
+$withStudyRoomProfile = function (StudentSchedule $schedule): StudentSchedule {
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
 
     return $schedule;
-}
+};
 
-it('claims an empty seat', function () {
+it('claims an empty seat', function () use ($studyRoomCookie, $withStudyRoomProfile) {
     Event::fake([StudyRoomUpdated::class]);
 
-    $schedule = withStudyRoomProfile(StudentSchedule::factory()->create());
+    $schedule = $withStudyRoomProfile(StudentSchedule::factory()->create());
     $seat = StudyRoomSeat::factory()->create(['floor' => 1]);
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomCookie($schedule))
         ->postJson(route('study-room.seats.take', $seat));
 
     $response->assertOk()->assertJsonPath('ok', true);
@@ -43,17 +41,17 @@ it('claims an empty seat', function () {
     );
 });
 
-it('rejects a seat someone else already holds', function () {
+it('rejects a seat someone else already holds', function () use ($studyRoomCookie, $withStudyRoomProfile) {
     Event::fake([StudyRoomUpdated::class]);
 
-    $occupant = withStudyRoomProfile(StudentSchedule::factory()->create());
+    $occupant = $withStudyRoomProfile(StudentSchedule::factory()->create());
     $seat = StudyRoomSeat::factory()->create(['floor' => 1]);
     $seat->update(['student_schedule_id' => $occupant->id, 'occupied_at' => now(), 'last_seen_at' => now()]);
 
-    $challenger = withStudyRoomProfile(StudentSchedule::factory()->create());
+    $challenger = $withStudyRoomProfile(StudentSchedule::factory()->create());
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomCookie($challenger))
+        ->withCookie('student_schedule', $studyRoomCookie($challenger))
         ->postJson(route('study-room.seats.take', $seat));
 
     $response->assertStatus(409)->assertJsonPath('message', '這個位子已經有人坐了。');
@@ -62,20 +60,20 @@ it('rejects a seat someone else already holds', function () {
     expect($seat->student_schedule_id)->toBe($occupant->id);
 });
 
-it('rejects claiming a second seat without leaving the first', function () {
+it('rejects claiming a second seat without leaving the first', function () use ($studyRoomCookie, $withStudyRoomProfile) {
     Event::fake([StudyRoomUpdated::class]);
 
-    $schedule = withStudyRoomProfile(StudentSchedule::factory()->create());
+    $schedule = $withStudyRoomProfile(StudentSchedule::factory()->create());
     $firstSeat = StudyRoomSeat::factory()->create(['floor' => 1]);
     $secondSeat = StudyRoomSeat::factory()->create(['floor' => 1]);
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomCookie($schedule))
         ->postJson(route('study-room.seats.take', $firstSeat))
         ->assertOk();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomCookie($schedule))
         ->postJson(route('study-room.seats.take', $secondSeat));
 
     $response->assertStatus(422)->assertJsonPath('message', '請先離開目前的座位，才能選擇其他座位。');
@@ -87,14 +85,14 @@ it('rejects claiming a second seat without leaving the first', function () {
         ->and($secondSeat->student_schedule_id)->toBeNull();
 });
 
-it('rejects claiming a seat on a floor that is not open', function () {
+it('rejects claiming a seat on a floor that is not open', function () use ($studyRoomCookie, $withStudyRoomProfile) {
     Event::fake([StudyRoomUpdated::class]);
 
-    $schedule = withStudyRoomProfile(StudentSchedule::factory()->create());
+    $schedule = $withStudyRoomProfile(StudentSchedule::factory()->create());
     $seat = StudyRoomSeat::factory()->create(['floor' => 3]);
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomCookie($schedule))
         ->postJson(route('study-room.seats.take', $seat));
 
     $response->assertStatus(422);
@@ -103,12 +101,12 @@ it('rejects claiming a seat on a floor that is not open', function () {
     expect($seat->student_schedule_id)->toBeNull();
 });
 
-it('rejects taking a seat without a profile', function () {
+it('rejects taking a seat without a profile', function () use ($studyRoomCookie) {
     $schedule = StudentSchedule::factory()->create();
     $seat = StudyRoomSeat::factory()->create(['floor' => 1]);
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomCookie($schedule))
         ->postJson(route('study-room.seats.take', $seat));
 
     $response->assertStatus(403);

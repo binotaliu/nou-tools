@@ -6,14 +6,13 @@ use App\Models\StudyRoomSeat;
 use App\Settings\StudyRoomSettings;
 use Inertia\Testing\AssertableInertia as Assert;
 
-function studyRoomScheduleCookie(StudentSchedule $schedule): string
-{
+$studyRoomScheduleCookie = function (StudentSchedule $schedule): string {
     return json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
     ]);
-}
+};
 
 it('shows the schedule prompt state when there is no cookie', function () {
     $response = $this->get(route('study-room.show'));
@@ -25,11 +24,11 @@ it('shows the schedule prompt state when there is no cookie', function () {
     );
 });
 
-it('flags that a profile is still needed when there is a cookie but no profile', function () {
+it('flags that a profile is still needed when there is a cookie but no profile', function () use ($studyRoomScheduleCookie) {
     $schedule = StudentSchedule::factory()->create();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomScheduleCookie($schedule))
         ->get(route('study-room.show'));
 
     // The live seat map / profile check itself is a client-side concern
@@ -43,12 +42,12 @@ it('flags that a profile is still needed when there is a cookie but no profile',
     );
 });
 
-it('does not flag needsProfile when there is a cookie and a profile', function () {
+it('does not flag needsProfile when there is a cookie and a profile', function () use ($studyRoomScheduleCookie) {
     $schedule = StudentSchedule::factory()->create();
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomScheduleCookie($schedule))
         ->get(route('study-room.show'));
 
     $response->assertOk()->assertInertia(
@@ -58,7 +57,7 @@ it('does not flag needsProfile when there is a cookie and a profile', function (
     );
 });
 
-it('renders the announcement markdown as html', function () {
+it('renders the announcement markdown as html', function () use ($studyRoomScheduleCookie) {
     $schedule = StudentSchedule::factory()->create();
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
 
@@ -68,7 +67,7 @@ it('renders the announcement markdown as html', function () {
     app()->forgetInstance(StudyRoomSettings::class);
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomScheduleCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomScheduleCookie($schedule))
         ->get(route('study-room.show'));
 
     $response->assertOk()->assertInertia(

@@ -6,8 +6,7 @@ use NouTools\Domains\Announcements\Actions\SyncAnnouncements;
 use NouTools\Domains\Announcements\DataTransferObjects\AnnouncementSourceConfigDTO;
 use NouTools\Domains\Announcements\Fetchers\HtmlScrapeFetcher;
 
-function htmlSourceConfig(array $overrides = []): AnnouncementSourceConfigDTO
-{
+$htmlSourceConfig = function (array $overrides = []): AnnouncementSourceConfigDTO {
     return AnnouncementSourceConfigDTO::fromConfig(
         $overrides['key'] ?? 'html-source',
         array_merge([
@@ -20,10 +19,10 @@ function htmlSourceConfig(array $overrides = []): AnnouncementSourceConfigDTO
             'is_active' => true,
         ], $overrides),
     );
-}
+};
 
-it('parses HTML response into fetched DTOs', function () {
-    $source = htmlSourceConfig([
+it('parses HTML response into fetched DTOs', function () use ($htmlSourceConfig) {
+    $source = $htmlSourceConfig([
         'fetch_url' => 'https://www2.nou.edu.tw/taichung/doclist.aspx?uid=2554&pid=2553',
         'fetcher_config' => ['base_url' => 'https://www2.nou.edu.tw/taichung'],
     ]);
@@ -77,8 +76,8 @@ it('parses HTML response into fetched DTOs', function () {
         ->and($results[1]->title)->toBe('南投校區114(下)一般生期中考考場公告');
 });
 
-it('syncs new announcements from HTML source', function () {
-    $source = htmlSourceConfig([
+it('syncs new announcements from HTML source', function () use ($htmlSourceConfig) {
+    $source = $htmlSourceConfig([
         'fetch_url' => 'https://www2.nou.edu.tw/taichung/doclist.aspx',
         'fetcher_config' => ['base_url' => 'https://www2.nou.edu.tw/taichung'],
     ]);
@@ -118,8 +117,8 @@ it('syncs new announcements from HTML source', function () {
         ->and($announcement->expired_at)->toBeNull();
 });
 
-it('skips items without title or link', function () {
-    $source = htmlSourceConfig();
+it('skips items without title or link', function () use ($htmlSourceConfig) {
+    $source = $htmlSourceConfig();
 
     $html = <<<'HTML'
     <html><body>
@@ -161,8 +160,8 @@ it('skips items without title or link', function () {
         ->and($results[0]->title)->toBe('有效的公告');
 });
 
-it('handles empty HTML list gracefully', function () {
-    $source = htmlSourceConfig();
+it('handles empty HTML list gracefully', function () use ($htmlSourceConfig) {
+    $source = $htmlSourceConfig();
 
     Http::fake([
         'example.com/*' => Http::response('<html><body><ul class="page-list-cont"></ul></body></html>'),

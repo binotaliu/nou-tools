@@ -14,29 +14,27 @@ use Illuminate\Support\Facades\Date;
 use Inertia\Testing\AssertableInertia as Assert;
 use NouTools\Domains\StudyRoom\Actions\ReleaseIdleSeats;
 
-function studyTimerCookie(StudentSchedule $schedule): string
-{
+$studyTimerCookie = function (StudentSchedule $schedule): string {
     return json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
     ]);
-}
+};
 
-function seatedStudent(): array
-{
+$seatedStudent = function (): array {
     $schedule = StudentSchedule::factory()->create();
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
     $seat = StudyRoomSeat::factory()->occupiedBy($schedule)->create(['floor' => 1]);
 
     return [$schedule, $seat];
-}
+};
 
-it('sets timer_ends_at to 25 minutes out for a pomodoro', function () {
-    [$schedule, $seat] = seatedStudent();
+it('sets timer_ends_at to 25 minutes out for a pomodoro', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -51,13 +49,13 @@ it('sets timer_ends_at to 25 minutes out for a pomodoro', function () {
         ->and((int) $seat->timer_started_at->diffInMinutes($seat->timer_ends_at))->toBe(25);
 });
 
-it('records exactly 600 focus seconds when stopping a pomodoro 10 minutes in', function () {
-    [$schedule, $seat] = seatedStudent();
+it('records exactly 600 focus seconds when stopping a pomodoro 10 minutes in', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -68,7 +66,7 @@ it('records exactly 600 focus seconds when stopping a pomodoro 10 minutes in', f
     $this->travel(10)->minutes();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->deleteJson(route('study-room.timer.stop'));
 
     $response->assertOk();
@@ -84,11 +82,11 @@ it('records exactly 600 focus seconds when stopping a pomodoro 10 minutes in', f
     Date::setTestNow();
 });
 
-it('rejects custom minutes outside the configured bounds', function () {
-    [$schedule] = seatedStudent();
+it('rejects custom minutes outside the configured bounds', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule] = $seatedStudent();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'custom',
             'minutes' => (int) config('study-room.timer.custom.max_minutes') + 1,
@@ -99,8 +97,8 @@ it('rejects custom minutes outside the configured bounds', function () {
     $response->assertStatus(422)->assertJsonValidationErrors('minutes');
 });
 
-it('rejects a course that is not in the caller\'s own schedule', function () {
-    [$schedule] = seatedStudent();
+it('rejects a course that is not in the caller\'s own schedule', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule] = $seatedStudent();
 
     $otherSchedule = StudentSchedule::factory()->create();
     $course = Course::factory()->create(['term' => config('app.current_semester')]);
@@ -112,7 +110,7 @@ it('rejects a course that is not in the caller\'s own schedule', function () {
     ]);
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -123,11 +121,11 @@ it('rejects a course that is not in the caller\'s own schedule', function () {
     $response->assertStatus(422)->assertJsonValidationErrors('subjectCourseId');
 });
 
-it('records the fixed 其他 label when no course is selected', function () {
-    [$schedule, $seat] = seatedStudent();
+it('records the fixed 其他 label when no course is selected', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -140,8 +138,8 @@ it('records the fixed 其他 label when no course is selected', function () {
         ->and($seat->subject_course_id)->toBeNull();
 });
 
-it('starts a timer for a course that is in the caller\'s schedule for the current term', function () {
-    [$schedule, $seat] = seatedStudent();
+it('starts a timer for a course that is in the caller\'s schedule for the current term', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $course = Course::factory()->create(['term' => config('app.current_semester')]);
     $courseClass = CourseClass::factory()->for($course)->create();
@@ -152,7 +150,7 @@ it('starts a timer for a course that is in the caller\'s schedule for the curren
     ]);
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -167,8 +165,8 @@ it('starts a timer for a course that is in the caller\'s schedule for the curren
         ->and($seat->subject_label)->toBeNull();
 });
 
-it('records no session when stopping a break-phase timer', function () {
-    [$schedule, $seat] = seatedStudent();
+it('records no session when stopping a break-phase timer', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $seat->update([
         'activity_verb' => StudyActivityVerb::Review,
@@ -179,20 +177,20 @@ it('records no session when stopping a break-phase timer', function () {
     ]);
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->deleteJson(route('study-room.timer.stop'))
         ->assertOk();
 
     expect(StudyRoomSession::query()->count())->toBe(0);
 });
 
-it('records the focus session when leaving a seat mid-timer', function () {
-    [$schedule, $seat] = seatedStudent();
+it('records the focus session when leaving a seat mid-timer', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -203,7 +201,7 @@ it('records the focus session when leaving a seat mid-timer', function () {
     $this->travel(5)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.seat.leave'))
         ->assertOk();
 
@@ -216,14 +214,14 @@ it('records the focus session when leaving a seat mid-timer', function () {
     Date::setTestNow();
 });
 
-it('respects the Asia/Taipei day boundary for daily totals', function () {
-    [$schedule, $seat] = seatedStudent();
+it('respects the Asia/Taipei day boundary for daily totals', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     // 2026-01-02 23:50 Asia/Taipei == 2026-01-02 15:50 UTC — still "today" (Jan 2) locally.
     Date::setTestNow(Date::parse('2026-01-02 15:50:00', 'UTC'));
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -234,12 +232,12 @@ it('respects the Asia/Taipei day boundary for daily totals', function () {
     Date::setTestNow(Date::parse('2026-01-02 15:55:00', 'UTC'));
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->deleteJson(route('study-room.timer.stop'))
         ->assertOk();
 
     $beforeMidnightState = $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->getJson(route('study-room.state'));
 
     expect($beforeMidnightState->json('totals.yourFocusSecondsToday'))->toBe(300);
@@ -250,7 +248,7 @@ it('respects the Asia/Taipei day boundary for daily totals', function () {
     $seat->refresh();
 
     $afterMidnightState = $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->getJson(route('study-room.state'));
 
     expect($afterMidnightState->json('totals.yourFocusSecondsToday'))->toBe(0);
@@ -259,11 +257,11 @@ it('respects the Asia/Taipei day boundary for daily totals', function () {
     Date::setTestNow();
 });
 
-it('saves the sent pomodoro cycle as the student\'s preference and starts round 1 of it', function () {
-    [$schedule, $seat] = seatedStudent();
+it('saves the sent pomodoro cycle as the student\'s preference and starts round 1 of it', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -289,7 +287,7 @@ it('saves the sent pomodoro cycle as the student\'s preference and starts round 
 
     // The saved cycle is what the page hands back next time.
     $page = $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->get(route('study-room.show'));
 
     $page->assertOk()->assertInertia(
@@ -298,11 +296,11 @@ it('saves the sent pomodoro cycle as the student\'s preference and starts round 
     );
 });
 
-it('rejects a pomodoro cycle outside the configured bounds', function () {
-    [$schedule] = seatedStudent();
+it('rejects a pomodoro cycle outside the configured bounds', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule] = $seatedStudent();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -317,8 +315,8 @@ it('rejects a pomodoro cycle outside the configured bounds', function () {
         ->assertJsonValidationErrors(['focusMinutes', 'shortBreakMinutes', 'roundsPerCycle']);
 });
 
-it('runs a short break after a mid-cycle round and the long break after the last round', function () {
-    [$schedule, $seat] = seatedStudent();
+it('runs a short break after a mid-cycle round and the long break after the last round', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     StudyRoomProfile::query()->where('student_schedule_id', $schedule->id)->update([
         'pomodoro_focus_minutes' => 25,
@@ -328,7 +326,7 @@ it('runs a short break after a mid-cycle round and the long break after the last
     ]);
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -340,7 +338,7 @@ it('runs a short break after a mid-cycle round and the long break after the last
     $this->travel(25)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.break'))
         ->assertOk();
 
@@ -353,7 +351,7 @@ it('runs a short break after a mid-cycle round and the long break after the last
     $this->travel(2)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.next'))
         ->assertOk();
 
@@ -366,7 +364,7 @@ it('runs a short break after a mid-cycle round and the long break after the last
     $this->travel(25)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.break'))
         ->assertOk();
 
@@ -378,8 +376,8 @@ it('runs a short break after a mid-cycle round and the long break after the last
     expect(StudyRoomSession::query()->where('student_schedule_id', $schedule->id)->where('was_completed', true)->count())->toBe(2);
 });
 
-it('lets a pomodoro round be skipped into its break, recording the elapsed focus as unfinished', function () {
-    [$schedule, $seat] = seatedStudent();
+it('lets a pomodoro round be skipped into its break, recording the elapsed focus as unfinished', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     StudyRoomProfile::query()->where('student_schedule_id', $schedule->id)->update([
         'pomodoro_focus_minutes' => 25,
@@ -389,7 +387,7 @@ it('lets a pomodoro round be skipped into its break, recording the elapsed focus
     ]);
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -401,7 +399,7 @@ it('lets a pomodoro round be skipped into its break, recording the elapsed focus
     $this->travel(10)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.break'))
         ->assertOk();
 
@@ -416,11 +414,11 @@ it('lets a pomodoro round be skipped into its break, recording the elapsed focus
         ->and($session->overtime_seconds)->toBe(0);
 });
 
-it('refuses to skip a paused pomodoro round into its break', function () {
-    [$schedule, $seat] = seatedStudent();
+it('refuses to skip a paused pomodoro round into its break', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -429,30 +427,30 @@ it('refuses to skip a paused pomodoro round into its break', function () {
         ])->assertOk();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.pause'))
         ->assertOk();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.break'))
         ->assertStatus(422);
 
     expect($seat->refresh()->timer_phase)->toBe(StudyTimerPhase::Focus);
 });
 
-it('refuses to start the next round unless the seat is on a pomodoro break', function () {
-    [$schedule, $seat] = seatedStudent();
+it('refuses to start the next round unless the seat is on a pomodoro break', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     // No timer at all.
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.next'))
         ->assertStatus(422);
 
     // Mid-focus.
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -461,7 +459,7 @@ it('refuses to start the next round unless the seat is on a pomodoro break', fun
         ])->assertOk();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.next'))
         ->assertStatus(422);
 
@@ -469,13 +467,13 @@ it('refuses to start the next round unless the seat is on a pomodoro break', fun
     expect($seat->timer_round)->toBe(1);
 });
 
-it('records overtime past the planned end when stopping a custom timer late', function () {
-    [$schedule, $seat] = seatedStudent();
+it('records overtime past the planned end when stopping a custom timer late', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'custom',
             'minutes' => 10,
@@ -487,7 +485,7 @@ it('records overtime past the planned end when stopping a custom timer late', fu
     $this->travel(13)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->deleteJson(route('study-room.timer.stop'))
         ->assertOk();
 
@@ -499,11 +497,11 @@ it('records overtime past the planned end when stopping a custom timer late', fu
     Date::setTestNow();
 });
 
-it('starts a count-up timer with no planned end and no round', function () {
-    [$schedule, $seat] = seatedStudent();
+it('starts a count-up timer with no planned end and no round', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'count_up',
             'minutes' => null,
@@ -522,13 +520,13 @@ it('starts a count-up timer with no planned end and no round', function () {
         ->and($seat->timer_started_at)->not->toBeNull();
 });
 
-it('records the elapsed time with no overtime when stopping a count-up timer', function () {
-    [$schedule, $seat] = seatedStudent();
+it('records the elapsed time with no overtime when stopping a count-up timer', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'count_up',
             'minutes' => null,
@@ -539,7 +537,7 @@ it('records the elapsed time with no overtime when stopping a count-up timer', f
     $this->travel(7)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->deleteJson(route('study-room.timer.stop'))
         ->assertOk();
 
@@ -551,11 +549,11 @@ it('records the elapsed time with no overtime when stopping a count-up timer', f
     Date::setTestNow();
 });
 
-it('refuses to start a break on a count-up timer, which has no planned end', function () {
-    [$schedule, $seat] = seatedStudent();
+it('refuses to start a break on a count-up timer, which has no planned end', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'count_up',
             'minutes' => null,
@@ -566,18 +564,18 @@ it('refuses to start a break on a count-up timer, which has no planned end', fun
     $this->travel(30)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.break'))
         ->assertStatus(422);
 });
 
-it('splits a session at the point activity changes mid-focus, crediting the old activity for elapsed time', function () {
-    [$schedule, $seat] = seatedStudent();
+it('splits a session at the point activity changes mid-focus, crediting the old activity for elapsed time', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -591,7 +589,7 @@ it('splits a session at the point activity changes mid-focus, crediting the old 
     $this->travel(10)->minutes();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->patchJson(route('study-room.timer.activity'), [
             'verb' => StudyActivityVerb::Homework->value,
             'subjectCourseId' => null,
@@ -616,13 +614,13 @@ it('splits a session at the point activity changes mid-focus, crediting the old 
     Date::setTestNow();
 });
 
-it('records a second session for the new activity, correctly measuring only its own remaining plan', function () {
-    [$schedule, $seat] = seatedStudent();
+it('records a second session for the new activity, correctly measuring only its own remaining plan', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'custom',
             'minutes' => 20,
@@ -633,7 +631,7 @@ it('records a second session for the new activity, correctly measuring only its 
     $this->travel(8)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->patchJson(route('study-room.timer.activity'), [
             'verb' => StudyActivityVerb::Homework->value,
             'subjectCourseId' => null,
@@ -643,7 +641,7 @@ it('records a second session for the new activity, correctly measuring only its 
     $this->travel(15)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->deleteJson(route('study-room.timer.stop'))
         ->assertOk();
 
@@ -659,11 +657,11 @@ it('records a second session for the new activity, correctly measuring only its 
     Date::setTestNow();
 });
 
-it('refuses to change activity when no timer is running', function () {
-    [$schedule] = seatedStudent();
+it('refuses to change activity when no timer is running', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule] = $seatedStudent();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->patchJson(route('study-room.timer.activity'), [
             'verb' => StudyActivityVerb::Homework->value,
             'subjectCourseId' => null,
@@ -671,8 +669,8 @@ it('refuses to change activity when no timer is running', function () {
         ->assertStatus(422);
 });
 
-it('refuses to change activity while on a break', function () {
-    [$schedule, $seat] = seatedStudent();
+it('refuses to change activity while on a break', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $seat->update([
         'activity_verb' => StudyActivityVerb::Review,
@@ -683,7 +681,7 @@ it('refuses to change activity while on a break', function () {
     ]);
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->patchJson(route('study-room.timer.activity'), [
             'verb' => StudyActivityVerb::Homework->value,
             'subjectCourseId' => null,
@@ -694,11 +692,11 @@ it('refuses to change activity while on a break', function () {
     expect($seat->activity_verb)->toBe(StudyActivityVerb::Review);
 });
 
-it('rejects a course that is not in the caller\'s own schedule when changing activity', function () {
-    [$schedule, $seat] = seatedStudent();
+it('rejects a course that is not in the caller\'s own schedule when changing activity', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -716,7 +714,7 @@ it('rejects a course that is not in the caller\'s own schedule when changing act
     ]);
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->patchJson(route('study-room.timer.activity'), [
             'verb' => StudyActivityVerb::Homework->value,
             'subjectCourseId' => $course->id,
@@ -728,11 +726,11 @@ it('rejects a course that is not in the caller\'s own schedule when changing act
     expect($seat->activity_verb)->toBe(StudyActivityVerb::Review);
 });
 
-it('leaves a custom timer without a round and stopping clears it', function () {
-    [$schedule, $seat] = seatedStudent();
+it('leaves a custom timer without a round and stopping clears it', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'custom',
             'minutes' => 40,
@@ -745,13 +743,13 @@ it('leaves a custom timer without a round and stopping clears it', function () {
     expect($seat->timer_round)->toBeNull();
 });
 
-it('pauses a running timer, recording the elapsed segment while the progress bar anchors stay put', function () {
-    [$schedule, $seat] = seatedStudent();
+it('pauses a running timer, recording the elapsed segment while the progress bar anchors stay put', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -765,7 +763,7 @@ it('pauses a running timer, recording the elapsed segment while the progress bar
     $this->travel(10)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.pause'))
         ->assertOk()
         ->assertJsonPath('state.floors.0.soloSeats.0.pausedAt', now()->toIso8601String());
@@ -784,13 +782,13 @@ it('pauses a running timer, recording the elapsed segment while the progress bar
     Date::setTestNow();
 });
 
-it('resumes by shifting the timer forward by the pause and measuring only the remaining plan', function () {
-    [$schedule, $seat] = seatedStudent();
+it('resumes by shifting the timer forward by the pause and measuring only the remaining plan', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'custom',
             'minutes' => 20,
@@ -804,14 +802,14 @@ it('resumes by shifting the timer forward by the pause and measuring only the re
     $this->travel(8)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.pause'))
         ->assertOk();
 
     $this->travel(30)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.resume'))
         ->assertOk()
         ->assertJsonPath('state.floors.0.soloSeats.0.pausedAt', null);
@@ -826,7 +824,7 @@ it('resumes by shifting the timer forward by the pause and measuring only the re
     $this->travel(15)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->deleteJson(route('study-room.timer.stop'))
         ->assertOk();
 
@@ -840,13 +838,13 @@ it('resumes by shifting the timer forward by the pause and measuring only the re
     Date::setTestNow();
 });
 
-it('does not record the overtime twice when pausing past the planned end and carrying on', function () {
-    [$schedule] = seatedStudent();
+it('does not record the overtime twice when pausing past the planned end and carrying on', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'custom',
             'minutes' => 20,
@@ -857,21 +855,21 @@ it('does not record the overtime twice when pausing past the planned end and car
     $this->travel(25)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.pause'))
         ->assertOk();
 
     $this->travel(10)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.resume'))
         ->assertOk();
 
     $this->travel(5)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->deleteJson(route('study-room.timer.stop'))
         ->assertOk();
 
@@ -888,13 +886,13 @@ it('does not record the overtime twice when pausing past the planned end and car
     Date::setTestNow();
 });
 
-it('does not record the overtime twice when changing activity past the planned end', function () {
-    [$schedule] = seatedStudent();
+it('does not record the overtime twice when changing activity past the planned end', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'custom',
             'minutes' => 20,
@@ -905,7 +903,7 @@ it('does not record the overtime twice when changing activity past the planned e
     $this->travel(25)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->patchJson(route('study-room.timer.activity'), [
             'verb' => StudyActivityVerb::Homework->value,
             'subjectCourseId' => null,
@@ -914,7 +912,7 @@ it('does not record the overtime twice when changing activity past the planned e
     $this->travel(5)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->deleteJson(route('study-room.timer.stop'))
         ->assertOk();
 
@@ -926,13 +924,13 @@ it('does not record the overtime twice when changing activity past the planned e
     Date::setTestNow();
 });
 
-it('keeps the progress bar continuous across repeated pauses', function () {
-    [$schedule, $seat] = seatedStudent();
+it('keeps the progress bar continuous across repeated pauses', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $call = fn (string $route, array $body = []) => $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route($route), $body)
         ->assertOk();
 
@@ -966,13 +964,13 @@ it('keeps the progress bar continuous across repeated pauses', function () {
     Date::setTestNow();
 });
 
-it('keeps a count-up timer open-ended when resuming', function () {
-    [$schedule, $seat] = seatedStudent();
+it('keeps a count-up timer open-ended when resuming', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'count_up',
             'verb' => StudyActivityVerb::Review->value,
@@ -984,14 +982,14 @@ it('keeps a count-up timer open-ended when resuming', function () {
     $this->travel(5)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.pause'))
         ->assertOk();
 
     $this->travel(10)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.resume'))
         ->assertOk();
 
@@ -1002,13 +1000,13 @@ it('keeps a count-up timer open-ended when resuming', function () {
     Date::setTestNow();
 });
 
-it('does not record the pause as study time when stopping while paused', function () {
-    [$schedule, $seat] = seatedStudent();
+it('does not record the pause as study time when stopping while paused', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'pomodoro',
             'minutes' => null,
@@ -1019,14 +1017,14 @@ it('does not record the pause as study time when stopping while paused', functio
     $this->travel(10)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.pause'))
         ->assertOk();
 
     $this->travel(20)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->deleteJson(route('study-room.timer.stop'))
         ->assertOk();
 
@@ -1039,13 +1037,13 @@ it('does not record the pause as study time when stopping while paused', functio
     Date::setTestNow();
 });
 
-it('does not record the pause as study time when a paused seat is released for being idle', function () {
-    [$schedule, $seat] = seatedStudent();
+it('does not record the pause as study time when a paused seat is released for being idle', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'custom',
             'minutes' => 30,
@@ -1056,7 +1054,7 @@ it('does not record the pause as study time when a paused seat is released for b
     $this->travel(10)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.pause'))
         ->assertOk();
 
@@ -1073,13 +1071,13 @@ it('does not record the pause as study time when a paused seat is released for b
     Date::setTestNow();
 });
 
-it('lets the activity be changed while paused, applying it to the resumed segment without a new session', function () {
-    [$schedule, $seat] = seatedStudent();
+it('lets the activity be changed while paused, applying it to the resumed segment without a new session', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     Date::setTestNow(Date::now());
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), [
             'mode' => 'custom',
             'minutes' => 30,
@@ -1090,12 +1088,12 @@ it('lets the activity be changed while paused, applying it to the resumed segmen
     $this->travel(10)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.pause'))
         ->assertOk();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->patchJson(route('study-room.timer.activity'), [
             'verb' => StudyActivityVerb::Homework->value,
             'subjectCourseId' => null,
@@ -1106,14 +1104,14 @@ it('lets the activity be changed while paused, applying it to the resumed segmen
     $this->travel(5)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.resume'))
         ->assertOk();
 
     $this->travel(20)->minutes();
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->deleteJson(route('study-room.timer.stop'))
         ->assertOk();
 
@@ -1127,11 +1125,11 @@ it('lets the activity be changed while paused, applying it to the resumed segmen
     Date::setTestNow();
 });
 
-it('refuses to pause when no timer is running, on a break, or already paused', function () {
-    [$schedule, $seat] = seatedStudent();
+it('refuses to pause when no timer is running, on a break, or already paused', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $pause = fn () => $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.pause'));
 
     $pause()->assertStatus(422);
@@ -1155,8 +1153,8 @@ it('refuses to pause when no timer is running, on a break, or already paused', f
     $pause()->assertStatus(422);
 });
 
-it('refuses to resume a timer that is not paused', function () {
-    [$schedule, $seat] = seatedStudent();
+it('refuses to resume a timer that is not paused', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $seat->update([
         'activity_verb' => StudyActivityVerb::Review,
@@ -1167,13 +1165,13 @@ it('refuses to resume a timer that is not paused', function () {
     ]);
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.resume'))
         ->assertStatus(422);
 });
 
-it('refuses to start a break while paused, even past the planned end', function () {
-    [$schedule, $seat] = seatedStudent();
+it('refuses to start a break while paused, even past the planned end', function () use ($studyTimerCookie, $seatedStudent) {
+    [$schedule, $seat] = $seatedStudent();
 
     $seat->update([
         'activity_verb' => StudyActivityVerb::Review,
@@ -1186,7 +1184,7 @@ it('refuses to start a break while paused, even past the planned end', function 
     ]);
 
     $this->withCredentials()
-        ->withCookie('student_schedule', studyTimerCookie($schedule))
+        ->withCookie('student_schedule', $studyTimerCookie($schedule))
         ->postJson(route('study-room.timer.break'))
         ->assertStatus(422);
 

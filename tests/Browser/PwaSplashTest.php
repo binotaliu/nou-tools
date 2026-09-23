@@ -4,8 +4,7 @@
 // injected to read the stylesheet's verdict: hidden in a normal browser tab,
 // shown once the head script's html[data-pwa] flag is set.
 
-function splashDisplay($page): string
-{
+$splashDisplay = function ($page): string {
     return $page->script(<<<'JS'
         (() => {
             document.getElementById('app-splash')?.remove()
@@ -15,18 +14,18 @@ function splashDisplay($page): string
             return getComputedStyle(splash).display
         })()
     JS);
-}
+};
 
-it('keeps the launch splash hidden in a normal browser tab', function () {
+it('keeps the launch splash hidden in a normal browser tab', function () use ($splashDisplay) {
     $page = visit('/announcements')->assertSee('學校公告');
 
-    expect(splashDisplay($page))->toBe('none');
+    expect($splashDisplay($page))->toBe('none');
 });
 
-it('shows the launch splash when running as an installed PWA', function () {
+it('shows the launch splash when running as an installed PWA', function () use ($splashDisplay) {
     $page = visit('/announcements')->assertSee('學校公告');
 
     $page->script("document.documentElement.dataset.pwa = ''");
 
-    expect(splashDisplay($page))->toBe('flex');
+    expect($splashDisplay($page))->toBe('flex');
 });

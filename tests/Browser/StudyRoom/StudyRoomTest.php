@@ -27,8 +27,7 @@ use NouTools\Domains\StudyRoom\Actions\FillFloorWithTestStudents;
  *
  * @return array<string, array{cx: float, cy: float, r: float}>
  */
-function studyRoomLampParts(string $html): array
-{
+$studyRoomLampParts = function (string $html): array {
     $parts = [];
 
     foreach (['shade-mouth', 'bulb'] as $part) {
@@ -54,10 +53,9 @@ function studyRoomLampParts(string $html): array
     }
 
     return $parts;
-}
+};
 
-function createScheduleWithCourse(): StudentSchedule
-{
+$createScheduleWithCourse = function (): StudentSchedule {
     $course = Course::factory()->create(['term' => config('app.current_semester')]);
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
@@ -70,10 +68,10 @@ function createScheduleWithCourse(): StudentSchedule
     ]);
 
     return $schedule;
-}
+};
 
-it('lets a student remember their schedule, set a profile, take a seat, and start a pomodoro', function () {
-    $schedule = createScheduleWithCourse();
+it('lets a student remember their schedule, set a profile, take a seat, and start a pomodoro', function () use ($createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
 
@@ -144,8 +142,8 @@ it('lets a student remember their schedule, set a profile, take a seat, and star
         ->screenshot();
 });
 
-it('prepends the countdown and phase to the tab title, and swaps the favicon, once backgrounded', function () {
-    $schedule = createScheduleWithCourse();
+it('prepends the countdown and phase to the tab title, and swaps the favicon, once backgrounded', function () use ($createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -242,8 +240,8 @@ it('prepends the countdown and phase to the tab title, and swaps the favicon, on
         ->and(substr_count($overtimeTitle, '這一輪完成了'))->toBe(1);
 });
 
-it('lets a student tune their pomodoro cycle and walks them through break and next round', function () {
-    $schedule = createScheduleWithCourse();
+it('lets a student tune their pomodoro cycle and walks them through break and next round', function () use ($createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -336,8 +334,8 @@ it('lets a student tune their pomodoro cycle and walks them through break and ne
     expect((int) $seat->timer_started_at->diffInMinutes($seat->timer_ends_at))->toBe(20);
 });
 
-it('opens a fullscreen focus mode over the sky and leaves it when the timer stops', function () {
-    $schedule = createScheduleWithCourse();
+it('opens a fullscreen focus mode over the sky and leaves it when the timer stops', function () use ($studyRoomLampParts, $createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -390,7 +388,7 @@ it('opens a fullscreen focus mode over the sky and leaves it when the timer stop
     $lampHtml = $page->script(
         'document.querySelector(\'[data-testid="study-room-page"]\').outerHTML'
     );
-    $lampParts = studyRoomLampParts($lampHtml);
+    $lampParts = $studyRoomLampParts($lampHtml);
 
     expect($lampParts['bulb'])->toHaveCount(3);
 
@@ -473,8 +471,8 @@ it('opens a fullscreen focus mode over the sky and leaves it when the timer stop
         ->assertVisible('[data-testid="study-room-timer-form"]');
 });
 
-it('minimizes the action banner to a slim bar and expands it again', function () {
-    $schedule = createScheduleWithCourse();
+it('minimizes the action banner to a slim bar and expands it again', function () use ($createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -522,8 +520,8 @@ it('minimizes the action banner to a slim bar and expands it again', function ()
         ->assertVisible('[data-testid="study-room-your-countdown"]');
 });
 
-it('shows the PersonalInfo modal for editing nickname/emoji, without the session log', function () {
-    $schedule = createScheduleWithCourse();
+it('shows the PersonalInfo modal for editing nickname/emoji, without the session log', function () use ($createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -553,8 +551,8 @@ it('shows the PersonalInfo modal for editing nickname/emoji, without the session
         ->assertMissing('[data-testid="study-room-stats-session-log"]');
 });
 
-it('shows the Stats modal with the 7-day chart and an empty-state log when opened', function () {
-    $schedule = createScheduleWithCourse();
+it('shows the Stats modal with the 7-day chart and an empty-state log when opened', function () use ($createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -587,7 +585,7 @@ it('shows the Stats modal with the 7-day chart and an empty-state log when opene
     );
 });
 
-it('shows a connection-error message once the room gives up on a realtime connection', function () {
+it('shows a connection-error message once the room gives up on a realtime connection', function () use ($createScheduleWithCourse) {
     // This test environment may genuinely have Reverb running (a local dev
     // run does), so it can't rely on the real connect-timeout actually
     // elapsing without becoming flaky either way. Instead it drives the
@@ -595,7 +593,7 @@ it('shows a connection-error message once the room gives up on a realtime connec
     // exact state `connectRealtime()`'s timeout (see study-room.js) and
     // its Pusher `state_change` handler both flip on a genuine failure —
     // to deterministically exercise the resulting UI.
-    $schedule = createScheduleWithCourse();
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -617,8 +615,8 @@ it('shows a connection-error message once the room gives up on a realtime connec
     $page->assertVisible('[data-testid="study-room-connection-error"]');
 });
 
-it('shows a popover with nickname and activity for an occupied table seat, and opens the next floor once the first is full', function () {
-    $schedule = createScheduleWithCourse();
+it('shows a popover with nickname and activity for an occupied table seat, and opens the next floor once the first is full', function () use ($createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -652,8 +650,8 @@ it('shows a popover with nickname and activity for an occupied table seat, and o
         ->assertVisible('[data-testid="study-room-floor-2"] [data-testid="study-room-stair-blocked"]');
 });
 
-it('formats a seat timer as mm:ss under an hour and h:mm:ss from an hour onward', function () {
-    $schedule = createScheduleWithCourse();
+it('formats a seat timer as mm:ss under an hour and h:mm:ss from an hour onward', function () use ($createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -678,7 +676,7 @@ it('formats a seat timer as mm:ss under an hour and h:mm:ss from an hour onward'
         ->and($page->script($component.'.clockLabel(7325)'))->toBe('2:02:05');
 });
 
-it('updates a floor\'s occupied count live and closes it once its last occupant leaves', function () {
+it('updates a floor\'s occupied count live and closes it once its last occupant leaves', function () use ($createScheduleWithCourse) {
     // Regression test for two bugs in applyDelta()/patchSeat(): the
     // per-floor "N / N 人在座" badge never updated from a realtime seat
     // patch (only a full setState() touched floor.occupiedCount), and a
@@ -687,7 +685,7 @@ it('updates a floor\'s occupied count live and closes it once its last occupant 
     // is reachable through a real second Reverb-connected browser in this
     // test environment, so the fix is exercised by feeding applyDelta()
     // the same payload shapes StudyRoomUpdated::broadcastWith() produces.
-    $schedule = createScheduleWithCourse();
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -752,13 +750,13 @@ it('updates a floor\'s occupied count live and closes it once its last occupant 
     $page->assertMissing('[data-testid="study-room-floor-2"]');
 });
 
-it('clears the held-seat highlight and action banner once a realtime delta releases your own seat', function () {
+it('clears the held-seat highlight and action banner once a realtime delta releases your own seat', function () use ($createScheduleWithCourse) {
     // Regression test for patchSeat() not clearing heldSeatCode when the
     // viewer's own seat is released by something other than a heartbeat
     // response (idle kick, admin clear, etc.) — the seat kept its "this is
     // mine" amber highlight and the action banner stayed visible until the
     // next heartbeat poll or full refresh happened to catch up.
-    $schedule = createScheduleWithCourse();
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -820,14 +818,14 @@ it('clears the held-seat highlight and action banner once a realtime delta relea
     expect($isStillHighlighted)->toBeFalse();
 });
 
-it('keeps your own focus total intact when a realtime delta broadcasts for someone else', function () {
+it('keeps your own focus total intact when a realtime delta broadcasts for someone else', function () use ($createScheduleWithCourse) {
     // Regression test: BroadcastStudyRoomChange builds its payload with a
     // null viewer (one broadcast fans out to everyone), so
     // totals.yourFocusSecondsToday in every delta is always 0. applyDelta()
     // used to replace the whole totals object wholesale, so any seat
     // join/leave broadcast — even one for a completely different seat —
     // stomped your real "今天專注了" total with 0 until the next refresh().
-    $schedule = createScheduleWithCourse();
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -882,11 +880,11 @@ it('keeps your own focus total intact when a realtime delta broadcasts for someo
     $page->assertSeeIn('[data-testid="study-room-personal-info"]', '今天專注了 25 分');
 });
 
-it('draws the garden and windows from the real Taiwan sky, day and night', function () {
+it('draws the garden and windows from the real Taiwan sky, day and night', function () use ($createScheduleWithCourse) {
     // The sky is computed client-side from the campus coordinates (see
     // study-room-sky.js); previewSky() freezes it at a chosen instant so
     // the test doesn't depend on when it runs.
-    $schedule = createScheduleWithCourse();
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');
@@ -992,8 +990,8 @@ it('draws the garden and windows from the real Taiwan sky, day and night', funct
     expect($page->script($component.'.clockTimeLabel()'))->toBe('15:20');
 });
 
-it('pauses and resumes a running timer, freezing the countdown while paused', function () {
-    $schedule = createScheduleWithCourse();
+it('pauses and resumes a running timer, freezing the countdown while paused', function () use ($createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
 
     $page = visit(route('schedules.show', $schedule));
     $page->script('navigator.serviceWorker.ready');

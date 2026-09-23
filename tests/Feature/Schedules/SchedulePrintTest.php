@@ -10,8 +10,7 @@ use Illuminate\Support\Str;
 use NouTools\Domains\Schedules\Actions\BuildSchedulePrintPage;
 use NouTools\Domains\Shared\Contracts\HtmlToPdf;
 
-function printableSchedule(array $courseAttributes = [], string $term = '2025B'): StudentSchedule
-{
+$printableSchedule = function (array $courseAttributes = [], string $term = '2025B'): StudentSchedule {
     $course = Course::factory()->create(array_merge(['term' => $term, 'credits' => 3], $courseAttributes));
     $courseClass = CourseClass::factory()->create(['course_id' => $course->id]);
 
@@ -24,10 +23,32 @@ function printableSchedule(array $courseAttributes = [], string $term = '2025B')
     ]);
 
     return $schedule;
-}
+};
 
-it('lists courses with their credits', function () {
-    $schedule = printableSchedule(['name' => '經濟學', 'credits' => 4]);
+/**
+ * Stands in for Chromium so tests never launch a browser.
+ */
+$fakeHtmlToPdf = function (): object {
+    $fake = new class implements HtmlToPdf
+    {
+        /** @var array<int, string> */
+        public array $rendered = [];
+
+        public function landscapeA4(string $html): string
+        {
+            $this->rendered[] = $html;
+
+            return "%PDF-fake\x00\xff";
+        }
+    };
+
+    app()->instance(HtmlToPdf::class, $fake);
+
+    return $fake;
+};
+
+it('lists courses with their credits', function () use ($printableSchedule) {
+    $schedule = $printableSchedule(['name' => '經濟學', 'credits' => 4]);
 
     $page = app(BuildSchedulePrintPage::class)($schedule, '2025B');
 
@@ -39,9 +60,9 @@ it('lists courses with their credits', function () {
         ->and($page->qrCodeSvg)->toContain('<svg');
 });
 
-it('gives each course one exam row with its dates under the weekday they fall on', function () {
+it('gives each course one exam row with its dates under the weekday they fall on', function () use ($printableSchedule) {
     // 2026-04-25 is a Saturday, 2026-06-28 a Sunday; both exams share the time slot.
-    $schedule = printableSchedule([
+    $schedule = $printableSchedule([
         'name' => '會計學',
         'midterm_date' => '2026-04-25',
         'final_date' => '2026-06-28',
@@ -61,9 +82,9 @@ it('gives each course one exam row with its dates under the weekday they fall on
         ->and($row->other)->toBe([]);
 });
 
-it('lists both exams in one column when they fall on the same weekday', function () {
+it('lists both exams in one column when they fall on the same weekday', function () use ($printableSchedule) {
     // 2026-04-25 and 2026-06-27 are both Saturdays.
-    $schedule = printableSchedule(['midterm_date' => '2026-04-25', 'final_date' => '2026-06-27']);
+    $schedule = $printableSchedule(['midterm_date' => '2026-04-25', 'final_date' => '2026-06-27']);
 
     $row = app(BuildSchedulePrintPage::class)($schedule, '2025B')->exams[0];
 
@@ -71,8 +92,8 @@ it('lists both exams in one column when they fall on the same weekday', function
         ->and($row->sunday)->toBe([]);
 });
 
-it('orders rows by earliest exam and leaves out courses without a date', function () {
-    $schedule = printableSchedule(['name' => '期末在後', 'final_date' => '2026-06-28']);
+it('orders rows by earliest exam and leaves out courses without a date', function () use ($printableSchedule) {
+    $schedule = $printableSchedule(['name' => '期末在後', 'final_date' => '2026-06-28']);
     foreach ([['name' => '未公布'], ['name' => '期中在前', 'midterm_date' => '2026-04-25']] as $attributes) {
         $course = Course::factory()->create(array_merge(['term' => '2025B'], $attributes));
         StudentScheduleItem::create([
@@ -87,9 +108,9 @@ it('orders rows by earliest exam and leaves out courses without a date', functio
     expect(array_map(fn ($row) => $row->courseName, $page->exams))->toBe(['期中在前', '期末在後']);
 });
 
-it('keeps weekday exams visible', function () {
+it('keeps weekday exams visible', function () use ($printableSchedule) {
     // 2026-04-27 is a Monday.
-    $schedule = printableSchedule(['name' => '統計學', 'midterm_date' => '2026-04-27']);
+    $schedule = $printableSchedule(['name' => '統計學', 'midterm_date' => '2026-04-27']);
 
     $row = app(BuildSchedulePrintPage::class)($schedule, '2025B')->exams[0];
 
@@ -99,8 +120,8 @@ it('keeps weekday exams visible', function () {
         ->and($row->other[0]['kind'])->toBe('期中考');
 });
 
-it('omits the midterm for summer terms', function () {
-    $schedule = printableSchedule([
+it('omits the midterm for summer terms', function () use ($printableSchedule) {
+    $schedule = $printableSchedule([
         'midterm_date' => '2026-07-25',
         'final_date' => '2026-08-23',
     ], '2025C');
@@ -111,8 +132,8 @@ it('omits the midterm for summer terms', function () {
         ->and($row->sunday)->toBe([['kind' => '期末考', 'label' => '8/23']]);
 });
 
-it('hides courses without an exam date from the exam table but not the course list', function () {
-    $schedule = printableSchedule(['name' => '哲學']);
+it('hides courses without an exam date from the exam table but not the course list', function () use ($printableSchedule) {
+    $schedule = $printableSchedule(['name' => '哲學']);
 
     $page = app(BuildSchedulePrintPage::class)($schedule, '2025B');
 
@@ -120,8 +141,8 @@ it('hides courses without an exam date from the exam table but not the course li
         ->and($page->courses[0]->name)->toBe('哲學');
 });
 
-it('builds monthly calendars with gap months and Monday-first weeks', function () {
-    $schedule = printableSchedule();
+it('builds monthly calendars with gap months and Monday-first weeks', function () use ($printableSchedule) {
+    $schedule = $printableSchedule();
     $class = $schedule->items->first()->courseClass;
 
     // March 2026 starts on a Sunday; April has no classes; May 2026 starts on a Friday.
@@ -152,8 +173,8 @@ it('builds monthly calendars with gap months and Monday-first weeks', function (
         ->and(collect($may->weeks)->flatten(1)->filter()->count())->toBe(31);
 });
 
-it('can start the calendar weeks on Sunday', function () {
-    $schedule = printableSchedule();
+it('can start the calendar weeks on Sunday', function () use ($printableSchedule) {
+    $schedule = $printableSchedule();
     $class = $schedule->items->first()->courseClass;
 
     // March 2026 starts on a Sunday; May 2026 starts on a Friday.
@@ -175,14 +196,14 @@ it('can start the calendar weeks on Sunday', function () {
         ->and($may->weeks[1][0]['day'])->toBe(3);
 });
 
-it('defaults to Monday-first weeks', function () {
-    $page = app(BuildSchedulePrintPage::class)(printableSchedule(), '2025B');
+it('defaults to Monday-first weeks', function () use ($printableSchedule) {
+    $page = app(BuildSchedulePrintPage::class)($printableSchedule(), '2025B');
 
     expect($page->weekdayLabels)->toBe(['一', '二', '三', '四', '五', '六', '日']);
 });
 
-it('renders the sheet with the week start from the query', function (?string $weekStart, string $firstWeekday) {
-    $schedule = printableSchedule();
+it('renders the sheet with the week start from the query', function (?string $weekStart, string $firstWeekday) use ($printableSchedule) {
+    $schedule = $printableSchedule();
     ClassSchedule::factory()->create(['class_id' => $schedule->items->first()->course_class_id, 'date' => '2026-03-08']);
 
     $html = $this->get(route('schedules.print', array_filter(['schedule' => $schedule->refresh(), 'term' => '2025B', 'week_start' => $weekStart])))
@@ -199,9 +220,9 @@ it('renders the sheet with the week start from the query', function (?string $we
     'unknown' => ['friday', '一'],
 ]);
 
-it('passes the week start on to the PDF', function () {
-    $fake = fakeHtmlToPdf();
-    $schedule = printableSchedule();
+it('passes the week start on to the PDF', function () use ($printableSchedule, $fakeHtmlToPdf) {
+    $fake = $fakeHtmlToPdf();
+    $schedule = $printableSchedule();
     ClassSchedule::factory()->create(['class_id' => $schedule->items->first()->course_class_id, 'date' => '2026-03-08']);
 
     $this->get(route('schedules.print.pdf', ['schedule' => $schedule->refresh(), 'term' => '2025B', 'week_start' => 'sunday']))->assertOk();
@@ -211,8 +232,8 @@ it('passes the week start on to the PDF', function () {
     expect($fake->rendered)->toHaveCount(2);
 });
 
-it('orders the courses on one class date by start time, not alphabetically', function () {
-    $schedule = printableSchedule(['name' => '下午班']);
+it('orders the courses on one class date by start time, not alphabetically', function () use ($printableSchedule) {
+    $schedule = $printableSchedule(['name' => '下午班']);
     $afternoon = $schedule->items->first()->courseClass;
     $afternoon->update(['start_time' => '14:00', 'end_time' => '15:50']);
 
@@ -236,8 +257,8 @@ it('orders the courses on one class date by start time, not alphabetically', fun
         ->toBe(['9:00', '14:00', '19:00']);
 });
 
-it('pads every month to the same number of week rows', function () {
-    $schedule = printableSchedule();
+it('pads every month to the same number of week rows', function () use ($printableSchedule) {
+    $schedule = $printableSchedule();
     $class = $schedule->items->first()->courseClass;
 
     // March 2026 needs six week rows, April and May five.
@@ -253,8 +274,8 @@ it('pads every month to the same number of week rows', function () {
     expect(substr_count($html, 'h-[5mm]'))->toBe(3 * 6 * 7);
 });
 
-it('lists the courses held on each class date under its month', function () {
-    $schedule = printableSchedule(['name' => '心理學']);
+it('lists the courses held on each class date under its month', function () use ($printableSchedule) {
+    $schedule = $printableSchedule(['name' => '心理學']);
     $morning = $schedule->items->first()->courseClass;
     $morning->update(['start_time' => '09:00', 'end_time' => '10:50']);
 
@@ -285,10 +306,10 @@ it('lists the courses held on each class date under its month', function () {
         ]);
 });
 
-it('marks exam dates and extends the calendars to the final exam month', function () {
+it('marks exam dates and extends the calendars to the final exam month', function () use ($printableSchedule) {
     // 2026-03-08 is the only class; the midterm (2026-04-25, Saturday) and the
     // final (2026-05-30, Saturday) fall in later months.
-    $schedule = printableSchedule(['name' => '會計學', 'midterm_date' => '2026-04-25', 'final_date' => '2026-05-30']);
+    $schedule = $printableSchedule(['name' => '會計學', 'midterm_date' => '2026-04-25', 'final_date' => '2026-05-30']);
     ClassSchedule::factory()->create(['class_id' => $schedule->items->first()->course_class_id, 'date' => '2026-03-08']);
 
     $page = app(BuildSchedulePrintPage::class)($schedule->refresh(), '2025B');
@@ -306,8 +327,8 @@ it('marks exam dates and extends the calendars to the final exam month', functio
         ->and($may->examDays)->toBe([['label' => '5/30 (六)', 'kind' => '期末考', 'courses' => ['會計學']]]);
 });
 
-it('marks a date that has both a class and an exam', function () {
-    $schedule = printableSchedule(['midterm_date' => '2026-03-08']);
+it('marks a date that has both a class and an exam', function () use ($printableSchedule) {
+    $schedule = $printableSchedule(['midterm_date' => '2026-03-08']);
     ClassSchedule::factory()->create(['class_id' => $schedule->items->first()->course_class_id, 'date' => '2026-03-08']);
 
     $march = app(BuildSchedulePrintPage::class)($schedule->refresh(), '2025B')->months[0];
@@ -316,8 +337,8 @@ it('marks a date that has both a class and an exam', function () {
         ->toBe(['day' => 8, 'hasClass' => true, 'isExam' => true]);
 });
 
-it('draws calendars for exams even when no class dates exist', function () {
-    $schedule = printableSchedule(['final_date' => '2026-06-28']);
+it('draws calendars for exams even when no class dates exist', function () use ($printableSchedule) {
+    $schedule = $printableSchedule(['final_date' => '2026-06-28']);
 
     $page = app(BuildSchedulePrintPage::class)($schedule, '2025B');
 
@@ -326,14 +347,14 @@ it('draws calendars for exams even when no class dates exist', function () {
         ->and($page->months[0]->classDays)->toBe([]);
 });
 
-it('has no calendars when the schedule has no classes', function () {
-    $page = app(BuildSchedulePrintPage::class)(printableSchedule(), '2025B');
+it('has no calendars when the schedule has no classes', function () use ($printableSchedule) {
+    $page = app(BuildSchedulePrintPage::class)($printableSchedule(), '2025B');
 
     expect($page->months)->toBe([]);
 });
 
-it('renders the printable sheet', function () {
-    $schedule = printableSchedule([
+it('renders the printable sheet', function () use ($printableSchedule) {
+    $schedule = $printableSchedule([
         'name' => '會計學',
         'credits' => 3,
         'midterm_date' => '2026-04-25',
@@ -363,8 +384,8 @@ it('renders the printable sheet', function () {
         ->assertSee('noindex', false);
 });
 
-it('only asks for the final exam classroom in summer terms', function () {
-    $schedule = printableSchedule(['final_date' => '2026-08-23'], '2025C');
+it('only asks for the final exam classroom in summer terms', function () use ($printableSchedule) {
+    $schedule = $printableSchedule(['final_date' => '2026-08-23'], '2025C');
 
     $this->get(route('schedules.print', ['schedule' => $schedule, 'term' => '2025C']))
         ->assertOk()
@@ -372,8 +393,8 @@ it('only asks for the final exam classroom in summer terms', function () {
         ->assertDontSee('期中教室');
 });
 
-it('shows the schedule name and semester on both halves of the sheet', function () {
-    $schedule = printableSchedule();
+it('shows the schedule name and semester on both halves of the sheet', function () use ($printableSchedule) {
+    $schedule = $printableSchedule();
 
     $html = $this->get(route('schedules.print', ['schedule' => $schedule, 'term' => '2025B']))->assertOk()->getContent();
 
@@ -393,32 +414,9 @@ it('returns 404 for an unknown schedule', function () {
     $this->get(route('schedules.print', ['schedule' => (string) Str::uuid()]))->assertNotFound();
 });
 
-/**
- * Stands in for Chromium so tests never launch a browser.
- */
-function fakeHtmlToPdf(): object
-{
-    $fake = new class implements HtmlToPdf
-    {
-        /** @var array<int, string> */
-        public array $rendered = [];
-
-        public function landscapeA4(string $html): string
-        {
-            $this->rendered[] = $html;
-
-            return "%PDF-fake\x00\xff";
-        }
-    };
-
-    app()->instance(HtmlToPdf::class, $fake);
-
-    return $fake;
-}
-
-it('serves the sheet as a PDF', function () {
-    $fake = fakeHtmlToPdf();
-    $schedule = printableSchedule(['name' => '會計學']);
+it('serves the sheet as a PDF', function () use ($printableSchedule, $fakeHtmlToPdf) {
+    $fake = $fakeHtmlToPdf();
+    $schedule = $printableSchedule(['name' => '會計學']);
 
     $response = $this->get(route('schedules.print.pdf', ['schedule' => $schedule, 'term' => '2025B']));
 
@@ -431,9 +429,9 @@ it('serves the sheet as a PDF', function () {
         ->and($fake->rendered[0])->toContain('會計學')->toContain('<style>')->not->toContain('nonce=');
 });
 
-it('reuses the rendered PDF while the sheet is unchanged', function () {
-    $fake = fakeHtmlToPdf();
-    $schedule = printableSchedule();
+it('reuses the rendered PDF while the sheet is unchanged', function () use ($printableSchedule, $fakeHtmlToPdf) {
+    $fake = $fakeHtmlToPdf();
+    $schedule = $printableSchedule();
 
     $url = route('schedules.print.pdf', ['schedule' => $schedule, 'term' => '2025B']);
 
@@ -448,9 +446,9 @@ it('reuses the rendered PDF while the sheet is unchanged', function () {
     expect($fake->rendered)->toHaveCount(2);
 });
 
-it('throttles PDF generation', function () {
-    fakeHtmlToPdf();
-    $schedule = printableSchedule();
+it('throttles PDF generation', function () use ($printableSchedule, $fakeHtmlToPdf) {
+    $fakeHtmlToPdf();
+    $schedule = $printableSchedule();
 
     foreach (range(1, 6) as $ignored) {
         $this->get(route('schedules.print.pdf', $schedule))->assertOk();

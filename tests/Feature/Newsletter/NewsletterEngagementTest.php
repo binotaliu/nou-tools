@@ -22,22 +22,20 @@ beforeEach(function () {
  * fresh session id. Pinning the session cookie makes several requests one
  * "reader". The JSON helpers only send cookies with `withCredentials()`.
  */
-function readerSession(): string
-{
+$readerSession = function (): string {
     return Str::random(40);
-}
+};
 
-function asReader(string $sessionId): void
-{
+$asReader = function (string $sessionId): void {
     withCookie(config('session.cookie'), $sessionId)->withCredentials();
-}
+};
 
-it('counts an issue once per session', function () {
+it('counts an issue once per session', function () use ($readerSession, $asReader) {
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->published()->create();
-    $sessionId = readerSession();
+    $sessionId = $readerSession();
 
     foreach (range(1, 3) as $_) {
-        asReader($sessionId);
+        $asReader($sessionId);
         get(route('newsletter.show', $issue->issue_key))->assertSuccessful();
     }
 
@@ -46,7 +44,7 @@ it('counts an issue once per session', function () {
     // The array session driver keeps attributes in memory across requests, so
     // a genuinely different reader needs the store emptied as well.
     flushSession();
-    asReader(readerSession());
+    $asReader($readerSession());
     get(route('newsletter.show', $issue->issue_key))
         ->assertInertia(fn (Assert $page) => $page->where('viewModel.viewCount', 2));
 
@@ -81,17 +79,17 @@ it('lists every reaction with zero counts before anyone reacts', function () {
             ->where('viewModel.reactions.options.0.count', 0));
 });
 
-it('lets a session pick, switch and withdraw its one reaction', function () {
+it('lets a session pick, switch and withdraw its one reaction', function () use ($readerSession, $asReader) {
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->published()->create();
-    $sessionId = readerSession();
+    $sessionId = $readerSession();
 
-    asReader($sessionId);
+    $asReader($sessionId);
     putJson(route('newsletter.reaction.update', $issue->issue_key), ['reaction' => 'like'])
         ->assertSuccessful()
         ->assertJsonPath('reactions.mine', 'like')
         ->assertJsonPath('reactions.options.0.count', 1);
 
-    asReader($sessionId);
+    $asReader($sessionId);
     putJson(route('newsletter.reaction.update', $issue->issue_key), ['reaction' => 'love'])
         ->assertJsonPath('reactions.mine', 'love')
         ->assertJsonPath('reactions.options.0.count', 0)
@@ -99,11 +97,11 @@ it('lets a session pick, switch and withdraw its one reaction', function () {
 
     expect(NewsletterReaction::query()->count())->toBe(1);
 
-    asReader($sessionId);
+    $asReader($sessionId);
     get(route('newsletter.show', $issue->issue_key))
         ->assertInertia(fn (Assert $page) => $page->where('viewModel.reactions.mine', 'love'));
 
-    asReader($sessionId);
+    $asReader($sessionId);
     putJson(route('newsletter.reaction.update', $issue->issue_key), ['reaction' => null])
         ->assertJsonPath('reactions.mine', null)
         ->assertJsonPath('reactions.options.1.count', 0);
@@ -111,15 +109,15 @@ it('lets a session pick, switch and withdraw its one reaction', function () {
     expect(NewsletterReaction::query()->count())->toBe(0);
 });
 
-it('adds up reactions from different sessions', function () {
+it('adds up reactions from different sessions', function () use ($readerSession, $asReader) {
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->published()->create();
 
     foreach (['like', 'like', 'helpful'] as $reaction) {
-        asReader(readerSession());
+        $asReader($readerSession());
         putJson(route('newsletter.reaction.update', $issue->issue_key), ['reaction' => $reaction])->assertSuccessful();
     }
 
-    asReader(readerSession());
+    $asReader($readerSession());
     get(route('newsletter.show', $issue->issue_key))
         ->assertInertia(fn (Assert $page) => $page
             ->where('viewModel.reactions.mine', null)
@@ -127,15 +125,15 @@ it('adds up reactions from different sessions', function () {
             ->where('viewModel.reactions.options.2.count', 1));
 });
 
-it('keeps reactions to each issue separate', function () {
+it('keeps reactions to each issue separate', function () use ($readerSession, $asReader) {
     $first = NewsletterIssue::factory()->publishingOn('2026-09-21')->published()->create();
     $second = NewsletterIssue::factory()->publishingOn('2026-10-05')->published()->create();
-    $sessionId = readerSession();
+    $sessionId = $readerSession();
 
-    asReader($sessionId);
+    $asReader($sessionId);
     putJson(route('newsletter.reaction.update', $first->issue_key), ['reaction' => 'like'])->assertSuccessful();
 
-    asReader($sessionId);
+    $asReader($sessionId);
     get(route('newsletter.show', $second->issue_key))
         ->assertInertia(fn (Assert $page) => $page
             ->where('viewModel.reactions.mine', null)
@@ -162,11 +160,11 @@ it('does not take reactions on unpublished or missing issues', function () {
     expect(NewsletterReaction::query()->count())->toBe(0);
 });
 
-it('does not keep the raw session id next to the reaction', function () {
+it('does not keep the raw session id next to the reaction', function () use ($readerSession, $asReader) {
     $issue = NewsletterIssue::factory()->publishingOn('2026-09-21')->published()->create();
-    $sessionId = readerSession();
+    $sessionId = $readerSession();
 
-    asReader($sessionId);
+    $asReader($sessionId);
     putJson(route('newsletter.reaction.update', $issue->issue_key), ['reaction' => 'like'])->assertSuccessful();
 
     expect(NewsletterReaction::query()->value('session_hash'))

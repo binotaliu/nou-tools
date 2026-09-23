@@ -18,8 +18,7 @@ beforeEach(function () {
     config(['newsletter.anchor_date' => '2026-09-21']);
 });
 
-function publishedIssueWithContent(string $publishesOn = '2026-09-21'): NewsletterIssue
-{
+$publishedIssueWithContent = function (string $publishesOn = '2026-09-21'): NewsletterIssue {
     $issue = NewsletterIssue::factory()->publishingOn($publishesOn)->published()->create([
         'highlights_intro' => '這兩週要注意 **期中考報名**。<script>alert(1)</script>',
         'highlights_events' => [['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '期中考報名截止', 'description' => '逾期不受理']],
@@ -38,11 +37,11 @@ function publishedIssueWithContent(string $publishesOn = '2026-09-21'): Newslett
     ]);
 
     return $issue;
-}
+};
 
-it('highlights the latest published issue and lists the rest as past issues', function () {
-    publishedIssueWithContent('2026-09-21');
-    publishedIssueWithContent('2026-10-05');
+it('highlights the latest published issue and lists the rest as past issues', function () use ($publishedIssueWithContent) {
+    $publishedIssueWithContent('2026-09-21');
+    $publishedIssueWithContent('2026-10-05');
     NewsletterIssue::factory()->publishingOn('2026-10-19')->ready()->create();
 
     get(route('newsletter.index'))
@@ -130,9 +129,9 @@ it('has no highlight or past issues before the first issue is published', functi
             ->has('viewModel.issues.data', 0));
 });
 
-it('renders an issue with sections and server-rendered markdown', function () {
-    publishedIssueWithContent('2026-09-21');
-    publishedIssueWithContent('2026-10-05');
+it('renders an issue with sections and server-rendered markdown', function () use ($publishedIssueWithContent) {
+    $publishedIssueWithContent('2026-09-21');
+    $publishedIssueWithContent('2026-10-05');
 
     get('/newsletter/2026-W39')
         ->assertSuccessful()
@@ -182,8 +181,8 @@ it('returns 404 for unknown or malformed issue keys', function (string $path) {
     get($path)->assertNotFound();
 })->with(['/newsletter/2026-W41', '/newsletter/2026-39', '/newsletter/latest']);
 
-it('serves markdown twins', function () {
-    publishedIssueWithContent();
+it('serves markdown twins', function () use ($publishedIssueWithContent) {
+    $publishedIssueWithContent();
 
     get('/newsletter.md')
         ->assertSuccessful()
@@ -205,8 +204,8 @@ it('serves markdown twins', function () {
         ->assertSee('## 浣熊站長的自言自語');
 });
 
-it('serves an Atom feed of published issues', function () {
-    publishedIssueWithContent();
+it('serves an Atom feed of published issues', function () use ($publishedIssueWithContent) {
+    $publishedIssueWithContent();
     NewsletterIssue::factory()->publishingOn('2026-10-05')->draft()->create();
 
     $response = get(route('newsletter.feed'))
@@ -225,8 +224,8 @@ it('serves an Atom feed of published issues', function () {
         ->not->toContain('<script>');
 });
 
-it('lists the newsletter and published issues in the sitemap and llms.txt', function () {
-    publishedIssueWithContent();
+it('lists the newsletter and published issues in the sitemap and llms.txt', function () use ($publishedIssueWithContent) {
+    $publishedIssueWithContent();
     NewsletterIssue::factory()->publishingOn('2026-10-05')->draft()->create();
 
     get(route('sitemap'))
@@ -253,8 +252,8 @@ it('orders center items like the directory: by region, then configured order', f
             ]));
 });
 
-it('advertises a generated og:image card for published issues', function () {
-    publishedIssueWithContent();
+it('advertises a generated og:image card for published issues', function () use ($publishedIssueWithContent) {
+    $publishedIssueWithContent();
 
     get('/newsletter/2026-W39')
         ->assertSuccessful()
@@ -265,8 +264,8 @@ it('advertises a generated og:image card for published issues', function () {
         ->assertDontSee(asset('og-image.png'), false);
 });
 
-it('advertises Open Graph and Twitter tags for published issues', function () {
-    publishedIssueWithContent();
+it('advertises Open Graph and Twitter tags for published issues', function () use ($publishedIssueWithContent) {
+    $publishedIssueWithContent();
 
     get('/newsletter/2026-W39')
         ->assertSuccessful()
@@ -312,8 +311,8 @@ it('renders the card for admins previewing drafts', function () {
         ->assertSee('<template data-og-image', false);
 });
 
-it('allows Google Fonts in the CSP only when rendering the og-image card', function () {
-    publishedIssueWithContent();
+it('allows Google Fonts in the CSP only when rendering the og-image card', function () use ($publishedIssueWithContent) {
+    $publishedIssueWithContent();
 
     $policy = fn ($response): string => (string) $response->headers->get('Content-Security-Policy');
 
@@ -325,8 +324,8 @@ it('allows Google Fonts in the CSP only when rendering the og-image card', funct
         ->not->toContain('fonts.gstatic.com');
 });
 
-it('loads Noto Sans TC in the og-image screenshot document', function () {
-    publishedIssueWithContent();
+it('loads Noto Sans TC in the og-image screenshot document', function () use ($publishedIssueWithContent) {
+    $publishedIssueWithContent();
 
     get('/newsletter/2026-W39?ogimage')
         ->assertSuccessful()

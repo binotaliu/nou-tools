@@ -8,8 +8,7 @@ use NouTools\Domains\Announcements\Fetchers\JsonApiFetcher;
 
 use function Pest\Laravel\freezeSecond;
 
-function jsonApiSourceConfig(array $overrides = []): AnnouncementSourceConfigDTO
-{
+$jsonApiSourceConfig = function (array $overrides = []): AnnouncementSourceConfigDTO {
     return AnnouncementSourceConfigDTO::fromConfig(
         $overrides['key'] ?? 'json-api-source',
         array_merge([
@@ -22,10 +21,10 @@ function jsonApiSourceConfig(array $overrides = []): AnnouncementSourceConfigDTO
             'is_active' => true,
         ], $overrides),
     );
-}
+};
 
-it('parses JSON API response into fetched DTOs', function () {
-    $source = jsonApiSourceConfig([
+it('parses JSON API response into fetched DTOs', function () use ($jsonApiSourceConfig) {
+    $source = $jsonApiSourceConfig([
         'fetch_url' => 'https://studadm.nou.edu.tw/api/AdvertApi?CategoryId=12&Page=1&take=999',
         'fetcher_config' => ['base_url' => 'https://studadm.nou.edu.tw'],
     ]);
@@ -68,10 +67,10 @@ it('parses JSON API response into fetched DTOs', function () {
         ->and($results[1]->title)->toBe('舊生選課注意事項');
 });
 
-it('caps far-future pinned dates to the discovery time', function () {
+it('caps far-future pinned dates to the discovery time', function () use ($jsonApiSourceConfig) {
     $frozenNow = freezeSecond();
 
-    $source = jsonApiSourceConfig([
+    $source = $jsonApiSourceConfig([
         'fetch_url' => 'https://studadm.nou.edu.tw/api/AdvertApi?CategoryId=12&Page=1&take=999',
         'fetcher_config' => ['base_url' => 'https://studadm.nou.edu.tw'],
     ]);
@@ -98,8 +97,8 @@ it('caps far-future pinned dates to the discovery time', function () {
         ->and($results[0]->publishedAt->equalTo($frozenNow))->toBeTrue();
 });
 
-it('syncs new announcements from JSON API source', function () {
-    $source = jsonApiSourceConfig();
+it('syncs new announcements from JSON API source', function () use ($jsonApiSourceConfig) {
+    $source = $jsonApiSourceConfig();
 
     Http::fake([
         'example.com/*' => Http::response([
@@ -144,8 +143,8 @@ it('syncs new announcements from JSON API source', function () {
         ->and($second->published_at)->toBeNull();
 });
 
-it('does not duplicate announcements on repeated sync', function () {
-    $source = jsonApiSourceConfig();
+it('does not duplicate announcements on repeated sync', function () use ($jsonApiSourceConfig) {
+    $source = $jsonApiSourceConfig();
 
     $apiResponse = Http::response([
         'Adverts' => [
@@ -173,8 +172,8 @@ it('does not duplicate announcements on repeated sync', function () {
     expect(Announcement::count())->toBe(1);
 });
 
-it('marks announcements as expired when they disappear from JSON API', function () {
-    $source = jsonApiSourceConfig();
+it('marks announcements as expired when they disappear from JSON API', function () use ($jsonApiSourceConfig) {
+    $source = $jsonApiSourceConfig();
 
     Announcement::factory()->create([
         'source_key' => $source->key,
@@ -217,8 +216,8 @@ it('marks announcements as expired when they disappear from JSON API', function 
     expect($active->expired_at)->toBeNull();
 });
 
-it('does not track expiry for non-tracking sources', function () {
-    $source = jsonApiSourceConfig([
+it('does not track expiry for non-tracking sources', function () use ($jsonApiSourceConfig) {
+    $source = $jsonApiSourceConfig([
         'tracks_expiry' => false,
     ]);
 
@@ -252,8 +251,8 @@ it('does not track expiry for non-tracking sources', function () {
     expect($old->expired_at)->toBeNull();
 });
 
-it('re-activates previously expired announcements if they reappear', function () {
-    $source = jsonApiSourceConfig();
+it('re-activates previously expired announcements if they reappear', function () use ($jsonApiSourceConfig) {
+    $source = $jsonApiSourceConfig();
 
     Announcement::factory()->expired()->create([
         'source_key' => $source->key,
@@ -285,8 +284,8 @@ it('re-activates previously expired announcements if they reappear', function ()
     expect($announcement->expired_at)->toBeNull();
 });
 
-it('updates existing announcement content on repeated sync', function () {
-    $source = jsonApiSourceConfig();
+it('updates existing announcement content on repeated sync', function () use ($jsonApiSourceConfig) {
+    $source = $jsonApiSourceConfig();
 
     Announcement::factory()->create([
         'source_key' => $source->key,
@@ -322,8 +321,8 @@ it('updates existing announcement content on repeated sync', function () {
         ->and($announcement->tags)->toBe(['新標籤']);
 });
 
-it('does not reset published_at on repeated sync of a far-future pinned announcement', function () {
-    $source = jsonApiSourceConfig();
+it('does not reset published_at on repeated sync of a far-future pinned announcement', function () use ($jsonApiSourceConfig) {
+    $source = $jsonApiSourceConfig();
 
     Http::fake([
         'example.com/*' => Http::response([

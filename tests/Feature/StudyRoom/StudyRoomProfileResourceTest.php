@@ -12,14 +12,13 @@ use Filament\Actions\Testing\TestAction;
 use Illuminate\Support\Facades\Event;
 use Livewire\Livewire;
 
-function studyRoomScheduleCookiePayload(StudentSchedule $schedule): string
-{
+$studyRoomScheduleCookiePayload = function (StudentSchedule $schedule): string {
     return json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
     ]);
-}
+};
 
 test('the list renders for an admin', function () {
     $admin = User::factory()->createOne(['roles' => [UserRole::Admin->value]]);
@@ -40,7 +39,7 @@ test('a non-admin cannot access the study room profile resource', function () {
         ->assertForbidden();
 });
 
-test('force-resetting a nickname clears the cooldown and lets the user set a new nickname immediately', function () {
+test('force-resetting a nickname clears the cooldown and lets the user set a new nickname immediately', function () use ($studyRoomScheduleCookiePayload) {
     Event::fake([StudyRoomUpdated::class]);
 
     $admin = User::factory()->createOne(['roles' => [UserRole::Admin->value]]);
@@ -67,7 +66,7 @@ test('force-resetting a nickname clears the cooldown and lets the user set a new
     Event::assertDispatched(StudyRoomUpdated::class, fn (StudyRoomUpdated $event): bool => $event->seat->is($seat));
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomScheduleCookiePayload($schedule))
+        ->withCookie('student_schedule', $studyRoomScheduleCookiePayload($schedule))
         ->post(route('study-room.profile.update'), [
             'nickname' => '新暱稱',
             'emoji' => config('study-room.emojis')[0],

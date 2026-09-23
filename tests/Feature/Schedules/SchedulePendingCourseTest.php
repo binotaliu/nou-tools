@@ -10,8 +10,7 @@ use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 use NouTools\Domains\Schedules\Actions\ImportCourseSelectSimulation;
 
-function fakeCourseSelectSimJsonFor(string $term, string $courseName): string
-{
+$fakeCourseSelectSimJsonFor = function (string $term, string $courseName): string {
     return json_encode([
         $term => [
             'calendar' => ['2026-09'],
@@ -29,10 +28,9 @@ function fakeCourseSelectSimJsonFor(string $term, string $courseName): string
             ],
         ],
     ]);
-}
+};
 
-function mockCourseSelectSimJson(string $term, string $courseName): void
-{
+$mockCourseSelectSimJson = function (string $term, string $courseName) use ($fakeCourseSelectSimJsonFor): void {
     // Catch-all fallbacks so other File facade calls made during the
     // request (e.g. Inertia's `ensure_pages_exist` testing check, which
     // stats resource_path('js/pages/...') for the rendered component) don't
@@ -48,9 +46,9 @@ function mockCourseSelectSimJson(string $term, string $courseName): void
 
     File::shouldReceive('get')
         ->with(resource_path('data/course-select-sim.json'))
-        ->andReturn(fakeCourseSelectSimJsonFor($term, $courseName))
+        ->andReturn($fakeCourseSelectSimJsonFor($term, $courseName))
         ->byDefault();
-}
+};
 
 it('creates a schedule with a pending course-only item', function () {
     $course = Course::factory()->create(['term' => '2025B']);
@@ -304,8 +302,8 @@ it('rejects a duplicate course_id for the same schedule at the database level', 
     ]))->toThrow(QueryException::class);
 });
 
-it('editor page shows a tentative class option for a pending course after importing notice data', function () {
-    mockCourseSelectSimJson('2025B', 'Notice Session Course');
+it('editor page shows a tentative class option for a pending course after importing notice data', function () use ($mockCourseSelectSimJson) {
+    $mockCourseSelectSimJson('2025B', 'Notice Session Course');
     Course::factory()->create(['name' => 'Notice Session Course', 'term' => '2025B']);
     (new ImportCourseSelectSimulation)('2025B');
 
@@ -325,9 +323,9 @@ it('editor page shows a tentative class option for a pending course after import
     });
 });
 
-it('shows the chosen tentative class and notice disclaimer on the schedule show page', function () {
+it('shows the chosen tentative class and notice disclaimer on the schedule show page', function () use ($mockCourseSelectSimJson) {
     config()->set('app.current_semester', '2025B');
-    mockCourseSelectSimJson('2025B', 'Notice Show Course');
+    $mockCourseSelectSimJson('2025B', 'Notice Show Course');
 
     $course = Course::factory()->create(['name' => 'Notice Show Course', 'term' => '2025B']);
     (new ImportCourseSelectSimulation)('2025B');
@@ -361,9 +359,9 @@ it('shows the chosen tentative class and notice disclaimer on the schedule show 
     });
 });
 
-it('shows the chosen tentative class in the markdown export', function () {
+it('shows the chosen tentative class in the markdown export', function () use ($mockCourseSelectSimJson) {
     config()->set('app.current_semester', '2025B');
-    mockCourseSelectSimJson('2025B', 'Notice Markdown Course');
+    $mockCourseSelectSimJson('2025B', 'Notice Markdown Course');
 
     $course = Course::factory()->create(['name' => 'Notice Markdown Course', 'term' => '2025B']);
     (new ImportCourseSelectSimulation)('2025B');
@@ -388,8 +386,8 @@ it('shows the chosen tentative class in the markdown export', function () {
         ->assertDontSee('模擬資料');
 });
 
-it('calendar export includes a notice-prefixed VEVENT per date for a chosen tentative class', function () {
-    mockCourseSelectSimJson('2025B', 'Notice Calendar Course');
+it('calendar export includes a notice-prefixed VEVENT per date for a chosen tentative class', function () use ($mockCourseSelectSimJson) {
+    $mockCourseSelectSimJson('2025B', 'Notice Calendar Course');
 
     $course = Course::factory()->create(['name' => 'Notice Calendar Course', 'term' => '2025B']);
     (new ImportCourseSelectSimulation)('2025B');
@@ -415,9 +413,9 @@ it('calendar export includes a notice-prefixed VEVENT per date for a chosen tent
     expect(substr_count($response->getContent(), 'UID:course-'.$schedule->uuid))->toBe(2);
 });
 
-it('shows a pending course with a chosen tentative class under 面授日期', function () {
+it('shows a pending course with a chosen tentative class under 面授日期', function () use ($mockCourseSelectSimJson) {
     config()->set('app.current_semester', '2025B');
-    mockCourseSelectSimJson('2025B', 'Notice Class Dates Course');
+    $mockCourseSelectSimJson('2025B', 'Notice Class Dates Course');
 
     $course = Course::factory()->create(['name' => 'Notice Class Dates Course', 'term' => '2025B']);
     (new ImportCourseSelectSimulation)('2025B');

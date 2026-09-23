@@ -5,14 +5,13 @@ use App\Models\StudyRoomSession;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 use NouTools\Domains\StudyRoom\Actions\ListStudyRoomSessions;
 
-function studyRoomCookieForSchedule(StudentSchedule $schedule): string
-{
+$studyRoomCookieForSchedule = function (StudentSchedule $schedule): string {
     return json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
     ]);
-}
+};
 
 it('only returns the viewer\'s own sessions, newest first', function () {
     $schedule = StudentSchedule::factory()->create();
@@ -42,12 +41,12 @@ it('respects the limit', function () {
     expect($sessions)->toHaveCount(3);
 });
 
-it('returns sessions as JSON for a viewer with a schedule cookie', function () {
+it('returns sessions as JSON for a viewer with a schedule cookie', function () use ($studyRoomCookieForSchedule) {
     $schedule = StudentSchedule::factory()->create();
     StudyRoomSession::factory()->for($schedule, 'schedule')->create();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomCookieForSchedule($schedule))
+        ->withCookie('student_schedule', $studyRoomCookieForSchedule($schedule))
         ->getJson(route('study-room.sessions'));
 
     $response->assertOk()->assertJsonStructure([

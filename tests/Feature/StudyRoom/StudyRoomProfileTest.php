@@ -4,20 +4,19 @@ use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
 use App\Settings\StudyRoomSettings;
 
-function studyRoomProfileCookie(StudentSchedule $schedule): string
-{
+$studyRoomProfileCookie = function (StudentSchedule $schedule): string {
     return json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
     ]);
-}
+};
 
-it('creates a profile on the happy path', function () {
+it('creates a profile on the happy path', function () use ($studyRoomProfileCookie) {
     $schedule = StudentSchedule::factory()->create();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomProfileCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomProfileCookie($schedule))
         ->postJson(route('study-room.profile.update'), [
             'nickname' => '認真讀書中',
             'emoji' => config('study-room.emojis')[0],
@@ -35,9 +34,9 @@ it('creates a profile on the happy path', function () {
     ]);
 });
 
-it('saves the play-sound-on-timer-end preference, including turning it off', function () {
+it('saves the play-sound-on-timer-end preference, including turning it off', function () use ($studyRoomProfileCookie) {
     $schedule = StudentSchedule::factory()->create();
-    $cookie = studyRoomProfileCookie($schedule);
+    $cookie = $studyRoomProfileCookie($schedule);
 
     $this->withCredentials()->withCookie('student_schedule', $cookie)->postJson(route('study-room.profile.update'), [
         'nickname' => '愛聽音效',
@@ -52,9 +51,9 @@ it('saves the play-sound-on-timer-end preference, including turning it off', fun
     ]);
 });
 
-it('saves the notify-on-timer-end preference, including turning it back off', function () {
+it('saves the notify-on-timer-end preference, including turning it back off', function () use ($studyRoomProfileCookie) {
     $schedule = StudentSchedule::factory()->create();
-    $cookie = studyRoomProfileCookie($schedule);
+    $cookie = $studyRoomProfileCookie($schedule);
 
     $this->withCredentials()->withCookie('student_schedule', $cookie)->postJson(route('study-room.profile.update'), [
         'nickname' => '想收通知',
@@ -81,11 +80,11 @@ it('saves the notify-on-timer-end preference, including turning it back off', fu
     ]);
 });
 
-it('rejects an emoji outside the allowlist', function () {
+it('rejects an emoji outside the allowlist', function () use ($studyRoomProfileCookie) {
     $schedule = StudentSchedule::factory()->create();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomProfileCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomProfileCookie($schedule))
         ->postJson(route('study-room.profile.update'), [
             'nickname' => '認真讀書中',
             'emoji' => '💀',
@@ -97,7 +96,7 @@ it('rejects an emoji outside the allowlist', function () {
     $this->assertDatabaseMissing(StudyRoomProfile::class, ['student_schedule_id' => $schedule->id]);
 });
 
-it('rejects a forbidden nickname, including a whitespace-evasion variant', function () {
+it('rejects a forbidden nickname, including a whitespace-evasion variant', function () use ($studyRoomProfileCookie) {
     $settings = app(StudyRoomSettings::class);
     $settings->forbiddenNicknames = ['壞字詞'];
     $settings->save();
@@ -106,7 +105,7 @@ it('rejects a forbidden nickname, including a whitespace-evasion variant', funct
     $schedule = StudentSchedule::factory()->create();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomProfileCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomProfileCookie($schedule))
         ->postJson(route('study-room.profile.update'), [
             'nickname' => '我是壞字詞啦',
             'emoji' => config('study-room.emojis')[0],
@@ -117,7 +116,7 @@ it('rejects a forbidden nickname, including a whitespace-evasion variant', funct
     $response->assertStatus(422)->assertJsonValidationErrors('nickname');
 
     $evasionResponse = $this->withCredentials()
-        ->withCookie('student_schedule', studyRoomProfileCookie($schedule))
+        ->withCookie('student_schedule', $studyRoomProfileCookie($schedule))
         ->postJson(route('study-room.profile.update'), [
             'nickname' => '我是 壞 字 詞 啦',
             'emoji' => config('study-room.emojis')[0],
@@ -129,9 +128,9 @@ it('rejects a forbidden nickname, including a whitespace-evasion variant', funct
     $this->assertDatabaseMissing(StudyRoomProfile::class, ['student_schedule_id' => $schedule->id]);
 });
 
-it('blocks a second nickname change within the cooldown, then allows it after the cooldown', function () {
+it('blocks a second nickname change within the cooldown, then allows it after the cooldown', function () use ($studyRoomProfileCookie) {
     $schedule = StudentSchedule::factory()->create();
-    $cookie = studyRoomProfileCookie($schedule);
+    $cookie = $studyRoomProfileCookie($schedule);
 
     $this->withCredentials()->withCookie('student_schedule', $cookie)->postJson(route('study-room.profile.update'), [
         'nickname' => '第一個暱稱',
@@ -169,9 +168,9 @@ it('blocks a second nickname change within the cooldown, then allows it after th
     ]);
 });
 
-it('allows an emoji-only change during the nickname cooldown', function () {
+it('allows an emoji-only change during the nickname cooldown', function () use ($studyRoomProfileCookie) {
     $schedule = StudentSchedule::factory()->create();
-    $cookie = studyRoomProfileCookie($schedule);
+    $cookie = $studyRoomProfileCookie($schedule);
 
     $this->withCredentials()->withCookie('student_schedule', $cookie)->postJson(route('study-room.profile.update'), [
         'nickname' => '保持不變的暱稱',
@@ -195,9 +194,9 @@ it('allows an emoji-only change during the nickname cooldown', function () {
     ]);
 });
 
-it('allows re-submitting the identical nickname during the cooldown', function () {
+it('allows re-submitting the identical nickname during the cooldown', function () use ($studyRoomProfileCookie) {
     $schedule = StudentSchedule::factory()->create();
-    $cookie = studyRoomProfileCookie($schedule);
+    $cookie = $studyRoomProfileCookie($schedule);
 
     $this->withCredentials()->withCookie('student_schedule', $cookie)->postJson(route('study-room.profile.update'), [
         'nickname' => '相同的暱稱',

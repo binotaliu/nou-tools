@@ -18,8 +18,7 @@ use NouTools\Domains\Schedules\Actions\DispatchClassStartingReminders;
 const TEST_PUSH_PUBLIC_KEY = 'BPeI0YeBE3C3e-klFTupoIbmJmGvM1xPKn5rIFiNz8Uc3N5R8-keeX-WVmaNVAu0-5MTNzjx6NNNwIvCbnj1oW8';
 const TEST_PUSH_AUTH_TOKEN = 'zJs6GqzLmdU4jVj56lFQIA';
 
-function subscribedStudentSchedule(CourseClass $courseClass, string $endpoint = 'https://push.example.com/success/one'): StudentSchedule
-{
+$subscribedStudentSchedule = function (CourseClass $courseClass, string $endpoint = 'https://push.example.com/success/one'): StudentSchedule {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
         'name' => '提醒測試',
@@ -41,7 +40,7 @@ function subscribedStudentSchedule(CourseClass $courseClass, string $endpoint = 
     );
 
     return $schedule;
-}
+};
 
 beforeEach(function () {
     Carbon::setTestNow(Carbon::parse('2026-03-02 09:50:00', 'Asia/Taipei'));
@@ -57,9 +56,9 @@ afterEach(function () {
     Carbon::setTestNow();
 });
 
-it('sends a reminder for a class starting in ten minutes with a video link', function () {
+it('sends a reminder for a class starting in ten minutes with a video link', function () use ($subscribedStudentSchedule) {
     $courseClass = CourseClass::factory()->create(['link' => 'https://meet.example.com/abc']);
-    $schedule = subscribedStudentSchedule($courseClass);
+    $schedule = $subscribedStudentSchedule($courseClass);
 
     ClassSchedule::factory()->create([
         'class_id' => $courseClass->id,
@@ -80,9 +79,9 @@ it('sends a reminder for a class starting in ten minutes with a video link', fun
     ]);
 });
 
-it('does not send a duplicate reminder for the same occurrence', function () {
+it('does not send a duplicate reminder for the same occurrence', function () use ($subscribedStudentSchedule) {
     $courseClass = CourseClass::factory()->create(['link' => 'https://meet.example.com/abc']);
-    subscribedStudentSchedule($courseClass);
+    $subscribedStudentSchedule($courseClass);
 
     ClassSchedule::factory()->create([
         'class_id' => $courseClass->id,
@@ -99,9 +98,9 @@ it('does not send a duplicate reminder for the same occurrence', function () {
     $this->assertDatabaseCount('push_notification_deliveries', 1);
 });
 
-it('does not send a reminder for a class without a video link', function () {
+it('does not send a reminder for a class without a video link', function () use ($subscribedStudentSchedule) {
     $courseClass = CourseClass::factory()->create(['link' => '']);
-    subscribedStudentSchedule($courseClass);
+    $subscribedStudentSchedule($courseClass);
 
     ClassSchedule::factory()->create([
         'class_id' => $courseClass->id,
@@ -115,9 +114,9 @@ it('does not send a reminder for a class without a video link', function () {
     $this->assertDatabaseCount('class_schedule_reminders', 0);
 });
 
-it('does not send a reminder to a schedule that has a subscription but has not opted in', function () {
+it('does not send a reminder to a schedule that has a subscription but has not opted in', function () use ($subscribedStudentSchedule) {
     $courseClass = CourseClass::factory()->create(['link' => 'https://meet.example.com/abc']);
-    $schedule = subscribedStudentSchedule($courseClass);
+    $schedule = $subscribedStudentSchedule($courseClass);
     $schedule->notify_on_class_start = false;
     $schedule->save();
 
@@ -135,9 +134,9 @@ it('does not send a reminder to a schedule that has a subscription but has not o
     Http::assertNothingSent();
 });
 
-it('does not send a reminder for a class outside the ten minute window', function () {
+it('does not send a reminder for a class outside the ten minute window', function () use ($subscribedStudentSchedule) {
     $courseClass = CourseClass::factory()->create(['link' => 'https://meet.example.com/abc']);
-    subscribedStudentSchedule($courseClass);
+    $subscribedStudentSchedule($courseClass);
 
     ClassSchedule::factory()->create([
         'class_id' => $courseClass->id,
@@ -151,9 +150,9 @@ it('does not send a reminder for a class outside the ten minute window', functio
     $this->assertDatabaseCount('class_schedule_reminders', 0);
 });
 
-it('records a failed delivery instead of marking the occurrence as sent', function () {
+it('records a failed delivery instead of marking the occurrence as sent', function () use ($subscribedStudentSchedule) {
     $courseClass = CourseClass::factory()->create(['link' => 'https://meet.example.com/abc']);
-    $schedule = subscribedStudentSchedule($courseClass, endpoint: 'https://push.example.com/failure/one');
+    $schedule = $subscribedStudentSchedule($courseClass, endpoint: 'https://push.example.com/failure/one');
 
     ClassSchedule::factory()->create([
         'class_id' => $courseClass->id,
@@ -170,9 +169,9 @@ it('records a failed delivery instead of marking the occurrence as sent', functi
     expect($reminder->sent_at)->toBeNull();
 });
 
-it('retries a previously failed delivery on the next run', function () {
+it('retries a previously failed delivery on the next run', function () use ($subscribedStudentSchedule) {
     $courseClass = CourseClass::factory()->create(['link' => 'https://meet.example.com/abc']);
-    $schedule = subscribedStudentSchedule($courseClass, endpoint: 'https://push.example.com/failure/one');
+    $schedule = $subscribedStudentSchedule($courseClass, endpoint: 'https://push.example.com/failure/one');
 
     ClassSchedule::factory()->create([
         'class_id' => $courseClass->id,
@@ -199,9 +198,9 @@ it('retries a previously failed delivery on the next run', function () {
     ]);
 });
 
-it('marks the occurrence as sent when at least one of several devices succeeds', function () {
+it('marks the occurrence as sent when at least one of several devices succeeds', function () use ($subscribedStudentSchedule) {
     $courseClass = CourseClass::factory()->create(['link' => 'https://meet.example.com/abc']);
-    $schedule = subscribedStudentSchedule($courseClass, endpoint: 'https://push.example.com/success/one');
+    $schedule = $subscribedStudentSchedule($courseClass, endpoint: 'https://push.example.com/success/one');
     $schedule->updatePushSubscription(
         endpoint: 'https://push.example.com/failure/two',
         key: TEST_PUSH_PUBLIC_KEY,
@@ -226,9 +225,9 @@ it('marks the occurrence as sent when at least one of several devices succeeds',
     $this->assertDatabaseHas(PushNotificationDelivery::class, ['endpoint' => 'https://push.example.com/failure/two', 'success' => false]);
 });
 
-it('prunes a subscription the push service reports as gone', function () {
+it('prunes a subscription the push service reports as gone', function () use ($subscribedStudentSchedule) {
     $courseClass = CourseClass::factory()->create(['link' => 'https://meet.example.com/abc']);
-    $schedule = subscribedStudentSchedule($courseClass, endpoint: 'https://push.example.com/gone/one');
+    $schedule = $subscribedStudentSchedule($courseClass, endpoint: 'https://push.example.com/gone/one');
 
     ClassSchedule::factory()->create([
         'class_id' => $courseClass->id,

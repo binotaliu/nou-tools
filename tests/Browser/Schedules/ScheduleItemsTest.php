@@ -13,8 +13,7 @@ use Illuminate\Support\Str;
 // behaviour, and the "你的時間" hint shown to overseas students, are only
 // observable with a real browser.
 
-function createScheduleWithClass(string $date, string $startTime, string $endTime): array
-{
+$createScheduleWithClass = function (string $date, string $startTime, string $endTime): array {
     $course = Course::factory()->create(['term' => '2025B']);
     $courseClass = CourseClass::factory()->create([
         'course_id' => $course->id,
@@ -42,13 +41,13 @@ function createScheduleWithClass(string $date, string $startTime, string $endTim
     ]);
 
     return [$schedule, $course, $courseClass];
-}
+};
 
-it('shows the Taipei class time without a "your time" hint for a viewer in Asia/Taipei', function () {
+it('shows the Taipei class time without a "your time" hint for a viewer in Asia/Taipei', function () use ($createScheduleWithClass) {
     config()->set('app.current_semester', '2025B');
 
     $date = now('Asia/Taipei')->addDays(3)->toDateString();
-    [$schedule, $course] = createScheduleWithClass($date, '09:00', '10:00');
+    [$schedule, $course] = $createScheduleWithClass($date, '09:00', '10:00');
 
     $classDate = Carbon::parse($date, 'Asia/Taipei');
 
@@ -60,11 +59,11 @@ it('shows the Taipei class time without a "your time" hint for a viewer in Asia/
         ->assertDontSee('你的時間');
 });
 
-it('shows a "your time" hint with the converted class time for a viewer whose timezone differs from Asia/Taipei', function () {
+it('shows a "your time" hint with the converted class time for a viewer whose timezone differs from Asia/Taipei', function () use ($createScheduleWithClass) {
     config()->set('app.current_semester', '2025B');
 
     $date = now('Asia/Taipei')->addDays(3)->toDateString();
-    [$schedule, $course] = createScheduleWithClass($date, '09:00', '10:00');
+    [$schedule, $course] = $createScheduleWithClass($date, '09:00', '10:00');
 
     // Fixed-offset zone (no DST), 2.5 hours behind Taipei, same calendar day.
     $timezone = 'Asia/Kolkata';
@@ -80,11 +79,11 @@ it('shows a "your time" hint with the converted class time for a viewer whose ti
         ->screenshot();
 });
 
-it('shows the local calendar date in the "your time" hint when it crosses to the previous day', function () {
+it('shows the local calendar date in the "your time" hint when it crosses to the previous day', function () use ($createScheduleWithClass) {
     config()->set('app.current_semester', '2025B');
 
     $date = now('Asia/Taipei')->addDays(3)->toDateString();
-    [$schedule, $course] = createScheduleWithClass($date, '07:00', '08:00');
+    [$schedule, $course] = $createScheduleWithClass($date, '07:00', '08:00');
 
     // Fixed UTC-7 offset, 15 hours behind Taipei: 07:00 Taipei falls on the
     // previous calendar day for this viewer.
@@ -141,11 +140,11 @@ it('shows "無未來課程" when a course only has past class occurrences', func
         ->screenshot();
 });
 
-it('renders the next class as a card on a phone, with the date tile, time and classroom link', function () {
+it('renders the next class as a card on a phone, with the date tile, time and classroom link', function () use ($createScheduleWithClass) {
     config()->set('app.current_semester', '2025B');
 
     $date = now('Asia/Taipei')->addDays(3)->toDateString();
-    [$schedule, $course, $courseClass] = createScheduleWithClass($date, '09:00', '10:00');
+    [$schedule, $course, $courseClass] = $createScheduleWithClass($date, '09:00', '10:00');
     $courseClass->update(['link' => 'https://example.com/live', 'backup_classroom_url' => 'https://example.com/backup']);
 
     $classDate = Carbon::parse($date, 'Asia/Taipei');

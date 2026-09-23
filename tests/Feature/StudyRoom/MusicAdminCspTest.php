@@ -12,8 +12,7 @@ use function Pest\Laravel\actingAs;
 /**
  * @return array<string, string>
  */
-function adminCspDirectives(): array
-{
+$adminCspDirectives = function (): array {
     $csp = (string) actingAs(User::factory()->createOne())
         ->get(route('filament.admin.auth.profile'))
         ->headers->get('Content-Security-Policy');
@@ -25,9 +24,9 @@ function adminCspDirectives(): array
             return [$parts[0] => $parts[1] ?? ''];
         })
         ->all();
-}
+};
 
-it('lets the admin panel reach the S3 buckets holding music audio and playlist covers', function () {
+it('lets the admin panel reach the S3 buckets holding music audio and playlist covers', function () use ($adminCspDirectives) {
     config([
         'filesystems.disks.'.MusicTrack::AUDIO_DISK.'.disk' => 's3_audio',
         'filesystems.disks.'.MusicPlaylist::COVER_DISK.'.disk' => 's3_covers',
@@ -49,7 +48,7 @@ it('lets the admin panel reach the S3 buckets holding music audio and playlist c
         ],
     ]);
 
-    $directives = adminCspDirectives();
+    $directives = $adminCspDirectives();
 
     expect($directives['connect-src'])
         ->toContain('https://music-audio.s3.ap-northeast-1.amazonaws.com')
@@ -57,19 +56,19 @@ it('lets the admin panel reach the S3 buckets holding music audio and playlist c
         ->and($directives['img-src'])->toContain('https://covers.example-cdn.net');
 });
 
-it('adds no music origins to the admin CSP while files are stored locally', function () {
+it('adds no music origins to the admin CSP while files are stored locally', function () use ($adminCspDirectives) {
     config([
         'filesystems.disks.'.NewsletterIssue::COVER_DISK.'.disk' => 'public',
         'filesystems.disks.'.MusicTrack::AUDIO_DISK.'.disk' => 'public',
         'filesystems.disks.'.MusicPlaylist::COVER_DISK.'.disk' => 'public',
     ]);
 
-    $directives = adminCspDirectives();
+    $directives = $adminCspDirectives();
 
     expect($directives['connect-src'])->not->toContain('amazonaws.com')
         ->and($directives['img-src'])->not->toContain('example-cdn.net');
 });
 
-it('lets the admin panel play a just-picked audio file from its blob: preview', function () {
-    expect(adminCspDirectives()['media-src'])->toContain('blob:');
+it('lets the admin panel play a just-picked audio file from its blob: preview', function () use ($adminCspDirectives) {
+    expect($adminCspDirectives()['media-src'])->toContain('blob:');
 });

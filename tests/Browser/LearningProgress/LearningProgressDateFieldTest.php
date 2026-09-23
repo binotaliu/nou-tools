@@ -11,8 +11,7 @@ use Pest\Browser\Api\PendingAwaitablePage;
 // when empty). Its label, popover and hidden value are all client-side, so a
 // server-rendered Feature test can't tell whether they actually work.
 
-function dismissRememberModalIfPresentForDateField(PendingAwaitablePage $page): void
-{
+$dismissRememberModalIfPresentForDateField = function (PendingAwaitablePage $page): void {
     waitUntil(
         $page,
         'document.querySelector(\'[data-testid="remember-schedule-dismiss"]\') !== null'.
@@ -22,10 +21,9 @@ function dismissRememberModalIfPresentForDateField(PendingAwaitablePage $page): 
     if ($page->script("!!document.querySelector('[data-testid=\"remember-schedule-dismiss\"]')")) {
         $page->click('[data-testid="remember-schedule-dismiss"]');
     }
-}
+};
 
-function learningProgressWithDeadline(?string $deadline): StudentSchedule
-{
+$learningProgressWithDeadline = function (?string $deadline): StudentSchedule {
     config()->set('app.current_semester', '2025B');
     config()->set('app.current_semester_range', ['2026-02-23', '2026-06-28']);
 
@@ -48,16 +46,16 @@ function learningProgressWithDeadline(?string $deadline): StudentSchedule
     ]);
 
     return $schedule;
-}
+};
 
 const DATE_FIELD = '[data-testid="date-field-trigger"][aria-label*="作業一"]';
 const DATE_FIELD_VALUE = 'document.querySelector(\'input[name$="[1][deadline]"]\').value';
 
-it('shows a fixed M/D label and a placeholder instead of a native date input', function () {
-    $schedule = learningProgressWithDeadline('2026-03-05');
+it('shows a fixed M/D label and a placeholder instead of a native date input', function () use ($dismissRememberModalIfPresentForDateField, $learningProgressWithDeadline) {
+    $schedule = $learningProgressWithDeadline('2026-03-05');
 
     $page = visit(route('learning-progress.show', ['schedule' => $schedule, 'term' => '2025B']));
-    dismissRememberModalIfPresentForDateField($page);
+    $dismissRememberModalIfPresentForDateField($page);
 
     $page->assertSeeIn(DATE_FIELD, '3/5')
         ->assertMissing('input[type="date"]');
@@ -65,22 +63,22 @@ it('shows a fixed M/D label and a placeholder instead of a native date input', f
     expect($page->script(DATE_FIELD_VALUE))->toBe('2026-03-05');
 });
 
-it('renders an unset deadline as a placeholder, not today', function () {
-    $schedule = learningProgressWithDeadline(null);
+it('renders an unset deadline as a placeholder, not today', function () use ($dismissRememberModalIfPresentForDateField, $learningProgressWithDeadline) {
+    $schedule = $learningProgressWithDeadline(null);
 
     $page = visit(route('learning-progress.show', ['schedule' => $schedule, 'term' => '2025B']));
-    dismissRememberModalIfPresentForDateField($page);
+    $dismissRememberModalIfPresentForDateField($page);
 
     $page->assertSeeIn(DATE_FIELD, '未設定');
 
     expect($page->script(DATE_FIELD_VALUE))->toBe('');
 });
 
-it('picks, changes and clears a deadline from the calendar', function () {
-    $schedule = learningProgressWithDeadline('2026-03-05');
+it('picks, changes and clears a deadline from the calendar', function () use ($dismissRememberModalIfPresentForDateField, $learningProgressWithDeadline) {
+    $schedule = $learningProgressWithDeadline('2026-03-05');
 
     $page = visit(route('learning-progress.show', ['schedule' => $schedule, 'term' => '2025B']));
-    dismissRememberModalIfPresentForDateField($page);
+    $dismissRememberModalIfPresentForDateField($page);
 
     $page->click(DATE_FIELD)
         ->assertSeeIn('[data-testid="date-field-popover"]', '2026 年 3 月')
@@ -105,11 +103,11 @@ it('picks, changes and clears a deadline from the calendar', function () {
     expect($page->script(DATE_FIELD_VALUE))->toBe('');
 });
 
-it('starts the calendar week on Monday', function () {
-    $schedule = learningProgressWithDeadline('2026-03-05');
+it('starts the calendar week on Monday', function () use ($dismissRememberModalIfPresentForDateField, $learningProgressWithDeadline) {
+    $schedule = $learningProgressWithDeadline('2026-03-05');
 
     $page = visit(route('learning-progress.show', ['schedule' => $schedule, 'term' => '2025B']));
-    dismissRememberModalIfPresentForDateField($page);
+    $dismissRememberModalIfPresentForDateField($page);
 
     $page->click(DATE_FIELD);
 

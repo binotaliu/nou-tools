@@ -245,16 +245,15 @@ test('unique constraint on student_schedule_id and term', function () {
     ]);
 });
 
-function rememberedScheduleCookie(StudentSchedule $schedule): string
-{
+$rememberedScheduleCookie = function (StudentSchedule $schedule): string {
     return json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
     ]);
-}
+};
 
-test('/schedules/my/learning-progress redirects to the remembered schedule for the current semester', function () {
+test('/schedules/my/learning-progress redirects to the remembered schedule for the current semester', function () use ($rememberedScheduleCookie) {
     config(['app.current_semester' => '2025B']);
 
     $schedule = StudentSchedule::factory()->create();
@@ -263,12 +262,12 @@ test('/schedules/my/learning-progress redirects to the remembered schedule for t
         ->create();
     $schedule->items()->create(['course_id' => $courseClass->course_id, 'course_class_id' => $courseClass->id]);
 
-    $this->withCookie('student_schedule', rememberedScheduleCookie($schedule))
+    $this->withCookie('student_schedule', $rememberedScheduleCookie($schedule))
         ->get(route('schedules.my.learning-progress'))
         ->assertRedirect(route('learning-progress.show', ['schedule' => $schedule, 'term' => '2025B']));
 });
 
-test('/schedules/my/learning-progress falls back to the schedule when it has no courses this semester', function () {
+test('/schedules/my/learning-progress falls back to the schedule when it has no courses this semester', function () use ($rememberedScheduleCookie) {
     config(['app.current_semester' => '2025B']);
 
     $schedule = StudentSchedule::factory()->create();
@@ -277,7 +276,7 @@ test('/schedules/my/learning-progress falls back to the schedule when it has no 
         ->create();
     $schedule->items()->create(['course_id' => $oldClass->course_id, 'course_class_id' => $oldClass->id]);
 
-    $this->withCookie('student_schedule', rememberedScheduleCookie($schedule))
+    $this->withCookie('student_schedule', $rememberedScheduleCookie($schedule))
         ->get(route('schedules.my.learning-progress'))
         ->assertRedirect(route('schedules.show', $schedule));
 });

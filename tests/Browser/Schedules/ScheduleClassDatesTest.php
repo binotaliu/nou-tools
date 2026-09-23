@@ -11,8 +11,7 @@ use Illuminate\Support\Str;
 // time) and swaps the visible month client-side, so it is only observable with
 // a real browser.
 
-function createScheduleWithClassesOn(array $courseNamesByDate): StudentSchedule
-{
+$createScheduleWithClassesOn = function (array $courseNamesByDate): StudentSchedule {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
         'name' => 'Class Dates Schedule',
@@ -41,15 +40,15 @@ function createScheduleWithClassesOn(array $courseNamesByDate): StudentSchedule
     }
 
     return $schedule;
-}
+};
 
-it('shows one card that opens on the current month with a dot on each class date', function () {
+it('shows one card that opens on the current month with a dot on each class date', function () use ($createScheduleWithClassesOn) {
     config()->set('app.current_semester', '2025B');
 
     $thisMonth = now('Asia/Taipei')->startOfMonth()->addDays(9);
     $laterMonth = now('Asia/Taipei')->startOfMonth()->addMonths(2)->addDays(4);
 
-    $schedule = createScheduleWithClassesOn([
+    $schedule = $createScheduleWithClassesOn([
         $thisMonth->toDateString() => 'Alpha 本月課程',
         $laterMonth->toDateString() => 'Beta 之後的課程',
     ]);
@@ -67,14 +66,14 @@ it('shows one card that opens on the current month with a dot on each class date
         ->assertMissing('[data-testid="class-dates-list-'.$laterMonth->format('Y-m').'"]');
 });
 
-it('reveals another month\'s courses when its month is chosen, including a month without classes', function () {
+it('reveals another month\'s courses when its month is chosen, including a month without classes', function () use ($createScheduleWithClassesOn) {
     config()->set('app.current_semester', '2025B');
 
     $thisMonth = now('Asia/Taipei')->startOfMonth()->addDays(9);
     $emptyMonth = $thisMonth->copy()->addMonth();
     $laterMonth = $thisMonth->copy()->addMonths(2)->addDays(-5);
 
-    $schedule = createScheduleWithClassesOn([
+    $schedule = $createScheduleWithClassesOn([
         $thisMonth->toDateString() => 'Alpha 本月課程',
         $laterMonth->toDateString() => 'Beta 之後的課程',
     ]);
@@ -91,13 +90,13 @@ it('reveals another month\'s courses when its month is chosen, including a month
         ->assertNotPresent('[data-testid="class-dates-day"][data-has-classes="true"]');
 });
 
-it('opens a semester that has already ended on its last month', function () {
+it('opens a semester that has already ended on its last month', function () use ($createScheduleWithClassesOn) {
     config()->set('app.current_semester', '2025B');
 
     $lastMonth = now('Asia/Taipei')->subMonths(3)->startOfMonth()->addDays(2);
     $earlierMonth = $lastMonth->copy()->subMonth();
 
-    $schedule = createScheduleWithClassesOn([
+    $schedule = $createScheduleWithClassesOn([
         $earlierMonth->toDateString() => 'Alpha 較早的課程',
         $lastMonth->toDateString() => 'Beta 最後的課程',
     ]);

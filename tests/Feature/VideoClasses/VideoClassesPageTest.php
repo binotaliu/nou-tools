@@ -12,17 +12,16 @@ beforeEach(function () {
     withoutVite();
 });
 
-function videoClassOn(string $courseName, string $date, string $code): void
-{
+$videoClassOn = function (string $courseName, string $date, string $code): void {
     $course = Course::factory()->create(['name' => $courseName]);
     $class = CourseClass::factory()->for($course)->create(['code' => $code]);
     ClassSchedule::factory()->for($class, 'courseClass')->create(['date' => $date]);
-}
+};
 
-test('standalone page lists today\'s video courses by default', function () {
+test('standalone page lists today\'s video courses by default', function () use ($videoClassOn) {
     $today = Carbon::now('Asia/Taipei')->format('Y-m-d');
-    videoClassOn('普通物理學', $today, 'aaa001');
-    videoClassOn('明天的課', Carbon::parse($today)->addDay()->format('Y-m-d'), 'bbb001');
+    $videoClassOn('普通物理學', $today, 'aaa001');
+    $videoClassOn('明天的課', Carbon::parse($today)->addDay()->format('Y-m-d'), 'bbb001');
 
     $this->get(route('video-classes.index'))
         ->assertOk()
@@ -33,9 +32,9 @@ test('standalone page lists today\'s video courses by default', function () {
             ->where('viewModel.courses.0.name', '普通物理學'));
 });
 
-test('standalone page honours ?date= and falls back to today on invalid input', function () {
+test('standalone page honours ?date= and falls back to today on invalid input', function () use ($videoClassOn) {
     $today = Carbon::now('Asia/Taipei')->format('Y-m-d');
-    videoClassOn('指定日的課', '2026-03-05', 'ccc001');
+    $videoClassOn('指定日的課', '2026-03-05', 'ccc001');
 
     $this->get(route('video-classes.index', ['date' => '2026-03-05']))
         ->assertInertia(fn (Assert $page) => $page
@@ -56,8 +55,8 @@ test('standalone page excludes tentative classes', function () {
         ->assertInertia(fn (Assert $page) => $page->has('viewModel.courses', 0));
 });
 
-test('markdown twin lists the day\'s courses', function () {
-    videoClassOn('普通物理學', '2026-03-05', 'eee001');
+test('markdown twin lists the day\'s courses', function () use ($videoClassOn) {
+    $videoClassOn('普通物理學', '2026-03-05', 'eee001');
 
     $this->get(route('video-classes.index.md', ['date' => '2026-03-05']))
         ->assertOk()

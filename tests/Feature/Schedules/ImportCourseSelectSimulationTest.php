@@ -7,8 +7,7 @@ use Illuminate\Support\Facades\File;
 use NouTools\Domains\Schedules\Actions\ImportCourseSelectSimulation;
 use NouTools\Domains\Schedules\ViewModels\ScheduleEditorCourseClassViewModel;
 
-function fakeCourseSelectSimJson(): string
-{
+$fakeCourseSelectSimJson = function (): string {
     return json_encode([
         '2026A' => [
             'calendar' => ['2026-09'],
@@ -52,9 +51,9 @@ function fakeCourseSelectSimJson(): string
             ],
         ],
     ]);
-}
+};
 
-beforeEach(function () {
+beforeEach(function () use ($fakeCourseSelectSimJson) {
     File::shouldReceive('exists')
         ->with(resource_path('data/course-select-sim.json'))
         ->andReturnTrue()
@@ -62,7 +61,7 @@ beforeEach(function () {
 
     File::shouldReceive('get')
         ->with(resource_path('data/course-select-sim.json'))
-        ->andReturn(fakeCourseSelectSimJson())
+        ->andReturn($fakeCourseSelectSimJson())
         ->byDefault();
 });
 

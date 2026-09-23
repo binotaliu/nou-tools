@@ -6,16 +6,15 @@ use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Event;
 
-function leaveSeatCookie(StudentSchedule $schedule): string
-{
+$leaveSeatCookie = function (StudentSchedule $schedule): string {
     return json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
     ]);
-}
+};
 
-it('clears occupancy when leaving a held seat', function () {
+it('clears occupancy when leaving a held seat', function () use ($leaveSeatCookie) {
     Event::fake([StudyRoomUpdated::class]);
 
     $schedule = StudentSchedule::factory()->create();
@@ -24,7 +23,7 @@ it('clears occupancy when leaving a held seat', function () {
     $seat = StudyRoomSeat::factory()->occupiedBy($schedule)->create();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', leaveSeatCookie($schedule))
+        ->withCookie('student_schedule', $leaveSeatCookie($schedule))
         ->postJson(route('study-room.seat.leave'));
 
     $response->assertOk()->assertJsonPath('ok', true);
@@ -43,14 +42,14 @@ it('clears occupancy when leaving a held seat', function () {
     );
 });
 
-it('is a no-op when the viewer holds no seat', function () {
+it('is a no-op when the viewer holds no seat', function () use ($leaveSeatCookie) {
     Event::fake([StudyRoomUpdated::class]);
 
     $schedule = StudentSchedule::factory()->create();
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', leaveSeatCookie($schedule))
+        ->withCookie('student_schedule', $leaveSeatCookie($schedule))
         ->postJson(route('study-room.seat.leave'));
 
     $response->assertOk()->assertJsonPath('ok', true);
@@ -58,11 +57,11 @@ it('is a no-op when the viewer holds no seat', function () {
     Event::assertNotDispatched(StudyRoomUpdated::class);
 });
 
-it('rejects leaving without a profile', function () {
+it('rejects leaving without a profile', function () use ($leaveSeatCookie) {
     $schedule = StudentSchedule::factory()->create();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', leaveSeatCookie($schedule))
+        ->withCookie('student_schedule', $leaveSeatCookie($schedule))
         ->postJson(route('study-room.seat.leave'));
 
     $response->assertStatus(403);

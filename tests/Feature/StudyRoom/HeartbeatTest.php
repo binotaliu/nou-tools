@@ -9,16 +9,15 @@ use App\Models\StudyRoomSeat;
 use App\Models\StudyRoomSession;
 use Illuminate\Support\Facades\Event;
 
-function heartbeatCookie(StudentSchedule $schedule): string
-{
+$heartbeatCookie = function (StudentSchedule $schedule): string {
     return json_encode([
         'id' => $schedule->id,
         'uuid' => $schedule->uuid,
         'name' => $schedule->name,
     ]);
-}
+};
 
-it('bumps last_seen_at for the caller\'s held seat', function () {
+it('bumps last_seen_at for the caller\'s held seat', function () use ($heartbeatCookie) {
     $schedule = StudentSchedule::factory()->create();
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
     $seat = StudyRoomSeat::factory()->occupiedBy($schedule)->create(['last_seen_at' => now()->subMinutes(2)]);
@@ -26,7 +25,7 @@ it('bumps last_seen_at for the caller\'s held seat', function () {
     $this->travel(1)->minute();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', heartbeatCookie($schedule))
+        ->withCookie('student_schedule', $heartbeatCookie($schedule))
         ->postJson(route('study-room.heartbeat'));
 
     $response->assertOk()->assertJsonPath('stillSeated', true);
@@ -35,7 +34,7 @@ it('bumps last_seen_at for the caller\'s held seat', function () {
     expect($seat->last_seen_at->diffInSeconds(now()))->toBeLessThan(2);
 });
 
-it('keeps an expired focus timer running through a heartbeat instead of finalizing it', function () {
+it('keeps an expired focus timer running through a heartbeat instead of finalizing it', function () use ($heartbeatCookie) {
     Event::fake([StudyRoomUpdated::class]);
 
     $schedule = StudentSchedule::factory()->create();
@@ -51,7 +50,7 @@ it('keeps an expired focus timer running through a heartbeat instead of finalizi
     $this->travel(26)->minutes();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', heartbeatCookie($schedule))
+        ->withCookie('student_schedule', $heartbeatCookie($schedule))
         ->postJson(route('study-room.heartbeat'));
 
     $response->assertOk()->assertJsonPath('stillSeated', true);
@@ -66,12 +65,12 @@ it('keeps an expired focus timer running through a heartbeat instead of finalizi
     Event::assertNotDispatched(StudyRoomUpdated::class);
 });
 
-it('reports the caller no longer seated after their heartbeat has no seat', function () {
+it('reports the caller no longer seated after their heartbeat has no seat', function () use ($heartbeatCookie) {
     $schedule = StudentSchedule::factory()->create();
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create();
 
     $response = $this->withCredentials()
-        ->withCookie('student_schedule', heartbeatCookie($schedule))
+        ->withCookie('student_schedule', $heartbeatCookie($schedule))
         ->postJson(route('study-room.heartbeat'));
 
     $response->assertOk()->assertJsonPath('stillSeated', false);

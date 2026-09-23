@@ -6,8 +6,7 @@ use NouTools\Domains\Announcements\Actions\SyncAnnouncements;
 use NouTools\Domains\Announcements\DataTransferObjects\AnnouncementSourceConfigDTO;
 use NouTools\Domains\Announcements\Fetchers\HtmlNewsBoxFetcher;
 
-function htmlNewsBoxSourceConfig(array $overrides = []): AnnouncementSourceConfigDTO
-{
+$htmlNewsBoxSourceConfig = function (array $overrides = []): AnnouncementSourceConfigDTO {
     return AnnouncementSourceConfigDTO::fromConfig(
         $overrides['key'] ?? 'html-news-box-source',
         array_merge([
@@ -20,10 +19,10 @@ function htmlNewsBoxSourceConfig(array $overrides = []): AnnouncementSourceConfi
             'is_active' => true,
         ], $overrides),
     );
-}
+};
 
-it('parses clnews rows into fetched DTOs', function () {
-    $source = htmlNewsBoxSourceConfig();
+it('parses clnews rows into fetched DTOs', function () use ($htmlNewsBoxSourceConfig) {
+    $source = $htmlNewsBoxSourceConfig();
 
     $html = <<<'HTML'
     <html><body>
@@ -71,8 +70,8 @@ it('parses clnews rows into fetched DTOs', function () {
         ->and($results[1]->tags)->toBe(['考試資訊']);
 });
 
-it('syncs clnews rows announcements with category tag', function () {
-    $source = htmlNewsBoxSourceConfig();
+it('syncs clnews rows announcements with category tag', function () use ($htmlNewsBoxSourceConfig) {
+    $source = $htmlNewsBoxSourceConfig();
 
     $html = <<<'HTML'
     <html><body>
@@ -109,8 +108,8 @@ it('syncs clnews rows announcements with category tag', function () {
         ->and($announcement->tags)->toBe(['重要訊息']);
 });
 
-it('skips clnews rows without usable link or title', function () {
-    $source = htmlNewsBoxSourceConfig([
+it('skips clnews rows without usable link or title', function () use ($htmlNewsBoxSourceConfig) {
+    $source = $htmlNewsBoxSourceConfig([
         'fetch_url' => 'https://example.com/news_idx.aspx',
         'fetcher_config' => ['base_url' => 'https://example.com'],
     ]);

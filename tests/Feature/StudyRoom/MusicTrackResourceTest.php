@@ -18,10 +18,9 @@ use Livewire\Livewire;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
-function fakeAudio(string $extension): UploadedFile
-{
+$fakeAudio = function (string $extension): UploadedFile {
     return UploadedFile::fake()->createWithContent("track.{$extension}", file_get_contents(base_path("tests/fixtures/audio/silence-2s.{$extension}")));
-}
+};
 
 beforeEach(function () {
     Storage::fake(MusicTrack::AUDIO_DISK);
@@ -41,7 +40,7 @@ it('lists tracks', function () {
     Livewire::test(ListMusicTracks::class)->assertCanSeeTableRecords($tracks);
 });
 
-it('creates a track from an mp3 and an ogg and reads the duration from the file', function () {
+it('creates a track from an mp3 and an ogg and reads the duration from the file', function () use ($fakeAudio) {
     Livewire::test(CreateMusicTrack::class)
         ->fillForm([
             'title' => 'Quiet Rain',
@@ -49,8 +48,8 @@ it('creates a track from an mp3 and an ogg and reads the duration from the file'
             'license' => 'CC BY 4.0',
             'license_url' => 'https://creativecommons.org/licenses/by/4.0/',
             'source_url' => 'https://example.com/quiet-rain',
-            'mp3_path' => fakeAudio('mp3'),
-            'ogg_path' => fakeAudio('ogg'),
+            'mp3_path' => $fakeAudio('mp3'),
+            'ogg_path' => $fakeAudio('ogg'),
         ])
         ->assertSet('data.duration_seconds', 2)
         ->call('create')
@@ -65,9 +64,9 @@ it('creates a track from an mp3 and an ogg and reads the duration from the file'
     Storage::disk(MusicTrack::AUDIO_DISK)->assertExists([$track->mp3_path, $track->ogg_path]);
 });
 
-it('requires both audio formats and a duration when none can be read', function () {
+it('requires both audio formats and a duration when none can be read', function () use ($fakeAudio) {
     Livewire::test(CreateMusicTrack::class)
-        ->fillForm(['title' => 'Quiet Rain', 'author' => 'Someone', 'license' => 'CC0', 'mp3_path' => fakeAudio('mp3')])
+        ->fillForm(['title' => 'Quiet Rain', 'author' => 'Someone', 'license' => 'CC0', 'mp3_path' => $fakeAudio('mp3')])
         ->call('create')
         ->assertHasFormErrors(['ogg_path' => 'required']);
 
@@ -127,11 +126,11 @@ it('deletes a track together with its files and playlist entries', function () {
     Storage::disk(MusicTrack::AUDIO_DISK)->assertMissing(['a.mp3', 'a.ogg']);
 });
 
-it('falls back to the ogg duration when the mp3 is unreadable', function () {
+it('falls back to the ogg duration when the mp3 is unreadable', function () use ($fakeAudio) {
     Livewire::test(CreateMusicTrack::class)
         ->fillForm([
             'mp3_path' => UploadedFile::fake()->create('a.mp3', 10, 'audio/mpeg'),
-            'ogg_path' => fakeAudio('ogg'),
+            'ogg_path' => $fakeAudio('ogg'),
         ])
         ->assertSet('data.duration_seconds', 2);
 });

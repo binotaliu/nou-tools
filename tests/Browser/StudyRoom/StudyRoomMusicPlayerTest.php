@@ -20,8 +20,7 @@ const MUSIC_DESKTOP = [1280, 900];
 /**
  * @param  array<int, string>  $titles
  */
-function studyRoomPlaylist(string $title, array $titles): MusicPlaylist
-{
+$studyRoomPlaylist = function (string $title, array $titles): MusicPlaylist {
     $playlist = MusicPlaylist::factory()->create(['title' => $title]);
 
     foreach ($titles as $position => $trackTitle) {
@@ -32,13 +31,12 @@ function studyRoomPlaylist(string $title, array $titles): MusicPlaylist
     }
 
     return $playlist;
-}
+};
 
 /**
  * Remembers a fresh schedule, sets a profile and lands in the study room.
  */
-function openStudyRoomForMusic(): mixed
-{
+$openStudyRoomForMusic = function (): mixed {
     $course = Course::factory()->create(['term' => config('app.current_semester')]);
     $schedule = StudentSchedule::create(['uuid' => Str::uuid(), 'name' => 'Music Schedule']);
 
@@ -67,13 +65,12 @@ function openStudyRoomForMusic(): mixed
     $page->assertVisible('[data-testid="study-room-root"]');
 
     return $page;
-}
+};
 
 /**
  * Stops the page's <audio> from touching the network or a real decoder.
  */
-function stubMediaElement(mixed $page): void
-{
+$stubMediaElement = function (mixed $page): void {
     $page->script(<<<'JS'
         HTMLMediaElement.prototype.play = () => Promise.resolve()
         HTMLMediaElement.prototype.pause = () => {}
@@ -84,21 +81,21 @@ function stubMediaElement(mixed $page): void
             set(value) { this._src = value },
         })
     JS);
-}
+};
 
-it('leaves the wall without a player while no playlists exist', function () {
-    $page = openStudyRoomForMusic();
+it('leaves the wall without a player while no playlists exist', function () use ($openStudyRoomForMusic) {
+    $page = $openStudyRoomForMusic();
 
     $page->assertVisible('[data-testid="study-room-clock"]')
         ->assertMissing('[data-testid="study-room-music-player"]');
 });
 
-it('plays a tape, skips tracks, and swaps playlists from the popover', function () {
-    $rain = studyRoomPlaylist('雨聲', ['Rain Tape', 'Cafe Tape']);
-    $night = studyRoomPlaylist('夜間', ['Night Tape']);
+it('plays a tape, skips tracks, and swaps playlists from the popover', function () use ($studyRoomPlaylist, $openStudyRoomForMusic, $stubMediaElement) {
+    $rain = $studyRoomPlaylist('雨聲', ['Rain Tape', 'Cafe Tape']);
+    $night = $studyRoomPlaylist('夜間', ['Night Tape']);
 
-    $page = openStudyRoomForMusic();
-    stubMediaElement($page);
+    $page = $openStudyRoomForMusic();
+    $stubMediaElement($page);
 
     waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-player"]\') !== null');
 
@@ -161,14 +158,14 @@ it('plays a tape, skips tracks, and swaps playlists from the popover', function 
         ->assertMissing('[data-testid="study-room-music-popover"]');
 });
 
-it('scrolls a track title that does not fit, and leaves a short one still', function () {
-    studyRoomPlaylist('長短', [
+it('scrolls a track title that does not fit, and leaves a short one still', function () use ($studyRoomPlaylist, $openStudyRoomForMusic, $stubMediaElement) {
+    $studyRoomPlaylist('長短', [
         'Short',
         'An extremely long track title that can never fit inside the strip',
     ]);
 
-    $page = openStudyRoomForMusic();
-    stubMediaElement($page);
+    $page = $openStudyRoomForMusic();
+    $stubMediaElement($page);
 
     waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-player"]\') !== null');
 
@@ -196,10 +193,10 @@ it('scrolls a track title that does not fit, and leaves a short one still', func
     $page->assertMissing('[data-testid="study-room-marquee"]');
 });
 
-it('saves the volume the listener picks', function () {
-    studyRoomPlaylist('雨聲', ['Rain Tape']);
+it('saves the volume the listener picks', function () use ($studyRoomPlaylist, $openStudyRoomForMusic) {
+    $studyRoomPlaylist('雨聲', ['Rain Tape']);
 
-    $page = openStudyRoomForMusic();
+    $page = $openStudyRoomForMusic();
 
     waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-toggle"]\') !== null');
 
@@ -215,10 +212,10 @@ it('saves the volume the listener picks', function () {
     expect($page->script("localStorage.getItem('nou:study-room:music-volume:v1')"))->toBe('0.25');
 });
 
-it('puts the player left of the clock on a phone and under the window on a desktop', function () {
-    studyRoomPlaylist('雨聲', ['Rain Tape']);
+it('puts the player left of the clock on a phone and under the window on a desktop', function () use ($studyRoomPlaylist, $openStudyRoomForMusic) {
+    $studyRoomPlaylist('雨聲', ['Rain Tape']);
 
-    $page = openStudyRoomForMusic();
+    $page = $openStudyRoomForMusic();
 
     $rects = <<<'JS'
         (() => {
@@ -260,11 +257,11 @@ it('puts the player left of the clock on a phone and under the window on a deskt
         ->and($desktop['clock']['left'])->toBeGreaterThanOrEqual($desktop['player']['right']);
 });
 
-it('keeps the tape playing on the desk in focus mode, and Esc closes the popover before the fullscreen', function () {
-    studyRoomPlaylist('雨聲', ['Rain Tape', 'Cafe Tape']);
+it('keeps the tape playing on the desk in focus mode, and Esc closes the popover before the fullscreen', function () use ($studyRoomPlaylist, $openStudyRoomForMusic, $stubMediaElement) {
+    $studyRoomPlaylist('雨聲', ['Rain Tape', 'Cafe Tape']);
 
-    $page = openStudyRoomForMusic();
-    stubMediaElement($page);
+    $page = $openStudyRoomForMusic();
+    $stubMediaElement($page);
 
     $focus = '[data-testid="study-room-focus-mode"] ';
 

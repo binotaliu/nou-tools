@@ -16,23 +16,20 @@ const DESKTOP = [1280, 800];
 
 // assertVisible() doesn't retry, so wait for the nav's own text (which does)
 // so Vue has mounted and the resize has been laid out before reading the DOM.
-function waitForHeaderNav($page)
-{
+$waitForHeaderNav = function ($page) {
     return $page->assertSee('自習室')->assertVisible('[data-testid="header-nav"]');
-}
+};
 
-function enterPwaMode($page): void
-{
+$enterPwaMode = function ($page): void {
     $page->script("document.documentElement.dataset.pwa = ''");
-}
+};
 
-function linkTexts($page, string $selector): array
-{
+$linkTexts = function ($page, string $selector): array {
     return json_decode(
         $page->script("JSON.stringify([...document.querySelectorAll('{$selector}')].map(a => a.textContent.trim()))"),
         true,
     );
-}
+};
 
 it('shows the hamburger menu and no bottom tab bar in a normal phone browser tab', function () {
     $page = visit('/announcements')->resize(...PHONE);
@@ -42,10 +39,10 @@ it('shows the hamburger menu and no bottom tab bar in a normal phone browser tab
         ->assertMissing('[data-testid="bottom-nav"]');
 });
 
-it('swaps the hamburger menu for a bottom tab bar when running as an installed PWA on a phone', function () {
+it('swaps the hamburger menu for a bottom tab bar when running as an installed PWA on a phone', function () use ($enterPwaMode) {
     $page = visit('/announcements')->resize(...PHONE);
 
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
     $page->assertVisible('[data-testid="bottom-nav"]')
         ->assertMissing('[data-testid="header-menu-toggle"]')
@@ -62,21 +59,21 @@ it('swaps the hamburger menu for a bottom tab bar when running as an installed P
     expect($indicators)->toBe(1)->and($indicatorInActiveTab)->toBe(1);
 });
 
-it('keeps the header menu and hides the bottom tab bar in an installed PWA on tablet and desktop', function (array $viewport) {
+it('keeps the header menu and hides the bottom tab bar in an installed PWA on tablet and desktop', function (array $viewport) use ($waitForHeaderNav, $enterPwaMode) {
     $page = visit('/announcements')->resize(...$viewport);
 
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
-    waitForHeaderNav($page)->assertMissing('[data-testid="bottom-nav"]');
+    $waitForHeaderNav($page)->assertMissing('[data-testid="bottom-nav"]');
 })->with([
     'tablet' => [TABLET],
     'desktop' => [DESKTOP],
 ]);
 
-it('opens the more sheet from the tab bar and closes it again', function () {
+it('opens the more sheet from the tab bar and closes it again', function () use ($enterPwaMode) {
     $page = visit('/announcements')->resize(...PHONE);
 
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
     $page->screenshot(filename: 'pwa-bottom-nav-phone')
         ->click('[data-testid="bottom-nav-more"]')
@@ -94,40 +91,40 @@ it('opens the more sheet from the tab bar and closes it again', function () {
     $page->assertMissing('[data-testid="bottom-nav-sheet"]');
 });
 
-it('puts learning progress after my schedule in both navs and moves Alt UU and discount stores into more', function () {
-    $page = waitForHeaderNav(visit('/announcements')->resize(...DESKTOP));
+it('puts learning progress after my schedule in both navs and moves Alt UU and discount stores into more', function () use ($waitForHeaderNav, $enterPwaMode, $linkTexts) {
+    $page = $waitForHeaderNav(visit('/announcements')->resize(...DESKTOP));
 
-    expect(linkTexts($page, '[data-testid="header-nav"] > a'))
+    expect($linkTexts($page, '[data-testid="header-nav"] > a'))
         ->toBe(['我的課表', '學習進度', '自習室', '學校公告', '優惠店家']);
 
     $page->resize(...PHONE);
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
-    expect(linkTexts($page, '[data-testid="bottom-nav"] a'))
+    expect($linkTexts($page, '[data-testid="bottom-nav"] a'))
         ->toBe(['我的課表', '學習進度', '自習室', '學校公告']);
 
     $page->click('[data-testid="bottom-nav-more"]');
 
-    expect(linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))
+    expect($linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))
         ->toContain('優惠店家', 'Alt UU', '今日視訊面授');
 });
 
-it('highlights learning progress, not my schedule, on a learning progress page', function () {
+it('highlights learning progress, not my schedule, on a learning progress page', function () use ($waitForHeaderNav, $linkTexts) {
     $schedule = StudentSchedule::factory()->create();
     $courseClass = CourseClass::factory()
         ->for(Course::factory()->state(['term' => config('app.current_semester')]))
         ->create();
     $schedule->items()->create(['course_id' => $courseClass->course_id, 'course_class_id' => $courseClass->id]);
 
-    $page = waitForHeaderNav(
+    $page = $waitForHeaderNav(
         visit(route('learning-progress.show', ['schedule' => $schedule, 'term' => config('app.current_semester')], absolute: false))
             ->resize(...DESKTOP)
     );
 
-    expect(linkTexts($page, '[data-testid="header-nav"] > a[aria-current="page"]'))->toBe(['學習進度']);
+    expect($linkTexts($page, '[data-testid="header-nav"] > a[aria-current="page"]'))->toBe(['學習進度']);
 });
 
-it('collapses the schedule page actions into one menu in an installed PWA on a phone', function () {
+it('collapses the schedule page actions into one menu in an installed PWA on a phone', function () use ($enterPwaMode, $linkTexts) {
     $schedule = StudentSchedule::factory()->create();
 
     $page = visit(route('schedules.show', $schedule, absolute: false))->resize(...PHONE);
@@ -145,7 +142,7 @@ it('collapses the schedule page actions into one menu in an installed PWA on a p
     // In a plain browser tab the buttons stay inline and there is no menu.
     $page->assertMissing('[data-testid="schedule-actions-toggle"]');
 
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
     $page->assertVisible('[data-testid="schedule-actions-toggle"]')
         ->assertMissing('[data-testid="schedule-actions-menu"]')
@@ -158,26 +155,26 @@ it('collapses the schedule page actions into one menu in an installed PWA on a p
         ->assertVisible('[data-testid="schedule-actions-menu"]')
         ->screenshot(filename: 'pwa-schedule-actions-open');
 
-    expect(linkTexts($page, '[data-testid="schedule-actions-menu"] a'))
+    expect($linkTexts($page, '[data-testid="schedule-actions-menu"] a'))
         ->toBe(['學習進度表', '訂閱行事曆', '編輯', '自訂']);
 
     // Tapping outside dismisses it.
     $page->click('[data-testid="schedule-title"]')->assertMissing('[data-testid="schedule-actions-menu"]');
 });
 
-it('keeps the schedule page actions inline in an installed PWA on a tablet', function () {
+it('keeps the schedule page actions inline in an installed PWA on a tablet', function () use ($enterPwaMode) {
     $schedule = StudentSchedule::factory()->create();
 
     $page = visit(route('schedules.show', $schedule, absolute: false))->resize(...TABLET);
 
     waitUntil($page, 'document.querySelector(\'#term\') !== null');
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
     $page->assertMissing('[data-testid="schedule-actions-toggle"]')
         ->assertVisible('a[data-analytics-event="calendar_subscribe_open"]');
 });
 
-it('hides the learning progress header in a phone PWA and offers a floating save button once edited', function () {
+it('hides the learning progress header in a phone PWA and offers a floating save button once edited', function () use ($enterPwaMode) {
     $schedule = StudentSchedule::factory()->create();
     $courseClass = CourseClass::factory()
         ->for(Course::factory()->state(['term' => config('app.current_semester')]))
@@ -190,7 +187,7 @@ it('hides the learning progress header in a phone PWA and offers a floating save
     $page->assertVisible('[data-testid="learning-progress-header"]')
         ->assertMissing('[data-testid="learning-progress-floating-save"]');
 
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
     $page->assertMissing('[data-testid="learning-progress-header"]')
         ->assertMissing('[data-testid="learning-progress-floating-save"]');
@@ -200,12 +197,12 @@ it('hides the learning progress header in a phone PWA and offers a floating save
     $page->assertVisible('[data-testid="learning-progress-floating-save"]');
 });
 
-it('hides the page footer in a phone PWA while About carries the disclaimer and contact info', function () {
+it('hides the page footer in a phone PWA while About carries the disclaimer and contact info', function () use ($enterPwaMode) {
     $page = visit('/announcements')->resize(...PHONE);
 
     $page->assertSee('學校公告')->assertVisible('[data-testid="site-footer"]');
 
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
     $page->assertMissing('[data-testid="site-footer"]');
 
@@ -219,56 +216,56 @@ it('hides the page footer in a phone PWA while About carries the disclaimer and 
         ->assertSee('nou-tools-contact@binota.org');
 });
 
-it('drops the About page title and subtitle in a phone PWA but keeps the brand block', function () {
+it('drops the About page title and subtitle in a phone PWA but keeps the brand block', function () use ($enterPwaMode) {
     $page = visit('/about')->resize(...PHONE);
 
     $page->assertVisible('[data-testid="about-title"]')
         ->assertVisible('[data-testid="about-subtitle"]');
 
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
     $page->assertMissing('[data-testid="about-title"]')
         ->assertMissing('[data-testid="about-subtitle"]')
         ->assertVisible('[data-testid="about-brand"]');
 });
 
-it('drops the double-tap zoom delay only in an installed PWA', function () {
+it('drops the double-tap zoom delay only in an installed PWA', function () use ($enterPwaMode) {
     $page = visit('/announcements')->resize(...PHONE);
 
     $page->assertSee('學校公告');
     expect($page->script('getComputedStyle(document.documentElement).touchAction'))->toBe('auto');
 
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
     expect($page->script('getComputedStyle(document.documentElement).touchAction'))->toBe('manipulation');
 });
 
-it('hides the header in a phone PWA and links 設定 from the more sheet', function () {
+it('hides the header in a phone PWA and links 設定 from the more sheet', function () use ($enterPwaMode, $linkTexts) {
     $page = visit('/announcements')->resize(...PHONE);
 
     dismissCookieConsentBanner($page);
 
     $page->assertSee('學校公告')->assertVisible('[data-testid="header-menu-toggle"]');
 
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
     $page->assertMissing('[data-testid="header-menu-toggle"]')
         ->assertMissing('[data-testid="site-header"]')
         ->click('[data-testid="bottom-nav-more"]');
 
-    expect(linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))->toContain('設定');
+    expect($linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))->toContain('設定');
 
     $page->click('[data-testid="bottom-nav-sheet"] a[href$="/settings"]')
         ->waitForEvent('load')
         ->assertVisible('[data-testid="settings-title"]');
 });
 
-it('keeps the header on a tablet PWA', function () {
+it('keeps the header on a tablet PWA', function () use ($waitForHeaderNav, $enterPwaMode) {
     $page = visit('/announcements')->resize(...TABLET);
 
-    enterPwaMode($page);
+    $enterPwaMode($page);
 
-    waitForHeaderNav($page)->assertVisible('[data-testid="site-header"]');
+    $waitForHeaderNav($page)->assertVisible('[data-testid="site-header"]');
 });
 
 it('changes the theme and accent from the settings page', function () {

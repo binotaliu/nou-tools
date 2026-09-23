@@ -18,8 +18,7 @@ beforeEach(function () {
 /**
  * @param  array<int, MusicTrack>  $tracks
  */
-function playlistWith(array $tracks, array $attributes = []): MusicPlaylist
-{
+$playlistWith = function (array $tracks, array $attributes = []): MusicPlaylist {
     $playlist = MusicPlaylist::factory()->create($attributes);
 
     foreach ($tracks as $position => $track) {
@@ -27,12 +26,12 @@ function playlistWith(array $tracks, array $attributes = []): MusicPlaylist
     }
 
     return $playlist;
-}
+};
 
-it('returns playlists with their tracks in playback order', function () {
+it('returns playlists with their tracks in playback order', function () use ($playlistWith) {
     $first = MusicTrack::factory()->create(['title' => 'First', 'duration_seconds' => 100]);
     $second = MusicTrack::factory()->create(['title' => 'Second', 'duration_seconds' => 200, 'license_url' => null, 'source_url' => null]);
-    $playlist = playlistWith([$second, $first], ['title' => 'Rainy Focus', 'description' => 'Soft rain.', 'cover_image' => 'cover.jpg']);
+    $playlist = $playlistWith([$second, $first], ['title' => 'Rainy Focus', 'description' => 'Soft rain.', 'cover_image' => 'cover.jpg']);
 
     getJson(route('study-room.music.playlists'))
         ->assertOk()
@@ -54,8 +53,8 @@ it('returns playlists with their tracks in playback order', function () {
         ->assertJsonPath('playlists.0.tracks.1.audioOggUrl', Storage::disk(MusicTrack::AUDIO_DISK)->url($first->ogg_path));
 });
 
-it('has a null cover url when the playlist has no cover', function () {
-    playlistWith([MusicTrack::factory()->create()], ['cover_image' => null]);
+it('has a null cover url when the playlist has no cover', function () use ($playlistWith) {
+    $playlistWith([MusicTrack::factory()->create()], ['cover_image' => null]);
 
     getJson(route('study-room.music.playlists'))->assertJsonPath('playlists.0.coverImageUrl', null);
 });
@@ -68,10 +67,10 @@ it('skips playlists without tracks', function () {
         ->assertExactJson(['playlists' => []]);
 });
 
-it('lists a track that appears in several playlists under each of them', function () {
+it('lists a track that appears in several playlists under each of them', function () use ($playlistWith) {
     $track = MusicTrack::factory()->create();
-    playlistWith([$track]);
-    playlistWith([$track]);
+    $playlistWith([$track]);
+    $playlistWith([$track]);
 
     getJson(route('study-room.music.playlists'))
         ->assertJsonCount(2, 'playlists')
@@ -79,15 +78,15 @@ it('lists a track that appears in several playlists under each of them', functio
         ->assertJsonPath('playlists.1.tracks.0.id', $track->id);
 });
 
-it('does not run more queries as playlists and tracks grow', function () {
-    playlistWith(MusicTrack::factory()->count(2)->create()->all());
+it('does not run more queries as playlists and tracks grow', function () use ($playlistWith) {
+    $playlistWith(MusicTrack::factory()->count(2)->create()->all());
 
     DB::enableQueryLog();
     getJson(route('study-room.music.playlists'))->assertOk();
     $baseline = count(DB::getQueryLog());
 
     foreach (range(1, 3) as $ignored) {
-        playlistWith(MusicTrack::factory()->count(5)->create()->all());
+        $playlistWith(MusicTrack::factory()->count(5)->create()->all());
     }
 
     DB::flushQueryLog();

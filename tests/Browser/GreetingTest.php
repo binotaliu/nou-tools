@@ -9,8 +9,7 @@ use Illuminate\Support\Str;
 // so these behaviours are only observable with a real browser, not the
 // Feature tests that merely assert the config payload is embedded.
 
-function expectedGreetingBucket(Carbon $now): string
-{
+$expectedGreetingBucket = function (Carbon $now): string {
     $hour = (int) $now->format('G');
 
     return match (true) {
@@ -18,19 +17,17 @@ function expectedGreetingBucket(Carbon $now): string
         $hour >= 12 && $hour < 18 => '午安',
         default => '晚安',
     };
-}
+};
 
-function expectedGreetingDateString(Carbon $now): string
-{
+$expectedGreetingDateString = function (Carbon $now): string {
     return $now->format('Y').' 年 '.$now->format('n').' 月 '.$now->format('j').' 日 ('.chineseWeekdayChar($now).')';
-}
+};
 
-function expectedCompactDateString(Carbon $now): string
-{
+$expectedCompactDateString = function (Carbon $now): string {
     return $now->format('Y').'/'.$now->format('m').'/'.$now->format('d').' ('.chineseWeekdayChar($now).')';
-}
+};
 
-it('renders the client-computed greeting and semester week for a viewer in Asia/Taipei', function () {
+it('renders the client-computed greeting and semester week for a viewer in Asia/Taipei', function () use ($expectedGreetingBucket, $expectedGreetingDateString) {
     $semesterStart = now('Asia/Taipei')->subWeeks(3)->startOfDay();
 
     Config::set('app.current_semester', '2025B');
@@ -45,13 +42,13 @@ it('renders the client-computed greeting and semester week for a viewer in Asia/
 
     visit('/')
         ->withTimezone('Asia/Taipei')
-        ->assertSee(expectedGreetingBucket($now))
-        ->assertSee(expectedGreetingDateString($now))
+        ->assertSee($expectedGreetingBucket($now))
+        ->assertSee($expectedGreetingDateString($now))
         ->assertSee('114 學年度下學期第'.Str::toChineseNumber($expectedWeek).'週')
         ->screenshot();
 });
 
-it('renders the greeting from the viewer local clock when their timezone differs from Asia/Taipei', function () {
+it('renders the greeting from the viewer local clock when their timezone differs from Asia/Taipei', function () use ($expectedGreetingBucket, $expectedGreetingDateString) {
     $semesterStart = now('Asia/Taipei')->subWeeks(3)->startOfDay();
 
     Config::set('app.current_semester', '2025B');
@@ -66,8 +63,8 @@ it('renders the greeting from the viewer local clock when their timezone differs
 
     visit('/')
         ->withTimezone($timezone)
-        ->assertSee(expectedGreetingBucket($now))
-        ->assertSee(expectedGreetingDateString($now))
+        ->assertSee($expectedGreetingBucket($now))
+        ->assertSee($expectedGreetingDateString($now))
         ->screenshot();
 });
 
@@ -117,7 +114,7 @@ describe('Taiwan clock', function () {
     });
 });
 
-describe('Compact mode', function () {
+describe('Compact mode', function () use ($expectedCompactDateString) {
     it('switches from the normal to the compact widget when clicked, and back again', function () {
         visit('/')
             ->withTimezone('Asia/Taipei')
@@ -132,7 +129,7 @@ describe('Compact mode', function () {
             ->screenshot();
     });
 
-    it('renders the single-line date and semester week for a viewer in Asia/Taipei', function () {
+    it('renders the single-line date and semester week for a viewer in Asia/Taipei', function () use ($expectedCompactDateString) {
         $semesterStart = now('Asia/Taipei')->subWeeks(3)->startOfDay();
 
         Config::set('app.current_semester', '2025B');
@@ -148,7 +145,7 @@ describe('Compact mode', function () {
         visit('/')
             ->withTimezone('Asia/Taipei')
             ->click('[data-testid="greeting-widget"]')
-            ->assertSeeIn('[data-testid="greeting-compact"]', expectedCompactDateString($now))
+            ->assertSeeIn('[data-testid="greeting-compact"]', $expectedCompactDateString($now))
             ->assertSeeIn('[data-testid="greeting-compact"]', '114 下 W'.$expectedWeek)
             ->assertMissing('[data-testid="taiwan-clock-compact"]')
             ->screenshot();
