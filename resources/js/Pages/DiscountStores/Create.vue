@@ -101,9 +101,7 @@ function submit() {
 </script>
 
 <template>
-  <Head title="新增優惠店家 - NOU 小幫手">
-    <meta name="description" content="送出新的學生優惠店家資訊。" />
-  </Head>
+  <Head title="新增優惠店家 - NOU 小幫手" />
 
   <AppLayout>
     <div class="mx-auto max-w-3xl space-y-6">

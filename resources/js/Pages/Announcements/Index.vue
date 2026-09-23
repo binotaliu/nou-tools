@@ -15,20 +15,6 @@ const props = defineProps({
   },
 })
 
-const jsonLd = computed(() => ({
-  '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  name: '學校公告',
-  itemListElement: (props.viewModel.announcements.data ?? []).map(
-    (announcement, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: announcement.url,
-      name: announcement.title,
-    })
-  ),
-}))
-
 const sourceCategoryTree = computed(() => {
   const tree = {}
 
@@ -112,12 +98,7 @@ function isExpired(announcement) {
 </script>
 
 <template>
-  <Head title="學校公告 - NOU 小幫手">
-    <meta name="description" content="彙整校內公告。" />
-    <script type="application/ld+json">
-      {{ JSON.stringify(jsonLd) }}
-    </script>
-  </Head>
+  <Head title="學校公告 - NOU 小幫手" />
 
   <AppLayout>
     <div class="mx-auto max-w-6xl space-y-6">

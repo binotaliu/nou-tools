@@ -189,9 +189,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Head title="自習室 - NOU 小幫手">
-    <meta name="description" content="24 小時開放的自習室，歡迎一起用功。" />
-  </Head>
+  <Head title="自習室 - NOU 小幫手" />
 
   <AppLayout>
     <div class="mx-auto max-w-6xl space-y-6" data-testid="study-room-page">

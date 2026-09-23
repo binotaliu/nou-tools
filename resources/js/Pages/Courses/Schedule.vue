@@ -28,11 +28,6 @@ function toSemesterDisplay(semester) {
   return `${rocYear} 學年度${termName}`
 }
 
-const seoDescription = computed(
-  () =>
-    `國立空中大學 ${toSemesterDisplay(props.viewModel.selectedTerm)}開課表，查詢各學系課程的學分數與考試時間。`
-)
-
 // Port of the Blade view's `$courseFrontEndData` @php block: flattens the
 // exam-time groups and the micro-credit/remote courses into one list of
 // plain course rows for client-side filtering/grouping.
@@ -316,9 +311,7 @@ const creditsDropdown = useDropdown()
 </script>
 
 <template>
-  <Head title="本學期開課表 - NOU 小幫手">
-    <meta name="description" :content="seoDescription" />
-  </Head>
+  <Head title="本學期開課表 - NOU 小幫手" />
 
   <AppLayout>
     <div class="mx-auto max-w-5xl">

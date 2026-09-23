@@ -12,13 +12,7 @@ defineProps({
 </script>
 
 <template>
-  <Head title="送出成功 - NOU 小幫手">
-    <meta
-      name="description"
-      content="已收到您送出的優惠店家資訊，將由管理員確認。"
-    />
-    <meta name="robots" content="noindex, nofollow" />
-  </Head>
+  <Head title="送出成功 - NOU 小幫手" />
 
   <AppLayout>
     <div class="mx-auto max-w-2xl">

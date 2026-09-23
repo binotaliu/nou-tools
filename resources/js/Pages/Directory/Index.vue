@@ -22,25 +22,6 @@ const props = defineProps({
   },
 })
 
-const jsonLd = computed(() => {
-  const linkItems = (props.viewModel.linkGroups ?? []).flatMap(
-    group => group.links ?? []
-  )
-  const centerItems = props.viewModel.centerGroup?.centers ?? []
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: '連結 / 學習指導中心目錄',
-    itemListElement: [...linkItems, ...centerItems].map((link, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: link.url,
-      name: link.name,
-    })),
-  }
-})
-
 const centersByRegion = computed(() => {
   const centers = props.viewModel.centerGroup?.centers ?? []
   const groups = new Map()
@@ -221,15 +202,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Head title="連結 / 學習指導中心目錄 - NOU 小幫手">
-    <meta
-      name="description"
-      content="彙整校內各處室、學系與學習指導中心的官方網站連結。"
-    />
-    <script type="application/ld+json">
-      {{ JSON.stringify(jsonLd) }}
-    </script>
-  </Head>
+  <Head title="連結 / 學習指導中心目錄 - NOU 小幫手" />
 
   <AppLayout>
     <div class="mx-auto max-w-6xl space-y-6">

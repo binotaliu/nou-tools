@@ -72,27 +72,10 @@ function clearFilters() {
 function goToPage(target) {
   page.value = Math.min(totalPages.value, Math.max(1, target))
 }
-
-const jsonLd = computed(() => ({
-  '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  name: '優惠店家',
-  itemListElement: (props.viewModel.stores ?? []).map((store, index) => ({
-    '@type': 'ListItem',
-    position: index + 1,
-    url: `/discount-stores/${store.id}`,
-    name: store.name,
-  })),
-}))
 </script>
 
 <template>
-  <Head title="優惠店家 - NOU 小幫手">
-    <meta name="description" content="學生優惠店家列表。" />
-    <script type="application/ld+json">
-      {{ JSON.stringify(jsonLd) }}
-    </script>
-  </Head>
+  <Head title="優惠店家 - NOU 小幫手" />
 
   <AppLayout>
     <div class="mx-auto max-w-6xl space-y-6">

@@ -2,6 +2,7 @@
 
 use App\Enums\ArticleType;
 use App\Enums\DiscountStoreStatus;
+use App\Models\Announcement;
 use App\Models\Course;
 use App\Models\DiscountStore;
 use App\Models\DiscountStoreCategory;
@@ -58,6 +59,43 @@ it('server-renders WebSite JSON-LD on the home page', function () {
         ->assertSee('<script data-seo type="application/ld+json">', false)
         ->assertSee('"@type":"WebSite"', false)
         ->assertSee('"url":"'.url('/').'"', false);
+});
+
+it('server-renders an announcements index page with its ItemList JSON-LD', function () {
+    Announcement::factory()->create([
+        'source_name' => '教務處',
+        'title' => '期中考公告',
+        'published_at' => now()->subDay(),
+    ]);
+
+    $this->get(route('announcements.index'))
+        ->assertSuccessful()
+        ->assertSee('<title>學校公告 - NOU 小幫手</title>', false)
+        ->assertSee('"@type":"ItemList"', false)
+        ->assertSee('"name":"學校公告"', false)
+        ->assertSee('期中考公告', false);
+});
+
+it('server-renders a discount stores index page with its ItemList JSON-LD', function () {
+    $store = DiscountStore::factory()
+        ->for(DiscountStoreCategory::factory(), 'category')
+        ->create(['name' => '測試優惠店家', 'status' => DiscountStoreStatus::Online]);
+
+    $this->get(route('discount-stores.index'))
+        ->assertSuccessful()
+        ->assertSee('<title>優惠店家 - NOU 小幫手</title>', false)
+        ->assertSee('"@type":"ItemList"', false)
+        ->assertSee('"name":"優惠店家"', false)
+        ->assertSee(route('discount-stores.show', $store), false);
+});
+
+it('server-renders a directory index page with its ItemList JSON-LD', function () {
+    $this->get(route('directory.index'))
+        ->assertSuccessful()
+        ->assertSee('<title>連結 / 學習指導中心目錄 - NOU 小幫手</title>', false)
+        ->assertSee('"@type":"ItemList"', false)
+        ->assertSee('"name":"連結 / 學習指導中心目錄"', false)
+        ->assertSee('教務處', false);
 });
 
 it('server-renders an article page with its own description and JSON-LD', function () {
