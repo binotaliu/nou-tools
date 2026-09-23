@@ -4,11 +4,14 @@
 // 夜間班, …) gets a row with its time on the left and the class chips on the
 // right, so there are no boxes nested in boxes. The date filter is driven by
 // useDatePicker.js and navigates with ?date=.
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import Icon from '../Icon.vue'
 import DateField from '../DateField.vue'
 import useDatePicker from '../../Composables/useDatePicker'
+import useSessionClock, {
+  sessionState,
+} from '../../Composables/useSessionClock'
 
 const props = defineProps({
   courses: {
@@ -36,6 +39,28 @@ const { date, navigate } = useDatePicker({ date: props.selectedDate })
 function selectDate(next) {
   date.value = next
   navigate()
+}
+
+const { now } = useSessionClock()
+
+// Ended courses (over more than 30 minutes ago) are hidden unless asked for.
+const SHOW_ENDED_KEY = 'nou:video-classes:show-ended:v1'
+const showEnded = ref(false)
+
+try {
+  showEnded.value = localStorage.getItem(SHOW_ENDED_KEY) === '1'
+} catch {
+  // Storage can be unavailable; the default (hidden) applies.
+}
+
+function setShowEnded(value) {
+  showEnded.value = value
+
+  try {
+    localStorage.setItem(SHOW_ENDED_KEY, value ? '1' : '0')
+  } catch {
+    // Not persisted; still applies for this visit.
+  }
 }
 
 const typeLabels = {
@@ -82,7 +107,18 @@ const groupedCourses = computed(() =>
       })
 
       byTime.forEach((classes, timeLabel) => {
-        slots.push({ key: `${key}-${timeLabel}`, label, timeLabel, classes })
+        const [startTime, endTime] = timeLabel.includes(' - ')
+          ? timeLabel.split(' - ')
+          : [null, null]
+
+        slots.push({
+          key: `${key}-${timeLabel}`,
+          label,
+          timeLabel,
+          startTime,
+          endTime,
+          classes,
+        })
       })
     })
 
@@ -94,8 +130,27 @@ const groupedCourses = computed(() =>
   })
 )
 
+const stateOf = slot =>
+  sessionState(props.selectedDate, slot.startTime, slot.endTime, now.value)
+
+const visibleCourses = computed(() =>
+  groupedCourses.value
+    .map(course => {
+      const slots = course.slots.filter(
+        slot => showEnded.value || stateOf(slot) !== 'ended'
+      )
+
+      return {
+        ...course,
+        slots,
+        classCount: slots.reduce((sum, slot) => sum + slot.classes.length, 0),
+      }
+    })
+    .filter(course => course.slots.length > 0)
+)
+
 const classTotal = computed(() =>
-  groupedCourses.value.reduce((sum, course) => sum + course.classCount, 0)
+  visibleCourses.value.reduce((sum, course) => sum + course.classCount, 0)
 )
 </script>
 
@@ -111,10 +166,10 @@ const classTotal = computed(() =>
           今日視訊面授
         </h2>
         <p
-          v-if="groupedCourses.length > 0"
+          v-if="visibleCourses.length > 0"
           class="mt-1 text-sm text-theme-700 tabular-nums dark:text-zinc-400"
         >
-          共 {{ groupedCourses.length }} 門課程、{{ classTotal }} 個班級
+          共 {{ visibleCourses.length }} 門課程、{{ classTotal }} 個班級
         </p>
         <Link
           v-if="!standalone"
@@ -146,6 +201,20 @@ const classTotal = computed(() =>
       </div>
     </div>
 
+    <label
+      v-if="groupedCourses.length > 0"
+      class="mb-4 inline-flex cursor-pointer items-center gap-2 text-sm text-theme-700 dark:text-zinc-400"
+    >
+      <input
+        type="checkbox"
+        :checked="showEnded"
+        class="size-4 rounded border-theme-300 accent-theme-700"
+        data-testid="video-courses-show-ended"
+        @change="setShowEnded($event.target.checked)"
+      />
+      顯示已結束課程
+    </label>
+
     <div
       v-if="groupedCourses.length === 0"
       class="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-12 text-theme-700 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
@@ -154,9 +223,19 @@ const classTotal = computed(() =>
       <p class="text-lg font-medium">今日無面授課程</p>
     </div>
 
+    <div
+      v-else-if="visibleCourses.length === 0"
+      class="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-12 text-theme-700 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
+      data-testid="video-courses-all-ended"
+    >
+      <Icon name="face-smile" class="size-8" />
+      <p class="text-lg font-medium">已無進行中或未開始的課程</p>
+      <p class="text-sm">勾選「顯示已結束課程」可查看已結束的課程。</p>
+    </div>
+
     <div v-else class="divide-y divide-theme-100 dark:divide-zinc-800">
       <div
-        v-for="course in groupedCourses"
+        v-for="course in visibleCourses"
         :key="course.id"
         class="py-4 first:pt-0 last:pb-0"
       >
@@ -168,6 +247,7 @@ const classTotal = computed(() =>
           <div
             v-for="slot in course.slots"
             :key="slot.key"
+            data-testid="video-course-slot"
             class="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-4"
           >
             <div
