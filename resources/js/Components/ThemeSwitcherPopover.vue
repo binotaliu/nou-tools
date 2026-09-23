@@ -46,6 +46,7 @@ onBeforeUnmount(() => {
       type="button"
       class="inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none md:mr-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
       :aria-expanded="open.toString()"
+      data-testid="theme-switcher-toggle"
       @click="toggle()"
     >
       <span class="sr-only">外觀與文字大小設定</span>
