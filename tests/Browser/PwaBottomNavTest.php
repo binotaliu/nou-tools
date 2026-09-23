@@ -232,7 +232,7 @@ it('drops the About page title and subtitle in a phone PWA but keeps the brand b
         ->assertVisible('[data-testid="about-brand"]');
 });
 
-it('disables pinch-zoom only in an installed PWA', function () {
+it('drops the double-tap zoom delay only in an installed PWA', function () {
     $page = visit('/announcements')->resize(...PHONE);
 
     $page->assertSee('學校公告');
@@ -240,7 +240,7 @@ it('disables pinch-zoom only in an installed PWA', function () {
 
     enterPwaMode($page);
 
-    expect($page->script('getComputedStyle(document.documentElement).touchAction'))->toBe('pan-x pan-y');
+    expect($page->script('getComputedStyle(document.documentElement).touchAction'))->toBe('manipulation');
 });
 
 it('hides the header in a phone PWA and links 設定 from the more sheet', function () {

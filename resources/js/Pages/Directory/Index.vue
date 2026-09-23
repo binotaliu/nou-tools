@@ -279,6 +279,7 @@ onMounted(() => {
             <select
               :value="selectedKey"
               data-testid="center-select"
+              aria-label="學習指導中心"
               class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm font-medium text-theme-800 sm:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
               @change="selectCenter($event.target.value)"
             >

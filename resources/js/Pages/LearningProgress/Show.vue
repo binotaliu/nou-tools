@@ -852,6 +852,7 @@ const csrfToken =
               <Select
                 v-model.number="selectedWeekNum"
                 data-testid="learning-progress-week-picker"
+                aria-label="選擇週次"
               >
                 <option
                   v-for="week in viewModel.weeks"

@@ -42,7 +42,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 // tone, and a bolder label.
 const tabClass = active =>
   active
-    ? 'font-bold text-theme-700 dark:text-theme-700'
+    ? 'font-bold text-theme-700 dark:text-theme-400'
     : 'font-medium text-theme-900/70 dark:text-zinc-300'
 </script>
 

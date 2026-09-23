@@ -166,6 +166,7 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             <!-- eslint-disable-next-line vue/no-v-html -->
             <div
               ref="announcementRoot"
+              tabindex="0"
               class="prose prose-sm max-h-36 max-w-none overflow-y-auto prose-theme dark:prose-invert"
               v-html="announcementHtml"
             ></div>
