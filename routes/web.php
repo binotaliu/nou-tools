@@ -30,6 +30,7 @@ use App\Http\Controllers\Markdown\NewsletterIndexMarkdownController;
 use App\Http\Controllers\Markdown\NewsletterShowMarkdownController;
 use App\Http\Controllers\Markdown\ScheduleShowMarkdownController;
 use App\Http\Controllers\Markdown\StudyRoomMarkdownController;
+use App\Http\Controllers\Markdown\VideoClassIndexMarkdownController;
 use App\Http\Controllers\MusicPlaylistController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NewsletterFeedController;
@@ -66,6 +67,7 @@ use App\Http\Controllers\StudyRoomSessionStatsController;
 use App\Http\Controllers\StudyRoomStateController;
 use App\Http\Controllers\StudyRoomTimerController;
 use App\Http\Controllers\StudyRoomTimerEndNotificationController;
+use App\Http\Controllers\VideoClassController;
 use Illuminate\Support\Facades\Route;
 use Spatie\Csp\AddCspHeaders;
 
@@ -115,6 +117,9 @@ Route::get('/newsletter/{issueKey}', [NewsletterController::class, 'show'])->nam
 Route::put('/newsletter/{issueKey}/reaction', NewsletterReactionController::class)->name('newsletter.reaction.update')
     ->where('issueKey', '\d{4}-W\d{2}')
     ->middleware('throttle:30,1');
+
+Route::get('/video-classes', [VideoClassController::class, 'index'])->name('video-classes.index')
+    ->withMarkdown(VideoClassIndexMarkdownController::class);
 
 Route::get('/directory', [DirectoryController::class, 'index'])->name('directory.index')
     ->withMarkdown(DirectoryIndexMarkdownController::class);
