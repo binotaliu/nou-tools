@@ -49,7 +49,7 @@ function close() {
         </h3>
         <p
           v-if="description"
-          class="mb-4 text-sm text-theme-600 dark:text-zinc-400"
+          class="mb-4 text-sm text-theme-700 dark:text-zinc-400"
         >
           {{ description }}
         </p>

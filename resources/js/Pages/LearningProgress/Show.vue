@@ -365,14 +365,14 @@ const csrfToken =
                             class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
                           />
                           <CheckIcon
-                            class="col-start-1 row-start-1 m-0.5 size-3 text-gray-400 opacity-0 group-has-checked:opacity-100 print:hidden"
+                            class="col-start-1 row-start-1 m-0.5 size-3 text-gray-600 opacity-0 group-has-checked:opacity-100 print:hidden"
                           />
                           <div
                             class="col-start-1 row-start-1 hidden size-4 rounded border border-gray-500 bg-white dark:bg-zinc-900 print:block"
                           ></div>
                         </div>
                         <span
-                          class="text-xs group-has-checked:text-gray-400 print:hidden"
+                          class="text-xs group-has-checked:text-gray-600 print:hidden"
                           >完成</span
                         >
                       </label>
@@ -421,7 +421,7 @@ const csrfToken =
                       currentWeek === week.num
                         ? 'bg-blue-50 dark:bg-blue-950/60'
                         : isWeekFullyComplete(week.num)
-                          ? 'bg-white dark:bg-zinc-900 [&>div]:text-gray-400 dark:[&>div]:text-zinc-500'
+                          ? 'bg-white dark:bg-zinc-900 [&>div]:text-gray-600 dark:[&>div]:text-zinc-500'
                           : isWeekPassed(week.num) &&
                               hasIncompleteCourseInWeek(week.num)
                             ? 'bg-red-50 dark:bg-red-950/60'
@@ -435,7 +435,7 @@ const csrfToken =
                       第{{ toChineseNumber(week.num) }}週
                     </div>
                     <div
-                      class="text-center text-xs text-theme-600 dark:text-zinc-400 print:text-theme-600!"
+                      class="text-center text-xs text-theme-700 dark:text-zinc-400 print:text-theme-700!"
                     >
                       {{ week.start }} - {{ week.end }}
                     </div>
@@ -471,14 +471,14 @@ const csrfToken =
                             class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
                           />
                           <CheckIcon
-                            class="col-start-1 row-start-1 m-0.5 size-3 text-gray-400 opacity-0 group-has-checked:opacity-100 print:hidden"
+                            class="col-start-1 row-start-1 m-0.5 size-3 text-gray-600 opacity-0 group-has-checked:opacity-100 print:hidden"
                           />
                           <div
                             class="col-start-1 row-start-1 hidden size-4 rounded border border-gray-500 bg-white dark:bg-zinc-900 print:block"
                           ></div>
                         </div>
                         <span
-                          class="text-xs group-has-checked:text-gray-400 print:hidden"
+                          class="text-xs group-has-checked:text-gray-600 print:hidden"
                           >影音</span
                         >
                       </label>
@@ -506,14 +506,14 @@ const csrfToken =
                             class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
                           />
                           <CheckIcon
-                            class="col-start-1 row-start-1 m-0.5 size-3 text-gray-400 opacity-0 group-has-checked:opacity-100 print:hidden"
+                            class="col-start-1 row-start-1 m-0.5 size-3 text-gray-600 opacity-0 group-has-checked:opacity-100 print:hidden"
                           />
                           <div
                             class="col-start-1 row-start-1 hidden size-4 rounded border border-gray-500 bg-white dark:bg-zinc-900 print:block"
                           ></div>
                         </div>
                         <span
-                          class="text-xs group-has-checked:text-gray-400 print:hidden"
+                          class="text-xs group-has-checked:text-gray-600 print:hidden"
                           >課本</span
                         >
                       </label>
@@ -532,7 +532,7 @@ const csrfToken =
                       placeholder="（尚未設定目標）"
                       :class="
                         isProgressComplete(course.id, week.num)
-                          ? 'text-gray-400'
+                          ? 'text-gray-600'
                           : 'text-theme-700 dark:text-zinc-300'
                       "
                       class="m-0 h-full w-full resize-none px-2 py-2 text-xs placeholder-gray-400 focus:border-blue-500 focus:outline-none print:text-black print:placeholder-transparent"

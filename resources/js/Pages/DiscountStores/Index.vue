@@ -86,7 +86,7 @@ function goToPage(target) {
           <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
             優惠店家
           </h2>
-          <p class="text-sm text-theme-600 dark:text-zinc-400">
+          <p class="text-sm text-theme-700 dark:text-zinc-400">
             適用於空大學生的優惠店家列表，歡迎回報或新增店家資訊。
             <br />
             此區資料由 <strong>112姍姍</strong> 同學維護。
@@ -227,7 +227,7 @@ function goToPage(target) {
             <button
               v-show="hasFilters"
               type="button"
-              class="inline-flex items-center justify-center gap-2 text-orange-600 hover:text-orange-700"
+              class="inline-flex items-center justify-center gap-2 text-orange-700 hover:text-orange-800"
               @click.prevent="clearFilters()"
             >
               清除條件
@@ -246,7 +246,7 @@ function goToPage(target) {
           >
             <Icon
               name="building-storefront"
-              class="size-10 text-theme-400 dark:text-zinc-500"
+              class="size-10 text-theme-700 dark:text-zinc-500"
             />
             <div class="space-y-1">
               <h3
@@ -254,7 +254,7 @@ function goToPage(target) {
               >
                 目前沒有符合條件的優惠店家
               </h3>
-              <p class="text-sm text-theme-500 dark:text-zinc-400">
+              <p class="text-sm text-theme-700 dark:text-zinc-400">
                 可以調整篩選條件，或新增一個優惠店家！
               </p>
             </div>
@@ -291,7 +291,7 @@ function goToPage(target) {
 
                 <span
                   v-if="store.city"
-                  class="text-theme-500 dark:text-zinc-400"
+                  class="text-theme-700 dark:text-zinc-400"
                 >
                   {{ store.city }} {{ store.district }}
                 </span>
@@ -320,7 +320,7 @@ function goToPage(target) {
                   </h3>
 
                   <p
-                    class="line-clamp-2 text-sm text-theme-600 dark:text-zinc-400"
+                    class="line-clamp-2 text-sm text-theme-700 dark:text-zinc-400"
                   >
                     <Link
                       :href="`/discount-stores/${store.id}`"
@@ -386,7 +386,7 @@ function goToPage(target) {
         <div
           class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
         >
-          <p class="text-sm text-theme-600 dark:text-zinc-400">
+          <p class="text-sm text-theme-700 dark:text-zinc-400">
             第 {{ page }} / {{ totalPages }} 頁，共
             {{ filteredStores.length.toLocaleString() }} 筆結果
           </p>
@@ -394,7 +394,7 @@ function goToPage(target) {
           <div class="flex items-center gap-3">
             <button
               type="button"
-              class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400"
+              class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400"
               :disabled="page === 1"
               @click.prevent="goToPage(page - 1)"
             >
@@ -404,7 +404,7 @@ function goToPage(target) {
 
             <button
               type="button"
-              class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400"
+              class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400"
               :disabled="page === totalPages"
               @click.prevent="goToPage(page + 1)"
             >

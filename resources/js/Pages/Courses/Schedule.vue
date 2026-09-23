@@ -321,7 +321,7 @@ const creditsDropdown = useDropdown()
             本學期開課表
           </h2>
 
-          <div class="text-sm text-theme-600 dark:text-zinc-400">
+          <div class="text-sm text-theme-700 dark:text-zinc-400">
             {{ toSemesterDisplay(viewModel.selectedTerm) }}
           </div>
         </div>
@@ -517,7 +517,7 @@ const creditsDropdown = useDropdown()
 
         <p
           v-if="section.groups.length === 0"
-          class="text-sm text-theme-600 dark:text-zinc-400"
+          class="text-sm text-theme-700 dark:text-zinc-400"
         >
           {{ section.emptyMessage }}
         </p>
@@ -581,7 +581,7 @@ const creditsDropdown = useDropdown()
                     >
                       <Link
                         :href="course.url"
-                        class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                        class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
                       >
                         {{ course.name }}
                       </Link>
@@ -615,12 +615,12 @@ const creditsDropdown = useDropdown()
               >
                 <Link
                   :href="course.url"
-                  class="text-base font-semibold text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                  class="text-base font-semibold text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
                 >
                   {{ course.name }}
                 </Link>
                 <div
-                  class="mt-1 flex items-center gap-2 text-sm text-theme-600 dark:text-zinc-400"
+                  class="mt-1 flex items-center gap-2 text-sm text-theme-700 dark:text-zinc-400"
                 >
                   <span>{{ mobileColumnValue(course, columns[0]) }}</span>
                   <span>·</span>

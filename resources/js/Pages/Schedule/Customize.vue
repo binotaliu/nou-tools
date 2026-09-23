@@ -166,7 +166,7 @@ function submitAnnouncementPreferences() {
           <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
             自訂課表
           </h2>
-          <p class="mt-2 text-sm text-theme-600 dark:text-zinc-400">
+          <p class="mt-2 text-sm text-theme-700 dark:text-zinc-400">
             調整課表頁顯示區塊、常用連結，以及最新公告要顯示的分類。
           </p>
         </div>
@@ -195,7 +195,7 @@ function submitAnnouncementPreferences() {
           :class="
             activeTab === tab.key
               ? 'border-theme-600 text-theme-900 dark:border-zinc-300 dark:text-zinc-100'
-              : 'border-transparent text-theme-600 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200'
+              : 'border-transparent text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200'
           "
           @click="activeTab = tab.key"
         >
@@ -215,7 +215,7 @@ function submitAnnouncementPreferences() {
             <h2 class="text-xl font-semibold text-theme-900 dark:text-zinc-100">
               顯示區塊
             </h2>
-            <div class="text-sm text-theme-600 dark:text-zinc-400">
+            <div class="text-sm text-theme-700 dark:text-zinc-400">
               取消勾選即可在課表頁隱藏對應區塊。
             </div>
           </div>
@@ -247,7 +247,7 @@ function submitAnnouncementPreferences() {
             <h2 class="text-xl font-semibold text-theme-900 dark:text-zinc-100">
               常用連結：自訂連結
             </h2>
-            <div class="text-sm text-theme-600 dark:text-zinc-400">
+            <div class="text-sm text-theme-700 dark:text-zinc-400">
               最多可新增 20 筆。請輸入完整網址（以 https:// 開頭）。僅限
               *.nou.edu.tw、line.me、docs.google.com 網域。
             </div>
@@ -316,7 +316,7 @@ function submitAnnouncementPreferences() {
 
             <div
               v-if="links.length === 0"
-              class="rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-6 text-center text-sm text-theme-600 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
+              class="rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-6 text-center text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
             >
               尚未新增自訂連結。
             </div>
@@ -337,7 +337,7 @@ function submitAnnouncementPreferences() {
           <button
             type="submit"
             :disabled="form.processing"
-            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-600 bg-theme-600 px-4 py-2 font-semibold text-white transition hover:bg-theme-700 disabled:bg-theme-400 sm:w-auto"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400 sm:w-auto"
           >
             <Icon name="check" class="size-4" />
             儲存自訂設定
@@ -357,7 +357,7 @@ function submitAnnouncementPreferences() {
         class="space-y-6"
         @submit.prevent="submitAnnouncementPreferences"
       >
-        <p class="text-sm text-theme-600 dark:text-zinc-400">
+        <p class="text-sm text-theme-700 dark:text-zinc-400">
           選擇要在課表頁「最新公告」區塊顯示的公告分類。未選擇任何分類時，該區塊將不顯示任何公告。
         </p>
         <div
@@ -394,7 +394,7 @@ function submitAnnouncementPreferences() {
 
               <button
                 type="button"
-                class="inline-flex items-center rounded-md p-2 text-theme-600 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-200"
+                class="inline-flex items-center rounded-md p-2 text-theme-700 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-200"
                 :aria-expanded="isGroupExpanded(groupValue)"
                 :aria-label="`展開或收合 ${groupLabel} 分類`"
                 @click="toggleGroupExpansion(groupValue)"
@@ -489,7 +489,7 @@ function submitAnnouncementPreferences() {
           <button
             type="submit"
             :disabled="announcementForm.processing"
-            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-600 bg-theme-600 px-4 py-2 font-semibold text-white transition hover:bg-theme-700 disabled:bg-theme-400 sm:w-auto"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400 sm:w-auto"
           >
             <Icon name="check" class="size-4" />
             儲存公告分類設定

@@ -182,7 +182,7 @@ const bottomMoreItems = computed(() =>
               :class="
                 isItemActive(item)
                   ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
-                  : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
+                  : 'text-theme-700 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
               "
             >
               <Icon :name="item.icon" class="size-4 shrink-0" />
@@ -196,7 +196,7 @@ const bottomMoreItems = computed(() =>
                 :class="
                   moreMenuItems.some(item => isItemActive(item))
                     ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
-                    : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
+                    : 'text-theme-700 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
                 "
                 :aria-expanded="moreMenuOpen.toString()"
                 @click="moreMenuOpen = !moreMenuOpen"
@@ -222,7 +222,7 @@ const bottomMoreItems = computed(() =>
                   :class="
                     isItemActive(item)
                       ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
-                      : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
+                      : 'text-theme-700 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
                   "
                 >
                   <Icon :name="item.icon" class="size-4 shrink-0" />
@@ -261,7 +261,7 @@ const bottomMoreItems = computed(() =>
           :class="
             isItemActive(item)
               ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
-              : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
+              : 'text-theme-700 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
           "
         >
           <Icon :name="item.icon" class="size-4 shrink-0" />
@@ -277,7 +277,7 @@ const bottomMoreItems = computed(() =>
           :class="
             isItemActive(item)
               ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
-              : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
+              : 'text-theme-700 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
           "
         >
           <Icon :name="item.icon" class="size-4 shrink-0" />
@@ -347,7 +347,7 @@ const bottomMoreItems = computed(() =>
             >
               NOU 小幫手
             </Link>
-            <p class="mt-1 text-xs text-theme-500 dark:text-zinc-400">
+            <p class="mt-1 text-xs text-theme-700 dark:text-zinc-400">
               給 NOU 同學的非官方小工具
             </p>
           </div>
@@ -355,7 +355,7 @@ const bottomMoreItems = computed(() =>
 
         <div class="flex flex-col items-center gap-6 sm:flex-row">
           <div
-            class="max-w-lg text-center text-sm text-theme-400 md:text-left dark:text-zinc-500"
+            class="max-w-lg text-center text-sm text-theme-700 md:text-left dark:text-zinc-500"
           >
             <span class="font-semibold">免責聲明：</span>
             <p class="text-justify text-xs md:text-left">
@@ -366,7 +366,7 @@ const bottomMoreItems = computed(() =>
       </div>
 
       <div
-        class="mt-6 flex flex-col-reverse items-center justify-between gap-6 border-t border-theme-200 pt-4 text-xs text-theme-500 md:flex-row md:gap-3 dark:border-zinc-700 dark:text-zinc-400 print:hidden"
+        class="mt-6 flex flex-col-reverse items-center justify-between gap-6 border-t border-theme-200 pt-4 text-xs text-theme-700 md:flex-row md:gap-3 dark:border-zinc-700 dark:text-zinc-400 print:hidden"
       >
         <div>&copy; {{ new Date().getFullYear() }} NOU 小幫手</div>
         <div
@@ -375,7 +375,7 @@ const bottomMoreItems = computed(() =>
           <div class="text-xs">
             <Link
               href="/about"
-              class="inline-flex items-center gap-1 text-theme-500 hover:text-theme-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
             >
               <Icon name="information-circle" class="size-3" />
               關於本站
@@ -385,7 +385,7 @@ const bottomMoreItems = computed(() =>
             <Link
               href="/install"
               data-testid="footer-install-link"
-              class="inline-flex items-center gap-1 text-theme-500 hover:text-theme-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
             >
               <Icon name="device-phone-mobile" class="size-3" />
               安裝 NOU 小幫手
@@ -394,7 +394,7 @@ const bottomMoreItems = computed(() =>
           <div class="text-xs">
             <a
               href="https://kuma.binota.org/status/nou"
-              class="inline-flex items-center gap-1 text-theme-500 hover:text-theme-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -405,7 +405,7 @@ const bottomMoreItems = computed(() =>
           <div class="text-xs">
             <a
               href="https://github.com/binotaliu/nou-tools"
-              class="inline-flex items-center gap-1 text-theme-500 hover:text-theme-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -416,7 +416,7 @@ const bottomMoreItems = computed(() =>
           <div class="text-xs">
             <a
               href="mailto:nou-tools-contact@binota.org"
-              class="inline-flex items-center gap-1 text-theme-500 hover:text-theme-600 dark:text-zinc-400 dark:hover:text-zinc-300"
+              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
             >
               <Icon name="envelope" class="size-3" />
               聯絡作者

@@ -98,7 +98,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         />
         <figcaption
           v-if="issue.coverImageCreditName"
-          class="mt-1 text-right text-xs text-theme-500 dark:text-zinc-500"
+          class="mt-1 text-right text-xs text-theme-700 dark:text-zinc-500"
           data-testid="newsletter-cover-image-credit"
         >
           Photo by
@@ -125,7 +125,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
       <header
         class="mb-6 space-y-2 border-b border-theme-200 pb-6 dark:border-zinc-700"
       >
-        <p class="text-sm text-theme-600 dark:text-zinc-400">
+        <p class="text-sm text-theme-700 dark:text-zinc-400">
           <Link href="/newsletter" class="underline hover:no-underline">
             {{ viewModel.newsletterTitle }}
           </Link>
@@ -134,7 +134,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         <h1 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
           {{ issue.title }}
         </h1>
-        <p class="text-sm text-theme-600 dark:text-zinc-400">
+        <p class="text-sm text-theme-700 dark:text-zinc-400">
           {{ formatNewsletterDate(issue.publishesOn) }} 發刊
         </p>
         <p
@@ -147,7 +147,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
         </p>
         <div
           v-else
-          class="flex items-center justify-between gap-4 pt-1 text-sm text-theme-600 dark:text-zinc-400"
+          class="flex items-center justify-between gap-4 pt-1 text-sm text-theme-700 dark:text-zinc-400"
         >
           <span
             class="inline-flex items-center gap-1"
@@ -256,7 +256,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
                   {{ event.name }}
                   <span
                     v-if="event.description"
-                    class="block text-sm text-theme-600 dark:text-zinc-400"
+                    class="block text-sm text-theme-700 dark:text-zinc-400"
                   >
                     {{ event.description }}
                   </span>
@@ -293,12 +293,12 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
                   {{ item.headline }}
                   <Icon
                     name="arrow-top-right-on-square"
-                    class="inline size-4 align-baseline text-theme-500"
+                    class="inline size-4 align-baseline text-theme-700"
                   />
                 </a>
                 <template v-else>{{ item.headline }}</template>
               </h3>
-              <p class="text-sm text-theme-600 dark:text-zinc-400">
+              <p class="text-sm text-theme-700 dark:text-zinc-400">
                 {{ item.sourceName }}
               </p>
               <div
@@ -337,12 +337,12 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
                   {{ item.headline }}
                   <Icon
                     name="arrow-top-right-on-square"
-                    class="inline size-4 align-baseline text-theme-500"
+                    class="inline size-4 align-baseline text-theme-700"
                   />
                 </a>
                 <template v-else>{{ item.headline }}</template>
               </h3>
-              <p class="text-sm text-theme-600 dark:text-zinc-400">
+              <p class="text-sm text-theme-700 dark:text-zinc-400">
                 {{ item.sourceName }}
               </p>
               <div
@@ -390,7 +390,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
                     {{ item.headline }}
                     <Icon
                       name="arrow-top-right-on-square"
-                      class="inline size-4 align-baseline text-theme-500"
+                      class="inline size-4 align-baseline text-theme-700"
                     />
                   </a>
                   <span
@@ -424,7 +424,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
           </h2>
           <p
             v-if="column.author"
-            class="mb-3 text-sm text-theme-600 dark:text-zinc-400"
+            class="mb-3 text-sm text-theme-700 dark:text-zinc-400"
           >
             {{ column.author }}
           </p>
@@ -473,7 +473,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
           </button>
         </div>
         <div class="mt-4 flex items-center justify-center gap-3">
-          <span class="text-sm text-theme-600 dark:text-zinc-400">
+          <span class="text-sm text-theme-700 dark:text-zinc-400">
             覺得有用？分享給同學吧
           </span>
           <ShareButton
@@ -511,7 +511,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
 
       <!-- License Footer -->
       <div
-        class="mt-8 flex items-start gap-3 border-t border-theme-200 pt-6 text-sm text-theme-600 dark:border-zinc-700 dark:text-zinc-400"
+        class="mt-8 flex items-start gap-3 border-t border-theme-200 pt-6 text-sm text-theme-700 dark:border-zinc-700 dark:text-zinc-400"
         data-testid="newsletter-license"
       >
         <Icon name="information-circle" class="mt-0.5 size-5 shrink-0" />

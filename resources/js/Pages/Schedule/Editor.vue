@@ -408,7 +408,7 @@ const csrfToken =
                             </div>
                             <div
                               v-if="courseClass.start_time"
-                              class="text-sm text-theme-600 dark:text-zinc-400"
+                              class="text-sm text-theme-700 dark:text-zinc-400"
                             >
                               <span>
                                 {{ courseClass.start_time }} -
@@ -417,7 +417,7 @@ const csrfToken =
                             </div>
                             <div
                               v-if="courseClass.teacher_name"
-                              class="truncate text-sm text-theme-600 dark:text-zinc-400"
+                              class="truncate text-sm text-theme-700 dark:text-zinc-400"
                             >
                               {{ courseClass.teacher_name }}
                             </div>
@@ -478,7 +478,7 @@ const csrfToken =
                           </div>
                           <div
                             v-if="courseClass.start_time"
-                            class="text-sm text-theme-600 dark:text-zinc-400"
+                            class="text-sm text-theme-700 dark:text-zinc-400"
                           >
                             <span>
                               {{ courseClass.start_time }} -
@@ -487,7 +487,7 @@ const csrfToken =
                           </div>
                           <div
                             v-if="courseClass.teacher_name"
-                            class="truncate text-sm text-theme-600 dark:text-zinc-400"
+                            class="truncate text-sm text-theme-700 dark:text-zinc-400"
                           >
                             {{ courseClass.teacher_name }}
                           </div>
@@ -550,7 +550,7 @@ const csrfToken =
             type="submit"
             data-testid="schedule-submit"
             :disabled="selectedItems.length === 0 || submitting"
-            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-600 bg-theme-600 px-6 py-3 text-lg font-semibold text-white transition hover:bg-theme-700 disabled:bg-theme-400"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-6 py-3 text-lg font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
           >
             <span v-if="!submitting">{{ submitLabel }}</span>
             <span v-else>{{ submittingLabel }}</span>

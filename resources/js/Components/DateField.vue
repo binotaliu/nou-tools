@@ -410,7 +410,7 @@ onBeforeUnmount(() => {
         </div>
 
         <div
-          class="grid grid-cols-7 text-center text-xs text-theme-500 dark:text-zinc-400"
+          class="grid grid-cols-7 text-center text-xs text-theme-700 dark:text-zinc-400"
         >
           <div v-for="weekday in WEEKDAYS" :key="weekday" class="py-1">
             {{ weekday }}

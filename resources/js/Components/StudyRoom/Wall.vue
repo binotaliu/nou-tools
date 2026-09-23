@@ -133,7 +133,7 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             class="block font-mono text-sm leading-tight font-semibold text-theme-800 tabular-nums dark:text-zinc-200"
             >{{ sky.clockTimeLabel() }}</span
           >
-          <span class="block text-[10px] text-theme-500 dark:text-zinc-400">{{
+          <span class="block text-[10px] text-theme-700 dark:text-zinc-400">{{
             sky.clockDateLabel()
           }}</span>
         </p>
@@ -190,7 +190,7 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
               >
                 {{ profile.nickname || '尚未設定暱稱' }}
               </p>
-              <p class="text-xs text-theme-500 dark:text-zinc-400">
+              <p class="text-xs text-theme-700 dark:text-zinc-400">
                 今天專注了
                 {{ profile.formatDurationLabel(yourFocusSecondsToday) }}
               </p>
@@ -199,7 +199,7 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
               type="button"
               aria-label="檢視專注紀錄與統計"
               data-testid="study-room-personal-info-stats"
-              class="shrink-0 rounded-full p-1.5 text-theme-500 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
+              class="shrink-0 rounded-full p-1.5 text-theme-700 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
               @click.stop="profile.openStats()"
             >
               <ChartBarIcon class="size-4" />
@@ -208,7 +208,7 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
               type="button"
               aria-label="編輯個人資料"
               data-testid="study-room-personal-info-edit"
-              class="shrink-0 rounded-full p-1.5 text-theme-500 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
+              class="shrink-0 rounded-full p-1.5 text-theme-700 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
               @click.stop="profile.openPersonalInfo()"
             >
               <PencilIcon class="size-4" />

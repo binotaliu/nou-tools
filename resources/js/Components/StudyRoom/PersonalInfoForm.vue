@@ -56,7 +56,7 @@ async function submit() {
 </script>
 
 <template>
-  <p class="mb-4 text-sm text-theme-600 dark:text-zinc-400">
+  <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
     暱稱與表情符號會顯示給其他在自習室裡的同學看到。暱稱每
     {{ nicknameCooldownDays }} 天只能變更一次，表情符號則隨時可以換。
   </p>
@@ -83,7 +83,7 @@ async function submit() {
         :readonly="!profile.canChangeNickname"
         :class="
           !profile.canChangeNickname
-            ? 'bg-theme-50 text-theme-500 dark:bg-zinc-800 dark:text-zinc-400'
+            ? 'bg-theme-50 text-theme-700 dark:bg-zinc-800 dark:text-zinc-400'
             : 'bg-white dark:bg-zinc-900'
         "
         data-testid="study-room-nickname-input"
@@ -91,7 +91,7 @@ async function submit() {
       />
       <p
         v-show="!profile.canChangeNickname"
-        class="mt-1 text-xs text-theme-500 dark:text-zinc-400"
+        class="mt-1 text-xs text-theme-700 dark:text-zinc-400"
         data-testid="study-room-nickname-cooldown-note"
       >
         {{ profile.nicknameCooldownLabel(clockNow) }}
@@ -143,7 +143,7 @@ async function submit() {
           v-model="playSoundInput"
           type="checkbox"
           name="playSoundOnTimerEnd"
-          class="size-4 rounded border-theme-300 text-theme-600 focus:ring-orange-300 dark:border-zinc-600"
+          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-orange-300 dark:border-zinc-600"
           data-testid="study-room-play-sound-checkbox"
         />
         時間到時播放音效
@@ -159,7 +159,7 @@ async function submit() {
           type="checkbox"
           name="notifyOnTimerEnd"
           :disabled="push.busy"
-          class="size-4 rounded border-theme-300 text-theme-600 focus:ring-orange-300 disabled:opacity-50 dark:border-zinc-600"
+          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-orange-300 disabled:opacity-50 dark:border-zinc-600"
           data-testid="study-room-notify-checkbox"
           @change="onNotifyChange"
         />

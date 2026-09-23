@@ -55,7 +55,7 @@ onUnmounted(() => {
     >
       <span
         v-if="!seat.isOccupied"
-        class="text-[10px] font-medium text-theme-400 dark:text-zinc-500"
+        class="text-[10px] font-medium text-theme-700 dark:text-zinc-500"
         >{{ seat.seatNumber }}</span
       >
       <span v-else class="text-base leading-none">{{ seat.emoji }}</span>
@@ -92,7 +92,7 @@ onUnmounted(() => {
         {{ grid.thoughtBubbleText(seat) }}
       </p>
       <p
-        class="mt-1 font-mono text-[11px] text-theme-500 tabular-nums dark:text-zinc-400"
+        class="mt-1 font-mono text-[11px] text-theme-700 tabular-nums dark:text-zinc-400"
       >
         剩餘 {{ timer.timerLabel(seat) }}
       </p>

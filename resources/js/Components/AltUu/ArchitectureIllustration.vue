@@ -44,7 +44,7 @@ const steps = [
       >
         <Icon
           name="device-phone-mobile"
-          class="mx-auto size-8 text-theme-600 dark:text-zinc-300"
+          class="mx-auto size-8 text-theme-700 dark:text-zinc-300"
         />
         <p class="mt-2 text-sm font-semibold text-theme-900 dark:text-zinc-100">
           你的手機／裝置
@@ -69,7 +69,7 @@ const steps = [
         >
           <Icon
             name="lock-closed"
-            class="size-4 text-theme-600 dark:text-zinc-300"
+            class="size-4 text-theme-700 dark:text-zinc-300"
           />
         </div>
       </div>
@@ -79,7 +79,7 @@ const steps = [
       >
         <Icon
           name="globe-alt"
-          class="mx-auto size-8 text-theme-600 dark:text-zinc-300"
+          class="mx-auto size-8 text-theme-700 dark:text-zinc-300"
         />
         <p class="mt-2 text-sm font-semibold text-theme-900 dark:text-zinc-100">
           空大伺服器
@@ -91,7 +91,7 @@ const steps = [
         </p>
       </div>
     </div>
-    <p class="mt-2 text-center text-xs text-theme-500 dark:text-zinc-400">
+    <p class="mt-2 text-center text-xs text-theme-700 dark:text-zinc-400">
       端對端直接連線 —— 帳號密碼與教材內容，只會在你的裝置與空大伺服器之間往返
     </p>
 
@@ -112,7 +112,7 @@ const steps = [
           {{ step.title }}
         </p>
         <p
-          class="mt-1.5 text-xs leading-relaxed text-theme-600 dark:text-zinc-400"
+          class="mt-1.5 text-xs leading-relaxed text-theme-700 dark:text-zinc-400"
         >
           {{ step.detail }}
         </p>
@@ -164,7 +164,7 @@ const steps = [
       >
         <Icon
           name="shield-check"
-          class="size-6 shrink-0 text-theme-500 dark:text-zinc-400"
+          class="size-6 shrink-0 text-theme-700 dark:text-zinc-400"
         />
         <p class="text-sm text-theme-700 dark:text-zinc-300">
           <strong class="font-semibold"

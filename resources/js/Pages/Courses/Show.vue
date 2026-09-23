@@ -135,7 +135,7 @@ function examReferenceUrl(reference) {
       <div class="mb-8">
         <Link
           :href="backUrl"
-          class="mb-4 inline-flex items-center justify-center gap-2 text-orange-600 hover:text-orange-700"
+          class="mb-4 inline-flex items-center justify-center gap-2 text-orange-700 hover:text-orange-800"
         >
           <Icon name="chevron-left" class="size-4" />
           回到我的課表
@@ -146,7 +146,7 @@ function examReferenceUrl(reference) {
 
         <div
           v-if="course.term"
-          class="mb-4 text-sm text-theme-600 dark:text-zinc-400"
+          class="mb-4 text-sm text-theme-700 dark:text-zinc-400"
         >
           {{ toSemesterDisplay(course.term) }}
         </div>
@@ -176,7 +176,7 @@ function examReferenceUrl(reference) {
                 rel="noopener"
                 data-analytics-event="course_description_open"
                 data-analytics-feature="course"
-                class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
               >
                 檢視詳細內容
                 <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -210,13 +210,13 @@ function examReferenceUrl(reference) {
                   />
                   <span
                     v-if="starCount > displayStars"
-                    class="text-xs text-theme-600 dark:text-zinc-400"
+                    class="text-xs text-theme-700 dark:text-zinc-400"
                   >
                     +{{ starCount - displayStars }}
                   </span>
                 </div>
 
-                <div class="text-sm text-theme-600 dark:text-zinc-400">
+                <div class="text-sm text-theme-700 dark:text-zinc-400">
                   {{ course.credits }} 學分
                 </div>
               </div>
@@ -259,7 +259,7 @@ function examReferenceUrl(reference) {
                 :href="viewModel.multimediaUrl"
                 target="_blank"
                 rel="noopener"
-                class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
               >
                 檢視簡介
                 <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -297,7 +297,7 @@ function examReferenceUrl(reference) {
 
                   <div
                     v-if="course.examTimeStart || course.examTimeEnd"
-                    class="text-sm whitespace-nowrap text-theme-600 dark:text-zinc-400"
+                    class="text-sm whitespace-nowrap text-theme-700 dark:text-zinc-400"
                   >
                     <template v-if="course.examTimeStart && course.examTimeEnd">
                       {{ course.examTimeStart }} - {{ course.examTimeEnd }}
@@ -318,7 +318,7 @@ function examReferenceUrl(reference) {
 
                   <div
                     v-if="course.examTimeStart || course.examTimeEnd"
-                    class="text-sm whitespace-nowrap text-theme-600 dark:text-zinc-400"
+                    class="text-sm whitespace-nowrap text-theme-700 dark:text-zinc-400"
                   >
                     <template v-if="course.examTimeStart && course.examTimeEnd">
                       {{ course.examTimeStart }} - {{ course.examTimeEnd }}
@@ -399,7 +399,7 @@ function examReferenceUrl(reference) {
                 :href="course.textbook.referenceUrl"
                 target="_blank"
                 rel="noopener"
-                class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
               >
                 開啟
                 <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -465,7 +465,7 @@ function examReferenceUrl(reference) {
                       </div>
                     </div>
                     <div
-                      class="text-sm whitespace-nowrap text-theme-600 dark:text-zinc-400"
+                      class="text-sm whitespace-nowrap text-theme-700 dark:text-zinc-400"
                     >
                       <div v-if="courseClass.startTime">
                         {{ courseClass.startTime }} - {{ courseClass.endTime }}
@@ -525,7 +525,7 @@ function examReferenceUrl(reference) {
 
                       <div
                         v-if="entry.session.startTime || entry.session.endTime"
-                        class="text-sm whitespace-nowrap text-theme-600 dark:text-zinc-400"
+                        class="text-sm whitespace-nowrap text-theme-700 dark:text-zinc-400"
                       >
                         <template
                           v-if="
@@ -544,7 +544,7 @@ function examReferenceUrl(reference) {
                 </div>
                 <p
                   v-else
-                  class="mt-2 text-sm text-theme-600 dark:text-zinc-400"
+                  class="mt-2 text-sm text-theme-700 dark:text-zinc-400"
                 >
                   未設定上課時間
                 </p>
@@ -581,7 +581,7 @@ function examReferenceUrl(reference) {
 
             <div class="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <p class="mb-1 font-semibold text-theme-600 dark:text-zinc-400">
+                <p class="mb-1 font-semibold text-theme-700 dark:text-zinc-400">
                   期中考正參
                 </p>
                 <a
@@ -591,16 +591,16 @@ function examReferenceUrl(reference) {
                   rel="noopener"
                   :aria-label="`${exam.term}的期中考正參`"
                   :download="`${examSubjectName}_${exam.term}_期中考正參.${fileExtension(exam.midtermReferencePrimary)}`"
-                  class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
                 >
                   正參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
                 </a>
-                <span v-else class="text-theme-500 dark:text-zinc-400">—</span>
+                <span v-else class="text-theme-700 dark:text-zinc-400">—</span>
               </div>
 
               <div>
-                <p class="mb-1 font-semibold text-theme-600 dark:text-zinc-400">
+                <p class="mb-1 font-semibold text-theme-700 dark:text-zinc-400">
                   期中考副參
                 </p>
                 <a
@@ -610,16 +610,16 @@ function examReferenceUrl(reference) {
                   rel="noopener"
                   :aria-label="`${exam.term}的期中考副參`"
                   :download="`${examSubjectName}_${exam.term}_期中考副參.${fileExtension(exam.midtermReferenceSecondary)}`"
-                  class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
                 >
                   副參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
                 </a>
-                <span v-else class="text-theme-500 dark:text-zinc-400">—</span>
+                <span v-else class="text-theme-700 dark:text-zinc-400">—</span>
               </div>
 
               <div>
-                <p class="mb-1 font-semibold text-theme-600 dark:text-zinc-400">
+                <p class="mb-1 font-semibold text-theme-700 dark:text-zinc-400">
                   期末考正參
                 </p>
                 <a
@@ -629,16 +629,16 @@ function examReferenceUrl(reference) {
                   rel="noopener"
                   :aria-label="`${exam.term}的期末考正參`"
                   :download="`${examSubjectName}_${exam.term}_期末考正參.${fileExtension(exam.finalReferencePrimary)}`"
-                  class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
                 >
                   正參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
                 </a>
-                <span v-else class="text-theme-500 dark:text-zinc-400">—</span>
+                <span v-else class="text-theme-700 dark:text-zinc-400">—</span>
               </div>
 
               <div>
-                <p class="mb-1 font-semibold text-theme-600 dark:text-zinc-400">
+                <p class="mb-1 font-semibold text-theme-700 dark:text-zinc-400">
                   期末考副參
                 </p>
                 <a
@@ -648,12 +648,12 @@ function examReferenceUrl(reference) {
                   rel="noopener"
                   :aria-label="`${exam.term}的期末考副參`"
                   :download="`${examSubjectName}_${exam.term}_期末考副參.${fileExtension(exam.finalReferenceSecondary)}`"
-                  class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                  class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
                 >
                   副參
                   <Icon name="arrow-top-right-on-square" class="size-4" />
                 </a>
-                <span v-else class="text-theme-500 dark:text-zinc-400">—</span>
+                <span v-else class="text-theme-700 dark:text-zinc-400">—</span>
               </div>
             </div>
           </div>
@@ -726,7 +726,7 @@ function examReferenceUrl(reference) {
                     rel="noopener"
                     :aria-label="`${exam.term}的期中考正參`"
                     :download="`${examSubjectName}_${exam.term}_期中考正參.${fileExtension(exam.midtermReferencePrimary)}`"
-                    class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
                   >
                     正參
                     <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -743,7 +743,7 @@ function examReferenceUrl(reference) {
                     rel="noopener"
                     :aria-label="`${exam.term}的期中考副參`"
                     :download="`${examSubjectName}_${exam.term}_期中考副參.${fileExtension(exam.midtermReferenceSecondary)}`"
-                    class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
                   >
                     副參
                     <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -760,7 +760,7 @@ function examReferenceUrl(reference) {
                     rel="noopener"
                     :aria-label="`${exam.term}的期末考正參`"
                     :download="`${examSubjectName}_${exam.term}_期末考正參.${fileExtension(exam.finalReferencePrimary)}`"
-                    class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
                   >
                     正參
                     <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -777,7 +777,7 @@ function examReferenceUrl(reference) {
                     rel="noopener"
                     :aria-label="`${exam.term}的期末考副參`"
                     :download="`${examSubjectName}_${exam.term}_期末考副參.${fileExtension(exam.finalReferenceSecondary)}`"
-                    class="inline-flex items-center gap-2 text-orange-600 underline underline-offset-4 hover:text-orange-700 hover:no-underline"
+                    class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline"
                   >
                     副參
                     <Icon name="arrow-top-right-on-square" class="size-4" />
@@ -860,7 +860,7 @@ function examReferenceUrl(reference) {
             免責聲明
           </h2>
         </div>
-        <p class="text-sm text-theme-600 dark:text-zinc-400">
+        <p class="text-sm text-theme-700 dark:text-zinc-400">
           課程資料來自國立空中大學之公開資料，基於合理使用原則，以非商用、公開的方式供其他上課同學參考使用，資料版權屬於國立空中大學所有。本站只搜集課程之詮釋資料（Metadata），例如課程名稱、教師、學分數、上課時間等，不保存其他資料。
         </p>
       </div>

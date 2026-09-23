@@ -61,16 +61,16 @@ const faqs = [
             <div class="flex items-center gap-3">
               <Icon
                 name="academic-cap"
-                class="size-12 text-theme-600 dark:text-zinc-400"
+                class="size-12 text-theme-700 dark:text-zinc-400"
                 aria-hidden="true"
               />
               <h2
-                class="text-4xl font-bold tracking-tight text-theme-600 dark:text-zinc-400"
+                class="text-4xl font-bold tracking-tight text-theme-700 dark:text-zinc-400"
               >
                 Alt UU
               </h2>
             </div>
-            <p class="mt-4 max-w-xl text-lg text-theme-600 dark:text-zinc-400">
+            <p class="mt-4 max-w-xl text-lg text-theme-700 dark:text-zinc-400">
               專為 NOU 同學打造的 UU 平台瀏覽器 App。
               <br class="hidden lg:inline" />
               隨時隨地在行動裝置上輕鬆學習。
@@ -100,7 +100,7 @@ const faqs = [
               </a>
             </div>
 
-            <p class="mt-3 text-xs text-theme-400 dark:text-zinc-500">
+            <p class="mt-3 text-xs text-theme-700 dark:text-zinc-500">
               App Store 支援 iPhone、iPad 及 Mac（Apple Silicon）
             </p>
           </div>
@@ -131,7 +131,7 @@ const faqs = [
             >
               瀏覽 UU 平台教材
             </h4>
-            <p class="text-sm text-theme-600 dark:text-zinc-400">
+            <p class="text-sm text-theme-700 dark:text-zinc-400">
               以 App 瀏覽 UU
               平台，讓你在行動裝置上輕鬆存取所有課程教材，不需使用瀏覽器開啟電腦版網頁。
             </p>
@@ -150,7 +150,7 @@ const faqs = [
             >
               保存學習時數
             </h4>
-            <p class="text-sm text-theme-600 dark:text-zinc-400">
+            <p class="text-sm text-theme-700 dark:text-zinc-400">
               開啟教材後，畫面右上方會顯示本次學習計時器。觀看完畢後點擊返回按鈕，即可自動保存本次學習時數。
             </p>
           </div>
@@ -168,7 +168,7 @@ const faqs = [
             >
               繼續上次觀看進度
             </h4>
-            <p class="text-sm text-theme-600 dark:text-zinc-400">
+            <p class="text-sm text-theme-700 dark:text-zinc-400">
               Alt UU
               會記住你上次觀看的位置，讓你再次開啟教材時能直接從上次離開的地方繼續學習。
             </p>
@@ -187,7 +187,7 @@ const faqs = [
             >
               NOU 小幫手整合
             </h4>
-            <p class="text-sm text-theme-600 dark:text-zinc-400">
+            <p class="text-sm text-theme-700 dark:text-zinc-400">
               支援整合「NOU 小幫手」，開啟後即可在 App
               內直接檢視學校行事曆、視訊面授資訊，以及考古題等。
             </p>
@@ -200,7 +200,7 @@ const faqs = [
           class="flex flex-col items-start gap-4 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div>
-            <p class="text-xs font-semibold text-theme-400 dark:text-zinc-500">
+            <p class="text-xs font-semibold text-theme-700 dark:text-zinc-500">
               iPhone / iPad / Mac
             </p>
             <h4
@@ -208,7 +208,7 @@ const faqs = [
             >
               App Store
             </h4>
-            <p class="mt-2 text-sm text-theme-600 dark:text-zinc-400">
+            <p class="mt-2 text-sm text-theme-700 dark:text-zinc-400">
               支援 iPhone、iPad，以及搭載 Apple Silicon 的 Mac。
             </p>
           </div>
@@ -216,7 +216,7 @@ const faqs = [
             href="https://apps.apple.com/tw/app/alt-uu/id6760690577"
             target="_blank"
             rel="noopener noreferrer"
-            class="mt-auto inline-flex items-center justify-center gap-2 rounded-lg border border-theme-600 bg-theme-600 px-4 py-2 font-semibold text-white transition hover:bg-theme-700"
+            class="mt-auto inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800"
           >
             前往 App Store
           </a>
@@ -226,7 +226,7 @@ const faqs = [
           class="flex flex-col items-start gap-4 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div>
-            <p class="text-xs font-semibold text-theme-400 dark:text-zinc-500">
+            <p class="text-xs font-semibold text-theme-700 dark:text-zinc-500">
               Android
             </p>
             <h4
@@ -235,7 +235,7 @@ const faqs = [
               Google Play
             </h4>
 
-            <p class="mt-2 text-sm text-theme-600 dark:text-zinc-400">
+            <p class="mt-2 text-sm text-theme-700 dark:text-zinc-400">
               支援 Android 手機、平板。
             </p>
           </div>
@@ -243,7 +243,7 @@ const faqs = [
             href="https://play.google.com/store/apps/details?id=org.binota.alt_uu"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-600 bg-theme-600 px-4 py-2 font-semibold text-white transition hover:bg-theme-700"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800"
           >
             前往 Google Play
           </a>
@@ -257,20 +257,20 @@ const faqs = [
         >
           Alt UU 安全嗎？公開透明的運作方式
         </h3>
-        <p class="mb-4 text-sm text-theme-600 dark:text-zinc-400">
+        <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
           你是否會擔心，對於一個非官方 App，要輸入帳號密碼是否安全？下圖說明了
           Alt UU 的運作原理，帶你瞭解此一過程。
         </p>
 
         <ArchitectureIllustration />
 
-        <p class="mt-3 text-xs text-theme-400 dark:text-zinc-500">
+        <p class="mt-3 text-xs text-theme-700 dark:text-zinc-500">
           完整的技術說明請見《
           <a
             href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/app-architecture"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-theme-600 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+            class="text-theme-700 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
           >
             Alt UU 運作原理說明
           </a>
@@ -299,12 +299,12 @@ const faqs = [
               {{ faq.question }}
               <Icon
                 name="chevron-down"
-                class="size-5 shrink-0 text-theme-400 transition-transform group-open:rotate-180 dark:text-zinc-500"
+                class="size-5 shrink-0 text-theme-700 transition-transform group-open:rotate-180 dark:text-zinc-500"
                 aria-hidden="true"
               />
             </summary>
             <p
-              class="mt-2 text-sm whitespace-pre-line text-theme-600 dark:text-zinc-400"
+              class="mt-2 text-sm whitespace-pre-line text-theme-700 dark:text-zinc-400"
             >
               {{ faq.answer }}
             </p>
@@ -314,7 +314,7 @@ const faqs = [
 
       <!-- Trademark Credit -->
       <div
-        class="flex flex-col gap-2 text-xs text-theme-400 dark:text-zinc-500"
+        class="flex flex-col gap-2 text-xs text-theme-700 dark:text-zinc-500"
       >
         <p>
           使用 Alt UU，你必須同意並遵守 Alt UU 的《
@@ -322,7 +322,7 @@ const faqs = [
             href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/usage-policy"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-theme-600 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+            class="text-theme-700 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
           >
             使用條款
           </a>
@@ -331,7 +331,7 @@ const faqs = [
             href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/privacy-policy"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-theme-600 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+            class="text-theme-700 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
           >
             隱私權政策
           </a>
@@ -345,7 +345,7 @@ const faqs = [
             href="https://alt-uu-statics.wcsvdzeimhwq.workers.dev/app-architecture"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-theme-600 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+            class="text-theme-700 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
           >
             Alt UU 運作原理說明
           </a>
@@ -357,7 +357,7 @@ const faqs = [
             href="https://github.com/binotaliu/alt-uu"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-theme-600 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+            class="text-theme-700 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
           >
             GitHub
           </a>

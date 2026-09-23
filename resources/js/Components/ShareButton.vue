@@ -99,11 +99,11 @@ onUnmounted(() => window.removeEventListener('keydown', handleEscape))
         </h3>
 
         <div
-          class="flex items-stretch gap-3 rounded border border-theme-300 bg-white text-sm text-theme-600 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
+          class="flex items-stretch gap-3 rounded border border-theme-300 bg-white text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
         >
           <input
             ref="shareInput"
-            class="flex-1 px-3 py-2 font-mono break-all text-theme-600 dark:text-zinc-400"
+            class="flex-1 px-3 py-2 font-mono break-all text-theme-700 dark:text-zinc-400"
             :value="shareUrl"
             readonly
             :aria-label="inputLabel"

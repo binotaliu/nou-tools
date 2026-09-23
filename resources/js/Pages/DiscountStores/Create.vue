@@ -109,7 +109,7 @@ function submit() {
         <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
           新增優惠店家
         </h2>
-        <p class="text-sm text-theme-600 dark:text-zinc-400">
+        <p class="text-sm text-theme-700 dark:text-zinc-400">
           填寫下方表單來送出新的學生優惠店家。送出後需經管理員確認才會顯示在前台。
         </p>
       </div>

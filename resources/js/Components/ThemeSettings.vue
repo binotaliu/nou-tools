@@ -23,7 +23,7 @@ const MODES = [
 <template>
   <div class="space-y-4">
     <div>
-      <p class="mb-2 text-xs font-medium text-theme-600 dark:text-zinc-400">
+      <p class="mb-2 text-xs font-medium text-theme-700 dark:text-zinc-400">
         外觀模式
       </p>
       <div
@@ -40,7 +40,7 @@ const MODES = [
           :class="
             theme === mode.value
               ? 'bg-white text-theme-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100'
-              : 'text-theme-600 hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+              : 'text-theme-700 hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-100'
           "
           data-analytics-event="theme_mode_change"
           data-analytics-feature="theme"
@@ -53,7 +53,7 @@ const MODES = [
     </div>
 
     <div>
-      <p class="mb-2 text-xs font-medium text-theme-600 dark:text-zinc-400">
+      <p class="mb-2 text-xs font-medium text-theme-700 dark:text-zinc-400">
         主題色
       </p>
       <div class="flex flex-wrap items-center justify-between gap-2">

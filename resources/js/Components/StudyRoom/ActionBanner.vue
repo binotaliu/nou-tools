@@ -78,7 +78,7 @@ defineProps({
             <button
               v-show="!minimized"
               type="button"
-              class="relative flex h-5 w-full items-center justify-center text-theme-500 transition hover:text-theme-800 sm:absolute sm:top-1 sm:right-3 sm:z-10 sm:size-7 sm:rounded-lg sm:hover:bg-white/70 dark:text-zinc-400 dark:hover:text-zinc-100 dark:sm:hover:bg-zinc-800"
+              class="relative flex h-5 w-full items-center justify-center text-theme-700 transition hover:text-theme-800 sm:absolute sm:top-1 sm:right-3 sm:z-10 sm:size-7 sm:rounded-lg sm:hover:bg-white/70 dark:text-zinc-400 dark:hover:text-zinc-100 dark:sm:hover:bg-zinc-800"
               title="收合"
               aria-label="收合控制列"
               data-testid="study-room-banner-minimize"
@@ -118,7 +118,7 @@ defineProps({
                 data-testid="study-room-banner-mini-countdown"
                 >{{ timer.myRemainingLabel() }}</span
               >
-              <ChevronUpIcon class="size-5 shrink-0 text-theme-500" />
+              <ChevronUpIcon class="size-5 shrink-0 text-theme-700" />
             </button>
 
             <div
@@ -148,7 +148,7 @@ defineProps({
                   >
                     <label class="block">
                       <span
-                        class="mb-1 block text-xs font-medium text-theme-600 dark:text-zinc-400"
+                        class="mb-1 block text-xs font-medium text-theme-700 dark:text-zinc-400"
                         >科目</span
                       >
                       <div class="relative">
@@ -170,7 +170,7 @@ defineProps({
 
                     <div>
                       <span
-                        class="mb-1 block text-xs font-medium text-theme-600 dark:text-zinc-400"
+                        class="mb-1 block text-xs font-medium text-theme-700 dark:text-zinc-400"
                         >計時方式</span
                       >
                       <div class="flex flex-wrap items-center gap-2">
@@ -299,7 +299,7 @@ defineProps({
                       <button
                         v-show="timer.canChangeActivity()"
                         type="button"
-                        class="inline-flex shrink-0 items-center rounded-lg p-1 text-theme-500 transition hover:bg-white hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                        class="inline-flex shrink-0 items-center rounded-lg p-1 text-theme-700 transition hover:bg-white hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
                         title="變更活動"
                         data-testid="study-room-change-activity-open"
                         @click="timer.openChangeActivity()"
@@ -308,7 +308,7 @@ defineProps({
                       </button>
                     </p>
                     <div
-                      class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-theme-500 sm:mt-1.5 dark:text-zinc-400"
+                      class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-theme-700 sm:mt-1.5 dark:text-zinc-400"
                     >
                       <span
                         v-show="timer.isPomodoro()"
@@ -384,7 +384,7 @@ defineProps({
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-start-break"
-                    class="order-first col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700 disabled:opacity-50 sm:order-none sm:col-span-1 sm:py-2.5"
+                    class="order-first col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-800 disabled:opacity-50 sm:order-none sm:col-span-1 sm:py-2.5"
                     @click="timer.startBreak()"
                   >
                     <SparklesIcon class="size-4" />
@@ -418,7 +418,7 @@ defineProps({
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-leave-seat-running"
-                    class="inline-flex items-center justify-center gap-1 rounded-xl px-3 py-3 text-sm font-medium text-theme-600 transition hover:bg-white/70 hover:text-theme-900 disabled:opacity-50 sm:py-2.5 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                    class="inline-flex items-center justify-center gap-1 rounded-xl px-3 py-3 text-sm font-medium text-theme-700 transition hover:bg-white/70 hover:text-theme-900 disabled:opacity-50 sm:py-2.5 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
                     @click="timer.leave()"
                   >
                     <ArrowRightStartOnRectangleIcon class="size-4" />
@@ -460,7 +460,7 @@ defineProps({
       <div class="grid grid-cols-2 gap-3">
         <label class="block">
           <span
-            class="mb-1 block text-xs font-medium text-theme-600 dark:text-zinc-400"
+            class="mb-1 block text-xs font-medium text-theme-700 dark:text-zinc-400"
             >專注（分鐘）</span
           >
           <input
@@ -474,7 +474,7 @@ defineProps({
         </label>
         <label class="block">
           <span
-            class="mb-1 block text-xs font-medium text-theme-600 dark:text-zinc-400"
+            class="mb-1 block text-xs font-medium text-theme-700 dark:text-zinc-400"
             >短休息（分鐘）</span
           >
           <input
@@ -488,7 +488,7 @@ defineProps({
         </label>
         <label class="block">
           <span
-            class="mb-1 block text-xs font-medium text-theme-600 dark:text-zinc-400"
+            class="mb-1 block text-xs font-medium text-theme-700 dark:text-zinc-400"
             >長休息（分鐘）</span
           >
           <input
@@ -502,7 +502,7 @@ defineProps({
         </label>
         <label class="block">
           <span
-            class="mb-1 block text-xs font-medium text-theme-600 dark:text-zinc-400"
+            class="mb-1 block text-xs font-medium text-theme-700 dark:text-zinc-400"
             >每幾輪長休息一次</span
           >
           <input
@@ -528,7 +528,7 @@ defineProps({
         <div class="flex w-full items-center justify-between gap-2">
           <button
             type="button"
-            class="text-sm text-theme-600 underline-offset-2 hover:underline dark:text-zinc-400"
+            class="text-sm text-theme-700 underline-offset-2 hover:underline dark:text-zinc-400"
             @click="timer.resetCycle()"
           >
             恢復預設
@@ -562,7 +562,7 @@ defineProps({
 
         <label class="block">
           <span
-            class="mb-1 block text-xs font-medium text-theme-600 dark:text-zinc-400"
+            class="mb-1 block text-xs font-medium text-theme-700 dark:text-zinc-400"
             >科目</span
           >
           <select

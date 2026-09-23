@@ -225,7 +225,7 @@ onMounted(() => {
         <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
           連結 / 學習指導中心目錄
         </h2>
-        <p class="text-sm text-theme-600 dark:text-zinc-400">
+        <p class="text-sm text-theme-700 dark:text-zinc-400">
           彙整校內各處室、學系與學習指導中心的官方網站連結。
         </p>
       </div>
@@ -257,7 +257,7 @@ onMounted(() => {
               <span class="truncate">{{ link.name }}</span>
               <Icon
                 name="arrow-top-right-on-square"
-                class="size-4 shrink-0 text-theme-400 dark:text-zinc-500"
+                class="size-4 shrink-0 text-theme-700 dark:text-zinc-500"
               />
             </a>
           </div>
@@ -307,7 +307,7 @@ onMounted(() => {
                 class="space-y-1"
               >
                 <p
-                  class="px-3 text-xs font-semibold tracking-wide text-theme-500 uppercase dark:text-zinc-500"
+                  class="px-3 text-xs font-semibold tracking-wide text-theme-700 uppercase dark:text-zinc-500"
                 >
                   {{ region.label }}
                 </p>
@@ -370,7 +370,7 @@ onMounted(() => {
                     <button
                       type="button"
                       data-testid="center-address-button"
-                      class="text-left text-orange-600 hover:underline"
+                      class="text-left text-orange-700 hover:underline"
                       :disabled="
                         !selectedCenter.latitude || !selectedCenter.longitude
                       "
@@ -409,7 +409,7 @@ onMounted(() => {
                     <span class="truncate">開啟中心網站</span>
                     <Icon
                       name="arrow-top-right-on-square"
-                      class="size-4 shrink-0 text-theme-400 dark:text-zinc-500"
+                      class="size-4 shrink-0 text-theme-700 dark:text-zinc-500"
                     />
                   </a>
 
@@ -425,7 +425,7 @@ onMounted(() => {
                     <span class="truncate">交通資訊</span>
                     <Icon
                       name="truck"
-                      class="size-4 shrink-0 text-theme-400 dark:text-zinc-500"
+                      class="size-4 shrink-0 text-theme-700 dark:text-zinc-500"
                     />
                   </a>
                 </div>
@@ -459,7 +459,7 @@ onMounted(() => {
                   >
                     選擇地圖 App
                   </h3>
-                  <p class="mb-6 text-sm text-theme-600 dark:text-zinc-400">
+                  <p class="mb-6 text-sm text-theme-700 dark:text-zinc-400">
                     選擇你慣用的地圖應用程式來檢視學習指導中心位置。
                   </p>
                   <div class="space-y-2">

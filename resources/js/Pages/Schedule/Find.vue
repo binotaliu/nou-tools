@@ -39,7 +39,7 @@ function onScanned(text) {
       <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
         我的課表
       </h2>
-      <p class="mt-2 text-sm text-theme-600 dark:text-zinc-400">
+      <p class="mt-2 text-sm text-theme-700 dark:text-zinc-400">
         這個<span class="pwa:hidden">瀏覽器</span
         ><span class="hidden pwa:inline">裝置</span
         >上還沒有記住任何課表。你之前建立過課表嗎？
@@ -55,7 +55,7 @@ function onScanned(text) {
           class="rounded-lg border px-4 py-4 text-center font-semibold transition"
           :class="
             hasCreatedBefore
-              ? 'border-theme-600 bg-theme-600 text-white'
+              ? 'border-theme-700 bg-theme-700 text-white'
               : 'border-theme-500 bg-white text-theme-900 hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800'
           "
           @click="hasCreatedBefore = true"
@@ -84,13 +84,13 @@ function onScanned(text) {
           把課表記住在此<span class="pwa:hidden">瀏覽器</span
           ><span class="hidden pwa:inline">裝置</span>
         </h3>
-        <p class="mb-4 text-sm text-theme-600 dark:text-zinc-400">
+        <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
           在原本的裝置開啟課表頁面，複製頁面上的連結貼到下方，或用相機掃描頁面上的
           QR Code。
         </p>
         <p
           data-testid="find-schedule-calendar-hint"
-          class="mb-4 text-sm text-theme-600 dark:text-zinc-400"
+          class="mb-4 text-sm text-theme-700 dark:text-zinc-400"
         >
           如果你之前訂閱過行事曆，也可以在行事曆行程中的備註內找到課表連結。
         </p>
@@ -145,7 +145,7 @@ function onScanned(text) {
               data-analytics-event="find_schedule_submit"
               data-analytics-feature="schedule"
               :disabled="form.processing || form.url.trim() === ''"
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-600 bg-theme-600 px-4 py-2 font-semibold text-white transition hover:bg-theme-700 disabled:opacity-50"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:opacity-50"
             >
               記住課表
             </button>

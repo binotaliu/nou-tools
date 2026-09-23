@@ -62,7 +62,7 @@ const {
             ，歡迎回來！
           </p>
 
-          <p class="text-theme-500 dark:text-zinc-400">
+          <p class="text-theme-700 dark:text-zinc-400">
             今天是
             <span>{{ dateString }}</span>
             ，
@@ -83,10 +83,10 @@ const {
             <span>{{ taiwanMinute }}</span>
           </div>
           <div class="text-center">
-            <p class="text-xs text-theme-500 tabular-nums dark:text-zinc-400">
+            <p class="text-xs text-theme-700 tabular-nums dark:text-zinc-400">
               {{ taiwanDateString }}
             </p>
-            <p class="text-[0.65rem] text-theme-400 dark:text-zinc-500">
+            <p class="text-[0.65rem] text-theme-700 dark:text-zinc-500">
               台灣時間
             </p>
           </div>
@@ -96,7 +96,7 @@ const {
       <div
         v-else
         data-testid="greeting-compact"
-        class="flex flex-row items-center justify-between gap-3 text-sm text-theme-500 tabular-nums dark:text-zinc-400"
+        class="flex flex-row items-center justify-between gap-3 text-sm text-theme-700 tabular-nums dark:text-zinc-400"
       >
         <span>
           <span>{{ compactDateString }}</span>

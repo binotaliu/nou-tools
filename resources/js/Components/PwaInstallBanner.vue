@@ -27,7 +27,7 @@ const { visible, isIos, showDismissedNotice, install, close, optOut } =
         class="flex flex-col overflow-hidden rounded-lg bg-white sm:flex-row dark:bg-zinc-900"
       >
         <div
-          class="flex h-24 min-h-24 items-center justify-center bg-theme-500/10 px-4 text-theme-700 sm:h-auto sm:w-24 sm:px-3 dark:bg-theme-500/15 dark:text-theme-400"
+          class="flex h-24 min-h-24 items-center justify-center bg-theme-500/10 px-4 text-theme-700 sm:h-auto sm:w-24 sm:px-3 dark:bg-theme-500/15 dark:text-theme-700"
         >
           <Icon name="device-phone-mobile" class="size-6" />
         </div>

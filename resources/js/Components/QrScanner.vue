@@ -129,7 +129,7 @@ onBeforeUnmount(stop)
     </div>
     <p
       v-if="!error"
-      class="mt-2 text-center text-sm text-theme-600 dark:text-zinc-400"
+      class="mt-2 text-center text-sm text-theme-700 dark:text-zinc-400"
     >
       將相機對準課表頁面上的 QR Code
     </p>

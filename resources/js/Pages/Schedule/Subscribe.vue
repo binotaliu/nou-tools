@@ -57,7 +57,7 @@ function submit() {
           <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
             訂閱行事曆
           </h2>
-          <p class="mt-2 text-sm text-theme-600 dark:text-zinc-400">
+          <p class="mt-2 text-sm text-theme-700 dark:text-zinc-400">
             將你的課表訂閱到行事曆應用程式，以自動同步課表更新與接收提醒。
           </p>
         </div>
@@ -88,7 +88,7 @@ function submit() {
             <h2 class="text-xl font-semibold text-theme-900 dark:text-zinc-100">
               選擇訂閱方式
             </h2>
-            <div class="text-sm text-theme-600 dark:text-zinc-400">
+            <div class="text-sm text-theme-700 dark:text-zinc-400">
               選擇您常用的行事曆應用程式，點擊按鈕訂閱此課表。
             </div>
           </div>
@@ -164,7 +164,7 @@ function submit() {
               >
                 訂閱設定
               </h2>
-              <div class="text-sm text-theme-600 dark:text-zinc-400">
+              <div class="text-sm text-theme-700 dark:text-zinc-400">
                 保存設定後，已訂閱的行事曆會在同步時自動更新。
               </div>
             </div>
@@ -221,7 +221,7 @@ function submit() {
                 </label>
 
                 <span
-                  class="mt-1 block text-sm text-theme-600 dark:text-zinc-400"
+                  class="mt-1 block text-sm text-theme-700 dark:text-zinc-400"
                 >
                   註：此設定僅支援 Apple 日曆與其他相容的行事曆應用程式，
                   <strong>Google 日曆需要手動設定提醒</strong>。
@@ -292,7 +292,7 @@ function submit() {
             <button
               type="submit"
               :disabled="form.processing"
-              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-600 bg-theme-600 px-4 py-2 font-semibold text-white transition hover:bg-theme-700 disabled:bg-theme-400 sm:w-auto"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400 sm:w-auto"
             >
               儲存設定
             </button>

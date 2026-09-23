@@ -42,7 +42,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 // tone, and a bolder label.
 const tabClass = active =>
   active
-    ? 'font-bold text-theme-600 dark:text-theme-400'
+    ? 'font-bold text-theme-700 dark:text-theme-700'
     : 'font-medium text-theme-900/70 dark:text-zinc-300'
 </script>
 
@@ -86,7 +86,7 @@ const tabClass = active =>
           :class="
             item.active
               ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
-              : 'text-theme-600 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
+              : 'text-theme-700 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
           "
           @click="closeSheet"
         >

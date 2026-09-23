@@ -91,7 +91,7 @@ useMarkdownContainers(sidebarContentRoot, [
             >
               <Link
                 :href="indexUrl"
-                class="inline-flex items-center gap-1 text-sm text-theme-600 transition-colors hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                class="inline-flex items-center gap-1 text-sm text-theme-700 transition-colors hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-100"
               >
                 <Icon name="chevron-left" class="size-3" />
                 回到{{ typeLabel }}首頁
@@ -126,7 +126,7 @@ useMarkdownContainers(sidebarContentRoot, [
               </div>
 
               <div
-                class="flex items-center gap-4 text-sm text-theme-500 dark:text-zinc-400"
+                class="flex items-center gap-4 text-sm text-theme-700 dark:text-zinc-400"
               >
                 <span>作者：{{ viewModel.article.author }}</span>
                 <span
@@ -150,7 +150,7 @@ useMarkdownContainers(sidebarContentRoot, [
               class="mt-8 border-t border-theme-200 pt-6 dark:border-zinc-700"
             >
               <div
-                class="flex items-center gap-3 text-sm text-theme-600 dark:text-zinc-400"
+                class="flex items-center gap-3 text-sm text-theme-700 dark:text-zinc-400"
               >
                 <Icon name="information-circle" class="size-5 shrink-0" />
 

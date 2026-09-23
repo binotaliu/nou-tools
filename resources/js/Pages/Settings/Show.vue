@@ -144,7 +144,7 @@ const rows = computed(() => [
         <h3 class="text-lg font-semibold text-theme-800 dark:text-zinc-100">
           外觀
         </h3>
-        <p class="mt-1 mb-4 text-sm text-theme-600 dark:text-zinc-400">
+        <p class="mt-1 mb-4 text-sm text-theme-700 dark:text-zinc-400">
           設定只會套用到這台裝置中。
         </p>
 
@@ -161,7 +161,7 @@ const rows = computed(() => [
 
         <p
           v-if="!notifications"
-          class="mt-1 text-sm text-theme-600 dark:text-zinc-400"
+          class="mt-1 text-sm text-theme-700 dark:text-zinc-400"
           data-testid="settings-schedule-no-schedule"
         >
           請先
@@ -202,7 +202,7 @@ const rows = computed(() => [
 
         <p
           v-if="!notifications"
-          class="mt-1 text-sm text-theme-600 dark:text-zinc-400"
+          class="mt-1 text-sm text-theme-700 dark:text-zinc-400"
           data-testid="settings-notifications-no-schedule"
         >
           通知是綁在課表上的，請先
@@ -240,7 +240,7 @@ const rows = computed(() => [
                 >
                   {{ row.label }}
                 </p>
-                <p class="text-xs text-theme-600 dark:text-zinc-400">
+                <p class="text-xs text-theme-700 dark:text-zinc-400">
                   {{ row.description }}
                 </p>
               </div>

@@ -292,7 +292,7 @@ onUnmounted(() => {
         </h2>
         <Link
           href="/discount-stores"
-          class="inline-flex items-center gap-1 text-theme-600 transition hover:text-theme-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100"
+          class="inline-flex items-center gap-1 text-theme-700 transition hover:text-theme-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100"
         >
           <Icon name="chevron-left" class="size-4" />
           回到優惠店家列表
@@ -322,7 +322,7 @@ onUnmounted(() => {
 
             <span
               v-if="viewModel.city"
-              class="text-theme-500 dark:text-zinc-400"
+              class="text-theme-700 dark:text-zinc-400"
             >
               {{ viewModel.city }} {{ viewModel.district }}
             </span>
@@ -341,7 +341,7 @@ onUnmounted(() => {
 
           <p
             v-if="viewModel.address"
-            class="flex items-center gap-1 text-sm text-theme-600 dark:text-zinc-400"
+            class="flex items-center gap-1 text-sm text-theme-700 dark:text-zinc-400"
           >
             <template v-if="viewModel.typeValue === 'online'">
               <template
@@ -355,7 +355,7 @@ onUnmounted(() => {
                   :href="viewModel.address"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="text-orange-600 hover:underline"
+                  class="text-orange-700 hover:underline"
                 >
                   {{ viewModel.address }}
                 </a>
@@ -365,7 +365,7 @@ onUnmounted(() => {
               <Icon name="map-pin" class="inline-block size-4" />
               <button
                 type="button"
-                class="text-left text-orange-600 hover:underline"
+                class="text-left text-orange-700 hover:underline"
                 :disabled="!hasCoordinates"
                 :class="
                   hasCoordinates
@@ -404,7 +404,7 @@ onUnmounted(() => {
 
           <p
             v-if="viewModel.notes"
-            class="text-sm wrap-break-word text-theme-500 dark:text-zinc-400"
+            class="text-sm wrap-break-word text-theme-700 dark:text-zinc-400"
           >
             備註：
             <span class="whitespace-pre-line">{{ viewModel.notes }}</span>
@@ -443,7 +443,7 @@ onUnmounted(() => {
                 }}</span>
               </p>
 
-              <p class="text-xs text-theme-500 dark:text-zinc-400">
+              <p class="text-xs text-theme-700 dark:text-zinc-400">
                 {{ latestReport.createdAtHuman }}
               </p>
             </div>
@@ -486,7 +486,7 @@ onUnmounted(() => {
                       report.comment || '（無補充說明）'
                     }}</span>
                   </p>
-                  <p class="mt-1 text-xs text-theme-500 dark:text-zinc-400">
+                  <p class="mt-1 text-xs text-theme-700 dark:text-zinc-400">
                     {{ report.createdAtHuman }}
                   </p>
                 </div>
@@ -495,7 +495,7 @@ onUnmounted(() => {
 
             <p
               v-if="!latestReport"
-              class="text-sm text-theme-600 dark:text-zinc-400"
+              class="text-sm text-theme-700 dark:text-zinc-400"
             >
               目前還沒有回報資料。
             </p>
@@ -504,7 +504,7 @@ onUnmounted(() => {
           <div
             class="flex flex-col gap-2 border-t border-theme-100 pt-3 dark:border-zinc-800"
           >
-            <p class="text-sm text-theme-600 dark:text-zinc-400">
+            <p class="text-sm text-theme-700 dark:text-zinc-400">
               使用了本優惠嗎？請協助回報優惠的有效性，讓其他同學參考！
             </p>
             <div class="flex items-center gap-2">
@@ -610,7 +610,7 @@ onUnmounted(() => {
             >
               選擇地圖 App
             </h3>
-            <p class="mb-6 text-sm text-theme-600 dark:text-zinc-400">
+            <p class="mb-6 text-sm text-theme-700 dark:text-zinc-400">
               選擇你慣用的地圖應用程式來檢視店家位置。
             </p>
             <div class="space-y-2">
@@ -676,7 +676,7 @@ onUnmounted(() => {
             <p class="wrap-break-word whitespace-pre-line">
               {{ comment.content }}
             </p>
-            <span class="text-xs text-theme-400 dark:text-zinc-500">
+            <span class="text-xs text-theme-700 dark:text-zinc-500">
               — {{ comment.createdAtHuman }}
             </span>
           </div>
@@ -690,7 +690,7 @@ onUnmounted(() => {
           <h3 class="text-base font-semibold text-theme-700 dark:text-zinc-300">
             新增留言
           </h3>
-          <p class="text-sm text-theme-600 dark:text-zinc-400">
+          <p class="text-sm text-theme-700 dark:text-zinc-400">
             歡迎分享使用經驗，留言會在確認後顯示。
           </p>
           <button
@@ -746,7 +746,7 @@ onUnmounted(() => {
                   {{ commentForm.errors['cf-turnstile-response'] }}
                 </p>
               </div>
-              <p class="text-xs text-theme-500 dark:text-zinc-400">
+              <p class="text-xs text-theme-700 dark:text-zinc-400">
                 為避免垃圾留言，留言將由管理員確認後才會顯示出來。
               </p>
               <div class="flex items-center gap-2">

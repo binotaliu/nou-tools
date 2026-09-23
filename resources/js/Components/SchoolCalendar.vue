@@ -54,7 +54,7 @@ const {
                 {{ countdownEvent.name }}
               </div>
               <p
-                class="mt-1 text-sm text-theme-600 tabular-nums dark:text-zinc-400"
+                class="mt-1 text-sm text-theme-700 tabular-nums dark:text-zinc-400"
               >
                 {{ dateRange(countdownEvent) }}
               </p>
@@ -72,7 +72,7 @@ const {
                 >
                   {{ countdownEvent.daysUntil }}
                 </div>
-                <div class="text-sm text-theme-500 dark:text-zinc-400">
+                <div class="text-sm text-theme-700 dark:text-zinc-400">
                   天後
                 </div>
               </div>
@@ -105,7 +105,7 @@ const {
               {{ event.name }}
             </span>
             <div
-              class="flex flex-col-reverse items-start gap-x-2 text-sm text-theme-600 tabular-nums sm:flex-row sm:items-center dark:text-zinc-400"
+              class="flex flex-col-reverse items-start gap-x-2 text-sm text-theme-700 tabular-nums sm:flex-row sm:items-center dark:text-zinc-400"
             >
               <span
                 v-if="event.status === 'ongoing'"
@@ -123,7 +123,7 @@ const {
 
     <p
       v-if="showTaipeiHint"
-      class="mt-3 text-xs text-theme-500 dark:text-zinc-400 print:hidden"
+      class="mt-3 text-xs text-theme-700 dark:text-zinc-400 print:hidden"
     >
       此區塊日期皆為台灣時間（Asia/Taipei）
     </p>

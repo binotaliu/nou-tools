@@ -37,7 +37,7 @@ function iconFor(value) {
 <template>
   <div>
     <span
-      class="mb-1 block text-xs font-medium text-theme-600 dark:text-zinc-400"
+      class="mb-1 block text-xs font-medium text-theme-700 dark:text-zinc-400"
       >活動</span
     >
     <div

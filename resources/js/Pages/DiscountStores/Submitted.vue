@@ -26,7 +26,7 @@ defineProps({
             已收到您送出的資料
           </h2>
 
-          <p class="max-w-md text-sm text-theme-600 dark:text-zinc-400">
+          <p class="max-w-md text-sm text-theme-700 dark:text-zinc-400">
             <template v-if="storeName">
               感謝您提供的「{{ storeName }}」優惠店家資訊！
             </template>

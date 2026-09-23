@@ -126,9 +126,9 @@ const cells = computed(() => {
       </h2>
       <div
         v-if="hasAnyOverride"
-        class="flex items-center gap-1 text-sm text-theme-600 dark:text-zinc-400"
+        class="flex items-center gap-1 text-sm text-theme-700 dark:text-zinc-400"
       >
-        <Icon name="exclamation-triangle" class="size-4 text-orange-600" />
+        <Icon name="exclamation-triangle" class="size-4 text-orange-700" />
         表示該次面授時間與一般時間不同
       </div>
     </div>
@@ -151,7 +151,7 @@ const cells = computed(() => {
             ? 'bg-theme-700 text-white dark:bg-zinc-200 dark:text-zinc-900'
             : tab.data
               ? 'text-theme-800 hover:bg-theme-100 dark:text-zinc-200 dark:hover:bg-zinc-800'
-              : 'text-theme-400 hover:bg-theme-100 dark:text-zinc-500 dark:hover:bg-zinc-800'
+              : 'text-theme-700 hover:bg-theme-100 dark:text-zinc-500 dark:hover:bg-zinc-800'
         "
         @click="selectedKey = tab.key"
       >
@@ -168,7 +168,7 @@ const cells = computed(() => {
         </div>
 
         <div
-          class="grid grid-cols-7 text-center text-xs text-theme-500 dark:text-zinc-400"
+          class="grid grid-cols-7 text-center text-xs text-theme-700 dark:text-zinc-400"
         >
           <div v-for="weekday in WEEKDAYS" :key="weekday" class="py-1">
             {{ weekday }}
@@ -187,7 +187,7 @@ const cells = computed(() => {
               :class="[
                 cell.count > 0
                   ? 'font-semibold text-theme-900 dark:text-zinc-100'
-                  : 'text-theme-500 dark:text-zinc-400',
+                  : 'text-theme-700 dark:text-zinc-400',
                 cell.iso === todayYmd
                   ? 'ring-1 ring-theme-500 dark:ring-zinc-400'
                   : '',
@@ -216,7 +216,7 @@ const cells = computed(() => {
         >
           <p
             v-if="!tab.data"
-            class="py-6 text-center text-sm text-theme-500 dark:text-zinc-400"
+            class="py-6 text-center text-sm text-theme-700 dark:text-zinc-400"
           >
             這個月沒有面授
           </p>
@@ -242,13 +242,13 @@ const cells = computed(() => {
                   />
                   <br />
                   <span
-                    class="inline-flex items-center gap-1 text-theme-600 dark:text-zinc-400"
+                    class="inline-flex items-center gap-1 text-theme-700 dark:text-zinc-400"
                   >
                     {{ course.time }}
                     <Icon
                       v-if="course.hasOverride"
                       name="exclamation-triangle"
-                      class="size-4 text-theme-500 dark:text-zinc-400"
+                      class="size-4 text-theme-700 dark:text-zinc-400"
                       title="該次課程時間與一般時間不同"
                     />
                   </span>

@@ -200,7 +200,7 @@ onUnmounted(() => {
           <h2 class="text-3xl font-bold text-theme-900 dark:text-zinc-100">
             自習室
           </h2>
-          <p class="text-sm text-theme-600 dark:text-zinc-400">
+          <p class="text-sm text-theme-700 dark:text-zinc-400">
             找個座位跟其他同學一起用功。自習室 {{ openHoursLabel }} 開放。
           </p>
         </div>
@@ -224,12 +224,12 @@ onUnmounted(() => {
         class="rounded-lg border border-theme-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
       >
         <div class="flex flex-col items-center gap-3 py-6 text-center">
-          <TableCellsIcon class="size-10 text-theme-400 dark:text-zinc-500" />
+          <TableCellsIcon class="size-10 text-theme-700 dark:text-zinc-500" />
           <div class="space-y-1">
             <h3 class="text-xl font-semibold text-theme-800 dark:text-zinc-200">
               先建立課表才能進自習室
             </h3>
-            <p class="text-sm text-theme-500 dark:text-zinc-400">
+            <p class="text-sm text-theme-700 dark:text-zinc-400">
               自習室會用你的課表列出「你在讀什麼」的選項，所以需要先有一份儲存好的課表。
             </p>
           </div>
@@ -317,7 +317,7 @@ onUnmounted(() => {
         >
           <p
             v-show="profile.statsLoading"
-            class="text-sm text-theme-500 dark:text-zinc-400"
+            class="text-sm text-theme-700 dark:text-zinc-400"
           >
             載入中…
           </p>
@@ -359,7 +359,7 @@ onUnmounted(() => {
                     ></span>
                   </span>
                   <span
-                    class="text-xs font-medium text-theme-600 dark:text-zinc-400"
+                    class="text-xs font-medium text-theme-700 dark:text-zinc-400"
                     >{{ day.label }}</span
                   >
                 </button>
@@ -373,7 +373,7 @@ onUnmounted(() => {
                 >
                   {{ profile.selectedStatsDay().label }} 的紀錄
                 </h4>
-                <span class="text-xs text-theme-500 dark:text-zinc-400">{{
+                <span class="text-xs text-theme-700 dark:text-zinc-400">{{
                   profile.formatDurationLabel(
                     profile.selectedStatsDay().focusSeconds
                   )
@@ -382,7 +382,7 @@ onUnmounted(() => {
 
               <p
                 v-show="profile.selectedStatsDay().sessions.length === 0"
-                class="text-sm text-theme-500 dark:text-zinc-400"
+                class="text-sm text-theme-700 dark:text-zinc-400"
               >
                 這天沒有紀錄
               </p>
@@ -400,7 +400,7 @@ onUnmounted(() => {
                   <span class="truncate text-theme-800 dark:text-zinc-200">{{
                     session.activityLabel
                   }}</span>
-                  <span class="shrink-0 text-theme-500 dark:text-zinc-400">{{
+                  <span class="shrink-0 text-theme-700 dark:text-zinc-400">{{
                     profile.sessionDurationLabel(session)
                   }}</span>
                 </li>
@@ -414,7 +414,7 @@ onUnmounted(() => {
           data-testid="study-room-needs-profile-placeholder"
           class="rounded-lg border border-theme-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
         >
-          <p class="text-sm text-theme-600 dark:text-zinc-400">
+          <p class="text-sm text-theme-700 dark:text-zinc-400">
             請先設定暱稱與表情符號，才能加入自習室。
           </p>
         </div>
@@ -439,7 +439,7 @@ onUnmounted(() => {
               >
                 <span>{{ floor.label }}</span>
                 <span
-                  class="text-sm font-normal text-theme-500 dark:text-zinc-400"
+                  class="text-sm font-normal text-theme-700 dark:text-zinc-400"
                   >閱覽室</span
                 >
               </h3>
@@ -534,11 +534,11 @@ onUnmounted(() => {
                       class="flex flex-col items-center gap-1"
                     >
                       <span
-                        class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-300 bg-white text-[10px] font-medium text-theme-400 transition group-hover:border-theme-400 group-hover:text-theme-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-500"
+                        class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-300 bg-white text-[10px] font-medium text-theme-700 transition group-hover:border-theme-400 group-hover:text-theme-800 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-500"
                         >{{ seat.seatNumber }}</span
                       >
                       <span
-                        class="text-[10px] text-theme-400 opacity-0 transition group-hover:opacity-100 dark:text-zinc-500"
+                        class="text-[10px] text-theme-700 opacity-0 transition group-hover:opacity-100 dark:text-zinc-500"
                         >點擊入座</span
                       >
                     </div>
@@ -623,7 +623,7 @@ onUnmounted(() => {
                         >🪴</span
                       >
                       <span
-                        class="text-xs font-medium text-theme-700 dark:text-zinc-300"
+                        class="text-xs font-medium text-theme-800 dark:text-zinc-300"
                         >{{ table.label }}</span
                       >
                     </div>
@@ -652,7 +652,7 @@ onUnmounted(() => {
                     data-testid="study-room-stair-up"
                   >
                     <span
-                      class="max-w-16 text-[10px] leading-tight text-theme-500 dark:text-zinc-400"
+                      class="max-w-16 text-[10px] leading-tight text-theme-700 dark:text-zinc-400"
                       >{{ grid.stairHint(floor) }}</span
                     >
                     <div
@@ -661,7 +661,7 @@ onUnmounted(() => {
                     >
                       <ArrowUpIcon
                         v-if="!grid.isStairBlocked(floor)"
-                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-theme-600 dark:text-zinc-300"
+                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-theme-700 dark:text-zinc-300"
                       />
                       <div
                         v-else
@@ -672,7 +672,7 @@ onUnmounted(() => {
                           class="h-1.5 w-full rounded-full bg-theme-400/80 shadow-sm dark:bg-zinc-500/80"
                         ></div>
                         <LockClosedIcon
-                          class="size-3.5 text-theme-500 dark:text-zinc-400"
+                          class="size-3.5 text-theme-700 dark:text-zinc-400"
                         />
                         <div
                           class="h-1.5 w-full rounded-full bg-theme-400/80 shadow-sm dark:bg-zinc-500/80"
@@ -687,7 +687,7 @@ onUnmounted(() => {
                     data-testid="study-room-stair-down"
                   >
                     <span
-                      class="max-w-16 text-[10px] leading-tight text-theme-500 dark:text-zinc-400"
+                      class="max-w-16 text-[10px] leading-tight text-theme-700 dark:text-zinc-400"
                       >{{ grid.stairDownHint(floor) }}</span
                     >
                     <div
@@ -695,7 +695,7 @@ onUnmounted(() => {
                       aria-hidden="true"
                     >
                       <ArrowDownIcon
-                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-theme-600 dark:text-zinc-300"
+                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-theme-700 dark:text-zinc-300"
                       />
                     </div>
                   </div>
@@ -715,7 +715,7 @@ onUnmounted(() => {
           </section>
 
           <p
-            class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-theme-500 dark:text-zinc-400"
+            class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-theme-700 dark:text-zinc-400"
           >
             <span class="inline-flex items-center gap-1.5">
               <span

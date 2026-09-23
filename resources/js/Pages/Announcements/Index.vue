@@ -181,7 +181,7 @@ function isExpired(announcement) {
                       <button
                         v-if="categories.length > 0"
                         type="button"
-                        class="inline-flex items-center rounded-md p-2 text-theme-600 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-200"
+                        class="inline-flex items-center rounded-md p-2 text-theme-700 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-200"
                         :aria-expanded="isSourceExpanded(source)"
                         :aria-label="'展開或收合 ' + source + ' 分類'"
                         @click="toggleSourceExpansion(source)"
@@ -208,7 +208,7 @@ function isExpired(announcement) {
                           type="checkbox"
                           :name="`source_categories[${source}][]`"
                           :value="category"
-                          class="size-4 rounded border-theme-300 text-orange-600 focus:ring-orange-300 dark:border-zinc-600"
+                          class="size-4 rounded border-theme-300 text-orange-700 focus:ring-orange-300 dark:border-zinc-600"
                           :checked="isCategoryChecked(source, category)"
                           @change="
                             toggleCategory(
@@ -263,7 +263,7 @@ function isExpired(announcement) {
 
           <div
             v-if="Object.keys(state.selected).length > 0"
-            class="mt-4 flex flex-col gap-y-1 text-sm text-theme-600 dark:text-zinc-400"
+            class="mt-4 flex flex-col gap-y-1 text-sm text-theme-700 dark:text-zinc-400"
           >
             <span class="font-medium">目前條件：</span>
 
@@ -292,7 +292,7 @@ function isExpired(announcement) {
           </div>
           <div
             v-else-if="totalSelectedCategories > 0"
-            class="mt-4 text-sm text-theme-600 dark:text-zinc-400"
+            class="mt-4 text-sm text-theme-700 dark:text-zinc-400"
           >
             目前條件：已勾選 {{ totalSelectedCategories }} 個分類
           </div>
@@ -335,12 +335,12 @@ function isExpired(announcement) {
                       :href="announcement.url"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="line-clamp-2! block max-w-full align-middle break-all transition hover:text-orange-700 dark:hover:text-orange-400"
+                      class="line-clamp-2! block max-w-full align-middle break-all transition hover:text-orange-800 dark:hover:text-orange-400"
                     >
                       <span
                         v-for="tag in announcement.tags ?? []"
                         :key="tag"
-                        class="mr-1 truncate rounded border border-theme-200 px-1 py-0.5 text-sm text-theme-600 dark:border-zinc-700 dark:text-zinc-400"
+                        class="mr-1 truncate rounded border border-theme-200 px-1 py-0.5 text-sm text-theme-700 dark:border-zinc-700 dark:text-zinc-400"
                         >{{ tag }}</span
                       >
 
@@ -352,7 +352,7 @@ function isExpired(announcement) {
                 <div
                   class="flex shrink-0 flex-col items-start gap-3 lg:items-end"
                 >
-                  <p class="text-xs text-theme-500 dark:text-zinc-400">
+                  <p class="text-xs text-theme-700 dark:text-zinc-400">
                     <span class="sr-only">發布時間：</span>
                     {{ formatDate(announcement.published_at) }}
                   </p>
@@ -369,7 +369,7 @@ function isExpired(announcement) {
               >
                 <Icon
                   name="inbox"
-                  class="size-10 text-theme-400 dark:text-zinc-500"
+                  class="size-10 text-theme-700 dark:text-zinc-500"
                 />
                 <div class="space-y-1">
                   <h3
@@ -377,7 +377,7 @@ function isExpired(announcement) {
                   >
                     目前沒有符合條件的公告
                   </h3>
-                  <p class="text-sm text-theme-500 dark:text-zinc-400">
+                  <p class="text-sm text-theme-700 dark:text-zinc-400">
                     可以調整來源或分類，或稍後再回來檢視。
                   </p>
                 </div>
@@ -392,7 +392,7 @@ function isExpired(announcement) {
             <div
               class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
             >
-              <p class="text-sm text-theme-600 dark:text-zinc-400">
+              <p class="text-sm text-theme-700 dark:text-zinc-400">
                 第 {{ viewModel.announcements.current_page }} /
                 {{ viewModel.announcements.last_page }} 頁，共
                 {{ viewModel.announcements.total.toLocaleString() }} 筆結果
@@ -401,7 +401,7 @@ function isExpired(announcement) {
               <div class="flex items-center gap-3">
                 <span
                   v-if="!viewModel.announcements.prev_page_url"
-                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-400 dark:border-zinc-700 dark:text-zinc-500"
+                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 dark:border-zinc-700 dark:text-zinc-500"
                 >
                   <Icon name="chevron-left" class="size-4" />
                   上一頁
@@ -417,7 +417,7 @@ function isExpired(announcement) {
 
                 <span
                   v-if="!viewModel.announcements.next_page_url"
-                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-400 dark:border-zinc-700 dark:text-zinc-500"
+                  class="inline-flex items-center gap-2 rounded-lg border border-theme-200 px-4 py-2 text-sm text-theme-700 dark:border-zinc-700 dark:text-zinc-500"
                 >
                   下一頁
                   <Icon name="chevron-right" class="size-4" />

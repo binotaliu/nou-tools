@@ -61,7 +61,7 @@ const stepNumberClass =
   'flex size-7 shrink-0 items-center justify-center rounded-full bg-theme-700 text-sm font-semibold text-white dark:bg-theme-600'
 const figureClass = 'mx-auto w-full max-w-64'
 const captionClass =
-  'mt-2 text-center text-xs text-theme-600 dark:text-zinc-400'
+  'mt-2 text-center text-xs text-theme-700 dark:text-zinc-400'
 const bodyClass = 'text-sm leading-relaxed text-theme-700 dark:text-zinc-300'
 </script>
 
@@ -77,7 +77,7 @@ const bodyClass = 'text-sm leading-relaxed text-theme-700 dark:text-zinc-300'
         >
           安裝 NOU 小幫手
         </h2>
-        <p class="mt-3 text-theme-600 dark:text-zinc-400">
+        <p class="mt-3 text-theme-700 dark:text-zinc-400">
           NOU 小幫手可以被安裝為 PWA App。安裝為 PWA App
           後，就可以接收推播通知，還能離線檢視課表。
         </p>
@@ -90,7 +90,7 @@ const bodyClass = 'text-sm leading-relaxed text-theme-700 dark:text-zinc-300'
       >
         <Icon
           name="check-circle"
-          class="mt-0.5 size-6 shrink-0 text-theme-700 dark:text-theme-400"
+          class="mt-0.5 size-6 shrink-0 text-theme-700 dark:text-theme-700"
         />
         <p :class="bodyClass">
           你現在就是在已安裝的 App 裡開啟這個網頁，不需要再次安裝。
@@ -113,7 +113,7 @@ const bodyClass = 'text-sm leading-relaxed text-theme-700 dark:text-zinc-300'
           :class="
             platform === option.key
               ? 'bg-white text-theme-800 shadow-sm dark:bg-zinc-900 dark:text-zinc-100'
-              : 'text-theme-600 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200'
+              : 'text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200'
           "
           :aria-selected="platform === option.key"
           :aria-controls="`pwa-install-panel-${option.key}`"
@@ -165,7 +165,7 @@ const bodyClass = 'text-sm leading-relaxed text-theme-700 dark:text-zinc-300'
             <li>點右上角的 [⋮] 選單。</li>
             <li>選擇 [安裝應用程式] 或 [加到主畫面]，再依提示按 [安裝]。</li>
           </ol>
-          <p class="text-xs text-theme-500 dark:text-zinc-400">
+          <p class="text-xs text-theme-700 dark:text-zinc-400">
             如果你使用 iPhone 或 iPad，請切換到上方的「iPhone / iPad」。
           </p>
         </template>
@@ -313,7 +313,7 @@ const bodyClass = 'text-sm leading-relaxed text-theme-700 dark:text-zinc-300'
                 {{ option.title }}
               </span>
               <span
-                class="mt-1 block text-xs text-theme-600 dark:text-zinc-400"
+                class="mt-1 block text-xs text-theme-700 dark:text-zinc-400"
               >
                 {{ option.hint }}
               </span>
@@ -367,7 +367,7 @@ const bodyClass = 'text-sm leading-relaxed text-theme-700 dark:text-zinc-300'
             <figure class="mt-4">
               <div :class="figureClass"><IosToolbarShare /></div>
             </figure>
-            <p class="mt-3 text-xs text-theme-500 dark:text-zinc-400">
+            <p class="mt-3 text-xs text-theme-700 dark:text-zinc-400">
               往下捲動網頁時工具列會收起來，往上輕滑一下或點畫面最下緣就會再出現。
             </p>
           </div>

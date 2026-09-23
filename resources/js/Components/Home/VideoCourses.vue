@@ -106,7 +106,7 @@ const classTotal = computed(() =>
         </h2>
         <p
           v-if="groupedCourses.length > 0"
-          class="mt-1 text-sm text-theme-500 tabular-nums dark:text-zinc-400"
+          class="mt-1 text-sm text-theme-700 tabular-nums dark:text-zinc-400"
         >
           共 {{ groupedCourses.length }} 門課程、{{ classTotal }} 個班級
         </p>
@@ -115,7 +115,7 @@ const classTotal = computed(() =>
       <div class="flex items-center gap-2">
         <label
           for="video-course-date"
-          class="text-sm text-theme-500 dark:text-zinc-400"
+          class="text-sm text-theme-700 dark:text-zinc-400"
         >
           選擇日期
         </label>
@@ -134,7 +134,7 @@ const classTotal = computed(() =>
 
     <div
       v-if="groupedCourses.length === 0"
-      class="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-12 text-theme-600 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
+      class="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-12 text-theme-700 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
     >
       <Icon name="face-smile" class="size-8" />
       <p class="text-lg font-medium">今日無面授課程</p>
@@ -165,7 +165,7 @@ const classTotal = computed(() =>
                 {{ slot.label }}
               </span>
               <span
-                class="inline-flex items-center gap-1 text-sm text-theme-600 tabular-nums dark:text-zinc-400"
+                class="inline-flex items-center gap-1 text-sm text-theme-700 tabular-nums dark:text-zinc-400"
               >
                 <Icon name="clock" class="size-3.5" />
                 {{ slot.timeLabel }}
@@ -198,19 +198,19 @@ const classTotal = computed(() =>
                     </div>
                     <div
                       v-if="courseClass.teacherName"
-                      class="truncate text-xs text-theme-600 dark:text-zinc-400"
+                      class="truncate text-xs text-theme-700 dark:text-zinc-400"
                     >
                       {{ courseClass.teacherName }}
                     </div>
                   </div>
                   <Icon
                     name="arrow-top-right-on-square"
-                    class="size-4 shrink-0 text-theme-400 transition group-hover:text-theme-700 dark:text-zinc-500 dark:group-hover:text-zinc-300"
+                    class="size-4 shrink-0 text-theme-700 transition group-hover:text-theme-800 dark:text-zinc-500 dark:group-hover:text-zinc-300"
                   />
                 </a>
                 <div
                   v-else
-                  class="min-w-0 flex-1 px-3 py-2 text-theme-500 dark:text-zinc-400"
+                  class="min-w-0 flex-1 px-3 py-2 text-theme-700 dark:text-zinc-400"
                 >
                   <div class="font-semibold tabular-nums">
                     {{ courseClass.code }}

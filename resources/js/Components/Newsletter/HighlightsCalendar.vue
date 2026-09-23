@@ -90,7 +90,7 @@ function dayLabelClass(day, dayIndex) {
 
   return day.inWindow
     ? 'text-theme-800 dark:text-zinc-200'
-    : 'text-theme-400 dark:text-zinc-500'
+    : 'text-theme-700 dark:text-zinc-500'
 }
 
 const weeks = computed(() => {
@@ -136,7 +136,7 @@ const weeks = computed(() => {
         :class="
           labelIndex >= 5
             ? 'text-red-600 dark:text-red-400'
-            : 'text-theme-600 dark:text-zinc-400'
+            : 'text-theme-700 dark:text-zinc-400'
         "
       >
         {{ label }}

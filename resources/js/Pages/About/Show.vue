@@ -31,7 +31,7 @@ const { granted, toggle, error } = useAnalyticsConsent()
             <p class="text-lg font-semibold text-theme-700 dark:text-zinc-300">
               NOU 小幫手
             </p>
-            <p class="mt-1 text-xs text-theme-500 dark:text-zinc-400">
+            <p class="mt-1 text-xs text-theme-700 dark:text-zinc-400">
               給 NOU 同學的非官方小工具
             </p>
           </div>
@@ -43,7 +43,7 @@ const { granted, toggle, error } = useAnalyticsConsent()
           關於本站
         </h2>
         <p
-          class="mt-3 text-theme-600 dark:text-zinc-400 bottom-nav:hidden"
+          class="mt-3 text-theme-700 dark:text-zinc-400 bottom-nav:hidden"
           data-testid="about-subtitle"
         >
           NOU 小幫手是給 NOU 同學的非官方小工具，由學生自發製作。

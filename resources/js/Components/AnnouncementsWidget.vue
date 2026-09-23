@@ -40,7 +40,7 @@ function relativeLabel(announcement) {
     <div class="space-y-1">
       <div
         v-if="!hasAnySelection"
-        class="rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-6 text-center text-sm text-theme-600 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
+        class="rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-6 text-center text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
       >
         尚未選擇任何公告分類。
         <Link
@@ -53,7 +53,7 @@ function relativeLabel(announcement) {
 
       <div
         v-else-if="announcements.length === 0"
-        class="rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-6 text-center text-sm text-theme-600 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
+        class="rounded-lg border border-dashed border-theme-300 bg-theme-50 px-4 py-6 text-center text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-400"
       >
         目前沒有符合條件的最新公告。
       </div>
@@ -81,7 +81,7 @@ function relativeLabel(announcement) {
             <div class="flex-1"></div>
 
             <p
-              class="shrink-0 text-right text-xs whitespace-nowrap text-theme-500 dark:text-zinc-400"
+              class="shrink-0 text-right text-xs whitespace-nowrap text-theme-700 dark:text-zinc-400"
             >
               <template v-if="announcement.publishedAt">
                 {{ relativeLabel(announcement) }} •
@@ -114,7 +114,7 @@ function relativeLabel(announcement) {
 
         <Link
           :href="`/schedules/${scheduleUuid}/customize`"
-          class="text-sm text-theme-600 hover:underline dark:text-zinc-400"
+          class="text-sm text-theme-700 hover:underline dark:text-zinc-400"
         >
           選擇公告分類
         </Link>

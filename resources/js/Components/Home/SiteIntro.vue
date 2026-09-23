@@ -37,7 +37,7 @@ const points = [
     <h2 class="text-xl font-semibold text-theme-900 dark:text-zinc-100">
       NOU 小幫手是什麼？
     </h2>
-    <p class="mt-2 text-sm text-theme-600 dark:text-zinc-400">
+    <p class="mt-2 text-sm text-theme-700 dark:text-zinc-400">
       NOU
       小幫手是給空大同學的非官方小工具，提供面授課表、學習進度管理、自習室等功能。免登入、免安裝，打開網頁即可立即使用。
     </p>
@@ -57,7 +57,7 @@ const points = [
           <p class="text-sm font-semibold text-theme-900 dark:text-zinc-100">
             {{ point.title }}
           </p>
-          <p class="mt-0.5 text-sm text-theme-600 dark:text-zinc-400">
+          <p class="mt-0.5 text-sm text-theme-700 dark:text-zinc-400">
             {{ point.description }}
           </p>
         </div>

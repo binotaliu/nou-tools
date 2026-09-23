@@ -461,7 +461,7 @@ function localHint(next) {
             >
               要記住這個課表嗎？
             </h3>
-            <p class="mb-4 text-sm text-theme-600 dark:text-zinc-400">
+            <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
               看樣子這個課表不是在此瀏覽器上建立的。要將此課表記住在此瀏覽器上嗎？記住後仍可使用其他瀏覽器或裝置開啟課表。
             </p>
 
@@ -486,7 +486,7 @@ function localHint(next) {
                 data-testid="remember-schedule-confirm"
                 data-analytics-event="remember_schedule_confirm"
                 data-analytics-feature="schedule"
-                class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-600 bg-theme-600 px-4 py-2 font-semibold text-white transition hover:bg-theme-700"
+                class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800"
               >
                 記住課表
               </button>
@@ -507,7 +507,7 @@ function localHint(next) {
           </h2>
           <p
             v-show="!isPwa"
-            class="mt-1 flex items-center gap-1 text-sm text-theme-600 dark:text-zinc-400"
+            class="mt-1 flex items-center gap-1 text-sm text-theme-700 dark:text-zinc-400"
           >
             <Icon name="information-circle" class="inline size-4" />
             小提示：將此頁加入瀏覽器書籤，下次即可快速開啟課表。
@@ -554,7 +554,7 @@ function localHint(next) {
               :href="`/schedules/${viewModel.uuid}/subscribe`"
               data-analytics-event="calendar_subscribe_open"
               data-analytics-feature="schedule"
-              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-600 bg-theme-600 px-4 py-2 font-semibold text-white transition hover:bg-theme-700 sm:w-1/2 lg:w-auto"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800 sm:w-1/2 lg:w-auto"
             >
               <Icon name="calendar" class="inline size-4" />
               訂閱行事曆
@@ -763,7 +763,7 @@ function localHint(next) {
             沒有課程。
           </p>
 
-          <p class="text-sm text-theme-600 dark:text-zinc-400">
+          <p class="text-sm text-theme-700 dark:text-zinc-400">
             您可以切換其他學期，或前往
             <Link
               :href="`/schedules/${viewModel.uuid}/edit?term=${viewModel.selectedTerm}`"
@@ -872,7 +872,7 @@ function localHint(next) {
                   class="px-4 py-3 text-theme-800 tabular-nums dark:text-zinc-200"
                 >
                   <span v-if="row.next">{{ taipeiDate(row.next) }}</span>
-                  <span v-else class="text-sm text-theme-500 dark:text-zinc-400"
+                  <span v-else class="text-sm text-theme-700 dark:text-zinc-400"
                     >無未來課程</span
                   >
                 </td>
@@ -886,7 +886,7 @@ function localHint(next) {
                       <span v-if="row.next.hasOverride" class="inline-flex">
                         <Icon
                           name="exclamation-triangle"
-                          class="size-4 text-theme-500 dark:text-zinc-400"
+                          class="size-4 text-theme-700 dark:text-zinc-400"
                           title="該次課程時間與一般時間不同"
                         />
                         <span class="sr-only"
@@ -896,14 +896,14 @@ function localHint(next) {
                     </span>
                     <div
                       v-if="localHint(row.next)"
-                      class="text-xs text-theme-500 dark:text-zinc-400"
+                      class="text-xs text-theme-700 dark:text-zinc-400"
                     >
                       {{ localHint(row.next) }}
                     </div>
                   </div>
                   <span
                     v-else-if="row.next"
-                    class="text-sm text-theme-400 dark:text-zinc-500"
+                    class="text-sm text-theme-700 dark:text-zinc-500"
                     >未設定</span
                   >
                 </td>
@@ -942,7 +942,7 @@ function localHint(next) {
                     target="_blank"
                     rel="noopener"
                     data-offline-allow
-                    class="inline-flex items-center gap-1 font-semibold text-theme-500 underline underline-offset-4 hover:text-theme-400 hover:no-underline dark:text-zinc-400 dark:hover:text-zinc-500"
+                    class="inline-flex items-center gap-1 font-semibold text-theme-700 underline underline-offset-4 hover:text-theme-800 hover:no-underline dark:text-zinc-400 dark:hover:text-zinc-500"
                     :aria-label="
                       '前往 ' + row.item.courseName + ' 的視訊上課連結'
                     "
@@ -988,13 +988,13 @@ function localHint(next) {
                   >
                     {{ monthDay(row.next) }}
                   </p>
-                  <p class="mt-0.5 text-base text-theme-600 dark:text-zinc-400">
+                  <p class="mt-0.5 text-base text-theme-700 dark:text-zinc-400">
                     {{ weekday(row.next) }}
                   </p>
                 </template>
                 <p
                   v-else
-                  class="text-lg font-bold text-theme-400 dark:text-zinc-500"
+                  class="text-lg font-bold text-theme-700 dark:text-zinc-500"
                 >
                   —
                 </p>
@@ -1019,7 +1019,7 @@ function localHint(next) {
                 <div class="flex flex-wrap items-end justify-between gap-y-2">
                   <div class="flex shrink-0 flex-col gap-1">
                     <p
-                      class="flex items-center gap-1.5 text-xs text-theme-600 dark:text-zinc-400"
+                      class="flex items-center gap-1.5 text-xs text-theme-700 dark:text-zinc-400"
                     >
                       <span
                         v-if="!row.item.isTentative"
@@ -1055,26 +1055,26 @@ function localHint(next) {
                         <Icon
                           v-if="row.next.hasOverride"
                           name="exclamation-triangle"
-                          class="size-4 text-theme-500 dark:text-zinc-400"
+                          class="size-4 text-theme-700 dark:text-zinc-400"
                           title="該次課程時間與一般時間不同"
                         />
                       </p>
                       <p
                         v-else
-                        class="mt-1 text-sm text-theme-400 dark:text-zinc-500"
+                        class="mt-1 text-sm text-theme-700 dark:text-zinc-500"
                       >
                         時間未設定
                       </p>
                       <p
                         v-if="localHint(row.next)"
-                        class="text-xs text-theme-500 dark:text-zinc-400"
+                        class="text-xs text-theme-700 dark:text-zinc-400"
                       >
                         {{ localHint(row.next) }}
                       </p>
                     </div>
                     <p
                       v-else
-                      class="mt-1 text-sm font-medium text-theme-500 dark:text-zinc-400"
+                      class="mt-1 text-sm font-medium text-theme-700 dark:text-zinc-400"
                     >
                       無未來課程
                     </p>
@@ -1103,7 +1103,7 @@ function localHint(next) {
                         target="_blank"
                         rel="noopener"
                         title="主教室人數已滿時可改用此備用連結"
-                        class="rounded-lg px-2 py-1 text-xs font-medium text-theme-500 transition hover:text-theme-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                        class="rounded-lg px-2 py-1 text-xs font-medium text-theme-700 transition hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
                         :aria-label="
                           '前往 ' + row.item.courseName + ' 的備用教室連結'
                         "
@@ -1112,7 +1112,7 @@ function localHint(next) {
                       </a>
                       <Link
                         :href="row.item.courseInfoUrl"
-                        class="rounded-lg px-2 py-1 text-xs font-medium text-theme-500 transition hover:text-theme-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                        class="rounded-lg px-2 py-1 text-xs font-medium text-theme-700 transition hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
                         :aria-label="row.item.courseName + ' 的課程資訊'"
                       >
                         課程資訊
@@ -1127,11 +1127,11 @@ function localHint(next) {
 
         <div
           v-if="viewModel.hasAnyOverride"
-          class="mt-3 flex items-center gap-1 px-1 text-xs text-theme-600 md:mt-0 md:border-t md:border-theme-200 md:bg-theme-50 md:px-4 md:py-2 dark:text-zinc-400 dark:md:border-zinc-700 dark:md:bg-zinc-950"
+          class="mt-3 flex items-center gap-1 px-1 text-xs text-theme-700 md:mt-0 md:border-t md:border-theme-200 md:bg-theme-50 md:px-4 md:py-2 dark:text-zinc-400 dark:md:border-zinc-700 dark:md:bg-zinc-950"
         >
           <Icon
             name="exclamation-triangle"
-            class="size-4 text-theme-500 dark:text-zinc-400"
+            class="size-4 text-theme-700 dark:text-zinc-400"
           />
           <span>表示該次課程時間與一般時間不同</span>
         </div>
@@ -1212,7 +1212,7 @@ function localHint(next) {
           <h2 class="text-xl font-semibold text-theme-900 dark:text-zinc-100">
             考試資訊
           </h2>
-          <div class="text-sm text-theme-600 dark:text-zinc-400">
+          <div class="text-sm text-theme-700 dark:text-zinc-400">
             以下為您加入課表的科目之期中 / 期末考試日期與節次。
           </div>
         </div>
@@ -1247,7 +1247,7 @@ function localHint(next) {
             <div class="mt-3 grid grid-cols-2 gap-3">
               <div v-if="!viewModel.selectedTerm.endsWith('C')">
                 <p
-                  class="mb-1 text-xs font-semibold tracking-wide text-theme-600 uppercase dark:text-zinc-400"
+                  class="mb-1 text-xs font-semibold tracking-wide text-theme-700 uppercase dark:text-zinc-400"
                 >
                   期中考
                 </p>
@@ -1257,17 +1257,17 @@ function localHint(next) {
                   </div>
                   <div
                     v-if="exam.formattedExamTime"
-                    class="mt-1 text-sm text-theme-600 dark:text-zinc-400"
+                    class="mt-1 text-sm text-theme-700 dark:text-zinc-400"
                   >
                     {{ exam.formattedExamTime }}
                   </div>
                 </template>
-                <div v-else class="text-theme-500 dark:text-zinc-400">—</div>
+                <div v-else class="text-theme-700 dark:text-zinc-400">—</div>
               </div>
 
               <div>
                 <p
-                  class="mb-1 text-xs font-semibold tracking-wide text-theme-600 uppercase dark:text-zinc-400"
+                  class="mb-1 text-xs font-semibold tracking-wide text-theme-700 uppercase dark:text-zinc-400"
                 >
                   期末考
                 </p>
@@ -1277,19 +1277,19 @@ function localHint(next) {
                   </div>
                   <div
                     v-if="exam.formattedExamTime"
-                    class="mt-1 text-sm text-theme-600 dark:text-zinc-400"
+                    class="mt-1 text-sm text-theme-700 dark:text-zinc-400"
                   >
                     {{ exam.formattedExamTime }}
                   </div>
                 </template>
-                <div v-else class="text-theme-500 dark:text-zinc-400">—</div>
+                <div v-else class="text-theme-700 dark:text-zinc-400">—</div>
               </div>
             </div>
           </div>
 
           <div
             v-if="viewModel.exams.length === 0"
-            class="px-4 py-16 text-center text-theme-500 dark:text-zinc-400"
+            class="px-4 py-16 text-center text-theme-700 dark:text-zinc-400"
           >
             您的課表中沒有任何科目有設定考試日期。
           </div>
@@ -1358,10 +1358,10 @@ function localHint(next) {
                   <div v-if="exam.midtermDate" class="font-semibold">
                     {{ exam.formattedMidtermDate }}
                   </div>
-                  <div v-else class="text-theme-500 dark:text-zinc-400">—</div>
+                  <div v-else class="text-theme-700 dark:text-zinc-400">—</div>
                   <div
                     v-if="exam.formattedExamTime"
-                    class="mt-1 text-sm text-theme-600 dark:text-zinc-400"
+                    class="mt-1 text-sm text-theme-700 dark:text-zinc-400"
                   >
                     {{ exam.formattedExamTime }}
                   </div>
@@ -1371,10 +1371,10 @@ function localHint(next) {
                   <div v-if="exam.finalDate" class="font-semibold">
                     {{ exam.formattedFinalDate }}
                   </div>
-                  <div v-else class="text-theme-500 dark:text-zinc-400">—</div>
+                  <div v-else class="text-theme-700 dark:text-zinc-400">—</div>
                   <div
                     v-if="exam.formattedExamTime"
-                    class="mt-1 text-sm text-theme-600 dark:text-zinc-400"
+                    class="mt-1 text-sm text-theme-700 dark:text-zinc-400"
                   >
                     {{ exam.formattedExamTime }}
                   </div>
@@ -1384,7 +1384,7 @@ function localHint(next) {
               <tr v-if="viewModel.exams.length === 0">
                 <td
                   colspan="3"
-                  class="px-4 py-16 text-center text-theme-500 dark:text-zinc-400"
+                  class="px-4 py-16 text-center text-theme-700 dark:text-zinc-400"
                 >
                   您的課表中沒有任何科目有設定考試日期。
                 </td>
@@ -1424,12 +1424,12 @@ function localHint(next) {
             </p>
 
             <div
-              class="rounded border border-theme-300 bg-white text-sm text-theme-600 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
+              class="rounded border border-theme-300 bg-white text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
             >
               <div class="flex items-stretch gap-3">
                 <input
                   ref="shareInput"
-                  class="flex-1 px-3 py-2 font-mono break-all text-theme-600 dark:text-zinc-400"
+                  class="flex-1 px-3 py-2 font-mono break-all text-theme-700 dark:text-zinc-400"
                   :value="copyShareUrl"
                   readonly
                   aria-label="我的課表連結"
@@ -1524,7 +1524,7 @@ function localHint(next) {
             role="menu"
             class="absolute right-0 bottom-full z-30 mb-2 w-48 rounded-lg border border-theme-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
           >
-            <p class="px-3 pt-1 pb-2 text-xs text-theme-600 dark:text-zinc-400">
+            <p class="px-3 pt-1 pb-2 text-xs text-theme-700 dark:text-zinc-400">
               選擇月曆版本
             </p>
             <!-- The PDF is rendered on the server (Blade + Browsershot), so

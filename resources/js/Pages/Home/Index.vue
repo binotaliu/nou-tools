@@ -144,7 +144,7 @@ onUnmounted(() => {
           >
             <Link
               href="/schedules/create"
-              class="text-theme-600 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+              class="text-theme-700 underline hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
               data-analytics-event="schedule_create_start"
               data-analytics-feature="schedule"
             >

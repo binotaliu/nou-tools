@@ -29,7 +29,7 @@ const issues = computed(() => props.viewModel.issues.data ?? [])
         </p>
         <a
           :href="viewModel.feedUrl"
-          class="inline-flex items-center gap-1 text-sm text-theme-600 underline hover:text-theme-900 hover:no-underline dark:text-zinc-400 dark:hover:text-zinc-100"
+          class="inline-flex items-center gap-1 text-sm text-theme-700 underline hover:text-theme-900 hover:no-underline dark:text-zinc-400 dark:hover:text-zinc-100"
         >
           <Icon name="rss" class="size-4" />
           Atom 訂閱
@@ -54,7 +54,7 @@ const issues = computed(() => props.viewModel.issues.data ?? [])
           />
           <div
             v-else
-            class="flex aspect-[3/1] w-full items-center justify-center bg-theme-100 text-theme-400 dark:bg-zinc-800 dark:text-zinc-600"
+            class="flex aspect-[3/1] w-full items-center justify-center bg-theme-100 text-theme-700 dark:bg-zinc-800 dark:text-zinc-600"
             data-testid="newsletter-cover-placeholder"
           >
             <Icon name="book-open" class="size-12" />
@@ -65,7 +65,7 @@ const issues = computed(() => props.viewModel.issues.data ?? [])
             >
               {{ viewModel.latestIssue.title }}
             </p>
-            <p class="text-sm text-theme-600 dark:text-zinc-400">
+            <p class="text-sm text-theme-700 dark:text-zinc-400">
               {{ formatNewsletterDate(viewModel.latestIssue.publishesOn) }} 發刊
             </p>
           </div>
@@ -74,7 +74,7 @@ const issues = computed(() => props.viewModel.issues.data ?? [])
 
       <p
         v-else
-        class="rounded-lg border border-theme-200 bg-white p-6 text-center text-theme-600 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
+        class="rounded-lg border border-theme-200 bg-white p-6 text-center text-theme-700 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
       >
         第一期正在準備中，敬請期待。
       </p>
@@ -102,7 +102,7 @@ const issues = computed(() => props.viewModel.issues.data ?? [])
               />
               <div
                 v-else
-                class="flex aspect-[3/1] w-full items-center justify-center bg-theme-100 text-theme-400 dark:bg-zinc-800 dark:text-zinc-600"
+                class="flex aspect-[3/1] w-full items-center justify-center bg-theme-100 text-theme-700 dark:bg-zinc-800 dark:text-zinc-600"
                 data-testid="newsletter-cover-placeholder"
               >
                 <Icon name="book-open" class="size-8" />
@@ -113,7 +113,7 @@ const issues = computed(() => props.viewModel.issues.data ?? [])
                 >
                   {{ issue.title }}
                 </p>
-                <p class="text-sm text-theme-600 dark:text-zinc-400">
+                <p class="text-sm text-theme-700 dark:text-zinc-400">
                   {{ formatNewsletterDate(issue.publishesOn) }} 發刊
                 </p>
               </div>
