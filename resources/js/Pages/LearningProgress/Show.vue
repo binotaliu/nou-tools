@@ -166,6 +166,55 @@ function isWeekPassed(weekNum) {
   return currentWeek.value !== null && weekNum < currentWeek.value
 }
 
+// Mirrors the table's legend (目前週次 / 進度落後) for the 依科目 mobile
+// view, scoped to the single selected course rather than "any course".
+function subjectWeekStatus(weekNum) {
+  if (currentWeek.value === weekNum) {
+    return 'current'
+  }
+
+  if (
+    isWeekPassed(weekNum) &&
+    !isProgressComplete(selectedCourseId.value, weekNum)
+  ) {
+    return 'overdue'
+  }
+
+  return null
+}
+
+function subjectCardBorderClass(weekNum) {
+  const status = subjectWeekStatus(weekNum)
+
+  if (status === 'current') {
+    return 'border-blue-500 dark:border-blue-400'
+  }
+
+  if (status === 'overdue') {
+    return 'border-red-400 dark:border-red-400'
+  }
+
+  return 'border-theme-200 dark:border-zinc-700'
+}
+
+function subjectCheckboxClass(weekNum, checked) {
+  if (checked) {
+    return 'border-theme-400 bg-theme-50 dark:border-zinc-500 dark:bg-zinc-800'
+  }
+
+  const status = subjectWeekStatus(weekNum)
+
+  if (status === 'current') {
+    return 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-950/60'
+  }
+
+  if (status === 'overdue') {
+    return 'border-red-400 bg-red-50 dark:border-red-400 dark:bg-red-950/60'
+  }
+
+  return 'border-theme-200 dark:border-zinc-700'
+}
+
 // --- homework table state ---
 // `homeworkEntries` is guarded because the app's service worker
 // (public/sw.js) caches JS chunks independently of the page's props, so a
@@ -196,10 +245,10 @@ function toChineseNumber(n) {
 const { viewMode, setViewMode } = useLearningProgressViewMode()
 
 const viewModeTabs = [
-  { value: 'table', label: '表格' },
-  { value: 'homework', label: '作業' },
   { value: 'week', label: '依週次' },
   { value: 'subject', label: '依科目' },
+  { value: 'homework', label: '作業' },
+  { value: 'table', label: '表格' },
 ]
 
 const selectedWeekNum = ref(
@@ -353,51 +402,56 @@ const csrfToken =
         </div>
       </div>
 
-      <div
-        class="relative rounded border border-theme-300 dark:border-zinc-600"
+      <form
+        id="progress-form"
+        method="POST"
+        :action="`/schedules/${viewModel.scheduleUuid}/${viewModel.term}/learning-progress`"
+        :style="{
+          '--courses-count': viewModel.courses.length,
+          '--weeks-count': viewModel.weeks.length,
+        }"
+        @input="hasUnsavedChanges = true"
+        @change="hasUnsavedChanges = true"
       >
-        <form
-          id="progress-form"
-          method="POST"
-          :action="`/schedules/${viewModel.scheduleUuid}/${viewModel.term}/learning-progress`"
-          :style="{
-            '--courses-count': viewModel.courses.length,
-            '--weeks-count': viewModel.weeks.length,
-          }"
-          @input="hasUnsavedChanges = true"
-          @change="hasUnsavedChanges = true"
+        <input type="hidden" name="_method" value="PUT" />
+        <input type="hidden" name="_token" :value="csrfToken" />
+
+        <div
+          class="p-2 md:hidden print:hidden"
+          data-testid="learning-progress-view-switcher"
         >
-          <input type="hidden" name="_method" value="PUT" />
-          <input type="hidden" name="_token" :value="csrfToken" />
-
           <div
-            class="p-2 md:hidden print:hidden"
-            data-testid="learning-progress-view-switcher"
+            role="tablist"
+            class="grid grid-cols-4 gap-1 rounded-md bg-theme-100 p-1 dark:bg-zinc-800"
           >
-            <div
-              role="tablist"
-              class="grid grid-cols-4 gap-1 rounded-md bg-theme-100 p-1 dark:bg-zinc-800"
+            <button
+              v-for="tab in viewModeTabs"
+              :key="tab.value"
+              type="button"
+              role="tab"
+              :aria-selected="(viewMode === tab.value).toString()"
+              class="rounded px-2 py-1.5 text-sm font-medium transition-colors"
+              :class="
+                viewMode === tab.value
+                  ? 'bg-white text-theme-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100'
+                  : 'text-theme-700 hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+              "
+              :data-testid="`learning-progress-view-tab-${tab.value}`"
+              @click="setViewMode(tab.value)"
             >
-              <button
-                v-for="tab in viewModeTabs"
-                :key="tab.value"
-                type="button"
-                role="tab"
-                :aria-selected="(viewMode === tab.value).toString()"
-                class="rounded px-2 py-1.5 text-sm font-medium transition-colors"
-                :class="
-                  viewMode === tab.value
-                    ? 'bg-white text-theme-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100'
-                    : 'text-theme-700 hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-100'
-                "
-                :data-testid="`learning-progress-view-tab-${tab.value}`"
-                @click="setViewMode(tab.value)"
-              >
-                {{ tab.label }}
-              </button>
-            </div>
+              {{ tab.label }}
+            </button>
           </div>
+        </div>
 
+        <div
+          class="relative"
+          :class="
+            viewMode === 'table' || !isMobileViewport
+              ? 'rounded border border-theme-300 dark:border-zinc-600'
+              : ''
+          "
+        >
           <div
             ref="progressForm"
             :class="viewMode === 'table' ? 'block' : 'hidden md:block'"
@@ -697,9 +751,9 @@ const csrfToken =
                   :key="number"
                   class="mb-2 last:mb-0"
                 >
-                  <div class="mb-1 flex items-center justify-between gap-2">
+                  <div class="mb-1 grid grid-cols-2 gap-2">
                     <label
-                      class="flex items-center gap-2 text-sm text-theme-700 dark:text-zinc-300"
+                      class="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-theme-200 px-3 py-2.5 text-sm whitespace-nowrap text-theme-700 has-checked:border-theme-400 has-checked:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:has-checked:border-zinc-500 dark:has-checked:bg-zinc-800"
                     >
                       <input
                         v-model="homework[course.id][number].completed"
@@ -713,6 +767,9 @@ const csrfToken =
                       :label="`${course.name} ${homeworkLabel(number)}的截止日期`"
                       :today="viewModel.now"
                       :initial-month="viewModel.semesterStart"
+                      variant="box"
+                      format="compact"
+                      placeholder="按一下以設定期限"
                       @change="
                         value =>
                           updateHomeworkDeadline(course.id, number, value)
@@ -722,8 +779,8 @@ const csrfToken =
                   <textarea
                     v-model="homework[course.id][number].note"
                     placeholder="（尚未設定備註）"
-                    rows="1"
-                    class="w-full resize-none rounded border border-theme-200 px-2 py-1 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
+                    rows="3"
+                    class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
                   ></textarea>
                 </div>
               </article>
@@ -735,20 +792,25 @@ const csrfToken =
             class="p-2 md:hidden"
             data-testid="learning-progress-week-view"
           >
-            <Select
-              v-model.number="selectedWeekNum"
-              class="mb-3"
-              data-testid="learning-progress-week-picker"
+            <div
+              class="sticky top-(--mobile-header-height) z-10 -mx-2 bg-theme-50 px-2 pt-2 pb-3 dark:bg-zinc-950"
             >
-              <option
-                v-for="week in viewModel.weeks"
-                :key="week.num"
-                :value="week.num"
+              <Select
+                v-model.number="selectedWeekNum"
+                data-testid="learning-progress-week-picker"
               >
-                第{{ toChineseNumber(week.num) }}週（{{ week.start }} -
-                {{ week.end }}）
-              </option>
-            </Select>
+                <option
+                  v-for="week in viewModel.weeks"
+                  :key="week.num"
+                  :value="week.num"
+                >
+                  第{{ toChineseNumber(week.num) }}週（{{ week.start }} -
+                  {{ week.end }}）{{
+                    currentWeek === week.num ? '（本週）' : ''
+                  }}
+                </option>
+              </Select>
+            </div>
 
             <div class="space-y-3">
               <article
@@ -764,9 +826,9 @@ const csrfToken =
                   {{ course.name }}
                 </h3>
 
-                <div class="mb-2 flex gap-4">
+                <div class="mb-2 grid grid-cols-2 gap-2">
                   <label
-                    class="flex items-center gap-2 text-sm text-theme-700 dark:text-zinc-300"
+                    class="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-theme-200 px-3 py-2.5 text-sm text-theme-700 has-checked:border-theme-400 has-checked:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:has-checked:border-zinc-500 dark:has-checked:bg-zinc-800"
                   >
                     <input
                       v-model="progress[course.id][selectedWeekNum].video"
@@ -776,7 +838,7 @@ const csrfToken =
                     影音
                   </label>
                   <label
-                    class="flex items-center gap-2 text-sm text-theme-700 dark:text-zinc-300"
+                    class="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-theme-200 px-3 py-2.5 text-sm text-theme-700 has-checked:border-theme-400 has-checked:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:has-checked:border-zinc-500 dark:has-checked:bg-zinc-800"
                   >
                     <input
                       v-model="progress[course.id][selectedWeekNum].textbook"
@@ -802,25 +864,29 @@ const csrfToken =
             class="p-2 md:hidden"
             data-testid="learning-progress-subject-view"
           >
-            <Select
-              v-model.number="selectedCourseId"
-              class="mb-3"
-              data-testid="learning-progress-subject-picker"
+            <div
+              class="sticky top-(--mobile-header-height) z-10 -mx-2 bg-theme-50 px-2 pt-2 pb-3 dark:bg-zinc-950"
             >
-              <option
-                v-for="course in viewModel.courses"
-                :key="course.id"
-                :value="course.id"
+              <Select
+                v-model.number="selectedCourseId"
+                data-testid="learning-progress-subject-picker"
               >
-                {{ course.name }}
-              </option>
-            </Select>
+                <option
+                  v-for="course in viewModel.courses"
+                  :key="course.id"
+                  :value="course.id"
+                >
+                  {{ course.name }}
+                </option>
+              </Select>
+            </div>
 
             <div class="space-y-3">
               <article
                 v-for="week in viewModel.weeks"
                 :key="week.num"
-                class="rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+                class="rounded-lg border bg-white p-4 dark:bg-zinc-900"
+                :class="subjectCardBorderClass(week.num)"
                 data-testid="learning-progress-subject-view-week-row"
                 :data-week-num="week.num"
               >
@@ -835,9 +901,15 @@ const csrfToken =
                   </span>
                 </div>
 
-                <div class="mb-2 flex gap-4">
+                <div class="mb-2 grid grid-cols-2 gap-2">
                   <label
-                    class="flex items-center gap-2 text-sm text-theme-700 dark:text-zinc-300"
+                    class="flex cursor-pointer items-center justify-center gap-2 rounded-md border px-3 py-2.5 text-sm text-theme-700 dark:text-zinc-300"
+                    :class="
+                      subjectCheckboxClass(
+                        week.num,
+                        progress[selectedCourseId][week.num].video
+                      )
+                    "
                   >
                     <input
                       v-model="progress[selectedCourseId][week.num].video"
@@ -847,7 +919,13 @@ const csrfToken =
                     影音
                   </label>
                   <label
-                    class="flex items-center gap-2 text-sm text-theme-700 dark:text-zinc-300"
+                    class="flex cursor-pointer items-center justify-center gap-2 rounded-md border px-3 py-2.5 text-sm text-theme-700 dark:text-zinc-300"
+                    :class="
+                      subjectCheckboxClass(
+                        week.num,
+                        progress[selectedCourseId][week.num].textbook
+                      )
+                    "
                   >
                     <input
                       v-model="progress[selectedCourseId][week.num].textbook"
@@ -867,18 +945,18 @@ const csrfToken =
               </article>
             </div>
           </div>
-        </form>
 
-        <div
-          class="pointer-events-none absolute bottom-0 left-0 z-20 h-16 w-full rounded-b bg-linear-to-t from-stone-900/20 to-transparent transition-opacity duration-150 ease-in md:h-32 print:hidden"
-          :class="showHorizontalGradient ? 'opacity-100' : 'opacity-0'"
-        ></div>
+          <div
+            class="pointer-events-none absolute bottom-0 left-0 z-20 h-16 w-full rounded-b bg-linear-to-t from-stone-900/20 to-transparent transition-opacity duration-150 ease-in md:h-32 print:hidden"
+            :class="showHorizontalGradient ? 'opacity-100' : 'opacity-0'"
+          ></div>
 
-        <div
-          class="pointer-events-none absolute top-0 right-0 z-20 h-full w-16 rounded-r bg-linear-to-l from-stone-900/20 to-transparent transition-opacity duration-150 ease-in md:w-32 print:hidden"
-          :class="showVerticalGradient ? 'opacity-100' : 'opacity-0'"
-        ></div>
-      </div>
+          <div
+            class="pointer-events-none absolute top-0 right-0 z-20 h-full w-16 rounded-r bg-linear-to-l from-stone-900/20 to-transparent transition-opacity duration-150 ease-in md:w-32 print:hidden"
+            :class="showVerticalGradient ? 'opacity-100' : 'opacity-0'"
+          ></div>
+        </div>
+      </form>
 
       <div class="mt-6 flex items-start justify-between">
         <div

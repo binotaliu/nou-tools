@@ -24,9 +24,14 @@ const props = defineProps({
   today: { type: String, default: null },
   initialMonth: { type: String, default: null },
   placeholder: { type: String, default: '未設定' },
-  // `cell` fills a table cell and shows `M/D`; `field` is a bordered
-  // standalone control that shows the full date including the year.
+  // `cell` fills a table cell and shows `M/D`; `field` is a bordered,
+  // inline-sized control; `box` is a bordered, full-width control sized to
+  // match a grid of same-height toggle boxes (e.g. a checkbox alongside it).
   variant: { type: String, default: 'cell' },
+  // `field`/`box` variants only: 'default' shows `YYYY/M/D（週）`, 'compact'
+  // shows a zero-padded `YYYY/MM/DD` with no weekday, for tight mobile
+  // layouts.
+  format: { type: String, default: 'default' },
   clearable: { type: Boolean, default: true },
 })
 
@@ -103,9 +108,13 @@ const buttonText = computed(() => {
 
   const { year, month, day } = selected.value
 
-  return props.variant === 'field'
-    ? `${year}/${month}/${day}（${WEEKDAYS[weekdayOf(selected.value)]}）`
-    : `${month}/${day}`
+  if (props.variant === 'cell') {
+    return `${month}/${day}`
+  }
+
+  return props.format === 'compact'
+    ? toIso(selected.value).replaceAll('-', '/')
+    : `${year}/${month}/${day}（${WEEKDAYS[weekdayOf(selected.value)]}）`
 })
 
 const buttonTitle = computed(() =>
@@ -350,7 +359,15 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div :class="variant === 'cell' ? 'h-full w-full' : 'inline-block'">
+  <div
+    :class="
+      variant === 'cell'
+        ? 'h-full w-full'
+        : variant === 'box'
+          ? 'w-full'
+          : 'inline-block'
+    "
+  >
     <input v-if="name" type="hidden" :name="name" :value="value" />
 
     <button
@@ -361,7 +378,9 @@ onBeforeUnmount(() => {
       :class="[
         variant === 'cell'
           ? 'm-0 h-full w-full px-2 py-2 text-center text-xs focus:ring-inset'
-          : 'rounded border border-theme-200 bg-white px-3 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-900',
+          : variant === 'box'
+            ? 'flex w-full items-center justify-center rounded-md border border-theme-200 px-3 py-2.5 text-sm dark:border-zinc-700'
+            : 'rounded border border-theme-200 bg-white px-3 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-900',
         { 'text-gray-400 print:text-transparent': !selected },
       ]"
       :aria-label="`${label}：${selected ? describe(selected) : placeholder}`"

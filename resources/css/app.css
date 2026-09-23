@@ -154,6 +154,21 @@
     }
   }
 
+  /* Height of the sticky site header on phone widths, so content that also
+   * needs to stick (e.g. a picker below the header) can dock right beneath
+   * it instead of sliding under it. The installed PWA hides the header
+   * entirely at this width (see `bottom-nav:hidden` on it), so there's
+   * nothing to dock under there. */
+  :root {
+    --mobile-header-height: 3.5rem;
+  }
+
+  @media (width < 48rem) {
+    html[data-pwa] {
+      --mobile-header-height: 0px;
+    }
+  }
+
   /* viewport-fit=cover (added for PWAs only, at any width) lets content run
    * under the landscape notch, so keep it inside the side insets. */
   html[data-pwa] body {
