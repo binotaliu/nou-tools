@@ -250,10 +250,14 @@ onUnmounted(() => {
           data-testid="study-room-site-total"
         >
           <FireIcon class="size-4 shrink-0" />
-          今天大家一起專注了
-          <span>{{
-            timer.formatDurationLabel(socket.state.totals.siteFocusSecondsToday)
-          }}</span>
+          <span
+            >今天大家一起專注了
+            {{
+              timer.formatDurationLabel(
+                socket.state.totals.siteFocusSecondsToday
+              )
+            }}</span
+          >
         </div>
       </div>
 
@@ -589,11 +593,11 @@ onUnmounted(() => {
                       class="flex flex-col items-center gap-1"
                     >
                       <span
-                        class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-300 bg-white text-[10px] font-medium text-theme-700 transition group-hover:border-theme-400 group-hover:text-theme-800 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                        class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-300 bg-white text-[0.625rem] font-medium text-theme-700 transition group-hover:border-theme-400 group-hover:text-theme-800 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
                         >{{ seat.seatNumber }}</span
                       >
                       <span
-                        class="text-[10px] text-theme-700 opacity-0 transition group-hover:opacity-100 dark:text-zinc-400"
+                        class="text-[0.625rem] text-theme-700 opacity-0 transition group-hover:opacity-100 dark:text-zinc-400"
                         >點擊入座</span
                       >
                     </div>
@@ -608,7 +612,7 @@ onUnmounted(() => {
                       >
                         <span
                           v-if="grid.needsMarquee(seat)"
-                          class="flex animate-marquee text-[9px] whitespace-nowrap text-theme-700 dark:text-zinc-200"
+                          class="flex animate-marquee text-[0.5625rem] whitespace-nowrap text-theme-700 dark:text-zinc-200"
                         >
                           <span class="pr-4">{{
                             grid.thoughtBubbleText(seat)
@@ -619,7 +623,7 @@ onUnmounted(() => {
                         </span>
                         <span
                           v-else
-                          class="block w-full truncate text-center text-[9px] whitespace-nowrap text-theme-700 dark:text-zinc-200"
+                          class="block w-full truncate text-center text-[0.5625rem] whitespace-nowrap text-theme-700 dark:text-zinc-200"
                           >{{ grid.thoughtBubbleText(seat) }}</span
                         >
                       </div>
@@ -631,16 +635,16 @@ onUnmounted(() => {
                         >
                         <span
                           v-show="grid.isMine(seat)"
-                          class="absolute -top-1.5 -right-2 rounded-full bg-amber-500 px-1 text-[9px] leading-4 font-semibold text-white shadow-sm"
+                          class="absolute -top-1.5 -right-2 rounded-full bg-amber-500 px-1 text-[0.5625rem] leading-4 font-semibold text-white shadow-sm"
                           >你</span
                         >
                       </span>
                       <span
-                        class="max-w-full truncate text-[10px] font-medium text-theme-800 dark:text-zinc-200"
+                        class="max-w-full truncate text-[0.625rem] font-medium text-theme-800 dark:text-zinc-200"
                         >{{ seat.nickname }}</span
                       >
                       <span
-                        class="font-mono text-[10px] tabular-nums"
+                        class="font-mono text-[0.625rem] tabular-nums"
                         :class="grid.seatTimerLabelClass(seat)"
                         >{{ timer.timerLabel(seat) }}</span
                       >
@@ -707,7 +711,7 @@ onUnmounted(() => {
                     data-testid="study-room-stair-up"
                   >
                     <span
-                      class="max-w-16 text-[10px] leading-tight text-theme-700 dark:text-zinc-400"
+                      class="max-w-16 text-[0.625rem] leading-tight text-theme-700 dark:text-zinc-400"
                       aria-hidden="true"
                       >{{ grid.stairHint(floor) }}</span
                     >
@@ -743,7 +747,7 @@ onUnmounted(() => {
                     data-testid="study-room-stair-down"
                   >
                     <span
-                      class="max-w-16 text-[10px] leading-tight text-theme-700 dark:text-zinc-400"
+                      class="max-w-16 text-[0.625rem] leading-tight text-theme-700 dark:text-zinc-400"
                       aria-hidden="true"
                       >{{ grid.stairDownHint(floor) }}</span
                     >
@@ -788,7 +792,7 @@ onUnmounted(() => {
             </li>
             <li class="inline-flex items-center gap-1.5">
               <span
-                class="rounded-full bg-amber-500 px-1 text-[9px] leading-4 font-semibold text-white"
+                class="rounded-full bg-amber-500 px-1 text-[0.5625rem] leading-4 font-semibold text-white"
                 >你</span
               >
               你的座位

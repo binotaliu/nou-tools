@@ -41,6 +41,14 @@
   }
 }
 
+/* The reader picked 特大 or 超大 text (useFontSize). For layouts that fit at
+ * 100% but need to restack when everything is up to 1.5x wider. */
+@custom-variant zoomed {
+  html:is([data-font-size='xlarge'], [data-font-size='xxlarge']) & {
+    @slot;
+  }
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';

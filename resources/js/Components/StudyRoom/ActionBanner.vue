@@ -246,12 +246,14 @@ defineProps({
                   </div>
                 </div>
 
-                <div class="flex items-center gap-2 lg:shrink-0">
+                <div
+                  class="flex items-center gap-2 lg:shrink-0 zoomed:max-sm:flex-wrap"
+                >
                   <button
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-start-timer"
-                    class="inline-flex flex-[2] items-center justify-center gap-2 rounded-xl bg-theme-700 px-6 py-3 text-base font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 lg:flex-none dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
+                    class="inline-flex flex-[2] items-center justify-center gap-2 rounded-xl bg-theme-700 px-6 py-3 text-base font-semibold whitespace-nowrap text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 lg:flex-none dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400 zoomed:max-sm:basis-full"
                     @click="timer.startTimer()"
                   >
                     <PlaySolidIcon class="size-5" />
@@ -262,7 +264,7 @@ defineProps({
                     type="button"
                     :disabled="timer.panelBusy"
                     data-testid="study-room-leave-seat"
-                    class="inline-flex flex-1 items-center justify-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-4 py-3 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 lg:flex-none dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                    class="inline-flex flex-1 items-center justify-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-4 py-3 text-sm font-medium whitespace-nowrap text-theme-800 transition hover:bg-white disabled:opacity-50 lg:flex-none dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
                     @click="timer.leave()"
                   >
                     <ArrowRightStartOnRectangleIcon class="size-4" />
@@ -332,7 +334,9 @@ defineProps({
                   </div>
                 </div>
 
-                <div class="text-right lg:px-4 lg:text-center">
+                <div
+                  class="text-right lg:px-4 lg:text-center zoomed:max-sm:col-span-2 zoomed:max-sm:text-center"
+                >
                   <p
                     class="text-4xl leading-none font-bold text-theme-900 tabular-nums sm:text-6xl dark:text-zinc-100"
                     data-testid="study-room-your-countdown"

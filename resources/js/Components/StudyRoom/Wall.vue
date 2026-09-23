@@ -136,9 +136,10 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             class="block font-mono text-sm leading-tight font-semibold text-theme-800 tabular-nums dark:text-zinc-200"
             >{{ sky.clockTimeLabel() }}</span
           >
-          <span class="block text-[10px] text-theme-700 dark:text-zinc-400">{{
-            sky.clockDateLabel()
-          }}</span>
+          <span
+            class="block text-[0.625rem] text-theme-700 dark:text-zinc-400"
+            >{{ sky.clockDateLabel() }}</span
+          >
         </p>
       </div>
 
@@ -186,9 +187,9 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             aria-hidden="true"
           ></span>
 
-          <div class="flex items-center gap-3">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span class="text-2xl">👋</span>
-            <div class="min-w-0 flex-1">
+            <div class="min-w-32 flex-1">
               <p
                 class="text-sm font-semibold text-theme-900 dark:text-zinc-100"
               >
@@ -218,9 +219,9 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             aria-hidden="true"
           ></span>
 
-          <div class="flex items-center gap-3">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span class="text-2xl">{{ profile.emoji }}</span>
-            <div class="min-w-0 flex-1">
+            <div class="min-w-32 flex-1">
               <p
                 class="truncate text-sm font-semibold text-theme-900 dark:text-zinc-100"
               >
