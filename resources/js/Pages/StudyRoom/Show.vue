@@ -26,7 +26,9 @@ import PersonalInfoForm from '../../Components/StudyRoom/PersonalInfoForm.vue'
 import TableChair from '../../Components/StudyRoom/TableChair.vue'
 import Wall from '../../Components/StudyRoom/Wall.vue'
 import FloorSkeleton from '../../Components/StudyRoom/FloorSkeleton.vue'
+import LiveAnnouncer from '../../Components/StudyRoom/LiveAnnouncer.vue'
 import useSeatGrid from '../../Composables/useSeatGrid'
+import useStudyRoomAnnouncer from '../../Composables/useStudyRoomAnnouncer'
 import useStudyRoomDemo from '../../Composables/useStudyRoomDemo'
 import useStudyRoomMusic from '../../Composables/useStudyRoomMusic'
 import useStudyRoomProfile from '../../Composables/useStudyRoomProfile'
@@ -59,6 +61,7 @@ const grid = useSeatGrid(socket, props.clientConfig)
 const sky = useStudyRoomSky(props.clientConfig)
 const profile = useStudyRoomProfile(props.profile, props.emojiChoices)
 const music = useStudyRoomMusic()
+const announcer = useStudyRoomAnnouncer()
 
 // Only `supported` and `enable` are used. `disable()` would call
 // subscription.unsubscribe(), and a browser holds one subscription that the
@@ -80,6 +83,21 @@ const timer = useStudyTimer(
   profile,
   props.verbs,
   props.subjects
+)
+
+// Errors are shown on screen and also spoken, since a failed seat claim or
+// timer action otherwise leaves a screen-reader user waiting for nothing.
+watch(
+  () => [socket.errorMessage, timer.errorMessage],
+  ([seatError, timerError], [previousSeatError, previousTimerError]) => {
+    if (seatError && seatError !== previousSeatError) {
+      announcer.say(seatError, { assertive: true })
+    }
+
+    if (timerError && timerError !== previousTimerError) {
+      announcer.say(timerError, { assertive: true })
+    }
+  }
 )
 
 // Derived client-side, not from the initial server prop: the profile
@@ -187,7 +205,15 @@ onMounted(async () => {
   // overrides, injecting a realtime delta without a live Echo connection).
   // Exposed unconditionally since browser tests run against a built
   // (production) bundle. Never read by production code.
-  window.__studyRoomTest = { socket, timer, sky, profile, grid, music }
+  window.__studyRoomTest = {
+    socket,
+    timer,
+    sky,
+    profile,
+    grid,
+    music,
+    announcer,
+  }
 
   // Separate Vite entry (see resources/js/echo.js) so pages that don't need
   // realtime don't pay for pusher-js/laravel-echo — dynamically imported
@@ -307,6 +333,8 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
+
+      <LiveAnnouncer :announcer="announcer" />
 
       <div
         class="space-y-4"

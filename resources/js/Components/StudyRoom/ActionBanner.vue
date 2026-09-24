@@ -8,6 +8,7 @@ import {
   ArrowsPointingOutIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  ExclamationTriangleIcon,
   PauseIcon,
   PencilSquareIcon,
   PlayIcon,
@@ -125,6 +126,17 @@ defineProps({
               v-show="!minimized"
               class="relative max-h-[70dvh] overflow-y-auto overscroll-contain px-4 pt-0 pb-[calc(var(--safe-bottom)+1rem)] sm:px-6 sm:pt-6 sm:pb-[calc(var(--safe-bottom)+1.25rem)]"
             >
+              <!-- Spoken through the page's announcer; shown here so a
+              failed start/pause/leave isn't silent on screen either. -->
+              <p
+                v-if="timer.errorMessage"
+                class="mb-3 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+                data-testid="study-room-timer-error"
+              >
+                <ExclamationTriangleIcon class="size-4 shrink-0" />
+                <span>{{ timer.errorMessage }}</span>
+              </p>
+
               <!-- Not timing yet: pick activity/subject/mode, then start -->
               <div
                 v-show="!timer.hasTimer()"
