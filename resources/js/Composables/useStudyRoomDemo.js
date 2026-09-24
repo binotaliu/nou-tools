@@ -197,6 +197,7 @@ export default function useStudyRoomDemo(config) {
     applyDelta: noop,
     onStateChange,
     onSeatEvent: noop,
+    onSeatChange: noop,
     take,
     leave: noop,
     heartbeat: noop,

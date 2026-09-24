@@ -29,6 +29,7 @@ export default function useStudyRoomSocket(config) {
   let connectTimeoutHandle = null
   const onStateChangeCallbacks = []
   const onSeatEventCallbacks = []
+  const onSeatChangeCallbacks = []
 
   function onStateChange(callback) {
     onStateChangeCallbacks.push(callback)
@@ -39,6 +40,13 @@ export default function useStudyRoomSocket(config) {
   // the server let the seat go (idle release, admin clear).
   function onSeatEvent(callback) {
     onSeatEventCallbacks.push(callback)
+  }
+
+  // Someone else sat down or got up, as broadcast to the room: called with
+  // the seat after the change and a copy of it from before. Never fired for
+  // the viewer's own seat, nor for full refreshes.
+  function onSeatChange(callback) {
+    onSeatChangeCallbacks.push(callback)
   }
 
   function emitSeatEvent(type, code) {
@@ -201,6 +209,7 @@ export default function useStudyRoomSocket(config) {
     }
 
     const wasOccupied = target.isOccupied
+    const before = { ...target }
     const isHeldSeat = incomingSeat.code === heldSeatCode.value
 
     // The seat we hold was released out from under us (idle kick, admin
@@ -223,6 +232,12 @@ export default function useStudyRoomSocket(config) {
 
       if (floor) {
         floor.occupiedCount += target.isOccupied ? 1 : -1
+      }
+
+      if (!isHeldSeat) {
+        for (const callback of onSeatChangeCallbacks) {
+          callback(target, before)
+        }
       }
     }
   }
@@ -389,6 +404,7 @@ export default function useStudyRoomSocket(config) {
     applyDelta,
     onStateChange,
     onSeatEvent,
+    onSeatChange,
     take,
     leave,
     heartbeat,

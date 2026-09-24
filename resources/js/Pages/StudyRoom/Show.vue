@@ -40,12 +40,14 @@ import LiveAnnouncer from '../../Components/StudyRoom/LiveAnnouncer.vue'
 import useSeatGrid from '../../Composables/useSeatGrid'
 import useSeatRovingFocus from '../../Composables/useSeatRovingFocus'
 import useStudyRoomAnnouncer from '../../Composables/useStudyRoomAnnouncer'
+import useStudyRoomAnnouncements from '../../Composables/useStudyRoomAnnouncements'
 import useStudyRoomDemo from '../../Composables/useStudyRoomDemo'
 import useStudyRoomMusic from '../../Composables/useStudyRoomMusic'
 import useStudyRoomProfile from '../../Composables/useStudyRoomProfile'
 import usePushSubscription from '../../Composables/usePushSubscription'
 import useStudyRoomSky from '../../Composables/useStudyRoomSky'
 import useStudyRoomSocket from '../../Composables/useStudyRoomSocket'
+import useStudyRoomVoiceSettings from '../../Composables/useStudyRoomVoiceSettings'
 import useStudyTimer from '../../Composables/useStudyTimer'
 
 const props = defineProps({
@@ -96,6 +98,10 @@ const timer = useStudyTimer(
   props.verbs,
   props.subjects
 )
+
+const voiceSettings = useStudyRoomVoiceSettings()
+
+useStudyRoomAnnouncements({ socket, timer, announcer, settings: voiceSettings })
 
 // Errors are shown on screen and also spoken, since a failed seat claim or
 // timer action otherwise leaves a screen-reader user waiting for nothing.
@@ -304,6 +310,7 @@ onMounted(async () => {
     music,
     announcer,
     roving,
+    voiceSettings,
   }
 
   // Separate Vite entry (see resources/js/echo.js) so pages that don't need
@@ -615,6 +622,7 @@ onUnmounted(() => {
             :socket="socket"
             :grid="grid"
             :announcer="announcer"
+            :voice-settings="hasSchedule ? voiceSettings : null"
           />
 
           <SeatList

@@ -632,6 +632,30 @@ export default function useStudyTimer(
     return seat ? remainingLabel(seat) : ''
   }
 
+  // Everything the panel shows about your timer, as one sentence for the
+  // 朗讀目前狀態 accesskey.
+  function statusSentence() {
+    const seat = socket.mySeat()
+
+    if (!seat) {
+      return '你還沒有入座'
+    }
+
+    if (!seat.timerMode) {
+      return '你坐在 ' + seat.label + '，還沒開始計時'
+    }
+
+    return [
+      timerPhaseLabel(),
+      myActivityLabel(),
+      spokenTimerLabel(seat),
+      roundLabel(),
+      seat.label,
+    ]
+      .filter(Boolean)
+      .join('，')
+  }
+
   function formatDurationLabel(totalSeconds) {
     const hours = Math.floor(totalSeconds / 3600)
     const minutes = Math.floor((totalSeconds % 3600) / 60)
@@ -814,6 +838,7 @@ export default function useStudyTimer(
     mySeatLabel,
     myActivityLabel,
     myRemainingLabel,
+    statusSentence,
     formatDurationLabel,
     startTimer,
     stopTimer,

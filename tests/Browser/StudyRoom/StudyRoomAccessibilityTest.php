@@ -350,3 +350,94 @@ it('shows the room as a table in the list view and remembers the choice', functi
     // Leaving from the list returns focus to the seat's row.
     waitUntil($page, "document.activeElement?.dataset.seatCode === '1-S03'");
 });
+
+/**
+ * Takes seat 1-S01 and starts a default pomodoro.
+ */
+$sitAndStartTimer = function (mixed $page): mixed {
+    $page->keys('[data-testid="seat-1-S01"]', 'Enter');
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-start-timer"]\') !== null');
+    $page->keys('[data-testid="study-room-start-timer"]', 'Enter');
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-pause-timer'");
+
+    return $page;
+};
+
+it('announces your own timer changes', function () use ($enterStudyRoom, $sitAndStartTimer, $politeText) {
+    $page = $sitAndStartTimer($enterStudyRoom());
+
+    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.includes('開始專注')");
+
+    $page->keys('[data-testid="study-room-pause-timer"]', 'Enter');
+    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.trim() === '已暫停'");
+
+    $page->keys('[data-testid="study-room-resume-timer"]', 'Enter');
+    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.trim() === '已繼續'");
+
+    $page->keys('[data-testid="study-room-stop-timer"]', 'Enter');
+    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.trim() === '已結束計時'");
+
+    expect($page->script($politeText))->toBe('已結束計時');
+});
+
+it('announces the end of a focus round and, when asked, the time left', function () use ($enterStudyRoom, $sitAndStartTimer, $politeText) {
+    $page = $sitAndStartTimer($enterStudyRoom());
+
+    $page->click('[data-testid="study-room-voice-settings-toggle"]')
+        ->select('[data-testid="study-room-voice-interval"]', '5');
+
+    expect($page->script('localStorage.getItem("nou:study-room:announce-interval:v1")'))->toBe('5');
+
+    // Move the end just past a five-minute mark: the next minute boundary
+    // lands on 5 and is spoken.
+    $page->script('window.__studyRoomTest.socket.mySeat().timerEndsAt = new Date(Date.now() + 5 * 60000 + 1500).toISOString()');
+    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.trim() === '剩 5 分鐘'");
+
+    $page->script('window.__studyRoomTest.socket.mySeat().timerEndsAt = new Date(Date.now() + 1500).toISOString()');
+    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.includes('專注時間到')");
+
+    expect($page->script($politeText))->toContain('專注時間到');
+});
+
+$deltaFor = fn (string $code, int $seatNumber, ?string $nickname): string => 'window.__studyRoomTest.socket.applyDelta('.
+    '{openFloors: 1, totals: {occupantCount: 1, siteFocusSecondsToday: 0, yourFocusSecondsToday: 0}, version: "'.Str::random(6).'", seat: '.
+    json_encode([
+        'code' => $code,
+        'kind' => 'solo',
+        'groupCode' => null,
+        'seatNumber' => $seatNumber,
+        'label' => '1F 單人座 '.str_pad((string) $seatNumber, 2, '0', STR_PAD_LEFT),
+        'isOccupied' => $nickname !== null,
+        'isYou' => false,
+        'nickname' => $nickname,
+        'emoji' => $nickname ? '🦝' : null,
+        'activity' => null,
+        'timerMode' => null,
+        'timerPhase' => null,
+        'timerEndsAt' => null,
+        'timerStartedAt' => null,
+    ]).
+    '})';
+
+it('announces neighbours coming and going only when asked to', function () use ($enterStudyRoom, $politeText, $deltaFor) {
+    $page = $enterStudyRoom();
+
+    $page->keys('[data-testid="seat-1-S01"]', 'Enter');
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-verb-exam_prep'");
+
+    // Off by default: a neighbour sitting down stays silent.
+    $page->script($deltaFor('1-S02', 2, '浣熊'));
+    $page->script('new Promise(resolve => setTimeout(resolve, 3500))');
+    expect($page->script($politeText))->not->toContain('浣熊');
+
+    $page->click('[data-testid="study-room-voice-settings-toggle"]')
+        ->select('[data-testid="study-room-voice-room"]', 'neighbors');
+
+    $page->script($deltaFor('1-S02', 2, null));
+    // Not a neighbour of 1-S01, so left out of the sentence.
+    $page->script($deltaFor('1-S05', 5, '夜貓'));
+
+    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.includes('離開了')");
+
+    expect($page->script($politeText))->toBe('隔壁的 浣熊 離開了');
+});
