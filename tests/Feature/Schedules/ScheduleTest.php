@@ -31,6 +31,33 @@ it('returns JSON and creates schedule on application/json POST', function () {
     ]);
 });
 
+it('redirects instead of returning JSON when an Inertia request creates or updates a schedule', function () {
+    $courseClass = CourseClass::factory()->create();
+
+    $payload = [
+        'name' => 'Inertia 課表',
+        'term' => '2025B',
+        'items' => [
+            ['course_id' => $courseClass->course_id, 'class_id' => $courseClass->id],
+        ],
+    ];
+
+    $headers = ['X-Inertia' => 'true', 'Accept' => 'application/json'];
+
+    $schedule = null;
+
+    $this->withHeaders($headers)->post(route('schedules.store'), $payload)
+        ->assertRedirect()
+        ->assertSessionHas('success', '課表已保存！')
+        ->assertCookie('student_schedule');
+
+    $schedule = StudentSchedule::where('name', 'Inertia 課表')->firstOrFail();
+
+    $this->withHeaders($headers)->put(route('schedules.update', $schedule), $payload)
+        ->assertRedirect(route('schedules.show', [$schedule, 'term' => '2025B']))
+        ->assertSessionHas('success', '課表已更新！');
+});
+
 it('allows creating multiple schedules', function () {
     $courseClass = CourseClass::factory()->create();
 

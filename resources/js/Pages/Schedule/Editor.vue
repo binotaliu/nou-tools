@@ -2,17 +2,8 @@
 // Serves both the create ('/schedules/create') and edit
 // ('/schedules/{schedule}/edit') routes, since
 // ScheduleController::create()/edit() share this one view.
-//
-// The submit form is a real (non-Inertia) POST/PUT, not useForm(): the
-// controller's store()/update() actions branch on `$request->wantsJson()`
-// for a non-Inertia JSON API consumer (exercised directly by
-// tests/Feature/ScheduleTest.php's postJson/putJson assertions), and
-// Inertia's own XHR requests would risk tripping that branch. A native
-// form submit (Accept: text/html) always takes the redirect path. Mirrors
-// how LearningProgress/Show.vue's progress form avoids Inertia's request
-// cycle for the same class of reason.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
+import { Head, Link, router, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 
@@ -65,7 +56,6 @@ const searchQuery = ref('')
 const filteredCourses = ref([])
 const showResults = ref(false)
 const scheduleName = ref(props.viewModel.scheduleName ?? '')
-const submitting = ref(false)
 
 const selectedItems = ref(
   (props.viewModel.selectedItems ?? []).flatMap(item => {
@@ -174,7 +164,7 @@ onUnmounted(() =>
   document.removeEventListener('click', closeDropdownOnOutsideClick)
 )
 
-const formRef = ref(null)
+const form = useForm({})
 
 function submitForm() {
   if (selectedItems.value.length === 0) {
@@ -195,14 +185,17 @@ function submitForm() {
     return
   }
 
-  submitting.value = true
-  formRef.value.submit()
+  form
+    .transform(() => ({
+      term: props.viewModel.selectedTerm,
+      name: scheduleName.value,
+      items: selectedItems.value.map(item => ({
+        course_id: item.course.id,
+        ...(item.selectedClassId ? { class_id: item.selectedClassId } : {}),
+      })),
+    }))
+    .submit(editing.value ? 'put' : 'post', formAction.value)
 }
-
-const csrfToken =
-  typeof document !== 'undefined'
-    ? (document.querySelector('meta[name="csrf-token"]')?.content ?? '')
-    : ''
 </script>
 
 <template>
@@ -541,16 +534,9 @@ const csrfToken =
 
       <!-- Submit Section -->
       <form
-        ref="formRef"
-        :action="formAction"
-        method="POST"
         class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         @submit.prevent="submitForm"
       >
-        <input type="hidden" name="_token" :value="csrfToken" />
-        <input v-if="editing" type="hidden" name="_method" value="PUT" />
-        <input type="hidden" name="term" :value="viewModel.selectedTerm" />
-
         <div class="mb-4">
           <label
             class="mb-1 block text-xl font-semibold text-theme-900 dark:text-zinc-100"
@@ -568,28 +554,14 @@ const csrfToken =
           />
         </div>
 
-        <span v-for="(item, index) in selectedItems" :key="item.course.id">
-          <input
-            type="hidden"
-            :name="'items[' + index + '][course_id]'"
-            :value="item.course.id"
-          />
-          <input
-            v-if="item.selectedClassId"
-            type="hidden"
-            :name="'items[' + index + '][class_id]'"
-            :value="item.selectedClassId"
-          />
-        </span>
-
         <div class="flex gap-4">
           <button
             type="submit"
             data-testid="schedule-submit"
-            :disabled="selectedItems.length === 0 || submitting"
+            :disabled="selectedItems.length === 0 || form.processing"
             class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-6 py-3 text-lg font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
           >
-            <span v-if="!submitting">{{ submitLabel }}</span>
+            <span v-if="!form.processing">{{ submitLabel }}</span>
             <span v-else>{{ submittingLabel }}</span>
           </button>
           <Link

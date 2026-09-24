@@ -42,7 +42,7 @@ final class ScheduleController extends Controller
         $schedule = $createSchedule($input);
         $cookie = $buildStudentScheduleCookie($schedule);
 
-        if ($request->wantsJson() || $request->isJson()) {
+        if (! $request->header('X-Inertia') && ($request->wantsJson() || $request->isJson())) {
             return response()->json([
                 'success' => true,
                 'redirect_url' => route('schedules.show', $schedule),
@@ -59,7 +59,7 @@ final class ScheduleController extends Controller
         $schedule = $updateSchedule($schedule, $input);
         $cookie = $buildStudentScheduleCookie($schedule);
 
-        if ($request->wantsJson() || $request->isJson()) {
+        if (! $request->header('X-Inertia') && ($request->wantsJson() || $request->isJson())) {
             return response()->json([
                 'success' => true,
                 'redirect_url' => route('schedules.show', [$schedule, 'term' => $input->term]),
