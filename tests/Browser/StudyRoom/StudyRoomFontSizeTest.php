@@ -23,7 +23,7 @@ it('keeps the nameplate and control panel usable at the largest text size on a p
 
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')

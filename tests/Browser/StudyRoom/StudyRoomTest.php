@@ -81,7 +81,7 @@ it('lets a student remember their schedule, set a profile, take a seat, and star
 
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -149,7 +149,7 @@ it('prepends the countdown and phase to the tab title, and swaps the favicon, on
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -247,7 +247,7 @@ it('lets a student tune their pomodoro cycle and walks them through break and ne
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -341,7 +341,7 @@ it('opens a fullscreen focus mode over the sky and leaves it when the timer stop
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -478,7 +478,7 @@ it('minimizes the action banner to a slim bar and expands it again', function ()
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -528,7 +528,7 @@ it('shows the PersonalInfo modal for editing nickname/emoji, without the session
 
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -559,7 +559,7 @@ it('shows the Stats modal with the 7-day chart and an empty-state log when opene
 
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -600,7 +600,7 @@ it('shows a connection-error message once the room gives up on a realtime connec
 
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     // Let any real Reverb connection this environment can make finish
     // settling first, so setting the flags below isn't immediately
@@ -622,7 +622,7 @@ it('shows a popover with nickname and activity for an occupied table seat, and o
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -657,7 +657,7 @@ it('formats a seat timer as mm:ss under an hour and h:mm:ss from an hour onward'
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -691,7 +691,7 @@ it('updates a floor\'s occupied count live and closes it once its last occupant 
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -762,7 +762,7 @@ it('clears the held-seat highlight and action banner once a realtime delta relea
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -831,7 +831,7 @@ it('keeps your own focus total intact when a realtime delta broadcasts for someo
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     StudyRoomSession::factory()->create([
         'student_schedule_id' => $schedule->id,
@@ -890,7 +890,7 @@ it('draws the garden and windows from the real Taiwan sky, day and night', funct
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')
@@ -997,7 +997,7 @@ it('pauses and resumes a running timer, freezing the countdown while paused', fu
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'))
         ->assertVisible('[data-testid="study-room-profile-form"]')

@@ -36,7 +36,7 @@ $enterStudyRoom = function (): mixed {
     $page->script('navigator.serviceWorker.ready');
     $page->assertVisible('[data-testid="remember-schedule-modal"]')
         ->click('[data-testid="remember-schedule-confirm"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('study-room.show'));
 

@@ -84,8 +84,7 @@ it('hides the hero from visitors who already saved a schedule', function () {
     $page->script('navigator.serviceWorker.ready');
 
     $page->click('[data-testid="remember-schedule-confirm"]')
-        ->assertMissing('[data-testid="remember-schedule-modal"]')
-        ->waitForEvent('load');
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
 
     $page->navigate(route('home'))
         ->assertSee('Hero Hidden Schedule')
