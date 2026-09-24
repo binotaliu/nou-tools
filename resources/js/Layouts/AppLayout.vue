@@ -5,7 +5,7 @@
 //
 // Nav active-state checks use Inertia's `usePage().url`, matched against
 // route paths (there is no Ziggy route() helper on the frontend).
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import BottomNav from '../Components/BottomNav.vue'
 import CookieConsentBanner from '../Components/CookieConsentBanner.vue'
@@ -20,6 +20,18 @@ const currentPath = computed(() => page.url.split('?')[0])
 // `flash.success` is shared by HandleInertiaRequests; `errors` is Inertia's
 // own default shared prop.
 const successMessage = computed(() => page.props.flash?.success ?? null)
+
+// Every Inertia response replaces `flash`/`errors` with new objects, even when
+// the text is identical. A toast hides itself after a few seconds, so without
+// a per-response key a repeat of the same message (saving twice on one page)
+// would reuse the already-hidden component and never show again.
+const toastKey = ref(0)
+watch(
+  () => [page.props.flash, page.props.errors],
+  () => {
+    toastKey.value++
+  }
+)
 const firstErrorMessage = computed(() => {
   const errors = page.props.errors ?? {}
   const keys = Object.keys(errors)
@@ -331,6 +343,7 @@ const bottomMoreItems = computed(() =>
     <!-- flash notifications use slide-in toasts instead of the old alert box -->
     <Notification
       v-if="successMessage"
+      :key="`success-${toastKey}`"
       type="success"
       :message="successMessage"
       class="print:hidden"
@@ -339,6 +352,7 @@ const bottomMoreItems = computed(() =>
     <!-- show first error only in toast; the page can still display the full list if needed -->
     <Notification
       v-if="firstErrorMessage"
+      :key="`error-${toastKey}`"
       type="error"
       :message="firstErrorMessage"
       class="print:hidden"
