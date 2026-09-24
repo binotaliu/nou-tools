@@ -500,3 +500,20 @@ it('toggles the timer, reads the status and jumps to your seat from the accesske
 
     expect($page->script($activeTestId))->toBe('study-room-control-panel-heading');
 });
+
+it('labels the nameplate, the change-activity button and the board heading', function () use ($enterStudyRoom, $sitAndStartTimer) {
+    $page = $sitAndStartTimer($enterStudyRoom());
+
+    $page->assertAttribute('[data-testid="study-room-change-activity-open"]', 'aria-label', '變更活動')
+        ->assertSeeIn('[data-testid="study-room-announcement"] h3', '公告板')
+        ->assertSourceInHas('[data-testid="study-room-personal-info"]', '你的暱稱：');
+
+    // The radio labels show a ring when their sr-only input has keyboard focus.
+    $page->script("document.querySelector('[data-testid=\"study-room-change-activity-open\"]').click()");
+    $page->keys('[data-testid="study-room-change-verb-reading"]', 'Space');
+
+    $ring = $page->script(
+        "getComputedStyle(document.querySelector('[data-testid=\"study-room-change-verb-reading\"]').closest('label')).boxShadow"
+    );
+    expect($ring)->not->toBe('none');
+});

@@ -50,7 +50,7 @@ function iconFor(value) {
       <label
         v-for="verb in verbs"
         :key="verb.value"
-        class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-theme-200 bg-white px-1 py-2.5 text-center transition has-checked:border-theme-700 has-checked:bg-theme-700 has-checked:text-white sm:gap-1.5 sm:px-3 sm:py-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:has-checked:border-theme-500 dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950"
+        class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-theme-200 bg-white px-1 py-2.5 text-center transition has-checked:border-theme-700 has-checked:bg-theme-700 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-theme-500 has-focus-visible:ring-offset-2 sm:gap-1.5 sm:px-3 sm:py-3 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:has-checked:border-theme-500 dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950 dark:has-focus-visible:ring-offset-zinc-900"
       >
         <input
           type="radio"

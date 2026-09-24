@@ -281,7 +281,7 @@ defineProps({
                           aria-label="計時方式"
                         >
                           <label
-                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950"
+                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-theme-500 has-focus-visible:ring-offset-2 dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950 dark:has-focus-visible:ring-offset-zinc-900"
                           >
                             <input
                               v-model="timer.timerMode"
@@ -293,7 +293,7 @@ defineProps({
                             番茄鐘
                           </label>
                           <label
-                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950"
+                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-theme-500 has-focus-visible:ring-offset-2 dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950 dark:has-focus-visible:ring-offset-zinc-900"
                           >
                             <input
                               v-model="timer.timerMode"
@@ -305,7 +305,7 @@ defineProps({
                             倒數
                           </label>
                           <label
-                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950"
+                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-theme-500 has-focus-visible:ring-offset-2 dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950 dark:has-focus-visible:ring-offset-zinc-900"
                           >
                             <input
                               v-model="timer.timerMode"
@@ -410,6 +410,7 @@ defineProps({
                         type="button"
                         class="inline-flex shrink-0 items-center rounded-lg p-1 text-theme-700 transition hover:bg-white hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
                         title="變更活動"
+                        aria-label="變更活動"
                         data-testid="study-room-change-activity-open"
                         @click="timer.openChangeActivity()"
                       >

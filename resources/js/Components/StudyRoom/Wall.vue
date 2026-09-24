@@ -162,11 +162,11 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
               aria-hidden="true"
             ></span>
 
-            <h2
+            <h3
               class="mb-1.5 text-sm font-semibold text-theme-900 dark:text-zinc-100"
             >
               公告板
-            </h2>
+            </h3>
             <!-- eslint-disable-next-line vue/no-v-html -->
             <div
               ref="announcementRoot"
@@ -220,15 +220,16 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
           ></span>
 
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span class="text-2xl">{{ profile.emoji }}</span>
+            <span class="text-2xl" aria-hidden="true">{{ profile.emoji }}</span>
             <div class="min-w-32 flex-1">
               <p
                 class="truncate text-sm font-semibold text-theme-900 dark:text-zinc-100"
               >
+                <span class="sr-only">你的暱稱：</span>
                 {{ profile.nickname || '尚未設定暱稱' }}
               </p>
               <p class="text-xs text-theme-700 dark:text-zinc-400">
-                今天專注了
+                <span class="sr-only">你</span>今天專注了
                 {{ profile.formatDurationLabel(yourFocusSecondsToday) }}
               </p>
             </div>
