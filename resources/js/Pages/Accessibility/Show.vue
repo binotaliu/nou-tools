@@ -23,6 +23,14 @@ const scheduleKeys = [
   { key: '7', target: '選擇學期' },
 ]
 
+const studyRoomKeys = [
+  { key: '4', target: '快速入座；已入座時移到你的控制列' },
+  { key: '5', target: '開始、暫停或繼續計時（已入座時）' },
+  { key: '6', target: '座位表：移到你的座位，或一樓目前的座位' },
+  { key: '7', target: '朗讀目前的計時狀態（已入座時）' },
+  { key: '8', target: '全螢幕專注（計時中）' },
+]
+
 const searchKeys = [
   { key: '8', target: '搜尋欄（本學期開課表、優惠店家、建立與編輯課表）' },
 ]
@@ -197,6 +205,38 @@ onMounted(() => {
         <h5
           class="mt-4 text-sm font-semibold text-theme-800 dark:text-zinc-100"
         >
+          自習室
+        </h5>
+        <table
+          class="mt-2 w-full text-left text-sm"
+          data-testid="accessibility-study-room-keys"
+        >
+          <caption class="sr-only">
+            自習室的快速鍵
+          </caption>
+          <thead class="sr-only">
+            <tr>
+              <th scope="col">數字</th>
+              <th scope="col">位置</th>
+            </tr>
+          </thead>
+          <tbody class="text-theme-900 dark:text-zinc-100">
+            <tr
+              v-for="row in studyRoomKeys"
+              :key="row.key"
+              class="border-t border-theme-100 dark:border-zinc-800"
+            >
+              <th scope="row" class="w-12 py-2 pr-4 font-mono font-semibold">
+                {{ row.key }}
+              </th>
+              <td class="py-2">{{ row.target }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h5
+          class="mt-4 text-sm font-semibold text-theme-800 dark:text-zinc-100"
+        >
           有搜尋欄的頁面
         </h5>
         <table
@@ -247,8 +287,40 @@ onMounted(() => {
           </li>
           <li>選單、彈出視窗與對話框都可以按 Esc 關閉。</li>
           <li>
-            自習室的每個座位都是按鈕，可用 Tab 移動、Enter
-            或空白鍵入座；座位名稱會說明樓層、桌號與是否有人。
+            自習室的座位每層樓只占一個 Tab 位置，進去後用方向鍵移動、Enter
+            或空白鍵入座，詳見下方「自習室」。
+          </li>
+        </ul>
+      </section>
+
+      <section
+        class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        data-testid="accessibility-study-room"
+        aria-labelledby="study-room-heading"
+      >
+        <h3
+          id="study-room-heading"
+          class="text-lg font-semibold text-theme-800 dark:text-zinc-100"
+        >
+          自習室
+        </h3>
+        <ul
+          class="mt-3 list-disc space-y-2 pl-5 text-sm text-theme-700 dark:text-zinc-300"
+        >
+          <li>
+            每層樓的座位是一組：左右方向鍵逐一移動，上下方向鍵換到上一排或下一排，Home、End
+            到第一個或最後一個座位。有人的座位也能停留，名稱會說出暱稱、在讀什麼和剩下幾分鐘。
+          </li>
+          <li>
+            「快速入座」會直接幫你坐進第一個空位。入座後焦點會移到下方的控制列，離開座位後回到原本的座位。
+          </li>
+          <li>
+            「清單」會把座位改成表格，一層樓一個表格，可以只看有人或空位的座位，每列都有入座按鈕。你的選擇會記在這個瀏覽器。
+          </li>
+          <li>
+            開始、暫停、休息、時間到與座位被釋放都會自動念出來。「語音提示」可以另外開啟每
+            5、10 或 15
+            分鐘報一次剩餘時間，以及鄰座、同桌或同一樓層有人入座或離開時的提示，預設都是關閉的。
           </li>
         </ul>
       </section>
@@ -306,7 +378,6 @@ onMounted(() => {
         <ul
           class="mt-3 list-disc space-y-2 pl-5 text-sm text-theme-700 dark:text-zinc-300"
         >
-          <li>自習室座位按鈕的名稱較長，座位很多時逐一瀏覽會比較花時間。</li>
           <li>Cookie 提示列位於頁尾之後，不在任何地標之內。</li>
           <li>以「加到主畫面」方式安裝的手機版沒有頁首與第一層標題。</li>
         </ul>
