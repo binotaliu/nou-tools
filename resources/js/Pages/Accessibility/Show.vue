@@ -8,10 +8,9 @@ import AppLayout from '../../Layouts/AppLayout.vue'
 
 const globalKeys = [
   { key: '0', target: '無障礙說明（本頁）' },
-  { key: '1', target: '首頁' },
-  { key: '2', target: '跳到主要區塊' },
-  { key: '3', target: '我的課表' },
-  { key: '9', target: '外觀與文字大小設定' },
+  { key: '1', target: '跳到主要區塊' },
+  { key: '2', target: '我的課表' },
+  { key: '3', target: '外觀與文字大小設定' },
 ]
 
 const scheduleKeys = [
@@ -226,10 +225,6 @@ onMounted(() => {
             </tr>
           </tbody>
         </table>
-
-        <p class="mt-4 text-xs text-theme-700 dark:text-zinc-400">
-          以「加到主畫面」方式安裝的手機版沒有頁首，因此只有 0、2、3 可以使用。
-        </p>
       </section>
 
       <section

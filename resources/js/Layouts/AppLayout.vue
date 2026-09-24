@@ -159,7 +159,7 @@ const bottomMoreItems = computed(() =>
 <template>
   <a
     href="#main-content"
-    accesskey="2"
+    accesskey="1"
     class="skip-link absolute top-auto -left-100 z-999 bg-transparent px-2 py-1 focus:top-0 focus:left-0 focus:bg-white focus:text-theme-900 focus:ring-2 focus:ring-theme-500 dark:focus:bg-zinc-900 dark:focus:text-zinc-100"
   >
     跳到主要區塊
@@ -178,7 +178,7 @@ const bottomMoreItems = computed(() =>
        already reachable. -->
   <Link
     href="/schedules/my"
-    accesskey="3"
+    accesskey="2"
     tabindex="-1"
     aria-hidden="true"
     data-testid="accesskey-my-schedule"
@@ -200,7 +200,7 @@ const bottomMoreItems = computed(() =>
             name="book-open"
             class="size-5 shrink-0 text-theme-700 md:size-6 dark:text-zinc-300"
           />
-          <Link href="/" accesskey="1" class="shrink-0">NOU 小幫手</Link>
+          <Link href="/" class="shrink-0">NOU 小幫手</Link>
         </h1>
 
         <div class="flex min-h-9.5 items-center gap-2">

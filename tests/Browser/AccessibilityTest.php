@@ -32,14 +32,13 @@ it('assigns each global accesskey to one element', function () {
 
     expect($keys)->toBe([
         '0' => '/accessibility',
-        '1' => '/',
-        '2' => '#main-content',
-        '3' => '/schedules/my',
-        '9' => 'theme-switcher-toggle',
+        '1' => '#main-content',
+        '2' => '/schedules/my',
+        '3' => 'theme-switcher-toggle',
     ]);
 
     $count = $page->script("document.querySelectorAll('[accesskey]').length");
-    expect($count)->toBe(5);
+    expect($count)->toBe(4);
 });
 
 it('names the header navigation and lets the skip link land on main', function () {
@@ -80,12 +79,12 @@ it('puts accesskey 8 on the course search field of the schedule editor', functio
         ->assertPresent('input#course-search[accesskey="8"]');
 });
 
-it('keeps accesskey 3 usable when the header nav is collapsed', function () {
+it('keeps accesskey 2 usable when the header nav is collapsed', function () {
     $page = visit('/')->resize(390, 844);
 
     $page->assertNoJavaScriptErrors()
         ->assertPresent('[data-testid="footer-accessibility-link"]')
-        ->assertPresent('a[data-testid="accesskey-my-schedule"][accesskey="3"][tabindex="-1"]');
+        ->assertPresent('a[data-testid="accesskey-my-schedule"][accesskey="2"][tabindex="-1"]');
 
     expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"header-nav\"]')).display"))->toBe('none');
 });
