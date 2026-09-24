@@ -57,6 +57,7 @@ $occupySeatBehindThePagesBack = function (string $code, string $nickname = '浣�
     StudyRoomProfile::factory()->create([
         'student_schedule_id' => $other->id,
         'nickname' => $nickname,
+        'emoji' => '🦝',
     ]);
 
     StudyRoomSeat::query()->where('code', $code)->update([
@@ -327,6 +328,24 @@ it('shows the room as a table in the list view and remembers the choice', functi
         ->assertSeeIn('[data-testid="study-room-list-floor-1"] caption', '一樓')
         ->assertSeeIn('[data-testid="study-room-list-row-1-S02"]', '浣熊')
         ->assertMissing('[data-testid="study-room-list-take-1-S02"]');
+
+    // Twemoji's image would be read as 「圖像」, so it is hidden and an sr-only
+    // twin speaks the character instead.
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-list-row-1-S02"] img.emoji\') !== null');
+
+    $emoji = $page->script(<<<'JS'
+        (() => {
+            const image = document.querySelector('[data-testid="study-room-list-row-1-S02"] img.emoji')
+            const twin = image.nextElementSibling
+            return {
+                hidden: image.getAttribute('aria-hidden'),
+                twin: twin.matches('.sr-only') ? twin.dataset.emojiText : null,
+                spoken: getComputedStyle(twin, '::before').content,
+            }
+        })()
+        JS);
+
+    expect($emoji)->toBe(['hidden' => 'true', 'twin' => '🦝', 'spoken' => '"🦝"']);
 
     $page->click('[data-testid="study-room-seat-list-filter-occupied"]');
 
