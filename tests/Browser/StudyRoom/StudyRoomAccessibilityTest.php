@@ -517,3 +517,20 @@ it('labels the nameplate, the change-activity button and the board heading', fun
     );
     expect($ring)->not->toBe('none');
 });
+
+it('exposes the seats as a 座位表 landmark with the floors as headings under it', function () use ($enterStudyRoom) {
+    $page = $enterStudyRoom();
+
+    $landmark = $page->script(<<<'JS'
+        (() => {
+            const region = document.querySelector('section[data-testid="study-room-seats"]')
+            return document.getElementById(region.getAttribute('aria-labelledby'))?.textContent.trim()
+        })()
+        JS);
+
+    expect($landmark)->toBe('座位表')
+        ->and($page->script("document.querySelector('[data-testid=\"study-room-seats\"]').contains(document.querySelector('[data-testid=\"study-room-toolbar\"]'))"))->toBeTrue()
+        ->and($page->script("document.getElementById('study-room-floor-heading-1').tagName"))->toBe('H4');
+
+    $page->assertAttribute('[data-testid="study-room-toolbar"]', 'aria-label', '座位工具');
+});

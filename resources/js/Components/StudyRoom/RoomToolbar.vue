@@ -75,6 +75,8 @@ const viewButtonClass =
 
 <template>
   <div
+    role="group"
+    aria-label="座位工具"
     class="flex flex-wrap items-center justify-between gap-3"
     data-testid="study-room-toolbar"
   >

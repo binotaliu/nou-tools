@@ -622,8 +622,15 @@ onUnmounted(() => {
           :seats-per-table="clientConfig.seatsPerTable"
         />
 
-        <div v-show="!needsProfile && socket.state" class="space-y-6">
-          <h3 class="sr-only">座位表</h3>
+        <!-- A landmark, so VoiceOver's rotor and other landmark lists can jump
+        straight to the seats (with their toolbar) past the wall and board. -->
+        <section
+          v-show="!needsProfile && socket.state"
+          class="space-y-6"
+          aria-labelledby="study-room-seats-heading"
+          data-testid="study-room-seats"
+        >
+          <h3 id="study-room-seats-heading" class="sr-only">座位表</h3>
 
           <RoomToolbar
             v-model:view="view"
@@ -654,7 +661,7 @@ onUnmounted(() => {
               :data-testid="'study-room-floor-' + floor.floor"
             >
               <div class="flex items-end justify-between px-1">
-                <h3
+                <h4
                   :id="'study-room-floor-heading-' + floor.floor"
                   class="flex items-center gap-2 text-lg font-semibold text-theme-900 dark:text-zinc-100"
                 >
@@ -663,7 +670,7 @@ onUnmounted(() => {
                     class="text-sm font-normal text-theme-700 dark:text-zinc-400"
                     >閱覽室</span
                   >
-                </h3>
+                </h4>
                 <span
                   class="inline-flex items-center gap-1.5 rounded-full bg-theme-100 px-2.5 py-1 text-xs text-theme-700 tabular-nums dark:bg-zinc-800 dark:text-zinc-300"
                 >
@@ -980,7 +987,7 @@ onUnmounted(() => {
               </li>
             </ul>
           </template>
-        </div>
+        </section>
 
         <ActionBanner
           v-if="hasSchedule"
