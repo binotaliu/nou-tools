@@ -11,7 +11,7 @@
 // link that isn't easily overridden per-page without risking a
 // duplicate/conflicting <link> tag.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { Head, Link } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import Greeting from '../../Components/Greeting.vue'
@@ -70,10 +70,11 @@ const props = defineProps({
   },
 })
 
-const csrfToken =
-  typeof document !== 'undefined'
-    ? (document.querySelector('meta[name="csrf-token"]')?.content ?? '')
-    : ''
+const rememberForm = useForm({})
+
+function rememberSchedule() {
+  rememberForm.post(`/schedules/${props.viewModel.uuid}/remember`)
+}
 
 // Port of the Str::toSemesterDisplay()/toShortSemesterDisplay() macros
 // (app/Providers/AppServiceProvider.php).
@@ -452,11 +453,9 @@ function localHint(next) {
             </p>
 
             <form
-              method="POST"
-              :action="`/schedules/${viewModel.uuid}/remember`"
               class="flex justify-end gap-2"
+              @submit.prevent="rememberSchedule"
             >
-              <input type="hidden" name="_token" :value="csrfToken" />
               <button
                 type="button"
                 data-testid="remember-schedule-dismiss"
@@ -469,6 +468,7 @@ function localHint(next) {
               </button>
               <button
                 type="submit"
+                :disabled="rememberForm.processing"
                 data-testid="remember-schedule-confirm"
                 data-analytics-event="remember_schedule_confirm"
                 data-analytics-feature="schedule"
