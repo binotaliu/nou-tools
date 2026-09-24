@@ -213,7 +213,25 @@ it('hides the page footer in a phone PWA while About carries the disclaimer and 
         ->assertSee('給 NOU 同學的非官方小工具')
         ->assertVisible('[data-testid="about-disclaimer"]')
         ->assertVisible('[data-testid="about-contact"]')
-        ->assertSee('nou-tools-contact@binota.org');
+        ->assertPresent('[data-testid="about-link-contact"][href="mailto:nou-tools-contact@binota.org"]')
+        ->assertVisible('[data-testid="about-link-accessibility"][href="/accessibility"]')
+        ->assertVisible('[data-testid="about-link-status"]');
+});
+
+it('links the accessibility page from About instead of the more sheet', function () use ($enterPwaMode, $linkTexts) {
+    $page = visit('/about')->resize(...PHONE);
+
+    $page->assertVisible('[data-testid="about-link-install"]');
+
+    $enterPwaMode($page);
+
+    $page->assertMissing('[data-testid="about-link-install"]')
+        ->assertVisible('[data-testid="about-link-accessibility"]')
+        ->click('[data-testid="bottom-nav-more"]');
+
+    expect($linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))
+        ->toContain('關於本站')
+        ->not->toContain('無障礙說明');
 });
 
 it('drops the About page title and subtitle in a phone PWA but keeps the brand block', function () use ($enterPwaMode) {

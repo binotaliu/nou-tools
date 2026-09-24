@@ -9,6 +9,12 @@ import Icon from '../../Components/Icon.vue'
 import useAnalyticsConsent from '../../Composables/useAnalyticsConsent'
 
 const { granted, toggle, error } = useAnalyticsConsent()
+
+// The footer's links as bordered buttons: in a phone PWA the footer is hidden
+// and this page is where they live (see BottomNav.vue).
+const linkButtonClass =
+  'inline-flex items-center justify-center gap-2 rounded-lg border border-theme-300 bg-theme-50 px-3 py-2 text-sm font-medium text-theme-800 transition-colors hover:border-theme-400 hover:bg-theme-100 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-500 dark:hover:bg-zinc-700'
+const linkIconClass = 'size-4 shrink-0 text-theme-700 dark:text-zinc-200'
 </script>
 
 <template>
@@ -71,32 +77,60 @@ const { granted, toggle, error } = useAnalyticsConsent()
         <h3 class="text-lg font-semibold text-theme-800 dark:text-zinc-100">
           聯絡與相關連結
         </h3>
-        <ul class="mt-3 space-y-2 text-sm text-theme-700 dark:text-zinc-300">
-          <li>
-            <Link
-              href="/changelog"
-              class="underline hover:text-theme-900 dark:hover:text-zinc-100"
-              >更新日誌</Link
-            >
-          </li>
-          <li>
-            聯絡作者：
-            <a
-              href="mailto:nou-tools-contact@binota.org"
-              class="underline hover:text-theme-900 dark:hover:text-zinc-100"
-              >nou-tools-contact@binota.org</a
-            >
-          </li>
-          <li>
-            <a
-              href="https://kuma.binota.org/status/nou"
-              class="underline hover:text-theme-900 dark:hover:text-zinc-100"
-              target="_blank"
-              rel="noopener noreferrer"
-              >學校網站狀態</a
-            >
-          </li>
-        </ul>
+        <div class="mt-4 grid gap-2 sm:grid-cols-2">
+          <a
+            href="mailto:nou-tools-contact@binota.org"
+            :class="linkButtonClass"
+            data-testid="about-link-contact"
+          >
+            <Icon name="envelope" :class="linkIconClass" />
+            聯絡作者
+          </a>
+          <Link
+            href="/accessibility"
+            :class="linkButtonClass"
+            data-testid="about-link-accessibility"
+          >
+            <Icon name="eye" :class="linkIconClass" />
+            無障礙說明
+          </Link>
+          <Link
+            href="/changelog"
+            :class="linkButtonClass"
+            data-testid="about-link-changelog"
+          >
+            <Icon name="sparkles" :class="linkIconClass" />
+            更新日誌
+          </Link>
+          <Link
+            href="/install"
+            :class="[linkButtonClass, 'pwa:hidden']"
+            data-testid="about-link-install"
+          >
+            <Icon name="device-phone-mobile" :class="linkIconClass" />
+            安裝 NOU 小幫手
+          </Link>
+          <a
+            href="https://kuma.binota.org/status/nou"
+            :class="linkButtonClass"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="about-link-status"
+          >
+            <Icon name="computer-desktop" :class="linkIconClass" />
+            學校網站狀態
+          </a>
+          <a
+            href="https://github.com/binotaliu/nou-tools"
+            :class="linkButtonClass"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="about-link-source"
+          >
+            <Icon name="code-bracket" :class="linkIconClass" />
+            網站原始碼
+          </a>
+        </div>
       </section>
 
       <section

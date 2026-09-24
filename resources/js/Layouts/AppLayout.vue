@@ -142,12 +142,6 @@ const bottomMoreItems = computed(() =>
       label: '關於本站',
       icon: 'information-circle',
     },
-    {
-      href: '/accessibility',
-      prefix: '/accessibility',
-      label: '無障礙說明',
-      icon: 'eye',
-    },
   ].map(item => ({
     ...item,
     active:
