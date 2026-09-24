@@ -82,6 +82,7 @@ useMarkdownContainers(sidebarContentRoot, [
             <nav
               v-if="viewModel.sidebarContent"
               ref="sidebarContentRoot"
+              :aria-label="typeLabel"
               class="prose prose-sm max-w-none prose-theme dark:prose-invert"
               v-html="viewModel.sidebarContent"
             ></nav>
@@ -101,7 +102,7 @@ useMarkdownContainers(sidebarContentRoot, [
         </aside>
 
         <!-- Main Content -->
-        <main class="min-w-0 flex-1">
+        <div class="min-w-0 flex-1">
           <article
             class="rounded-lg border border-theme-200 bg-white p-8 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
           >
@@ -177,7 +178,7 @@ useMarkdownContainers(sidebarContentRoot, [
               </div>
             </footer>
           </article>
-        </main>
+        </div>
       </div>
     </div>
   </AppLayout>

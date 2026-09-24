@@ -49,3 +49,33 @@ it('names the header navigation and lets the skip link land on main', function (
         ->assertPresent('nav[aria-label="主要導覽"][data-testid="header-nav"]')
         ->assertPresent('main#main-content[tabindex="-1"]');
 });
+
+it('renders a single main landmark on article pages', function () {
+    $page = visit('/kb/about-nou');
+
+    $page->assertNoJavaScriptErrors()
+        ->assertPresent('[data-testid="article-share-button"]');
+
+    expect($page->script("document.querySelectorAll('main').length"))->toBe(1);
+});
+
+it('puts accesskey 8 on the search field of the course schedule page', function () {
+    $page = visit('/courses/schedule');
+
+    $page->assertNoJavaScriptErrors()
+        ->assertPresent('input#search[accesskey="8"]');
+});
+
+it('puts accesskey 8 on the search field of the discount stores page', function () {
+    $page = visit('/discount-stores');
+
+    $page->assertNoJavaScriptErrors()
+        ->assertPresent('input#search[accesskey="8"]');
+});
+
+it('puts accesskey 8 on the course search field of the schedule editor', function () {
+    $page = visit('/schedules/create');
+
+    $page->assertNoJavaScriptErrors()
+        ->assertPresent('input#course-search[accesskey="8"]');
+});

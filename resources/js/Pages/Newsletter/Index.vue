@@ -124,6 +124,7 @@ const issues = computed(() => props.viewModel.issues.data ?? [])
 
       <nav
         v-if="viewModel.issues.last_page > 1"
+        aria-label="分頁"
         class="flex justify-between text-sm"
       >
         <Link

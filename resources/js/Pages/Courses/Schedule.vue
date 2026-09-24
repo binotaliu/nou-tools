@@ -365,6 +365,7 @@ const creditsDropdown = useDropdown()
               type="text"
               name="search"
               aria-label="搜尋"
+              accesskey="8"
               placeholder="課程名稱..."
               class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
             />
