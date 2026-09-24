@@ -88,3 +88,16 @@ it('keeps accesskey 2 usable when the header nav is collapsed', function () {
 
     expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"header-nav\"]')).display"))->toBe('none');
 });
+
+it('documents the study room keys and keyboard use on the accessibility page', function () {
+    $page = visit('/accessibility');
+
+    $page->assertNoJavaScriptErrors()
+        ->assertSeeIn('[data-testid="accessibility-study-room-keys"]', '快速入座')
+        ->assertSeeIn('[data-testid="accessibility-study-room-keys"]', '朗讀目前的計時狀態')
+        ->assertSeeIn('[data-testid="accessibility-study-room"]', '方向鍵')
+        ->assertDontSeeIn('[data-testid="accessibility-limitations"]', '座位按鈕的名稱較長');
+
+    $rows = $page->script("document.querySelectorAll('[data-testid=\"accessibility-study-room-keys\"] tbody tr').length");
+    expect($rows)->toBe(5);
+});

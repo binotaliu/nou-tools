@@ -28,9 +28,31 @@ export default function useStudyRoomSocket(config) {
   let heartbeatHandle = null
   let connectTimeoutHandle = null
   const onStateChangeCallbacks = []
+  const onSeatEventCallbacks = []
+  const onSeatChangeCallbacks = []
 
   function onStateChange(callback) {
     onStateChangeCallbacks.push(callback)
+  }
+
+  // What happened to the viewer's own seat, for focus and announcements:
+  // `taken` and `left` follow the viewer's own requests, `released` means
+  // the server let the seat go (idle release, admin clear).
+  function onSeatEvent(callback) {
+    onSeatEventCallbacks.push(callback)
+  }
+
+  // Someone else sat down or got up, as broadcast to the room: called with
+  // the seat after the change and a copy of it from before. Never fired for
+  // the viewer's own seat, nor for full refreshes.
+  function onSeatChange(callback) {
+    onSeatChangeCallbacks.push(callback)
+  }
+
+  function emitSeatEvent(type, code) {
+    for (const callback of onSeatEventCallbacks) {
+      callback({ type, code })
+    }
   }
 
   function deriveHeldSeatCode(roomState) {
@@ -187,12 +209,14 @@ export default function useStudyRoomSocket(config) {
     }
 
     const wasOccupied = target.isOccupied
+    const before = { ...target }
     const isHeldSeat = incomingSeat.code === heldSeatCode.value
 
     // The seat we hold was released out from under us (idle kick, admin
     // clear, etc.) — drop our local "this is mine" state immediately.
     if (isHeldSeat && !incomingSeat.isOccupied) {
       heldSeatCode.value = null
+      emitSeatEvent('released', incomingSeat.code)
     }
 
     Object.assign(target, incomingSeat, {
@@ -208,6 +232,12 @@ export default function useStudyRoomSocket(config) {
 
       if (floor) {
         floor.occupiedCount += target.isOccupied ? 1 : -1
+      }
+
+      if (!isHeldSeat) {
+        for (const callback of onSeatChangeCallbacks) {
+          callback(target, before)
+        }
       }
     }
   }
@@ -271,8 +301,13 @@ export default function useStudyRoomSocket(config) {
       const response = await window.axios.post('/study-room/heartbeat')
 
       if (!response.data.stillSeated) {
+        const releasedCode = heldSeatCode.value
         heldSeatCode.value = null
         refresh()
+
+        if (releasedCode) {
+          emitSeatEvent('released', releasedCode)
+        }
       }
     } catch (error) {
       // Passive background call — never surface this as an error toast.
@@ -302,6 +337,10 @@ export default function useStudyRoomSocket(config) {
       )
       setState(response.data.state)
       errorMessage.value = null
+
+      if (heldSeatCode.value === code) {
+        emitSeatEvent('taken', code)
+      }
     } catch (error) {
       errorMessage.value = resolveErrorMessage(error)
     } finally {
@@ -310,8 +349,14 @@ export default function useStudyRoomSocket(config) {
   }
 
   async function leave() {
+    const leftCode = heldSeatCode.value
     const response = await window.axios.post('/study-room/seat/leave')
     setState(response.data.state)
+
+    if (leftCode) {
+      emitSeatEvent('left', leftCode)
+    }
+
     return response
   }
 
@@ -358,6 +403,8 @@ export default function useStudyRoomSocket(config) {
     refresh,
     applyDelta,
     onStateChange,
+    onSeatEvent,
+    onSeatChange,
     take,
     leave,
     heartbeat,

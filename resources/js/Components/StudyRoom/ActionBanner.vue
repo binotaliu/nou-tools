@@ -2,12 +2,13 @@
 // The control panel fixed to the bottom of the page while the viewer holds
 // a seat — the "start timer" form, the running-timer countdown/controls,
 // the pomodoro cycle settings modal, and the change-activity modal.
-import { ref } from 'vue'
+import { nextTick, onUpdated, ref } from 'vue'
 import {
   ArrowRightStartOnRectangleIcon,
   ArrowsPointingOutIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  ExclamationTriangleIcon,
   PauseIcon,
   PencilSquareIcon,
   PlayIcon,
@@ -44,6 +45,82 @@ function setMinimized(value) {
   }
 }
 
+// --- keyboard focus ---
+//
+// Most controls here swap places with v-show (暫停 ↔ 繼續, the start form ↔
+// the countdown, 收合 ↔ 展開), and hiding the focused button would drop
+// focus to <body>. Each action says where focus goes next; anything that
+// changes on its own (a round ending while you sit on 暫停) falls back to
+// the first visible control in FALLBACK_FOCUS.
+const FALLBACK_FOCUS = [
+  'study-room-start-break',
+  'study-room-next-round',
+  'study-room-resume-timer',
+  'study-room-pause-timer',
+  'study-room-start-timer',
+  'study-room-banner-expand',
+  'study-room-stop-timer',
+]
+
+const panel = ref(null)
+let lastFocusedInPanel = null
+
+function focusFirstVisible(testIds) {
+  if (!panel.value) {
+    return false
+  }
+
+  for (const testId of testIds) {
+    const element = panel.value.querySelector('[data-testid="' + testId + '"]')
+
+    if (element && element.getClientRects().length > 0) {
+      element.focus()
+      return true
+    }
+  }
+
+  return false
+}
+
+async function act(action, ...nextFocus) {
+  await action()
+  await nextTick()
+  focusFirstVisible(nextFocus)
+}
+
+function toggleMinimized(value) {
+  setMinimized(value)
+  nextTick(() =>
+    focusFirstVisible([
+      value ? 'study-room-banner-expand' : 'study-room-banner-minimize',
+    ])
+  )
+}
+
+function onPanelFocusIn(event) {
+  lastFocusedInPanel = event.target
+}
+
+// Leaving for another part of the page ends the panel's claim on focus; a
+// focusout without a relatedTarget is the focused button being hidden.
+function onPanelFocusOut(event) {
+  if (event.relatedTarget && !panel.value?.contains(event.relatedTarget)) {
+    lastFocusedInPanel = null
+  }
+}
+
+onUpdated(() => {
+  if (!lastFocusedInPanel || lastFocusedInPanel.getClientRects().length > 0) {
+    return
+  }
+
+  const active = document.activeElement
+
+  if (active === document.body || !panel.value?.contains(active)) {
+    focusFirstVisible(FALLBACK_FOCUS)
+  }
+})
+
 defineProps({
   visible: { type: Boolean, required: true },
   timer: { type: Object, required: true },
@@ -62,9 +139,22 @@ defineProps({
     >
       <div
         v-if="visible"
+        ref="panel"
+        role="region"
+        aria-labelledby="study-room-control-panel-heading"
         class="fixed inset-x-0 bottom-(--pwa-nav-height) z-40 mb-0"
         data-testid="study-room-control-panel"
+        @focusin="onPanelFocusIn"
+        @focusout="onPanelFocusOut"
       >
+        <h3
+          id="study-room-control-panel-heading"
+          tabindex="-1"
+          class="sr-only"
+          data-testid="study-room-control-panel-heading"
+        >
+          你的座位：{{ timer.mySeatLabel() }}
+        </h3>
         <div class="mx-auto max-w-6xl sm:px-4">
           <div
             class="relative overflow-hidden border-t-[6px] border-theme-300 bg-theme-50 bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(0,0,0,0.035)_5.5rem_calc(5.5rem+1px))] shadow-[0_-10px_40px_rgba(0,0,0,0.14)] sm:rounded-t-2xl sm:border-x-[6px] dark:border-zinc-600 dark:bg-zinc-900 dark:bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(255,255,255,0.05)_5.5rem_calc(5.5rem+1px))]"
@@ -82,7 +172,7 @@ defineProps({
               title="收合"
               aria-label="收合控制列"
               data-testid="study-room-banner-minimize"
-              @click="setMinimized(true)"
+              @click="toggleMinimized(true)"
             >
               <ChevronDownIcon class="size-5" />
             </button>
@@ -92,10 +182,12 @@ defineProps({
               v-show="minimized"
               type="button"
               class="relative flex w-full items-center gap-3 px-4 pt-3 pb-[calc(var(--safe-bottom)+0.75rem)] text-left sm:px-6"
-              aria-label="展開控制列"
               data-testid="study-room-banner-expand"
-              @click="setMinimized(false)"
+              @click="toggleMinimized(false)"
             >
+              <!-- Named by its content (what's running and the time left),
+              not an aria-label, which would hide all of it. -->
+              <span class="sr-only">展開控制列：</span>
               <span v-if="timer.hasTimer()" class="min-w-0 flex-1">
                 <span
                   class="block text-xs font-semibold tracking-wide"
@@ -116,15 +208,32 @@ defineProps({
                 v-if="timer.hasTimer()"
                 class="text-2xl leading-none font-bold text-theme-900 tabular-nums dark:text-zinc-100"
                 data-testid="study-room-banner-mini-countdown"
-                >{{ timer.myRemainingLabel() }}</span
+                ><span aria-hidden="true">{{ timer.myRemainingLabel() }}</span
+                ><span class="sr-only"
+                  >，{{ timer.mySpokenRemaining() }}</span
+                ></span
               >
-              <ChevronUpIcon class="size-5 shrink-0 text-theme-700" />
+              <ChevronUpIcon
+                class="size-5 shrink-0 text-theme-700"
+                aria-hidden="true"
+              />
             </button>
 
             <div
               v-show="!minimized"
               class="relative max-h-[70dvh] overflow-y-auto overscroll-contain px-4 pt-0 pb-[calc(var(--safe-bottom)+1rem)] sm:px-6 sm:pt-6 sm:pb-[calc(var(--safe-bottom)+1.25rem)]"
             >
+              <!-- Spoken through the page's announcer; shown here so a
+              failed start/pause/leave isn't silent on screen either. -->
+              <p
+                v-if="timer.errorMessage"
+                class="mb-3 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+                data-testid="study-room-timer-error"
+              >
+                <ExclamationTriangleIcon class="size-4 shrink-0" />
+                <span>{{ timer.errorMessage }}</span>
+              </p>
+
               <!-- Not timing yet: pick activity/subject/mode, then start -->
               <div
                 v-show="!timer.hasTimer()"
@@ -180,7 +289,7 @@ defineProps({
                           aria-label="計時方式"
                         >
                           <label
-                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950"
+                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-theme-500 has-focus-visible:ring-offset-2 dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950 dark:has-focus-visible:ring-offset-zinc-900"
                           >
                             <input
                               v-model="timer.timerMode"
@@ -192,7 +301,7 @@ defineProps({
                             番茄鐘
                           </label>
                           <label
-                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950"
+                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-theme-500 has-focus-visible:ring-offset-2 dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950 dark:has-focus-visible:ring-offset-zinc-900"
                           >
                             <input
                               v-model="timer.timerMode"
@@ -204,7 +313,7 @@ defineProps({
                             倒數
                           </label>
                           <label
-                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950"
+                            class="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition has-checked:bg-theme-700 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-theme-500 has-focus-visible:ring-offset-2 dark:has-checked:bg-theme-500 dark:has-checked:text-zinc-950 dark:has-focus-visible:ring-offset-zinc-900"
                           >
                             <input
                               v-model="timer.timerMode"
@@ -222,6 +331,9 @@ defineProps({
                           type="button"
                           class="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-theme-300 px-2.5 py-1.5 text-xs text-theme-700 transition hover:border-theme-400 hover:bg-white dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
                           data-testid="study-room-cycle-settings"
+                          :aria-label="
+                            '番茄鐘設定：' + timer.cycleSummaryLabel()
+                          "
                           @click="timer.openCycleSettings()"
                         >
                           <span>{{ timer.cycleChipLabel() }}</span>
@@ -236,6 +348,7 @@ defineProps({
                             type="number"
                             :min="clientConfig.timerCustomMinMinutes"
                             :max="clientConfig.timerCustomMaxMinutes"
+                            aria-label="倒數分鐘數"
                             data-testid="study-room-custom-minutes"
                             class="w-20 rounded-lg border border-theme-200 bg-white px-2 py-1.5 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                           />
@@ -254,7 +367,13 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-start-timer"
                     class="inline-flex flex-[2] items-center justify-center gap-2 rounded-xl bg-theme-700 px-6 py-3 text-base font-semibold whitespace-nowrap text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 lg:flex-none dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400 zoomed:max-sm:basis-full"
-                    @click="timer.startTimer()"
+                    @click="
+                      act(
+                        timer.startTimer,
+                        'study-room-pause-timer',
+                        'study-room-stop-timer'
+                      )
+                    "
                   >
                     <PlaySolidIcon class="size-5" />
                     開始專注
@@ -303,6 +422,7 @@ defineProps({
                         type="button"
                         class="inline-flex shrink-0 items-center rounded-lg p-1 text-theme-700 transition hover:bg-white hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
                         title="變更活動"
+                        aria-label="變更活動"
                         data-testid="study-room-change-activity-open"
                         @click="timer.openChangeActivity()"
                       >
@@ -325,9 +445,12 @@ defineProps({
                           :class="timer.cycleDotClass(dot)"
                         ></span>
                       </span>
-                      <span data-testid="study-room-round-label">{{
-                        timer.roundLabel()
-                      }}</span>
+                      <span data-testid="study-room-round-label"
+                        >{{ timer.roundLabel()
+                        }}<span v-if="timer.isPomodoro()" class="sr-only"
+                          >，每 {{ timer.roundsPerCycle() }} 輪長休息一次</span
+                        ></span
+                      >
                       <span aria-hidden="true">·</span>
                       <span>{{ timer.timerEndsAtLabel() }}</span>
                     </div>
@@ -341,7 +464,10 @@ defineProps({
                     class="text-4xl leading-none font-bold text-theme-900 tabular-nums sm:text-6xl dark:text-zinc-100"
                     data-testid="study-room-your-countdown"
                   >
-                    {{ timer.myRemainingLabel() }}
+                    <span aria-hidden="true">{{
+                      timer.myRemainingLabel()
+                    }}</span>
+                    <span class="sr-only">{{ timer.mySpokenRemaining() }}</span>
                   </p>
                 </div>
 
@@ -365,7 +491,7 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-pause-timer"
                     class="inline-flex items-center justify-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-3 py-3 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 sm:py-2.5 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-                    @click="timer.pauseTimer()"
+                    @click="act(timer.pauseTimer, 'study-room-resume-timer')"
                   >
                     <PauseIcon class="size-4" />
                     暫停
@@ -377,7 +503,7 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-resume-timer"
                     class="order-first col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-theme-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 sm:order-none sm:col-span-1 sm:py-2.5 dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
-                    @click="timer.resumeTimer()"
+                    @click="act(timer.resumeTimer, 'study-room-pause-timer')"
                   >
                     <PlaySolidIcon class="size-4" />
                     繼續
@@ -389,7 +515,13 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-start-break"
                     class="order-first col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-800 disabled:opacity-50 sm:order-none sm:col-span-1 sm:py-2.5"
-                    @click="timer.startBreak()"
+                    @click="
+                      act(
+                        timer.startBreak,
+                        'study-room-next-round',
+                        'study-room-stop-timer'
+                      )
+                    "
                   >
                     <SparklesIcon class="size-4" />
                     <span>{{ timer.startBreakLabel() }}</span>
@@ -401,7 +533,13 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-next-round"
                     class="order-first col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-theme-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 sm:order-none sm:col-span-1 sm:py-2.5 dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
-                    @click="timer.startNextRound()"
+                    @click="
+                      act(
+                        timer.startNextRound,
+                        'study-room-pause-timer',
+                        'study-room-stop-timer'
+                      )
+                    "
                   >
                     <PlaySolidIcon class="size-4" />
                     <span>{{ timer.nextRoundLabel() }}</span>
@@ -412,7 +550,7 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-stop-timer"
                     class="inline-flex items-center justify-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-3 py-3 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 sm:py-2.5 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-                    @click="timer.stopTimer()"
+                    @click="act(timer.stopTimer, 'study-room-start-timer')"
                   >
                     <StopIcon class="size-4" />
                     結束
@@ -435,11 +573,7 @@ defineProps({
             <div
               v-show="timer.hasTimer() && timer.hasCountdownEnd()"
               class="absolute inset-x-0 bottom-0 h-1.5 bg-theme-200/80 dark:bg-zinc-800"
-              role="progressbar"
-              aria-label="計時進度"
-              :aria-valuenow="timer.progressPercent()"
-              aria-valuemin="0"
-              aria-valuemax="100"
+              aria-hidden="true"
               data-testid="study-room-progress"
             >
               <div

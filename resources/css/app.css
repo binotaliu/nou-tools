@@ -202,6 +202,12 @@
     vertical-align: -0.1em;
   }
 
+  /* The screen-reader twin of a Twemoji image (StudyRoom/Show.vue). Its
+     character lives in generated content so Twemoji never parses it. */
+  [data-emoji-text]::before {
+    content: attr(data-emoji-text);
+  }
+
   html {
     color-scheme: light;
   }

@@ -55,3 +55,29 @@ it('does not try to take a seat when a visitor clicks a free one in the preview'
     expect($tookSeat)->toBeFalse();
     $page->assertMissing('[data-testid="study-room-personal-info-modal"]');
 });
+
+it('moves keyboard focus to the sign-up banner when a visitor takes a seat', function () {
+    $page = visit(route('study-room.show'));
+
+    $page->assertVisible('[data-testid="study-room-floor-1"]')
+        ->keys('[data-testid="seat-1-S03"]', 'Enter');
+
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-needs-schedule-heading'");
+
+    expect($page->script('document.activeElement.dataset.testid'))->toBe('study-room-needs-schedule-heading');
+});
+
+it('points 快速入座 at the sign-up banner in the preview', function () {
+    $page = visit(route('study-room.show'));
+
+    $page->assertVisible('[data-testid="study-room-quick-seat"]')
+        ->click('[data-testid="study-room-quick-seat"]');
+
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-needs-schedule-heading'");
+
+    $tookSeat = $page->script(
+        "performance.getEntriesByType('resource').some(entry => entry.name.includes('/take'))"
+    );
+
+    expect($tookSeat)->toBeFalse();
+});

@@ -161,6 +161,17 @@ export default function useStudyRoomDemo(config) {
     ])
   }
 
+  function floorForSeat(code) {
+    return (
+      state.value?.floors.find(floor =>
+        [
+          ...floor.soloSeats,
+          ...floor.tables.flatMap(table => table.seats),
+        ].some(seat => seat.code === code)
+      ) ?? null
+    )
+  }
+
   function take() {
     promptOpen.value = true
   }
@@ -179,11 +190,14 @@ export default function useStudyRoomDemo(config) {
     realtime: false,
     connectionFailed: false,
     allSeats,
+    floorForSeat,
     mySeat: () => null,
     setState: noop,
     refresh: noop,
     applyDelta: noop,
     onStateChange,
+    onSeatEvent: noop,
+    onSeatChange: noop,
     take,
     leave: noop,
     heartbeat: noop,

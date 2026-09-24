@@ -102,6 +102,31 @@ export default function useStudyTimer(
     return remainingLabel(seat)
   }
 
+  // The spoken counterpart of timerLabel() for seat names. It is rounded to
+  // whole minutes so the name only changes once a minute: a screen reader
+  // re-reads names it sees change, and mm:ss would change every second.
+  function spokenTimerLabel(seat) {
+    if (seat.timerEndsAt) {
+      const diffMs = Date.parse(seat.timerEndsAt) - clockNow(seat)
+
+      if (diffMs <= 0) {
+        return '時間到了'
+      }
+
+      return '剩約 ' + Math.ceil(diffMs / 60000) + ' 分鐘'
+    }
+
+    if (seat.timerStartedAt) {
+      const elapsedMinutes = Math.floor(
+        Math.max(0, clockNow(seat) - Date.parse(seat.timerStartedAt)) / 60000
+      )
+
+      return '已經 ' + elapsedMinutes + ' 分鐘'
+    }
+
+    return ''
+  }
+
   function isSeatFinishedFocus(seat) {
     return (
       seat.timerPhase === 'focus' &&
@@ -607,6 +632,36 @@ export default function useStudyTimer(
     return seat ? remainingLabel(seat) : ''
   }
 
+  function mySpokenRemaining() {
+    const seat = socket.mySeat()
+
+    return seat ? spokenTimerLabel(seat) : ''
+  }
+
+  // Everything the panel shows about your timer, as one sentence for the
+  // 朗讀目前狀態 accesskey.
+  function statusSentence() {
+    const seat = socket.mySeat()
+
+    if (!seat) {
+      return '你還沒有入座'
+    }
+
+    if (!seat.timerMode) {
+      return '你坐在 ' + seat.label + '，還沒開始計時'
+    }
+
+    return [
+      timerPhaseLabel(),
+      myActivityLabel(),
+      spokenTimerLabel(seat),
+      roundLabel(),
+      seat.label,
+    ]
+      .filter(Boolean)
+      .join('，')
+  }
+
   function formatDurationLabel(totalSeconds) {
     const hours = Math.floor(totalSeconds / 3600)
     const minutes = Math.floor((totalSeconds % 3600) / 60)
@@ -749,6 +804,7 @@ export default function useStudyTimer(
     clockLabel,
     remainingLabel,
     timerLabel,
+    spokenTimerLabel,
     isSeatFinishedFocus,
     hasTimer,
     isPomodoro,
@@ -788,6 +844,8 @@ export default function useStudyTimer(
     mySeatLabel,
     myActivityLabel,
     myRemainingLabel,
+    mySpokenRemaining,
+    statusSentence,
     formatDurationLabel,
     startTimer,
     stopTimer,
