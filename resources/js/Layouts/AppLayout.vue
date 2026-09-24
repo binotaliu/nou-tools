@@ -56,6 +56,7 @@ const navItems = [
       path.startsWith('/schedules') && !LEARNING_PROGRESS_PATH.test(path),
     label: '我的課表',
     icon: 'table-cells',
+    accesskey: '3',
   },
   {
     href: '/schedules/my/learning-progress',
@@ -142,6 +143,12 @@ const bottomMoreItems = computed(() =>
       label: '關於本站',
       icon: 'information-circle',
     },
+    {
+      href: '/accessibility',
+      prefix: '/accessibility',
+      label: '無障礙說明',
+      icon: 'eye',
+    },
   ].map(item => ({
     ...item,
     active:
@@ -153,10 +160,19 @@ const bottomMoreItems = computed(() =>
 <template>
   <a
     href="#main-content"
+    accesskey="2"
     class="skip-link absolute top-auto -left-100 z-999 bg-transparent px-2 py-1 focus:top-0 focus:left-0 focus:bg-white focus:text-theme-900 focus:ring-2 focus:ring-theme-500 dark:focus:bg-zinc-900 dark:focus:text-zinc-100"
   >
     跳到主要區塊
   </a>
+  <Link
+    href="/accessibility"
+    accesskey="0"
+    data-testid="skip-link-accessibility"
+    class="skip-link absolute top-auto -left-100 z-999 bg-transparent px-2 py-1 focus:top-0 focus:left-0 focus:bg-white focus:text-theme-900 focus:ring-2 focus:ring-theme-500 dark:focus:bg-zinc-900 dark:focus:text-zinc-100"
+  >
+    無障礙說明
+  </Link>
 
   <header
     data-testid="site-header"
@@ -171,11 +187,12 @@ const bottomMoreItems = computed(() =>
             name="book-open"
             class="size-5 shrink-0 text-theme-700 md:size-6 dark:text-zinc-300"
           />
-          <Link href="/" class="shrink-0">NOU 小幫手</Link>
+          <Link href="/" accesskey="1" class="shrink-0">NOU 小幫手</Link>
         </h1>
 
         <div class="flex min-h-9.5 items-center gap-2">
           <nav
+            aria-label="主要導覽"
             data-testid="header-nav"
             class="hidden flex-wrap items-center justify-end gap-1 gap-x-6 lg:flex print:hidden bottom-nav:hidden"
           >
@@ -184,6 +201,7 @@ const bottomMoreItems = computed(() =>
               :key="item.href"
               :href="item.href"
               :aria-current="isItemActive(item) ? 'page' : null"
+              :accesskey="item.accesskey"
               class="-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3"
               :class="
                 isItemActive(item)
@@ -205,6 +223,7 @@ const bottomMoreItems = computed(() =>
                     : 'text-theme-700 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
                 "
                 :aria-expanded="moreMenuOpen.toString()"
+                aria-controls="header-more-menu"
                 @click="moreMenuOpen = !moreMenuOpen"
               >
                 <span class="hidden sm:inline">更多</span>
@@ -216,6 +235,7 @@ const bottomMoreItems = computed(() =>
               </button>
 
               <div
+                id="header-more-menu"
                 v-show="moreMenuOpen"
                 class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-md border border-theme-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
               >
@@ -245,6 +265,7 @@ const bottomMoreItems = computed(() =>
             data-testid="header-menu-toggle"
             class="inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none lg:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 bottom-nav:hidden"
             :aria-expanded="mobileMenuOpen.toString()"
+            aria-controls="header-mobile-menu"
             @click="mobileMenuOpen = !mobileMenuOpen"
           >
             <span class="sr-only">切換選單</span>
@@ -256,6 +277,7 @@ const bottomMoreItems = computed(() =>
       </div>
 
       <div
+        id="header-mobile-menu"
         v-show="mobileMenuOpen"
         class="absolute top-full right-0 left-0 -mx-px mt-0 space-y-2 rounded-b-2xl border border-theme-200 bg-white p-3 shadow-lg lg:hidden dark:border-zinc-700 dark:bg-zinc-900 print:hidden bottom-nav:hidden"
       >
@@ -295,7 +317,8 @@ const bottomMoreItems = computed(() =>
 
   <main
     id="main-content"
-    class="mx-auto max-w-7xl px-6 py-8 bottom-nav:pb-[calc(var(--pwa-nav-height)+2rem)]"
+    tabindex="-1"
+    class="mx-auto max-w-7xl px-6 py-8 focus:outline-none bottom-nav:pb-[calc(var(--pwa-nav-height)+2rem)]"
   >
     <!-- flash notifications use slide-in toasts instead of the old alert box -->
     <Notification
@@ -385,6 +408,16 @@ const bottomMoreItems = computed(() =>
             >
               <Icon name="information-circle" class="size-3" />
               關於本站
+            </Link>
+          </div>
+          <div class="text-xs">
+            <Link
+              href="/accessibility"
+              data-testid="footer-accessibility-link"
+              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
+            >
+              <Icon name="eye" class="size-3" />
+              無障礙說明
             </Link>
           </div>
           <div class="text-xs">
