@@ -26,20 +26,28 @@ export default function useSeatGrid(socket, config) {
     const parts = [seat.label]
 
     if (isMine(seat)) {
-      parts.push('你的座位')
+      parts.push('你的座位', '按下移到控制列')
     } else {
       parts.push((seat.nickname || '同學') + ' 正在使用')
     }
 
-    parts.push(thoughtBubbleText(seat), spokenTimer)
+    // The hint reads last on your own seat, after what's on it.
+    const hint = isMine(seat) ? parts.splice(2, 1) : []
+
+    parts.push(thoughtBubbleText(seat), spokenTimer, ...hint)
 
     return parts.filter(Boolean).join('，')
   }
 
   // Occupied seats and, once you hold one, every other seat are
   // aria-disabled rather than disabled, so they stay focusable: a disabled
-  // button drops keyboard focus and hides its occupant from Tab.
+  // button drops keyboard focus and hides its occupant from Tab. Your own
+  // seat stays actionable: it leads to your control panel.
   function isSeatActionable(seat) {
+    if (isMine(seat)) {
+      return true
+    }
+
     return (
       !seat.isOccupied &&
       socket.heldSeatCode === null &&
@@ -47,9 +55,23 @@ export default function useSeatGrid(socket, config) {
     )
   }
 
-  // Click/Enter/Space on any seat: a free one is taken, an occupied table
-  // chair toggles its popover, anything else does nothing.
+  // Set by the page: what pressing your own seat does (open and focus the
+  // control panel), since the panel lives outside the grid.
+  let ownSeatHandler = null
+
+  function onOwnSeatActivated(callback) {
+    ownSeatHandler = callback
+  }
+
+  // Click/Enter/Space on any seat: a free one is taken, your own leads to
+  // the control panel, another occupied table chair toggles its popover,
+  // anything else does nothing.
   function activateSeat(seat) {
+    if (isMine(seat)) {
+      ownSeatHandler?.(seat)
+      return
+    }
+
     if (socket.busySeatCode !== null) {
       return
     }
@@ -239,6 +261,7 @@ export default function useSeatGrid(socket, config) {
     seatTestId,
     seatAriaLabel,
     isSeatActionable,
+    onOwnSeatActivated,
     activateSeat,
     firstFreeSeat,
     thoughtBubbleText,

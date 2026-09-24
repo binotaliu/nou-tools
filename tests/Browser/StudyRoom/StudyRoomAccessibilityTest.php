@@ -562,3 +562,29 @@ it('gives the control panel spoken times and named controls', function () use ($
         ->and($name)->toContain('專注中')
         ->and($name)->toContain('剩約');
 });
+
+it('leads from your own seat to the control panel, expanding it if minimized', function () use ($enterStudyRoom, $sitAndStartTimer) {
+    $page = $sitAndStartTimer($enterStudyRoom());
+
+    $page->assertAttributeContains('[data-testid="seat-1-S01"]', 'aria-label', '按下移到控制列')
+        ->assertAttributeMissing('[data-testid="seat-1-S01"]', 'aria-disabled');
+
+    $page->keys('[data-testid="seat-1-S01"]', 'Enter');
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-pause-timer'");
+
+    $page->keys('[data-testid="study-room-banner-minimize"]', 'Enter');
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-banner-expand'");
+
+    $page->keys('[data-testid="seat-1-S01"]', 'Space');
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-pause-timer'");
+
+    $page->assertVisible('[data-testid="study-room-timer-panel"]');
+
+    // The list view offers the same through its own row.
+    $page->click('[data-testid="study-room-view-list"]')
+        ->assertMissing('[data-testid="study-room-list-take-1-S01"]')
+        ->click('[data-testid="study-room-list-own-seat"]');
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-pause-timer'");
+
+    expect($page->script('document.activeElement.dataset.testid'))->toBe('study-room-pause-timer');
+});

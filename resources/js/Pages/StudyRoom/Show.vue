@@ -190,6 +190,42 @@ function focusControlPanel() {
   target?.focus()
 }
 
+// Pressing your own seat (map or list) opens the panel if it's minimized and
+// lands on its main control: the activity choice before a timer starts,
+// otherwise whichever of 繼續/next round/暫停/break is showing (暫停 before
+// break, since a running pomodoro offers both).
+const OWN_SEAT_FOCUS = [
+  '[data-testid="study-room-verb-group"] input:checked',
+  '[data-testid="study-room-resume-timer"]',
+  '[data-testid="study-room-next-round"]',
+  '[data-testid="study-room-pause-timer"]',
+  '[data-testid="study-room-start-break"]',
+  '[data-testid="study-room-control-panel-heading"]',
+]
+
+async function openControlPanel() {
+  const expand = document.querySelector(
+    '[data-testid="study-room-banner-expand"]'
+  )
+
+  if (expand && expand.getClientRects().length > 0) {
+    expand.click()
+    await nextTick()
+  }
+
+  // The sr-only heading always has a rect, so it is the last resort.
+  for (const selector of OWN_SEAT_FOCUS) {
+    const target = document.querySelector(selector)
+
+    if (target && target.closest('[style*="display: none"]') === null) {
+      target.focus()
+      return
+    }
+  }
+}
+
+grid.onOwnSeatActivated(() => openControlPanel())
+
 socket.onSeatEvent(async ({ type, code }) => {
   const seat = socket.allSeats().find(candidate => candidate.code === code)
   const label = seat ? seat.label : ''

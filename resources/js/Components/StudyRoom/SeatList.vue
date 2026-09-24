@@ -153,6 +153,15 @@ function visibleSeats(floor) {
               >
                 入座
               </button>
+              <button
+                v-else-if="grid.isMine(seat)"
+                type="button"
+                class="rounded-lg border border-amber-400 px-3 py-1 text-sm font-medium text-theme-800 transition hover:bg-amber-100 dark:border-amber-600 dark:text-zinc-200 dark:hover:bg-amber-950/40"
+                data-testid="study-room-list-own-seat"
+                @click="grid.activateSeat(seat)"
+              >
+                前往控制列
+              </button>
             </td>
           </tr>
         </tbody>
