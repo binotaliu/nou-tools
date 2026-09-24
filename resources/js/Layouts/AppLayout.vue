@@ -56,7 +56,6 @@ const navItems = [
       path.startsWith('/schedules') && !LEARNING_PROGRESS_PATH.test(path),
     label: '我的課表',
     icon: 'table-cells',
-    accesskey: '3',
   },
   {
     href: '/schedules/my/learning-progress',
@@ -173,6 +172,20 @@ const bottomMoreItems = computed(() =>
   >
     無障礙說明
   </Link>
+  <!-- Key target only: the header nav is display:none below lg (and in PWAs),
+       and a hidden element cannot take an accesskey. Off-screen, out of the
+       tab order and hidden from assistive tech, since the real nav link is
+       already reachable. -->
+  <Link
+    href="/schedules/my"
+    accesskey="3"
+    tabindex="-1"
+    aria-hidden="true"
+    data-testid="accesskey-my-schedule"
+    class="sr-only"
+  >
+    我的課表
+  </Link>
 
   <header
     data-testid="site-header"
@@ -201,7 +214,6 @@ const bottomMoreItems = computed(() =>
               :key="item.href"
               :href="item.href"
               :aria-current="isItemActive(item) ? 'page' : null"
-              :accesskey="item.accesskey"
               class="-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3"
               :class="
                 isItemActive(item)

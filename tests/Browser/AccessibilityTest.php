@@ -79,3 +79,13 @@ it('puts accesskey 8 on the course search field of the schedule editor', functio
     $page->assertNoJavaScriptErrors()
         ->assertPresent('input#course-search[accesskey="8"]');
 });
+
+it('keeps accesskey 3 usable when the header nav is collapsed', function () {
+    $page = visit('/')->resize(390, 844);
+
+    $page->assertNoJavaScriptErrors()
+        ->assertPresent('[data-testid="footer-accessibility-link"]')
+        ->assertPresent('a[data-testid="accesskey-my-schedule"][accesskey="3"][tabindex="-1"]');
+
+    expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"header-nav\"]')).display"))->toBe('none');
+});
