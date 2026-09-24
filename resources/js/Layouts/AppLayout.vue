@@ -71,10 +71,10 @@ const navItems = [
     icon: 'academic-cap',
   },
   {
-    href: '/announcements',
-    prefix: '/announcements',
-    label: '學校公告',
-    icon: 'megaphone',
+    href: '/newsletter',
+    prefix: '/newsletter',
+    label: '雙週報',
+    icon: 'newspaper',
   },
   {
     href: '/discount-stores',
@@ -92,10 +92,10 @@ const moreMenuItems = [
     icon: 'device-phone-mobile',
   },
   {
-    href: '/newsletter',
-    prefix: '/newsletter',
-    label: '浣熊的空大雙週報',
-    icon: 'newspaper',
+    href: '/announcements',
+    prefix: '/announcements',
+    label: '學校公告',
+    icon: 'megaphone',
   },
   {
     href: '/video-classes',

@@ -40,7 +40,7 @@ it('shows the hamburger menu and no bottom tab bar in a normal phone browser tab
 });
 
 it('swaps the hamburger menu for a bottom tab bar when running as an installed PWA on a phone', function () use ($enterPwaMode) {
-    $page = visit('/announcements')->resize(...PHONE);
+    $page = visit('/newsletter')->resize(...PHONE);
 
     $enterPwaMode($page);
 
@@ -50,7 +50,7 @@ it('swaps the hamburger menu for a bottom tab bar when running as an installed P
 
     $activeTab = $page->script('document.querySelector(\'[data-testid="bottom-nav"] [aria-current="page"]\').textContent.trim()');
 
-    expect($activeTab)->toBe('學校公告');
+    expect($activeTab)->toBe('雙週報');
 
     // The active tab carries a bar on its top edge (and only that tab).
     $indicators = $page->script('document.querySelectorAll(\'[data-testid="bottom-nav-indicator"]\').length');
@@ -78,7 +78,7 @@ it('opens the more sheet from the tab bar and closes it again', function () use 
     $page->screenshot(filename: 'pwa-bottom-nav-phone')
         ->click('[data-testid="bottom-nav-more"]')
         ->assertVisible('[data-testid="bottom-nav-sheet"]')
-        ->assertSee('浣熊的空大雙週報')
+        ->assertSee('今日視訊面授')
         ->assertSee('關於本站');
 
     // The sheet covers the middle of the backdrop, where a driver click would
@@ -91,22 +91,22 @@ it('opens the more sheet from the tab bar and closes it again', function () use 
     $page->assertMissing('[data-testid="bottom-nav-sheet"]');
 });
 
-it('puts learning progress after my schedule in both navs and moves Alt UU and discount stores into more', function () use ($waitForHeaderNav, $enterPwaMode, $linkTexts) {
+it('puts learning progress after my schedule and the newsletter in both navs, and moves Alt UU, announcements and discount stores into more', function () use ($waitForHeaderNav, $enterPwaMode, $linkTexts) {
     $page = $waitForHeaderNav(visit('/announcements')->resize(...DESKTOP));
 
     expect($linkTexts($page, '[data-testid="header-nav"] > a'))
-        ->toBe(['我的課表', '學習進度', '自習室', '學校公告', '優惠店家']);
+        ->toBe(['我的課表', '學習進度', '自習室', '雙週報', '優惠店家']);
 
     $page->resize(...PHONE);
     $enterPwaMode($page);
 
     expect($linkTexts($page, '[data-testid="bottom-nav"] a'))
-        ->toBe(['我的課表', '學習進度', '自習室', '學校公告']);
+        ->toBe(['我的課表', '學習進度', '自習室', '雙週報']);
 
     $page->click('[data-testid="bottom-nav-more"]');
 
     expect($linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))
-        ->toContain('優惠店家', 'Alt UU', '今日視訊面授');
+        ->toContain('優惠店家', 'Alt UU', '學校公告', '今日視訊面授');
 });
 
 it('highlights learning progress, not my schedule, on a learning progress page', function () use ($waitForHeaderNav, $linkTexts) {
