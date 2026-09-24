@@ -28,9 +28,23 @@ export default function useStudyRoomSocket(config) {
   let heartbeatHandle = null
   let connectTimeoutHandle = null
   const onStateChangeCallbacks = []
+  const onSeatEventCallbacks = []
 
   function onStateChange(callback) {
     onStateChangeCallbacks.push(callback)
+  }
+
+  // What happened to the viewer's own seat, for focus and announcements:
+  // `taken` and `left` follow the viewer's own requests, `released` means
+  // the server let the seat go (idle release, admin clear).
+  function onSeatEvent(callback) {
+    onSeatEventCallbacks.push(callback)
+  }
+
+  function emitSeatEvent(type, code) {
+    for (const callback of onSeatEventCallbacks) {
+      callback({ type, code })
+    }
   }
 
   function deriveHeldSeatCode(roomState) {
@@ -193,6 +207,7 @@ export default function useStudyRoomSocket(config) {
     // clear, etc.) — drop our local "this is mine" state immediately.
     if (isHeldSeat && !incomingSeat.isOccupied) {
       heldSeatCode.value = null
+      emitSeatEvent('released', incomingSeat.code)
     }
 
     Object.assign(target, incomingSeat, {
@@ -271,8 +286,13 @@ export default function useStudyRoomSocket(config) {
       const response = await window.axios.post('/study-room/heartbeat')
 
       if (!response.data.stillSeated) {
+        const releasedCode = heldSeatCode.value
         heldSeatCode.value = null
         refresh()
+
+        if (releasedCode) {
+          emitSeatEvent('released', releasedCode)
+        }
       }
     } catch (error) {
       // Passive background call — never surface this as an error toast.
@@ -302,6 +322,10 @@ export default function useStudyRoomSocket(config) {
       )
       setState(response.data.state)
       errorMessage.value = null
+
+      if (heldSeatCode.value === code) {
+        emitSeatEvent('taken', code)
+      }
     } catch (error) {
       errorMessage.value = resolveErrorMessage(error)
     } finally {
@@ -310,8 +334,14 @@ export default function useStudyRoomSocket(config) {
   }
 
   async function leave() {
+    const leftCode = heldSeatCode.value
     const response = await window.axios.post('/study-room/seat/leave')
     setState(response.data.state)
+
+    if (leftCode) {
+      emitSeatEvent('left', leftCode)
+    }
+
     return response
   }
 
@@ -358,6 +388,7 @@ export default function useStudyRoomSocket(config) {
     refresh,
     applyDelta,
     onStateChange,
+    onSeatEvent,
     take,
     leave,
     heartbeat,

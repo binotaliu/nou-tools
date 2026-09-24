@@ -7,7 +7,15 @@
 // session state is fetched from GET /study-room/state on mount and kept in
 // sync via the existing REST endpoints and Echo/Reverb broadcasts — never
 // through an Inertia prop or router.reload().
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  watch,
+} from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import {
   ArrowUpIcon,
@@ -109,6 +117,7 @@ const needsProfile = computed(() => props.hasSchedule && !profile.nickname)
 
 // Taking a seat in the preview points at the sign-up banner instead.
 const signUpBanner = ref(null)
+const signUpHeading = ref(null)
 const signUpHighlighted = ref(false)
 let signUpHighlightHandle = null
 
@@ -122,12 +131,64 @@ watch(
     socket.promptOpen = false
     signUpHighlighted.value = true
     signUpBanner.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    // Keyboard and screen-reader users land on the banner's heading too,
+    // instead of being left on a seat that did nothing.
+    signUpHeading.value?.focus({ preventScroll: true })
     clearTimeout(signUpHighlightHandle)
     signUpHighlightHandle = setTimeout(() => {
       signUpHighlighted.value = false
     }, 2500)
   }
 )
+
+// Where focus goes when your own seat changes hands. Taking a seat moves
+// into the control panel (a disabled seat would otherwise drop focus);
+// leaving, or being released by the server, returns to the seat itself.
+// A release only takes focus back from the panel or <body>, never from
+// something the viewer is busy with elsewhere on the page.
+function focusControlPanel() {
+  const target =
+    document.querySelector(
+      '[data-testid="study-room-banner-expand"]:not([style*="display: none"])'
+    ) ||
+    document.querySelector(
+      '[data-testid="study-room-verb-group"] input:checked'
+    ) ||
+    document.querySelector('[data-testid="study-room-control-panel-heading"]')
+
+  target?.focus()
+}
+
+socket.onSeatEvent(async ({ type, code }) => {
+  const seat = socket.allSeats().find(candidate => candidate.code === code)
+  const label = seat ? seat.label : ''
+
+  if (type === 'taken') {
+    announcer.say('已入座 ' + label)
+    await nextTick()
+    focusControlPanel()
+    return
+  }
+
+  const panel = document.querySelector(
+    '[data-testid="study-room-control-panel"]'
+  )
+  const focusWasOnPanel =
+    document.activeElement === document.body ||
+    !!panel?.contains(document.activeElement)
+
+  if (type === 'left') {
+    announcer.say('已離開座位')
+  } else {
+    announcer.say('你的座位（' + label + '）因為閒置已被釋放', {
+      assertive: true,
+    })
+  }
+
+  if (type === 'left' || focusWasOnPanel) {
+    roving.focusSeat(code)
+  }
+})
 
 socket.onStateChange(() => {
   timer.onRoomStateChanged(() => sky.unmountSkyCanvas('focus'))
@@ -308,7 +369,10 @@ onUnmounted(() => {
             />
             <div class="space-y-1">
               <h3
-                class="text-lg font-semibold text-theme-800 dark:text-zinc-200"
+                ref="signUpHeading"
+                tabindex="-1"
+                class="text-lg font-semibold text-theme-800 focus:outline-none dark:text-zinc-200"
+                data-testid="study-room-needs-schedule-heading"
               >
                 這是自習室的預覽
               </h3>

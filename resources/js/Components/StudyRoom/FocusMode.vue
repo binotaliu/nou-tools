@@ -4,7 +4,7 @@
 // closes itself if the timer ends or the seat is released underneath you
 // (see useStudyTimer's onRoomStateChanged). The cassette player sits on the
 // desk.
-import { onUnmounted } from 'vue'
+import { onUnmounted, ref } from 'vue'
 import {
   ArrowsPointingInIcon,
   PauseIcon,
@@ -15,6 +15,7 @@ import { PlayIcon as PlaySolidIcon } from '@heroicons/vue/24/solid'
 import CassettePlayer from './CassettePlayer.vue'
 import SceneSkyline from './SceneSkyline.vue'
 import SkyLayers from './SkyLayers.vue'
+import useDialogFocus from '../../Composables/useDialogFocus'
 
 const props = defineProps({
   sky: { type: Object, required: true },
@@ -33,6 +34,17 @@ function close() {
   props.timer.closeFocusMode(() => props.sky.unmountSkyCanvas('focus'))
 }
 
+// Focus starts on 離開全螢幕 and stays inside while open; on leaving it goes
+// back to the 全螢幕 button (or, if the panel changed meanwhile, the panel's
+// own fallback in ActionBanner).
+const dialog = ref(null)
+const closeButton = ref(null)
+const { onKeydown } = useDialogFocus(dialog, () => props.timer.focusMode, {
+  initialFocus: () => closeButton.value,
+  fallbackFocus: () =>
+    document.querySelector('[data-testid="study-room-control-panel-heading"]'),
+})
+
 window.addEventListener('keydown', handleEscape)
 
 onUnmounted(() => {
@@ -43,6 +55,7 @@ onUnmounted(() => {
 <template>
   <div
     v-if="timer.focusMode"
+    ref="dialog"
     class="fixed inset-0 z-50 animate-focus-in overflow-hidden select-none [--win-h:31%] [--win-top:max(8%,calc(env(safe-area-inset-top)+3.5rem))] sm:[--win-h:37%] sm:[--win-top:max(9%,calc(env(safe-area-inset-top)+3.5rem))] short:[--win-h:24%] short:[--win-top:calc(env(safe-area-inset-top)+3rem)]"
     :style="sky.carrelVars(timer.hasTimer())"
     :data-sky-phase="sky.sky.phase"
@@ -50,6 +63,7 @@ onUnmounted(() => {
     aria-modal="true"
     aria-label="專注模式"
     data-testid="study-room-focus-mode"
+    @keydown="onKeydown"
   >
     <div
       class="absolute inset-0 bg-[linear-gradient(to_bottom,var(--c-wall)_0%,var(--c-wall)_60%,var(--c-wall-deep)_100%)] transition-[background] duration-1000"
@@ -91,6 +105,7 @@ onUnmounted(() => {
         <span>{{ sky.clockDateLabel() }}</span>
       </p>
       <button
+        ref="closeButton"
         type="button"
         class="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm backdrop-blur transition"
         :class="sky.focusChromeClass()"

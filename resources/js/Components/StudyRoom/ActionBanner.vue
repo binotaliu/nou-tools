@@ -2,7 +2,7 @@
 // The control panel fixed to the bottom of the page while the viewer holds
 // a seat — the "start timer" form, the running-timer countdown/controls,
 // the pomodoro cycle settings modal, and the change-activity modal.
-import { ref } from 'vue'
+import { nextTick, onUpdated, ref } from 'vue'
 import {
   ArrowRightStartOnRectangleIcon,
   ArrowsPointingOutIcon,
@@ -45,6 +45,82 @@ function setMinimized(value) {
   }
 }
 
+// --- keyboard focus ---
+//
+// Most controls here swap places with v-show (暫停 ↔ 繼續, the start form ↔
+// the countdown, 收合 ↔ 展開), and hiding the focused button would drop
+// focus to <body>. Each action says where focus goes next; anything that
+// changes on its own (a round ending while you sit on 暫停) falls back to
+// the first visible control in FALLBACK_FOCUS.
+const FALLBACK_FOCUS = [
+  'study-room-start-break',
+  'study-room-next-round',
+  'study-room-resume-timer',
+  'study-room-pause-timer',
+  'study-room-start-timer',
+  'study-room-banner-expand',
+  'study-room-stop-timer',
+]
+
+const panel = ref(null)
+let lastFocusedInPanel = null
+
+function focusFirstVisible(testIds) {
+  if (!panel.value) {
+    return false
+  }
+
+  for (const testId of testIds) {
+    const element = panel.value.querySelector('[data-testid="' + testId + '"]')
+
+    if (element && element.getClientRects().length > 0) {
+      element.focus()
+      return true
+    }
+  }
+
+  return false
+}
+
+async function act(action, ...nextFocus) {
+  await action()
+  await nextTick()
+  focusFirstVisible(nextFocus)
+}
+
+function toggleMinimized(value) {
+  setMinimized(value)
+  nextTick(() =>
+    focusFirstVisible([
+      value ? 'study-room-banner-expand' : 'study-room-banner-minimize',
+    ])
+  )
+}
+
+function onPanelFocusIn(event) {
+  lastFocusedInPanel = event.target
+}
+
+// Leaving for another part of the page ends the panel's claim on focus; a
+// focusout without a relatedTarget is the focused button being hidden.
+function onPanelFocusOut(event) {
+  if (event.relatedTarget && !panel.value?.contains(event.relatedTarget)) {
+    lastFocusedInPanel = null
+  }
+}
+
+onUpdated(() => {
+  if (!lastFocusedInPanel || lastFocusedInPanel.getClientRects().length > 0) {
+    return
+  }
+
+  const active = document.activeElement
+
+  if (active === document.body || !panel.value?.contains(active)) {
+    focusFirstVisible(FALLBACK_FOCUS)
+  }
+})
+
 defineProps({
   visible: { type: Boolean, required: true },
   timer: { type: Object, required: true },
@@ -63,9 +139,22 @@ defineProps({
     >
       <div
         v-if="visible"
+        ref="panel"
+        role="region"
+        aria-labelledby="study-room-control-panel-heading"
         class="fixed inset-x-0 bottom-(--pwa-nav-height) z-40 mb-0"
         data-testid="study-room-control-panel"
+        @focusin="onPanelFocusIn"
+        @focusout="onPanelFocusOut"
       >
+        <h3
+          id="study-room-control-panel-heading"
+          tabindex="-1"
+          class="sr-only"
+          data-testid="study-room-control-panel-heading"
+        >
+          你的座位：{{ timer.mySeatLabel() }}
+        </h3>
         <div class="mx-auto max-w-6xl sm:px-4">
           <div
             class="relative overflow-hidden border-t-[6px] border-theme-300 bg-theme-50 bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(0,0,0,0.035)_5.5rem_calc(5.5rem+1px))] shadow-[0_-10px_40px_rgba(0,0,0,0.14)] sm:rounded-t-2xl sm:border-x-[6px] dark:border-zinc-600 dark:bg-zinc-900 dark:bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(255,255,255,0.05)_5.5rem_calc(5.5rem+1px))]"
@@ -83,7 +172,7 @@ defineProps({
               title="收合"
               aria-label="收合控制列"
               data-testid="study-room-banner-minimize"
-              @click="setMinimized(true)"
+              @click="toggleMinimized(true)"
             >
               <ChevronDownIcon class="size-5" />
             </button>
@@ -95,7 +184,7 @@ defineProps({
               class="relative flex w-full items-center gap-3 px-4 pt-3 pb-[calc(var(--safe-bottom)+0.75rem)] text-left sm:px-6"
               aria-label="展開控制列"
               data-testid="study-room-banner-expand"
-              @click="setMinimized(false)"
+              @click="toggleMinimized(false)"
             >
               <span v-if="timer.hasTimer()" class="min-w-0 flex-1">
                 <span
@@ -266,7 +355,13 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-start-timer"
                     class="inline-flex flex-[2] items-center justify-center gap-2 rounded-xl bg-theme-700 px-6 py-3 text-base font-semibold whitespace-nowrap text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 lg:flex-none dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400 zoomed:max-sm:basis-full"
-                    @click="timer.startTimer()"
+                    @click="
+                      act(
+                        timer.startTimer,
+                        'study-room-pause-timer',
+                        'study-room-stop-timer'
+                      )
+                    "
                   >
                     <PlaySolidIcon class="size-5" />
                     開始專注
@@ -377,7 +472,7 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-pause-timer"
                     class="inline-flex items-center justify-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-3 py-3 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 sm:py-2.5 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-                    @click="timer.pauseTimer()"
+                    @click="act(timer.pauseTimer, 'study-room-resume-timer')"
                   >
                     <PauseIcon class="size-4" />
                     暫停
@@ -389,7 +484,7 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-resume-timer"
                     class="order-first col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-theme-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 sm:order-none sm:col-span-1 sm:py-2.5 dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
-                    @click="timer.resumeTimer()"
+                    @click="act(timer.resumeTimer, 'study-room-pause-timer')"
                   >
                     <PlaySolidIcon class="size-4" />
                     繼續
@@ -401,7 +496,13 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-start-break"
                     class="order-first col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-800 disabled:opacity-50 sm:order-none sm:col-span-1 sm:py-2.5"
-                    @click="timer.startBreak()"
+                    @click="
+                      act(
+                        timer.startBreak,
+                        'study-room-next-round',
+                        'study-room-stop-timer'
+                      )
+                    "
                   >
                     <SparklesIcon class="size-4" />
                     <span>{{ timer.startBreakLabel() }}</span>
@@ -413,7 +514,13 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-next-round"
                     class="order-first col-span-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-theme-700 px-4 py-3 text-sm font-semibold text-white shadow-md shadow-theme-700/20 transition hover:bg-theme-800 disabled:opacity-50 sm:order-none sm:col-span-1 sm:py-2.5 dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
-                    @click="timer.startNextRound()"
+                    @click="
+                      act(
+                        timer.startNextRound,
+                        'study-room-pause-timer',
+                        'study-room-stop-timer'
+                      )
+                    "
                   >
                     <PlaySolidIcon class="size-4" />
                     <span>{{ timer.nextRoundLabel() }}</span>
@@ -424,7 +531,7 @@ defineProps({
                     :disabled="timer.panelBusy"
                     data-testid="study-room-stop-timer"
                     class="inline-flex items-center justify-center gap-1 rounded-xl border border-theme-300 bg-white/70 px-3 py-3 text-sm font-medium text-theme-800 transition hover:bg-white disabled:opacity-50 sm:py-2.5 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-                    @click="timer.stopTimer()"
+                    @click="act(timer.stopTimer, 'study-room-start-timer')"
                   >
                     <StopIcon class="size-4" />
                     結束
