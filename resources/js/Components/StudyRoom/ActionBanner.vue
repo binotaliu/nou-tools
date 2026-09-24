@@ -182,10 +182,12 @@ defineProps({
               v-show="minimized"
               type="button"
               class="relative flex w-full items-center gap-3 px-4 pt-3 pb-[calc(var(--safe-bottom)+0.75rem)] text-left sm:px-6"
-              aria-label="展開控制列"
               data-testid="study-room-banner-expand"
               @click="toggleMinimized(false)"
             >
+              <!-- Named by its content (what's running and the time left),
+              not an aria-label, which would hide all of it. -->
+              <span class="sr-only">展開控制列：</span>
               <span v-if="timer.hasTimer()" class="min-w-0 flex-1">
                 <span
                   class="block text-xs font-semibold tracking-wide"
@@ -206,9 +208,15 @@ defineProps({
                 v-if="timer.hasTimer()"
                 class="text-2xl leading-none font-bold text-theme-900 tabular-nums dark:text-zinc-100"
                 data-testid="study-room-banner-mini-countdown"
-                >{{ timer.myRemainingLabel() }}</span
+                ><span aria-hidden="true">{{ timer.myRemainingLabel() }}</span
+                ><span class="sr-only"
+                  >，{{ timer.mySpokenRemaining() }}</span
+                ></span
               >
-              <ChevronUpIcon class="size-5 shrink-0 text-theme-700" />
+              <ChevronUpIcon
+                class="size-5 shrink-0 text-theme-700"
+                aria-hidden="true"
+              />
             </button>
 
             <div
@@ -323,6 +331,9 @@ defineProps({
                           type="button"
                           class="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-theme-300 px-2.5 py-1.5 text-xs text-theme-700 transition hover:border-theme-400 hover:bg-white dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
                           data-testid="study-room-cycle-settings"
+                          :aria-label="
+                            '番茄鐘設定：' + timer.cycleSummaryLabel()
+                          "
                           @click="timer.openCycleSettings()"
                         >
                           <span>{{ timer.cycleChipLabel() }}</span>
@@ -337,6 +348,7 @@ defineProps({
                             type="number"
                             :min="clientConfig.timerCustomMinMinutes"
                             :max="clientConfig.timerCustomMaxMinutes"
+                            aria-label="倒數分鐘數"
                             data-testid="study-room-custom-minutes"
                             class="w-20 rounded-lg border border-theme-200 bg-white px-2 py-1.5 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                           />
@@ -433,9 +445,12 @@ defineProps({
                           :class="timer.cycleDotClass(dot)"
                         ></span>
                       </span>
-                      <span data-testid="study-room-round-label">{{
-                        timer.roundLabel()
-                      }}</span>
+                      <span data-testid="study-room-round-label"
+                        >{{ timer.roundLabel()
+                        }}<span v-if="timer.isPomodoro()" class="sr-only"
+                          >，每 {{ timer.roundsPerCycle() }} 輪長休息一次</span
+                        ></span
+                      >
                       <span aria-hidden="true">·</span>
                       <span>{{ timer.timerEndsAtLabel() }}</span>
                     </div>
@@ -449,7 +464,10 @@ defineProps({
                     class="text-4xl leading-none font-bold text-theme-900 tabular-nums sm:text-6xl dark:text-zinc-100"
                     data-testid="study-room-your-countdown"
                   >
-                    {{ timer.myRemainingLabel() }}
+                    <span aria-hidden="true">{{
+                      timer.myRemainingLabel()
+                    }}</span>
+                    <span class="sr-only">{{ timer.mySpokenRemaining() }}</span>
                   </p>
                 </div>
 
@@ -555,11 +573,7 @@ defineProps({
             <div
               v-show="timer.hasTimer() && timer.hasCountdownEnd()"
               class="absolute inset-x-0 bottom-0 h-1.5 bg-theme-200/80 dark:bg-zinc-800"
-              role="progressbar"
-              aria-label="計時進度"
-              :aria-valuenow="timer.progressPercent()"
-              aria-valuemin="0"
-              aria-valuemax="100"
+              aria-hidden="true"
               data-testid="study-room-progress"
             >
               <div

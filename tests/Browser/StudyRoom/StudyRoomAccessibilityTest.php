@@ -534,3 +534,31 @@ it('exposes the seats as a 座位表 landmark with the floors as headings under 
 
     $page->assertAttribute('[data-testid="study-room-toolbar"]', 'aria-label', '座位工具');
 });
+
+it('gives the control panel spoken times and named controls', function () use ($enterStudyRoom) {
+    $page = $enterStudyRoom();
+
+    $page->keys('[data-testid="seat-1-S01"]', 'Enter');
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-start-timer"]\') !== null');
+
+    $page->assertAttributeContains('[data-testid="study-room-cycle-settings"]', 'aria-label', '番茄鐘設定：')
+        ->assertAttribute('[data-testid="study-room-custom-minutes"]', 'aria-label', '倒數分鐘數');
+
+    $page->keys('[data-testid="study-room-start-timer"]', 'Enter');
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-pause-timer'");
+
+    $page->assertSourceInHas('[data-testid="study-room-your-countdown"]', '剩約')
+        // The bar only repeats the countdown, so it's decorative.
+        ->assertAttribute('[data-testid="study-room-progress"]', 'aria-hidden', 'true')
+        ->assertSourceInHas('[data-testid="study-room-round-label"]', '輪長休息一次');
+
+    // Minimized, the bar is still named by what it shows.
+    $page->keys('[data-testid="study-room-banner-minimize"]', 'Enter');
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-banner-expand'");
+
+    $page->assertAttributeMissing('[data-testid="study-room-banner-expand"]', 'aria-label');
+    $name = $page->script("document.querySelector('[data-testid=\"study-room-banner-expand\"]').textContent.replace(/\\s+/g, ' ')");
+    expect($name)->toContain('展開控制列')
+        ->and($name)->toContain('專注中')
+        ->and($name)->toContain('剩約');
+});

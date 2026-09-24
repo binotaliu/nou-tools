@@ -632,6 +632,12 @@ export default function useStudyTimer(
     return seat ? remainingLabel(seat) : ''
   }
 
+  function mySpokenRemaining() {
+    const seat = socket.mySeat()
+
+    return seat ? spokenTimerLabel(seat) : ''
+  }
+
   // Everything the panel shows about your timer, as one sentence for the
   // 朗讀目前狀態 accesskey.
   function statusSentence() {
@@ -838,6 +844,7 @@ export default function useStudyTimer(
     mySeatLabel,
     myActivityLabel,
     myRemainingLabel,
+    mySpokenRemaining,
     statusSentence,
     formatDurationLabel,
     startTimer,

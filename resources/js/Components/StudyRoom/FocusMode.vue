@@ -312,18 +312,15 @@ onUnmounted(() => {
         class="font-mono text-[clamp(3.25rem,min(11vw,16vh),7rem)] leading-none font-bold tracking-tight tabular-nums short:text-[clamp(2.5rem,13vh,4rem)]"
         data-testid="study-room-focus-countdown"
       >
-        {{ timer.myRemainingLabel() }}
+        <span aria-hidden="true">{{ timer.myRemainingLabel() }}</span>
+        <span class="sr-only">{{ timer.mySpokenRemaining() }}</span>
       </p>
 
       <div
         v-show="timer.hasCountdownEnd()"
         class="h-1.5 w-56 overflow-hidden rounded-full sm:w-80"
         :class="sky.focusProgressTrackClass()"
-        role="progressbar"
-        aria-label="計時進度"
-        :aria-valuenow="timer.progressPercent()"
-        aria-valuemin="0"
-        aria-valuemax="100"
+        aria-hidden="true"
       >
         <div
           class="h-full rounded-full bg-current transition-[width] duration-1000 ease-linear"
