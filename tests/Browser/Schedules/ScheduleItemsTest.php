@@ -164,3 +164,47 @@ it('renders the next class as a card on a phone, with the date tile, time and cl
         ->assertSeeIn($card, '備用教室')
         ->assertDontSee('進行中');
 });
+
+it('summarises the next class with accesskeys for the summary, the classroom, the timetable and the term', function () use ($createScheduleWithClass) {
+    config()->set('app.current_semester', '2025B');
+
+    $date = now('Asia/Taipei')->addDays(3)->toDateString();
+    [$schedule, $course, $courseClass] = $createScheduleWithClass($date, '09:00', '10:00');
+    $courseClass->update(['link' => 'https://example.com/live']);
+
+    $page = visit(route('schedules.show', $schedule))
+        ->withTimezone('Asia/Taipei')
+        ->assertSee($course->name)
+        ->assertSeeIn('[data-testid="schedule-next-class"]', '下一堂課')
+        ->assertSeeIn('[data-testid="schedule-next-class-name"]', $course->name)
+        ->assertSeeIn('[data-testid="schedule-next-class"]', '09:00 ~ 10:00')
+        ->assertAttribute('[data-testid="schedule-next-class-join"]', 'href', 'https://example.com/live');
+
+    $keys = json_decode($page->script(
+        "JSON.stringify(Object.fromEntries([...document.querySelectorAll('main [accesskey]')].map(e => [e.accessKey, e.id || e.dataset.testid])))"
+    ), true);
+
+    expect($keys)->toBe([
+        '4' => 'schedule-next-class',
+        '5' => 'schedule-next-class-join',
+        '6' => 'schedule-items-heading',
+        '7' => 'term',
+    ]);
+});
+
+it('offers no next-class accesskeys when the schedule has no upcoming class', function () use ($createScheduleWithClass) {
+    config()->set('app.current_semester', '2025B');
+
+    $date = now('Asia/Taipei')->subDays(3)->toDateString();
+    [$schedule] = $createScheduleWithClass($date, '09:00', '10:00');
+
+    $page = visit(route('schedules.show', $schedule))
+        ->withTimezone('Asia/Taipei')
+        ->assertSeeIn('[data-testid="schedule-next-class"]', '無未來課程');
+
+    $keys = json_decode($page->script(
+        "JSON.stringify([...document.querySelectorAll('main [accesskey]')].map(e => e.accessKey))"
+    ), true);
+
+    expect($keys)->not->toContain('4')->not->toContain('5');
+});

@@ -348,6 +348,10 @@ const itemRows = computed(() =>
     })
 )
 
+// Rows are already ordered by next class, so the first row with an upcoming
+// class is the one the 下一堂課 summary (accesskey 4/5) points at.
+const nextClass = computed(() => itemRows.value.find(row => row.next) ?? null)
+
 // Split a teacher name so a trailing "老師" can render smaller, mirroring
 // the previous server-side markup.
 function teacher(item) {
@@ -556,6 +560,7 @@ function localHint(next) {
                 <select
                   id="term"
                   name="term"
+                  accesskey="7"
                   aria-label="選擇學期"
                   data-offline-disable
                   class="h-10 w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 dark:border-zinc-700 dark:bg-zinc-900"
@@ -758,11 +763,91 @@ function localHint(next) {
         </div>
       </div>
 
+      <section
+        v-if="hasCourses"
+        tabindex="-1"
+        :accesskey="nextClass ? '4' : null"
+        aria-labelledby="next-class-heading"
+        data-testid="schedule-next-class"
+        class="mb-8 rounded-lg border border-theme-200 bg-white p-5 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
+      >
+        <div class="flex items-center gap-2">
+          <h2
+            id="next-class-heading"
+            class="text-sm font-semibold text-theme-700 dark:text-zinc-400"
+          >
+            下一堂課
+          </h2>
+          <span
+            v-if="nextClass && isOngoing(nextClass.next)"
+            class="rounded-full bg-emerald-100 px-2.5 py-1 text-[0.6875rem] font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
+          >
+            進行中
+          </span>
+        </div>
+
+        <template v-if="nextClass">
+          <p
+            class="mt-2 text-xl font-bold text-theme-900 dark:text-zinc-100"
+            data-testid="schedule-next-class-name"
+          >
+            {{ nextClass.item.courseName }}
+          </p>
+          <p class="mt-1 text-theme-800 tabular-nums dark:text-zinc-200">
+            {{ taipeiDate(nextClass.next) }}
+            <span v-if="taipeiTime(nextClass.next)">
+              {{ taipeiTime(nextClass.next) }}
+            </span>
+          </p>
+          <p
+            v-if="localHint(nextClass.next)"
+            class="mt-1 text-xs text-theme-700 dark:text-zinc-400"
+          >
+            {{ localHint(nextClass.next) }}
+          </p>
+
+          <a
+            v-if="nextClass.item.videoLink"
+            :href="nextClass.item.videoLink"
+            target="_blank"
+            rel="noopener"
+            accesskey="5"
+            data-offline-allow
+            data-testid="schedule-next-class-join"
+            class="mt-4 inline-flex items-center gap-2 rounded-lg bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300"
+            :aria-label="
+              '前往 ' +
+              nextClass.item.courseName +
+              ' 的視訊上課連結（在新分頁開啟）'
+            "
+          >
+            <Icon name="video-camera" class="size-5" />
+            進入教室
+          </a>
+          <p
+            v-else-if="nextClass.item.isTentative"
+            class="mt-4 text-sm text-amber-800 dark:text-amber-200"
+          >
+            尚未分班，開學分班後選擇班級才會有視訊上課連結。
+          </p>
+        </template>
+        <p v-else class="mt-2 text-theme-700 dark:text-zinc-400">無未來課程</p>
+      </section>
+
       <!-- Schedule Items - Responsive Table/Cards -->
       <div
         v-if="viewModel.displayOptions.show_schedule_items && hasCourses"
         class="mb-4 md:overflow-hidden md:rounded-lg md:border md:border-theme-200 md:bg-white dark:md:border-zinc-700 dark:md:bg-zinc-900"
       >
+        <h2
+          id="schedule-items-heading"
+          tabindex="-1"
+          accesskey="6"
+          class="sr-only"
+        >
+          完整課表
+        </h2>
+
         <!-- 桌面版表格 -->
         <div class="hidden overflow-x-auto md:block">
           <table
