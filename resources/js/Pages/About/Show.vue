@@ -22,38 +22,45 @@ const linkIconClass = 'size-4 shrink-0 text-theme-700 dark:text-zinc-200'
 
   <AppLayout>
     <div class="mx-auto max-w-3xl space-y-8">
-      <div>
+      <!-- One header, two looks: on the web the icon sits beside the page
+           title like a page heading; in a phone PWA (no header, no title) it
+           becomes a centred app-style brand block. -->
+      <div
+        class="flex items-center gap-4 bottom-nav:flex-col bottom-nav:gap-1"
+        data-testid="about-brand"
+      >
         <div
-          class="flex flex-col items-center gap-1 md:flex-row md:gap-4"
-          data-testid="about-brand"
+          class="shrink-0 rounded-xl bg-theme-100 p-3 dark:bg-zinc-800 bottom-nav:bg-transparent dark:bottom-nav:bg-transparent"
         >
-          <div class="p-3">
-            <Icon
-              name="book-open"
-              class="size-6 text-theme-700 dark:text-zinc-300"
-            />
-          </div>
-          <div class="text-center md:text-left">
-            <p class="text-lg font-semibold text-theme-700 dark:text-zinc-300">
-              NOU 小幫手
-            </p>
-            <p class="mt-1 text-xs text-theme-700 dark:text-zinc-400">
-              給 NOU 同學的非官方小工具
-            </p>
-          </div>
+          <Icon
+            name="book-open"
+            class="size-8 text-theme-700 dark:text-zinc-300 bottom-nav:size-6"
+          />
         </div>
-        <h2
-          class="mt-6 text-3xl font-bold tracking-tight text-theme-700 dark:text-zinc-200 bottom-nav:hidden"
-          data-testid="about-title"
-        >
-          關於本站
-        </h2>
-        <p
-          class="mt-3 text-theme-700 dark:text-zinc-400 bottom-nav:hidden"
-          data-testid="about-subtitle"
-        >
-          NOU 小幫手是給 NOU 同學的非官方小工具，由學生自發製作。
-        </p>
+        <div class="bottom-nav:text-center">
+          <h2
+            class="text-3xl font-bold tracking-tight text-theme-700 dark:text-zinc-200 bottom-nav:hidden"
+            data-testid="about-title"
+          >
+            關於本站
+          </h2>
+          <p
+            class="mt-1 text-theme-700 dark:text-zinc-400 bottom-nav:hidden"
+            data-testid="about-subtitle"
+          >
+            NOU 小幫手是給 NOU 同學的非官方小工具，由學生自發製作。
+          </p>
+          <p
+            class="hidden text-lg font-semibold text-theme-700 dark:text-zinc-300 bottom-nav:block"
+          >
+            NOU 小幫手
+          </p>
+          <p
+            class="mt-1 hidden text-xs text-theme-700 dark:text-zinc-400 bottom-nav:block"
+          >
+            給 NOU 同學的非官方小工具
+          </p>
+        </div>
       </div>
 
       <section
