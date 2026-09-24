@@ -1,6 +1,6 @@
 <script setup>
-// Uses the `useLearningProgress` composable for the scroll-gradient overlay
-// + print-friendly form submission, and the `Greeting` component (see
+// Uses the `useLearningProgress` composable for the scroll-gradient overlay,
+// Inertia's `useForm` for saving, and the `Greeting` component (see
 // resources/js/Components/Greeting.vue) for the greeting card.
 //
 // Only the ViewModel's constructor properties survive Inertia's JSON
@@ -15,7 +15,7 @@ import {
   ref,
   watch,
 } from 'vue'
-import { Head, Link } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import { CheckIcon } from '@heroicons/vue/24/solid'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
@@ -326,8 +326,8 @@ function updateHomeworkDeadline(courseId, number, value) {
 const progressForm = ref(null)
 
 // Any edit inside the form marks it dirty; the phone PWA (which hides the
-// header save button) then shows a floating save button. Saving is a native
-// POST + redirect, so the flag never needs resetting.
+// header save button) then shows a floating save button; a successful save
+// clears it.
 const hasUnsavedChanges = ref(false)
 
 const {
@@ -335,8 +335,40 @@ const {
   showVerticalGradient,
   checkGradientVisibility,
   init,
-  submitProgressForm,
 } = useLearningProgress(progressForm)
+
+const form = useForm({})
+
+// `progress` also carries each week's note, but the server stores notes
+// separately (UpdateLearningProgressData), so split them here.
+function save() {
+  form
+    .transform(() => ({
+      progress: mapCourseWeeks(({ video, textbook }) => ({ video, textbook })),
+      notes: mapCourseWeeks(({ note }) => note),
+      homework,
+    }))
+    .put(
+      `/schedules/${props.viewModel.scheduleUuid}/${props.viewModel.term}/learning-progress`,
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          hasUnsavedChanges.value = false
+        },
+      }
+    )
+}
+
+function mapCourseWeeks(pick) {
+  return Object.fromEntries(
+    Object.entries(progress).map(([courseId, weeks]) => [
+      courseId,
+      Object.fromEntries(
+        Object.entries(weeks).map(([weekNum, slot]) => [weekNum, pick(slot)])
+      ),
+    ])
+  )
+}
 
 // Switching back to the table view can change its scroll
 // dimensions (it was `display:none` a moment ago), so re-check the
@@ -384,15 +416,6 @@ onUnmounted(() => {
 function print() {
   window.print()
 }
-
-// The progress form is a plain native POST (see useLearningProgress's
-// fallback `document.getElementById(formId)?.submit()`), not an Inertia/XHR
-// request, so it needs its own CSRF token field rather than relying on the
-// XSRF-TOKEN cookie Inertia's axios instance reads automatically.
-const csrfToken =
-  typeof document !== 'undefined'
-    ? (document.querySelector('meta[name="csrf-token"]')?.content ?? '')
-    : ''
 </script>
 
 <template>
@@ -432,7 +455,8 @@ const csrfToken =
             class="inline-flex w-1/2 items-center justify-center gap-2 rounded-md bg-theme-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-theme-600 md:w-auto"
             data-analytics-event="learning_progress_save"
             data-analytics-feature="learning_progress"
-            @click="submitProgressForm()"
+            :disabled="form.processing"
+            @click="save"
           >
             <Icon name="check" class="size-4" />
             保存進度
@@ -465,18 +489,14 @@ const csrfToken =
 
       <form
         id="progress-form"
-        method="POST"
-        :action="`/schedules/${viewModel.scheduleUuid}/${viewModel.term}/learning-progress`"
         :style="{
           '--courses-count': viewModel.courses.length,
           '--weeks-count': viewModel.weeks.length,
         }"
         @input="hasUnsavedChanges = true"
         @change="hasUnsavedChanges = true"
+        @submit.prevent="save"
       >
-        <input type="hidden" name="_method" value="PUT" />
-        <input type="hidden" name="_token" :value="csrfToken" />
-
         <div
           class="p-2 md:px-0 md:pt-0 print:hidden"
           data-testid="learning-progress-view-switcher"
@@ -598,7 +618,6 @@ const csrfToken =
                             <input
                               v-model="homework[course.id][number].completed"
                               type="checkbox"
-                              :name="`homework[${course.id}][${number}][completed]`"
                               value="1"
                               :aria-label="`${course.name} ${number === 1 ? '作業一' : '作業二'}已完成`"
                               class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
@@ -642,7 +661,6 @@ const csrfToken =
                     >
                       <textarea
                         v-model="homework[course.id][number].note"
-                        :name="`homework[${course.id}][${number}][note]`"
                         placeholder="（尚未設定備註）"
                         class="m-0 h-full w-full resize-none px-2 py-2 text-xs text-theme-700 placeholder-gray-400 focus:border-blue-500 focus:outline-none dark:text-zinc-300 print:text-black print:placeholder-transparent"
                         rows="2"
@@ -706,7 +724,6 @@ const csrfToken =
                             <input
                               v-model="progress[course.id][week.num].video"
                               type="checkbox"
-                              :name="`progress[${course.id}][${week.num}][video]`"
                               value="1"
                               :aria-label="`第${toChineseNumber(week.num)}週 ${course.name} 的影音學習進度`"
                               class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
@@ -741,7 +758,6 @@ const csrfToken =
                             <input
                               v-model="progress[course.id][week.num].textbook"
                               type="checkbox"
-                              :name="`progress[${course.id}][${week.num}][textbook]`"
                               value="1"
                               :aria-label="`第${toChineseNumber(week.num)}週 ${course.name} 的課本學習進度`"
                               class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
@@ -770,7 +786,6 @@ const csrfToken =
                     >
                       <textarea
                         v-model="progress[course.id][week.num].note"
-                        :name="`notes[${course.id}][${week.num}]`"
                         placeholder="（尚未設定目標）"
                         :class="
                           isProgressComplete(course.id, week.num)
@@ -1216,7 +1231,8 @@ const csrfToken =
           data-testid="learning-progress-floating-save"
           data-analytics-event="learning_progress_save"
           data-analytics-feature="learning_progress"
-          @click="submitProgressForm()"
+          :disabled="form.processing"
+          @click="save"
         >
           <Icon name="check" class="size-4" />
           保存進度

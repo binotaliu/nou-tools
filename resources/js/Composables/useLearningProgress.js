@@ -1,11 +1,7 @@
 import { nextTick, ref } from 'vue'
 
-// `progressFormRef` must point at the scrollable form element; `formId` is
-// the id used for the fallback native submit.
-export default function useLearningProgress(
-  progressFormRef,
-  formId = 'progress-form'
-) {
+// `progressFormRef` must point at the scrollable form element.
+export default function useLearningProgress(progressFormRef) {
   const showHorizontalGradient = ref(false)
   const showVerticalGradient = ref(false)
 
@@ -34,15 +30,10 @@ export default function useLearningProgress(
     checkGradientVisibility()
   }
 
-  function submitProgressForm() {
-    document.getElementById(formId)?.submit()
-  }
-
   return {
     showHorizontalGradient,
     showVerticalGradient,
     checkGradientVisibility,
     init,
-    submitProgressForm,
   }
 }
