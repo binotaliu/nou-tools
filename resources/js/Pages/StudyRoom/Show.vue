@@ -28,6 +28,7 @@ import Wall from '../../Components/StudyRoom/Wall.vue'
 import FloorSkeleton from '../../Components/StudyRoom/FloorSkeleton.vue'
 import LiveAnnouncer from '../../Components/StudyRoom/LiveAnnouncer.vue'
 import useSeatGrid from '../../Composables/useSeatGrid'
+import useSeatRovingFocus from '../../Composables/useSeatRovingFocus'
 import useStudyRoomAnnouncer from '../../Composables/useStudyRoomAnnouncer'
 import useStudyRoomDemo from '../../Composables/useStudyRoomDemo'
 import useStudyRoomMusic from '../../Composables/useStudyRoomMusic'
@@ -58,6 +59,7 @@ const socket = props.hasSchedule
   ? useStudyRoomSocket(props.clientConfig)
   : useStudyRoomDemo(props.clientConfig)
 const grid = useSeatGrid(socket, props.clientConfig)
+const roving = useSeatRovingFocus(socket)
 const sky = useStudyRoomSky(props.clientConfig)
 const profile = useStudyRoomProfile(props.profile, props.emojiChoices)
 const music = useStudyRoomMusic()
@@ -213,6 +215,7 @@ onMounted(async () => {
     grid,
     music,
     announcer,
+    roving,
   }
 
   // Separate Vite entry (see resources/js/echo.js) so pages that don't need
@@ -514,14 +517,21 @@ onUnmounted(() => {
         />
 
         <div v-show="!needsProfile && socket.state" class="space-y-6">
+          <p id="study-room-seat-keys-hint" class="sr-only">
+            用左右方向鍵逐一移動座位，上下方向鍵移到上一排或下一排，Home、End
+            移到這層第一個或最後一個座位。
+          </p>
+
           <section
             v-for="floor in socket.state ? socket.state.floors : []"
             :key="floor.floor"
             class="space-y-3"
+            :aria-labelledby="'study-room-floor-heading-' + floor.floor"
             :data-testid="'study-room-floor-' + floor.floor"
           >
             <div class="flex items-end justify-between px-1">
               <h3
+                :id="'study-room-floor-heading-' + floor.floor"
                 class="flex items-center gap-2 text-lg font-semibold text-theme-900 dark:text-zinc-100"
               >
                 <span>{{ floor.label }}</span>
@@ -540,6 +550,14 @@ onUnmounted(() => {
                 >
               </span>
             </div>
+
+            <p
+              v-if="grid.stairSpokenHint(floor)"
+              class="sr-only"
+              :data-testid="'study-room-floor-' + floor.floor + '-stair-hint'"
+            >
+              {{ grid.stairSpokenHint(floor) }}
+            </p>
 
             <div
               class="relative rounded-2xl border-[6px] border-theme-300 bg-theme-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
@@ -578,7 +596,13 @@ onUnmounted(() => {
               </template>
 
               <div
+                role="group"
+                :aria-label="floor.label + '座位'"
+                aria-describedby="study-room-seat-keys-hint"
+                :data-testid="'study-room-floor-' + floor.floor + '-seats'"
                 class="relative space-y-6 rounded-[10px] bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(0,0,0,0.04)_5.5rem_calc(5.5rem+1px))] px-4 pt-6 pb-16 sm:px-8 dark:bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(255,255,255,0.05)_5.5rem_calc(5.5rem+1px))]"
+                @keydown="roving.onKeydown($event, floor)"
+                @focusin="roving.onFocusIn($event, floor)"
               >
                 <div
                   class="grid grid-cols-3 justify-items-center gap-x-3 gap-y-7 sm:grid-cols-4 sm:gap-x-5 md:grid-cols-6"
@@ -588,15 +612,15 @@ onUnmounted(() => {
                     v-for="seat in floor.soloSeats"
                     :key="seat.code"
                     type="button"
-                    :disabled="
-                      seat.isOccupied ||
-                      socket.busySeatCode !== null ||
-                      socket.heldSeatCode !== null
-                    "
+                    :aria-disabled="grid.isSeatActionable(seat) ? null : 'true'"
+                    :tabindex="roving.tabIndexFor(floor, seat)"
                     :class="grid.seatClasses(seat)"
                     :data-testid="grid.seatTestId(seat)"
-                    :aria-label="grid.seatAriaLabel(seat)"
-                    @click="socket.take(seat.code)"
+                    :data-seat-code="seat.code"
+                    :aria-label="
+                      grid.seatAriaLabel(seat, timer.spokenTimerLabel(seat))
+                    "
+                    @click="grid.activateSeat(seat)"
                   >
                     <span
                       class="pointer-events-none absolute inset-x-1.5 top-0 h-4 rounded-b-md bg-theme-200 shadow-[inset_0_-2px_0_var(--color-theme-300)] dark:bg-zinc-700 dark:shadow-[inset_0_-2px_0_var(--color-zinc-600)]"
@@ -688,6 +712,8 @@ onUnmounted(() => {
                     v-for="table in floor.tables"
                     :key="table.groupCode"
                     class="flex flex-col items-center gap-1"
+                    role="group"
+                    :aria-label="table.label"
                     :data-testid="'study-room-table-' + table.groupCode"
                   >
                     <div class="flex gap-4">
@@ -697,13 +723,14 @@ onUnmounted(() => {
                         :seat="seat"
                         backrest="border-t-4"
                         timer-side="top"
-                        :socket="socket"
                         :grid="grid"
                         :timer="timer"
+                        :roving-tabindex="roving.tabIndexFor(floor, seat)"
                       />
                     </div>
 
                     <div
+                      aria-hidden="true"
                       class="flex h-14 w-44 items-center justify-center gap-2 rounded-xl border-2 border-theme-300 bg-theme-200 shadow-[inset_0_2px_0_rgba(255,255,255,0.6),0_2px_4px_rgba(0,0,0,0.06)] dark:border-zinc-600 dark:bg-zinc-700 dark:shadow-none"
                     >
                       <span class="text-base leading-none" aria-hidden="true"
@@ -722,9 +749,9 @@ onUnmounted(() => {
                         :seat="seat"
                         backrest="border-b-4"
                         timer-side="bottom"
-                        :socket="socket"
                         :grid="grid"
                         :timer="timer"
+                        :roving-tabindex="roving.tabIndexFor(floor, seat)"
                       />
                     </div>
                   </div>

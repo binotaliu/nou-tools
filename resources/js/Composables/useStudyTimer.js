@@ -102,6 +102,31 @@ export default function useStudyTimer(
     return remainingLabel(seat)
   }
 
+  // The spoken counterpart of timerLabel() for seat names. It is rounded to
+  // whole minutes so the name only changes once a minute: a screen reader
+  // re-reads names it sees change, and mm:ss would change every second.
+  function spokenTimerLabel(seat) {
+    if (seat.timerEndsAt) {
+      const diffMs = Date.parse(seat.timerEndsAt) - clockNow(seat)
+
+      if (diffMs <= 0) {
+        return '時間到了'
+      }
+
+      return '剩約 ' + Math.ceil(diffMs / 60000) + ' 分鐘'
+    }
+
+    if (seat.timerStartedAt) {
+      const elapsedMinutes = Math.floor(
+        Math.max(0, clockNow(seat) - Date.parse(seat.timerStartedAt)) / 60000
+      )
+
+      return '已經 ' + elapsedMinutes + ' 分鐘'
+    }
+
+    return ''
+  }
+
   function isSeatFinishedFocus(seat) {
     return (
       seat.timerPhase === 'focus' &&
@@ -749,6 +774,7 @@ export default function useStudyTimer(
     clockLabel,
     remainingLabel,
     timerLabel,
+    spokenTimerLabel,
     isSeatFinishedFocus,
     hasTimer,
     isPomodoro,

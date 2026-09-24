@@ -4,16 +4,18 @@
 // that for the always-reserved timer line below the chair.
 //
 // Table chairs are too small to show nickname/activity inline, so those
-// live in a hover/tap popover (peek/unpeek/isPeeking in useSeatGrid).
+// live in a hover/focus/tap popover (peek/unpeek/isPeeking in useSeatGrid).
 import { onMounted, onUnmounted, ref } from 'vue'
 
 const props = defineProps({
   seat: { type: Object, required: true },
   backrest: { type: String, required: true },
   timerSide: { type: String, required: true },
-  socket: { type: Object, required: true },
   grid: { type: Object, required: true },
   timer: { type: Object, required: true },
+  // The floor's roving tabindex (useSeatRovingFocus): 0 for the one seat
+  // that holds the floor's Tab stop, -1 for the rest.
+  rovingTabindex: { type: Number, default: 0 },
 })
 
 const rootEl = ref(null)
@@ -43,15 +45,15 @@ onUnmounted(() => {
   >
     <button
       type="button"
-      :disabled="
-        socket.busySeatCode !== null ||
-        (!seat.isOccupied && socket.heldSeatCode !== null)
-      "
+      :aria-disabled="grid.isSeatActionable(seat) ? null : 'true'"
+      :tabindex="rovingTabindex"
       :class="grid.seatClasses(seat, 'table') + ' ' + backrest"
       :data-testid="grid.seatTestId(seat)"
-      :aria-label="grid.seatAriaLabel(seat)"
-      :aria-expanded="grid.isPeeking(seat) ? 'true' : 'false'"
-      @click="grid.tapTableSeat(seat)"
+      :data-seat-code="seat.code"
+      :aria-label="grid.seatAriaLabel(seat, timer.spokenTimerLabel(seat))"
+      @click="grid.activateSeat(seat)"
+      @focus="grid.peek(seat)"
+      @blur="grid.unpeek(seat)"
     >
       <span
         v-if="!seat.isOccupied"
@@ -75,8 +77,10 @@ onUnmounted(() => {
       >{{ seat.isOccupied ? timer.timerLabel(seat) : '00:00' }}</span
     >
 
+    <!-- Visual only: the button's name already says all of this. -->
     <div
       v-show="grid.isPeeking(seat)"
+      aria-hidden="true"
       class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-1.5 w-36 -translate-x-1/2 rounded-lg border border-theme-200 bg-white p-2 text-left shadow-md dark:border-zinc-600 dark:bg-zinc-800"
       :data-testid="grid.seatTestId(seat) + '-popover'"
     >

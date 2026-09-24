@@ -15,12 +15,53 @@ export default function useSeatGrid(socket, config) {
     return 'seat-' + seat.code
   }
 
-  function seatAriaLabel(seat) {
+  // The whole seat in one sentence, since occupied seats stay focusable and
+  // this is all a screen reader hears of them: who, what, and how long.
+  // `spokenTimer` is timer.spokenTimerLabel(seat), rounded to minutes.
+  function seatAriaLabel(seat, spokenTimer = '') {
     if (!seat.isOccupied) {
-      return seat.label + '，空位，點擊入座'
+      return seat.label + '，空位'
     }
 
-    return seat.label + '，' + (seat.nickname || '同學') + ' 正在使用'
+    const parts = [seat.label]
+
+    if (isMine(seat)) {
+      parts.push('你的座位')
+    } else {
+      parts.push((seat.nickname || '同學') + ' 正在使用')
+    }
+
+    parts.push(thoughtBubbleText(seat), spokenTimer)
+
+    return parts.filter(Boolean).join('，')
+  }
+
+  // Occupied seats and, once you hold one, every other seat are
+  // aria-disabled rather than disabled, so they stay focusable: a disabled
+  // button drops keyboard focus and hides its occupant from Tab.
+  function isSeatActionable(seat) {
+    return (
+      !seat.isOccupied &&
+      socket.heldSeatCode === null &&
+      socket.busySeatCode === null
+    )
+  }
+
+  // Click/Enter/Space on any seat: a free one is taken, an occupied table
+  // chair toggles its popover, anything else does nothing.
+  function activateSeat(seat) {
+    if (socket.busySeatCode !== null) {
+      return
+    }
+
+    if (seat.isOccupied) {
+      peekSeatCode.value = peekSeatCode.value === seat.code ? null : seat.code
+      return
+    }
+
+    if (socket.heldSeatCode === null) {
+      socket.take(seat.code)
+    }
   }
 
   function thoughtBubbleText(seat) {
@@ -83,6 +124,13 @@ export default function useSeatGrid(socket, config) {
 
     if (socket.busySeatCode === seat.code) {
       classes.push('opacity-50 cursor-wait')
+    } else if (!isSeatActionable(seat)) {
+      classes.push('cursor-default')
+    }
+
+    // Keeps a focused seat clear of the fixed control panel.
+    if (socket.heldSeatCode !== null) {
+      classes.push('scroll-mb-96 sm:scroll-mb-72 lg:scroll-mb-48')
     }
 
     return classes.join(' ')
@@ -135,16 +183,17 @@ export default function useSeatGrid(socket, config) {
     return '往' + floorLabel(floor.floor - 1) + ' ↓'
   }
 
-  // --- table seat popover ---
-
-  function tapTableSeat(seat) {
-    if (!seat.isOccupied) {
-      socket.take(seat.code)
-      return
+  // The stairs are drawn aria-hidden; this is their text alternative, only
+  // needed when the way up is closed (an open floor has its own section).
+  function stairSpokenHint(floor) {
+    if (!isStairBlocked(floor)) {
+      return ''
     }
 
-    peekSeatCode.value = peekSeatCode.value === seat.code ? null : seat.code
+    return floorLabel(floor.floor + 1) + '尚未開放，樓下坐滿後就會開放'
   }
+
+  // --- table seat popover ---
 
   function peek(seat) {
     if (seat.isOccupied) {
@@ -167,6 +216,8 @@ export default function useSeatGrid(socket, config) {
     isMine,
     seatTestId,
     seatAriaLabel,
+    isSeatActionable,
+    activateSeat,
     thoughtBubbleText,
     needsMarquee,
     seatTimerLabelClass,
@@ -177,7 +228,7 @@ export default function useSeatGrid(socket, config) {
     stairHint,
     isStairBlocked,
     stairDownHint,
-    tapTableSeat,
+    stairSpokenHint,
     peek,
     unpeek,
     isPeeking,

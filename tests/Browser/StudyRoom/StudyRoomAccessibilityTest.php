@@ -84,3 +84,81 @@ it('speaks a failed seat claim through the assertive live region', function () u
     expect($spoken)->not->toBe('')
         ->and($shown)->toContain($spoken);
 });
+
+$activeTestId = 'document.activeElement?.dataset.testid ?? null';
+
+it('keeps occupied seats focusable and names who sits there', function () use ($enterStudyRoom, $occupySeatBehindThePagesBack, $activeTestId) {
+    $page = $enterStudyRoom();
+
+    $occupySeatBehindThePagesBack('1-S02', '浣熊');
+
+    $page->navigate(route('study-room.show'));
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="seat-1-S02"]\')?.getAttribute("aria-disabled") === "true"');
+
+    $page->assertAttributeContains('[data-testid="seat-1-S02"]', 'aria-label', '浣熊 正在使用')
+        ->assertAttributeMissing('[data-testid="seat-1-S02"]', 'disabled');
+
+    $page->script("document.querySelector('[data-testid=\"seat-1-S02\"]').focus()");
+
+    expect($page->script($activeTestId))->toBe('seat-1-S02');
+});
+
+it('gives each floor one Tab stop and moves between seats with the arrow keys', function () use ($enterStudyRoom, $activeTestId) {
+    $page = $enterStudyRoom();
+
+    $tabStops = $page->script(
+        "document.querySelectorAll('[data-testid=\"study-room-floor-1-seats\"] [data-seat-code][tabindex=\"0\"]').length"
+    );
+
+    expect($tabStops)->toBe(1);
+
+    $page->keys('[data-testid="seat-1-S01"]', 'ArrowRight');
+    expect($page->script($activeTestId))->toBe('seat-1-S02');
+
+    $page->keys('[data-testid="seat-1-S02"]', 'ArrowLeft');
+    expect($page->script($activeTestId))->toBe('seat-1-S01');
+
+    $page->keys('[data-testid="seat-1-S01"]', 'End');
+    $last = $page->script(
+        "[...document.querySelectorAll('[data-testid=\"study-room-floor-1-seats\"] [data-seat-code]')].at(-1).dataset.testid"
+    );
+    expect($page->script($activeTestId))->toBe($last);
+
+    $page->keys('[data-testid="'.$last.'"]', 'Home');
+    expect($page->script($activeTestId))->toBe('seat-1-S01');
+
+    // Down lands on a seat that is really further down the floor.
+    $page->keys('[data-testid="seat-1-S01"]', 'ArrowDown');
+    $movedDown = $page->script(
+        "document.activeElement.getBoundingClientRect().top > document.querySelector('[data-testid=\"seat-1-S01\"]').getBoundingClientRect().bottom - 1"
+    );
+    expect($movedDown)->toBeTrue();
+
+    // The Tab stop follows focus, so there is still exactly one.
+    $current = $page->script($activeTestId);
+    expect($page->script("document.querySelector('[data-testid=\"{$current}\"]').tabIndex"))->toBe(0)
+        ->and($page->script("document.querySelector('[data-testid=\"seat-1-S01\"]').tabIndex"))->toBe(-1);
+
+    // One Tab leaves the floor instead of walking every seat.
+    $page->keys('[data-testid="'.$current.'"]', 'Tab');
+    $stillOnFloor = $page->script(
+        "document.querySelector('[data-testid=\"study-room-floor-1-seats\"]').contains(document.activeElement)"
+    );
+    expect($stillOnFloor)->toBeFalse();
+});
+
+it('opens a table chair popover on keyboard focus', function () use ($enterStudyRoom, $occupySeatBehindThePagesBack) {
+    $page = $enterStudyRoom();
+
+    $occupySeatBehindThePagesBack('1-T1-1', '浣熊');
+
+    $page->navigate(route('study-room.show'));
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="seat-1-T1-1"]\')?.getAttribute("aria-disabled") === "true"');
+
+    $page->assertMissing('[data-testid="seat-1-T1-1-popover"]');
+    $page->script("document.querySelector('[data-testid=\"seat-1-T1-1\"]').focus()");
+    $page->assertVisible('[data-testid="seat-1-T1-1-popover"]')
+        ->assertAttribute('[data-testid="seat-1-T1-1-popover"]', 'aria-hidden', 'true');
+});
