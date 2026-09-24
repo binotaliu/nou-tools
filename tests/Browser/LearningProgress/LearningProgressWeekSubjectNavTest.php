@@ -87,3 +87,34 @@ it('wraps the subject switch around and always shows a target name', function ()
         ->assertSeeIn('[data-testid="learning-progress-subject-prev"]', '國文賞析')
         ->assertSeeIn('[data-testid="learning-progress-subject-next"]', '國文賞析');
 });
+
+it('lays the week and subject views out as boards on desktop and one track at a time on a phone', function () use ($dismissRememberModalIfPresentForNav, $scheduleWithTwoCourses) {
+    $schedule = $scheduleWithTwoCourses();
+
+    $page = visit(route('learning-progress.show', ['schedule' => $schedule, 'term' => '2025B']))
+        ->resize(1440, 900);
+    $dismissRememberModalIfPresentForNav($page);
+
+    // Desktop keeps the table as its default; the switcher is there too.
+    $page->assertVisible('[data-testid="learning-progress-view-switcher"]')
+        ->assertMissing('[data-testid="learning-progress-week-view"]');
+
+    $visibleCount = fn (string $testId) => $page->script(
+        "[...document.querySelectorAll('[data-testid=\"{$testId}\"]')].filter(el => el.offsetParent !== null).length"
+    );
+
+    $page->click('[data-testid="learning-progress-view-tab-subject"]');
+    expect($visibleCount('learning-progress-subject-column'))->toBe(2);
+    $page->assertMissing('[data-testid="learning-progress-subject-picker"]');
+
+    $page->click('[data-testid="learning-progress-view-tab-week"]');
+    expect($visibleCount('learning-progress-week-column'))->toBeGreaterThan(2);
+    $page->assertMissing('[data-testid="learning-progress-week-picker"]');
+
+    $page->resize(390, 844)
+        ->assertVisible('[data-testid="learning-progress-week-picker"]');
+    expect($visibleCount('learning-progress-week-column'))->toBe(1);
+
+    $page->click('[data-testid="learning-progress-view-tab-subject"]');
+    expect($visibleCount('learning-progress-subject-column'))->toBe(1);
+});

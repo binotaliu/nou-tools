@@ -166,25 +166,22 @@ function isWeekPassed(weekNum) {
   return currentWeek.value !== null && weekNum < currentWeek.value
 }
 
-// Mirrors the table's legend (目前週次 / 進度落後) for the 依科目 mobile
-// view, scoped to the single selected course rather than "any course".
-function subjectWeekStatus(weekNum) {
+// Mirrors the table's legend (目前週次 / 進度落後) for the 依科目 view,
+// scoped to a single course rather than "any course".
+function subjectWeekStatus(courseId, weekNum) {
   if (currentWeek.value === weekNum) {
     return 'current'
   }
 
-  if (
-    isWeekPassed(weekNum) &&
-    !isProgressComplete(selectedCourseId.value, weekNum)
-  ) {
+  if (isWeekPassed(weekNum) && !isProgressComplete(courseId, weekNum)) {
     return 'overdue'
   }
 
   return null
 }
 
-function subjectCardBorderClass(weekNum) {
-  const status = subjectWeekStatus(weekNum)
+function subjectCardBorderClass(courseId, weekNum) {
+  const status = subjectWeekStatus(courseId, weekNum)
 
   if (status === 'current') {
     return 'border-blue-500 dark:border-blue-400'
@@ -197,12 +194,12 @@ function subjectCardBorderClass(weekNum) {
   return 'border-theme-200 dark:border-zinc-700'
 }
 
-function subjectCheckboxClass(weekNum, checked) {
+function subjectCheckboxClass(courseId, weekNum, checked) {
   if (checked) {
     return 'border-theme-400 bg-theme-50 dark:border-zinc-500 dark:bg-zinc-800'
   }
 
-  const status = subjectWeekStatus(weekNum)
+  const status = subjectWeekStatus(courseId, weekNum)
 
   if (status === 'current') {
     return 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-950/60'
@@ -241,8 +238,14 @@ function toChineseNumber(n) {
   return window.NouTime ? window.NouTime.chineseNumber(n) : String(n)
 }
 
-// --- mobile view-mode switch (table/week/subject) ---
-const { viewMode, setViewMode } = useLearningProgressViewMode()
+// --- view-mode switch (week/subject/homework/table) ---
+// With no saved preference, phones start on the card view and larger screens
+// on the familiar table. `md` (48rem) is the same breakpoint the layout uses.
+const { viewMode, setViewMode } = useLearningProgressViewMode(
+  typeof window !== 'undefined' && window.matchMedia('(width < 48rem)').matches
+    ? 'week'
+    : 'table'
+)
 
 const viewModeTabs = [
   { value: 'week', label: '依週次' },
@@ -335,22 +338,30 @@ const {
   submitProgressForm,
 } = useLearningProgress(progressForm)
 
-// Switching back to the table view on mobile can change its scroll
+// Switching back to the table view can change its scroll
 // dimensions (it was `display:none` a moment ago), so re-check the
 // gradients once Vue has applied the new visibility class.
 watch(viewMode, () => nextTick(checkGradientVisibility))
 
-// The week/subject card views must only ever be mounted below `md` (48rem) —
-// matching CSS with a `md:hidden` class isn't enough on its own, since it
-// would still mount a second DateField with the same aria-label as the
-// table's, which breaks Playwright's strict-mode element matching even
-// though the copy is visually hidden.
-const isMobileViewport = ref(false)
-let mobileMediaQuery = null
+// On desktop the 依週次 board lays every week out as a column. It opens on the
+// week *before* the selected (by default current) one, so last week's unticked
+// boxes are the first thing a delayed reader sees, with this week beside it.
+const weekBoard = ref(null)
 
-function updateIsMobileViewport(event) {
-  isMobileViewport.value = event.matches
+function scrollWeekBoardToStart() {
+  const board = weekBoard.value
+  const startWeekNum = (previousWeek.value ?? props.viewModel.weeks[0])?.num
+  const column = board?.querySelector(`[data-week-num="${startWeekNum}"]`)
+
+  if (board && column) {
+    // Stop one padding short so the current week's ring isn't clipped.
+    const padding = parseFloat(getComputedStyle(board).paddingLeft) || 0
+
+    board.scrollLeft = column.offsetLeft - board.offsetLeft - padding
+  }
 }
+
+watch(viewMode, () => nextTick(scrollWeekBoardToStart))
 
 let scrollDebounceTimer = null
 
@@ -361,17 +372,13 @@ function onFormScroll() {
 
 onMounted(() => {
   init()
+  scrollWeekBoardToStart()
   window.addEventListener('resize', checkGradientVisibility)
-
-  mobileMediaQuery = window.matchMedia('(width < 48rem)')
-  isMobileViewport.value = mobileMediaQuery.matches
-  mobileMediaQuery.addEventListener('change', updateIsMobileViewport)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkGradientVisibility)
   clearTimeout(scrollDebounceTimer)
-  mobileMediaQuery?.removeEventListener('change', updateIsMobileViewport)
 })
 
 function print() {
@@ -471,12 +478,12 @@ const csrfToken =
         <input type="hidden" name="_token" :value="csrfToken" />
 
         <div
-          class="p-2 md:hidden print:hidden"
+          class="p-2 md:px-0 md:pt-0 print:hidden"
           data-testid="learning-progress-view-switcher"
         >
           <div
             role="tablist"
-            class="grid grid-cols-4 gap-1 rounded-md bg-theme-100 p-1 dark:bg-zinc-800"
+            class="grid grid-cols-4 gap-1 rounded-md bg-theme-100 p-1 md:max-w-md dark:bg-zinc-800"
           >
             <button
               v-for="tab in viewModeTabs"
@@ -501,14 +508,14 @@ const csrfToken =
         <div
           class="relative"
           :class="
-            viewMode === 'table' || !isMobileViewport
+            viewMode === 'table'
               ? 'rounded border border-theme-300 dark:border-zinc-600'
               : ''
           "
         >
           <div
             ref="progressForm"
-            :class="viewMode === 'table' ? 'block' : 'hidden md:block'"
+            :class="viewMode === 'table' ? 'block' : 'hidden print:block'"
             class="max-h-[min(45rem,90vh)] max-w-full overflow-x-auto rounded bg-linear-to-b from-theme-100 to-white dark:from-zinc-900 dark:to-zinc-950 print:max-h-full"
             @scroll="onFormScroll"
           >
@@ -782,15 +789,17 @@ const csrfToken =
           </div>
 
           <div
-            v-if="viewMode === 'homework' && isMobileViewport"
-            class="p-2 md:hidden"
+            v-if="viewMode === 'homework'"
+            class="p-2 md:px-0 print:hidden"
             data-testid="learning-progress-homework-view"
           >
-            <div class="space-y-3">
-              <article
+            <div
+              class="space-y-3 md:flex md:items-start md:gap-4 md:space-y-0 md:overflow-x-auto md:pb-4"
+            >
+              <section
                 v-for="course in viewModel.courses"
                 :key="course.id"
-                class="rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+                class="rounded-lg border border-theme-200 bg-white p-4 md:w-64 md:shrink-0 md:rounded-lg md:border-0 md:bg-theme-100/60 md:p-3 dark:md:bg-zinc-900/60"
                 data-testid="learning-progress-homework-view-course-card"
                 :data-course-id="course.id"
               >
@@ -800,279 +809,349 @@ const csrfToken =
                   {{ course.name }}
                 </h3>
 
-                <div
-                  v-for="number in [1, 2]"
-                  :key="number"
-                  class="mb-2 last:mb-0"
-                >
-                  <div class="mb-1 grid grid-cols-2 gap-2">
-                    <label
-                      class="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-theme-200 px-3 py-2.5 text-sm whitespace-nowrap text-theme-700 has-checked:border-theme-400 has-checked:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:has-checked:border-zinc-500 dark:has-checked:bg-zinc-800"
-                    >
-                      <input
-                        v-model="homework[course.id][number].completed"
-                        type="checkbox"
-                        class="size-4 rounded border-gray-500"
+                <div class="space-y-3">
+                  <div
+                    v-for="number in [1, 2]"
+                    :key="number"
+                    class="rounded-lg md:border md:border-theme-200 md:bg-white md:p-3 md:dark:border-zinc-700 md:dark:bg-zinc-900"
+                  >
+                    <div class="mb-1 grid grid-cols-2 gap-2 md:grid-cols-1">
+                      <label
+                        class="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-theme-200 px-3 py-2.5 text-sm whitespace-nowrap text-theme-700 has-checked:border-theme-400 has-checked:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:has-checked:border-zinc-500 dark:has-checked:bg-zinc-800"
+                      >
+                        <input
+                          v-model="homework[course.id][number].completed"
+                          type="checkbox"
+                          class="size-4 rounded border-gray-500"
+                        />
+                        {{ homeworkLabel(number) }}
+                      </label>
+                      <DateField
+                        :model-value="homework[course.id][number].deadline"
+                        :label="`${course.name} ${homeworkLabel(number)}的截止日期`"
+                        :today="viewModel.now"
+                        :initial-month="viewModel.semesterStart"
+                        variant="box"
+                        format="compact"
+                        placeholder="按一下以設定期限"
+                        @change="
+                          value =>
+                            updateHomeworkDeadline(course.id, number, value)
+                        "
                       />
-                      {{ homeworkLabel(number) }}
-                    </label>
-                    <DateField
-                      :model-value="homework[course.id][number].deadline"
-                      :label="`${course.name} ${homeworkLabel(number)}的截止日期`"
-                      :today="viewModel.now"
-                      :initial-month="viewModel.semesterStart"
-                      variant="box"
-                      format="compact"
-                      placeholder="按一下以設定期限"
-                      @change="
-                        value =>
-                          updateHomeworkDeadline(course.id, number, value)
-                      "
-                    />
+                    </div>
+                    <textarea
+                      v-model="homework[course.id][number].note"
+                      placeholder="（尚未設定備註）"
+                      rows="3"
+                      class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
+                    ></textarea>
                   </div>
-                  <textarea
-                    v-model="homework[course.id][number].note"
-                    placeholder="（尚未設定備註）"
-                    rows="3"
-                    class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
-                  ></textarea>
                 </div>
-              </article>
+              </section>
             </div>
           </div>
 
           <div
-            v-if="viewMode === 'week' && isMobileViewport"
-            class="p-2 md:hidden"
+            v-if="viewMode === 'week'"
+            class="p-2 md:px-0 print:hidden"
             data-testid="learning-progress-week-view"
           >
-            <div
-              class="sticky top-(--mobile-header-height) z-10 -mx-2 bg-theme-50 px-2 pt-2 pb-3 dark:bg-zinc-950"
-            >
-              <Select
-                v-model.number="selectedWeekNum"
-                data-testid="learning-progress-week-picker"
-                aria-label="選擇週次"
+            <div class="md:hidden">
+              <div
+                class="sticky top-(--mobile-header-height) z-10 -mx-2 bg-theme-50 px-2 pt-2 pb-3 dark:bg-zinc-950"
               >
-                <option
-                  v-for="week in viewModel.weeks"
-                  :key="week.num"
-                  :value="week.num"
+                <Select
+                  v-model.number="selectedWeekNum"
+                  data-testid="learning-progress-week-picker"
+                  aria-label="選擇週次"
                 >
-                  第{{ toChineseNumber(week.num) }}週（{{ week.start }} -
-                  {{ week.end }}）{{
-                    currentWeek === week.num ? '（本週）' : ''
-                  }}
-                </option>
-              </Select>
-            </div>
-
-            <div
-              class="mb-3 flex items-center gap-2"
-              data-testid="learning-progress-week-nav"
-            >
-              <button
-                type="button"
-                class="flex flex-1 items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
-                data-testid="learning-progress-week-prev"
-                aria-label="上一週"
-                :disabled="!previousWeek"
-                @click="previousWeek && (selectedWeekNum = previousWeek.num)"
-              >
-                <Icon name="chevron-left" class="size-4 shrink-0" />
-                <span class="truncate">{{
-                  previousWeek ? weekNavLabel(previousWeek) : '—'
-                }}</span>
-              </button>
-              <button
-                v-if="currentWeek !== null && currentWeek !== selectedWeekNum"
-                type="button"
-                class="shrink-0 rounded-md border border-theme-200 px-3 py-2 text-sm font-medium text-theme-700 dark:border-zinc-700 dark:text-zinc-300"
-                data-testid="learning-progress-week-current"
-                @click="selectedWeekNum = currentWeek"
-              >
-                本週
-              </button>
-              <button
-                type="button"
-                class="flex flex-1 items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
-                data-testid="learning-progress-week-next"
-                aria-label="下一週"
-                :disabled="!nextWeek"
-                @click="nextWeek && (selectedWeekNum = nextWeek.num)"
-              >
-                <span class="truncate">{{
-                  nextWeek ? weekNavLabel(nextWeek) : '—'
-                }}</span>
-                <Icon name="chevron-right" class="size-4 shrink-0" />
-              </button>
-            </div>
-
-            <div class="space-y-3">
-              <article
-                v-for="course in viewModel.courses"
-                :key="course.id"
-                class="rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
-                data-testid="learning-progress-week-view-course-card"
-                :data-course-id="course.id"
-              >
-                <h3
-                  class="mb-2 line-clamp-2 text-sm font-semibold text-theme-900 dark:text-zinc-100"
-                >
-                  {{ course.name }}
-                </h3>
-
-                <div class="mb-2 grid grid-cols-2 gap-2">
-                  <label
-                    class="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-theme-200 px-3 py-2.5 text-sm text-theme-700 has-checked:border-theme-400 has-checked:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:has-checked:border-zinc-500 dark:has-checked:bg-zinc-800"
+                  <option
+                    v-for="week in viewModel.weeks"
+                    :key="week.num"
+                    :value="week.num"
                   >
-                    <input
-                      v-model="progress[course.id][selectedWeekNum].video"
-                      type="checkbox"
-                      class="size-4 rounded border-gray-500"
-                    />
-                    影音
-                  </label>
-                  <label
-                    class="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-theme-200 px-3 py-2.5 text-sm text-theme-700 has-checked:border-theme-400 has-checked:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:has-checked:border-zinc-500 dark:has-checked:bg-zinc-800"
-                  >
-                    <input
-                      v-model="progress[course.id][selectedWeekNum].textbook"
-                      type="checkbox"
-                      class="size-4 rounded border-gray-500"
-                    />
-                    課本
-                  </label>
-                </div>
+                    第{{ toChineseNumber(week.num) }}週（{{ week.start }} -
+                    {{ week.end }}）{{
+                      currentWeek === week.num ? '（本週）' : ''
+                    }}
+                  </option>
+                </Select>
+              </div>
 
-                <textarea
-                  v-model="progress[course.id][selectedWeekNum].note"
-                  placeholder="（尚未設定目標）"
-                  rows="2"
-                  class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
-                ></textarea>
-              </article>
-            </div>
-          </div>
-
-          <div
-            v-if="viewMode === 'subject' && isMobileViewport"
-            class="p-2 md:hidden"
-            data-testid="learning-progress-subject-view"
-          >
-            <div
-              class="sticky top-(--mobile-header-height) z-10 -mx-2 bg-theme-50 px-2 pt-2 pb-3 dark:bg-zinc-950"
-            >
-              <Select
-                v-model.number="selectedCourseId"
-                data-testid="learning-progress-subject-picker"
+              <div
+                class="mb-3 flex items-center gap-2"
+                data-testid="learning-progress-week-nav"
               >
-                <option
-                  v-for="course in viewModel.courses"
-                  :key="course.id"
-                  :value="course.id"
+                <button
+                  type="button"
+                  class="flex flex-1 items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
+                  data-testid="learning-progress-week-prev"
+                  aria-label="上一週"
+                  :disabled="!previousWeek"
+                  @click="previousWeek && (selectedWeekNum = previousWeek.num)"
                 >
-                  {{ course.name }}
-                </option>
-              </Select>
+                  <Icon name="chevron-left" class="size-4 shrink-0" />
+                  <span class="truncate">{{
+                    previousWeek ? weekNavLabel(previousWeek) : '—'
+                  }}</span>
+                </button>
+                <button
+                  v-if="currentWeek !== null && currentWeek !== selectedWeekNum"
+                  type="button"
+                  class="shrink-0 rounded-md border border-theme-200 px-3 py-2 text-sm font-medium text-theme-700 dark:border-zinc-700 dark:text-zinc-300"
+                  data-testid="learning-progress-week-current"
+                  @click="selectedWeekNum = currentWeek"
+                >
+                  本週
+                </button>
+                <button
+                  type="button"
+                  class="flex flex-1 items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
+                  data-testid="learning-progress-week-next"
+                  aria-label="下一週"
+                  :disabled="!nextWeek"
+                  @click="nextWeek && (selectedWeekNum = nextWeek.num)"
+                >
+                  <span class="truncate">{{
+                    nextWeek ? weekNavLabel(nextWeek) : '—'
+                  }}</span>
+                  <Icon name="chevron-right" class="size-4 shrink-0" />
+                </button>
+              </div>
             </div>
 
+            <!-- Phones show only the selected week's column; from md up every
+                 week is a column of the board. -->
             <div
-              class="mb-3 grid grid-cols-2 gap-2"
-              data-testid="learning-progress-subject-nav"
+              ref="weekBoard"
+              class="md:-mx-1 md:-mt-1 md:flex md:snap-x md:snap-proximity md:scroll-px-1 md:items-start md:gap-4 md:overflow-x-auto md:px-1 md:pt-1 md:pb-4"
             >
-              <button
-                type="button"
-                class="flex items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
-                data-testid="learning-progress-subject-prev"
-                aria-label="上一科"
-                :disabled="!previousCourse"
-                @click="
-                  previousCourse && (selectedCourseId = previousCourse.id)
-                "
-              >
-                <Icon name="chevron-left" class="size-4 shrink-0" />
-                <span class="truncate">{{
-                  previousCourse ? previousCourse.name : '—'
-                }}</span>
-              </button>
-              <button
-                type="button"
-                class="flex items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
-                data-testid="learning-progress-subject-next"
-                aria-label="下一科"
-                :disabled="!nextCourse"
-                @click="nextCourse && (selectedCourseId = nextCourse.id)"
-              >
-                <span class="truncate">{{
-                  nextCourse ? nextCourse.name : '—'
-                }}</span>
-                <Icon name="chevron-right" class="size-4 shrink-0" />
-              </button>
-            </div>
-
-            <div class="space-y-3">
-              <article
+              <section
                 v-for="week in viewModel.weeks"
                 :key="week.num"
-                class="rounded-lg border bg-white p-4 dark:bg-zinc-900"
-                :class="subjectCardBorderClass(week.num)"
-                data-testid="learning-progress-subject-view-week-row"
+                class="md:w-64 md:shrink-0 md:snap-start md:rounded-lg md:bg-theme-100/60 md:p-3 dark:md:bg-zinc-900/60"
+                :class="[
+                  week.num === selectedWeekNum ? '' : 'hidden md:block',
+                  currentWeek === week.num
+                    ? 'md:ring-2 md:ring-blue-500 md:dark:ring-blue-400'
+                    : '',
+                ]"
+                data-testid="learning-progress-week-column"
                 :data-week-num="week.num"
               >
-                <div class="mb-2 flex items-center justify-between">
-                  <span
+                <header
+                  class="mb-3 hidden items-baseline justify-between md:flex"
+                >
+                  <h3
                     class="text-sm font-semibold text-theme-900 dark:text-zinc-100"
                   >
                     第{{ toChineseNumber(week.num) }}週
-                  </span>
+                    <span
+                      v-if="currentWeek === week.num"
+                      class="ml-1 text-xs font-medium text-blue-700 dark:text-blue-300"
+                      >本週</span
+                    >
+                  </h3>
                   <span class="text-xs text-theme-700 dark:text-zinc-400">
                     {{ week.start }} - {{ week.end }}
                   </span>
-                </div>
+                </header>
 
-                <div class="mb-2 grid grid-cols-2 gap-2">
-                  <label
-                    class="flex cursor-pointer items-center justify-center gap-2 rounded-md border px-3 py-2.5 text-sm text-theme-700 dark:text-zinc-300"
-                    :class="
-                      subjectCheckboxClass(
-                        week.num,
-                        progress[selectedCourseId][week.num].video
-                      )
-                    "
+                <div class="space-y-3">
+                  <article
+                    v-for="course in viewModel.courses"
+                    :key="course.id"
+                    class="rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+                    data-testid="learning-progress-week-view-course-card"
+                    :data-course-id="course.id"
                   >
-                    <input
-                      v-model="progress[selectedCourseId][week.num].video"
-                      type="checkbox"
-                      class="size-4 rounded border-gray-500"
-                    />
-                    影音
-                  </label>
-                  <label
-                    class="flex cursor-pointer items-center justify-center gap-2 rounded-md border px-3 py-2.5 text-sm text-theme-700 dark:text-zinc-300"
-                    :class="
-                      subjectCheckboxClass(
-                        week.num,
-                        progress[selectedCourseId][week.num].textbook
-                      )
-                    "
-                  >
-                    <input
-                      v-model="progress[selectedCourseId][week.num].textbook"
-                      type="checkbox"
-                      class="size-4 rounded border-gray-500"
-                    />
-                    課本
-                  </label>
-                </div>
+                    <h4
+                      class="mb-2 line-clamp-2 text-sm font-semibold text-theme-900 dark:text-zinc-100"
+                    >
+                      {{ course.name }}
+                    </h4>
 
-                <textarea
-                  v-model="progress[selectedCourseId][week.num].note"
-                  placeholder="（尚未設定目標）"
-                  rows="2"
-                  class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
-                ></textarea>
-              </article>
+                    <div class="mb-2 grid grid-cols-2 gap-2">
+                      <label
+                        class="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-theme-200 px-3 py-2.5 text-sm text-theme-700 has-checked:border-theme-400 has-checked:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:has-checked:border-zinc-500 dark:has-checked:bg-zinc-800"
+                      >
+                        <input
+                          v-model="progress[course.id][week.num].video"
+                          type="checkbox"
+                          class="size-4 rounded border-gray-500"
+                        />
+                        影音
+                      </label>
+                      <label
+                        class="flex cursor-pointer items-center justify-center gap-2 rounded-md border border-theme-200 px-3 py-2.5 text-sm text-theme-700 has-checked:border-theme-400 has-checked:bg-theme-50 dark:border-zinc-700 dark:text-zinc-300 dark:has-checked:border-zinc-500 dark:has-checked:bg-zinc-800"
+                      >
+                        <input
+                          v-model="progress[course.id][week.num].textbook"
+                          type="checkbox"
+                          class="size-4 rounded border-gray-500"
+                        />
+                        課本
+                      </label>
+                    </div>
+
+                    <textarea
+                      v-model="progress[course.id][week.num].note"
+                      placeholder="（尚未設定目標）"
+                      rows="2"
+                      class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
+                    ></textarea>
+                  </article>
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <div
+            v-if="viewMode === 'subject'"
+            class="p-2 md:px-0 print:hidden"
+            data-testid="learning-progress-subject-view"
+          >
+            <div class="md:hidden">
+              <div
+                class="sticky top-(--mobile-header-height) z-10 -mx-2 bg-theme-50 px-2 pt-2 pb-3 dark:bg-zinc-950"
+              >
+                <Select
+                  v-model.number="selectedCourseId"
+                  data-testid="learning-progress-subject-picker"
+                  aria-label="選擇科目"
+                >
+                  <option
+                    v-for="course in viewModel.courses"
+                    :key="course.id"
+                    :value="course.id"
+                  >
+                    {{ course.name }}
+                  </option>
+                </Select>
+              </div>
+
+              <div
+                class="mb-3 grid grid-cols-2 gap-2"
+                data-testid="learning-progress-subject-nav"
+              >
+                <button
+                  type="button"
+                  class="flex items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
+                  data-testid="learning-progress-subject-prev"
+                  aria-label="上一科"
+                  :disabled="!previousCourse"
+                  @click="
+                    previousCourse && (selectedCourseId = previousCourse.id)
+                  "
+                >
+                  <Icon name="chevron-left" class="size-4 shrink-0" />
+                  <span class="truncate">{{
+                    previousCourse ? previousCourse.name : '—'
+                  }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="flex items-center justify-center gap-1 rounded-md border border-theme-200 px-3 py-2 text-sm text-theme-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
+                  data-testid="learning-progress-subject-next"
+                  aria-label="下一科"
+                  :disabled="!nextCourse"
+                  @click="nextCourse && (selectedCourseId = nextCourse.id)"
+                >
+                  <span class="truncate">{{
+                    nextCourse ? nextCourse.name : '—'
+                  }}</span>
+                  <Icon name="chevron-right" class="size-4 shrink-0" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Phones show only the selected course's column; from md up every
+                 course is a column. The board is the one scroll container, so
+                 the columns scroll together and the headers stay pinned. -->
+            <div
+              class="md:flex md:max-h-[70vh] md:items-start md:gap-4 md:overflow-x-auto md:overflow-y-auto md:pb-4"
+            >
+              <section
+                v-for="course in viewModel.courses"
+                :key="course.id"
+                class="md:w-64 md:shrink-0 md:rounded-lg md:bg-theme-100/60 md:p-3 dark:md:bg-zinc-900/60"
+                :class="course.id === selectedCourseId ? '' : 'hidden md:block'"
+                data-testid="learning-progress-subject-column"
+                :data-course-id="course.id"
+              >
+                <h3
+                  class="mb-3 hidden text-sm font-semibold text-theme-900 md:sticky md:top-0 md:z-10 md:-mx-3 md:-mt-3 md:block md:rounded-t-lg md:bg-theme-100 md:px-3 md:pt-3 md:pb-2 dark:text-zinc-100 md:dark:bg-zinc-900"
+                >
+                  <span class="line-clamp-2">{{ course.name }}</span>
+                </h3>
+
+                <div class="space-y-3">
+                  <article
+                    v-for="week in viewModel.weeks"
+                    :key="week.num"
+                    class="rounded-lg border bg-white p-4 dark:bg-zinc-900"
+                    :class="subjectCardBorderClass(course.id, week.num)"
+                    data-testid="learning-progress-subject-view-week-row"
+                    :data-week-num="week.num"
+                  >
+                    <div class="mb-2 flex items-center justify-between">
+                      <span
+                        class="text-sm font-semibold text-theme-900 dark:text-zinc-100"
+                      >
+                        第{{ toChineseNumber(week.num) }}週
+                      </span>
+                      <span class="text-xs text-theme-700 dark:text-zinc-400">
+                        {{ week.start }} - {{ week.end }}
+                      </span>
+                    </div>
+
+                    <div class="mb-2 grid grid-cols-2 gap-2">
+                      <label
+                        class="flex cursor-pointer items-center justify-center gap-2 rounded-md border px-3 py-2.5 text-sm text-theme-700 dark:text-zinc-300"
+                        :class="
+                          subjectCheckboxClass(
+                            course.id,
+                            week.num,
+                            progress[course.id][week.num].video
+                          )
+                        "
+                      >
+                        <input
+                          v-model="progress[course.id][week.num].video"
+                          type="checkbox"
+                          class="size-4 rounded border-gray-500"
+                        />
+                        影音
+                      </label>
+                      <label
+                        class="flex cursor-pointer items-center justify-center gap-2 rounded-md border px-3 py-2.5 text-sm text-theme-700 dark:text-zinc-300"
+                        :class="
+                          subjectCheckboxClass(
+                            course.id,
+                            week.num,
+                            progress[course.id][week.num].textbook
+                          )
+                        "
+                      >
+                        <input
+                          v-model="progress[course.id][week.num].textbook"
+                          type="checkbox"
+                          class="size-4 rounded border-gray-500"
+                        />
+                        課本
+                      </label>
+                    </div>
+
+                    <textarea
+                      v-model="progress[course.id][week.num].note"
+                      placeholder="（尚未設定目標）"
+                      rows="2"
+                      class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
+                    ></textarea>
+                  </article>
+                </div>
+              </section>
             </div>
           </div>
 
