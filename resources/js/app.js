@@ -282,6 +282,10 @@ window.NouTime =
       return WEEKDAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]
     }
 
+    function mediumWeekdayFromYmd(ymd) {
+      return `週${weekdayFromYmd(ymd)}`
+    }
+
     // "M/D" (no leading zeros) for a Y-m-d string.
     function monthDay(ymd) {
       const [, m, d] = ymd.split('-').map(Number)
@@ -388,6 +392,7 @@ window.NouTime =
       localYmd,
       localHM,
       weekdayFromYmd,
+      mediumWeekdayFromYmd,
       monthDay,
       gmtLabel,
       differsFromTaipei,

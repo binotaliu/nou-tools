@@ -376,7 +376,7 @@ function monthDay(next) {
 }
 
 function weekday(next) {
-  return window.NouTime.weekdayFromYmd(next.ymd)
+  return window.NouTime.mediumWeekdayFromYmd(next.ymd)
 }
 
 // A class is "in progress" between its start and end instants; a class with
@@ -1025,10 +1025,12 @@ function localHint(next) {
                   </span>
                 </div>
 
-                <div class="flex flex-wrap items-end justify-between gap-y-2">
+                <div
+                  class="mt-2 flex flex-wrap items-end justify-between gap-y-2"
+                >
                   <div class="flex shrink-0 flex-col gap-1">
                     <p
-                      class="flex items-center gap-1.5 text-xs text-theme-700 dark:text-zinc-400"
+                      class="flex flex-col items-start gap-1.5 text-xs text-theme-700 dark:text-zinc-400"
                     >
                       <span
                         v-if="!row.item.isTentative"
@@ -1048,17 +1050,18 @@ function localHint(next) {
                       </span>
 
                       <span v-if="teacher(row.item)">
-                        {{ teacher(row.item).base }}
-                        <small v-if="teacher(row.item).suffix">{{
-                          teacher(row.item).suffix
-                        }}</small>
+                        {{ teacher(row.item).base }}&nbsp;<small
+                          v-if="teacher(row.item).suffix"
+                          >{{ teacher(row.item).suffix }}</small
+                        >
                       </span>
+                      <span v-else aria-hidden="true">—</span>
                     </p>
 
                     <div v-if="row.next">
                       <p
                         v-if="taipeiTime(row.next)"
-                        class="mt-1 inline-flex items-center gap-1 text-sm font-medium text-theme-800 tabular-nums dark:text-zinc-200"
+                        class="inline-flex items-center gap-1 text-sm font-medium text-theme-800 tabular-nums dark:text-zinc-200"
                       >
                         {{ taipeiTime(row.next) }}
                         <Icon
@@ -1083,7 +1086,7 @@ function localHint(next) {
                     </div>
                     <p
                       v-else
-                      class="mt-1 text-sm font-medium text-theme-700 dark:text-zinc-400"
+                      class="text-sm font-medium text-theme-700 dark:text-zinc-400"
                     >
                       無未來課程
                     </p>
@@ -1122,7 +1125,7 @@ function localHint(next) {
                       </a>
                       <Link
                         :href="row.item.courseInfoUrl"
-                        class="rounded-lg px-2 py-1 text-xs font-medium text-theme-700 transition hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+                        class="-m-2 rounded-lg px-4 py-3 text-xs font-medium text-theme-700 transition hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-200"
                         :aria-label="row.item.courseName + ' 的課程資訊'"
                       >
                         課程資訊
