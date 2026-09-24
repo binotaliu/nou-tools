@@ -349,7 +349,7 @@ const itemRows = computed(() =>
 )
 
 // Rows are already ordered by next class, so the first row with an upcoming
-// class is the one the 下一堂課 summary (accesskey 4/5) points at.
+// class is the one accesskeys 4 (the row) and 5 (its classroom link) target.
 const nextClass = computed(() => itemRows.value.find(row => row.next) ?? null)
 
 // Split a teacher name so a trailing "老師" can render smaller, mirroring
@@ -763,77 +763,6 @@ function localHint(next) {
         </div>
       </div>
 
-      <section
-        v-if="hasCourses"
-        tabindex="-1"
-        :accesskey="nextClass ? '4' : null"
-        aria-labelledby="next-class-heading"
-        data-testid="schedule-next-class"
-        class="mb-8 rounded-lg border border-theme-200 bg-white p-5 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900"
-      >
-        <div class="flex items-center gap-2">
-          <h2
-            id="next-class-heading"
-            class="text-sm font-semibold text-theme-700 dark:text-zinc-400"
-          >
-            下一堂課
-          </h2>
-          <span
-            v-if="nextClass && isOngoing(nextClass.next)"
-            class="rounded-full bg-emerald-100 px-2.5 py-1 text-[0.6875rem] font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
-          >
-            進行中
-          </span>
-        </div>
-
-        <template v-if="nextClass">
-          <p
-            class="mt-2 text-xl font-bold text-theme-900 dark:text-zinc-100"
-            data-testid="schedule-next-class-name"
-          >
-            {{ nextClass.item.courseName }}
-          </p>
-          <p class="mt-1 text-theme-800 tabular-nums dark:text-zinc-200">
-            {{ taipeiDate(nextClass.next) }}
-            <span v-if="taipeiTime(nextClass.next)">
-              {{ taipeiTime(nextClass.next) }}
-            </span>
-          </p>
-          <p
-            v-if="localHint(nextClass.next)"
-            class="mt-1 text-xs text-theme-700 dark:text-zinc-400"
-          >
-            {{ localHint(nextClass.next) }}
-          </p>
-
-          <a
-            v-if="nextClass.item.videoLink"
-            :href="nextClass.item.videoLink"
-            target="_blank"
-            rel="noopener"
-            accesskey="5"
-            data-offline-allow
-            data-testid="schedule-next-class-join"
-            class="mt-4 inline-flex items-center gap-2 rounded-lg bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300"
-            :aria-label="
-              '前往 ' +
-              nextClass.item.courseName +
-              ' 的視訊上課連結（在新分頁開啟）'
-            "
-          >
-            <Icon name="video-camera" class="size-5" />
-            進入教室
-          </a>
-          <p
-            v-else-if="nextClass.item.isTentative"
-            class="mt-4 text-sm text-amber-800 dark:text-amber-200"
-          >
-            尚未分班，開學分班後選擇班級才會有視訊上課連結。
-          </p>
-        </template>
-        <p v-else class="mt-2 text-theme-700 dark:text-zinc-400">無未來課程</p>
-      </section>
-
       <!-- Schedule Items - Responsive Table/Cards -->
       <div
         v-if="viewModel.displayOptions.show_schedule_items && hasCourses"
@@ -905,12 +834,18 @@ function localHint(next) {
               <tr
                 v-for="row in itemRows"
                 :key="row.i"
-                class="border-b border-theme-200 hover:bg-theme-50 dark:border-zinc-700 dark:hover:bg-zinc-950"
+                tabindex="-1"
+                :accesskey="row === nextClass ? '4' : null"
+                :data-next-class="row === nextClass ? '' : null"
+                class="border-b border-theme-200 hover:bg-theme-50 focus:outline-2 focus:-outline-offset-2 focus:outline-theme-500 dark:border-zinc-700 dark:hover:bg-zinc-950"
               >
                 <th
                   scope="row"
                   class="px-4 py-3 font-semibold text-theme-900 dark:text-zinc-100"
                 >
+                  <span v-if="row === nextClass" class="sr-only"
+                    >下一堂課：</span
+                  >
                   {{ row.item.courseName }}
                 </th>
 
@@ -1006,6 +941,7 @@ function localHint(next) {
                   <a
                     v-show="row.item.videoLink"
                     :href="row.item.videoLink"
+                    :accesskey="row === nextClass ? '5' : null"
                     target="_blank"
                     rel="noopener"
                     data-offline-allow
@@ -1043,7 +979,10 @@ function localHint(next) {
             v-for="row in itemRows"
             :key="row.i"
             data-testid="schedule-item-card"
-            class="rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+            tabindex="-1"
+            :accesskey="row === nextClass ? '4' : null"
+            :data-next-class="row === nextClass ? '' : null"
+            class="rounded-lg border border-theme-200 bg-white p-4 focus:outline-2 focus:outline-theme-500 dark:border-zinc-700 dark:bg-zinc-900"
           >
             <div class="flex items-center gap-3">
               <div
@@ -1072,6 +1011,9 @@ function localHint(next) {
                   <h3
                     class="line-clamp-2 min-w-0 flex-1 text-sm font-semibold text-theme-900 dark:text-zinc-100"
                   >
+                    <span v-if="row === nextClass" class="sr-only"
+                      >下一堂課：</span
+                    >
                     {{ row.item.courseName }}
                   </h3>
 
@@ -1151,6 +1093,7 @@ function localHint(next) {
                     <a
                       v-show="row.item.videoLink"
                       :href="row.item.videoLink"
+                      :accesskey="row === nextClass ? '5' : null"
                       target="_blank"
                       rel="noopener"
                       data-offline-allow

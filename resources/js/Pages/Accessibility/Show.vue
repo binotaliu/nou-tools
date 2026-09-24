@@ -15,8 +15,11 @@ const globalKeys = [
 ]
 
 const scheduleKeys = [
-  { key: '4', target: '下一堂課：移到下一堂課的資訊' },
-  { key: '5', target: '進入教室：開啟下一堂課的視訊上課連結' },
+  { key: '4', target: '下一堂課：移到課程清單中最近的一堂課' },
+  {
+    key: '5',
+    target: '進入教室：開啟最近一堂課的視訊上課連結（沒有連結時無效）',
+  },
   { key: '6', target: '完整課表：移到課程清單' },
   { key: '7', target: '選擇學期' },
 ]

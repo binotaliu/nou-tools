@@ -165,7 +165,7 @@ it('renders the next class as a card on a phone, with the date tile, time and cl
         ->assertDontSee('進行中');
 });
 
-it('summarises the next class with accesskeys for the summary, the classroom, the timetable and the term', function () use ($createScheduleWithClass) {
+it('puts the next class and its classroom link on accesskeys 4 and 5, with 6 and 7 for the timetable and the term', function () use ($createScheduleWithClass) {
     config()->set('app.current_semester', '2025B');
 
     $date = now('Asia/Taipei')->addDays(3)->toDateString();
@@ -174,37 +174,38 @@ it('summarises the next class with accesskeys for the summary, the classroom, th
 
     $page = visit(route('schedules.show', $schedule))
         ->withTimezone('Asia/Taipei')
-        ->assertSee($course->name)
-        ->assertSeeIn('[data-testid="schedule-next-class"]', '下一堂課')
-        ->assertSeeIn('[data-testid="schedule-next-class-name"]', $course->name)
-        ->assertSeeIn('[data-testid="schedule-next-class"]', '09:00 ~ 10:00')
-        ->assertAttribute('[data-testid="schedule-next-class-join"]', 'href', 'https://example.com/live');
+        ->assertSee($course->name);
 
     $keys = json_decode($page->script(
-        "JSON.stringify(Object.fromEntries([...document.querySelectorAll('main [accesskey]')].map(e => [e.accessKey, e.id || e.dataset.testid])))"
+        "JSON.stringify([...document.querySelectorAll('main [accesskey]')].map(e => [e.accessKey, e.tagName, e.id || null]))"
     ), true);
 
-    expect($keys)->toBe([
-        '4' => 'schedule-next-class',
-        '5' => 'schedule-next-class-join',
-        '6' => 'schedule-items-heading',
-        '7' => 'term',
-    ]);
+    // The desktop table row and the phone card each carry 4 and 5 (one is
+    // always display:none), so compare the sorted, de-duplicated set.
+    $found = collect($keys)->unique(fn ($k) => $k[0])->sortBy(fn ($k) => $k[0])->values()->all();
+
+    expect($page->script("document.querySelectorAll('[data-next-class] .sr-only').length"))->toBeGreaterThan(0);
+
+    expect(collect($found)->pluck(0)->all())->toBe(['4', '5', '6', '7'])
+        ->and(collect($found)->firstWhere(0, '5')[1])->toBe('A')
+        ->and(collect($found)->firstWhere(0, '6')[2])->toBe('schedule-items-heading')
+        ->and(collect($found)->firstWhere(0, '7')[2])->toBe('term');
 });
 
 it('offers no next-class accesskeys when the schedule has no upcoming class', function () use ($createScheduleWithClass) {
     config()->set('app.current_semester', '2025B');
 
     $date = now('Asia/Taipei')->subDays(3)->toDateString();
-    [$schedule] = $createScheduleWithClass($date, '09:00', '10:00');
+    [$schedule, $course] = $createScheduleWithClass($date, '09:00', '10:00');
 
     $page = visit(route('schedules.show', $schedule))
         ->withTimezone('Asia/Taipei')
-        ->assertSeeIn('[data-testid="schedule-next-class"]', '無未來課程');
+        ->assertSee($course->name);
 
     $keys = json_decode($page->script(
         "JSON.stringify([...document.querySelectorAll('main [accesskey]')].map(e => e.accessKey))"
     ), true);
 
-    expect($keys)->not->toContain('4')->not->toContain('5');
+    expect($keys)->not->toContain('4')->not->toContain('5')
+        ->and($page->script("document.querySelectorAll('[data-next-class]').length"))->toBe(0);
 });
