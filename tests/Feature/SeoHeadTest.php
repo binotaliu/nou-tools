@@ -45,6 +45,15 @@ it('advertises a generated og:image card on the Alt UU page', function () {
         ->assertDontSee(asset('og-image.png'), false);
 });
 
+it('server-renders the video classes page with a generated og:image card', function () {
+    $this->get(route('video-classes.index'))
+        ->assertSuccessful()
+        ->assertSee('<title>今日視訊面授 - NOU 小幫手</title>', false)
+        ->assertSee('<template data-og-image', false)
+        ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
+        ->assertDontSee(asset('og-image.png'), false);
+});
+
 it('server-renders the newsletter index with its Atom feed link', function () {
     $this->get(route('newsletter.index'))
         ->assertSuccessful()
