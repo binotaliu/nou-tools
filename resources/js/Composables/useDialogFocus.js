@@ -44,7 +44,13 @@ export default function useDialogFocus(container, isOpen, options = {}) {
     const target = opener
     opener = null
 
-    if (target && target.isConnected && target.getClientRects().length > 0) {
+    // An accesskey proxy (off-screen, aria-hidden) is no place to land.
+    if (
+      target &&
+      target.isConnected &&
+      target.getClientRects().length > 0 &&
+      !target.closest('[aria-hidden="true"]')
+    ) {
       target.focus()
     } else if (options.fallbackFocus) {
       options.fallbackFocus()?.focus()

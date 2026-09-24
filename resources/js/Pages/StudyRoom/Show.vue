@@ -27,6 +27,7 @@ import {
   TableCellsIcon,
 } from '@heroicons/vue/24/outline'
 import AppLayout from '../../Layouts/AppLayout.vue'
+import AccessKeys from '../../Components/StudyRoom/AccessKeys.vue'
 import ActionBanner from '../../Components/StudyRoom/ActionBanner.vue'
 import FocusMode from '../../Components/StudyRoom/FocusMode.vue'
 import Modal from '../../Components/StudyRoom/Modal.vue'
@@ -436,6 +437,13 @@ onUnmounted(() => {
       </div>
 
       <LiveAnnouncer :announcer="announcer" />
+
+      <AccessKeys
+        :socket="socket"
+        :timer="timer"
+        :roving="roving"
+        :announcer="announcer"
+      />
 
       <div
         class="space-y-4"

@@ -441,3 +441,62 @@ it('announces neighbours coming and going only when asked to', function () use (
 
     expect($page->script($politeText))->toBe('隔壁的 浣熊 離開了');
 });
+
+$accessKeyMap = "JSON.stringify(Object.fromEntries([...document.querySelectorAll('[accesskey]')].map(e => [e.accessKey, e.getAttribute('href') ?? e.dataset.testid])))";
+
+it('puts each study room accesskey on exactly one element, seated or not', function () use ($enterStudyRoom, $sitAndStartTimer, $accessKeyMap) {
+    $page = $enterStudyRoom();
+
+    $keys = json_decode($page->script($accessKeyMap), true);
+    ksort($keys);
+
+    expect($keys)->toBe([
+        '0' => '/accessibility',
+        '1' => '#main-content',
+        '2' => '/schedules/my',
+        '3' => 'theme-switcher-toggle',
+        '4' => 'study-room-quick-seat',
+        '6' => 'study-room-accesskey-seats',
+    ])->and($page->script("document.querySelectorAll('[accesskey]').length"))->toBe(6);
+
+    $sitAndStartTimer($page);
+
+    $keys = json_decode($page->script($accessKeyMap), true);
+    ksort($keys);
+
+    expect($keys)->toBe([
+        '0' => '/accessibility',
+        '1' => '#main-content',
+        '2' => '/schedules/my',
+        '3' => 'theme-switcher-toggle',
+        '4' => 'study-room-accesskey-panel',
+        '5' => 'study-room-accesskey-timer',
+        '6' => 'study-room-accesskey-seats',
+        '7' => 'study-room-accesskey-status',
+        '8' => 'study-room-accesskey-focus-mode',
+    ])->and($page->script("document.querySelectorAll('[accesskey]').length"))->toBe(9);
+});
+
+it('toggles the timer, reads the status and jumps to your seat from the accesskeys', function () use ($enterStudyRoom, $sitAndStartTimer, $politeText, $activeTestId) {
+    $page = $sitAndStartTimer($enterStudyRoom());
+
+    $page->script("document.querySelector('[data-testid=\"study-room-accesskey-timer\"]').click()");
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-resume-timer'");
+
+    $page->script("document.querySelector('[data-testid=\"study-room-accesskey-status\"]').click()");
+    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.includes('1F 單人座 01')");
+    expect($page->script($politeText))->toContain('已暫停');
+
+    $page->script("document.querySelector('[data-testid=\"study-room-accesskey-seats\"]').click()");
+    waitUntil($page, "document.activeElement?.dataset.testid === 'seat-1-S01'");
+
+    // A real accesskey focuses its element before clicking it.
+    $page->script("(() => { const key = document.querySelector('[data-testid=\"study-room-accesskey-focus-mode\"]'); key.focus(); key.click() })()");
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-focus-mode-close'");
+
+    // Leaving focus mode doesn't return to the hidden accesskey button.
+    $page->keys('[data-testid="study-room-focus-mode-close"]', 'Escape');
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-control-panel-heading'");
+
+    expect($page->script($activeTestId))->toBe('study-room-control-panel-heading');
+});

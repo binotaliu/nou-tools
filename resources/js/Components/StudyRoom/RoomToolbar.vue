@@ -83,6 +83,7 @@ const viewButtonClass =
       type="button"
       :aria-disabled="socket.busySeatCode !== null ? 'true' : null"
       class="inline-flex items-center gap-1.5 rounded-lg bg-theme-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-theme-800 aria-disabled:opacity-50 dark:bg-theme-500 dark:text-zinc-950 dark:hover:bg-theme-400"
+      accesskey="4"
       data-testid="study-room-quick-seat"
       @click="takeFirstFreeSeat()"
     >
