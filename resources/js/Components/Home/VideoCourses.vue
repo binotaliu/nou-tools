@@ -22,6 +22,11 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  // The standalone page carries its own H2, so it hides the card's title.
+  showTitle: {
+    type: Boolean,
+    default: true,
+  },
   // The server's date, so the calendar's "today" follows Taipei time.
   today: {
     type: String,
@@ -144,11 +149,47 @@ const localHintOf = slot =>
 const stateOf = slot =>
   sessionState(props.selectedDate, slot.startTime, slot.endTime, now.value)
 
+const TABS = [
+  { key: 'live', label: '上課中' },
+  { key: 'soon', label: '即將開始' },
+  { key: 'all', label: '所有教室' },
+]
+
+// 即將開始 covers every slot that has not started yet, not just the 30-minute
+// "soon" window, so the tab is useful earlier in the day.
+const matchesTab = (slot, tab) => {
+  const state = stateOf(slot)
+
+  if (tab === 'live') {
+    return state === 'live'
+  }
+
+  if (tab === 'soon') {
+    return state === 'soon' || state === 'upcoming'
+  }
+
+  return showEnded.value || state !== 'ended'
+}
+
+const hasSlotIn = tab =>
+  groupedCourses.value.some(course =>
+    course.slots.some(slot => matchesTab(slot, tab))
+  )
+
+// Until the viewer picks a tab it follows the clock: live classes first, then
+// the ones still to come, then everything.
+const pickedTab = ref(null)
+const activeTab = computed(
+  () =>
+    pickedTab.value ??
+    (hasSlotIn('live') ? 'live' : hasSlotIn('soon') ? 'soon' : 'all')
+)
+
 const visibleCourses = computed(() =>
   groupedCourses.value
     .map(course => {
-      const slots = course.slots.filter(
-        slot => showEnded.value || stateOf(slot) !== 'ended'
+      const slots = course.slots.filter(slot =>
+        matchesTab(slot, activeTab.value)
       )
 
       return {
@@ -158,10 +199,6 @@ const visibleCourses = computed(() =>
       }
     })
     .filter(course => course.slots.length > 0)
-)
-
-const classTotal = computed(() =>
-  visibleCourses.value.reduce((sum, course) => sum + course.classCount, 0)
 )
 </script>
 
@@ -173,15 +210,12 @@ const classTotal = computed(() =>
       class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <div>
-        <h2 class="text-xl font-semibold text-theme-900 dark:text-zinc-100">
+        <h2
+          v-if="showTitle"
+          class="text-xl font-semibold text-theme-900 dark:text-zinc-100"
+        >
           今日視訊面授
         </h2>
-        <p
-          v-if="visibleCourses.length > 0"
-          class="mt-1 text-sm text-theme-700 tabular-nums dark:text-zinc-400"
-        >
-          共 {{ visibleCourses.length }} 門課程、{{ classTotal }} 個班級
-        </p>
       </div>
 
       <div class="flex items-center gap-2">
@@ -204,8 +238,33 @@ const classTotal = computed(() =>
       </div>
     </div>
 
-    <label
+    <div
       v-if="groupedCourses.length > 0"
+      role="tablist"
+      aria-label="課程狀態"
+      class="mb-4 flex gap-1 rounded-lg bg-theme-100 p-1 dark:bg-zinc-800"
+    >
+      <button
+        v-for="tab in TABS"
+        :key="tab.key"
+        type="button"
+        role="tab"
+        :aria-selected="activeTab === tab.key"
+        :data-testid="`video-courses-tab-${tab.key}`"
+        class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition"
+        :class="
+          activeTab === tab.key
+            ? 'bg-white text-theme-900 shadow-sm dark:bg-zinc-950 dark:text-zinc-100'
+            : 'text-theme-700 hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-200'
+        "
+        @click="pickedTab = tab.key"
+      >
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <label
+      v-if="groupedCourses.length > 0 && activeTab === 'all'"
       class="mb-4 inline-flex cursor-pointer items-center gap-2 text-sm text-theme-700 dark:text-zinc-400"
     >
       <input
@@ -232,8 +291,18 @@ const classTotal = computed(() =>
       data-testid="video-courses-all-ended"
     >
       <Icon name="face-smile" class="size-8" />
-      <p class="text-lg font-medium">已無進行中或未開始的課程</p>
-      <p class="text-sm">勾選「顯示已結束課程」可查看已結束的課程。</p>
+      <p class="text-lg font-medium">
+        {{
+          activeTab === 'live'
+            ? '目前沒有上課中的課程'
+            : activeTab === 'soon'
+              ? '沒有即將開始的課程'
+              : '已無進行中或未開始的課程'
+        }}
+      </p>
+      <p v-if="activeTab === 'all'" class="text-sm">
+        勾選「顯示已結束課程」可查看已結束的課程。
+      </p>
     </div>
 
     <div v-else class="divide-y divide-theme-100 dark:divide-zinc-800">
@@ -291,11 +360,13 @@ const classTotal = computed(() =>
               </span>
             </div>
 
-            <div class="flex min-w-0 flex-1 flex-wrap gap-2">
+            <div
+              class="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:flex sm:flex-wrap"
+            >
               <div
                 v-for="courseClass in slot.classes"
                 :key="courseClass.id"
-                class="flex w-full items-stretch overflow-hidden rounded-lg border bg-theme-50 sm:w-auto sm:min-w-44 dark:bg-zinc-950"
+                class="flex min-w-0 items-stretch overflow-hidden rounded-lg border bg-theme-50 sm:w-auto sm:min-w-44 dark:bg-zinc-950"
                 :class="
                   courseClass.link
                     ? 'border-theme-200 dark:border-zinc-700'

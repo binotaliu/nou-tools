@@ -106,3 +106,26 @@ it('shows no "your time" hint to a viewer in Taipei time', function () use ($vid
         ->assertSee('本地同學的課')
         ->assertMissing('[data-testid="video-course-local-time"]');
 });
+
+it('defaults to the 上課中 tab while a class is running', function () use ($videoClassAroundNow) {
+    $videoClassAroundNow('進行中的課', -20, 80);
+
+    visit(route('video-classes.index'))
+        ->assertAttribute('[data-testid="video-courses-tab-live"]', 'aria-selected', 'true')
+        ->assertSee('進行中的課');
+});
+
+it('defaults to the 即將開始 tab when nothing is running yet', function () use ($videoClassAroundNow) {
+    $videoClassAroundNow('還很久的課', 180, 280);
+
+    visit(route('video-classes.index'))
+        ->assertAttribute('[data-testid="video-courses-tab-soon"]', 'aria-selected', 'true')
+        ->assertSee('還很久的課');
+});
+
+it('defaults to the 所有教室 tab when nothing is running or upcoming', function () use ($videoClassAt) {
+    $videoClassAt('已結束的課', '2026-03-05', '19:00', '20:50');
+
+    visit(route('video-classes.index', ['date' => '2026-03-05']))
+        ->assertAttribute('[data-testid="video-courses-tab-all"]', 'aria-selected', 'true');
+});
