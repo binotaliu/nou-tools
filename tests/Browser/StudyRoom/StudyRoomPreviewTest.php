@@ -66,3 +66,18 @@ it('moves keyboard focus to the sign-up banner when a visitor takes a seat', fun
 
     expect($page->script('document.activeElement.dataset.testid'))->toBe('study-room-needs-schedule-heading');
 });
+
+it('points 快速入座 at the sign-up banner in the preview', function () {
+    $page = visit(route('study-room.show'));
+
+    $page->assertVisible('[data-testid="study-room-quick-seat"]')
+        ->click('[data-testid="study-room-quick-seat"]');
+
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-needs-schedule-heading'");
+
+    $tookSeat = $page->script(
+        "performance.getEntriesByType('resource').some(entry => entry.name.includes('/take'))"
+    );
+
+    expect($tookSeat)->toBeFalse();
+});

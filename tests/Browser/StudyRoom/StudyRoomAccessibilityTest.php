@@ -243,7 +243,7 @@ it('traps focus in the study room dialogs and returns it to the opener', functio
     expect($page->script($activeTestId))->toBe('study-room-personal-info-stats');
 });
 
-it('announces a seat released by the server and returns focus to it', function () use ($enterStudyRoom, $assertiveText) {
+it('announces a seat released by the server and offers 快速入座 again', function () use ($enterStudyRoom, $assertiveText) {
     $page = $enterStudyRoom();
 
     $page->keys('[data-testid="seat-1-S01"]', 'Enter');
@@ -272,7 +272,7 @@ it('announces a seat released by the server and returns focus to it', function (
             '})'
     );
 
-    waitUntil($page, "document.activeElement?.dataset.testid === 'seat-1-S01'");
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-quick-seat'");
 
     expect($page->script($assertiveText))->toContain('已被釋放');
 });
@@ -292,4 +292,61 @@ it('focuses the exit button in focus mode and returns to the 全螢幕 button af
     waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-focus-mode-open'");
 
     expect($page->script('document.activeElement.dataset.testid'))->toBe('study-room-focus-mode-open');
+});
+
+it('takes the first free seat with 快速入座', function () use ($enterStudyRoom, $occupySeatBehindThePagesBack, $politeText) {
+    $page = $enterStudyRoom();
+
+    $occupySeatBehindThePagesBack('1-S01');
+
+    $page->navigate(route('study-room.show'));
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="seat-1-S01"]\')?.getAttribute("aria-disabled") === "true"');
+
+    $page->click('[data-testid="study-room-quick-seat"]');
+
+    waitUntil($page, 'window.__studyRoomTest.socket.heldSeatCode === "1-S02"');
+
+    $page->assertMissing('[data-testid="study-room-quick-seat"]');
+    expect($page->script($politeText))->toContain('已入座 1F 單人座 02');
+});
+
+it('shows the room as a table in the list view and remembers the choice', function () use ($enterStudyRoom, $occupySeatBehindThePagesBack) {
+    $page = $enterStudyRoom();
+
+    $occupySeatBehindThePagesBack('1-S02', '浣熊');
+
+    $page->navigate(route('study-room.show'));
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-view-list"]\') !== null');
+
+    $page->click('[data-testid="study-room-view-list"]')
+        ->assertVisible('[data-testid="study-room-list-floor-1"]')
+        ->assertMissing('[data-testid="study-room-floor-1"]')
+        ->assertAttribute('[data-testid="study-room-view-list"]', 'aria-pressed', 'true')
+        ->assertSeeIn('[data-testid="study-room-list-floor-1"] caption', '一樓')
+        ->assertSeeIn('[data-testid="study-room-list-row-1-S02"]', '浣熊')
+        ->assertMissing('[data-testid="study-room-list-take-1-S02"]');
+
+    $page->click('[data-testid="study-room-seat-list-filter-occupied"]');
+
+    $rows = $page->script(
+        "document.querySelectorAll('[data-testid^=\"study-room-list-row-\"]').length"
+    );
+    expect($rows)->toBe(1);
+
+    $page->click('[data-testid="study-room-seat-list-filter-all"]')
+        ->click('[data-testid="study-room-list-take-1-S03"]');
+
+    waitUntil($page, 'window.__studyRoomTest.socket.heldSeatCode === "1-S03"');
+
+    $page->navigate(route('study-room.show'));
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-list-floor-1"]\') !== null');
+
+    $page->assertMissing('[data-testid="study-room-floor-1"]')
+        ->click('[data-testid="study-room-leave-seat"]');
+
+    // Leaving from the list returns focus to the seat's row.
+    waitUntil($page, "document.activeElement?.dataset.seatCode === '1-S03'");
 });

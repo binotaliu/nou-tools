@@ -193,6 +193,28 @@ export default function useSeatGrid(socket, config) {
     return floorLabel(floor.floor + 1) + '尚未開放，樓下坐滿後就會開放'
   }
 
+  // 快速入座: the lowest open floor first, solo seats before table chairs,
+  // i.e. the first free seat in reading order.
+  function firstFreeSeat() {
+    if (!socket.state) {
+      return null
+    }
+
+    for (const floor of socket.state.floors) {
+      const seat =
+        floor.soloSeats.find(candidate => !candidate.isOccupied) ||
+        floor.tables
+          .flatMap(table => table.seats)
+          .find(candidate => !candidate.isOccupied)
+
+      if (seat) {
+        return seat
+      }
+    }
+
+    return null
+  }
+
   // --- table seat popover ---
 
   function peek(seat) {
@@ -218,6 +240,7 @@ export default function useSeatGrid(socket, config) {
     seatAriaLabel,
     isSeatActionable,
     activateSeat,
+    firstFreeSeat,
     thoughtBubbleText,
     needsMarquee,
     seatTimerLabelClass,

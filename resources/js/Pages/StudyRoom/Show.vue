@@ -31,6 +31,8 @@ import ActionBanner from '../../Components/StudyRoom/ActionBanner.vue'
 import FocusMode from '../../Components/StudyRoom/FocusMode.vue'
 import Modal from '../../Components/StudyRoom/Modal.vue'
 import PersonalInfoForm from '../../Components/StudyRoom/PersonalInfoForm.vue'
+import RoomToolbar from '../../Components/StudyRoom/RoomToolbar.vue'
+import SeatList from '../../Components/StudyRoom/SeatList.vue'
 import TableChair from '../../Components/StudyRoom/TableChair.vue'
 import Wall from '../../Components/StudyRoom/Wall.vue'
 import FloorSkeleton from '../../Components/StudyRoom/FloorSkeleton.vue'
@@ -115,6 +117,28 @@ watch(
 // viewer has a nickname, they no longer need the profile prompt.
 const needsProfile = computed(() => props.hasSchedule && !profile.nickname)
 
+// 平面圖 or 清單, remembered per browser. Storage may be unavailable, in
+// which case the map is shown and the choice lasts for the page.
+const VIEW_KEY = 'nou:study-room:view:v1'
+
+function readView() {
+  try {
+    return localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'map'
+  } catch {
+    return 'map'
+  }
+}
+
+const view = ref(readView())
+
+watch(view, value => {
+  try {
+    localStorage.setItem(VIEW_KEY, value)
+  } catch {
+    // Storage blocked: the choice just doesn't outlive the page.
+  }
+})
+
 // Taking a seat in the preview points at the sign-up banner instead.
 const signUpBanner = ref(null)
 const signUpHeading = ref(null)
@@ -143,7 +167,7 @@ watch(
 
 // Where focus goes when your own seat changes hands. Taking a seat moves
 // into the control panel (a disabled seat would otherwise drop focus);
-// leaving, or being released by the server, returns to the seat itself.
+// leaving returns to the seat itself, and a release to 快速入座.
 // A release only takes focus back from the panel or <body>, never from
 // something the viewer is busy with elsewhere on the page.
 function focusControlPanel() {
@@ -185,8 +209,11 @@ socket.onSeatEvent(async ({ type, code }) => {
     })
   }
 
-  if (type === 'left' || focusWasOnPanel) {
+  if (type === 'left') {
     roving.focusSeat(code)
+  } else if (focusWasOnPanel) {
+    await nextTick()
+    document.querySelector('[data-testid="study-room-quick-seat"]')?.focus()
   }
 })
 
@@ -581,342 +608,362 @@ onUnmounted(() => {
         />
 
         <div v-show="!needsProfile && socket.state" class="space-y-6">
-          <p id="study-room-seat-keys-hint" class="sr-only">
-            用左右方向鍵逐一移動座位，上下方向鍵移到上一排或下一排，Home、End
-            移到這層第一個或最後一個座位。
-          </p>
+          <h3 class="sr-only">座位表</h3>
 
-          <section
-            v-for="floor in socket.state ? socket.state.floors : []"
-            :key="floor.floor"
-            class="space-y-3"
-            :aria-labelledby="'study-room-floor-heading-' + floor.floor"
-            :data-testid="'study-room-floor-' + floor.floor"
-          >
-            <div class="flex items-end justify-between px-1">
-              <h3
-                :id="'study-room-floor-heading-' + floor.floor"
-                class="flex items-center gap-2 text-lg font-semibold text-theme-900 dark:text-zinc-100"
-              >
-                <span>{{ floor.label }}</span>
-                <span
-                  class="text-sm font-normal text-theme-700 dark:text-zinc-400"
-                  >閱覽室</span
-                >
-              </h3>
-              <span
-                class="inline-flex items-center gap-1.5 rounded-full bg-theme-100 px-2.5 py-1 text-xs text-theme-700 tabular-nums dark:bg-zinc-800 dark:text-zinc-300"
-              >
-                <span class="size-1.5 rounded-full bg-emerald-500"></span>
-                <span
-                  >{{ floor.occupiedCount }} /
-                  {{ floor.totalCount }} 人在座</span
-                >
-              </span>
-            </div>
+          <RoomToolbar
+            v-model:view="view"
+            :socket="socket"
+            :grid="grid"
+            :announcer="announcer"
+          />
 
-            <p
-              v-if="grid.stairSpokenHint(floor)"
-              class="sr-only"
-              :data-testid="'study-room-floor-' + floor.floor + '-stair-hint'"
-            >
-              {{ grid.stairSpokenHint(floor) }}
+          <SeatList
+            v-if="view === 'list'"
+            :socket="socket"
+            :grid="grid"
+            :timer="timer"
+          />
+
+          <template v-else>
+            <p id="study-room-seat-keys-hint" class="sr-only">
+              用左右方向鍵逐一移動座位，上下方向鍵移到上一排或下一排，Home、End
+              移到這層第一個或最後一個座位。
             </p>
 
-            <div
-              class="relative rounded-2xl border-[6px] border-theme-300 bg-theme-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
+            <section
+              v-for="floor in socket.state ? socket.state.floors : []"
+              :key="floor.floor"
+              class="space-y-3"
+              :aria-labelledby="'study-room-floor-heading-' + floor.floor"
+              :data-testid="'study-room-floor-' + floor.floor"
             >
-              <div
-                class="pointer-events-none absolute inset-x-10 -top-[6px] z-10 flex h-[6px] gap-3 sm:inset-x-20"
-                data-testid="study-room-windows"
-                aria-hidden="true"
-              >
+              <div class="flex items-end justify-between px-1">
+                <h3
+                  :id="'study-room-floor-heading-' + floor.floor"
+                  class="flex items-center gap-2 text-lg font-semibold text-theme-900 dark:text-zinc-100"
+                >
+                  <span>{{ floor.label }}</span>
+                  <span
+                    class="text-sm font-normal text-theme-700 dark:text-zinc-400"
+                    >閱覽室</span
+                  >
+                </h3>
                 <span
-                  v-for="pane in 4"
-                  :key="pane"
-                  class="flex-1 bg-sky-200 transition-[background] duration-1000 dark:bg-sky-900"
-                  :style="sky.windowPaneStyle()"
-                ></span>
+                  class="inline-flex items-center gap-1.5 rounded-full bg-theme-100 px-2.5 py-1 text-xs text-theme-700 tabular-nums dark:bg-zinc-800 dark:text-zinc-300"
+                >
+                  <span class="size-1.5 rounded-full bg-emerald-500"></span>
+                  <span
+                    >{{ floor.occupiedCount }} /
+                    {{ floor.totalCount }} 人在座</span
+                  >
+                </span>
               </div>
-              <div
-                class="pointer-events-none absolute inset-x-10 top-0 h-12 transition-[background] duration-1000 sm:inset-x-20"
-                :style="sky.windowLightStyle()"
-                aria-hidden="true"
-              ></div>
 
-              <template v-if="grid.isGroundFloor(floor)">
+              <p
+                v-if="grid.stairSpokenHint(floor)"
+                class="sr-only"
+                :data-testid="'study-room-floor-' + floor.floor + '-stair-hint'"
+              >
+                {{ grid.stairSpokenHint(floor) }}
+              </p>
+
+              <div
+                class="relative rounded-2xl border-[6px] border-theme-300 bg-theme-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
+              >
                 <div
-                  class="pointer-events-none absolute right-8 -bottom-[6px] z-10 h-[6px] w-12 bg-theme-50 dark:bg-zinc-950"
-                  aria-hidden="true"
-                ></div>
-                <div
-                  class="pointer-events-none absolute right-8 bottom-0 z-10 size-12 rounded-tl-full border-t border-l border-dashed border-theme-400 dark:border-zinc-500"
+                  class="pointer-events-none absolute inset-x-10 -top-[6px] z-10 flex h-[6px] gap-3 sm:inset-x-20"
+                  data-testid="study-room-windows"
                   aria-hidden="true"
                 >
                   <span
-                    class="absolute right-0 bottom-0 h-full w-[3px] origin-bottom -rotate-[70deg] rounded-full bg-theme-500 dark:bg-zinc-400"
+                    v-for="pane in 4"
+                    :key="pane"
+                    class="flex-1 bg-sky-200 transition-[background] duration-1000 dark:bg-sky-900"
+                    :style="sky.windowPaneStyle()"
                   ></span>
                 </div>
-              </template>
-
-              <div
-                role="group"
-                :aria-label="floor.label + '座位'"
-                aria-describedby="study-room-seat-keys-hint"
-                :data-testid="'study-room-floor-' + floor.floor + '-seats'"
-                class="relative space-y-6 rounded-[10px] bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(0,0,0,0.04)_5.5rem_calc(5.5rem+1px))] px-4 pt-6 pb-16 sm:px-8 dark:bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(255,255,255,0.05)_5.5rem_calc(5.5rem+1px))]"
-                @keydown="roving.onKeydown($event, floor)"
-                @focusin="roving.onFocusIn($event, floor)"
-              >
                 <div
-                  class="grid grid-cols-3 justify-items-center gap-x-3 gap-y-7 sm:grid-cols-4 sm:gap-x-5 md:grid-cols-6"
-                  data-testid="study-room-solo-seats"
-                >
-                  <button
-                    v-for="seat in floor.soloSeats"
-                    :key="seat.code"
-                    type="button"
-                    :aria-disabled="grid.isSeatActionable(seat) ? null : 'true'"
-                    :tabindex="roving.tabIndexFor(floor, seat)"
-                    :class="grid.seatClasses(seat)"
-                    :data-testid="grid.seatTestId(seat)"
-                    :data-seat-code="seat.code"
-                    :aria-label="
-                      grid.seatAriaLabel(seat, timer.spokenTimerLabel(seat))
-                    "
-                    @click="grid.activateSeat(seat)"
+                  class="pointer-events-none absolute inset-x-10 top-0 h-12 transition-[background] duration-1000 sm:inset-x-20"
+                  :style="sky.windowLightStyle()"
+                  aria-hidden="true"
+                ></div>
+
+                <template v-if="grid.isGroundFloor(floor)">
+                  <div
+                    class="pointer-events-none absolute right-8 -bottom-[6px] z-10 h-[6px] w-12 bg-theme-50 dark:bg-zinc-950"
+                    aria-hidden="true"
+                  ></div>
+                  <div
+                    class="pointer-events-none absolute right-8 bottom-0 z-10 size-12 rounded-tl-full border-t border-l border-dashed border-theme-400 dark:border-zinc-500"
+                    aria-hidden="true"
                   >
                     <span
-                      class="pointer-events-none absolute inset-x-1.5 top-0 h-4 rounded-b-md bg-theme-200 shadow-[inset_0_-2px_0_var(--color-theme-300)] dark:bg-zinc-700 dark:shadow-[inset_0_-2px_0_var(--color-zinc-600)]"
-                      aria-hidden="true"
-                    >
-                      <span
-                        class="absolute top-1 right-1.5 size-2 rounded-full transition"
-                        :class="
-                          seat.isOccupied
-                            ? 'bg-amber-400 shadow-[0_0_8px_3px_rgba(251,191,36,0.55)]'
-                            : 'bg-theme-300 dark:bg-zinc-600'
-                        "
-                      ></span>
-                      <span
-                        v-show="seat.isOccupied"
-                        class="absolute top-1.5 left-2 h-1.5 w-4 rounded-[2px] bg-sky-400/80 dark:bg-sky-500/70"
-                      ></span>
-                    </span>
+                      class="absolute right-0 bottom-0 h-full w-[3px] origin-bottom -rotate-[70deg] rounded-full bg-theme-500 dark:bg-zinc-400"
+                    ></span>
+                  </div>
+                </template>
 
-                    <div
-                      v-if="!seat.isOccupied"
-                      class="flex flex-col items-center gap-1"
+                <div
+                  role="group"
+                  :aria-label="floor.label + '座位'"
+                  aria-describedby="study-room-seat-keys-hint"
+                  :data-testid="'study-room-floor-' + floor.floor + '-seats'"
+                  class="relative space-y-6 rounded-[10px] bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(0,0,0,0.04)_5.5rem_calc(5.5rem+1px))] px-4 pt-6 pb-16 sm:px-8 dark:bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(255,255,255,0.05)_5.5rem_calc(5.5rem+1px))]"
+                  @keydown="roving.onKeydown($event, floor)"
+                  @focusin="roving.onFocusIn($event, floor)"
+                >
+                  <div
+                    class="grid grid-cols-3 justify-items-center gap-x-3 gap-y-7 sm:grid-cols-4 sm:gap-x-5 md:grid-cols-6"
+                    data-testid="study-room-solo-seats"
+                  >
+                    <button
+                      v-for="seat in floor.soloSeats"
+                      :key="seat.code"
+                      type="button"
+                      :aria-disabled="
+                        grid.isSeatActionable(seat) ? null : 'true'
+                      "
+                      :tabindex="roving.tabIndexFor(floor, seat)"
+                      :class="grid.seatClasses(seat)"
+                      :data-testid="grid.seatTestId(seat)"
+                      :data-seat-code="seat.code"
+                      :aria-label="
+                        grid.seatAriaLabel(seat, timer.spokenTimerLabel(seat))
+                      "
+                      @click="grid.activateSeat(seat)"
                     >
                       <span
-                        class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-300 bg-white text-[0.625rem] font-medium text-theme-700 transition group-hover:border-theme-400 group-hover:text-theme-800 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-                        >{{ seat.seatNumber }}</span
+                        class="pointer-events-none absolute inset-x-1.5 top-0 h-4 rounded-b-md bg-theme-200 shadow-[inset_0_-2px_0_var(--color-theme-300)] dark:bg-zinc-700 dark:shadow-[inset_0_-2px_0_var(--color-zinc-600)]"
+                        aria-hidden="true"
                       >
-                      <span
-                        class="text-[0.625rem] text-theme-700 opacity-0 transition group-hover:opacity-100 dark:text-zinc-400"
-                        >點擊入座</span
-                      >
-                    </div>
-                    <div
-                      v-else
-                      class="flex w-full flex-col items-center gap-0.5"
-                    >
+                        <span
+                          class="absolute top-1 right-1.5 size-2 rounded-full transition"
+                          :class="
+                            seat.isOccupied
+                              ? 'bg-amber-400 shadow-[0_0_8px_3px_rgba(251,191,36,0.55)]'
+                              : 'bg-theme-300 dark:bg-zinc-600'
+                          "
+                        ></span>
+                        <span
+                          v-show="seat.isOccupied"
+                          class="absolute top-1.5 left-2 h-1.5 w-4 rounded-[2px] bg-sky-400/80 dark:bg-sky-500/70"
+                        ></span>
+                      </span>
+
                       <div
-                        v-if="grid.thoughtBubbleText(seat)"
-                        class="pointer-events-none absolute -top-6 left-1/2 z-10 flex w-24 -translate-x-1/2 overflow-hidden rounded-full border border-theme-200 bg-white px-2 py-0.5 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
-                        data-testid="study-room-seat-bubble"
+                        v-if="!seat.isOccupied"
+                        class="flex flex-col items-center gap-1"
                       >
                         <span
-                          v-if="grid.needsMarquee(seat)"
-                          class="flex animate-marquee text-[0.5625rem] whitespace-nowrap text-theme-700 dark:text-zinc-200"
+                          class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-300 bg-white text-[0.625rem] font-medium text-theme-700 transition group-hover:border-theme-400 group-hover:text-theme-800 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                          >{{ seat.seatNumber }}</span
                         >
-                          <span class="pr-4">{{
-                            grid.thoughtBubbleText(seat)
-                          }}</span>
-                          <span class="pr-4" aria-hidden="true">{{
-                            grid.thoughtBubbleText(seat)
-                          }}</span>
-                        </span>
                         <span
-                          v-else
-                          class="block w-full truncate text-center text-[0.5625rem] whitespace-nowrap text-theme-700 dark:text-zinc-200"
-                          >{{ grid.thoughtBubbleText(seat) }}</span
+                          class="text-[0.625rem] text-theme-700 opacity-0 transition group-hover:opacity-100 dark:text-zinc-400"
+                          >點擊入座</span
                         >
                       </div>
-
-                      <span class="relative">
-                        <span
-                          class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-400 bg-white text-lg leading-none shadow-sm dark:border-zinc-500 dark:bg-zinc-800"
-                          >{{ seat.emoji }}</span
-                        >
-                        <span
-                          v-show="grid.isMine(seat)"
-                          class="absolute -top-1.5 -right-2 rounded-full bg-amber-500 px-1 text-[0.5625rem] leading-4 font-semibold text-white shadow-sm"
-                          >你</span
-                        >
-                      </span>
-                      <span
-                        class="max-w-full truncate text-[0.625rem] font-medium text-theme-800 dark:text-zinc-200"
-                        >{{ seat.nickname }}</span
-                      >
-                      <span
-                        class="font-mono text-[0.625rem] tabular-nums"
-                        :class="grid.seatTimerLabelClass(seat)"
-                        >{{ timer.timerLabel(seat) }}</span
-                      >
-                    </div>
-                  </button>
-                </div>
-
-                <div
-                  class="flex flex-wrap justify-center gap-x-8 gap-y-6 pt-2"
-                  data-testid="study-room-tables"
-                >
-                  <div
-                    v-for="table in floor.tables"
-                    :key="table.groupCode"
-                    class="flex flex-col items-center gap-1"
-                    role="group"
-                    :aria-label="table.label"
-                    :data-testid="'study-room-table-' + table.groupCode"
-                  >
-                    <div class="flex gap-4">
-                      <TableChair
-                        v-for="seat in grid.tableSeatsRow(table, 0)"
-                        :key="seat.code"
-                        :seat="seat"
-                        backrest="border-t-4"
-                        timer-side="top"
-                        :grid="grid"
-                        :timer="timer"
-                        :roving-tabindex="roving.tabIndexFor(floor, seat)"
-                      />
-                    </div>
-
-                    <div
-                      aria-hidden="true"
-                      class="flex h-14 w-44 items-center justify-center gap-2 rounded-xl border-2 border-theme-300 bg-theme-200 shadow-[inset_0_2px_0_rgba(255,255,255,0.6),0_2px_4px_rgba(0,0,0,0.06)] dark:border-zinc-600 dark:bg-zinc-700 dark:shadow-none"
-                    >
-                      <span class="text-base leading-none" aria-hidden="true"
-                        >🪴</span
-                      >
-                      <span
-                        class="text-xs font-medium text-theme-800 dark:text-zinc-300"
-                        >{{ table.label }}</span
-                      >
-                    </div>
-
-                    <div class="flex gap-4">
-                      <TableChair
-                        v-for="seat in grid.tableSeatsRow(table, 1)"
-                        :key="seat.code"
-                        :seat="seat"
-                        backrest="border-b-4"
-                        timer-side="bottom"
-                        :grid="grid"
-                        :timer="timer"
-                        :roving-tabindex="roving.tabIndexFor(floor, seat)"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  class="pointer-events-none absolute bottom-0 left-3 flex items-end gap-2 sm:left-5"
-                  data-testid="study-room-stairs"
-                >
-                  <div
-                    class="flex flex-col items-start gap-1"
-                    data-testid="study-room-stair-up"
-                  >
-                    <span
-                      class="max-w-16 text-[0.625rem] leading-tight text-theme-700 dark:text-zinc-400"
-                      aria-hidden="true"
-                      >{{ grid.stairHint(floor) }}</span
-                    >
-                    <div
-                      class="relative h-9 w-16 overflow-hidden rounded-t-sm border-x-2 border-t-2 border-theme-300 bg-[repeating-linear-gradient(180deg,var(--color-theme-100)_0_5px,var(--color-theme-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
-                      aria-hidden="true"
-                    >
-                      <ArrowUpIcon
-                        v-if="!grid.isStairBlocked(floor)"
-                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-theme-700 dark:text-zinc-300"
-                      />
                       <div
                         v-else
-                        class="absolute inset-x-1.5 top-1/2 flex -translate-y-1/2 flex-col items-center gap-1"
-                        data-testid="study-room-stair-blocked"
+                        class="flex w-full flex-col items-center gap-0.5"
                       >
                         <div
-                          class="h-1.5 w-full rounded-full bg-theme-400/80 shadow-sm dark:bg-zinc-500/80"
-                        ></div>
-                        <LockClosedIcon
-                          class="size-3.5 text-theme-700 dark:text-zinc-400"
+                          v-if="grid.thoughtBubbleText(seat)"
+                          class="pointer-events-none absolute -top-6 left-1/2 z-10 flex w-24 -translate-x-1/2 overflow-hidden rounded-full border border-theme-200 bg-white px-2 py-0.5 shadow-sm dark:border-zinc-600 dark:bg-zinc-800"
+                          data-testid="study-room-seat-bubble"
+                        >
+                          <span
+                            v-if="grid.needsMarquee(seat)"
+                            class="flex animate-marquee text-[0.5625rem] whitespace-nowrap text-theme-700 dark:text-zinc-200"
+                          >
+                            <span class="pr-4">{{
+                              grid.thoughtBubbleText(seat)
+                            }}</span>
+                            <span class="pr-4" aria-hidden="true">{{
+                              grid.thoughtBubbleText(seat)
+                            }}</span>
+                          </span>
+                          <span
+                            v-else
+                            class="block w-full truncate text-center text-[0.5625rem] whitespace-nowrap text-theme-700 dark:text-zinc-200"
+                            >{{ grid.thoughtBubbleText(seat) }}</span
+                          >
+                        </div>
+
+                        <span class="relative">
+                          <span
+                            class="flex size-8 items-center justify-center rounded-lg border-2 border-b-4 border-theme-400 bg-white text-lg leading-none shadow-sm dark:border-zinc-500 dark:bg-zinc-800"
+                            >{{ seat.emoji }}</span
+                          >
+                          <span
+                            v-show="grid.isMine(seat)"
+                            class="absolute -top-1.5 -right-2 rounded-full bg-amber-500 px-1 text-[0.5625rem] leading-4 font-semibold text-white shadow-sm"
+                            >你</span
+                          >
+                        </span>
+                        <span
+                          class="max-w-full truncate text-[0.625rem] font-medium text-theme-800 dark:text-zinc-200"
+                          >{{ seat.nickname }}</span
+                        >
+                        <span
+                          class="font-mono text-[0.625rem] tabular-nums"
+                          :class="grid.seatTimerLabelClass(seat)"
+                          >{{ timer.timerLabel(seat) }}</span
+                        >
+                      </div>
+                    </button>
+                  </div>
+
+                  <div
+                    class="flex flex-wrap justify-center gap-x-8 gap-y-6 pt-2"
+                    data-testid="study-room-tables"
+                  >
+                    <div
+                      v-for="table in floor.tables"
+                      :key="table.groupCode"
+                      class="flex flex-col items-center gap-1"
+                      role="group"
+                      :aria-label="table.label"
+                      :data-testid="'study-room-table-' + table.groupCode"
+                    >
+                      <div class="flex gap-4">
+                        <TableChair
+                          v-for="seat in grid.tableSeatsRow(table, 0)"
+                          :key="seat.code"
+                          :seat="seat"
+                          backrest="border-t-4"
+                          timer-side="top"
+                          :grid="grid"
+                          :timer="timer"
+                          :roving-tabindex="roving.tabIndexFor(floor, seat)"
                         />
-                        <div
-                          class="h-1.5 w-full rounded-full bg-theme-400/80 shadow-sm dark:bg-zinc-500/80"
-                        ></div>
+                      </div>
+
+                      <div
+                        aria-hidden="true"
+                        class="flex h-14 w-44 items-center justify-center gap-2 rounded-xl border-2 border-theme-300 bg-theme-200 shadow-[inset_0_2px_0_rgba(255,255,255,0.6),0_2px_4px_rgba(0,0,0,0.06)] dark:border-zinc-600 dark:bg-zinc-700 dark:shadow-none"
+                      >
+                        <span class="text-base leading-none" aria-hidden="true"
+                          >🪴</span
+                        >
+                        <span
+                          class="text-xs font-medium text-theme-800 dark:text-zinc-300"
+                          >{{ table.label }}</span
+                        >
+                      </div>
+
+                      <div class="flex gap-4">
+                        <TableChair
+                          v-for="seat in grid.tableSeatsRow(table, 1)"
+                          :key="seat.code"
+                          :seat="seat"
+                          backrest="border-b-4"
+                          timer-side="bottom"
+                          :grid="grid"
+                          :timer="timer"
+                          :roving-tabindex="roving.tabIndexFor(floor, seat)"
+                        />
                       </div>
                     </div>
                   </div>
 
                   <div
-                    v-if="!grid.isGroundFloor(floor)"
-                    class="flex flex-col items-start gap-1"
-                    data-testid="study-room-stair-down"
+                    class="pointer-events-none absolute bottom-0 left-3 flex items-end gap-2 sm:left-5"
+                    data-testid="study-room-stairs"
                   >
-                    <span
-                      class="max-w-16 text-[0.625rem] leading-tight text-theme-700 dark:text-zinc-400"
-                      aria-hidden="true"
-                      >{{ grid.stairDownHint(floor) }}</span
-                    >
                     <div
-                      class="relative h-9 w-16 rounded-b-sm border-x-2 border-b-2 border-theme-300 bg-[repeating-linear-gradient(180deg,var(--color-theme-100)_0_5px,var(--color-theme-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
-                      aria-hidden="true"
+                      class="flex flex-col items-start gap-1"
+                      data-testid="study-room-stair-up"
                     >
-                      <ArrowDownIcon
-                        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-theme-700 dark:text-zinc-300"
-                      />
+                      <span
+                        class="max-w-16 text-[0.625rem] leading-tight text-theme-700 dark:text-zinc-400"
+                        aria-hidden="true"
+                        >{{ grid.stairHint(floor) }}</span
+                      >
+                      <div
+                        class="relative h-9 w-16 overflow-hidden rounded-t-sm border-x-2 border-t-2 border-theme-300 bg-[repeating-linear-gradient(180deg,var(--color-theme-100)_0_5px,var(--color-theme-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
+                        aria-hidden="true"
+                      >
+                        <ArrowUpIcon
+                          v-if="!grid.isStairBlocked(floor)"
+                          class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-theme-700 dark:text-zinc-300"
+                        />
+                        <div
+                          v-else
+                          class="absolute inset-x-1.5 top-1/2 flex -translate-y-1/2 flex-col items-center gap-1"
+                          data-testid="study-room-stair-blocked"
+                        >
+                          <div
+                            class="h-1.5 w-full rounded-full bg-theme-400/80 shadow-sm dark:bg-zinc-500/80"
+                          ></div>
+                          <LockClosedIcon
+                            class="size-3.5 text-theme-700 dark:text-zinc-400"
+                          />
+                          <div
+                            class="h-1.5 w-full rounded-full bg-theme-400/80 shadow-sm dark:bg-zinc-500/80"
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      v-if="!grid.isGroundFloor(floor)"
+                      class="flex flex-col items-start gap-1"
+                      data-testid="study-room-stair-down"
+                    >
+                      <span
+                        class="max-w-16 text-[0.625rem] leading-tight text-theme-700 dark:text-zinc-400"
+                        aria-hidden="true"
+                        >{{ grid.stairDownHint(floor) }}</span
+                      >
+                      <div
+                        class="relative h-9 w-16 rounded-b-sm border-x-2 border-b-2 border-theme-300 bg-[repeating-linear-gradient(180deg,var(--color-theme-100)_0_5px,var(--color-theme-300)_5px_6px)] dark:border-zinc-600 dark:bg-[repeating-linear-gradient(180deg,var(--color-zinc-800)_0_5px,var(--color-zinc-600)_5px_6px)]"
+                        aria-hidden="true"
+                      >
+                        <ArrowDownIcon
+                          class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 text-theme-700 dark:text-zinc-300"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div
-                  class="pointer-events-none absolute right-24 bottom-0 flex h-5 items-end justify-center"
-                  :class="grid.isGroundFloor(floor) ? 'left-24' : 'left-40'"
-                  aria-hidden="true"
-                >
                   <div
-                    class="h-4 w-full max-w-md rounded-t-sm border-x-2 border-t-2 border-theme-300 bg-[repeating-linear-gradient(90deg,var(--color-theme-500)_0_5px,var(--color-theme-50)_5px_6px,var(--color-theme-700)_6px_9px,var(--color-theme-50)_9px_10px,var(--color-sky-600)_10px_14px,var(--color-theme-50)_14px_15px,var(--color-emerald-600)_15px_21px,var(--color-theme-50)_21px_22px,var(--color-theme-400)_22px_25px,var(--color-theme-50)_25px_26px)] opacity-70 dark:border-zinc-600 dark:opacity-50"
-                  ></div>
+                    class="pointer-events-none absolute right-24 bottom-0 flex h-5 items-end justify-center"
+                    :class="grid.isGroundFloor(floor) ? 'left-24' : 'left-40'"
+                    aria-hidden="true"
+                  >
+                    <div
+                      class="h-4 w-full max-w-md rounded-t-sm border-x-2 border-t-2 border-theme-300 bg-[repeating-linear-gradient(90deg,var(--color-theme-500)_0_5px,var(--color-theme-50)_5px_6px,var(--color-theme-700)_6px_9px,var(--color-theme-50)_9px_10px,var(--color-sky-600)_10px_14px,var(--color-theme-50)_14px_15px,var(--color-emerald-600)_15px_21px,var(--color-theme-50)_21px_22px,var(--color-theme-400)_22px_25px,var(--color-theme-50)_25px_26px)] opacity-70 dark:border-zinc-600 dark:opacity-50"
+                    ></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          <ul
-            class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-theme-700 dark:text-zinc-400"
-          >
-            <li class="inline-flex items-center gap-1.5">
-              <span
-                class="size-3 rounded-full border-2 border-b-[3px] border-theme-300 bg-white dark:border-zinc-600 dark:bg-zinc-800"
-              ></span>
-              空位
-            </li>
-            <li class="inline-flex items-center gap-1.5">
-              <span
-                class="size-3 rounded-full bg-amber-400 shadow-[0_0_6px_2px_rgba(251,191,36,0.5)]"
-              ></span>
-              有人（檯燈亮著）
-            </li>
-            <li class="inline-flex items-center gap-1.5">
-              <span
-                class="rounded-full bg-amber-500 px-1 text-[0.5625rem] leading-4 font-semibold text-white"
-                >你</span
-              >
-              你的座位
-            </li>
-          </ul>
+            <ul
+              class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-theme-700 dark:text-zinc-400"
+            >
+              <li class="inline-flex items-center gap-1.5">
+                <span
+                  class="size-3 rounded-full border-2 border-b-[3px] border-theme-300 bg-white dark:border-zinc-600 dark:bg-zinc-800"
+                ></span>
+                空位
+              </li>
+              <li class="inline-flex items-center gap-1.5">
+                <span
+                  class="size-3 rounded-full bg-amber-400 shadow-[0_0_6px_2px_rgba(251,191,36,0.5)]"
+                ></span>
+                有人（檯燈亮著）
+              </li>
+              <li class="inline-flex items-center gap-1.5">
+                <span
+                  class="rounded-full bg-amber-500 px-1 text-[0.5625rem] leading-4 font-semibold text-white"
+                  >你</span
+                >
+                你的座位
+              </li>
+            </ul>
+          </template>
         </div>
 
         <ActionBanner
