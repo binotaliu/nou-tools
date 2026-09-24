@@ -1,6 +1,6 @@
 <script setup>
 // Installed-PWA navigation on phones: a native-style bottom tab bar (plus a
-// "更多" bottom sheet for the overflow links) that replaces the web-style
+// "更多" bottom sheet laying the overflow links out as a launcher grid) that replaces the web-style
 // header menu. It renders everywhere but is `hidden` unless `html[data-pwa]`
 // is set and the screen is below `md` (the `bottom-nav:` variant in app.css),
 // so browser tabs, tablets and desktops never show it and the standalone
@@ -12,8 +12,9 @@ import Icon from './Icon.vue'
 const props = defineProps({
   // Primary tabs: { href, label, icon, active }.
   tabs: { type: Array, required: true },
-  // Overflow links shown in the sheet: { href, label, icon, active,
-  // offlineAllow? }.
+  // Overflow links shown as launcher tiles in the sheet: { href, label,
+  // shortLabel?, icon, active, offlineAllow? }. A tile fits about two short
+  // lines, so long labels bring a `shortLabel`.
   moreItems: { type: Array, required: true },
   // Changes whenever Inertia navigates; closes the sheet.
   currentPath: { type: String, required: true },
@@ -71,28 +72,46 @@ const tabClass = active =>
       <div
         v-if="sheetOpen"
         id="bottom-nav-sheet"
-        class="fixed inset-x-0 bottom-(--pwa-nav-height) z-40 max-h-[70vh] space-y-1 overflow-y-auto rounded-t-2xl border-t border-theme-200 bg-white p-3 shadow-[0_-10px_40px_rgba(0,0,0,0.14)] dark:border-zinc-700 dark:bg-zinc-900"
+        class="fixed inset-x-0 bottom-(--pwa-nav-height) z-40 max-h-[70vh] overflow-y-auto rounded-t-2xl border-t border-theme-200 bg-white px-3 pt-2 pb-4 shadow-[0_-10px_40px_rgba(0,0,0,0.14)] dark:border-zinc-700 dark:bg-zinc-900"
         role="dialog"
         aria-label="更多"
         data-testid="bottom-nav-sheet"
       >
-        <Link
-          v-for="item in moreItems"
-          :key="item.href"
-          :href="item.href"
-          :data-offline-allow="item.offlineAllow ? '' : null"
-          :aria-current="item.active ? 'page' : null"
-          class="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium transition-colors"
-          :class="
-            item.active
-              ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
-              : 'text-theme-700 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
-          "
-          @click="closeSheet"
-        >
-          <Icon :name="item.icon" class="size-5 shrink-0" />
-          {{ item.label }}
-        </Link>
+        <div
+          class="mx-auto mb-3 h-1 w-10 rounded-full bg-theme-200 dark:bg-zinc-700"
+          aria-hidden="true"
+        ></div>
+        <div class="mx-auto grid max-w-xl grid-cols-4 gap-x-2 gap-y-4">
+          <Link
+            v-for="item in moreItems"
+            :key="item.href"
+            :href="item.href"
+            :data-offline-allow="item.offlineAllow ? '' : null"
+            :aria-current="item.active ? 'page' : null"
+            class="group flex flex-col items-center gap-1.5 rounded-xl px-1 py-1.5 text-center text-xs leading-tight transition-colors"
+            :class="
+              item.active
+                ? 'font-bold text-theme-900 dark:text-theme-100'
+                : 'font-medium text-theme-900/80 dark:text-zinc-300'
+            "
+            data-testid="bottom-nav-sheet-item"
+            @click="closeSheet"
+          >
+            <span
+              class="flex size-12 items-center justify-center rounded-2xl transition-colors"
+              :class="
+                item.active
+                  ? 'bg-theme-600 text-white dark:bg-theme-500'
+                  : 'bg-theme-100 text-theme-700 group-hover:bg-theme-200 dark:bg-zinc-800 dark:text-theme-300 dark:group-hover:bg-zinc-700'
+              "
+            >
+              <Icon :name="item.icon" class="size-6 shrink-0" />
+            </span>
+            <span class="line-clamp-2 break-all">{{
+              item.shortLabel ?? item.label
+            }}</span>
+          </Link>
+        </div>
       </div>
     </Transition>
 

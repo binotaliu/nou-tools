@@ -91,6 +91,30 @@ it('opens the more sheet from the tab bar and closes it again', function () use 
     $page->assertMissing('[data-testid="bottom-nav-sheet"]');
 });
 
+it('lays the more sheet out as a launcher grid with short labels', function () use ($enterPwaMode, $linkTexts) {
+    $page = visit('/discount-stores')->resize(...PHONE);
+
+    $enterPwaMode($page);
+
+    $page->click('[data-testid="bottom-nav-more"]')
+        ->assertVisible('[data-testid="bottom-nav-sheet"]')
+        ->screenshot(filename: 'pwa-bottom-nav-more-grid');
+
+    // Four tiles per row: the first four share a top edge, the fifth wraps.
+    $tops = json_decode($page->script(
+        'JSON.stringify([...document.querySelectorAll(\'[data-testid="bottom-nav-sheet-item"]\')].map(a => Math.round(a.getBoundingClientRect().top)))'
+    ), true);
+
+    expect(array_unique(array_slice($tops, 0, 4)))->toHaveCount(1)
+        ->and($tops[4])->toBeGreaterThan($tops[0]);
+
+    expect($linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))
+        ->toContain('連結目錄')
+        ->not->toContain('連結 / 學習指導中心目錄');
+
+    expect($linkTexts($page, '[data-testid="bottom-nav-sheet"] a[aria-current="page"]'))->toBe(['優惠店家']);
+});
+
 it('puts learning progress after my schedule and the newsletter in both navs, and moves Alt UU, announcements and discount stores into more', function () use ($waitForHeaderNav, $enterPwaMode, $linkTexts) {
     $page = $waitForHeaderNav(visit('/announcements')->resize(...DESKTOP));
 

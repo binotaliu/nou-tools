@@ -113,6 +113,8 @@ const moreMenuItems = [
     href: '/directory',
     prefix: '/directory',
     label: '連結 / 學習指導中心目錄',
+    // The more sheet's launcher tiles fit about two short lines.
+    shortLabel: '連結目錄',
     icon: 'map',
     offlineAllow: true,
   },
