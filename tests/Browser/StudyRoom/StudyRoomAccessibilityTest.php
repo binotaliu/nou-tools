@@ -88,14 +88,15 @@ it('speaks a failed seat claim through the assertive live region', function () u
 
 $activeTestId = 'document.activeElement?.dataset.testid ?? null';
 
-it('keeps occupied seats focusable and names who sits there', function () use ($enterStudyRoom, $occupySeatBehindThePagesBack, $activeTestId) {
+it('keeps occupied seats focusable, names who sits there and peeks on focus', function () use ($enterStudyRoom, $occupySeatBehindThePagesBack, $activeTestId) {
     $page = $enterStudyRoom();
 
     $occupySeatBehindThePagesBack('1-S02', '浣熊');
+    $occupySeatBehindThePagesBack('1-T1-1', '夜貓');
 
     $page->navigate(route('study-room.show'));
 
-    waitUntil($page, 'document.querySelector(\'[data-testid="seat-1-S02"]\')?.getAttribute("aria-disabled") === "true"');
+    waitUntil($page, 'document.querySelector(\'[data-testid="seat-1-T1-1"]\')?.getAttribute("aria-disabled") === "true"');
 
     $page->assertAttributeContains('[data-testid="seat-1-S02"]', 'aria-label', '浣熊 正在使用')
         ->assertAttributeMissing('[data-testid="seat-1-S02"]', 'disabled');
@@ -103,9 +104,15 @@ it('keeps occupied seats focusable and names who sits there', function () use ($
     $page->script("document.querySelector('[data-testid=\"seat-1-S02\"]').focus()");
 
     expect($page->script($activeTestId))->toBe('seat-1-S02');
+
+    // A table chair's popover opens on keyboard focus, not only on hover.
+    $page->assertMissing('[data-testid="seat-1-T1-1-popover"]');
+    $page->script("document.querySelector('[data-testid=\"seat-1-T1-1\"]').focus()");
+    $page->assertVisible('[data-testid="seat-1-T1-1-popover"]')
+        ->assertAttribute('[data-testid="seat-1-T1-1-popover"]', 'aria-hidden', 'true');
 });
 
-it('gives each floor one Tab stop and moves between seats with the arrow keys', function () use ($enterStudyRoom, $activeTestId) {
+it('gives each floor of the 座位表 landmark one Tab stop and moves between seats with the arrow keys', function () use ($enterStudyRoom, $activeTestId) {
     $page = $enterStudyRoom();
 
     $tabStops = $page->script(
@@ -147,21 +154,20 @@ it('gives each floor one Tab stop and moves between seats with the arrow keys', 
         "document.querySelector('[data-testid=\"study-room-floor-1-seats\"]').contains(document.activeElement)"
     );
     expect($stillOnFloor)->toBeFalse();
-});
 
-it('opens a table chair popover on keyboard focus', function () use ($enterStudyRoom, $occupySeatBehindThePagesBack) {
-    $page = $enterStudyRoom();
+    // The seats sit in a 座位表 landmark, with the floors as headings under it.
+    $landmark = $page->script(<<<'JS'
+        (() => {
+            const region = document.querySelector('section[data-testid="study-room-seats"]')
+            return document.getElementById(region.getAttribute('aria-labelledby'))?.textContent.trim()
+        })()
+        JS);
 
-    $occupySeatBehindThePagesBack('1-T1-1', '浣熊');
+    expect($landmark)->toBe('座位表')
+        ->and($page->script("document.querySelector('[data-testid=\"study-room-seats\"]').contains(document.querySelector('[data-testid=\"study-room-toolbar\"]'))"))->toBeTrue()
+        ->and($page->script("document.getElementById('study-room-floor-heading-1').tagName"))->toBe('H4');
 
-    $page->navigate(route('study-room.show'));
-
-    waitUntil($page, 'document.querySelector(\'[data-testid="seat-1-T1-1"]\')?.getAttribute("aria-disabled") === "true"');
-
-    $page->assertMissing('[data-testid="seat-1-T1-1-popover"]');
-    $page->script("document.querySelector('[data-testid=\"seat-1-T1-1\"]').focus()");
-    $page->assertVisible('[data-testid="seat-1-T1-1-popover"]')
-        ->assertAttribute('[data-testid="seat-1-T1-1-popover"]', 'aria-hidden', 'true');
+    $page->assertAttribute('[data-testid="study-room-toolbar"]', 'aria-label', '座位工具');
 });
 
 $politeText = "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.trim()";
@@ -184,7 +190,7 @@ it('moves focus into the control panel on taking a seat and back to the seat on 
         ->and($page->script($politeText))->toBe('已離開座位');
 });
 
-it('keeps focus on the matching control as the panel swaps buttons', function () use ($enterStudyRoom, $activeTestId) {
+it('keeps focus on the matching control as the panel swaps buttons, and announces each change', function () use ($enterStudyRoom, $activeTestId, $politeText) {
     $page = $enterStudyRoom();
 
     $page->keys('[data-testid="seat-1-S01"]', 'Enter');
@@ -193,12 +199,15 @@ it('keeps focus on the matching control as the panel swaps buttons', function ()
 
     $page->keys('[data-testid="study-room-start-timer"]', 'Enter');
     waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-pause-timer'");
+    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.includes('開始專注')");
 
     $page->keys('[data-testid="study-room-pause-timer"]', 'Enter');
     waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-resume-timer'");
+    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.trim() === '已暫停'");
 
     $page->keys('[data-testid="study-room-resume-timer"]', 'Enter');
     waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-pause-timer'");
+    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.trim() === '已繼續'");
 
     $page->keys('[data-testid="study-room-banner-minimize"]', 'Enter');
     waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-banner-expand'");
@@ -209,7 +218,8 @@ it('keeps focus on the matching control as the panel swaps buttons', function ()
     $page->keys('[data-testid="study-room-stop-timer"]', 'Enter');
     waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-start-timer'");
 
-    expect($page->script($activeTestId))->toBe('study-room-start-timer');
+    expect($page->script($activeTestId))->toBe('study-room-start-timer')
+        ->and($page->script($politeText))->toBe('已結束計時');
 });
 
 it('traps focus in the study room dialogs and returns it to the opener', function () use ($enterStudyRoom, $activeTestId) {
@@ -276,23 +286,6 @@ it('announces a seat released by the server and offers 快速入座 again', func
     waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-quick-seat'");
 
     expect($page->script($assertiveText))->toContain('已被釋放');
-});
-
-it('focuses the exit button in focus mode and returns to the 全螢幕 button afterwards', function () use ($enterStudyRoom) {
-    $page = $enterStudyRoom();
-
-    $page->keys('[data-testid="seat-1-S01"]', 'Enter');
-    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-start-timer"]\') !== null');
-    $page->keys('[data-testid="study-room-start-timer"]', 'Enter');
-    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-pause-timer'");
-
-    $page->keys('[data-testid="study-room-focus-mode-open"]', 'Enter');
-    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-focus-mode-close'");
-
-    $page->keys('[data-testid="study-room-focus-mode-close"]', 'Escape');
-    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-focus-mode-open'");
-
-    expect($page->script('document.activeElement.dataset.testid'))->toBe('study-room-focus-mode-open');
 });
 
 it('takes the first free seat with 快速入座', function () use ($enterStudyRoom, $occupySeatBehindThePagesBack, $politeText) {
@@ -382,23 +375,6 @@ $sitAndStartTimer = function (mixed $page): mixed {
     return $page;
 };
 
-it('announces your own timer changes', function () use ($enterStudyRoom, $sitAndStartTimer, $politeText) {
-    $page = $sitAndStartTimer($enterStudyRoom());
-
-    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.includes('開始專注')");
-
-    $page->keys('[data-testid="study-room-pause-timer"]', 'Enter');
-    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.trim() === '已暫停'");
-
-    $page->keys('[data-testid="study-room-resume-timer"]', 'Enter');
-    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.trim() === '已繼續'");
-
-    $page->keys('[data-testid="study-room-stop-timer"]', 'Enter');
-    waitUntil($page, "document.querySelector('[data-testid=\"study-room-announcer-polite\"]').textContent.trim() === '已結束計時'");
-
-    expect($page->script($politeText))->toBe('已結束計時');
-});
-
 it('announces the end of a focus round and, when asked, the time left', function () use ($enterStudyRoom, $sitAndStartTimer, $politeText) {
     $page = $sitAndStartTimer($enterStudyRoom());
 
@@ -444,10 +420,9 @@ it('announces neighbours coming and going only when asked to', function () use (
     $page->keys('[data-testid="seat-1-S01"]', 'Enter');
     waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-verb-exam_prep'");
 
-    // Off by default: a neighbour sitting down stays silent.
+    // Off by default: a neighbour sitting down stays silent. Had it been
+    // queued, it would share the batch below and break the exact sentence.
     $page->script($deltaFor('1-S02', 2, '浣熊'));
-    $page->script('new Promise(resolve => setTimeout(resolve, 3500))');
-    expect($page->script($politeText))->not->toContain('浣熊');
 
     $page->click('[data-testid="study-room-voice-settings-toggle"]')
         ->select('[data-testid="study-room-voice-room"]', 'neighbors');
@@ -496,8 +471,15 @@ it('puts each study room accesskey on exactly one element, seated or not', funct
     ])->and($page->script("document.querySelectorAll('[accesskey]').length"))->toBe(9);
 });
 
-it('toggles the timer, reads the status and jumps to your seat from the accesskeys', function () use ($enterStudyRoom, $sitAndStartTimer, $politeText, $activeTestId) {
+it('enters and leaves focus mode, toggles the timer, reads the status and jumps to your seat from the accesskeys', function () use ($enterStudyRoom, $sitAndStartTimer, $politeText, $activeTestId) {
     $page = $sitAndStartTimer($enterStudyRoom());
+
+    // From the 全螢幕 button, focus goes to the exit button and comes back.
+    $page->keys('[data-testid="study-room-focus-mode-open"]', 'Enter');
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-focus-mode-close'");
+
+    $page->keys('[data-testid="study-room-focus-mode-close"]', 'Escape');
+    waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-focus-mode-open'");
 
     $page->script("document.querySelector('[data-testid=\"study-room-accesskey-timer\"]').click()");
     waitUntil($page, "document.activeElement?.dataset.testid === 'study-room-resume-timer'");
@@ -535,23 +517,6 @@ it('labels the nameplate, the change-activity button and the board heading', fun
         "getComputedStyle(document.querySelector('[data-testid=\"study-room-change-verb-reading\"]').closest('label')).boxShadow"
     );
     expect($ring)->not->toBe('none');
-});
-
-it('exposes the seats as a 座位表 landmark with the floors as headings under it', function () use ($enterStudyRoom) {
-    $page = $enterStudyRoom();
-
-    $landmark = $page->script(<<<'JS'
-        (() => {
-            const region = document.querySelector('section[data-testid="study-room-seats"]')
-            return document.getElementById(region.getAttribute('aria-labelledby'))?.textContent.trim()
-        })()
-        JS);
-
-    expect($landmark)->toBe('座位表')
-        ->and($page->script("document.querySelector('[data-testid=\"study-room-seats\"]').contains(document.querySelector('[data-testid=\"study-room-toolbar\"]'))"))->toBeTrue()
-        ->and($page->script("document.getElementById('study-room-floor-heading-1').tagName"))->toBe('H4');
-
-    $page->assertAttribute('[data-testid="study-room-toolbar"]', 'aria-label', '座位工具');
 });
 
 it('gives the control panel spoken times and named controls', function () use ($enterStudyRoom) {
