@@ -158,7 +158,7 @@ it('renders the next class as a card on a phone, with the date tile, time and cl
 
     $page->assertVisible($card)
         ->assertSeeIn($card, $classDate->format('n').'/'.$classDate->format('j'))
-        ->assertSeeIn($card, chineseWeekdayChar($classDate))
+        ->assertSeeIn($card, '週'.chineseWeekdayChar($classDate))
         ->assertSeeIn($card, '09:00 ~ 10:00')
         ->assertSeeIn($card, '進入教室')
         ->assertSeeIn($card, '備用教室')
