@@ -11,6 +11,11 @@ import BottomNav from '../Components/BottomNav.vue'
 import CookieConsentBanner from '../Components/CookieConsentBanner.vue'
 import Icon from '../Components/Icon.vue'
 import Notification from '../Components/Notification.vue'
+
+// Room for a fixed bottom banner (study room's ActionBanner) to sit over
+// without hiding content. It goes on the footer; only the installed phone
+// PWA, whose footer is hidden, puts it on <main> instead.
+defineProps({ reserveBottomSpace: { type: Boolean, default: false } })
 import ThemeSwitcherPopover from '../Components/ThemeSwitcherPopover.vue'
 
 const page = usePage()
@@ -338,7 +343,12 @@ const bottomMoreItems = computed(() =>
   <main
     id="main-content"
     tabindex="-1"
-    class="mx-auto max-w-7xl px-6 py-8 focus:outline-none bottom-nav:pb-[calc(var(--pwa-nav-height)+2rem)]"
+    :class="
+      reserveBottomSpace
+        ? 'bottom-nav:pb-[calc(var(--pwa-nav-height)+26rem)] sm:bottom-nav:pb-[calc(var(--pwa-nav-height)+20rem)]'
+        : 'bottom-nav:pb-[calc(var(--pwa-nav-height)+2rem)]'
+    "
+    class="mx-auto max-w-7xl px-6 py-8 focus:outline-none"
   >
     <!-- flash notifications use slide-in toasts instead of the old alert box -->
     <Notification
@@ -362,6 +372,7 @@ const bottomMoreItems = computed(() =>
   </main>
 
   <footer
+    :class="reserveBottomSpace ? 'pb-96! sm:pb-72! lg:pb-48!' : ''"
     class="mt-12 border-t border-theme-200 bg-theme-100 py-8 text-theme-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 print:bg-white print:text-black bottom-nav:hidden"
     data-testid="site-footer"
   >

@@ -410,7 +410,7 @@ onUnmounted(() => {
 <template>
   <Head title="自習室 - NOU 小幫手" />
 
-  <AppLayout>
+  <AppLayout :reserve-bottom-space="Boolean(socket.heldSeatCode)">
     <div class="mx-auto max-w-6xl space-y-6" data-testid="study-room-page">
       <div
         class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
@@ -507,11 +507,7 @@ onUnmounted(() => {
         :announcer="announcer"
       />
 
-      <div
-        class="space-y-4"
-        :class="socket.heldSeatCode ? 'pb-96 sm:pb-72 lg:pb-48' : ''"
-        :data-testid="rootTestidValue"
-      >
+      <div class="space-y-4" :data-testid="rootTestidValue">
         <div id="study-room-modal-target"></div>
 
         <div
