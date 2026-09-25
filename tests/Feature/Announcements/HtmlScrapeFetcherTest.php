@@ -172,3 +172,30 @@ it('handles empty HTML list gracefully', function () use ($htmlSourceConfig) {
 
     expect($results)->toHaveCount(0);
 });
+
+it('resolves root-relative attachment links against the host, not the sub-site path', function () use ($htmlSourceConfig) {
+    $source = $htmlSourceConfig([
+        'fetch_url' => 'https://www2.nou.edu.tw/coach/doclist.aspx?uid=4377&pid=4376',
+        'fetcher_config' => ['base_url' => 'https://www2.nou.edu.tw/coach'],
+    ]);
+
+    $html = <<<'HTML'
+    <ul class="page-list-cont">
+        <li>
+            <div class="page-list-info">
+                <a href="/upload/cont_att/abc.pdf">
+                    <div class="page-list-date"><span>2026-09-23</span></div>
+                    <div class="page-list-title">115年10月份重要訊息</div>
+                </a>
+            </div>
+        </li>
+    </ul>
+    HTML;
+
+    Http::fake(['www2.nou.edu.tw/*' => Http::response($html)]);
+
+    $results = (new HtmlScrapeFetcher)->fetch($source);
+
+    expect($results[0]->sourceId)->toBe('/upload/cont_att/abc.pdf')
+        ->and($results[0]->url)->toBe('https://www2.nou.edu.tw/upload/cont_att/abc.pdf');
+});

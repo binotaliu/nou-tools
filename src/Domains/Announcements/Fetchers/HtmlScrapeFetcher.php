@@ -9,6 +9,7 @@ use DOMXPath;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
+use NouTools\Domains\Announcements\Actions\ResolveAnnouncementUrl;
 use NouTools\Domains\Announcements\Contracts\AnnouncementFetcher;
 use NouTools\Domains\Announcements\DataTransferObjects\AnnouncementSourceConfigDTO;
 use NouTools\Domains\Announcements\DataTransferObjects\FetchedAnnouncementDTO;
@@ -75,9 +76,7 @@ final readonly class HtmlScrapeFetcher implements AnnouncementFetcher
                 }
             }
 
-            $fullUrl = str_starts_with($href, 'http')
-                ? $href
-                : rtrim($baseUrl, '/').'/'.ltrim($href, '/');
+            $fullUrl = (new ResolveAnnouncementUrl)($href, $baseUrl);
 
             $results[] = new FetchedAnnouncementDTO(
                 sourceId: $href,
