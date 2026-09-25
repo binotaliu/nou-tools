@@ -394,6 +394,17 @@ it('announces the end of a focus round and, when asked, the time left', function
     expect($page->script($politeText))->toContain('專注時間到');
 });
 
+it('keeps the voice settings panel inside a phone screen', function () use ($enterStudyRoom) {
+    $page = $enterStudyRoom()->resize(320, 640);
+
+    $page->click('[data-testid="study-room-voice-settings-toggle"]');
+
+    $box = json_decode($page->script('JSON.stringify(document.querySelector(\'[data-testid="study-room-voice-settings"]\').getBoundingClientRect())'), true);
+
+    expect($box['left'])->toBeGreaterThanOrEqual(0)
+        ->and($box['right'])->toBeLessThanOrEqual(320);
+});
+
 $deltaFor = fn (string $code, int $seatNumber, ?string $nickname): string => 'window.__studyRoomTest.socket.applyDelta('.
     '{openFloors: 1, totals: {occupantCount: 1, siteFocusSecondsToday: 0, yourFocusSecondsToday: 0}, version: "'.Str::random(6).'", seat: '.
     json_encode([
