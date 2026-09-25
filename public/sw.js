@@ -1,36 +1,40 @@
-// Minimal offline support: keeps a previously-visited home/schedule/directory
-// page (and the assets it needs) available when the network is down, and
-// shows a generic offline page for any other route that isn't cached.
-const CACHE_VERSION = 'v7'
-const PAGE_CACHE = `nou-schedule-pages-${CACHE_VERSION}`
+// Emergency mode. Pages are Inertia+Vue, which can't run without the app's
+// hashed build assets and live requests, so instead of caching them this
+// worker keeps a small server-rendered "lite" copy of the visitor's schedule
+// (GET /schedules/{token}/lite: plain Blade, inline CSS, the video-class
+// links) fresh in the background. When a navigation can't reach the app —
+// offline, or a gateway/outage response — that copy is served in its place,
+// or the generic /offline page when there isn't one yet.
+const CACHE_VERSION = 'v8'
+const PAGE_CACHE = `nou-pages-${CACHE_VERSION}`
 const RUNTIME_CACHE = `nou-runtime-${CACHE_VERSION}`
+// The /offline page lists backups by scanning caches named `nou-lite-*`.
+const LITE_CACHE = `nou-lite-${CACHE_VERSION}`
 
-// Matches /schedules/{token} only — not /schedules/create or nested routes
-// like /schedules/{token}/edit, which aren't meant to work offline.
-const SCHEDULE_SHOW_PATTERN = /^\/schedules\/([^/]+)$/
+// /schedules/{token} and /schedules/{token}/lite — not /schedules/create or
+// other nested routes.
+const SCHEDULE_PATH_PATTERN = /^\/schedules\/([^/]+)(\/lite)?$/
 const SCHEDULE_PDF_PATTERN = /^\/schedules\/[^/]+\/print\.pdf$/
 
-// Generic fallback shown for any other page when it isn't cached and the
-// network is unreachable. Precached below so it's always available, even if
-// the visitor never opened it directly.
+// Which token was backed up last, stored as a tiny cache entry.
+const LAST_TOKEN_KEY = '/__lite-last-token'
+
+// Generic fallback shown when there's no schedule backup to serve. Precached
+// so it's always available, even if the visitor never opened it directly.
 const OFFLINE_URL = '/offline'
 
-function isHomeUrl(url) {
-  return url.origin === self.location.origin && url.pathname === '/'
+function liteUrl(token) {
+  return `/schedules/${token}/lite`
 }
 
-function isDirectoryUrl(url) {
-  return url.origin === self.location.origin && url.pathname === '/directory'
-}
-
-function isScheduleShowUrl(url) {
+function scheduleTokenFromUrl(url) {
   if (url.origin !== self.location.origin) {
-    return false
+    return null
   }
 
-  const match = SCHEDULE_SHOW_PATTERN.exec(url.pathname)
+  const match = SCHEDULE_PATH_PATTERN.exec(url.pathname)
 
-  return !!match && match[1] !== 'create'
+  return match && match[1] !== 'create' && match[1] !== 'my' ? match[1] : null
 }
 
 // Third-party origins whose assets are safe to cache for offline rendering
@@ -40,13 +44,14 @@ function isCacheableCrossOrigin(url) {
   return url.hostname === 'cdn.jsdelivr.net'
 }
 
-// Standard gateway errors plus Cloudflare's origin-error range (520-527):
-// these mean the origin is unreachable, not that the app itself returned a
-// meaningful response. A real 401/403/404/429/etc from the app — including
+// 500 (the app is up but broken, e.g. the database is down), the standard
+// gateway errors and Cloudflare's origin-error range (520-527): these mean
+// the origin is unusable, not that the app returned a meaningful response. A real 401/403/404/429/etc from the app — including
 // a Cloudflare bot-challenge page, which also answers 403 — must NOT match
 // here, or we'd hide it behind the offline page and trap the visitor.
 function isOutageStatus(status) {
   return (
+    status === 500 ||
     status === 502 ||
     status === 503 ||
     status === 504 ||
@@ -72,7 +77,12 @@ self.addEventListener('activate', event => {
       .then(keys =>
         Promise.all(
           keys
-            .filter(key => key !== PAGE_CACHE && key !== RUNTIME_CACHE)
+            .filter(
+              key =>
+                key !== PAGE_CACHE &&
+                key !== RUNTIME_CACHE &&
+                key !== LITE_CACHE
+            )
             .map(key => caches.delete(key))
         )
       )
@@ -80,36 +90,62 @@ self.addEventListener('activate', event => {
   )
 })
 
-async function networkFirst(request) {
-  const cache = await caches.open(PAGE_CACHE)
-
+// Fetches the lite copy of a schedule and remembers it as the latest one.
+// Failures are ignored: the previous copy simply stays.
+async function refreshLite(token) {
   try {
-    const response = await fetch(request)
+    const response = await fetch(liteUrl(token), { cache: 'no-store' })
 
-    if (response && response.ok) {
-      cache.put(request, response.clone())
-      return response
+    if (!response || !response.ok) {
+      return
     }
 
-    // A gateway/outage response (e.g. Cloudflare's 5xx page when the origin
-    // is down) isn't a fetch failure, so it wouldn't hit the catch block
-    // below. Prefer the last good cached page over showing that error page.
-    // Any other status (404, 403, a Cloudflare challenge, etc.) is a real
-    // response and must be passed through as-is.
-    if (response && isOutageStatus(response.status)) {
-      return (await cache.match(request)) || response
-    }
+    const cache = await caches.open(LITE_CACHE)
 
-    return response
-  } catch (error) {
-    const cached = await cache.match(request)
+    await cache.put(liteUrl(token), response)
+    await cache.put(LAST_TOKEN_KEY, new Response(token))
+  } catch (error) {}
+}
 
-    if (cached) {
-      return cached
-    }
+// The same page with `data-emergency` on <html>, so the lite page knows it
+// is standing in for something (it can't tell from its own headers, and the
+// app's /up check stays green when only the database is down).
+async function flagged(response) {
+  const html = await response.text()
 
-    throw error
+  return new Response(html.replace('<html ', '<html data-emergency '), {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  })
+}
+
+// The lite copy for the schedule the request is about, else the most
+// recently backed-up one. Without any, a real response from the app (a 500
+// page) is better than a generic message and passes through; a failed fetch
+// or gateway error gets the generic /offline page.
+async function emergencyResponse(url, original) {
+  const lite = await caches.open(LITE_CACHE)
+  const requested = scheduleTokenFromUrl(url)
+  let backup = requested ? await lite.match(liteUrl(requested)) : undefined
+
+  if (!backup) {
+    const last = await lite.match(LAST_TOKEN_KEY)
+
+    backup = last ? await lite.match(liteUrl(await last.text())) : undefined
   }
+
+  if (backup) {
+    return flagged(backup)
+  }
+
+  if (original && original.status === 500) {
+    return original
+  }
+
+  const pages = await caches.open(PAGE_CACHE)
+
+  return (await pages.match(OFFLINE_URL)) || original || Response.error()
 }
 
 async function staleWhileRevalidate(request) {
@@ -188,6 +224,14 @@ self.addEventListener('fetch', event => {
   }
 
   if (isInertiaRequest(request)) {
+    // In-app visits to a schedule page are our cue to refresh its backup
+    // (there's no real navigation to hook when the app is already open).
+    const token = scheduleTokenFromUrl(url)
+
+    if (token && !url.pathname.endsWith('/lite')) {
+      event.waitUntil(refreshLite(token))
+    }
+
     return
   }
 
@@ -210,37 +254,35 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  // Navigations: home and schedule show pages are meant to work offline.
+  // Navigations: network first for every same-origin page. A failed fetch
+  // (offline) or a gateway/outage response (e.g. Cloudflare's 5xx page when
+  // the origin is down, Laravel's 503 maintenance mode, or a 500 because the
+  // database is down) is answered with
+  // the emergency page instead. A real app response — including a 401/403/404
+  // or a Cloudflare bot-challenge page — is passed through untouched.
   if (request.mode === 'navigate') {
-    if (isHomeUrl(url) || isScheduleShowUrl(url) || isDirectoryUrl(url)) {
-      event.respondWith(networkFirst(request))
-      return
-    }
-
-    // Every other page (announcements, create/edit flows, etc.) isn't
-    // cached — pass it straight to the network like there were no service
-    // worker at all, except when that fetch fails (offline) or comes back
-    // as a gateway/outage response (e.g. Cloudflare's 5xx page when the
-    // origin is down), in which case show the generic offline fallback
-    // instead. A real app response — including a 401/403/404 or a
-    // Cloudflare bot-challenge page — is passed through untouched.
     if (url.origin === self.location.origin && url.pathname !== OFFLINE_URL) {
       event.respondWith(
         fetch(request)
-          .then(async response => {
-            if (!response || !isOutageStatus(response.status)) {
-              return response
+          .then(response => {
+            if (response && isOutageStatus(response.status)) {
+              return emergencyResponse(url, response)
             }
 
-            const cache = await caches.open(PAGE_CACHE)
+            const token = scheduleTokenFromUrl(url)
 
-            return (await cache.match(OFFLINE_URL)) || response
-          })
-          .catch(async () => {
-            const cache = await caches.open(PAGE_CACHE)
+            if (
+              token &&
+              response &&
+              response.ok &&
+              !url.pathname.endsWith('/lite')
+            ) {
+              event.waitUntil(refreshLite(token))
+            }
 
-            return (await cache.match(OFFLINE_URL)) || Response.error()
+            return response
           })
+          .catch(() => emergencyResponse(url))
       )
     }
 

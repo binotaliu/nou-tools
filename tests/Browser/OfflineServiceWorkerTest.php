@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\StudentSchedule;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -23,7 +24,7 @@ it('shows the cached offline page for a gateway/outage response once the service
     $page->script('navigator.serviceWorker.ready');
 
     $page->navigate('/__browser-test__/simulated/outage')
-        ->assertSee('離線')
+        ->assertSee('目前無法連線')
         ->screenshot();
 });
 
@@ -33,7 +34,7 @@ it('leaves a real error response like a 404 untouched instead of masking it with
     $page->script('navigator.serviceWorker.ready');
 
     $page->navigate('/this-route-does-not-exist')
-        ->assertDontSee('離線')
+        ->assertDontSee('目前無法連線')
         ->screenshot();
 });
 
@@ -61,4 +62,81 @@ it("never caches Inertia's own client-side page-visit requests", function () {
     $second = $page->script($fetchInertiaVisit);
 
     expect($first)->not->toBe($second);
+});
+
+it('serves the backed-up lite schedule instead of an error page during an outage', function () {
+    Route::get('/__browser-test__/simulated/lite-outage', fn () => response('', 503));
+
+    $schedule = StudentSchedule::create(['uuid' => Str::uuid(), 'name' => '停機備份課表']);
+
+    // The worker only controls navigations after its first activation, so
+    // let it install on another page before opening the schedule.
+    $page = visit('/');
+
+    $page->script('navigator.serviceWorker.ready');
+
+    $page->navigate(route('schedules.show', $schedule, false));
+
+    // The worker refreshes the backup in the background after the page
+    // loads; wait until it has landed in the cache.
+    $page->script(<<<JS
+        navigator.serviceWorker.ready.then(async () => {
+            for (let i = 0; i < 30; i++) {
+                if (await caches.match('/schedules/{$schedule->getRouteKey()}/lite')) {
+                    return true
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 100))
+            }
+
+            return false
+        })
+        JS);
+
+    $page->navigate('/__browser-test__/simulated/lite-outage')
+        ->assertSee('停機備份課表')
+        ->assertDontSee('目前無法連線 -');
+});
+
+it('serves the backup on a 500 too, e.g. when the database is down', function () {
+    Route::get('/__browser-test__/simulated/server-error', fn () => response('', 500));
+
+    $schedule = StudentSchedule::create(['uuid' => Str::uuid(), 'name' => '資料庫故障課表']);
+
+    $page = visit('/');
+
+    $page->script('navigator.serviceWorker.ready');
+
+    $page->navigate(route('schedules.show', $schedule, false));
+
+    $page->script(<<<JS
+        navigator.serviceWorker.ready.then(async () => {
+            for (let i = 0; i < 30; i++) {
+                if (await caches.match('/schedules/{$schedule->getRouteKey()}/lite')) {
+                    return true
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 100))
+            }
+
+            return false
+        })
+        JS);
+
+    $page->navigate('/__browser-test__/simulated/server-error')
+        ->assertSee('資料庫故障課表')
+        ->assertSee('網路或伺服器發生問題')
+        ->assertVisible('#lite-banner');
+});
+
+it('lets a 500 through untouched when there is no backup to show', function () {
+    Route::get('/__browser-test__/simulated/no-backup-error', fn () => response('app broke', 500));
+
+    $page = visit('/');
+
+    $page->script('navigator.serviceWorker.ready');
+
+    $page->navigate('/__browser-test__/simulated/no-backup-error')
+        ->assertSee('app broke')
+        ->assertDontSee('目前無法連線');
 });

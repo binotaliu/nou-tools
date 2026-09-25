@@ -87,10 +87,10 @@ function trackPageView(page) {
   })
 }
 
-// Registers the offline-support service worker (see public/sw.js). It caches
-// previously-visited home and /schedules/{schedule} pages (plus their assets)
-// and is registered site-wide since the worker's fetch handler scopes the
-// offline behavior to those routes.
+// Registers the offline-support service worker (see public/sw.js). It keeps a
+// server-rendered backup of the visitor's schedule (/schedules/{schedule}/lite)
+// and serves it when a navigation can't reach the app. It is registered
+// site-wide since that fallback applies to every page.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {})
