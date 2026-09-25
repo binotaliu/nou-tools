@@ -111,7 +111,7 @@ export default function useSeatGrid(socket, config) {
   function seatTimerLabelClass(seat) {
     return seat.timerPhase === 'break'
       ? 'text-emerald-600 dark:text-emerald-400'
-      : 'text-theme-500 dark:text-zinc-400'
+      : 'text-theme-700 dark:text-zinc-400'
   }
 
   function seatClasses(seat, variant = 'solo') {

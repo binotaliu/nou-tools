@@ -237,7 +237,7 @@ function submit() {
 
                     <select
                       v-model="form.reminder_offsets[0]"
-                      class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                      class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
                     >
                       <option
                         v-for="[value, label] in REMINDER_OPTIONS"
@@ -258,7 +258,7 @@ function submit() {
 
                     <select
                       v-model="form.reminder_offsets[1]"
-                      class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                      class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
                     >
                       <option value="">不設定第二次提醒</option>
                       <option

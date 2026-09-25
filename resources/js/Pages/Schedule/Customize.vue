@@ -427,7 +427,7 @@ function submitAnnouncementPreferences() {
                   class="inline-flex w-fit items-center gap-1 rounded-full border py-1 pr-1 pl-3 text-sm transition"
                   :class="
                     isSourceChecked(source) || isSourceIndeterminate(source)
-                      ? 'border-orange-300 bg-orange-100 font-medium text-orange-800 dark:border-orange-800 dark:bg-orange-950/60 dark:text-orange-300'
+                      ? 'border-theme-300 bg-theme-100 font-medium text-theme-800 dark:border-theme-800 dark:bg-theme-900/60 dark:text-theme-300'
                       : 'border-theme-300 text-theme-700 hover:bg-theme-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-950'
                   "
                 >
@@ -470,7 +470,7 @@ function submitAnnouncementPreferences() {
                     class="cursor-pointer rounded-full border px-3 py-1 text-sm transition"
                     :class="
                       isCategoryChecked(source, category)
-                        ? 'border-orange-300 bg-orange-100 font-medium text-orange-800 dark:border-orange-800 dark:bg-orange-950/60 dark:text-orange-300'
+                        ? 'border-theme-300 bg-theme-100 font-medium text-theme-800 dark:border-theme-800 dark:bg-theme-900/60 dark:text-theme-300'
                         : 'border-theme-300 text-theme-700 hover:bg-theme-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-950'
                     "
                   >

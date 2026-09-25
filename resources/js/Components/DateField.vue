@@ -374,14 +374,14 @@ onBeforeUnmount(() => {
       ref="trigger"
       type="button"
       v-bind="$attrs"
-      class="cursor-pointer whitespace-nowrap text-theme-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-zinc-100"
+      class="cursor-pointer whitespace-nowrap text-theme-900 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:text-zinc-100"
       :class="[
         variant === 'cell'
           ? 'm-0 h-full w-full px-2 py-2 text-center text-xs focus:ring-inset'
           : variant === 'box'
             ? 'flex w-full items-center justify-center rounded-md border border-theme-200 px-3 py-2.5 text-sm dark:border-zinc-700'
             : 'rounded border border-theme-200 bg-white px-3 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-900',
-        { 'text-gray-400 print:text-transparent': !selected },
+        { 'text-zinc-400 print:text-transparent': !selected },
       ]"
       :aria-label="`${label}：${selected ? describe(selected) : placeholder}`"
       :title="buttonTitle"
@@ -407,7 +407,7 @@ onBeforeUnmount(() => {
         <div class="mb-2 flex items-center justify-between">
           <button
             type="button"
-            class="flex size-8 items-center justify-center rounded text-lg hover:bg-theme-100 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:hover:bg-zinc-800"
+            class="flex size-8 items-center justify-center rounded text-lg hover:bg-theme-100 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:hover:bg-zinc-800"
             aria-label="上個月"
             data-testid="date-field-prev"
             @click="shiftMonth(-1)"
@@ -419,7 +419,7 @@ onBeforeUnmount(() => {
           </div>
           <button
             type="button"
-            class="flex size-8 items-center justify-center rounded text-lg hover:bg-theme-100 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:hover:bg-zinc-800"
+            class="flex size-8 items-center justify-center rounded text-lg hover:bg-theme-100 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:hover:bg-zinc-800"
             aria-label="下個月"
             data-testid="date-field-next"
             @click="shiftMonth(1)"
@@ -447,14 +447,14 @@ onBeforeUnmount(() => {
               :tabindex="cell.iso === tabbableIso ? 0 : -1"
               :aria-label="describe(cell.date)"
               :aria-pressed="cell.iso === value"
-              class="mx-auto flex size-8 items-center justify-center rounded-full text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              class="mx-auto flex size-8 items-center justify-center rounded-full text-sm focus:ring-2 focus:ring-theme-500 focus:outline-none"
               :class="
                 cell.iso === value
                   ? 'bg-theme-700 font-semibold text-white'
                   : [
                       'hover:bg-theme-100 dark:hover:bg-zinc-800',
                       todayDate && cell.iso === toIso(todayDate)
-                        ? 'font-semibold text-blue-600 ring-1 ring-blue-400 dark:text-blue-400'
+                        ? 'font-semibold text-theme-700 ring-1 ring-theme-400 dark:text-theme-400'
                         : '',
                     ]
               "
@@ -471,7 +471,7 @@ onBeforeUnmount(() => {
           <button
             v-if="clearable"
             type="button"
-            class="rounded px-2 py-1 text-xs text-theme-700 hover:bg-theme-100 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-zinc-300 dark:hover:bg-zinc-800"
+            class="rounded px-2 py-1 text-xs text-theme-700 hover:bg-theme-100 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:text-zinc-300 dark:hover:bg-zinc-800"
             data-testid="date-field-clear"
             @click="clear()"
           >
@@ -480,7 +480,7 @@ onBeforeUnmount(() => {
           <button
             v-if="todayDate"
             type="button"
-            class="rounded px-2 py-1 text-xs text-theme-700 hover:bg-theme-100 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-zinc-300 dark:hover:bg-zinc-800"
+            class="rounded px-2 py-1 text-xs text-theme-700 hover:bg-theme-100 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:text-zinc-300 dark:hover:bg-zinc-800"
             data-testid="date-field-today"
             @click="pickToday()"
           >

@@ -578,7 +578,7 @@ function localHint(next) {
                 <div
                   class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
                 >
-                  <Icon name="chevron-down" class="size-5 text-gray-400" />
+                  <Icon name="chevron-down" class="size-5 text-zinc-400" />
                 </div>
               </div>
             </form>

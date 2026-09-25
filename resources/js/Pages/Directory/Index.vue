@@ -372,7 +372,7 @@ onMounted(() => {
                     <button
                       type="button"
                       data-testid="center-address-button"
-                      class="text-left text-orange-700 hover:underline"
+                      class="text-left text-theme-700 hover:underline"
                       :disabled="
                         !selectedCenter.latitude || !selectedCenter.longitude
                       "

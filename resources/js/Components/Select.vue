@@ -22,14 +22,14 @@ const [model, modelModifiers] = defineModel({
     <select
       v-model="model"
       v-bind="$attrs"
-      class="block w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+      class="block w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
     >
       <slot />
     </select>
     <div
       class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
     >
-      <Icon name="chevron-down" class="size-5 text-gray-400" />
+      <Icon name="chevron-down" class="size-5 text-zinc-400" />
     </div>
   </div>
 </template>

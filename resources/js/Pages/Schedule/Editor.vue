@@ -214,7 +214,7 @@ function submitForm() {
               id="term"
               name="term"
               aria-label="選擇學期"
-              class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+              class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
               :value="viewModel.selectedTerm"
               @change="selectTerm($event.target.value)"
             >
@@ -229,7 +229,7 @@ function submitForm() {
             <div
               class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
             >
-              <Icon name="chevron-down" class="size-5 text-gray-400" />
+              <Icon name="chevron-down" class="size-5 text-zinc-400" />
             </div>
           </div>
         </div>
@@ -277,7 +277,7 @@ function submitForm() {
             type="text"
             accesskey="8"
             placeholder="輸入課程名稱..."
-            class="w-full rounded-lg border-2 border-theme-300 px-4 py-3 text-lg focus:border-orange-500 focus:outline-none dark:border-zinc-600"
+            class="w-full rounded-lg border-2 border-theme-300 px-4 py-3 text-lg focus:border-theme-500 focus:outline-none dark:border-zinc-600"
             autocomplete="off"
             :disabled="selectedItems.length >= 14"
             :aria-describedby="
@@ -404,10 +404,10 @@ function submitForm() {
                               ? 'tentative-session-' + courseClass.type
                               : null
                           "
-                          class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300 dark:bg-zinc-900"
+                          class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-theme-300 dark:bg-zinc-900"
                           :class="
                             item.selectedClassId === courseClass.id
-                              ? 'border-orange-500 bg-orange-50'
+                              ? 'border-theme-500 bg-theme-50'
                               : 'border-theme-200 dark:border-zinc-700'
                           "
                         >
@@ -475,10 +475,10 @@ function submitForm() {
                             ? 'tentative-session-' + courseClass.type
                             : null
                         "
-                        class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-orange-300 dark:bg-zinc-900"
+                        class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-theme-300 dark:bg-zinc-900"
                         :class="
                           item.selectedClassId === courseClass.id
-                            ? 'border-orange-500 bg-orange-50'
+                            ? 'border-theme-500 bg-theme-50'
                             : 'border-theme-200 dark:border-zinc-700'
                         "
                       >
@@ -550,7 +550,7 @@ function submitForm() {
             type="text"
             name="name"
             placeholder="例如：浣熊的課表"
-            class="w-full rounded-lg border-2 border-theme-300 px-4 py-3 focus:border-orange-500 focus:outline-none dark:border-zinc-600"
+            class="w-full rounded-lg border-2 border-theme-300 px-4 py-3 focus:border-theme-500 focus:outline-none dark:border-zinc-600"
           />
         </div>
 

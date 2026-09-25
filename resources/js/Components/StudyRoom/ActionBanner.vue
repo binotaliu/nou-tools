@@ -264,7 +264,7 @@ defineProps({
                         <select
                           v-model="timer.selectedSubjectCourseId"
                           data-testid="study-room-subject-select"
-                          class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-base focus:border-orange-300 focus:ring-orange-300 sm:text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                          class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-base focus:border-theme-300 focus:ring-theme-300 sm:text-sm dark:border-zinc-700 dark:bg-zinc-900"
                         >
                           <option
                             v-for="subject in subjects"
@@ -706,7 +706,7 @@ defineProps({
           <select
             v-model="timer.changeSubjectCourseId"
             data-testid="study-room-change-subject-select"
-            class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-base focus:border-orange-300 focus:ring-orange-300 sm:text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-base focus:border-theme-300 focus:ring-theme-300 sm:text-sm dark:border-zinc-700 dark:bg-zinc-900"
           >
             <option
               v-for="subject in subjects"

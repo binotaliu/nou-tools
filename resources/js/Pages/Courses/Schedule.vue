@@ -367,7 +367,7 @@ const creditsDropdown = useDropdown()
               aria-label="搜尋"
               accesskey="8"
               placeholder="課程名稱..."
-              class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+              class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
             />
           </div>
           <div>
@@ -408,7 +408,7 @@ const creditsDropdown = useDropdown()
                     ? '已選 ' + department.length + ' 項'
                     : '全部學系')
                 "
-                class="flex w-full items-center justify-between rounded-lg border border-theme-200 px-3 py-2 text-left text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                class="flex w-full items-center justify-between rounded-lg border border-theme-200 px-3 py-2 text-left text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
                 @click="
                   departmentDropdown.open.value = !departmentDropdown.open.value
                 "
@@ -420,7 +420,7 @@ const creditsDropdown = useDropdown()
                       : '全部學系'
                   }}
                 </span>
-                <Icon name="chevron-down" class="size-4 text-gray-400" />
+                <Icon name="chevron-down" class="size-4 text-zinc-400" />
               </button>
               <div
                 v-show="departmentDropdown.open.value"
@@ -458,7 +458,7 @@ const creditsDropdown = useDropdown()
                     ? '已選 ' + credits.length + ' 項'
                     : '全部學分')
                 "
-                class="flex w-full items-center justify-between rounded-lg border border-theme-200 px-3 py-2 text-left text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                class="flex w-full items-center justify-between rounded-lg border border-theme-200 px-3 py-2 text-left text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
                 @click="
                   creditsDropdown.open.value = !creditsDropdown.open.value
                 "
@@ -470,7 +470,7 @@ const creditsDropdown = useDropdown()
                       : '全部學分'
                   }}
                 </span>
-                <Icon name="chevron-down" class="size-4 text-gray-400" />
+                <Icon name="chevron-down" class="size-4 text-zinc-400" />
               </button>
               <div
                 v-show="creditsDropdown.open.value"
@@ -585,7 +585,7 @@ const creditsDropdown = useDropdown()
                     >
                       <Link
                         :href="course.url"
-                        class="inline-flex items-center gap-2 text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
+                        class="inline-flex items-center gap-2 text-theme-700 underline underline-offset-4 hover:text-theme-800 hover:no-underline dark:text-theme-400 dark:hover:text-theme-300"
                       >
                         {{ course.name }}
                       </Link>
@@ -619,7 +619,7 @@ const creditsDropdown = useDropdown()
               >
                 <Link
                   :href="course.url"
-                  class="text-base font-semibold text-orange-700 underline underline-offset-4 hover:text-orange-800 hover:no-underline dark:text-orange-400 dark:hover:text-orange-300"
+                  class="text-base font-semibold text-theme-700 underline underline-offset-4 hover:text-theme-800 hover:no-underline dark:text-theme-400 dark:hover:text-theme-300"
                 >
                   {{ course.name }}
                 </Link>

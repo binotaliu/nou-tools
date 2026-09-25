@@ -45,7 +45,7 @@ function relativeLabel(announcement) {
         尚未選擇任何公告分類。
         <Link
           :href="`/schedules/${scheduleUuid}/customize`"
-          class="font-medium text-orange-700 hover:underline dark:text-orange-400"
+          class="font-medium text-theme-700 hover:underline dark:text-theme-400"
         >
           立即選擇
         </Link>
@@ -72,7 +72,7 @@ function relativeLabel(announcement) {
                 {{ announcement.sourceName }}
               </span>
               <span
-                class="rounded-full bg-orange-100 px-2 py-0.5 font-medium text-orange-700 dark:bg-orange-950/60 dark:text-orange-300"
+                class="rounded-full bg-theme-100 px-2 py-0.5 font-medium text-theme-700 dark:bg-theme-900/60 dark:text-theme-300"
               >
                 {{ announcement.category }}
               </span>
@@ -95,7 +95,7 @@ function relativeLabel(announcement) {
             :href="announcement.url"
             target="_blank"
             rel="noopener noreferrer"
-            class="line-clamp-1! block max-w-full text-sm font-medium break-all text-theme-900 transition hover:text-orange-700 dark:text-zinc-100 dark:hover:text-orange-400"
+            class="line-clamp-1! block max-w-full text-sm font-medium break-all text-theme-900 transition hover:text-theme-700 dark:text-zinc-100 dark:hover:text-theme-400"
           >
             {{ announcement.title }}
           </a>
@@ -107,7 +107,7 @@ function relativeLabel(announcement) {
       >
         <Link
           :href="moreAnnouncementsUrl"
-          class="text-sm font-medium text-orange-700 hover:underline dark:text-orange-400"
+          class="text-sm font-medium text-theme-700 hover:underline dark:text-theme-400"
         >
           檢視更多公告
         </Link>

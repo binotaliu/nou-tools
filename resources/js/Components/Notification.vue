@@ -65,12 +65,12 @@ onMounted(() => {
                 <Icon :name="iconName" :class="['size-6', iconColor]" />
               </div>
               <div class="ml-3 w-0 flex-1 pt-0.5">
-                <p class="text-sm font-medium text-gray-900 dark:text-zinc-100">
+                <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                   {{ message }}
                 </p>
                 <p
                   v-if="$slots.default"
-                  class="mt-1 text-sm text-gray-500 dark:text-zinc-400"
+                  class="mt-1 text-sm text-zinc-500 dark:text-zinc-400"
                 >
                   <slot />
                 </p>
@@ -78,7 +78,7 @@ onMounted(() => {
               <div class="ml-4 flex shrink-0">
                 <button
                   type="button"
-                  class="inline-flex rounded-md text-gray-400 hover:text-black focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500 dark:hover:text-white"
+                  class="inline-flex rounded-md text-zinc-400 hover:text-black focus:outline-2 focus:outline-offset-2 focus:outline-zinc-500 dark:hover:text-white"
                   @click="show = false"
                 >
                   <span class="sr-only">Close</span>

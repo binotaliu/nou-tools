@@ -210,7 +210,7 @@ function isExpired(announcement) {
                           type="checkbox"
                           :name="`source_categories[${source}][]`"
                           :value="category"
-                          class="size-4 rounded border-theme-300 text-orange-700 focus:ring-orange-300 dark:border-zinc-600"
+                          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600"
                           :checked="isCategoryChecked(source, category)"
                           :aria-label="category"
                           @change="
@@ -288,7 +288,7 @@ function isExpired(announcement) {
                 <span
                   v-for="selectedCategory in selectedCategories"
                   :key="selectedCategory"
-                  class="rounded-full bg-orange-100 px-3 py-1 font-medium text-orange-700 dark:bg-orange-950/60 dark:text-orange-300"
+                  class="rounded-full bg-theme-100 px-3 py-1 font-medium text-theme-700 dark:bg-theme-900/60 dark:text-theme-300"
                 >
                   {{ selectedCategory }}
                 </span>
@@ -320,14 +320,14 @@ function isExpired(announcement) {
                     </span>
 
                     <span
-                      class="rounded-full bg-orange-100 px-3 py-1 font-medium text-orange-700 dark:bg-orange-950/60 dark:text-orange-300"
+                      class="rounded-full bg-theme-100 px-3 py-1 font-medium text-theme-700 dark:bg-theme-900/60 dark:text-theme-300"
                     >
                       {{ announcement.category }}
                     </span>
 
                     <span
                       v-if="isExpired(announcement)"
-                      class="rounded-full bg-slate-200 px-3 py-1 font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                      class="rounded-full bg-zinc-200 px-3 py-1 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
                     >
                       已過期
                     </span>
@@ -340,7 +340,7 @@ function isExpired(announcement) {
                       :href="announcement.url"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="line-clamp-2! block max-w-full align-middle break-all transition hover:text-orange-800 dark:hover:text-orange-400"
+                      class="line-clamp-2! block max-w-full align-middle break-all transition hover:text-theme-800 dark:hover:text-theme-400"
                     >
                       <span
                         v-for="tag in announcement.tags ?? []"

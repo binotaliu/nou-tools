@@ -315,7 +315,7 @@ onUnmounted(() => {
               {{ viewModel.categoryName ?? '未分類' }}
             </span>
             <span
-              class="rounded-full bg-orange-100 px-3 py-1 font-medium text-orange-700 dark:bg-orange-950/60 dark:text-orange-300"
+              class="rounded-full bg-theme-100 px-3 py-1 font-medium text-theme-700 dark:bg-theme-900/60 dark:text-theme-300"
             >
               {{ viewModel.typeLabel }}
             </span>
@@ -355,7 +355,7 @@ onUnmounted(() => {
                   :href="viewModel.address"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="text-orange-700 hover:underline"
+                  class="text-theme-700 hover:underline"
                 >
                   {{ viewModel.address }}
                 </a>
@@ -365,7 +365,7 @@ onUnmounted(() => {
               <Icon name="map-pin" class="inline-block size-4" />
               <button
                 type="button"
-                class="text-left text-orange-700 hover:underline"
+                class="text-left text-theme-700 hover:underline"
                 :disabled="!hasCoordinates"
                 :class="
                   hasCoordinates
@@ -557,7 +557,7 @@ onUnmounted(() => {
                   id="report-comment"
                   v-model="reportForm.comment"
                   rows="2"
-                  class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                  class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
                   placeholder="補充說明..."
                 ></textarea>
               </div>
@@ -573,7 +573,7 @@ onUnmounted(() => {
               <div class="flex items-center gap-2">
                 <button
                   type="submit"
-                  class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:bg-gray-400"
+                  class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition disabled:bg-zinc-400"
                   :class="
                     pendingIsValid
                       ? 'bg-green-600 hover:bg-green-700'
@@ -723,14 +723,14 @@ onUnmounted(() => {
                 <input
                   v-model="commentForm.nickname"
                   type="text"
-                  class="rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                  class="rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
                   placeholder="暱稱"
                   maxlength="100"
                   required
                 />
                 <textarea
                   v-model="commentForm.content"
-                  class="flex-1 rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+                  class="flex-1 rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
                   placeholder="留言（確認後顯示）..."
                   maxlength="1000"
                   rows="5"
@@ -752,7 +752,7 @@ onUnmounted(() => {
               <div class="flex items-center gap-2">
                 <button
                   type="submit"
-                  class="inline-flex items-center gap-1 rounded-lg bg-theme-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-theme-900 disabled:bg-gray-400"
+                  class="inline-flex items-center gap-1 rounded-lg bg-theme-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-theme-900 disabled:bg-zinc-400"
                   :disabled="
                     commentForm.processing || !commentChallengeExecuted
                   "

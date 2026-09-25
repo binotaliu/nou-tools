@@ -119,7 +119,7 @@ function goToPage(target) {
               name="search"
               accesskey="8"
               placeholder="店家名稱..."
-              class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+              class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
               @input="applyFilters()"
             />
           </div>
@@ -135,7 +135,7 @@ function goToPage(target) {
                 id="category"
                 v-model="category"
                 name="category"
-                class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
                 @change="applyFilters()"
               >
                 <option value="">全部分類</option>
@@ -150,7 +150,7 @@ function goToPage(target) {
               <div
                 class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
               >
-                <Icon name="chevron-down" class="size-5 text-gray-400" />
+                <Icon name="chevron-down" class="size-5 text-zinc-400" />
               </div>
             </div>
           </div>
@@ -166,7 +166,7 @@ function goToPage(target) {
                 id="type"
                 v-model="type"
                 name="type"
-                class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
                 @change="applyFilters()"
               >
                 <option value="">全部類型</option>
@@ -181,7 +181,7 @@ function goToPage(target) {
               <div
                 class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
               >
-                <Icon name="chevron-down" class="size-5 text-gray-400" />
+                <Icon name="chevron-down" class="size-5 text-zinc-400" />
               </div>
             </div>
           </div>
@@ -197,7 +197,7 @@ function goToPage(target) {
                 id="city"
                 v-model="city"
                 name="city"
-                class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700 dark:bg-zinc-900"
+                class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
                 @change="applyFilters()"
               >
                 <option value="">全部縣市</option>
@@ -212,7 +212,7 @@ function goToPage(target) {
               <div
                 class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
               >
-                <Icon name="chevron-down" class="size-5 text-gray-400" />
+                <Icon name="chevron-down" class="size-5 text-zinc-400" />
               </div>
             </div>
           </div>
@@ -228,7 +228,7 @@ function goToPage(target) {
             <button
               v-show="hasFilters"
               type="button"
-              class="inline-flex items-center justify-center gap-2 text-orange-700 hover:text-orange-800"
+              class="inline-flex items-center justify-center gap-2 text-theme-700 hover:text-theme-800"
               @click.prevent="clearFilters()"
             >
               清除條件
@@ -286,7 +286,7 @@ function goToPage(target) {
                   <template v-else>未分類</template>
                 </span>
                 <span
-                  class="rounded-full bg-orange-100 px-3 py-1 font-medium text-orange-700 dark:bg-orange-950/60 dark:text-orange-300"
+                  class="rounded-full bg-theme-100 px-3 py-1 font-medium text-theme-700 dark:bg-theme-900/60 dark:text-theme-300"
                 >
                   <span class="sr-only">類型：</span>{{ store.typeLabel }}
                 </span>
@@ -343,7 +343,7 @@ function goToPage(target) {
             <div class="mb-4 md:mb-0">
               <span
                 v-if="store.latestReportIsValid === null"
-                class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-800 dark:bg-zinc-800 dark:text-zinc-300"
+                class="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-3 py-1 text-sm font-medium text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300"
               >
                 <Icon name="question-mark-circle" class="size-4" />
                 <span class="sr-only">狀態：</span>

@@ -88,7 +88,7 @@ async function submit() {
             : 'bg-white dark:bg-zinc-900'
         "
         data-testid="study-room-nickname-input"
-        class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-orange-300 focus:ring-orange-300 dark:border-zinc-700"
+        class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
       />
       <p
         v-show="!profile.canChangeNickname"
@@ -115,7 +115,7 @@ async function submit() {
         <label
           v-for="emojiChoice in profile.emojiChoices"
           :key="emojiChoice"
-          class="cursor-pointer rounded-lg border border-theme-200 px-3 py-2 text-xl has-[:checked]:border-theme-600 has-[:checked]:bg-theme-100 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-orange-300 dark:border-zinc-700 dark:has-[:checked]:border-theme-400 dark:has-[:checked]:bg-theme-900/40"
+          class="cursor-pointer rounded-lg border border-theme-200 px-3 py-2 text-xl has-[:checked]:border-theme-600 has-[:checked]:bg-theme-100 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-theme-300 dark:border-zinc-700 dark:has-[:checked]:border-theme-400 dark:has-[:checked]:bg-theme-900/40"
         >
           <input
             v-model="emojiInput"
@@ -146,7 +146,7 @@ async function submit() {
           v-model="playSoundInput"
           type="checkbox"
           name="playSoundOnTimerEnd"
-          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-orange-300 dark:border-zinc-600"
+          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600"
           data-testid="study-room-play-sound-checkbox"
         />
         時間到時播放音效
@@ -162,7 +162,7 @@ async function submit() {
           type="checkbox"
           name="notifyOnTimerEnd"
           :disabled="push.busy"
-          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-orange-300 disabled:opacity-50 dark:border-zinc-600"
+          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 disabled:opacity-50 dark:border-zinc-600"
           data-testid="study-room-notify-checkbox"
           @change="onNotifyChange"
         />

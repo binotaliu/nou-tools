@@ -620,17 +620,17 @@ function print() {
                               type="checkbox"
                               value="1"
                               :aria-label="`${course.name} ${number === 1 ? '作業一' : '作業二'}已完成`"
-                              class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
+                              class="col-start-1 row-start-1 size-4 appearance-none rounded border border-zinc-500 bg-white checked:border-zinc-400 dark:bg-zinc-900 print:hidden"
                             />
                             <CheckIcon
-                              class="col-start-1 row-start-1 m-0.5 size-3 text-gray-600 opacity-0 group-has-checked:opacity-100 print:hidden"
+                              class="col-start-1 row-start-1 m-0.5 size-3 text-zinc-600 opacity-0 group-has-checked:opacity-100 print:hidden"
                             />
                             <div
-                              class="col-start-1 row-start-1 hidden size-4 rounded border border-gray-500 bg-white dark:bg-zinc-900 print:block"
+                              class="col-start-1 row-start-1 hidden size-4 rounded border border-zinc-500 bg-white dark:bg-zinc-900 print:block"
                             ></div>
                           </div>
                           <span
-                            class="text-xs group-has-checked:text-gray-600 print:hidden"
+                            class="text-xs group-has-checked:text-zinc-600 print:hidden"
                             >完成</span
                           >
                         </label>
@@ -662,7 +662,7 @@ function print() {
                       <textarea
                         v-model="homework[course.id][number].note"
                         placeholder="（尚未設定備註）"
-                        class="m-0 h-full w-full resize-none px-2 py-2 text-xs text-theme-700 placeholder-gray-400 focus:border-blue-500 focus:outline-none dark:text-zinc-300 print:text-black print:placeholder-transparent"
+                        class="m-0 h-full w-full resize-none px-2 py-2 text-xs text-theme-700 placeholder-zinc-400 focus:border-blue-500 focus:outline-none dark:text-zinc-300 print:text-black print:placeholder-transparent"
                         rows="2"
                         :aria-label="`${course.name} ${number === 1 ? '作業一' : '作業二'}的備註`"
                       ></textarea>
@@ -680,7 +680,7 @@ function print() {
                         currentWeek === week.num
                           ? 'bg-blue-50 dark:bg-blue-950'
                           : isWeekFullyComplete(week.num)
-                            ? 'bg-white dark:bg-zinc-900 [&>div]:text-gray-600 dark:[&>div]:text-zinc-500'
+                            ? 'bg-white dark:bg-zinc-900 [&>div]:text-zinc-600 dark:[&>div]:text-zinc-500'
                             : isWeekPassed(week.num) &&
                                 hasIncompleteCourseInWeek(week.num)
                               ? 'bg-red-50 dark:bg-red-950'
@@ -726,17 +726,17 @@ function print() {
                               type="checkbox"
                               value="1"
                               :aria-label="`第${toChineseNumber(week.num)}週 ${course.name} 的影音學習進度`"
-                              class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
+                              class="col-start-1 row-start-1 size-4 appearance-none rounded border border-zinc-500 bg-white checked:border-zinc-400 dark:bg-zinc-900 print:hidden"
                             />
                             <CheckIcon
-                              class="col-start-1 row-start-1 m-0.5 size-3 text-gray-600 opacity-0 group-has-checked:opacity-100 print:hidden"
+                              class="col-start-1 row-start-1 m-0.5 size-3 text-zinc-600 opacity-0 group-has-checked:opacity-100 print:hidden"
                             />
                             <div
-                              class="col-start-1 row-start-1 hidden size-4 rounded border border-gray-500 bg-white dark:bg-zinc-900 print:block"
+                              class="col-start-1 row-start-1 hidden size-4 rounded border border-zinc-500 bg-white dark:bg-zinc-900 print:block"
                             ></div>
                           </div>
                           <span
-                            class="text-xs group-has-checked:text-gray-600 print:hidden"
+                            class="text-xs group-has-checked:text-zinc-600 print:hidden"
                             >影音</span
                           >
                         </label>
@@ -760,17 +760,17 @@ function print() {
                               type="checkbox"
                               value="1"
                               :aria-label="`第${toChineseNumber(week.num)}週 ${course.name} 的課本學習進度`"
-                              class="col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-500 bg-white checked:border-gray-400 dark:bg-zinc-900 print:hidden"
+                              class="col-start-1 row-start-1 size-4 appearance-none rounded border border-zinc-500 bg-white checked:border-zinc-400 dark:bg-zinc-900 print:hidden"
                             />
                             <CheckIcon
-                              class="col-start-1 row-start-1 m-0.5 size-3 text-gray-600 opacity-0 group-has-checked:opacity-100 print:hidden"
+                              class="col-start-1 row-start-1 m-0.5 size-3 text-zinc-600 opacity-0 group-has-checked:opacity-100 print:hidden"
                             />
                             <div
-                              class="col-start-1 row-start-1 hidden size-4 rounded border border-gray-500 bg-white dark:bg-zinc-900 print:block"
+                              class="col-start-1 row-start-1 hidden size-4 rounded border border-zinc-500 bg-white dark:bg-zinc-900 print:block"
                             ></div>
                           </div>
                           <span
-                            class="text-xs group-has-checked:text-gray-600 print:hidden"
+                            class="text-xs group-has-checked:text-zinc-600 print:hidden"
                             >課本</span
                           >
                         </label>
@@ -789,10 +789,10 @@ function print() {
                         placeholder="（尚未設定目標）"
                         :class="
                           isProgressComplete(course.id, week.num)
-                            ? 'text-gray-600'
+                            ? 'text-zinc-600'
                             : 'text-theme-700 dark:text-zinc-300'
                         "
-                        class="m-0 h-full w-full resize-none px-2 py-2 text-xs placeholder-gray-400 focus:border-blue-500 focus:outline-none print:text-black print:placeholder-transparent"
+                        class="m-0 h-full w-full resize-none px-2 py-2 text-xs placeholder-zinc-400 focus:border-blue-500 focus:outline-none print:text-black print:placeholder-transparent"
                         rows="2"
                         :aria-label="`第${toChineseNumber(week.num)}週 ${course.name} 的學習目標與備註`"
                       ></textarea>
@@ -837,7 +837,7 @@ function print() {
                         <input
                           v-model="homework[course.id][number].completed"
                           type="checkbox"
-                          class="size-4 rounded border-gray-500"
+                          class="size-4 rounded border-zinc-500"
                         />
                         {{ homeworkLabel(number) }}
                       </label>
@@ -859,7 +859,7 @@ function print() {
                       v-model="homework[course.id][number].note"
                       placeholder="（尚未設定備註）"
                       rows="3"
-                      class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
+                      class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-zinc-400 dark:border-zinc-700 dark:text-zinc-300"
                     ></textarea>
                   </div>
                 </div>
@@ -994,7 +994,7 @@ function print() {
                         <input
                           v-model="progress[course.id][week.num].video"
                           type="checkbox"
-                          class="size-4 rounded border-gray-500"
+                          class="size-4 rounded border-zinc-500"
                         />
                         影音
                       </label>
@@ -1004,7 +1004,7 @@ function print() {
                         <input
                           v-model="progress[course.id][week.num].textbook"
                           type="checkbox"
-                          class="size-4 rounded border-gray-500"
+                          class="size-4 rounded border-zinc-500"
                         />
                         課本
                       </label>
@@ -1014,7 +1014,7 @@ function print() {
                       v-model="progress[course.id][week.num].note"
                       placeholder="（尚未設定目標）"
                       rows="2"
-                      class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
+                      class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-zinc-400 dark:border-zinc-700 dark:text-zinc-300"
                     ></textarea>
                   </article>
                 </div>
@@ -1135,7 +1135,7 @@ function print() {
                         <input
                           v-model="progress[course.id][week.num].video"
                           type="checkbox"
-                          class="size-4 rounded border-gray-500"
+                          class="size-4 rounded border-zinc-500"
                         />
                         影音
                       </label>
@@ -1152,7 +1152,7 @@ function print() {
                         <input
                           v-model="progress[course.id][week.num].textbook"
                           type="checkbox"
-                          class="size-4 rounded border-gray-500"
+                          class="size-4 rounded border-zinc-500"
                         />
                         課本
                       </label>
@@ -1162,7 +1162,7 @@ function print() {
                       v-model="progress[course.id][week.num].note"
                       placeholder="（尚未設定目標）"
                       rows="2"
-                      class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-gray-400 dark:border-zinc-700 dark:text-zinc-300"
+                      class="w-full resize-none rounded border border-theme-200 px-2 py-2 text-xs text-theme-700 placeholder-zinc-400 dark:border-zinc-700 dark:text-zinc-300"
                     ></textarea>
                   </article>
                 </div>
@@ -1171,12 +1171,12 @@ function print() {
           </div>
 
           <div
-            class="pointer-events-none absolute bottom-0 left-0 z-20 h-16 w-full rounded-b bg-linear-to-t from-stone-900/20 to-transparent transition-opacity duration-150 ease-in md:h-32 print:hidden"
+            class="pointer-events-none absolute bottom-0 left-0 z-20 h-16 w-full rounded-b bg-linear-to-t from-zinc-900/20 to-transparent transition-opacity duration-150 ease-in md:h-32 print:hidden"
             :class="showHorizontalGradient ? 'opacity-100' : 'opacity-0'"
           ></div>
 
           <div
-            class="pointer-events-none absolute top-0 right-0 z-20 h-full w-16 rounded-r bg-linear-to-l from-stone-900/20 to-transparent transition-opacity duration-150 ease-in md:w-32 print:hidden"
+            class="pointer-events-none absolute top-0 right-0 z-20 h-full w-16 rounded-r bg-linear-to-l from-zinc-900/20 to-transparent transition-opacity duration-150 ease-in md:w-32 print:hidden"
             :class="showVerticalGradient ? 'opacity-100' : 'opacity-0'"
           ></div>
         </div>

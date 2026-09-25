@@ -34,7 +34,7 @@ const lectures = [
             影音
           </span>
           <span
-            class="bg-slate-100 px-1.5 py-px font-mono text-slate-600 dark:bg-zinc-800 dark:text-zinc-400"
+            class="bg-zinc-100 px-1.5 py-px font-mono text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
           >
             ZZZ001班
           </span>

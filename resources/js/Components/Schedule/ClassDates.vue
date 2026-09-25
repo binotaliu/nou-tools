@@ -128,7 +128,7 @@ const cells = computed(() => {
         v-if="hasAnyOverride"
         class="flex items-center gap-1 text-sm text-theme-700 dark:text-zinc-400"
       >
-        <Icon name="exclamation-triangle" class="size-4 text-orange-700" />
+        <Icon name="exclamation-triangle" class="size-4 text-theme-700" />
         表示該次面授時間與一般時間不同
       </div>
     </div>
