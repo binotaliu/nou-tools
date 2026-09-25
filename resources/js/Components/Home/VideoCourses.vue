@@ -301,7 +301,7 @@ const visibleCourses = computed(() =>
         }}
       </p>
       <p v-if="activeTab === 'all'" class="text-sm">
-        勾選「顯示已結束課程」可查看已結束的課程。
+        勾選「顯示已結束課程」可檢視已結束的課程。
       </p>
     </div>
 
