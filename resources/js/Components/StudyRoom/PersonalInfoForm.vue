@@ -4,6 +4,7 @@
 // itself on success.
 import { ref } from 'vue'
 import { CheckIcon } from '@heroicons/vue/24/outline'
+import { emojiName } from '../../study-room-emoji-names'
 
 const props = defineProps({
   profile: { type: Object, required: true },
@@ -104,11 +105,12 @@ async function submit() {
       </p>
     </div>
 
-    <div>
-      <span
+    <fieldset>
+      <legend
         class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
-        >選一個表情符號代表你</span
       >
+        選一個表情符號代表你
+      </legend>
       <div class="flex flex-wrap gap-2" data-testid="study-room-emoji-choices">
         <label
           v-for="emojiChoice in profile.emojiChoices"
@@ -120,11 +122,12 @@ async function submit() {
             type="radio"
             name="emoji"
             :value="emojiChoice"
+            :aria-label="emojiName(emojiChoice)"
             class="sr-only"
             data-testid="study-room-emoji-option"
             required
           />
-          {{ emojiChoice }}
+          <span aria-hidden="true">{{ emojiChoice }}</span>
         </label>
       </div>
       <p
@@ -133,7 +136,7 @@ async function submit() {
       >
         {{ profile.profileErrors.emoji[0] }}
       </p>
-    </div>
+    </fieldset>
 
     <div>
       <label

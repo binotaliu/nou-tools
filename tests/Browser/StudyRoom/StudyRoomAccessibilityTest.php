@@ -583,3 +583,18 @@ it('leads from your own seat to the control panel, expanding it if minimized', f
 
     expect($page->script('document.activeElement.dataset.testid'))->toBe('study-room-pause-timer');
 });
+
+it('groups the profile emoji choices under a legend and names each one', function () use ($enterStudyRoom) {
+    $page = $enterStudyRoom();
+
+    $page->click('[data-testid="study-room-personal-info-edit"]')
+        ->assertVisible('[data-testid="study-room-emoji-choices"]');
+
+    $legend = $page->script("document.querySelector('[data-testid=\"study-room-emoji-choices\"]').closest('fieldset')?.querySelector('legend')?.textContent.trim()");
+    expect($legend)->toBe('選一個表情符號代表你');
+
+    $labels = $page->script("[...document.querySelectorAll('[data-testid=\"study-room-emoji-option\"]')].map(input => input.getAttribute('aria-label'))");
+    expect($labels)->toHaveCount(count(config('study-room.emojis')))
+        ->and($labels)->each->toBeString()
+        ->and($labels[0])->toBe('書本');
+});
