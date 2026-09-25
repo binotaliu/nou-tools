@@ -4,6 +4,7 @@ import { Head, Link } from '@inertiajs/vue3'
 import { StarIcon } from '@heroicons/vue/24/solid'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import useCoursemapLink from '../../Composables/useCoursemapLink'
 
 const props = defineProps({
   viewModel: {
@@ -17,6 +18,7 @@ const props = defineProps({
 })
 
 const course = computed(() => props.viewModel.course)
+const coursemap = useCoursemapLink()
 
 // Port of the `Str::toSemesterDisplay()` macro (app/Providers/AppServiceProvider.php).
 function toSemesterDisplay(semester) {
@@ -173,7 +175,9 @@ function examReferenceUrl(reference) {
               <a
                 :href="course.descriptionUrl"
                 target="_blank"
+                @click="coursemap.open($event, course.descriptionUrl)"
                 rel="noopener"
+                data-testid="course-description-link"
                 data-analytics-event="course_description_open"
                 data-analytics-feature="course"
                 class="inline-flex items-center gap-2 text-theme-700 underline underline-offset-4 hover:text-theme-800 hover:no-underline dark:text-theme-400 dark:hover:text-theme-300"
