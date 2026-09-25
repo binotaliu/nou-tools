@@ -43,6 +43,7 @@ use App\Http\Controllers\ScheduleCalendarController;
 use App\Http\Controllers\ScheduleCalendarSettingsUpdateController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ScheduleCustomizationController;
+use App\Http\Controllers\ScheduleLiteController;
 use App\Http\Controllers\ScheduleMyController;
 use App\Http\Controllers\ScheduleMyLearningProgressController;
 use App\Http\Controllers\ScheduleMyStoreController;
@@ -145,6 +146,7 @@ Route::post('/schedules/my', ScheduleMyStoreController::class)->name('schedules.
 Route::get('/schedules/my/learning-progress', ScheduleMyLearningProgressController::class)->name('schedules.my.learning-progress');
 Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show')
     ->withMarkdown(ScheduleShowMarkdownController::class);
+Route::get('/schedules/{schedule}/lite', ScheduleLiteController::class)->name('schedules.lite');
 Route::get('/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->name('schedules.edit');
 Route::put('/schedules/{schedule}', [ScheduleController::class, 'update'])->name('schedules.update');
 Route::post('/schedules/{schedule}/remember', ScheduleRememberController::class)->name('schedules.remember');

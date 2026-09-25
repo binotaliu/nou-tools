@@ -1,8 +1,9 @@
 <?php
 
-test('offline page is reachable and mentions cached schedules', function () {
-    $response = $this->get(route('offline'));
-
-    $response->assertStatus(200)
-        ->assertSee('離線');
+test('offline page is a self-contained fallback', function () {
+    $this->get(route('offline'))
+        ->assertStatus(200)
+        ->assertSee('目前無法連線')
+        ->assertDontSee('data-page', false)
+        ->assertDontSee('/build/', false);
 });
