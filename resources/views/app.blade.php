@@ -177,7 +177,15 @@
 
             gtag('js', new Date())
 
-            gtag('config', 'G-1B65SQ4673', { send_page_view: false })
+            {{-- page_location/referrer are masked here too so events firing before the first Inertia navigate (and GA's automatic ones) never carry the real schedule token; app.js keeps them updated per navigation. --}}
+            gtag('config', 'G-1B65SQ4673', {
+                send_page_view: false,
+                page_location: location.origin + @js($analyticsPage),
+                page_referrer:
+                    document.referrer.indexOf(location.origin) === 0
+                        ? ''
+                        : document.referrer,
+            })
 
             {{-- User properties for the theme signals computed above; each also needs a GA4 Admin custom dimension to show in reports. --}}
             gtag('set', 'user_properties', {

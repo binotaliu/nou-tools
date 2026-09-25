@@ -69,6 +69,14 @@ router.on('navigate', () => {
   document.head.querySelectorAll('[data-seo]').forEach(tag => tag.remove())
 })
 
+// GA4 derives its page path/location dimensions from `page_location` and
+// ignores a custom `page_path`, and every other event (custom events,
+// scroll/click, the automatic `page_referrer`) defaults to the real
+// `document.location`, which carries schedule tokens. So the masked URL is
+// pinned with `gtag('set', ...)` before the page_view and stays in force for
+// all later events until the next navigation.
+let previousAnalyticsLocation = null
+
 function trackPageView(page) {
   if (typeof window.gtag !== 'function') {
     return
@@ -80,11 +88,25 @@ function trackPageView(page) {
     return
   }
 
+  const location = window.location.origin + path
+  const sameOriginReferrer = document.referrer.startsWith(
+    window.location.origin
+  )
+
+  window.gtag('set', {
+    page_location: location,
+    page_referrer: sameOriginReferrer
+      ? (previousAnalyticsLocation ?? '')
+      : document.referrer,
+  })
+
   window.gtag('event', 'page_view', {
     page_path: path,
     page_title: page?.props?.analyticsTitle || document.title,
-    page_location: window.location.href,
+    page_location: location,
   })
+
+  previousAnalyticsLocation = location
 }
 
 // Registers the offline-support service worker (see public/sw.js). It keeps a

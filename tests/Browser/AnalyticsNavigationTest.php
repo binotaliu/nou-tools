@@ -19,3 +19,24 @@ it('does not error when an Inertia client-side navigation happens', function () 
         ->click('a[href*="page=2"]')
         ->assertNoJavaScriptErrors();
 });
+
+it('pins the masked page_location on gtag instead of the real URL', function () {
+    Announcement::factory()->count(31)->create();
+
+    $page = visit(route('announcements.index'));
+
+    $page->script('window.__gtagCalls = []; window.gtag = function () { window.__gtagCalls.push(Array.from(arguments)) }');
+
+    $page->click('a[href*="page=2"]')
+        ->waitForEvent('load')
+        ->assertNoJavaScriptErrors();
+
+    $calls = $page->script('JSON.stringify(window.__gtagCalls)');
+    $calls = json_decode($calls, true);
+
+    $pageView = collect($calls)->first(fn ($call) => ($call[0] ?? null) === 'event' && ($call[1] ?? null) === 'page_view');
+
+    expect($pageView)->not->toBeNull()
+        ->and($pageView[2]['page_location'])->toEndWith('/announcements')
+        ->and($pageView[2]['page_location'])->not->toContain('page=2');
+});
