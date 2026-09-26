@@ -280,7 +280,7 @@ onMounted(() => {
               :value="selectedKey"
               data-testid="center-select"
               aria-label="學習指導中心"
-              class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm font-medium text-theme-800 sm:hidden dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+              class="w-full rounded-lg border border-zinc-500 bg-white px-3 py-2 text-sm font-medium text-theme-800 sm:hidden dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-200"
               @change="selectCenter($event.target.value)"
             >
               <option value="">請選擇學習指導中心</option>
@@ -325,6 +325,9 @@ onMounted(() => {
                     class="truncate rounded-lg px-3 py-2 text-left text-sm font-medium transition focus-visible:-outline-offset-2"
                     :data-testid="'center-button-' + center.key"
                     :aria-label="'檢視 ' + center.name + ' 詳情'"
+                    :aria-pressed="
+                      selectedKey === center.key ? 'true' : 'false'
+                    "
                     @click="selectCenter(center.key)"
                   >
                     {{ center.name }}

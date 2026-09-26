@@ -367,7 +367,7 @@ const creditsDropdown = useDropdown()
               aria-label="搜尋"
               accesskey="8"
               placeholder="課程名稱..."
-              class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
+              class="w-full rounded-lg border border-zinc-500 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500"
             />
           </div>
           <div>
@@ -408,7 +408,10 @@ const creditsDropdown = useDropdown()
                     ? '已選 ' + department.length + ' 項'
                     : '全部學系')
                 "
-                class="flex w-full items-center justify-between rounded-lg border border-theme-200 px-3 py-2 text-left text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
+                :aria-expanded="
+                  departmentDropdown.open.value ? 'true' : 'false'
+                "
+                class="flex w-full items-center justify-between rounded-lg border border-zinc-500 px-3 py-2 text-left text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500"
                 @click="
                   departmentDropdown.open.value = !departmentDropdown.open.value
                 "
@@ -435,7 +438,7 @@ const creditsDropdown = useDropdown()
                     v-model="department"
                     type="checkbox"
                     :value="departmentOption"
-                    class="rounded border-theme-300 dark:border-zinc-600"
+                    class="rounded border-zinc-500 dark:border-zinc-500"
                   />
                   {{ departmentOption }}
                 </label>
@@ -458,7 +461,8 @@ const creditsDropdown = useDropdown()
                     ? '已選 ' + credits.length + ' 項'
                     : '全部學分')
                 "
-                class="flex w-full items-center justify-between rounded-lg border border-theme-200 px-3 py-2 text-left text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
+                :aria-expanded="creditsDropdown.open.value ? 'true' : 'false'"
+                class="flex w-full items-center justify-between rounded-lg border border-zinc-500 px-3 py-2 text-left text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500"
                 @click="
                   creditsDropdown.open.value = !creditsDropdown.open.value
                 "
@@ -485,7 +489,7 @@ const creditsDropdown = useDropdown()
                     v-model="credits"
                     type="checkbox"
                     :value="String(creditOption)"
-                    class="rounded border-theme-300 dark:border-zinc-600"
+                    class="rounded border-zinc-500 dark:border-zinc-500"
                   />
                   {{ creditOption }}
                 </label>
