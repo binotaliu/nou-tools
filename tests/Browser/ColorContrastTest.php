@@ -89,8 +89,7 @@ JSON.stringify((() => {
 })())
 JS;
 
-function contrastAudit(string $url, bool $dark): array
-{
+$contrastAudit = function (string $url, bool $dark): array {
     $page = visit($url)->resize(1280, 900);
     $page->assertNoJavaScriptErrors()->assertPresent('main#main-content');
 
@@ -104,7 +103,7 @@ function contrastAudit(string $url, bool $dark): array
     $result = json_decode($page->script(CONTRAST_AUDIT_SCRIPT), true);
 
     return array_map(fn (array $items) => array_map(fn (string $item) => ($dark ? 'dark ' : 'light ')."{$url}: {$item}", $items), $result);
-}
+};
 
 $pages = [
     'home' => '/',
@@ -122,14 +121,14 @@ $pages = [
     'directory' => '/directory',
 ];
 
-it('keeps text at WCAG AA contrast', function (string $url, bool $dark) {
-    expect(contrastAudit($url, $dark)['text'])->toBe([]);
+it('keeps text at WCAG AA contrast', function (string $url, bool $dark) use ($contrastAudit) {
+    expect($contrastAudit($url, $dark)['text'])->toBe([]);
 })->with($pages)->with([false, true]);
 
-it('keeps input borders and switch tracks at 3:1 against their surroundings', function (string $url, bool $dark) {
-    expect(contrastAudit($url, $dark)['border'])->toBe([]);
+it('keeps input borders and switch tracks at 3:1 against their surroundings', function (string $url, bool $dark) use ($contrastAudit) {
+    expect($contrastAudit($url, $dark)['border'])->toBe([]);
 })->with($pages)->with([false, true]);
 
-it('underlines links inside running text', function (string $url) {
-    expect(contrastAudit($url, false)['links'])->toBe([]);
+it('underlines links inside running text', function (string $url) use ($contrastAudit) {
+    expect($contrastAudit($url, false)['links'])->toBe([]);
 })->with($pages);

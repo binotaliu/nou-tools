@@ -18,8 +18,7 @@ use App\Models\StudentSchedule;
 /**
  * @return array<int, string> descriptions of controls whose outline is clipped
  */
-function clippedFocusOutlines($page): array
-{
+$clippedFocusOutlines = function ($page): array {
     return json_decode($page->script(<<<'JS'
 JSON.stringify((() => {
   const bad = [];
@@ -58,9 +57,9 @@ JSON.stringify((() => {
   return bad;
 })())
 JS), true);
-}
+};
 
-it('does not clip the focus outline of video class links', function () {
+it('does not clip the focus outline of video class links', function () use ($clippedFocusOutlines) {
     $course = Course::factory()->create(['name' => '焦點測試課']);
     $class = CourseClass::factory()->for($course)->create([
         'start_time' => '19:00',
@@ -74,14 +73,14 @@ it('does not clip the focus outline of video class links', function () {
     $page->assertNoJavaScriptErrors();
     $page->assertSee('焦點測試課');
 
-    expect(clippedFocusOutlines($page))->toBe([]);
+    expect($clippedFocusOutlines($page))->toBe([]);
 });
 
-it('does not clip the focus outline on public pages', function (string $url) {
+it('does not clip the focus outline on public pages', function (string $url) use ($clippedFocusOutlines) {
     $page = visit($url)->resize(1280, 900);
     $page->assertNoJavaScriptErrors()->assertPresent('main#main-content');
 
-    expect(clippedFocusOutlines($page))->toBe([]);
+    expect($clippedFocusOutlines($page))->toBe([]);
 })->with([
     'home' => '/',
     'schedule find' => '/schedules/my',
@@ -93,7 +92,7 @@ it('does not clip the focus outline on public pages', function (string $url) {
     'study room preview' => '/study-room',
 ]);
 
-it('does not clip the focus outline on pages with data', function (string $page) {
+it('does not clip the focus outline on pages with data', function (string $page) use ($clippedFocusOutlines) {
     config()->set('app.current_semester', '2025B');
     config()->set('app.current_semester_range', ['2026-02-23', '2026-06-28']);
 
@@ -137,13 +136,13 @@ it('does not clip the focus outline on pages with data', function (string $page)
     $visit = visit($url)->resize(1280, 900);
     $visit->assertNoJavaScriptErrors()->assertPresent('main#main-content');
 
-    expect(clippedFocusOutlines($visit))->toBe([]);
+    expect($clippedFocusOutlines($visit))->toBe([]);
 })->with(['schedule', 'schedule editor', 'learning progress', 'course', 'course schedule', 'directory', 'alt-uu', 'newsletter', 'announcements', 'discount stores']);
 
-it('does not clip the focus outline in the study room list view', function () {
+it('does not clip the focus outline in the study room list view', function () use ($clippedFocusOutlines) {
     $page = visit('/study-room')->resize(1280, 900);
     $page->assertNoJavaScriptErrors()->click('[data-testid="study-room-view-list"]');
     $page->assertPresent('[data-testid="study-room-seat-list"] tbody th');
 
-    expect(clippedFocusOutlines($page))->toBe([]);
+    expect($clippedFocusOutlines($page))->toBe([]);
 });

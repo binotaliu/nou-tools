@@ -13,8 +13,7 @@ const AXE_ALLOWED_RULES = [
     // 'rule-id' => 'why this is a justified exception',
 ];
 
-function axeViolations(string $url, bool $dark): array
-{
+$axeViolations = function (string $url, bool $dark): array {
     $page = visit($url)->resize(1280, 900);
     $page->assertNoJavaScriptErrors()->assertPresent('main#main-content');
 
@@ -44,10 +43,10 @@ JS), true);
         ->map(fn (array $v) => "{$scheme} {$url}: {$v['id']} ({$v['impact']}) ".implode(' | ', $v['nodes']))
         ->values()
         ->all();
-}
+};
 
-it('has no serious or critical axe violations', function (string $url, bool $dark) {
-    expect(axeViolations($url, $dark))->toBe([]);
+it('has no serious or critical axe violations', function (string $url, bool $dark) use ($axeViolations) {
+    expect($axeViolations($url, $dark))->toBe([]);
 })->with([
     'home' => '/',
     'schedule find' => '/schedules/my',

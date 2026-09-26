@@ -25,6 +25,9 @@ JSON.stringify([...document.querySelectorAll('table')].flatMap(t => {
 JS;
 
 $expectAccessibleTables = function ($page): int {
+    // Inertia mounts the page after load; auditing before that sees no tables.
+    $page->assertPresent('main#main-content table');
+
     $problems = json_decode($page->script(TABLE_AUDIT_SCRIPT), true);
     expect($problems)->toBe([]);
 

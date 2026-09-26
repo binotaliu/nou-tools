@@ -73,7 +73,7 @@ const {
         <div
           v-if="showTaiwanClock"
           data-testid="taiwan-clock"
-          class="flex shrink-0 flex-row items-center justify-between gap-3 border-t border-theme-200 pt-3 sm:flex-col sm:items-end sm:justify-start sm:border-t-0 sm:border-l sm:pt-0 sm:pl-4 dark:border-zinc-700"
+          class="flex flex-row flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-theme-200 pt-3 sm:shrink-0 sm:flex-col sm:flex-nowrap sm:items-end sm:justify-start sm:border-t-0 sm:border-l sm:pt-0 sm:pl-4 dark:border-zinc-700"
         >
           <div
             class="inline-flex items-center text-2xl font-semibold text-theme-700 tabular-nums sm:text-3xl dark:text-zinc-300"

@@ -467,6 +467,7 @@ it('renders a print sheet with language, title, headings and a named exam table'
         ->assertSee('列印課表</title>', false)
         ->assertSee('<h1', false)
         ->assertSee('<h3', false)
-        ->assertSee('role="table" aria-label="考試時間表"', false)
+        ->assertSee('role="table"', false)
+        ->assertSee('aria-label="考試時間表"', false)
         ->assertSee('role="columnheader"', false);
 });

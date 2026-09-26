@@ -31,7 +31,8 @@ it('switches text spacing from the settings page, applies the WCAG values and re
 // tables, the study-room seat grid), sr-only/aria-hidden decoration and
 // deliberately clipped media (img, svg, canvas, iframe) are not text clipping.
 it('keeps pages readable at 320px with 150% text and wide text spacing', function (string $url) {
-    $page = visit($url)->resize(320, 800);
+    // Outside Taipei the homepage greeting adds the Taiwan clock, its widest state.
+    $page = visit($url)->withTimezone('America/New_York')->resize(320, 800);
     $page->assertNoJavaScriptErrors()->assertPresent('main#main-content');
 
     $page->script(<<<'JS'

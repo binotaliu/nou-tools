@@ -16,8 +16,7 @@
 //   spoken aria-label (seatAriaLabel), which the test below asserts.
 // - The Leaflet map controls are third-party widgets.
 
-function targetSizeAudit(string $url): array
-{
+$targetSizeAudit = function (string $url): array {
     $page = visit($url)->resize(1280, 900);
     $page->assertNoJavaScriptErrors()->assertPresent('main#main-content');
 
@@ -55,10 +54,10 @@ JSON.stringify((() => {
 JS), true);
 
     return array_map(fn (array $items) => array_map(fn (string $item) => "{$url}: {$item}", $items), $result);
-}
+};
 
-it('keeps every control at least 24x24 CSS px and text at least 12px', function (string $url) {
-    $result = targetSizeAudit($url);
+it('keeps every control at least 24x24 CSS px and text at least 12px', function (string $url) use ($targetSizeAudit) {
+    $result = $targetSizeAudit($url);
 
     expect($result['bad'])->toBe([])
         ->and($result['small'])->toBe([]);
