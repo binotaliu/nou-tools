@@ -1,6 +1,7 @@
 import './bootstrap'
 import { createApp, h } from 'vue'
 import { createInertiaApp, router } from '@inertiajs/vue3'
+import useRouteAnnouncer from './Composables/useRouteAnnouncer'
 
 // The CSP (style-src with no 'unsafe-inline') requires a nonce on every
 // inline <style>, including the one Inertia's progress bar injects itself.
@@ -51,6 +52,9 @@ createInertiaApp({
 // and would otherwise leak into analytics; `document.title` is the fallback
 // for every other route.
 router.on('navigate', event => trackPageView(event.detail.page))
+
+// Screen-reader announcement and focus move after client-side page changes.
+useRouteAnnouncer(router)
 
 // The SEO tags in <head> (description, robots, Open Graph, JSON-LD, ...) are
 // rendered by the server per route (resources/views/seo/) and tagged
