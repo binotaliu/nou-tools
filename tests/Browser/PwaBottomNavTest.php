@@ -59,16 +59,15 @@ it('swaps the hamburger menu for a bottom tab bar when running as an installed P
     expect($indicators)->toBe(1)->and($indicatorInActiveTab)->toBe(1);
 });
 
-it('keeps the header menu and hides the bottom tab bar in an installed PWA on tablet and desktop', function (array $viewport, string $menuTestId) use ($enterPwaMode) {
+it('swaps the header for the adaptable nav, not the bottom tab bar, in an installed PWA on tablet and desktop', function (array $viewport) use ($enterPwaMode) {
     $page = visit('/announcements')->resize(...$viewport);
 
     $enterPwaMode($page);
 
-    // The inline nav only shows from lg; a tablet keeps the hamburger instead.
-    $page->assertSee('NOU 小幫手')->assertVisible("[data-testid=\"{$menuTestId}\"]")->assertMissing('[data-testid="bottom-nav"]');
+    $page->assertVisible('[data-testid="adaptable-nav-tabs"]')->assertMissing('[data-testid="bottom-nav"]');
 })->with([
-    'tablet' => [TABLET, 'header-menu-toggle'],
-    'desktop' => [DESKTOP, 'header-nav'],
+    'tablet' => [TABLET],
+    'desktop' => [DESKTOP],
 ]);
 
 it('opens the more sheet from the tab bar and closes it again', function () use ($enterPwaMode) {
@@ -301,14 +300,6 @@ it('hides the header in a phone PWA and links 設定 from the more sheet', funct
     $page->click('[data-testid="bottom-nav-sheet"] a[href$="/settings"]')
         ->waitForEvent('load')
         ->assertVisible('[data-testid="settings-title"]');
-});
-
-it('keeps the header on a tablet PWA', function () use ($enterPwaMode) {
-    $page = visit('/announcements')->resize(...TABLET);
-
-    $enterPwaMode($page);
-
-    $page->assertSee('NOU 小幫手')->assertVisible('[data-testid="site-header"]');
 });
 
 it('changes the theme and accent from the settings page', function () {

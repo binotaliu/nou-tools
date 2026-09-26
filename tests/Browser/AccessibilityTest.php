@@ -27,7 +27,7 @@ it('assigns each global accesskey to one element', function () {
         ->assertPresent('[data-testid="footer-accessibility-link"]');
 
     $keys = json_decode($page->script(
-        "JSON.stringify(Object.fromEntries([...document.querySelectorAll('[accesskey]')].map(e => [e.accessKey, e.getAttribute('href') ?? e.dataset.testid])))"
+        "JSON.stringify(Object.fromEntries([...document.querySelectorAll('[accesskey]')].filter(e => e.getClientRects().length || e.classList.contains('sr-only') || e.classList.contains('skip-link')).map(e => [e.accessKey, e.getAttribute('href') ?? e.dataset.testid])))"
     ), true);
 
     expect($keys)->toBe([
@@ -37,7 +37,8 @@ it('assigns each global accesskey to one element', function () {
         '3' => 'theme-switcher-toggle',
     ]);
 
-    $count = $page->script("document.querySelectorAll('[accesskey]').length");
+    // The adaptable nav's own copy of key 3 is display:none outside a PWA.
+    $count = $page->script("[...document.querySelectorAll('[accesskey]')].filter(e => e.getClientRects().length || e.classList.contains('sr-only') || e.classList.contains('skip-link')).length");
     expect($count)->toBe(4);
 });
 
