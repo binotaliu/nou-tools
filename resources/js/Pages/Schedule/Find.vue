@@ -8,6 +8,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import QrScanner from '../../Components/QrScanner.vue'
+import decodeQrImage from '../../Composables/decodeQrImage'
 
 const hasCreatedBefore = ref(false)
 const scanning = ref(false)
@@ -26,6 +27,36 @@ function submit() {
 
 function onScanned(text) {
   scanning.value = false
+  form.url = text
+  submit()
+}
+
+// A screenshot of the backup card, picked from the photo library.
+const imageError = ref('')
+
+async function onImagePicked(event) {
+  const [file] = event.target.files
+  event.target.value = ''
+  imageError.value = ''
+
+  if (!file) {
+    return
+  }
+
+  let text = null
+
+  try {
+    text = await decodeQrImage(file)
+  } catch {
+    // An unreadable file is reported the same way as one with no code in it.
+  }
+
+  if (!text) {
+    imageError.value = '這張圖片裡找不到 QR Code，請確認是課表備份的截圖。'
+
+    return
+  }
+
   form.url = text
   submit()
 }
@@ -85,8 +116,8 @@ function onScanned(text) {
           ><span class="hidden pwa:inline">裝置</span>
         </h3>
         <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
-          在原本的裝置開啟課表頁面，複製頁面上的連結貼到下方，或用相機掃描頁面上的
-          QR Code。
+          在原裝置開啟課表，並在頁面最下方找到「備份課表連結」，複製並貼到下方；也可用相機掃描畫面上的
+          QR Code，或選擇備份截圖來讀取。
         </p>
         <p
           data-testid="find-schedule-calendar-hint"
@@ -100,7 +131,7 @@ function onScanned(text) {
             for="schedule-url"
             class="mb-1 block text-sm font-semibold text-theme-900 dark:text-zinc-100"
           >
-            課表連結
+            備份課表連結
           </label>
           <input
             id="schedule-url"
@@ -126,7 +157,30 @@ function onScanned(text) {
             {{ form.errors.url }}
           </p>
 
+          <p
+            v-if="imageError"
+            role="alert"
+            data-testid="find-schedule-image-error"
+            class="mt-2 text-sm text-red-600 dark:text-red-400"
+          >
+            {{ imageError }}
+          </p>
+
           <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+            <label
+              data-testid="find-schedule-image"
+              class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 font-semibold text-theme-900 transition focus-within:outline-2 focus-within:outline-theme-500 hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            >
+              <Icon name="photo" class="size-4" />
+              選取截圖
+              <input
+                type="file"
+                accept="image/*"
+                data-testid="find-schedule-image-input"
+                class="sr-only"
+                @change="onImagePicked"
+              />
+            </label>
             <button
               v-if="canScan"
               type="button"
