@@ -168,7 +168,7 @@ it('announces the new title and focuses main after a client-side page change', f
     expect($page->script('document.activeElement.id'))->toBe('main-content');
 });
 
-it('shows errors as an assertive alert that stays and success-style toasts as polite status', function () {
+it('shows error toasts as an alert that stays past the old 4 second timeout', function () {
     $page = visit('/schedules/my');
 
     $page->assertNoJavaScriptErrors()
