@@ -26,9 +26,9 @@ it('offers the font size choice in the header popover too', function () {
     $page = visit('/')->resize(1280, 800);
 
     $page->assertSee('自習室')
-        ->click('[data-testid="theme-switcher-toggle"]')
-        ->assertVisible('header [data-testid="font-size-large"]')
-        ->click('header [data-testid="font-size-large"]');
+        ->click('header [data-testid="theme-switcher-toggle"] >> visible=true')
+        ->assertPresent('header [data-testid="font-size-large"] >> visible=true')
+        ->click('header [data-testid="font-size-large"] >> visible=true');
 
     expect($page->script('getComputedStyle(document.documentElement).fontSize'))->toBe('18px');
 });

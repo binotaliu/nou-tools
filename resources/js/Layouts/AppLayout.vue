@@ -9,6 +9,7 @@ import { computed, ref, watch } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import AdaptableNav from '../Components/AdaptableNav.vue'
 import BottomNav from '../Components/BottomNav.vue'
+import usePwaStandalone from '../Composables/usePwaStandalone'
 import CookieConsentBanner from '../Components/CookieConsentBanner.vue'
 import Icon from '../Components/Icon.vue'
 import Notification from '../Components/Notification.vue'
@@ -20,6 +21,7 @@ defineProps({ reserveBottomSpace: { type: Boolean, default: false } })
 import ThemeSwitcherPopover from '../Components/ThemeSwitcherPopover.vue'
 
 const page = usePage()
+const { isPwa } = usePwaStandalone()
 
 const footerLinkClass =
   'text-theme-700 hover:text-theme-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100'
@@ -300,7 +302,7 @@ const adaptableOther = computed(() =>
             </div>
           </nav>
 
-          <ThemeSwitcherPopover />
+          <ThemeSwitcherPopover :accesskey="isPwa ? null : '3'" />
 
           <button
             type="button"

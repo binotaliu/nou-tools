@@ -127,6 +127,7 @@ $stubPwaPdfShare = function ($page, array $shareFailures = [], int $pdfStatus = 
 };
 
 $openPrintMenuAndChoose = function ($page, string $weekStart): void {
+    dismissCookieConsentBanner($page);
     $page->click('[data-testid="schedule-print-button"]')
         ->click('[data-testid="schedule-print-'.$weekStart.'"]');
 };
@@ -145,6 +146,7 @@ $visitPrintableSchedule = function () use ($dismissRememberModalIfPresent): Pend
 
 it('shares the PDF from an installed PWA instead of navigating to it, showing a loading state meanwhile', function () use ($stubPwaPdfShare, $openPrintMenuAndChoose, $sharedFiles, $visitPrintableSchedule) {
     $page = $visitPrintableSchedule();
+    dismissCookieConsentBanner($page);
     $stubPwaPdfShare($page);
     $url = $page->url();
 

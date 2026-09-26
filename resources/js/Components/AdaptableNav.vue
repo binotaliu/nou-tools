@@ -11,6 +11,7 @@ import { Link } from '@inertiajs/vue3'
 import Icon from './Icon.vue'
 import ThemeSwitcherPopover from './ThemeSwitcherPopover.vue'
 import useNavStyle from '../Composables/useNavStyle'
+import usePwaStandalone from '../Composables/usePwaStandalone'
 
 const props = defineProps({
   // Every group holds { href, label, icon, active, offlineAllow? }.
@@ -24,6 +25,8 @@ const props = defineProps({
 })
 
 const { navStyle, setNavStyle } = useNavStyle()
+// Outside an installed PWA the header's button owns accesskey 3.
+const { isPwa } = usePwaStandalone()
 
 const moreOpen = ref(false)
 const moreRoot = ref(null)
@@ -125,7 +128,7 @@ const toggleClass =
         <div class="flex items-center justify-self-end">
           <ThemeSwitcherPopover
             flat
-            :accesskey="navStyle === 'tabs' ? '3' : undefined"
+            :accesskey="isPwa && navStyle === 'tabs' ? '3' : null"
           />
 
           <div ref="moreRoot" class="relative">
@@ -235,7 +238,7 @@ const toggleClass =
       >
         <ThemeSwitcherPopover
           placement="above"
-          :accesskey="navStyle === 'sidebar' ? '3' : undefined"
+          :accesskey="isPwa && navStyle === 'sidebar' ? '3' : null"
         />
         <button
           type="button"
