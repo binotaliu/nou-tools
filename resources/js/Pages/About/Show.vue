@@ -10,8 +10,8 @@ import useAnalyticsConsent from '../../Composables/useAnalyticsConsent'
 
 const { granted, toggle, error } = useAnalyticsConsent()
 
-// The footer's links as bordered buttons: in a phone PWA the footer is hidden
-// and this page is where they live (see BottomNav.vue).
+// The footer's links as bordered buttons: in an installed PWA the footer is hidden
+// and this page is where they live (see BottomNav.vue, AdaptableNav.vue).
 const linkButtonClass =
   'inline-flex items-center justify-center gap-2 rounded-lg border border-theme-300 bg-theme-50 px-3 py-2 text-sm font-medium text-theme-800 transition-colors hover:border-theme-400 hover:bg-theme-100 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-500 dark:hover:bg-zinc-700'
 const linkIconClass = 'size-4 shrink-0 text-theme-700 dark:text-zinc-200'

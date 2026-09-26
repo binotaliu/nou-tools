@@ -12,6 +12,7 @@ import { computed, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import ThemeSettings from '../../Components/ThemeSettings.vue'
+import useNavStyle, { NAV_STYLES } from '../../Composables/useNavStyle'
 import usePushSubscription from '../../Composables/usePushSubscription'
 
 const props = defineProps({
@@ -25,6 +26,8 @@ const props = defineProps({
     default: null,
   },
 })
+
+const { navStyle, setNavStyle } = useNavStyle()
 
 const permissionError = ref('')
 
@@ -149,6 +152,42 @@ const rows = computed(() => [
         </p>
 
         <ThemeSettings large />
+
+        <!-- Only the installed PWA from md up has a nav to switch (AdaptableNav). -->
+        <div
+          class="mt-4 hidden wide-pwa:block"
+          data-testid="settings-nav-style"
+        >
+          <p
+            id="settings-nav-style-label"
+            class="mb-2 text-xs font-medium text-theme-700 dark:text-zinc-400"
+          >
+            導覽樣式
+          </p>
+          <div
+            role="radiogroup"
+            aria-labelledby="settings-nav-style-label"
+            class="grid grid-cols-2 gap-1 rounded-md bg-theme-100 p-1 dark:bg-zinc-800"
+          >
+            <button
+              v-for="option in NAV_STYLES"
+              :key="option.value"
+              type="button"
+              role="radio"
+              :aria-checked="(navStyle === option.value).toString()"
+              class="rounded px-1 py-1.5 text-sm font-medium transition-colors"
+              :class="
+                navStyle === option.value
+                  ? 'bg-white text-theme-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100'
+                  : 'text-theme-700 hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+              "
+              :data-testid="`nav-style-${option.value}`"
+              @click="setNavStyle(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
       </section>
 
       <section

@@ -17,7 +17,7 @@ const { showBanner, accept, decline } = useAnalyticsConsent()
     <div
       v-if="showBanner"
       data-testid="cookie-consent-banner"
-      class="fixed inset-x-0 bottom-(--pwa-nav-height) z-50 border-t border-theme-200 bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_40px_rgba(0,0,0,0.14)] dark:border-zinc-700 dark:bg-zinc-900 print:hidden"
+      class="fixed right-0 bottom-(--pwa-nav-height) left-(--pwa-sidebar-width) z-50 border-t border-theme-200 bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_40px_rgba(0,0,0,0.14)] dark:border-zinc-700 dark:bg-zinc-900 print:hidden"
     >
       <div
         class="mx-auto flex max-w-6xl flex-col items-center gap-4 px-6 py-4 sm:flex-row sm:justify-between"

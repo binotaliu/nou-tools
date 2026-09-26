@@ -142,7 +142,7 @@ defineProps({
         ref="panel"
         role="region"
         aria-labelledby="study-room-control-panel-heading"
-        class="fixed inset-x-0 bottom-(--pwa-nav-height) z-40 mb-0"
+        class="fixed right-0 bottom-(--pwa-nav-height) left-(--pwa-sidebar-width) z-40 mb-0"
         data-testid="study-room-control-panel"
         @focusin="onPanelFocusIn"
         @focusout="onPanelFocusOut"
