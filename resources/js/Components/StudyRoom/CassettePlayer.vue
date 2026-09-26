@@ -116,8 +116,7 @@ const linkClass =
                 class="block truncate text-xs font-semibold text-theme-900 dark:text-zinc-100"
                 >{{ item.title }}</span
               >
-              <span
-                class="block text-[0.625rem] text-theme-700 dark:text-zinc-400"
+              <span class="block text-xs text-theme-700 dark:text-zinc-400"
                 >{{ item.trackCount }} 首 ·
                 {{ formatTime(item.totalDurationSeconds) }}</span
               >
@@ -128,7 +127,7 @@ const linkClass =
 
       <p
         v-if="music.loaded && music.track"
-        class="truncate text-[0.625rem] text-theme-700 dark:text-zinc-400"
+        class="truncate text-xs text-theme-700 dark:text-zinc-400"
         data-testid="study-room-music-credit"
       >
         <a
@@ -330,8 +329,7 @@ const linkClass =
             aria-live="polite"
             data-testid="study-room-music-title"
           />
-          <span
-            class="block truncate text-[0.625rem] text-theme-800 dark:text-zinc-400"
+          <span class="block truncate text-xs text-theme-800 dark:text-zinc-400"
             >{{ music.track.author }} ·
             <span
               class="font-mono tabular-nums"
@@ -345,8 +343,7 @@ const linkClass =
             class="block truncate text-xs font-semibold text-theme-900 dark:text-zinc-100"
             >背景音樂</span
           >
-          <span
-            class="block truncate text-[0.625rem] text-theme-800 dark:text-zinc-400"
+          <span class="block truncate text-xs text-theme-800 dark:text-zinc-400"
             >尚未放入卡帶</span
           >
         </template>

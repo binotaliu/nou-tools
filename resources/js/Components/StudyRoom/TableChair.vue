@@ -90,13 +90,11 @@ onUnmounted(() => {
         <span>{{ seat.emoji }}</span>
         <span class="truncate">{{ seat.nickname }}</span>
       </p>
-      <p
-        class="mt-1 text-[0.6875rem] leading-snug text-theme-700 dark:text-zinc-300"
-      >
+      <p class="mt-1 text-xs leading-snug text-theme-700 dark:text-zinc-300">
         {{ grid.thoughtBubbleText(seat) }}
       </p>
       <p
-        class="mt-1 font-mono text-[0.6875rem] text-theme-700 tabular-nums dark:text-zinc-400"
+        class="mt-1 font-mono text-xs text-theme-700 tabular-nums dark:text-zinc-400"
       >
         剩餘 {{ timer.timerLabel(seat) }}
       </p>

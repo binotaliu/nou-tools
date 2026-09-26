@@ -115,7 +115,7 @@ onUnmounted(() => {
         <ArrowsPointingInIcon class="size-4" />
         離開全螢幕
         <kbd
-          class="ml-1 hidden rounded border border-current/30 px-1 text-[0.625rem] opacity-70 sm:inline"
+          class="ml-1 hidden rounded border border-current/30 px-1 text-xs opacity-70 sm:inline"
           >Esc</kbd
         >
       </button>

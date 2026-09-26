@@ -126,7 +126,7 @@ const tabClass = active =>
           :key="tab.href"
           :href="tab.href"
           :aria-current="tab.active ? 'page' : null"
-          class="relative flex flex-col items-center justify-center gap-0.5 text-[0.6875rem] transition-colors"
+          class="relative flex flex-col items-center justify-center gap-0.5 text-xs transition-colors"
           :class="tabClass(tab.active)"
         >
           <span
@@ -141,7 +141,7 @@ const tabClass = active =>
 
         <button
           type="button"
-          class="relative flex flex-col items-center justify-center gap-0.5 text-[0.6875rem] transition-colors"
+          class="relative flex flex-col items-center justify-center gap-0.5 text-xs transition-colors"
           :class="tabClass(moreActive || sheetOpen)"
           :aria-expanded="sheetOpen.toString()"
           aria-controls="bottom-nav-sheet"

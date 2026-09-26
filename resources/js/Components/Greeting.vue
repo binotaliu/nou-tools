@@ -86,9 +86,7 @@ const {
             <p class="text-xs text-theme-700 tabular-nums dark:text-zinc-400">
               {{ taiwanDateString }}
             </p>
-            <p class="text-[0.65rem] text-theme-700 dark:text-zinc-400">
-              台灣時間
-            </p>
+            <p class="text-xs text-theme-700 dark:text-zinc-400">台灣時間</p>
           </div>
         </div>
       </div>

@@ -136,10 +136,9 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             class="block font-mono text-sm leading-tight font-semibold text-theme-800 tabular-nums dark:text-zinc-200"
             >{{ sky.clockTimeLabel() }}</span
           >
-          <span
-            class="block text-[0.625rem] text-theme-700 dark:text-zinc-400"
-            >{{ sky.clockDateLabel() }}</span
-          >
+          <span class="block text-xs text-theme-700 dark:text-zinc-400">{{
+            sky.clockDateLabel()
+          }}</span>
         </p>
       </div>
 

@@ -1094,7 +1094,7 @@ function localHint(next) {
 
                   <span
                     v-if="row.next && isOngoing(row.next)"
-                    class="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-[0.6875rem] font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
+                    class="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
                   >
                     進行中
                   </span>
