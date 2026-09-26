@@ -6,6 +6,7 @@ import useThemeSwitcher from '../Composables/useThemeSwitcher'
 import useAccentColor, { ACCENTS } from '../Composables/useAccentColor'
 import useFontSize, { FONT_SIZES } from '../Composables/useFontSize'
 import useReduceMotion from '../Composables/useReduceMotion'
+import useTextSpacing, { TEXT_SPACINGS } from '../Composables/useTextSpacing'
 
 defineProps({
   // Bigger swatches for the full 設定 page; the header popover stays compact.
@@ -16,6 +17,7 @@ const { theme, setTheme } = useThemeSwitcher()
 const { accent, setAccent } = useAccentColor()
 const { fontSize, setFontSize } = useFontSize()
 const { reduceMotion, setReduceMotion } = useReduceMotion()
+const { textSpacing, setTextSpacing } = useTextSpacing()
 
 const MODES = [
   { value: 'system', label: '系統' },
@@ -121,6 +123,41 @@ const MODES = [
           @click="setFontSize(size.value)"
         >
           {{ size.label }}
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <p
+        id="theme-text-spacing-label"
+        class="mb-2 text-xs font-medium text-theme-700 dark:text-zinc-400"
+      >
+        行距與字距
+      </p>
+      <div
+        role="radiogroup"
+        aria-labelledby="theme-text-spacing-label"
+        class="grid grid-cols-2 gap-1 rounded-md bg-theme-100 p-1 dark:bg-zinc-800"
+      >
+        <button
+          v-for="option in TEXT_SPACINGS"
+          :key="option.value"
+          type="button"
+          role="radio"
+          :aria-checked="(textSpacing === option.value).toString()"
+          class="rounded px-1 py-1.5 text-sm font-medium transition-colors"
+          :class="
+            textSpacing === option.value
+              ? 'bg-white text-theme-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100'
+              : 'text-theme-700 hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+          "
+          :data-testid="`text-spacing-${option.value}`"
+          data-analytics-event="theme_text_spacing_change"
+          data-analytics-feature="theme"
+          :data-analytics-label="option.value"
+          @click="setTextSpacing(option.value)"
+        >
+          {{ option.label }}
         </button>
       </div>
     </div>

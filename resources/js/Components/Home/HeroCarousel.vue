@@ -117,7 +117,7 @@ const {
     </div>
 
     <div
-      class="flex items-center justify-center gap-3 px-6 pb-4 text-theme-700 dark:text-zinc-300"
+      class="flex flex-wrap items-center justify-center gap-3 px-6 pb-4 text-theme-700 dark:text-zinc-300"
     >
       <button
         type="button"

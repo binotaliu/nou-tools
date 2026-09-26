@@ -218,7 +218,7 @@ const visibleCourses = computed(() =>
         </h2>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <label
           for="video-course-date"
           class="text-sm text-theme-700 dark:text-zinc-400"

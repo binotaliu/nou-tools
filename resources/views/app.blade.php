@@ -97,6 +97,10 @@
                 document.documentElement.dataset.reduceMotion = 'true'
             }
 
+            if (localStorage.getItem('nou:text-spacing:v1') === 'wide') {
+                document.documentElement.dataset.textSpacing = 'wide'
+            }
+
             const fontSize = localStorage.getItem('font-size')
             if (fontSize) {
                 document.documentElement.dataset.fontSize = fontSize

@@ -318,6 +318,17 @@
     font-size: 150%;
   }
 
+  /* Reader-chosen text spacing (useTextSpacing): the WCAG 1.4.12 values. */
+  html[data-text-spacing='wide'] body :where(:not(svg, svg *)) {
+    line-height: 1.5 !important;
+    letter-spacing: 0.12em !important;
+    word-spacing: 0.16em !important;
+  }
+
+  html[data-text-spacing='wide'] body p {
+    margin-bottom: 2em !important;
+  }
+
   html[data-accent='ocean'] {
     --color-theme-50: oklch(0.98 0.01 230);
     --color-theme-100: oklch(0.96 0.02 230);
