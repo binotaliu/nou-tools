@@ -149,3 +149,36 @@ it('ships forced-colors rules and mentions keyboard focus on the help page', fun
 
     expect($hasRules)->toBeTrue();
 });
+
+it('announces the new title and focuses main after a client-side page change', function () {
+    $page = visit('/');
+
+    $page->assertNoJavaScriptErrors()
+        ->assertPresent('[data-testid="footer-accessibility-link"]');
+
+    // The initial load announces nothing.
+    expect($page->script("document.querySelector('[data-testid=\"route-announcer\"]').textContent"))->toBe('');
+    expect($page->script("document.querySelector('[data-testid=\"route-announcer\"]').getAttribute('aria-live')"))->toBe('polite');
+
+    $page->click('[data-testid="footer-accessibility-link"]')
+        ->assertPathIs('/accessibility')
+        ->wait(0.6);
+
+    expect($page->script("document.querySelector('[data-testid=\"route-announcer\"]').textContent"))->toBe('無障礙說明 - NOU 小幫手');
+    expect($page->script('document.activeElement.id'))->toBe('main-content');
+});
+
+it('shows errors as an assertive alert that stays and success-style toasts as polite status', function () {
+    $page = visit('/schedules/my');
+
+    $page->assertNoJavaScriptErrors()
+        ->click('[data-testid="find-schedule-existing"]')
+        ->assertPresent('[data-testid="find-schedule-url"]')
+        ->fill('[data-testid="find-schedule-url"]', 'not a link')
+        ->press('[data-testid="find-schedule-form"] button[type="submit"]')
+        ->assertPresent('[data-testid="notification"][role="alert"]');
+
+    // Not dismissed on its own within the old 4 second window.
+    $page->wait(5);
+    expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"notification\"] > div > div')).display"))->not->toBe('none');
+});

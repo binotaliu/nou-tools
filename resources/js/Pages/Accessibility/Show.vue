@@ -295,6 +295,29 @@ onMounted(() => {
 
       <section
         class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        data-testid="accessibility-navigation-announcements"
+        aria-labelledby="navigation-announcements-heading"
+      >
+        <h3
+          id="navigation-announcements-heading"
+          class="text-lg font-semibold text-theme-800 dark:text-zinc-100"
+        >
+          換頁與通知
+        </h3>
+        <ul
+          class="mt-3 list-disc space-y-2 pl-5 text-sm text-theme-700 dark:text-zinc-300"
+        >
+          <li>
+            從一頁切換到另一頁後，螢幕閱讀器會念出新頁面的標題，焦點也會回到主要區塊的開頭。只是重新整理同一頁的資料或儲存表單時不會打斷你。
+          </li>
+          <li>
+            成功與提示訊息會以較不打斷的方式念出，並在閱讀所需的時間後消失；滑鼠移上去或焦點停在訊息內時會暫停倒數。錯誤訊息會立即念出，並一直留著，直到你按下「關閉」。
+          </li>
+        </ul>
+      </section>
+
+      <section
+        class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         data-testid="accessibility-study-room"
         aria-labelledby="study-room-heading"
       >
