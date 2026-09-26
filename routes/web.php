@@ -54,6 +54,7 @@ use App\Http\Controllers\SchedulePushSubscriptionStoreController;
 use App\Http\Controllers\ScheduleRememberController;
 use App\Http\Controllers\ScheduleSubscribeController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ShareController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StudyRoomBreakController;
 use App\Http\Controllers\StudyRoomController;
@@ -95,6 +96,8 @@ Route::get('/alt-uu', AltUuController::class)->name('alt-uu');
 Route::get('/about', AboutController::class)->name('about');
 
 Route::get('/accessibility', AccessibilityController::class)->name('accessibility');
+
+Route::get('/share', ShareController::class)->name('share');
 
 Route::put('/analytics-consent', AnalyticsConsentController::class)
     ->name('analytics-consent.update')

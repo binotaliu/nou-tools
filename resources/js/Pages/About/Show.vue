@@ -102,6 +102,14 @@ const linkIconClass = 'size-4 shrink-0 text-theme-700 dark:text-zinc-200'
             無障礙說明
           </Link>
           <Link
+            href="/share"
+            :class="linkButtonClass"
+            data-testid="about-link-share"
+          >
+            <Icon name="share" :class="linkIconClass" />
+            分享 NOU 小幫手
+          </Link>
+          <Link
             href="/changelog"
             :class="linkButtonClass"
             data-testid="about-link-changelog"
