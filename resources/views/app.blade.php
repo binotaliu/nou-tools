@@ -80,6 +80,12 @@
                 navigator.standalone === true
             ) {
                 document.documentElement.dataset.pwa = ''
+
+                // Tablet/desktop PWA nav style (useNavStyle): top tabs by
+                // default, a sidebar when the reader chose one.
+                if (localStorage.getItem('nou:nav-style:v1') === 'sidebar') {
+                    document.documentElement.dataset.navStyle = 'sidebar'
+                }
             }
 
             const accent = localStorage.getItem('accent-color')

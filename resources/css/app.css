@@ -23,6 +23,34 @@
   }
 }
 
+/* Installed PWA from `md` up (tablet, desktop): the adaptable nav
+ * (AdaptableNav.vue) takes over from the header, as a top tab bar or, when the
+ * reader picked it (`html[data-nav-style='sidebar']`, useNavStyle), a sidebar.
+ * The exact complement of `bottom-nav`. */
+@custom-variant wide-pwa {
+  @media (width >= 48rem) {
+    html[data-pwa] & {
+      @slot;
+    }
+  }
+}
+
+@custom-variant pwa-sidebar {
+  @media (width >= 48rem) {
+    html[data-pwa][data-nav-style='sidebar'] & {
+      @slot;
+    }
+  }
+}
+
+@custom-variant pwa-tabs {
+  @media (width >= 48rem) {
+    html[data-pwa]:not([data-nav-style='sidebar']) & {
+      @slot;
+    }
+  }
+}
+
 /* Installed PWA at any width (unlike `bottom-nav`, which is phone-only): for
  * copy that should say 裝置 instead of 瀏覽器. Same head-script flag, so no
  * flash of the browser wording. */
@@ -151,7 +179,16 @@
    * fixed bottom UI can sit above it. */
   :root {
     --pwa-nav-height: 0px;
+    --pwa-sidebar-width: 0px;
     --safe-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Width of the adaptable nav's sidebar (0 in every other mode), so the body
+   * and fixed bottom UI can stay clear of it. */
+  @media (width >= 48rem) {
+    html[data-pwa][data-nav-style='sidebar'] {
+      --pwa-sidebar-width: 16rem;
+    }
   }
 
   @media (width < 48rem) {
@@ -177,10 +214,21 @@
     }
   }
 
+  /* The adaptable nav's top tab bar (h-12) is sticky, so docked content sits
+   * beneath it; the sidebar mode has no bar. */
+  @media (width >= 48rem) {
+    html[data-pwa]:not([data-nav-style='sidebar']) {
+      --mobile-header-height: 3rem;
+    }
+    html[data-pwa][data-nav-style='sidebar'] {
+      --mobile-header-height: 0px;
+    }
+  }
+
   /* viewport-fit=cover (added for PWAs only, at any width) lets content run
    * under the landscape notch, so keep it inside the side insets. */
   html[data-pwa] body {
-    padding-left: env(safe-area-inset-left);
+    padding-left: calc(env(safe-area-inset-left) + var(--pwa-sidebar-width));
     padding-right: env(safe-area-inset-right);
   }
 
