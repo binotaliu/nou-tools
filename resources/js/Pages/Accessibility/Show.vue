@@ -367,6 +367,24 @@ onMounted(() => {
 
       <section
         class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        data-testid="accessibility-focus"
+        aria-labelledby="focus-heading"
+      >
+        <h3
+          id="focus-heading"
+          class="text-lg font-semibold text-theme-800 dark:text-zinc-100"
+        >
+          鍵盤焦點與高對比模式
+        </h3>
+        <p class="mt-3 text-sm text-theme-700 dark:text-zinc-300">
+          使用 Tab
+          鍵切換時，目前所在的控制項一律會顯示清楚的外框，並且不會被頁首或底部導覽列遮住。Windows
+          高對比模式（強制色彩）下，外框、目前頁面、座位狀態與已選日期都改用系統色彩與邊框標示，不再只靠顏色或陰影區分。
+        </p>
+      </section>
+
+      <section
+        class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         data-testid="accessibility-limitations"
         aria-labelledby="limitations-heading"
       >

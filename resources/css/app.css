@@ -185,6 +185,30 @@
 }
 
 @layer base {
+  /* Global keyboard focus indicator: a 2px outline offset by 2px. The colour
+   * is theme-700 on light pages and theme-300 on dark ones, both >= 3:1
+   * against their surface. Utilities live in a later layer, so components
+   * can still override it (`focus-visible:outline-none` plus a ring). */
+  :root {
+    --focus-ring-color: var(--color-theme-700);
+  }
+
+  .dark {
+    --focus-ring-color: var(--color-theme-300);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+  }
+
+  /* Keep focused elements clear of the sticky header and the fixed bottom
+   * bar / banners when the browser scrolls them into view. */
+  html {
+    scroll-padding-top: 5rem;
+    scroll-padding-bottom: calc(var(--pwa-nav-height) + 5rem);
+  }
+
   /* Inertia root as a full-height column: AppLayout's <main> grows (flex-1),
    * so the footer sits at the window's bottom edge on short pages. */
   #app {
@@ -1024,4 +1048,70 @@ html[data-reduce-motion='true'] *::after {
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
   transition-delay: 0s !important;
+}
+
+/* Windows High Contrast / forced colours: backgrounds and shadows are dropped,
+ * so anything that only relied on them gets a border or outline in system
+ * colours. Focus rings drawn with box-shadow (`ring-*`) disappear too, so the
+ * outline is restored for every focusable element. */
+@media (forced-colors: active) {
+  :focus-visible,
+  :focus:where(input, textarea, select) {
+    outline: 2px solid Highlight !important;
+    outline-offset: 2px !important;
+  }
+
+  [aria-current='page'],
+  [aria-current='true'] {
+    border: 2px solid Highlight;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  [data-seat-code] {
+    border: 2px solid ButtonText;
+  }
+
+  [data-seat-code][aria-disabled='true'] {
+    border-style: dashed;
+    color: GrayText;
+  }
+
+  [data-seat-code][aria-label*='你的座位'] {
+    border: 4px double Highlight;
+  }
+
+  [data-day] {
+    border: 1px solid transparent;
+  }
+
+  [data-day][aria-pressed='true'] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    border-color: CanvasText;
+  }
+
+  [data-day][class*='ring-1'] {
+    border: 2px dotted CanvasText;
+  }
+
+  .md-checklist :where(li),
+  .md-tabs-trigger,
+  .md-countdown-item {
+    border: 1px solid CanvasText;
+  }
+
+  .md-checklist :where(li[data-checked='true']) {
+    border-style: double;
+    border-width: 3px;
+  }
+
+  .md-tabs-trigger[data-active='true'] {
+    border: 2px solid Highlight;
+  }
+
+  .md-checklist :where(li input[type='checkbox']) {
+    forced-color-adjust: auto;
+  }
 }

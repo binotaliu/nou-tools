@@ -102,3 +102,50 @@ it('documents the study room keys and keyboard use on the accessibility page', f
     $rows = $page->script("document.querySelectorAll('[data-testid=\"accessibility-study-room-keys\"] tbody tr').length");
     expect($rows)->toBe(5);
 });
+
+it('draws a visible focus indicator on keyboard-focused controls', function () {
+    $page = visit('/');
+
+    $page->assertNoJavaScriptErrors()
+        ->assertPresent('[data-testid="footer-accessibility-link"]');
+
+    $indicator = json_decode($page->script(<<<'JS'
+        (() => {
+            const el = document.querySelector('[data-testid="footer-accessibility-link"]');
+            el.focus();
+            const s = getComputedStyle(el);
+            return JSON.stringify({
+                focused: document.activeElement === el,
+                visible: el.matches(':focus-visible'),
+                outlineWidth: parseFloat(s.outlineWidth),
+                outlineStyle: s.outlineStyle,
+                boxShadow: s.boxShadow,
+            });
+        })()
+    JS), true);
+
+    expect($indicator['focused'])->toBeTrue()
+        ->and($indicator['visible'])->toBeTrue()
+        ->and($indicator['outlineStyle'])->toBe('solid')
+        ->and($indicator['outlineWidth'])->toBeGreaterThanOrEqual(2);
+});
+
+it('ships forced-colors rules and mentions keyboard focus on the help page', function () {
+    // Pest's browser cannot emulate forced-colors, so assert the rules exist.
+    $page = visit('/accessibility');
+
+    $page->assertNoJavaScriptErrors()
+        ->assertSeeIn('[data-testid="accessibility-focus"]', 'Windows 高對比模式（強制色彩）');
+
+    $hasRules = $page->script(<<<'JS'
+        [...document.styleSheets].some((sheet) => {
+            try {
+                return [...sheet.cssRules].some((rule) => rule.media && rule.media.mediaText.includes('forced-colors') && /highlight/i.test(rule.cssText));
+            } catch (e) {
+                return false;
+            }
+        })
+    JS);
+
+    expect($hasRules)->toBeTrue();
+});

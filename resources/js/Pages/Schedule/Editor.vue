@@ -277,7 +277,7 @@ function submitForm() {
             type="text"
             accesskey="8"
             placeholder="輸入課程名稱..."
-            class="w-full rounded-lg border-2 border-theme-300 px-4 py-3 text-lg focus:border-theme-500 focus:outline-none dark:border-zinc-600"
+            class="w-full rounded-lg border-2 border-theme-300 px-4 py-3 text-lg focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-600"
             autocomplete="off"
             :disabled="selectedItems.length >= 14"
             :aria-describedby="
@@ -550,7 +550,7 @@ function submitForm() {
             type="text"
             name="name"
             placeholder="例如：浣熊的課表"
-            class="w-full rounded-lg border-2 border-theme-300 px-4 py-3 focus:border-theme-500 focus:outline-none dark:border-zinc-600"
+            class="w-full rounded-lg border-2 border-theme-300 px-4 py-3 focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-600"
           />
         </div>
 

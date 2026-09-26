@@ -662,7 +662,7 @@ function print() {
                       <textarea
                         v-model="homework[course.id][number].note"
                         placeholder="（尚未設定備註）"
-                        class="m-0 h-full w-full resize-none px-2 py-2 text-xs text-theme-700 placeholder-zinc-400 focus:border-blue-500 focus:outline-none dark:text-zinc-300 print:text-black print:placeholder-transparent"
+                        class="m-0 h-full w-full resize-none px-2 py-2 text-xs text-theme-700 placeholder-zinc-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-inset dark:text-zinc-300 print:text-black print:placeholder-transparent"
                         rows="2"
                         :aria-label="`${course.name} ${number === 1 ? '作業一' : '作業二'}的備註`"
                       ></textarea>
@@ -792,7 +792,7 @@ function print() {
                             ? 'text-zinc-600'
                             : 'text-theme-700 dark:text-zinc-300'
                         "
-                        class="m-0 h-full w-full resize-none px-2 py-2 text-xs placeholder-zinc-400 focus:border-blue-500 focus:outline-none print:text-black print:placeholder-transparent"
+                        class="m-0 h-full w-full resize-none px-2 py-2 text-xs placeholder-zinc-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none focus:ring-inset print:text-black print:placeholder-transparent"
                         rows="2"
                         :aria-label="`第${toChineseNumber(week.num)}週 ${course.name} 的學習目標與備註`"
                       ></textarea>

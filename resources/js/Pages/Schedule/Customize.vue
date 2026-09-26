@@ -287,7 +287,7 @@ function submitAnnouncementPreferences() {
                     type="text"
                     maxlength="50"
                     placeholder="例如：我的課程群組"
-                    class="w-full rounded-lg border border-theme-300 px-3 py-2 text-sm focus:border-theme-500 focus:outline-none dark:border-zinc-600"
+                    class="w-full rounded-lg border border-theme-300 px-3 py-2 text-sm focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-600"
                   />
                 </div>
 
@@ -302,7 +302,7 @@ function submitAnnouncementPreferences() {
                     type="url"
                     maxlength="2048"
                     placeholder="https://example.com"
-                    class="w-full rounded-lg border border-theme-300 px-3 py-2 text-sm focus:border-theme-500 focus:outline-none dark:border-zinc-600"
+                    class="w-full rounded-lg border border-theme-300 px-3 py-2 text-sm focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-600"
                   />
                 </div>
 
