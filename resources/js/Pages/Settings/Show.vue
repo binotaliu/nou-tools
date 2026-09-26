@@ -12,6 +12,8 @@ import { computed, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import ThemeSettings from '../../Components/ThemeSettings.vue'
+import Icon from '../../Components/Icon.vue'
+import BackupLinkDialog from '../../Components/Schedule/BackupLinkDialog.vue'
 import useNavStyle, { NAV_STYLES } from '../../Composables/useNavStyle'
 import usePushSubscription from '../../Composables/usePushSubscription'
 
@@ -30,6 +32,7 @@ const props = defineProps({
 const { navStyle, setNavStyle } = useNavStyle()
 
 const permissionError = ref('')
+const backupOpen = ref(false)
 
 // Class-start reminders: the schedule's own subscribe/unsubscribe endpoints
 // set and clear `notify_on_class_start`.
@@ -228,7 +231,25 @@ const rows = computed(() => [
           >
             自訂課表頁顯示
           </Link>
+          <button
+            type="button"
+            data-testid="settings-schedule-backup"
+            data-analytics-event="schedule_backup_open"
+            data-analytics-feature="schedule"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            @click="backupOpen = true"
+          >
+            <Icon name="lock-closed" class="size-4" />
+            備份課表連結
+          </button>
         </div>
+
+        <p
+          v-if="notifications"
+          class="mt-3 text-xs text-theme-700 dark:text-zinc-400"
+        >
+          備份連結能在清除瀏覽器資料或換裝置後找回課表。建議現在就截圖存進相簿。
+        </p>
       </section>
 
       <section
@@ -316,5 +337,12 @@ const rows = computed(() => [
         </template>
       </section>
     </div>
+
+    <BackupLinkDialog
+      v-if="notifications"
+      :open="backupOpen"
+      :backup="notifications.backup"
+      @close="backupOpen = false"
+    />
   </AppLayout>
 </template>

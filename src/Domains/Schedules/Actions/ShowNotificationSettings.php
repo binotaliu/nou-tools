@@ -10,6 +10,8 @@ use NouTools\Domains\Schedules\ViewModels\NotificationSettingsViewModel;
 
 final readonly class ShowNotificationSettings
 {
+    public function __construct(private ShowScheduleBackup $showScheduleBackup) {}
+
     public function __invoke(StudentScheduleCookie $viewer): NotificationSettingsViewModel
     {
         $schedule = StudentSchedule::query()->with('studyRoomProfile')->findOrFail($viewer->id);
@@ -19,6 +21,7 @@ final readonly class ShowNotificationSettings
             classReminders: $schedule->notify_on_class_start,
             hasStudyRoomProfile: $schedule->studyRoomProfile !== null,
             timerEnd: $schedule->studyRoomProfile?->notify_on_timer_end ?? false,
+            backup: ($this->showScheduleBackup)($schedule),
         );
     }
 }

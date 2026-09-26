@@ -65,3 +65,14 @@ it('is not listed in the sitemap', function () {
         ->assertSuccessful()
         ->assertDontSee(route('settings'), false);
 });
+
+it('carries the remembered schedule\'s backup link for the settings page', function () {
+    $schedule = StudentSchedule::factory()->create(['name' => '備份測試']);
+
+    $this->withCookie('student_schedule', json_encode(['id' => $schedule->id, 'uuid' => $schedule->uuid]))
+        ->get(route('settings'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('notifications.backup.name', '備份測試')
+            ->where('notifications.backup.url', route('schedules.show', $schedule))
+            ->where('notifications.backup.qrCodeSvg', fn (string $svg) => str_contains($svg, 'viewBox')));
+});
