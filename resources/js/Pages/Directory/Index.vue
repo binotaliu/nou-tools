@@ -322,7 +322,7 @@ onMounted(() => {
                         ? 'bg-theme-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
                         : 'text-theme-700 hover:bg-theme-100 dark:text-zinc-300 dark:hover:bg-zinc-800'
                     "
-                    class="truncate rounded-lg px-3 py-2 text-left text-sm font-medium transition"
+                    class="truncate rounded-lg px-3 py-2 text-left text-sm font-medium transition focus-visible:-outline-offset-2"
                     :data-testid="'center-button-' + center.key"
                     :aria-label="'檢視 ' + center.name + ' 詳情'"
                     @click="selectCenter(center.key)"

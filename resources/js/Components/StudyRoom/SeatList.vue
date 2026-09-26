@@ -117,7 +117,7 @@ function visibleSeats(floor) {
             <th
               scope="row"
               tabindex="-1"
-              class="px-4 py-2 font-medium whitespace-nowrap focus:outline-2 focus:outline-theme-500"
+              class="px-4 py-2 font-medium whitespace-nowrap focus:outline-2 focus:-outline-offset-2 focus:outline-theme-500"
               :data-seat-code="seat.code"
             >
               {{ seat.label }}

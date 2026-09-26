@@ -89,7 +89,7 @@ const linkClass =
         <li v-for="(item, index) in music.playlists" :key="item.id">
           <button
             type="button"
-            class="flex w-full items-center gap-2 rounded-md border px-1.5 py-1 text-left transition hover:bg-white focus-visible:ring-2 focus-visible:ring-theme-500 focus-visible:outline-none dark:hover:bg-zinc-700"
+            class="flex w-full items-center gap-2 rounded-md border px-1.5 py-1 text-left transition hover:bg-white focus-visible:ring-2 focus-visible:ring-theme-500 focus-visible:outline-none focus-visible:ring-inset dark:hover:bg-zinc-700"
             :class="
               index === music.playlistIndex
                 ? 'border-theme-500 bg-white dark:border-theme-400 dark:bg-zinc-700'

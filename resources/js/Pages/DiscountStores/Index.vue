@@ -248,7 +248,7 @@ function statusLabel(store) {
           >
             <Link
               :href="`/discount-stores/${store.id}`"
-              class="flex items-start gap-3 px-4 py-3.5 transition hover:bg-theme-50 sm:gap-4 sm:px-5 dark:hover:bg-zinc-800/60"
+              class="flex items-start gap-3 px-4 py-3.5 transition hover:bg-theme-50 focus-visible:-outline-offset-2 sm:gap-4 sm:px-5 dark:hover:bg-zinc-800/60"
             >
               <span
                 class="mt-0.5 hidden size-10 shrink-0 items-center justify-center rounded-lg bg-theme-100 text-theme-800 sm:flex dark:bg-zinc-800 dark:text-zinc-200"

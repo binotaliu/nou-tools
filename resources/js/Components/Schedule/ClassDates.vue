@@ -136,7 +136,7 @@ const cells = computed(() => {
     <div
       role="group"
       aria-label="選擇月份"
-      class="-mx-1 mb-4 flex gap-1 overflow-x-auto px-1 pb-1"
+      class="-mx-1 mb-3 flex gap-1 overflow-x-auto px-1 py-1"
     >
       <button
         v-for="tab in monthTabs"
