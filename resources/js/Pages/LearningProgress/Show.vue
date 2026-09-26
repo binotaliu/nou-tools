@@ -848,7 +848,7 @@ function print() {
               <section
                 v-for="course in viewModel.courses"
                 :key="course.id"
-                class="rounded-lg border border-theme-200 bg-white p-4 md:w-64 md:shrink-0 md:rounded-lg md:border-0 md:bg-theme-100/60 md:p-3 dark:md:bg-zinc-900/60"
+                class="rounded-lg border border-theme-200 bg-white p-4 md:w-64 md:shrink-0 md:rounded-lg md:border-0 md:bg-theme-100/60 md:p-3 dark:border-zinc-700 dark:bg-zinc-900 dark:md:bg-zinc-900/60"
                 data-testid="learning-progress-homework-view-course-card"
                 :data-course-id="course.id"
               >
