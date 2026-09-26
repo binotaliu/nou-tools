@@ -63,6 +63,16 @@
 /* A short viewport: a phone held sideways, or a squat browser window. Width
  * breakpoints can't see it (a landscape phone is wider than `sm`), so layouts
  * that stack by percentage of the screen's height use this to tighten up. */
+/* `motion-reduce:` also matches the manual 減少動態效果 toggle. */
+@custom-variant motion-reduce {
+  @media (prefers-reduced-motion: reduce) {
+    @slot;
+  }
+  html[data-reduce-motion='true'] & {
+    @slot;
+  }
+}
+
 @custom-variant short {
   @media (height < 32rem) {
     @slot;
@@ -989,4 +999,29 @@
   .md-toc :where(li) {
     @apply m-0!;
   }
+}
+
+/* Reduced motion: the OS setting or the manual toggle (html[data-reduce-motion]). */
+@media (prefers-reduced-motion: reduce) {
+  html,
+  html *,
+  html *::before,
+  html *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+html[data-reduce-motion='true'],
+html[data-reduce-motion='true'] *,
+html[data-reduce-motion='true'] *::before,
+html[data-reduce-motion='true'] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0s !important;
 }

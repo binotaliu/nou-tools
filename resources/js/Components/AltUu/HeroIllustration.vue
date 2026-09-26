@@ -9,6 +9,7 @@
 // The front phone rotates on a timer (paused on hover and under reduced
 // motion), and clicking a side phone brings it to the front.
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { prefersReducedMotion } from '../../Composables/useReduceMotion'
 import PhoneFrame from './PhoneFrame.vue'
 import CourseListScreen from './CourseListScreen.vue'
 import MaterialsScreen from './MaterialsScreen.vue'
@@ -56,7 +57,7 @@ const bringToFront = index => {
 }
 
 onMounted(() => {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (prefersReducedMotion.value) {
     return
   }
 

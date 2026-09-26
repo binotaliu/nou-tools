@@ -93,6 +93,10 @@
                 document.documentElement.dataset.accent = accent
             }
 
+            if (localStorage.getItem('nou:reduce-motion:v1') === 'on') {
+                document.documentElement.dataset.reduceMotion = 'true'
+            }
+
             const fontSize = localStorage.getItem('font-size')
             if (fontSize) {
                 document.documentElement.dataset.fontSize = fontSize

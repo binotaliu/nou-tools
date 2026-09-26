@@ -56,7 +56,7 @@ onUnmounted(() => {
   <div
     v-if="timer.focusMode"
     ref="dialog"
-    class="fixed inset-0 z-50 animate-focus-in overflow-hidden select-none [--win-h:31%] [--win-top:max(8%,calc(env(safe-area-inset-top)+3.5rem))] sm:[--win-h:37%] sm:[--win-top:max(9%,calc(env(safe-area-inset-top)+3.5rem))] short:[--win-h:24%] short:[--win-top:calc(env(safe-area-inset-top)+3rem)]"
+    class="fixed inset-0 z-50 animate-focus-in overflow-hidden select-none [--win-h:31%] [--win-top:max(8%,calc(env(safe-area-inset-top)+3.5rem))] motion-reduce:animate-none sm:[--win-h:37%] sm:[--win-top:max(9%,calc(env(safe-area-inset-top)+3.5rem))] short:[--win-h:24%] short:[--win-top:calc(env(safe-area-inset-top)+3rem)]"
     :style="sky.carrelVars(timer.hasTimer())"
     :data-sky-phase="sky.sky.phase"
     role="dialog"
@@ -260,16 +260,16 @@ onUnmounted(() => {
           aria-hidden="true"
         >
           <span
-            class="absolute bottom-[30%] left-[12%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)]"
+            class="absolute bottom-[30%] left-[12%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] motion-reduce:hidden"
           ></span>
           <span
-            class="absolute bottom-[55%] left-[31%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-2.3s]"
+            class="absolute bottom-[55%] left-[31%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-2.3s] motion-reduce:hidden"
           ></span>
           <span
-            class="absolute bottom-[40%] left-[52%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-4.1s]"
+            class="absolute bottom-[40%] left-[52%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-4.1s] motion-reduce:hidden"
           ></span>
           <span
-            class="absolute bottom-[25%] left-[86%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-5.6s]"
+            class="absolute bottom-[25%] left-[86%] size-1 animate-firefly rounded-full bg-lime-200 shadow-[0_0_6px_2px_rgba(217,249,157,0.7)] [animation-delay:-5.6s] motion-reduce:hidden"
           ></span>
         </div>
 

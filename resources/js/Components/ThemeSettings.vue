@@ -5,6 +5,7 @@ import Icon from './Icon.vue'
 import useThemeSwitcher from '../Composables/useThemeSwitcher'
 import useAccentColor, { ACCENTS } from '../Composables/useAccentColor'
 import useFontSize, { FONT_SIZES } from '../Composables/useFontSize'
+import useReduceMotion from '../Composables/useReduceMotion'
 
 defineProps({
   // Bigger swatches for the full 設定 page; the header popover stays compact.
@@ -14,6 +15,7 @@ defineProps({
 const { theme, setTheme } = useThemeSwitcher()
 const { accent, setAccent } = useAccentColor()
 const { fontSize, setFontSize } = useFontSize()
+const { reduceMotion, setReduceMotion } = useReduceMotion()
 
 const MODES = [
   { value: 'system', label: '系統' },
@@ -121,6 +123,37 @@ const MODES = [
           {{ size.label }}
         </button>
       </div>
+    </div>
+
+    <div>
+      <button
+        type="button"
+        role="switch"
+        :aria-checked="reduceMotion.toString()"
+        class="flex w-full items-center justify-between gap-3 rounded-md bg-theme-100 px-3 py-2 text-left text-sm font-medium text-theme-900 dark:bg-zinc-800 dark:text-zinc-100"
+        data-testid="reduce-motion-toggle"
+        data-analytics-event="theme_reduce_motion_change"
+        data-analytics-feature="theme"
+        :data-analytics-label="reduceMotion ? 'off' : 'on'"
+        @click="setReduceMotion(!reduceMotion)"
+      >
+        減少動態效果
+        <span
+          aria-hidden="true"
+          class="relative inline-block h-5 w-9 shrink-0 rounded-full transition-colors"
+          :class="
+            reduceMotion ? 'bg-theme-600' : 'bg-theme-300 dark:bg-zinc-600'
+          "
+        >
+          <span
+            class="absolute top-0.5 left-0.5 size-4 rounded-full bg-white transition-transform"
+            :class="reduceMotion ? 'translate-x-4' : ''"
+          ></span>
+        </span>
+      </button>
+      <p class="mt-1 text-xs text-theme-700 dark:text-zinc-400">
+        預設跟隨系統設定；開啟後會停止動畫與平滑捲動。
+      </p>
     </div>
   </div>
 </template>

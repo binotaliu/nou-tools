@@ -43,3 +43,28 @@ it('falls back to the default size for an unknown stored value', function () {
         "document.querySelector('[data-testid=\"font-size-default\"]').getAttribute('aria-checked')"
     ))->toBe('true');
 });
+
+it('turns on reduced motion manually, remembers it and stops animations', function () {
+    $page = visit('/settings');
+
+    $page->assertVisible('[data-testid="settings-appearance"]')
+        ->click('[data-testid="settings-appearance"] [data-testid="reduce-motion-toggle"]');
+
+    expect($page->script('document.documentElement.dataset.reduceMotion'))->toBe('true');
+    expect($page->script("localStorage.getItem('nou:reduce-motion:v1')"))->toBe('on');
+
+    $page->navigate('/settings')->assertVisible('[data-testid="settings-appearance"]');
+
+    expect($page->script('document.documentElement.dataset.reduceMotion'))->toBe('true');
+    expect($page->script(
+        "document.querySelector('[data-testid=\"reduce-motion-toggle\"]').getAttribute('aria-checked')"
+    ))->toBe('true');
+    expect($page->script(
+        "(() => { const el = document.createElement('div'); el.style.transition = 'opacity 5s'; document.body.appendChild(el); return parseFloat(getComputedStyle(el).transitionDuration) < 0.001 })()"
+    ))->toBeTrue();
+
+    $page->click('[data-testid="settings-appearance"] [data-testid="reduce-motion-toggle"]');
+
+    expect($page->script('document.documentElement.dataset.reduceMotion'))->toBeNull();
+    expect($page->script("localStorage.getItem('nou:reduce-motion:v1')"))->toBeNull();
+});

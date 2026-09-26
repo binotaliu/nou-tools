@@ -47,7 +47,7 @@ onUnmounted(() => {
     <span
       v-for="star in sky.starsFor(skyLayout)"
       :key="star.id"
-      class="absolute animate-twinkle rounded-full bg-white"
+      class="absolute animate-twinkle rounded-full bg-white motion-reduce:animate-none"
       :style="sky.starStyle(star, skyLayout)"
     ></span>
   </div>
@@ -103,7 +103,7 @@ onUnmounted(() => {
     aria-hidden="true"
   >
     <div
-      class="absolute top-[18%] left-[12%] h-3 w-16 animate-drift [animation-duration:500s]"
+      class="absolute top-[18%] left-[12%] h-3 w-16 animate-drift [animation-duration:500s] motion-reduce:animate-none"
       :class="isFocus ? 'scale-[2.5] sm:scale-[3.5]' : ''"
     >
       <span
@@ -117,7 +117,7 @@ onUnmounted(() => {
       ></span>
     </div>
     <div
-      class="absolute top-[42%] left-[58%] h-2.5 w-12 animate-drift [animation-delay:-300s] [animation-duration:700s]"
+      class="absolute top-[42%] left-[58%] h-2.5 w-12 animate-drift [animation-delay:-300s] [animation-duration:700s] motion-reduce:animate-none"
       :class="isFocus ? 'scale-[2.5] sm:scale-[3.5]' : ''"
     >
       <span
@@ -131,7 +131,7 @@ onUnmounted(() => {
       ></span>
     </div>
     <div
-      class="absolute top-[8%] left-[78%] h-3.5 w-20 animate-drift [animation-delay:-467s] [animation-duration:600s]"
+      class="absolute top-[8%] left-[78%] h-3.5 w-20 animate-drift [animation-delay:-467s] [animation-duration:600s] motion-reduce:animate-none"
       :class="isFocus ? 'scale-[2.5] sm:scale-[3.5]' : ''"
     >
       <span
@@ -146,7 +146,7 @@ onUnmounted(() => {
     </div>
     <div
       v-if="isFocus"
-      class="absolute top-[30%] left-[32%] h-3 w-14 scale-[2.5] animate-drift [animation-delay:-133s] [animation-duration:800s] sm:scale-[3.5]"
+      class="absolute top-[30%] left-[32%] h-3 w-14 scale-[2.5] animate-drift [animation-delay:-133s] [animation-duration:800s] motion-reduce:animate-none sm:scale-[3.5]"
     >
       <span
         class="absolute right-0 bottom-0 left-0 h-2.5 rounded-full bg-(--g-cloud)"
