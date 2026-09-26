@@ -49,30 +49,114 @@ const {
   toggleCategory,
 } = useAnnouncementFilter({
   sourceCategories: sourceCategoryTree.value,
-  selected: initialSelectedSourceCategories.value,
+  // A copy, so ticking boxes never touches the applied selection below.
+  selected: Object.fromEntries(
+    Object.entries(initialSelectedSourceCategories.value).map(
+      ([source, categories]) => [source, [...categories]]
+    )
+  ),
 })
 
-// Sources with all their available categories selected are displayed bare
-// (no per-category chips), mirroring $displaySelectedSourceCategories.
-const displaySelectedSourceCategories = computed(() => {
-  const display = {}
+// Sources arrive ordered by group (各處室, 學習指導中心, 學系), the same
+// grouping the schedule's announcement preferences use.
+const sourceGroups = computed(() => {
+  const groups = []
 
-  Object.entries(state.selected).forEach(([source, selectedCategories]) => {
-    const availableCategories = sourceCategoryTree.value[source] ?? []
-    const hasSelectedAll =
-      availableCategories.length > 0 &&
-      selectedCategories.length === availableCategories.length &&
-      availableCategories.every(category =>
-        selectedCategories.includes(category)
-      )
+  props.viewModel.sourceCategorySelections.forEach(selection => {
+    let group = groups.find(candidate => candidate.group === selection.group)
 
-    display[source] = hasSelectedAll ? [] : selectedCategories
+    if (!group) {
+      group = {
+        group: selection.group,
+        label: selection.groupLabel,
+        sources: [],
+      }
+      groups.push(group)
+    }
+
+    group.sources.push(selection.source)
   })
 
-  return display
+  return groups
 })
 
-const selectedSourceCount = computed(() => Object.keys(state.selected).length)
+function selectedSourcesIn(group) {
+  return group.sources.filter(source => state.selected[source])
+}
+
+function isGroupChecked(group) {
+  return group.sources.every(source => isSourceChecked(source))
+}
+
+function isGroupIndeterminate(group) {
+  return selectedSourcesIn(group).length > 0 && !isGroupChecked(group)
+}
+
+function toggleGroup(group, checked) {
+  group.sources.forEach(source => toggleSource(source, checked))
+}
+
+// Groups holding a selection start open; the rest stay folded so the
+// panel opens as three short rows.
+const expandedGroups = ref(
+  Object.fromEntries(
+    sourceGroups.value.map(group => [
+      group.group,
+      selectedSourcesIn(group).length > 0,
+    ])
+  )
+)
+
+function toggleGroupExpansion(group) {
+  expandedGroups.value[group.group] = !expandedGroups.value[group.group]
+}
+
+// The chips and the button's count describe the filter that produced the
+// list (the page props), not the unsubmitted checkboxes.
+const appliedSelection = computed(() => initialSelectedSourceCategories.value)
+
+const appliedSourceCount = computed(
+  () => Object.keys(appliedSelection.value).length
+)
+
+function hasAllCategories(source, selectedCategories) {
+  const availableCategories = sourceCategoryTree.value[source] ?? []
+
+  return (
+    availableCategories.length > 0 &&
+    availableCategories.every(category => selectedCategories.includes(category))
+  )
+}
+
+// A fully applied group shows as one chip; otherwise each source does,
+// with its categories unless all of them are applied.
+const appliedChips = computed(() =>
+  sourceGroups.value.flatMap(group => {
+    const applied = group.sources.filter(
+      source => appliedSelection.value[source]
+    )
+    const isWholeGroup =
+      applied.length === group.sources.length &&
+      applied.every(source =>
+        hasAllCategories(source, appliedSelection.value[source])
+      )
+
+    if (isWholeGroup) {
+      return [{ key: group.group, label: `${group.label}（全部）` }]
+    }
+
+    return applied.map(source => {
+      const selectedCategories = appliedSelection.value[source]
+
+      return {
+        key: source,
+        label: hasAllCategories(source, selectedCategories)
+          ? source
+          : `${source} · ${selectedCategories.join('、')}`,
+      }
+    })
+  })
+)
 
 const isFilterPanelOpen = ref(false)
 const filterPanel = ref(null)
@@ -141,10 +225,10 @@ function isExpired(announcement) {
           <Icon name="funnel" class="size-4" />
           篩選來源
           <span
-            v-if="selectedSourceCount > 0"
+            v-if="appliedSourceCount > 0"
             class="rounded-full bg-theme-700 px-1.5 text-xs leading-5 text-white"
           >
-            {{ selectedSourceCount }}
+            {{ appliedSourceCount }}
           </span>
         </button>
       </div>
@@ -152,7 +236,7 @@ function isExpired(announcement) {
       <div class="grid gap-6 lg:grid-cols-12 lg:items-start">
         <div
           v-if="isFilterPanelOpen"
-          class="fixed inset-0 z-50 bg-black/40 lg:hidden"
+          class="fixed inset-0 z-60 bg-black/40 lg:hidden"
           aria-hidden="true"
           @click="isFilterPanelOpen = false"
         ></div>
@@ -166,7 +250,7 @@ function isExpired(announcement) {
           class="lg:sticky lg:top-6 lg:col-span-4 lg:block xl:col-span-3"
           :class="
             isFilterPanelOpen
-              ? 'fixed inset-x-0 bottom-0 z-50 max-h-[85dvh] lg:static lg:z-auto lg:max-h-none'
+              ? 'fixed inset-x-0 bottom-0 z-60 max-h-[85dvh] lg:static lg:z-auto lg:max-h-none'
               : 'hidden'
           "
           @keydown="onFilterPanelKeydown"
@@ -195,74 +279,126 @@ function isExpired(announcement) {
               </button>
             </div>
 
-            <div
-              class="min-h-0 flex-1 divide-y divide-theme-100 overflow-y-auto overscroll-contain dark:divide-zinc-800"
-            >
+            <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
               <section
-                v-for="(categories, source) in sourceCategoryTree"
-                :key="source"
-                class="px-2 py-1"
+                v-for="group in sourceGroups"
+                :key="group.group"
+                class="border-b border-theme-100 last:border-0 dark:border-zinc-800"
+                :data-testid="`announcement-source-group-${group.group}`"
               >
-                <div class="flex items-center justify-between gap-1">
+                <div
+                  class="sticky top-0 z-10 flex items-center justify-between gap-1 bg-theme-50 px-2 py-1 dark:bg-zinc-950"
+                >
                   <label
-                    class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition hover:bg-theme-50 dark:hover:bg-zinc-800"
+                    class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md px-2 py-2"
                   >
                     <input
                       type="checkbox"
                       class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600 dark:text-zinc-300"
-                      :checked="isSourceChecked(source)"
-                      :indeterminate="isSourceIndeterminate(source)"
-                      :aria-label="source"
-                      @change="toggleSource(source, $event.target.checked)"
+                      :checked="isGroupChecked(group)"
+                      :indeterminate="isGroupIndeterminate(group)"
+                      :aria-label="`${group.label}（全選）`"
+                      @change="toggleGroup(group, $event.target.checked)"
                     />
                     <span
                       aria-hidden="true"
-                      class="min-w-0 truncate text-sm font-medium text-theme-900 dark:text-zinc-100"
+                      class="min-w-0 truncate text-sm font-semibold text-theme-900 dark:text-zinc-100"
                     >
-                      {{ source }}
+                      {{ group.label }}
+                    </span>
+                    <span class="text-xs text-theme-600 dark:text-zinc-500">
+                      {{ selectedSourcesIn(group).length }} /
+                      {{ group.sources.length }}
                     </span>
                   </label>
 
                   <button
-                    v-if="categories.length > 0"
                     type="button"
                     class="inline-flex items-center rounded-md p-2 text-theme-700 transition hover:bg-theme-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                    :aria-expanded="isSourceExpanded(source)"
-                    :aria-label="'展開或收合 ' + source + ' 分類'"
-                    @click="toggleSourceExpansion(source)"
+                    :aria-expanded="!!expandedGroups[group.group]"
+                    :aria-label="`展開或收合 ${group.label} 來源`"
+                    @click="toggleGroupExpansion(group)"
                   >
                     <Icon
                       name="chevron-down"
                       class="size-4 transition"
-                      :class="isSourceExpanded(source) ? 'rotate-180' : ''"
+                      :class="expandedGroups[group.group] ? 'rotate-180' : ''"
                     />
                   </button>
                 </div>
 
-                <div
-                  v-show="isSourceExpanded(source)"
-                  class="grid gap-0.5 pb-1 pl-7"
-                >
-                  <label
-                    v-for="category in categories"
-                    :key="category"
-                    class="flex min-w-0 cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 text-sm text-theme-700 transition hover:bg-theme-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                <div v-show="expandedGroups[group.group]" class="py-1">
+                  <div
+                    v-for="source in group.sources"
+                    :key="source"
+                    class="px-2 py-0.5 pl-6"
                   >
-                    <input
-                      type="checkbox"
-                      :name="`source_categories[${source}][]`"
-                      :value="category"
-                      class="mt-0.5 size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600"
-                      :checked="isCategoryChecked(source, category)"
-                      :aria-label="category"
-                      @change="
-                        toggleCategory(source, category, $event.target.checked)
-                      "
-                    />
-                    <span aria-hidden="true" class="wrap-break-word">{{
-                      category
-                    }}</span>
-                  </label>
+                    <div class="flex items-center justify-between gap-1">
+                      <label
+                        class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition hover:bg-theme-50 dark:hover:bg-zinc-800"
+                      >
+                        <input
+                          type="checkbox"
+                          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600 dark:text-zinc-300"
+                          :checked="isSourceChecked(source)"
+                          :indeterminate="isSourceIndeterminate(source)"
+                          :aria-label="source"
+                          @change="toggleSource(source, $event.target.checked)"
+                        />
+                        <span
+                          aria-hidden="true"
+                          class="min-w-0 truncate text-sm font-medium text-theme-900 dark:text-zinc-100"
+                        >
+                          {{ source }}
+                        </span>
+                      </label>
+
+                      <button
+                        v-if="sourceCategoryTree[source]?.length > 0"
+                        type="button"
+                        class="inline-flex items-center rounded-md p-2 text-theme-700 transition hover:bg-theme-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                        :aria-expanded="isSourceExpanded(source)"
+                        :aria-label="'展開或收合 ' + source + ' 分類'"
+                        @click="toggleSourceExpansion(source)"
+                      >
+                        <Icon
+                          name="chevron-down"
+                          class="size-4 transition"
+                          :class="isSourceExpanded(source) ? 'rotate-180' : ''"
+                        />
+                      </button>
+                    </div>
+
+                    <div
+                      v-show="isSourceExpanded(source)"
+                      class="grid gap-0.5 pb-1 pl-7"
+                    >
+                      <label
+                        v-for="category in sourceCategoryTree[source]"
+                        :key="category"
+                        class="flex min-w-0 cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 text-sm text-theme-700 transition hover:bg-theme-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                      >
+                        <input
+                          type="checkbox"
+                          :name="`source_categories[${source}][]`"
+                          :value="category"
+                          class="mt-0.5 size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600"
+                          :checked="isCategoryChecked(source, category)"
+                          :aria-label="category"
+                          @change="
+                            toggleCategory(
+                              source,
+                              category,
+                              $event.target.checked
+                            )
+                          "
+                        />
+                        <span aria-hidden="true" class="wrap-break-word">{{
+                          category
+                        }}</span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </section>
             </div>
@@ -290,28 +426,20 @@ function isExpired(announcement) {
 
         <section class="space-y-3 lg:col-span-8 xl:col-span-9">
           <div
-            v-if="selectedSourceCount > 0"
+            v-if="appliedSourceCount > 0"
             class="flex items-center gap-2 text-sm"
           >
             <div
               class="-my-1 flex min-w-0 flex-1 gap-1.5 overflow-x-auto py-1 lg:flex-wrap"
             >
               <span class="sr-only">目前條件：</span>
-              <template
-                v-for="(
-                  selectedCategories, selectedSource
-                ) in displaySelectedSourceCategories"
-                :key="selectedSource"
+              <span
+                v-for="chip in appliedChips"
+                :key="chip.key"
+                class="shrink-0 rounded-full bg-theme-100 px-2.5 py-0.5 font-medium whitespace-nowrap text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
               >
-                <span
-                  class="shrink-0 rounded-full bg-theme-100 px-2.5 py-0.5 font-medium whitespace-nowrap text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
-                >
-                  {{ selectedSource
-                  }}<template v-if="selectedCategories.length > 0">
-                    · {{ selectedCategories.join('、') }}</template
-                  >
-                </span>
-              </template>
+                {{ chip.label }}
+              </span>
             </div>
             <Link
               href="/announcements"

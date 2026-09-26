@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Announcements\Actions;
 
+use App\Enums\AnnouncementSourceGroup;
 use App\Models\Announcement;
 use Illuminate\Support\Collection;
 use NouTools\Domains\Announcements\DataTransferObjects\ShowAnnouncementIndexPageData;
@@ -50,14 +51,22 @@ final readonly class ShowAnnouncementIndexPage
      */
     private function buildSourceCategorySelections(Collection $configuredSourceCategories, array $selectedSourceCategories): DataCollection
     {
+        $groupOrder = array_flip(array_map(
+            fn (AnnouncementSourceGroup $group): string => $group->value,
+            AnnouncementSourceGroup::cases(),
+        ));
+
         $sources = $configuredSourceCategories->keys()
             ->merge(array_keys($selectedSourceCategories))
             ->unique()
+            ->sortBy(fn (string $source): int => $groupOrder[AnnouncementSourceGroup::forSource($source)->value])
             ->values();
 
         return SourceCategorySelectionViewModel::collect(
             $sources->map(fn (string $source): SourceCategorySelectionViewModel => new SourceCategorySelectionViewModel(
                 source: $source,
+                group: AnnouncementSourceGroup::forSource($source),
+                groupLabel: AnnouncementSourceGroup::forSource($source)->label(),
                 availableCategories: $configuredSourceCategories->get($source, collect())->all(),
                 selectedCategories: $selectedSourceCategories[$source] ?? [],
             ))->all(),

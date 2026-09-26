@@ -339,3 +339,23 @@ it('returns markdown from the announcement index when the client prefers it in t
     $response->assertSee('# 學校公告', false);
     $response->assertSee($announcement->url, false);
 });
+
+it('tags each source selection with its group, ordered like the schedule preferences', function () {
+    config()->set('announcements.sources', [
+        ['name' => '人文學系', 'category' => '最新消息', 'is_active' => true],
+        ['name' => '台北中心', 'category' => '最新消息', 'is_active' => true],
+        ['name' => '教務處', 'category' => '考試資訊', 'is_active' => true],
+    ]);
+    config()->set('announcements.source_groups', [
+        '人文學系' => 'department',
+        '台北中心' => 'center',
+    ]);
+
+    get(route('announcements.index'))->assertInertia(function (Assert $page) {
+        $selections = collect($page->toArray()['props']['viewModel']['sourceCategorySelections']);
+
+        expect($selections->pluck('source')->all())->toBe(['教務處', '台北中心', '人文學系'])
+            ->and($selections->pluck('group')->all())->toBe(['administrative', 'center', 'department'])
+            ->and($selections->pluck('groupLabel')->all())->toBe(['各處室', '學習指導中心', '學系']);
+    });
+});
