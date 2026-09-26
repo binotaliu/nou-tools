@@ -9,10 +9,19 @@ import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import QrScanner from '../../Components/QrScanner.vue'
 import decodeQrImage from '../../Composables/decodeQrImage'
+import useDialogFocus from '../../Composables/useDialogFocus'
 import { focusFirstInvalid } from '../../Composables/useFormErrorFocus'
 
 const hasCreatedBefore = ref(false)
 const scanning = ref(false)
+const scannerDialog = ref(null)
+
+// Focus moves into the scanner, Tab stays inside and closing returns to the
+// 掃描 QR Code button.
+const { onKeydown: onScannerKeydown } = useDialogFocus(
+  scannerDialog,
+  () => scanning.value
+)
 
 const form = useForm({ url: '' })
 
@@ -216,9 +225,12 @@ async function onImagePicked(event) {
     >
       <div class="fixed inset-0 bg-black/40" @click="scanning = false"></div>
       <div
+        ref="scannerDialog"
         role="dialog"
         aria-modal="true"
         aria-label="掃描 QR Code"
+        @keydown.esc.stop="scanning = false"
+        @keydown="onScannerKeydown"
         class="relative max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-lg bg-white p-6 shadow-lg sm:max-h-[calc(100vh-2rem)] dark:bg-zinc-900"
       >
         <h3

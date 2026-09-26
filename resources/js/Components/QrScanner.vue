@@ -8,6 +8,8 @@ const emit = defineEmits(['detected', 'close'])
 
 const video = ref(null)
 const error = ref('')
+// Spoken through a polite live region: starting → scanning → found, or the error.
+const status = ref('正在啟動相機…')
 
 let stream = null
 let frameRequest = null
@@ -58,7 +60,9 @@ async function start() {
       audio: false,
     })
   } catch {
-    error.value = '無法使用相機。請允許此網站使用相機，或改用貼上連結。'
+    error.value =
+      '無法使用相機。請允許此網站使用相機，或關閉相機後改用貼上連結或選取截圖。'
+    status.value = ''
     return
   }
 
@@ -71,6 +75,13 @@ async function start() {
   await video.value.play()
 
   const decode = await createDecoder()
+
+  if (stopped) {
+    return
+  }
+
+  status.value =
+    '相機已啟動，正在掃描 QR Code，請將課表頁面上的 QR Code 對準畫面。'
 
   const tick = async () => {
     if (stopped) {
@@ -88,6 +99,7 @@ async function start() {
 
       if (text) {
         stop()
+        status.value = '已讀取到 QR Code。'
         emit('detected', text)
         return
       }
@@ -119,6 +131,7 @@ onBeforeUnmount(stop)
     >
       <video
         ref="video"
+        aria-label="相機預覽畫面，用來掃描課表的 QR Code"
         class="size-full object-cover"
         muted
         playsinline
@@ -132,6 +145,20 @@ onBeforeUnmount(stop)
       class="mt-2 text-center text-sm text-theme-700 dark:text-zinc-400"
     >
       將相機對準課表頁面上的 QR Code
+    </p>
+    <p
+      role="status"
+      aria-live="polite"
+      data-testid="qr-scanner-status"
+      class="sr-only"
+    >
+      {{ status }}
+    </p>
+    <p
+      data-testid="qr-scanner-alternative"
+      class="mt-2 text-center text-sm text-theme-700 dark:text-zinc-400"
+    >
+      不方便使用相機？請按「關閉相機」，改用貼上備份連結，或選取備份截圖。
     </p>
     <div class="mt-3 flex justify-end">
       <button
