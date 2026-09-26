@@ -374,7 +374,7 @@ const adaptableOther = computed(() =>
         ? 'pwa:pb-[calc(var(--pwa-nav-height)+26rem)] sm:pwa:pb-[calc(var(--pwa-nav-height)+20rem)] lg:pwa:pb-48'
         : 'pwa:pb-[calc(var(--pwa-nav-height)+2rem)]'
     "
-    class="mx-auto max-w-7xl px-6 py-8 focus:outline-none"
+    class="mx-auto w-full max-w-7xl flex-1 px-6 py-8 focus:outline-none"
   >
     <!-- flash notifications use slide-in toasts instead of the old alert box -->
     <Notification

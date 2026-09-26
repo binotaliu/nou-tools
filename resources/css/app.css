@@ -175,6 +175,12 @@
 }
 
 @layer base {
+  /* Inertia root as a full-height column: AppLayout's <main> grows (flex-1),
+   * so the footer sits at the window's bottom edge on short pages. */
+  #app {
+    @apply flex min-h-dvh flex-col;
+  }
+
   /* Space taken by the PWA bottom tab bar (0 in a normal browser tab), so
    * fixed bottom UI can sit above it. */
   :root {
