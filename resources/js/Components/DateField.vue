@@ -407,7 +407,7 @@ onBeforeUnmount(() => {
         <div class="mb-2 flex items-center justify-between">
           <button
             type="button"
-            class="flex size-8 items-center justify-center rounded text-lg hover:bg-theme-100 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:hover:bg-zinc-800"
+            class="flex size-8 items-center justify-center rounded text-lg hover:bg-theme-100 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:hover:bg-zinc-800 pointer-coarse:size-11"
             aria-label="上個月"
             data-testid="date-field-prev"
             @click="shiftMonth(-1)"
@@ -419,7 +419,7 @@ onBeforeUnmount(() => {
           </div>
           <button
             type="button"
-            class="flex size-8 items-center justify-center rounded text-lg hover:bg-theme-100 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:hover:bg-zinc-800"
+            class="flex size-8 items-center justify-center rounded text-lg hover:bg-theme-100 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:hover:bg-zinc-800 pointer-coarse:size-11"
             aria-label="下個月"
             data-testid="date-field-next"
             @click="shiftMonth(1)"

@@ -83,7 +83,7 @@ useMarkdownContainers(sidebarContentRoot, [
               v-if="viewModel.sidebarContent"
               ref="sidebarContentRoot"
               :aria-label="typeLabel"
-              class="prose prose-sm max-w-none prose-theme dark:prose-invert"
+              class="prose prose-sm max-w-none prose-theme dark:prose-invert [&_li>a]:inline-block [&_li>a]:py-1"
               v-html="viewModel.sidebarContent"
             ></nav>
 

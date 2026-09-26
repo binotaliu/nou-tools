@@ -44,7 +44,7 @@ useMarkdownContainers(indexContentRoot, [() => props.viewModel.indexContent])
       >
         <div
           ref="indexContentRoot"
-          class="prose max-w-none prose-theme dark:prose-invert"
+          class="prose max-w-none prose-theme dark:prose-invert [&_li>a]:inline-block [&_li>a]:py-1"
           v-html="viewModel.indexContent"
         ></div>
       </div>

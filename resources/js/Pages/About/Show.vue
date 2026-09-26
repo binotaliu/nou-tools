@@ -218,7 +218,7 @@ const linkIconClass = 'size-4 shrink-0 text-theme-700 dark:text-zinc-200'
         <p class="mt-3 text-sm">
           <a
             href="https://github.com/binotaliu/nou-tools"
-            class="text-theme-700 underline hover:text-theme-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+            class="inline-block py-1 text-theme-700 underline hover:text-theme-900 dark:text-zinc-300 dark:hover:text-zinc-100"
             target="_blank"
             rel="noopener noreferrer"
             >網站原始碼</a

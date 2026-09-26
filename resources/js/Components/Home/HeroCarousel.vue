@@ -123,7 +123,7 @@ const {
         type="button"
         data-testid="hero-previous"
         aria-label="上一張"
-        class="rounded-full p-1.5 transition hover:bg-theme-100 dark:hover:bg-zinc-800"
+        class="rounded-full p-1.5 transition hover:bg-theme-100 dark:hover:bg-zinc-800 pointer-coarse:p-3"
         @click="previous"
       >
         <Icon name="chevron-left" class="size-5" />
@@ -137,7 +137,7 @@ const {
           :data-testid="`hero-dot-${slide.key}`"
           :aria-label="`前往：${slide.title}`"
           :aria-current="i === index"
-          class="group flex size-6 items-center justify-center"
+          class="group flex size-6 items-center justify-center pointer-coarse:size-11"
           @click="goTo(i)"
         >
           <span
@@ -155,7 +155,7 @@ const {
         type="button"
         data-testid="hero-next"
         aria-label="下一張"
-        class="rounded-full p-1.5 transition hover:bg-theme-100 dark:hover:bg-zinc-800"
+        class="rounded-full p-1.5 transition hover:bg-theme-100 dark:hover:bg-zinc-800 pointer-coarse:p-3"
         @click="next"
       >
         <Icon name="chevron-right" class="size-5" />
@@ -165,7 +165,7 @@ const {
         type="button"
         data-testid="hero-toggle-autoplay"
         :aria-label="playing ? '暫停自動播放' : '開始自動播放'"
-        class="ml-2 rounded-full p-1.5 transition hover:bg-theme-100 dark:hover:bg-zinc-800"
+        class="ml-2 rounded-full p-1.5 transition hover:bg-theme-100 dark:hover:bg-zinc-800 pointer-coarse:p-3"
         @click="togglePaused"
       >
         <Icon :name="playing ? 'pause' : 'play'" class="size-5" />

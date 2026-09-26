@@ -24,7 +24,7 @@ const page = usePage()
 const { isPwa } = usePwaStandalone()
 
 const footerLinkClass =
-  'text-theme-700 hover:text-theme-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100'
+  'inline-block py-1 pointer-coarse:py-2.5 text-theme-700 hover:text-theme-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100'
 const currentPath = computed(() => page.url.split('?')[0])
 
 // Toast notifications for flash messages and validation errors.
@@ -430,7 +430,7 @@ const adaptableOther = computed(() =>
           <div class="text-center md:text-left">
             <Link
               href="/"
-              class="text-lg font-semibold text-theme-700 hover:text-theme-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+              class="inline-block py-1 text-lg font-semibold text-theme-700 hover:text-theme-900 dark:text-zinc-300 dark:hover:text-zinc-100"
             >
               NOU 小幫手
             </Link>
