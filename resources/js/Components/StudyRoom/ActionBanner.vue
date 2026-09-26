@@ -264,7 +264,7 @@ defineProps({
                         <select
                           v-model="timer.selectedSubjectCourseId"
                           data-testid="study-room-subject-select"
-                          class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-base focus:border-theme-300 focus:ring-theme-300 sm:text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                          class="w-full appearance-none rounded-lg border border-zinc-500 bg-white px-3 py-2 text-base focus:border-theme-300 focus:ring-theme-300 sm:text-sm dark:border-zinc-500 dark:bg-zinc-900"
                         >
                           <option
                             v-for="subject in subjects"
@@ -350,7 +350,7 @@ defineProps({
                             :max="clientConfig.timerCustomMaxMinutes"
                             aria-label="倒數分鐘數"
                             data-testid="study-room-custom-minutes"
-                            class="w-20 rounded-lg border border-theme-200 bg-white px-2 py-1.5 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                            class="w-20 rounded-lg border border-zinc-500 bg-white px-2 py-1.5 text-base tabular-nums sm:text-sm dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-100"
                           />
                           分鐘
                         </label>
@@ -607,7 +607,7 @@ defineProps({
             :min="timer.cycleBound('focus', 0)"
             :max="timer.cycleBound('focus', 1)"
             data-testid="study-room-cycle-focus"
-            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            class="w-full rounded-lg border border-zinc-500 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </label>
         <label class="block">
@@ -621,7 +621,7 @@ defineProps({
             :min="timer.cycleBound('break', 0)"
             :max="timer.cycleBound('break', 1)"
             data-testid="study-room-cycle-short-break"
-            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            class="w-full rounded-lg border border-zinc-500 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </label>
         <label class="block">
@@ -635,7 +635,7 @@ defineProps({
             :min="timer.cycleBound('break', 0)"
             :max="timer.cycleBound('break', 1)"
             data-testid="study-room-cycle-long-break"
-            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            class="w-full rounded-lg border border-zinc-500 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </label>
         <label class="block">
@@ -649,7 +649,7 @@ defineProps({
             :min="timer.cycleBound('rounds', 0)"
             :max="timer.cycleBound('rounds', 1)"
             data-testid="study-room-cycle-rounds"
-            class="w-full rounded-lg border border-theme-200 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            class="w-full rounded-lg border border-zinc-500 bg-white px-3 py-2 text-base tabular-nums sm:text-sm dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </label>
       </div>
@@ -706,7 +706,7 @@ defineProps({
           <select
             v-model="timer.changeSubjectCourseId"
             data-testid="study-room-change-subject-select"
-            class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-base focus:border-theme-300 focus:ring-theme-300 sm:text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            class="w-full appearance-none rounded-lg border border-zinc-500 bg-white px-3 py-2 text-base focus:border-theme-300 focus:ring-theme-300 sm:text-sm dark:border-zinc-500 dark:bg-zinc-900"
           >
             <option
               v-for="subject in subjects"

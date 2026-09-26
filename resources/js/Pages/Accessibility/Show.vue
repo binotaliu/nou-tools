@@ -295,6 +295,32 @@ onMounted(() => {
 
       <section
         class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        data-testid="accessibility-navigation-announcements"
+        aria-labelledby="navigation-announcements-heading"
+      >
+        <h3
+          id="navigation-announcements-heading"
+          class="text-lg font-semibold text-theme-800 dark:text-zinc-100"
+        >
+          換頁與通知
+        </h3>
+        <ul
+          class="mt-3 list-disc space-y-2 pl-5 text-sm text-theme-700 dark:text-zinc-300"
+        >
+          <li>
+            從一頁切換到另一頁後，螢幕閱讀器會念出新頁面的標題，焦點也會回到主要區塊的開頭。只是重新整理同一頁的資料或儲存表單時不會打斷你。
+          </li>
+          <li>
+            成功與提示訊息會以較不打斷的方式念出，並在閱讀所需的時間後消失；滑鼠移上去或焦點停在訊息內時會暫停倒數。錯誤訊息會立即念出，並一直留著，直到你按下「關閉」。
+          </li>
+          <li>
+            表單送出後若有欄位填錯，錯誤說明會立即念出，並與該欄位相連；焦點會移到第一個有問題的欄位，必填欄位也會標示。
+          </li>
+        </ul>
+      </section>
+
+      <section
+        class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
         data-testid="accessibility-study-room"
         aria-labelledby="study-room-heading"
       >
@@ -345,7 +371,8 @@ onMounted(() => {
           >
             設定
           </Link>
-          調整淺色、深色主題、強調色與四種文字大小。本站會遵循系統的「減少動態效果」設定。
+          調整淺色、深色主題、強調色四種文字大小與「行距與字距」（寬鬆時行高 1.5
+          倍、字距與詞距加寬、段落間距加倍）。本站預設遵循系統的「減少動態效果」設定，你也可以在同一處手動開啟「減少動態效果」，停止動畫、輪播與平滑捲動。
         </p>
       </section>
 
@@ -362,6 +389,24 @@ onMounted(() => {
         </h3>
         <p class="mt-3 text-sm text-theme-700 dark:text-zinc-300">
           每一頁都有頁首、主要導覽、主要內容與頁尾等地標。第一層標題（h1）固定是網站名稱，該頁的標題是第二層標題（h2），使用螢幕閱讀器的標題導覽即可在頁面之間快速定位。
+        </p>
+      </section>
+
+      <section
+        class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        data-testid="accessibility-focus"
+        aria-labelledby="focus-heading"
+      >
+        <h3
+          id="focus-heading"
+          class="text-lg font-semibold text-theme-800 dark:text-zinc-100"
+        >
+          鍵盤焦點與高對比模式
+        </h3>
+        <p class="mt-3 text-sm text-theme-700 dark:text-zinc-300">
+          使用 Tab
+          鍵切換時，目前所在的控制項一律會顯示清楚的外框，並且不會被頁首或底部導覽列遮住。Windows
+          高對比模式（強制色彩）下，外框、目前頁面、座位狀態與已選日期都改用系統色彩與邊框標示，不再只靠顏色或陰影區分。
         </p>
       </section>
 

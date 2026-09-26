@@ -218,7 +218,7 @@ const visibleCourses = computed(() =>
         </h2>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <label
           for="video-course-date"
           class="text-sm text-theme-700 dark:text-zinc-400"
@@ -270,7 +270,7 @@ const visibleCourses = computed(() =>
       <input
         type="checkbox"
         :checked="showEnded"
-        class="size-4 rounded border-theme-300 accent-theme-700"
+        class="size-4 rounded border-zinc-500 accent-theme-700"
         data-testid="video-courses-show-ended"
         @change="setShowEnded($event.target.checked)"
       />
@@ -378,7 +378,7 @@ const visibleCourses = computed(() =>
                   :href="courseClass.link"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="group flex min-w-0 flex-1 items-center gap-3 px-3 py-2 transition hover:bg-theme-100 dark:hover:bg-zinc-800"
+                  class="group flex min-w-0 flex-1 items-center gap-3 px-3 py-2 transition hover:bg-theme-100 focus-visible:-outline-offset-2 dark:hover:bg-zinc-800"
                 >
                   <div class="min-w-0 flex-1">
                     <div
@@ -415,7 +415,7 @@ const visibleCourses = computed(() =>
                   :href="courseClass.backupClassroomUrl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="flex shrink-0 items-center gap-1 border-l border-theme-200 px-2.5 text-xs font-medium text-theme-700 transition hover:bg-theme-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  class="flex shrink-0 items-center gap-1 border-l border-theme-200 px-2.5 text-xs font-medium text-theme-700 transition hover:bg-theme-100 focus-visible:-outline-offset-2 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
                 >
                   <Icon name="squares-plus" class="size-4" />
                   備用教室

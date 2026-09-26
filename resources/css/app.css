@@ -63,6 +63,16 @@
 /* A short viewport: a phone held sideways, or a squat browser window. Width
  * breakpoints can't see it (a landscape phone is wider than `sm`), so layouts
  * that stack by percentage of the screen's height use this to tighten up. */
+/* `motion-reduce:` also matches the manual 減少動態效果 toggle. */
+@custom-variant motion-reduce {
+  @media (prefers-reduced-motion: reduce) {
+    @slot;
+  }
+  html[data-reduce-motion='true'] & {
+    @slot;
+  }
+}
+
 @custom-variant short {
   @media (height < 32rem) {
     @slot;
@@ -175,6 +185,30 @@
 }
 
 @layer base {
+  /* Global keyboard focus indicator: a 2px outline offset by 2px. The colour
+   * is theme-700 on light pages and theme-300 on dark ones, both >= 3:1
+   * against their surface. Utilities live in a later layer, so components
+   * can still override it (`focus-visible:outline-none` plus a ring). */
+  :root {
+    --focus-ring-color: var(--color-theme-700);
+  }
+
+  .dark {
+    --focus-ring-color: var(--color-theme-300);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+  }
+
+  /* Keep focused elements clear of the sticky header and the fixed bottom
+   * bar / banners when the browser scrolls them into view. */
+  html {
+    scroll-padding-top: 5rem;
+    scroll-padding-bottom: calc(var(--pwa-nav-height) + 5rem);
+  }
+
   /* Inertia root as a full-height column: AppLayout's <main> grows (flex-1),
    * so the footer sits at the window's bottom edge on short pages. */
   #app {
@@ -282,6 +316,17 @@
 
   html[data-font-size='xxlarge'] {
     font-size: 150%;
+  }
+
+  /* Reader-chosen text spacing (useTextSpacing): the WCAG 1.4.12 values. */
+  html[data-text-spacing='wide'] body :where(:not(svg, svg *)) {
+    line-height: 1.5 !important;
+    letter-spacing: 0.12em !important;
+    word-spacing: 0.16em !important;
+  }
+
+  html[data-text-spacing='wide'] body p {
+    margin-bottom: 2em !important;
   }
 
   html[data-accent='ocean'] {
@@ -481,7 +526,7 @@
   }
 
   .md-dialogue > p {
-    @apply mb-3 text-xs font-medium text-theme-600 dark:text-zinc-600;
+    @apply mb-3 text-xs font-medium text-theme-800 dark:text-zinc-400;
   }
 
   .md-dialogue-turn {
@@ -614,7 +659,7 @@
 
   .md-faq-question::after {
     content: '⌄';
-    @apply text-lg text-theme-400 transition-transform duration-200 dark:text-zinc-500;
+    @apply text-lg text-theme-700 transition-transform duration-200 dark:text-zinc-400;
   }
 
   .md-faq-item[open] .md-faq-question::after {
@@ -654,7 +699,7 @@
   }
 
   .md-tabs-trigger {
-    @apply rounded-full px-3 py-1.5 text-sm font-medium text-theme-600 transition-colors hover:bg-white/60 dark:text-zinc-400 dark:hover:bg-zinc-700/60;
+    @apply rounded-full px-3 py-1.5 text-sm font-medium text-theme-800 transition-colors hover:bg-white/60 dark:text-zinc-400 dark:hover:bg-zinc-700/60;
   }
 
   .md-tabs-trigger[data-active='true'] {
@@ -687,7 +732,7 @@
   }
 
   .md-card-desc {
-    @apply text-sm text-theme-600 dark:text-zinc-400;
+    @apply text-sm text-theme-800 dark:text-zinc-400;
   }
 
   /* 2.7 Timeline */
@@ -799,7 +844,7 @@
   }
 
   .md-figcaption {
-    @apply mt-2 text-sm text-theme-600 dark:text-zinc-400;
+    @apply mt-2 text-sm text-theme-800 dark:text-zinc-400;
   }
 
   /* YouTube embed (pasted iframe snippet, rebuilt by YoutubeEmbedRenderer) */
@@ -825,7 +870,7 @@
   }
 
   .md-checklist :where(li[data-checked='true']) {
-    @apply border-theme-300 bg-theme-100/80 py-0 text-theme-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400;
+    @apply border-theme-300 bg-theme-100/80 py-0 text-theme-800 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400;
   }
 
   .md-checklist :where(li input[type='checkbox']) {
@@ -858,7 +903,7 @@
   }
 
   .md-countdown-range {
-    @apply m-0! text-xs text-theme-500 dark:text-zinc-400;
+    @apply m-0! text-xs text-theme-800 dark:text-zinc-400;
   }
 
   .md-countdown-days {
@@ -892,7 +937,7 @@
   }
 
   .md-heading-anchor {
-    @apply mr-2 text-theme-400 no-underline opacity-0 transition-opacity focus:opacity-100 dark:text-zinc-500;
+    @apply mr-2 text-theme-700 no-underline opacity-0 transition-opacity focus:opacity-100 dark:text-zinc-400;
   }
 
   :where(h2, h3, h4):hover .md-heading-anchor,
@@ -988,5 +1033,96 @@
 
   .md-toc :where(li) {
     @apply m-0!;
+  }
+}
+
+/* Reduced motion: the OS setting or the manual toggle (html[data-reduce-motion]). */
+@media (prefers-reduced-motion: reduce) {
+  html,
+  html *,
+  html *::before,
+  html *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+html[data-reduce-motion='true'],
+html[data-reduce-motion='true'] *,
+html[data-reduce-motion='true'] *::before,
+html[data-reduce-motion='true'] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0s !important;
+}
+
+/* Windows High Contrast / forced colours: backgrounds and shadows are dropped,
+ * so anything that only relied on them gets a border or outline in system
+ * colours. Focus rings drawn with box-shadow (`ring-*`) disappear too, so the
+ * outline is restored for every focusable element. */
+@media (forced-colors: active) {
+  :focus-visible,
+  :focus:where(input, textarea, select) {
+    outline: 2px solid Highlight !important;
+    outline-offset: 2px !important;
+  }
+
+  [aria-current='page'],
+  [aria-current='true'] {
+    border: 2px solid Highlight;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  [data-seat-code] {
+    border: 2px solid ButtonText;
+  }
+
+  [data-seat-code][aria-disabled='true'] {
+    border-style: dashed;
+    color: GrayText;
+  }
+
+  [data-seat-code][aria-label*='你的座位'] {
+    border: 4px double Highlight;
+  }
+
+  [data-day] {
+    border: 1px solid transparent;
+  }
+
+  [data-day][aria-pressed='true'] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    border-color: CanvasText;
+  }
+
+  [data-day][class*='ring-1'] {
+    border: 2px dotted CanvasText;
+  }
+
+  .md-checklist :where(li),
+  .md-tabs-trigger,
+  .md-countdown-item {
+    border: 1px solid CanvasText;
+  }
+
+  .md-checklist :where(li[data-checked='true']) {
+    border-style: double;
+    border-width: 3px;
+  }
+
+  .md-tabs-trigger[data-active='true'] {
+    border: 2px solid Highlight;
+  }
+
+  .md-checklist :where(li input[type='checkbox']) {
+    forced-color-adjust: auto;
   }
 }

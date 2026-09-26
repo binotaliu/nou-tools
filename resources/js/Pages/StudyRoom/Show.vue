@@ -481,7 +481,7 @@ onUnmounted(() => {
           <div class="flex flex-wrap gap-2 sm:shrink-0 sm:justify-end">
             <Link
               href="/schedules/create"
-              class="inline-flex items-center gap-1.5 rounded-lg bg-theme-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-theme-900 dark:bg-theme-600 dark:hover:bg-theme-500"
+              class="inline-flex items-center gap-1.5 rounded-lg bg-theme-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-theme-900 dark:bg-theme-700 dark:hover:bg-theme-800"
               data-testid="study-room-create-schedule"
             >
               <PlusIcon class="size-4" />
@@ -878,7 +878,7 @@ onUnmounted(() => {
                           >
                           <span
                             v-show="grid.isMine(seat)"
-                            class="absolute -top-1.5 -right-2 rounded-full bg-amber-500 px-1 text-[0.5625rem] leading-4 font-semibold text-white shadow-sm"
+                            class="absolute -top-1.5 -right-2 rounded-full bg-amber-700 px-1 text-[0.5625rem] leading-4 font-semibold text-white shadow-sm"
                             >你</span
                           >
                         </span>
@@ -957,7 +957,7 @@ onUnmounted(() => {
                       data-testid="study-room-stair-up"
                     >
                       <span
-                        class="max-w-16 text-[0.625rem] leading-tight text-theme-700 dark:text-zinc-400"
+                        class="max-w-16 text-xs leading-tight text-theme-700 dark:text-zinc-400"
                         aria-hidden="true"
                         >{{ grid.stairHint(floor) }}</span
                       >
@@ -993,7 +993,7 @@ onUnmounted(() => {
                       data-testid="study-room-stair-down"
                     >
                       <span
-                        class="max-w-16 text-[0.625rem] leading-tight text-theme-700 dark:text-zinc-400"
+                        class="max-w-16 text-xs leading-tight text-theme-700 dark:text-zinc-400"
                         aria-hidden="true"
                         >{{ grid.stairDownHint(floor) }}</span
                       >
@@ -1038,7 +1038,7 @@ onUnmounted(() => {
               </li>
               <li class="inline-flex items-center gap-1.5">
                 <span
-                  class="rounded-full bg-amber-500 px-1 text-[0.5625rem] leading-4 font-semibold text-white"
+                  class="rounded-full bg-amber-700 px-1 text-xs leading-4 font-semibold text-white"
                   >你</span
                 >
                 你的座位

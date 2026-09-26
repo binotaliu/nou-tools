@@ -58,7 +58,7 @@ const layout = ref('ios27')
 const sectionClass =
   'rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900'
 const stepNumberClass =
-  'flex size-7 shrink-0 items-center justify-center rounded-full bg-theme-700 text-sm font-semibold text-white dark:bg-theme-600'
+  'flex size-7 shrink-0 items-center justify-center rounded-full bg-theme-700 text-sm font-semibold text-white dark:bg-theme-700'
 const figureClass = 'mx-auto w-full max-w-64'
 const captionClass =
   'mt-2 text-center text-xs text-theme-700 dark:text-zinc-400'

@@ -117,7 +117,7 @@ function visibleSeats(floor) {
             <th
               scope="row"
               tabindex="-1"
-              class="px-4 py-2 font-medium whitespace-nowrap focus:outline-2 focus:outline-theme-500"
+              class="px-4 py-2 font-medium whitespace-nowrap focus:outline-2 focus:-outline-offset-2 focus:outline-theme-500"
               :data-seat-code="seat.code"
             >
               {{ seat.label }}
@@ -128,7 +128,7 @@ function visibleSeats(floor) {
                 <span>{{ seat.nickname || '同學' }}</span>
                 <span
                   v-if="grid.isMine(seat)"
-                  class="ml-1.5 rounded-full bg-amber-500 px-1.5 text-xs font-semibold text-white"
+                  class="ml-1.5 rounded-full bg-amber-700 px-1.5 text-xs font-semibold text-white"
                   >你</span
                 >
               </template>

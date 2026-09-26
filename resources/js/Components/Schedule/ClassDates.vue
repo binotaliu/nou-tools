@@ -136,7 +136,7 @@ const cells = computed(() => {
     <div
       role="group"
       aria-label="選擇月份"
-      class="-mx-1 mb-4 flex gap-1 overflow-x-auto px-1 pb-1"
+      class="-mx-1 mb-3 flex gap-1 overflow-x-auto px-1 py-1"
     >
       <button
         v-for="tab in monthTabs"
@@ -199,6 +199,7 @@ const cells = computed(() => {
                 :class="cell.count > 0 ? 'bg-theme-600 dark:bg-theme-500' : ''"
                 aria-hidden="true"
               ></span>
+              <span v-if="cell.iso === todayYmd" class="sr-only">，今天</span>
               <span v-if="cell.count > 0" class="sr-only">
                 ，{{ cell.count }} 堂面授
               </span>

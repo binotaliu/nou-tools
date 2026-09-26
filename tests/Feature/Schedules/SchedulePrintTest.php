@@ -456,3 +456,17 @@ it('throttles PDF generation', function () use ($printableSchedule, $fakeHtmlToP
 
     $this->get(route('schedules.print.pdf', $schedule))->assertStatus(429);
 });
+
+it('renders a print sheet with language, title, headings and a named exam table', function () use ($printableSchedule) {
+    $schedule = $printableSchedule(['name' => '經濟學', 'midterm_date' => '2026-04-25', 'final_date' => '2026-06-27']);
+    ClassSchedule::factory()->create(['class_id' => $schedule->items->first()->course_class_id, 'date' => '2026-03-08']);
+
+    $this->get(route('schedules.print', ['schedule' => $schedule->refresh(), 'term' => '2025B']))
+        ->assertOk()
+        ->assertSee('<html lang="zh-Hant">', false)
+        ->assertSee('列印課表</title>', false)
+        ->assertSee('<h1', false)
+        ->assertSee('<h3', false)
+        ->assertSee('role="table" aria-label="考試時間表"', false)
+        ->assertSee('role="columnheader"', false);
+});

@@ -7,7 +7,7 @@ calendar plus a QR code back to the web schedule.
 $inlineAssets: the PDF renders this view as an HTML string with no origin, so
 the built CSS is inlined instead of linked (needs `npm run build`). --}}
 <!DOCTYPE html>
-<html lang="zh-hant">
+<html lang="zh-Hant">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

@@ -625,7 +625,7 @@ function localHint(next) {
                   accesskey="7"
                   aria-label="選擇學期"
                   data-offline-disable
-                  class="h-10 w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 dark:border-zinc-700 dark:bg-zinc-900"
+                  class="h-10 w-full appearance-none rounded-lg border border-zinc-500 bg-white px-3 dark:border-zinc-500 dark:bg-zinc-900"
                   :value="viewModel.selectedTerm"
                   @change="$event.target.form.submit()"
                 >
@@ -664,7 +664,7 @@ function localHint(next) {
                 :class="
                   push.enabled.value
                     ? 'bg-theme-700 dark:bg-zinc-300'
-                    : 'bg-theme-200 dark:bg-zinc-700'
+                    : 'bg-zinc-500 dark:bg-zinc-500'
                 "
                 class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 data-analytics-event="schedule_push_toggle"
@@ -777,7 +777,7 @@ function localHint(next) {
                     :class="
                       push.enabled.value
                         ? 'bg-theme-700 dark:bg-zinc-300'
-                        : 'bg-theme-200 dark:bg-zinc-700'
+                        : 'bg-zinc-500 dark:bg-zinc-500'
                     "
                     class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                     data-analytics-event="schedule_push_toggle"
@@ -1094,7 +1094,7 @@ function localHint(next) {
 
                   <span
                     v-if="row.next && isOngoing(row.next)"
-                    class="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-[0.6875rem] font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
+                    class="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
                   >
                     進行中
                   </span>
@@ -1388,22 +1388,28 @@ function localHint(next) {
           <table
             class="w-full border-collapse overflow-hidden rounded text-left text-theme-700 dark:text-zinc-300"
           >
+            <caption class="sr-only">
+              考試日期與時間
+            </caption>
             <thead>
               <tr
                 class="rounded-t border-b-2 border-theme-300 bg-theme-100 dark:border-zinc-600 dark:bg-zinc-900"
               >
                 <th
+                  scope="col"
                   class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                 >
                   課程
                 </th>
                 <th
                   v-if="!viewModel.selectedTerm.endsWith('C')"
+                  scope="col"
                   class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                 >
                   期中考
                 </th>
                 <th
+                  scope="col"
                   class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                 >
                   期末考
@@ -1417,7 +1423,8 @@ function localHint(next) {
                 :key="exam.courseId"
                 class="border-b border-theme-200 hover:bg-theme-50 dark:border-zinc-700 dark:hover:bg-zinc-950"
               >
-                <td
+                <th
+                  scope="row"
                   class="px-4 py-3 font-semibold text-theme-900 dark:text-zinc-100"
                 >
                   {{ exam.courseName }}
@@ -1437,7 +1444,7 @@ function localHint(next) {
                       考古題
                     </Link>
                   </div>
-                </td>
+                </th>
 
                 <td
                   v-if="!viewModel.selectedTerm.endsWith('C')"

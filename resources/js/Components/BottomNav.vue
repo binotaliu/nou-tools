@@ -101,7 +101,7 @@ const tabClass = active =>
               class="flex size-12 items-center justify-center rounded-2xl transition-colors"
               :class="
                 item.active
-                  ? 'bg-theme-600 text-white dark:bg-theme-500'
+                  ? 'bg-theme-700 text-white dark:bg-theme-700'
                   : 'bg-theme-100 text-theme-700 group-hover:bg-theme-200 dark:bg-zinc-800 dark:text-theme-300 dark:group-hover:bg-zinc-700'
               "
             >
@@ -126,7 +126,7 @@ const tabClass = active =>
           :key="tab.href"
           :href="tab.href"
           :aria-current="tab.active ? 'page' : null"
-          class="relative flex flex-col items-center justify-center gap-0.5 text-[0.6875rem] transition-colors"
+          class="relative flex flex-col items-center justify-center gap-0.5 text-xs transition-colors"
           :class="tabClass(tab.active)"
         >
           <span
@@ -141,7 +141,7 @@ const tabClass = active =>
 
         <button
           type="button"
-          class="relative flex flex-col items-center justify-center gap-0.5 text-[0.6875rem] transition-colors"
+          class="relative flex flex-col items-center justify-center gap-0.5 text-xs transition-colors"
           :class="tabClass(moreActive || sheetOpen)"
           :aria-expanded="sheetOpen.toString()"
           aria-controls="bottom-nav-sheet"

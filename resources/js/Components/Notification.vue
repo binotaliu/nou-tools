@@ -1,7 +1,9 @@
 <script setup>
-// Auto-dismissing flash/toast message, rendered site-wide by AppLayout.vue
-// from the session's flash bag.
-import { onMounted, ref } from 'vue'
+// Flash/toast message, rendered site-wide by AppLayout.vue from the session's
+// flash bag. Errors use role="alert" (assertive) and stay until dismissed;
+// everything else is a polite role="status" that hides after a reading-friendly
+// delay, which pauses while the pointer or focus is on the toast (WCAG 2.2.1).
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import Icon from './Icon.vue'
 
 const props = defineProps({
@@ -46,16 +48,55 @@ const style = STYLE_BY_TYPE[props.type] ?? STYLE_BY_TYPE.info
 
 const show = ref(true)
 
-onMounted(() => {
-  setTimeout(() => {
+const isError = props.type === 'error'
+const role = isError ? 'alert' : 'status'
+const live = isError ? 'assertive' : 'polite'
+
+// Roughly 5 seconds plus time to read the text (about 20 characters a second).
+const duration = computed(() =>
+  Math.min(15000, 5000 + props.message.length * 50)
+)
+
+let timer = null
+const paused = ref(false)
+
+function startTimer() {
+  clearTimeout(timer)
+
+  if (isError || !show.value) {
+    return
+  }
+
+  timer = setTimeout(() => {
     show.value = false
-  }, 4000)
-})
+  }, duration.value)
+}
+
+function pause() {
+  paused.value = true
+  clearTimeout(timer)
+}
+
+function resume(event) {
+  // Moving between the toast's own children is not leaving it.
+  if (event?.currentTarget?.contains(event.relatedTarget)) {
+    return
+  }
+
+  paused.value = false
+  startTimer()
+}
+
+onMounted(startTimer)
+onBeforeUnmount(() => clearTimeout(timer))
 </script>
 
 <template>
   <div
-    aria-live="assertive"
+    :role="role"
+    :aria-live="live"
+    aria-atomic="true"
+    data-testid="notification"
     class="pointer-events-none fixed inset-0 z-50 flex items-end px-4 py-6 sm:items-start sm:p-6 bottom-nav:pb-[calc(var(--pwa-nav-height)+1.5rem)]"
   >
     <div class="flex w-full flex-col items-center space-y-4 sm:items-end">
@@ -69,6 +110,10 @@ onMounted(() => {
       >
         <div
           v-show="show"
+          @mouseenter="pause"
+          @mouseleave="resume"
+          @focusin="pause"
+          @focusout="resume"
           class="pointer-events-auto relative z-50 w-full max-w-sm overflow-hidden rounded-lg border border-theme-200 bg-theme-50 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
         >
           <span

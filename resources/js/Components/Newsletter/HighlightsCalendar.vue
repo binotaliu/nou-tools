@@ -181,7 +181,7 @@ const weeks = computed(() => {
         <div
           v-for="bar in week.bars"
           :key="`bar-${bar.number}`"
-          class="relative flex min-h-5 items-center bg-theme-200 px-1 py-0.5 text-[0.6875rem] leading-tight font-medium text-theme-900 sm:min-h-6 sm:px-2 sm:text-xs dark:bg-theme-800/70 dark:text-theme-100"
+          class="relative flex min-h-6 items-center bg-theme-200 px-1 py-0.5 text-xs leading-tight font-medium text-theme-900 sm:min-h-6 sm:px-2 dark:bg-theme-800/70 dark:text-theme-100"
           :class="[
             bar.startsHere ? 'ml-1 rounded-l-md' : 'ml-0',
             bar.endsHere ? 'mr-1 rounded-r-md' : 'mr-0',

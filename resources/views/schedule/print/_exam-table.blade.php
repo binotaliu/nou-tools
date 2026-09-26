@@ -7,24 +7,30 @@ and the class sat isn't always the one on the schedule.
 $hasMidterm: summer terms have no midterm, so no 期中教室 field.
 $dense: tighter rows when there are many exam rows, so up to 14 courses still
 fit on the strip. --}}
-<div @class(['text-[8.5pt]' => ! $dense, 'text-[8pt]' => $dense])>
+<div
+    role="table"
+    aria-label="考試時間表"
+    @class(['text-[8.5pt]' => ! $dense, 'text-[8pt]' => $dense])
+>
     <div
+        role="row"
         class="grid grid-cols-[1fr_18mm_18mm] items-center bg-theme-700 px-1.5 py-0.5 font-bold text-white"
     >
-        <span>課程</span>
-        <span class="text-center">週六</span>
-        <span class="text-center">週日</span>
+        <span role="columnheader">課程</span>
+        <span role="columnheader" class="text-center">週六</span>
+        <span role="columnheader" class="text-center">週日</span>
     </div>
 
     @forelse ($exams as $exam)
         <div
+            role="row"
             @class(['break-inside-avoid border-b border-zinc-300 px-1.5', 'py-1' => ! $dense, 'py-px' => $dense])
         >
             <div class="grid grid-cols-[1fr_18mm_18mm] items-start gap-y-px">
-                <p class="min-w-0 pr-1 leading-tight font-semibold">{{ $exam->courseName }}</p>
+                <p role="rowheader" class="min-w-0 pr-1 leading-tight font-semibold">{{ $exam->courseName }}</p>
 
                 @foreach ([$exam->saturday, $exam->sunday] as $dates)
-                    <p class="text-center text-[7.5pt] leading-tight tabular-nums">
+                    <p role="cell" class="text-center text-[7.5pt] leading-tight tabular-nums">
                         @if ($dates !== [])
                             {{ $exam->time ? str_replace(' ', '', $exam->time) : '時間未定' }}
                         @endif

@@ -92,12 +92,12 @@ it('shows the saved toast again on every save, not just the first', function () 
     }
 
     $save = '[data-testid="learning-progress-header"] button[data-analytics-event="learning_progress_save"]';
-    $toast = 'document.querySelector(\'[aria-live="assertive"] [class*="pointer-events-auto"]\')?.style.display !== \'none\'';
+    $toast = 'document.querySelector(\'[data-testid="notification"] [class*="pointer-events-auto"]\')?.style.display !== \'none\'';
 
     $page->click($save)->assertSee('學習進度已更新');
 
-    // The toast hides itself after 4s; the second save must bring it back.
-    waitUntil($page, '(document.querySelector(\'[aria-live="assertive"] [class*="pointer-events-auto"]\')?.style.display) === \'none\'', 8000);
+    // The toast hides itself after about 5s; the second save must bring it back.
+    waitUntil($page, '(document.querySelector(\'[data-testid="notification"] [class*="pointer-events-auto"]\')?.style.display) === \'none\'', 10000);
 
     $page->script("document.querySelector('#progress-form input[type=\"checkbox\"]').click()");
     $page->click($save);

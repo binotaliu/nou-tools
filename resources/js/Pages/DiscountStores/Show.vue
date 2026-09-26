@@ -557,7 +557,7 @@ onUnmounted(() => {
                   id="report-comment"
                   v-model="reportForm.comment"
                   rows="2"
-                  class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
+                  class="w-full rounded-lg border border-zinc-500 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500"
                   placeholder="補充說明..."
                 ></textarea>
               </div>
@@ -723,14 +723,14 @@ onUnmounted(() => {
                 <input
                   v-model="commentForm.nickname"
                   type="text"
-                  class="rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
+                  class="rounded-lg border border-zinc-500 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500"
                   placeholder="暱稱"
                   maxlength="100"
                   required
                 />
                 <textarea
                   v-model="commentForm.content"
-                  class="flex-1 rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
+                  class="flex-1 rounded-lg border border-zinc-500 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500"
                   placeholder="留言（確認後顯示）..."
                   maxlength="1000"
                   rows="5"

@@ -63,7 +63,7 @@ onUnmounted(() => {
       <span v-else class="text-base leading-none">{{ seat.emoji }}</span>
       <span
         v-show="grid.isMine(seat)"
-        class="absolute -top-1.5 -right-2 rounded-full bg-amber-500 px-1 text-[0.5625rem] leading-4 font-semibold text-white shadow-sm"
+        class="absolute -top-1.5 -right-2 rounded-full bg-amber-700 px-1 text-[0.5625rem] leading-4 font-semibold text-white shadow-sm"
         >你</span
       >
     </button>
@@ -90,13 +90,11 @@ onUnmounted(() => {
         <span>{{ seat.emoji }}</span>
         <span class="truncate">{{ seat.nickname }}</span>
       </p>
-      <p
-        class="mt-1 text-[0.6875rem] leading-snug text-theme-700 dark:text-zinc-300"
-      >
+      <p class="mt-1 text-xs leading-snug text-theme-700 dark:text-zinc-300">
         {{ grid.thoughtBubbleText(seat) }}
       </p>
       <p
-        class="mt-1 font-mono text-[0.6875rem] text-theme-700 tabular-nums dark:text-zinc-400"
+        class="mt-1 font-mono text-xs text-theme-700 tabular-nums dark:text-zinc-400"
       >
         剩餘 {{ timer.timerLabel(seat) }}
       </p>

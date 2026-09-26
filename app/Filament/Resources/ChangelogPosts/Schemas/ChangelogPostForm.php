@@ -33,6 +33,7 @@ class ChangelogPostForm
                     ->disabledOn('edit'),
                 MarkdownEditor::make('body')
                     ->label('內文')
+                    ->helperText('圖片請寫替代文字：![替代文字](圖片網址)；只有純裝飾的圖片才留空。')
                     ->required()
                     ->columnSpanFull(),
             ]);

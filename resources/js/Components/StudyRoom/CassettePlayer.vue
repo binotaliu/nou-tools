@@ -89,7 +89,7 @@ const linkClass =
         <li v-for="(item, index) in music.playlists" :key="item.id">
           <button
             type="button"
-            class="flex w-full items-center gap-2 rounded-md border px-1.5 py-1 text-left transition hover:bg-white focus-visible:ring-2 focus-visible:ring-theme-500 focus-visible:outline-none dark:hover:bg-zinc-700"
+            class="flex w-full items-center gap-2 rounded-md border px-1.5 py-1 text-left transition hover:bg-white focus-visible:ring-2 focus-visible:ring-theme-500 focus-visible:outline-none focus-visible:ring-inset dark:hover:bg-zinc-700"
             :class="
               index === music.playlistIndex
                 ? 'border-theme-500 bg-white dark:border-theme-400 dark:bg-zinc-700'
@@ -116,8 +116,7 @@ const linkClass =
                 class="block truncate text-xs font-semibold text-theme-900 dark:text-zinc-100"
                 >{{ item.title }}</span
               >
-              <span
-                class="block text-[0.625rem] text-theme-700 dark:text-zinc-400"
+              <span class="block text-xs text-theme-700 dark:text-zinc-400"
                 >{{ item.trackCount }} 首 ·
                 {{ formatTime(item.totalDurationSeconds) }}</span
               >
@@ -128,7 +127,7 @@ const linkClass =
 
       <p
         v-if="music.loaded && music.track"
-        class="truncate text-[0.625rem] text-theme-700 dark:text-zinc-400"
+        class="truncate text-xs text-theme-700 dark:text-zinc-400"
         data-testid="study-room-music-credit"
       >
         <a
@@ -330,8 +329,7 @@ const linkClass =
             aria-live="polite"
             data-testid="study-room-music-title"
           />
-          <span
-            class="block truncate text-[0.625rem] text-theme-800 dark:text-zinc-400"
+          <span class="block truncate text-xs text-theme-800 dark:text-zinc-400"
             >{{ music.track.author }} ·
             <span
               class="font-mono tabular-nums"
@@ -345,8 +343,7 @@ const linkClass =
             class="block truncate text-xs font-semibold text-theme-900 dark:text-zinc-100"
             >背景音樂</span
           >
-          <span
-            class="block truncate text-[0.625rem] text-theme-800 dark:text-zinc-400"
+          <span class="block truncate text-xs text-theme-800 dark:text-zinc-400"
             >尚未放入卡帶</span
           >
         </template>
@@ -354,7 +351,7 @@ const linkClass =
 
       <button
         type="button"
-        class="flex size-8 shrink-0 items-center justify-center rounded-lg border-2 border-b-4 border-theme-700 bg-theme-500 text-white transition hover:bg-theme-600 focus-visible:ring-2 focus-visible:ring-theme-500 focus-visible:ring-offset-1 focus-visible:outline-none active:translate-y-px active:border-b-2 dark:border-theme-800 dark:bg-theme-600 dark:hover:bg-theme-500"
+        class="flex size-8 shrink-0 items-center justify-center rounded-lg border-2 border-b-4 border-theme-700 bg-theme-600 text-white transition hover:bg-theme-700 focus-visible:ring-2 focus-visible:ring-theme-500 focus-visible:ring-offset-1 focus-visible:outline-none active:translate-y-px active:border-b-2 dark:border-theme-800 dark:bg-theme-700 dark:hover:bg-theme-600"
         :aria-label="music.playing ? '暫停' : '播放'"
         :aria-pressed="music.playing ? 'true' : 'false'"
         data-testid="study-room-music-play"

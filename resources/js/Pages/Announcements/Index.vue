@@ -294,7 +294,7 @@ function isExpired(announcement) {
                   >
                     <input
                       type="checkbox"
-                      class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600 dark:text-zinc-300"
+                      class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-300 dark:border-zinc-500 dark:text-zinc-300"
                       :checked="isGroupChecked(group)"
                       :indeterminate="isGroupIndeterminate(group)"
                       :aria-label="`${group.label}（全選）`"
@@ -306,7 +306,7 @@ function isExpired(announcement) {
                     >
                       {{ group.label }}
                     </span>
-                    <span class="text-xs text-theme-600 dark:text-zinc-500">
+                    <span class="text-xs text-theme-700 dark:text-zinc-400">
                       {{ selectedSourcesIn(group).length }} /
                       {{ group.sources.length }}
                     </span>
@@ -339,7 +339,7 @@ function isExpired(announcement) {
                       >
                         <input
                           type="checkbox"
-                          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600 dark:text-zinc-300"
+                          class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-300 dark:border-zinc-500 dark:text-zinc-300"
                           :checked="isSourceChecked(source)"
                           :indeterminate="isSourceIndeterminate(source)"
                           :aria-label="source"
@@ -382,7 +382,7 @@ function isExpired(announcement) {
                           type="checkbox"
                           :name="`source_categories[${source}][]`"
                           :value="category"
-                          class="mt-0.5 size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600"
+                          class="mt-0.5 size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-300 dark:border-zinc-500"
                           :checked="isCategoryChecked(source, category)"
                           :aria-label="category"
                           @change="
@@ -482,7 +482,7 @@ function isExpired(announcement) {
                 :class="{ 'opacity-60': isExpired(announcement) }"
               >
                 <p
-                  class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-theme-600 dark:text-zinc-500"
+                  class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-theme-700 dark:text-zinc-400"
                 >
                   <span class="font-medium text-theme-800 dark:text-zinc-300">
                     {{ announcement.source_name }}

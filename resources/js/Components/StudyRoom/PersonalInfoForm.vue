@@ -2,8 +2,10 @@
 // Submits fields over axios via profile.submitProfile() (see
 // useStudyRoomProfile.js / StudyRoomProfileController) and closes the modal
 // itself on success.
-import { ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { CheckIcon } from '@heroicons/vue/24/outline'
+import FieldError from '../FieldError.vue'
+import { focusFirstInvalid } from '../../Composables/useFormErrorFocus'
 import { emojiName } from '../../study-room-emoji-names'
 
 const props = defineProps({
@@ -20,6 +22,7 @@ const emojiInput = ref(props.profile.emoji)
 const playSoundInput = ref(props.profile.playSoundOnTimerEnd)
 const notifyInput = ref(props.profile.notifyOnTimerEnd)
 const notifyError = ref('')
+const formElement = ref(null)
 
 // Switching notifications on needs the browser's permission and a push
 // subscription, both of which must be asked for from a user gesture, so it
@@ -46,13 +49,28 @@ async function onNotifyChange() {
   }
 }
 
+const nicknameDescribedBy = computed(
+  () =>
+    [
+      props.profile.canChangeNickname ? null : 'nickname-cooldown-note',
+      props.profile.profileErrors.nickname ? 'nickname-error' : null,
+    ]
+      .filter(Boolean)
+      .join(' ') || null
+)
+
 async function submit() {
-  await props.profile.submitProfile({
+  const saved = await props.profile.submitProfile({
     nickname: nicknameInput.value,
     emoji: emojiInput.value,
     playSoundOnTimerEnd: playSoundInput.value,
     notifyOnTimerEnd: notifyInput.value,
   })
+
+  if (!saved) {
+    await nextTick()
+    focusFirstInvalid(formElement.value)
+  }
 }
 </script>
 
@@ -63,6 +81,7 @@ async function submit() {
   </p>
 
   <form
+    ref="formElement"
     class="space-y-4"
     data-testid="study-room-profile-form"
     @submit.prevent="submit"
@@ -78,6 +97,11 @@ async function submit() {
         v-model="nicknameInput"
         type="text"
         name="nickname"
+        autocomplete="nickname"
+        enterkeyhint="done"
+        aria-required="true"
+        :aria-invalid="profile.profileErrors.nickname ? 'true' : null"
+        :aria-describedby="nicknameDescribedBy"
         :minlength="nicknameMinLength"
         :maxlength="nicknameMaxLength"
         required
@@ -88,25 +112,25 @@ async function submit() {
             : 'bg-white dark:bg-zinc-900'
         "
         data-testid="study-room-nickname-input"
-        class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
+        class="w-full rounded-lg border border-zinc-500 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500"
       />
       <p
         v-show="!profile.canChangeNickname"
+        id="nickname-cooldown-note"
         class="mt-1 text-xs text-theme-700 dark:text-zinc-400"
         data-testid="study-room-nickname-cooldown-note"
       >
         {{ profile.nicknameCooldownLabel(clockNow) }}
       </p>
-      <p
-        v-if="profile.profileErrors.nickname"
-        class="mt-1 text-xs text-red-600 dark:text-red-400"
-      >
-        {{ profile.profileErrors.nickname[0] }}
-      </p>
+      <FieldError
+        id="nickname-error"
+        :message="profile.profileErrors.nickname?.[0]"
+      />
     </div>
 
     <fieldset>
       <legend
+        id="emoji-legend"
         class="mb-1 block text-sm font-medium text-theme-700 dark:text-zinc-300"
       >
         選一個表情符號代表你
@@ -125,17 +149,19 @@ async function submit() {
             :aria-label="emojiName(emojiChoice)"
             class="sr-only"
             data-testid="study-room-emoji-option"
+            :aria-invalid="profile.profileErrors.emoji ? 'true' : null"
+            :aria-describedby="
+              profile.profileErrors.emoji ? 'emoji-error' : null
+            "
             required
           />
           <span aria-hidden="true">{{ emojiChoice }}</span>
         </label>
       </div>
-      <p
-        v-if="profile.profileErrors.emoji"
-        class="mt-1 text-xs text-red-600 dark:text-red-400"
-      >
-        {{ profile.profileErrors.emoji[0] }}
-      </p>
+      <FieldError
+        id="emoji-error"
+        :message="profile.profileErrors.emoji?.[0]"
+      />
     </fieldset>
 
     <div>
@@ -146,7 +172,7 @@ async function submit() {
           v-model="playSoundInput"
           type="checkbox"
           name="playSoundOnTimerEnd"
-          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600"
+          class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-300 dark:border-zinc-500"
           data-testid="study-room-play-sound-checkbox"
         />
         時間到時播放音效
@@ -162,14 +188,17 @@ async function submit() {
           type="checkbox"
           name="notifyOnTimerEnd"
           :disabled="push.busy"
-          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 disabled:opacity-50 dark:border-zinc-600"
+          class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-300 disabled:opacity-50 dark:border-zinc-500"
           data-testid="study-room-notify-checkbox"
+          :aria-describedby="notifyError ? 'notify-error' : null"
           @change="onNotifyChange"
         />
         時間到時傳送通知
       </label>
       <p
         v-if="notifyError"
+        id="notify-error"
+        role="alert"
         class="mt-1 text-xs text-red-600 dark:text-red-400"
         data-testid="study-room-notify-error"
       >
@@ -181,7 +210,7 @@ async function submit() {
       type="submit"
       :disabled="profile.profileSubmitting"
       data-testid="study-room-profile-submit"
-      class="inline-flex items-center gap-1.5 rounded-lg bg-theme-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-theme-900 disabled:opacity-50 dark:bg-theme-600 dark:hover:bg-theme-500"
+      class="inline-flex items-center gap-1.5 rounded-lg bg-theme-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-theme-900 disabled:opacity-50 dark:bg-theme-700 dark:hover:bg-theme-800"
     >
       <CheckIcon class="size-4" />
       儲存

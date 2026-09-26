@@ -79,16 +79,14 @@ const {
             class="inline-flex items-center text-2xl font-semibold text-theme-700 tabular-nums sm:text-3xl dark:text-zinc-300"
           >
             <span>{{ taiwanHour }}</span>
-            <span class="blink-colon">:</span>
+            <span class="blink-colon motion-reduce:animate-none">:</span>
             <span>{{ taiwanMinute }}</span>
           </div>
           <div class="text-center">
             <p class="text-xs text-theme-700 tabular-nums dark:text-zinc-400">
               {{ taiwanDateString }}
             </p>
-            <p class="text-[0.65rem] text-theme-700 dark:text-zinc-400">
-              台灣時間
-            </p>
+            <p class="text-xs text-theme-700 dark:text-zinc-400">台灣時間</p>
           </div>
         </div>
       </div>

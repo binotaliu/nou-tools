@@ -19,6 +19,9 @@ final readonly class BrowsershotHtmlToPdf implements HtmlToPdf
             ->landscape()
             ->margins(0, 0, 0, 0)
             ->showBackground()
+            // Structure tags (headings, lists, table) for screen readers; needs a
+            // Puppeteer version that supports page.pdf({ tagged }).
+            ->taggedPdf()
             ->waitUntilNetworkIdle()
             // The sheet is meant to clip at 210mm (`overflow-hidden` on
             // <main>), but Chromium's print pagination ignores CSS overflow

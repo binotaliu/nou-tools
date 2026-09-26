@@ -102,3 +102,83 @@ it('documents the study room keys and keyboard use on the accessibility page', f
     $rows = $page->script("document.querySelectorAll('[data-testid=\"accessibility-study-room-keys\"] tbody tr').length");
     expect($rows)->toBe(5);
 });
+
+it('draws a visible focus indicator on keyboard-focused controls', function () {
+    $page = visit('/');
+
+    $page->assertNoJavaScriptErrors()
+        ->assertPresent('[data-testid="footer-accessibility-link"]');
+
+    $indicator = json_decode($page->script(<<<'JS'
+        (() => {
+            const el = document.querySelector('[data-testid="footer-accessibility-link"]');
+            el.focus();
+            const s = getComputedStyle(el);
+            return JSON.stringify({
+                focused: document.activeElement === el,
+                visible: el.matches(':focus-visible'),
+                outlineWidth: parseFloat(s.outlineWidth),
+                outlineStyle: s.outlineStyle,
+                boxShadow: s.boxShadow,
+            });
+        })()
+    JS), true);
+
+    expect($indicator['focused'])->toBeTrue()
+        ->and($indicator['visible'])->toBeTrue()
+        ->and($indicator['outlineStyle'])->toBe('solid')
+        ->and($indicator['outlineWidth'])->toBeGreaterThanOrEqual(2);
+});
+
+it('ships forced-colors rules and mentions keyboard focus on the help page', function () {
+    // Pest's browser cannot emulate forced-colors, so assert the rules exist.
+    $page = visit('/accessibility');
+
+    $page->assertNoJavaScriptErrors()
+        ->assertSeeIn('[data-testid="accessibility-focus"]', 'Windows 高對比模式（強制色彩）');
+
+    $hasRules = $page->script(<<<'JS'
+        [...document.styleSheets].some((sheet) => {
+            try {
+                return [...sheet.cssRules].some((rule) => rule.media && rule.media.mediaText.includes('forced-colors') && /highlight/i.test(rule.cssText));
+            } catch (e) {
+                return false;
+            }
+        })
+    JS);
+
+    expect($hasRules)->toBeTrue();
+});
+
+it('announces the new title and focuses main after a client-side page change', function () {
+    $page = visit('/');
+
+    $page->assertNoJavaScriptErrors()
+        ->assertPresent('[data-testid="footer-accessibility-link"]');
+
+    // The initial load announces nothing.
+    expect($page->script("document.querySelector('[data-testid=\"route-announcer\"]').textContent"))->toBe('');
+    expect($page->script("document.querySelector('[data-testid=\"route-announcer\"]').getAttribute('aria-live')"))->toBe('polite');
+
+    $page->click('[data-testid="footer-accessibility-link"]')
+        ->assertPathIs('/accessibility')
+        ->wait(0.6);
+
+    expect($page->script("document.querySelector('[data-testid=\"route-announcer\"]').textContent"))->toBe('無障礙說明 - NOU 小幫手');
+    expect($page->script('document.activeElement.id'))->toBe('main-content');
+});
+
+it('shows error toasts as an alert that stays past the old 4 second timeout', function () {
+    $page = visit('/schedules/my');
+
+    $page->assertNoJavaScriptErrors()
+        ->click('[data-testid="find-schedule-existing"]')
+        ->assertPresent('[data-testid="find-schedule-url"]')
+        ->fill('[data-testid="find-schedule-url"]', 'not a link')
+        ->press('[data-testid="find-schedule-form"] button[type="submit"]')
+        ->assertPresent('[data-testid="notification"][role="alert"]');
+
+    // Not dismissed on its own within the old 4 second window.
+    $page->wait(5);
+    expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"notification\"] > div > div')).display"))->not->toBe('none');
+});

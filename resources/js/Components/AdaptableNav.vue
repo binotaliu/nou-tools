@@ -73,7 +73,7 @@ const itemClass = active =>
 // tab bar has no hover boxes.
 const capsuleClass = active =>
   active
-    ? 'bg-theme-600 text-white shadow-sm dark:bg-theme-500'
+    ? 'bg-theme-700 text-white shadow-sm dark:bg-theme-700'
     : 'text-theme-800 hover:text-theme-900 dark:text-zinc-300 dark:hover:text-zinc-100'
 
 // Borderless icon buttons for the bar's edges.
@@ -196,7 +196,7 @@ const toggleClass =
 
         <div>
           <p
-            class="px-3 pb-1 text-xs font-semibold text-theme-700/80 dark:text-zinc-500"
+            class="px-3 pb-1 text-xs font-semibold text-theme-700 dark:text-zinc-400"
           >
             更多
           </p>

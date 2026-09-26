@@ -1,4 +1,5 @@
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { prefersReducedMotion } from './useReduceMotion'
 
 // Slide state and autoplay for the homepage hero. Autoplay never starts for
 // visitors who prefer reduced motion, and it holds while the pointer or focus
@@ -75,29 +76,19 @@ export default function useHeroCarousel({ count, interval = 6000 }) {
     }
   }
 
-  const motionQuery =
-    typeof window !== 'undefined' && window.matchMedia
-      ? window.matchMedia('(prefers-reduced-motion: reduce)')
-      : null
-
-  function onMotionChange() {
-    reducedMotion.value = motionQuery.matches
+  watch(prefersReducedMotion, value => {
+    reducedMotion.value = value
     start()
-  }
+  })
 
   onMounted(() => {
-    if (motionQuery) {
-      reducedMotion.value = motionQuery.matches
-      motionQuery.addEventListener('change', onMotionChange)
-    }
-
+    reducedMotion.value = prefersReducedMotion.value
     document.addEventListener('visibilitychange', start)
     start()
   })
 
   onUnmounted(() => {
     stop()
-    motionQuery?.removeEventListener('change', onMotionChange)
     document.removeEventListener('visibilitychange', start)
   })
 
