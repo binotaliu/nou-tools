@@ -142,7 +142,7 @@ const MODES = [
           aria-hidden="true"
           class="relative inline-block h-5 w-9 shrink-0 rounded-full transition-colors"
           :class="
-            reduceMotion ? 'bg-theme-600' : 'bg-theme-300 dark:bg-zinc-600'
+            reduceMotion ? 'bg-theme-700' : 'bg-zinc-500 dark:bg-zinc-500'
           "
         >
           <span

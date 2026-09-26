@@ -63,7 +63,7 @@ onUnmounted(() => {
       <span v-else class="text-base leading-none">{{ seat.emoji }}</span>
       <span
         v-show="grid.isMine(seat)"
-        class="absolute -top-1.5 -right-2 rounded-full bg-amber-500 px-1 text-[0.5625rem] leading-4 font-semibold text-white shadow-sm"
+        class="absolute -top-1.5 -right-2 rounded-full bg-amber-700 px-1 text-[0.5625rem] leading-4 font-semibold text-white shadow-sm"
         >你</span
       >
     </button>

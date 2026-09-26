@@ -128,7 +128,7 @@ function visibleSeats(floor) {
                 <span>{{ seat.nickname || '同學' }}</span>
                 <span
                   v-if="grid.isMine(seat)"
-                  class="ml-1.5 rounded-full bg-amber-500 px-1.5 text-xs font-semibold text-white"
+                  class="ml-1.5 rounded-full bg-amber-700 px-1.5 text-xs font-semibold text-white"
                   >你</span
                 >
               </template>

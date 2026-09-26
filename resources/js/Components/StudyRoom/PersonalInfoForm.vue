@@ -112,7 +112,7 @@ async function submit() {
             : 'bg-white dark:bg-zinc-900'
         "
         data-testid="study-room-nickname-input"
-        class="w-full rounded-lg border border-theme-200 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700"
+        class="w-full rounded-lg border border-zinc-500 px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500"
       />
       <p
         v-show="!profile.canChangeNickname"
@@ -172,7 +172,7 @@ async function submit() {
           v-model="playSoundInput"
           type="checkbox"
           name="playSoundOnTimerEnd"
-          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600"
+          class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-300 dark:border-zinc-500"
           data-testid="study-room-play-sound-checkbox"
         />
         時間到時播放音效
@@ -188,7 +188,7 @@ async function submit() {
           type="checkbox"
           name="notifyOnTimerEnd"
           :disabled="push.busy"
-          class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 disabled:opacity-50 dark:border-zinc-600"
+          class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-300 disabled:opacity-50 dark:border-zinc-500"
           data-testid="study-room-notify-checkbox"
           :aria-describedby="notifyError ? 'notify-error' : null"
           @change="onNotifyChange"
@@ -210,7 +210,7 @@ async function submit() {
       type="submit"
       :disabled="profile.profileSubmitting"
       data-testid="study-room-profile-submit"
-      class="inline-flex items-center gap-1.5 rounded-lg bg-theme-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-theme-900 disabled:opacity-50 dark:bg-theme-600 dark:hover:bg-theme-500"
+      class="inline-flex items-center gap-1.5 rounded-lg bg-theme-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-theme-900 disabled:opacity-50 dark:bg-theme-700 dark:hover:bg-theme-800"
     >
       <CheckIcon class="size-4" />
       儲存

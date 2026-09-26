@@ -381,7 +381,9 @@ onBeforeUnmount(() => {
           : variant === 'box'
             ? 'flex w-full items-center justify-center rounded-md border border-theme-200 px-3 py-2.5 text-sm dark:border-zinc-700'
             : 'rounded border border-theme-200 bg-white px-3 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-900',
-        { 'text-zinc-400 print:text-transparent': !selected },
+        {
+          'text-zinc-500 dark:text-zinc-400 print:text-transparent': !selected,
+        },
       ]"
       :aria-label="`${label}：${selected ? describe(selected) : placeholder}`"
       :title="buttonTitle"

@@ -313,7 +313,7 @@ const rows = computed(() => [
                 :class="
                   row.enabled
                     ? 'bg-theme-700 dark:bg-zinc-300'
-                    : 'bg-theme-200 dark:bg-zinc-700'
+                    : 'bg-zinc-500 dark:bg-zinc-500'
                 "
                 class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 :data-testid="`settings-notify-${row.key}`"

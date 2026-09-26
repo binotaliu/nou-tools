@@ -351,7 +351,7 @@ const linkClass =
 
       <button
         type="button"
-        class="flex size-8 shrink-0 items-center justify-center rounded-lg border-2 border-b-4 border-theme-700 bg-theme-500 text-white transition hover:bg-theme-600 focus-visible:ring-2 focus-visible:ring-theme-500 focus-visible:ring-offset-1 focus-visible:outline-none active:translate-y-px active:border-b-2 dark:border-theme-800 dark:bg-theme-600 dark:hover:bg-theme-500"
+        class="flex size-8 shrink-0 items-center justify-center rounded-lg border-2 border-b-4 border-theme-700 bg-theme-600 text-white transition hover:bg-theme-700 focus-visible:ring-2 focus-visible:ring-theme-500 focus-visible:ring-offset-1 focus-visible:outline-none active:translate-y-px active:border-b-2 dark:border-theme-800 dark:bg-theme-700 dark:hover:bg-theme-600"
         :aria-label="music.playing ? '暫停' : '播放'"
         :aria-pressed="music.playing ? 'true' : 'false'"
         data-testid="study-room-music-play"

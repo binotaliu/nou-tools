@@ -515,7 +515,7 @@
   }
 
   .md-dialogue > p {
-    @apply mb-3 text-xs font-medium text-theme-600 dark:text-zinc-600;
+    @apply mb-3 text-xs font-medium text-theme-800 dark:text-zinc-400;
   }
 
   .md-dialogue-turn {
@@ -648,7 +648,7 @@
 
   .md-faq-question::after {
     content: '⌄';
-    @apply text-lg text-theme-400 transition-transform duration-200 dark:text-zinc-500;
+    @apply text-lg text-theme-700 transition-transform duration-200 dark:text-zinc-400;
   }
 
   .md-faq-item[open] .md-faq-question::after {
@@ -688,7 +688,7 @@
   }
 
   .md-tabs-trigger {
-    @apply rounded-full px-3 py-1.5 text-sm font-medium text-theme-600 transition-colors hover:bg-white/60 dark:text-zinc-400 dark:hover:bg-zinc-700/60;
+    @apply rounded-full px-3 py-1.5 text-sm font-medium text-theme-800 transition-colors hover:bg-white/60 dark:text-zinc-400 dark:hover:bg-zinc-700/60;
   }
 
   .md-tabs-trigger[data-active='true'] {
@@ -721,7 +721,7 @@
   }
 
   .md-card-desc {
-    @apply text-sm text-theme-600 dark:text-zinc-400;
+    @apply text-sm text-theme-800 dark:text-zinc-400;
   }
 
   /* 2.7 Timeline */
@@ -833,7 +833,7 @@
   }
 
   .md-figcaption {
-    @apply mt-2 text-sm text-theme-600 dark:text-zinc-400;
+    @apply mt-2 text-sm text-theme-800 dark:text-zinc-400;
   }
 
   /* YouTube embed (pasted iframe snippet, rebuilt by YoutubeEmbedRenderer) */
@@ -859,7 +859,7 @@
   }
 
   .md-checklist :where(li[data-checked='true']) {
-    @apply border-theme-300 bg-theme-100/80 py-0 text-theme-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400;
+    @apply border-theme-300 bg-theme-100/80 py-0 text-theme-800 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400;
   }
 
   .md-checklist :where(li input[type='checkbox']) {
@@ -892,7 +892,7 @@
   }
 
   .md-countdown-range {
-    @apply m-0! text-xs text-theme-500 dark:text-zinc-400;
+    @apply m-0! text-xs text-theme-800 dark:text-zinc-400;
   }
 
   .md-countdown-days {
@@ -926,7 +926,7 @@
   }
 
   .md-heading-anchor {
-    @apply mr-2 text-theme-400 no-underline opacity-0 transition-opacity focus:opacity-100 dark:text-zinc-500;
+    @apply mr-2 text-theme-700 no-underline opacity-0 transition-opacity focus:opacity-100 dark:text-zinc-400;
   }
 
   :where(h2, h3, h4):hover .md-heading-anchor,

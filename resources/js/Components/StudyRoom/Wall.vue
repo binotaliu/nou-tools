@@ -200,7 +200,7 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             </div>
             <Link
               href="/schedules/create"
-              class="shrink-0 rounded-lg bg-theme-800 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-theme-900 dark:bg-theme-600 dark:hover:bg-theme-500"
+              class="shrink-0 rounded-lg bg-theme-800 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-theme-900 dark:bg-theme-700 dark:hover:bg-theme-800"
             >
               建立課表
             </Link>

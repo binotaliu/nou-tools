@@ -625,7 +625,7 @@ function localHint(next) {
                   accesskey="7"
                   aria-label="選擇學期"
                   data-offline-disable
-                  class="h-10 w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 dark:border-zinc-700 dark:bg-zinc-900"
+                  class="h-10 w-full appearance-none rounded-lg border border-zinc-500 bg-white px-3 dark:border-zinc-500 dark:bg-zinc-900"
                   :value="viewModel.selectedTerm"
                   @change="$event.target.form.submit()"
                 >
@@ -664,7 +664,7 @@ function localHint(next) {
                 :class="
                   push.enabled.value
                     ? 'bg-theme-700 dark:bg-zinc-300'
-                    : 'bg-theme-200 dark:bg-zinc-700'
+                    : 'bg-zinc-500 dark:bg-zinc-500'
                 "
                 class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                 data-analytics-event="schedule_push_toggle"
@@ -777,7 +777,7 @@ function localHint(next) {
                     :class="
                       push.enabled.value
                         ? 'bg-theme-700 dark:bg-zinc-300'
-                        : 'bg-theme-200 dark:bg-zinc-700'
+                        : 'bg-zinc-500 dark:bg-zinc-500'
                     "
                     class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                     data-analytics-event="schedule_push_toggle"

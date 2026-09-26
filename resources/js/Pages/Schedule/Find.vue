@@ -146,7 +146,7 @@ async function onImagePicked(event) {
             data-testid="find-schedule-url"
             :aria-invalid="form.errors.url ? 'true' : 'false'"
             :aria-describedby="form.errors.url ? 'schedule-url-error' : null"
-            class="w-full rounded-lg border border-theme-300 bg-white px-3 py-2 text-theme-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+            class="w-full rounded-lg border border-zinc-500 bg-white px-3 py-2 text-theme-900 dark:border-zinc-500 dark:bg-zinc-800 dark:text-zinc-100"
           />
           <p
             v-if="form.errors.url"

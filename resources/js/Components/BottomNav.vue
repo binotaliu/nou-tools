@@ -101,7 +101,7 @@ const tabClass = active =>
               class="flex size-12 items-center justify-center rounded-2xl transition-colors"
               :class="
                 item.active
-                  ? 'bg-theme-600 text-white dark:bg-theme-500'
+                  ? 'bg-theme-700 text-white dark:bg-theme-700'
                   : 'bg-theme-100 text-theme-700 group-hover:bg-theme-200 dark:bg-zinc-800 dark:text-theme-300 dark:group-hover:bg-zinc-700'
               "
             >

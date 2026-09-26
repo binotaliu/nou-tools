@@ -233,7 +233,7 @@ function submitAnnouncementPreferences() {
                 v-model="displayOptions[key]"
                 type="checkbox"
                 :aria-label="label"
-                class="size-4 rounded border-theme-400 text-theme-700 focus:ring-theme-500 dark:border-zinc-600 dark:text-zinc-300"
+                class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-500 dark:border-zinc-500 dark:text-zinc-300"
               />
               <span
                 aria-hidden="true"
@@ -294,7 +294,7 @@ function submitAnnouncementPreferences() {
                         : null
                     "
                     placeholder="例如：我的課程群組"
-                    class="w-full rounded-lg border border-theme-300 px-3 py-2 text-sm focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-600"
+                    class="w-full rounded-lg border border-zinc-500 px-3 py-2 text-sm focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-500"
                   />
                   <FieldError
                     :id="`custom-link-title-${index}-error`"
@@ -327,7 +327,7 @@ function submitAnnouncementPreferences() {
                         : null
                     "
                     placeholder="https://example.com"
-                    class="w-full rounded-lg border border-theme-300 px-3 py-2 text-sm focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-600"
+                    class="w-full rounded-lg border border-zinc-500 px-3 py-2 text-sm focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-500"
                   />
                   <FieldError
                     :id="`custom-link-url-${index}-error`"
@@ -414,7 +414,7 @@ function submitAnnouncementPreferences() {
                 <input
                   type="checkbox"
                   :aria-label="`${groupLabel}（全選）`"
-                  class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600 dark:text-zinc-300"
+                  class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-300 dark:border-zinc-500 dark:text-zinc-300"
                   :checked="isGroupChecked(groupValue)"
                   :indeterminate="isGroupIndeterminate(groupValue)"
                   @change="toggleGroup(groupValue, $event.target.checked)"
@@ -466,7 +466,7 @@ function submitAnnouncementPreferences() {
                     <input
                       type="checkbox"
                       :aria-label="source"
-                      class="size-4 rounded border-theme-300 text-theme-700 focus:ring-theme-300 dark:border-zinc-600 dark:text-zinc-300"
+                      class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-300 dark:border-zinc-500 dark:text-zinc-300"
                       :checked="isSourceChecked(source)"
                       :indeterminate="isSourceIndeterminate(source)"
                       @change="toggleSource(source, $event.target.checked)"

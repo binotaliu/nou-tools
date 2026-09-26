@@ -157,7 +157,7 @@ function statusLabel(store) {
             name="search"
             accesskey="8"
             placeholder="搜尋店家名稱"
-            class="w-full rounded-xl border border-theme-200 bg-white py-2.5 pr-3 pl-10 text-base focus:border-theme-300 focus:ring-theme-300 sm:text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            class="w-full rounded-xl border border-zinc-500 bg-white py-2.5 pr-3 pl-10 text-base focus:border-theme-300 focus:ring-theme-300 sm:text-sm dark:border-zinc-500 dark:bg-zinc-900"
           />
         </div>
 
@@ -177,8 +177,8 @@ function statusLabel(store) {
               class="appearance-none rounded-full border py-1.5 pr-8 pl-3.5 text-sm font-medium transition focus:ring-theme-300"
               :class="
                 filter.model.value
-                  ? 'border-theme-700 bg-theme-700 text-white dark:border-theme-500 dark:bg-theme-600'
-                  : 'border-theme-200 bg-white text-theme-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200'
+                  ? 'border-theme-700 bg-theme-700 text-white dark:border-theme-500 dark:bg-theme-700'
+                  : 'border-zinc-500 bg-white text-theme-800 dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-200'
               "
             >
               <option value="">{{ filter.allLabel }}</option>
@@ -273,7 +273,7 @@ function statusLabel(store) {
                   {{ store.discountDetails }}
                 </span>
                 <span
-                  class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-theme-600 dark:text-zinc-500"
+                  class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-theme-700 dark:text-zinc-400"
                 >
                   <span
                     class="inline-flex items-center gap-1 font-medium"

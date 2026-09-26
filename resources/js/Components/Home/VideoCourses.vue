@@ -270,7 +270,7 @@ const visibleCourses = computed(() =>
       <input
         type="checkbox"
         :checked="showEnded"
-        class="size-4 rounded border-theme-300 accent-theme-700"
+        class="size-4 rounded border-zinc-500 accent-theme-700"
         data-testid="video-courses-show-ended"
         @change="setShowEnded($event.target.checked)"
       />

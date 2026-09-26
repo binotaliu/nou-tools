@@ -183,7 +183,7 @@ function submit() {
                 <input
                   v-model="form.include_school_calendar"
                   type="checkbox"
-                  class="size-4 rounded border-theme-400 text-theme-700 focus:ring-theme-500 dark:border-zinc-600 dark:text-zinc-300"
+                  class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-500 dark:border-zinc-500 dark:text-zinc-300"
                 />
                 <span
                   class="text-sm font-medium text-theme-800 dark:text-zinc-200"
@@ -198,7 +198,7 @@ function submit() {
                 <input
                   v-model="form.include_exams"
                   type="checkbox"
-                  class="size-4 rounded border-theme-400 text-theme-700 focus:ring-theme-500 dark:border-zinc-600 dark:text-zinc-300"
+                  class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-500 dark:border-zinc-500 dark:text-zinc-300"
                 />
                 <span
                   class="text-sm font-medium text-theme-800 dark:text-zinc-200"
@@ -214,7 +214,7 @@ function submit() {
                   <input
                     v-model="form.class_reminders_enabled"
                     type="checkbox"
-                    class="size-4 rounded border-theme-400 text-theme-700 focus:ring-theme-500 dark:border-zinc-600 dark:text-zinc-300"
+                    class="size-4 rounded border-zinc-500 text-theme-700 focus:ring-theme-500 dark:border-zinc-500 dark:text-zinc-300"
                   />
                   <span
                     class="text-sm font-medium text-theme-800 dark:text-zinc-200"
@@ -250,7 +250,7 @@ function submit() {
                           ? 'reminder-offsets-error'
                           : null
                       "
-                      class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
+                      class="w-full appearance-none rounded-lg border border-zinc-500 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500 dark:bg-zinc-900"
                     >
                       <option
                         v-for="[value, label] in REMINDER_OPTIONS"
@@ -281,7 +281,7 @@ function submit() {
                           ? 'reminder-offsets-error'
                           : null
                       "
-                      class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
+                      class="w-full appearance-none rounded-lg border border-zinc-500 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500 dark:bg-zinc-900"
                     >
                       <option value="">不設定第二次提醒</option>
                       <option

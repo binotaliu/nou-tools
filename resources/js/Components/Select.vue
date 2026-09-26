@@ -22,7 +22,7 @@ const [model, modelModifiers] = defineModel({
     <select
       v-model="model"
       v-bind="$attrs"
-      class="block w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
+      class="block w-full appearance-none rounded-lg border border-zinc-500 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500 dark:bg-zinc-900"
     >
       <slot />
     </select>
