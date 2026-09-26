@@ -432,7 +432,7 @@ const bottomMoreItems = computed(() =>
       >
         <div>&copy; {{ new Date().getFullYear() }} NOU 小幫手</div>
         <div
-          class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:flex-nowrap md:gap-y-2"
+          class="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 md:justify-end"
         >
           <div class="text-xs">
             <Link
