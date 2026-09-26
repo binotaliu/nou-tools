@@ -29,7 +29,7 @@ const { showBanner, accept, decline } = useAnalyticsConsent()
             href="/about"
             class="underline hover:text-theme-900 dark:hover:text-zinc-100"
           >
-            關於本站
+            關於
           </Link>
           。
         </p>

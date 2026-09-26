@@ -28,7 +28,7 @@ it('server-renders title, description and Open Graph tags on static pages', func
     'announcements' => ['announcements.index', '學校公告 - NOU 小幫手'],
     'directory' => ['directory.index', '連結 / 學習指導中心目錄 - NOU 小幫手'],
     'course schedule' => ['course.schedule', '本學期開課表 - NOU 小幫手'],
-    'about' => ['about', '關於本站 - NOU 小幫手'],
+    'about' => ['about', '關於 - NOU 小幫手'],
     'accessibility' => ['accessibility', '無障礙說明 - NOU 小幫手'],
     'share' => ['share', '分享 NOU 小幫手 - NOU 小幫手'],
     'pwa install' => ['pwa.install', '安裝成 App - NOU 小幫手'],

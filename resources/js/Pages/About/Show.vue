@@ -18,7 +18,7 @@ const linkIconClass = 'size-4 shrink-0 text-theme-700 dark:text-zinc-200'
 </script>
 
 <template>
-  <Head title="關於本站 - NOU 小幫手" />
+  <Head title="關於 - NOU 小幫手" />
 
   <AppLayout>
     <div class="mx-auto max-w-3xl space-y-8">
@@ -42,7 +42,7 @@ const linkIconClass = 'size-4 shrink-0 text-theme-700 dark:text-zinc-200'
             class="text-3xl font-bold tracking-tight text-theme-700 dark:text-zinc-200 bottom-nav:hidden"
             data-testid="about-title"
           >
-            關於本站
+            關於 NOU 小幫手
           </h2>
           <p
             class="mt-1 text-theme-700 dark:text-zinc-400 bottom-nav:hidden"

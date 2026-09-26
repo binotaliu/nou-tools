@@ -79,7 +79,7 @@ it('opens the more sheet from the tab bar and closes it again', function () use 
         ->click('[data-testid="bottom-nav-more"]')
         ->assertVisible('[data-testid="bottom-nav-sheet"]')
         ->assertSee('今日視訊面授')
-        ->assertSee('關於本站');
+        ->assertSee('關於');
 
     // The sheet covers the middle of the backdrop, where a driver click would
     // land, so dispatch the click on the backdrop itself. Then let the 150ms
@@ -254,7 +254,7 @@ it('links the accessibility page from About instead of the more sheet', function
         ->click('[data-testid="bottom-nav-more"]');
 
     expect($linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))
-        ->toContain('關於本站')
+        ->toContain('關於')
         ->not->toContain('無障礙說明');
 });
 

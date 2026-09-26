@@ -148,7 +148,7 @@ const settingsItem = {
 const aboutItem = {
   href: '/about',
   prefix: '/about',
-  label: '關於本站',
+  label: '關於',
   icon: 'information-circle',
 }
 
@@ -463,7 +463,7 @@ const adaptableOther = computed(() =>
               class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
             >
               <Icon name="information-circle" class="size-3" />
-              關於本站
+              關於
             </Link>
           </div>
           <div class="text-xs">
