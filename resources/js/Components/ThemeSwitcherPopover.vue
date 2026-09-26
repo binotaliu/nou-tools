@@ -57,7 +57,7 @@ onBeforeUnmount(() => {
       type="button"
       :class="
         flat
-          ? 'inline-flex size-11 items-center justify-center rounded-full text-theme-700 transition hover:bg-black/5 focus:ring-2 focus:ring-theme-500 focus:outline-none active:scale-95 dark:text-zinc-300 dark:hover:bg-white/10'
+          ? 'inline-flex size-11 items-center justify-center rounded-md text-theme-700 transition hover:bg-black/5 focus:ring-2 focus:ring-theme-500 focus:outline-none active:scale-95 dark:text-zinc-300 dark:hover:bg-white/10'
           : 'inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none md:mr-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800'
       "
       :aria-expanded="open.toString()"

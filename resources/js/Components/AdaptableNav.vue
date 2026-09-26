@@ -75,7 +75,7 @@ const capsuleClass = active =>
 
 // Borderless icon buttons for the bar's edges.
 const flatButtonClass =
-  'inline-flex size-11 items-center justify-center rounded-full text-theme-700 transition active:scale-95 hover:bg-black/5 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:text-zinc-300 dark:hover:bg-white/10'
+  'inline-flex size-11 items-center justify-center rounded-md text-theme-700 transition active:scale-95 hover:bg-black/5 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:text-zinc-300 dark:hover:bg-white/10'
 
 const toggleClass =
   'inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800'
@@ -83,7 +83,7 @@ const toggleClass =
 
 <template>
   <div class="hidden print:hidden wide-pwa:contents">
-    <!-- Top tab bar: a centred capsule of tabs between the sidebar toggle and
+    <!-- Top tab bar: a centred rounded tray of tabs between the sidebar toggle and
          the utility buttons, on a translucent bar, like iPadOS. -->
     <header
       class="sticky top-0 z-40 box-content h-14 border-b border-black/5 bg-white/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/70 pwa-sidebar:hidden"
@@ -107,14 +107,14 @@ const toggleClass =
         <nav
           aria-label="主要導覽"
           data-testid="adaptable-nav-tabs-list"
-          class="flex min-w-0 items-center gap-0.5 rounded-full bg-theme-100/70 p-1 dark:bg-zinc-800/70"
+          class="flex min-w-0 items-center gap-0.5 rounded-lg bg-theme-100/70 p-1 dark:bg-zinc-800/70"
         >
           <Link
             v-for="item in primary"
             :key="item.href"
             :href="item.href"
             :aria-current="item.active ? 'page' : null"
-            class="inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium whitespace-nowrap transition-all active:scale-95 lg:px-4"
+            class="inline-flex min-h-9 items-center gap-1.5 rounded-md px-3 text-sm font-medium whitespace-nowrap transition-all active:scale-95 lg:px-4"
             :class="capsuleClass(item.active)"
           >
             <Icon :name="item.icon" class="hidden size-4 shrink-0 lg:block" />
@@ -147,7 +147,7 @@ const toggleClass =
             <div
               v-show="moreOpen"
               id="adaptable-nav-more-menu"
-              class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-2xl border border-black/5 bg-white/90 p-2 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/90"
+              class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-lg border border-black/5 bg-white/90 p-2 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/90"
             >
               <Link
                 v-for="item in [...more, ...other]"
@@ -155,7 +155,7 @@ const toggleClass =
                 :href="item.href"
                 :data-offline-allow="item.offlineAllow ? '' : null"
                 :aria-current="item.active ? 'page' : null"
-                class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors"
+                class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
                 :class="itemClass(item.active)"
               >
                 <Icon :name="item.icon" class="size-4 shrink-0" />
