@@ -542,11 +542,15 @@ function print() {
             <table
               class="w-[max(100%,calc(6rem+var(--courses-count)*9rem))] table-fixed border-collapse rounded print:w-full print:min-w-0"
             >
+              <caption class="sr-only">
+                學習進度：每週各課程的影音與課本完成狀況，以及作業截止日期與備註
+              </caption>
               <thead class="print:table-header-group">
                 <tr
                   class="sticky top-0 z-20 rounded-t bg-theme-100 dark:bg-zinc-900 print:static"
                 >
                   <th
+                    scope="col"
                     class="sticky left-0 z-30 w-24 rounded-tl border border-t-0 border-l-0 border-theme-300 bg-theme-100 px-0 py-2 text-center text-sm font-bold text-theme-900 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 print:static"
                     rowspan="2"
                   >
@@ -558,6 +562,7 @@ function print() {
                   <th
                     v-for="course in viewModel.courses"
                     :key="course.id"
+                    scope="colgroup"
                     class="relative w-[calc((100%-6rem)/var(--courses-count))] border border-t-0 border-theme-300 px-2 py-2 text-center font-bold text-theme-900 last:rounded-tr last:border-r-0 dark:border-zinc-600 dark:text-zinc-100 print:static"
                     colspan="2"
                   >
@@ -577,11 +582,13 @@ function print() {
                     :key="course.id"
                   >
                     <th
+                      scope="col"
                       class="border border-t-0 border-b-0 border-theme-300 px-0 py-1 text-center text-xs font-medium text-theme-700 dark:border-zinc-600 dark:text-zinc-300"
                     >
                       影音
                     </th>
                     <th
+                      scope="col"
                       class="border border-t-0 border-b-0 border-theme-300 px-0 py-1 text-center text-xs font-medium text-theme-700 last:border-r-0 dark:border-zinc-600 dark:text-zinc-300"
                     >
                       課本
@@ -594,7 +601,8 @@ function print() {
                   <tr
                     class="border-b border-theme-300 bg-theme-50 dark:border-zinc-600 dark:bg-zinc-950"
                   >
-                    <td
+                    <th
+                      scope="row"
                       class="sticky left-0 z-10 break-inside-avoid border border-b-0 border-l-0 border-theme-300 bg-theme-50 px-0 py-0 text-center text-xs font-semibold text-theme-900 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100 print:static"
                       rowspan="2"
                     >
@@ -602,7 +610,7 @@ function print() {
                       <div
                         class="absolute top-0 left-full h-full w-px bg-theme-300 dark:bg-zinc-600 print:hidden"
                       ></div>
-                    </td>
+                    </th>
 
                     <template
                       v-for="course in viewModel.courses"
@@ -674,7 +682,8 @@ function print() {
                   <tr
                     class="border-b border-theme-300 hover:bg-theme-50 dark:border-zinc-600 dark:hover:bg-zinc-950"
                   >
-                    <td
+                    <th
+                      scope="row"
                       class="sticky left-0 z-10 break-inside-avoid border border-b-0 border-l-0 border-theme-300 px-0 py-0 font-semibold text-theme-900 dark:border-zinc-600 dark:text-zinc-100 print:static print:bg-theme-50"
                       :class="
                         currentWeek === week.num
@@ -701,7 +710,7 @@ function print() {
                       <div
                         class="absolute top-0 left-full h-full w-px bg-theme-300 dark:bg-zinc-600 print:hidden"
                       ></div>
-                    </td>
+                    </th>
 
                     <template
                       v-for="course in viewModel.courses"

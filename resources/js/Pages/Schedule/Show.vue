@@ -1388,22 +1388,28 @@ function localHint(next) {
           <table
             class="w-full border-collapse overflow-hidden rounded text-left text-theme-700 dark:text-zinc-300"
           >
+            <caption class="sr-only">
+              考試日期與時間
+            </caption>
             <thead>
               <tr
                 class="rounded-t border-b-2 border-theme-300 bg-theme-100 dark:border-zinc-600 dark:bg-zinc-900"
               >
                 <th
+                  scope="col"
                   class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                 >
                   課程
                 </th>
                 <th
                   v-if="!viewModel.selectedTerm.endsWith('C')"
+                  scope="col"
                   class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                 >
                   期中考
                 </th>
                 <th
+                  scope="col"
                   class="px-4 py-3 font-bold text-theme-900 dark:text-zinc-100"
                 >
                   期末考
@@ -1417,7 +1423,8 @@ function localHint(next) {
                 :key="exam.courseId"
                 class="border-b border-theme-200 hover:bg-theme-50 dark:border-zinc-700 dark:hover:bg-zinc-950"
               >
-                <td
+                <th
+                  scope="row"
                   class="px-4 py-3 font-semibold text-theme-900 dark:text-zinc-100"
                 >
                   {{ exam.courseName }}
@@ -1437,7 +1444,7 @@ function localHint(next) {
                       考古題
                     </Link>
                   </div>
-                </td>
+                </th>
 
                 <td
                   v-if="!viewModel.selectedTerm.endsWith('C')"

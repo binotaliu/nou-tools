@@ -609,6 +609,20 @@ MD);
         ->toContain('type="checkbox"');
 });
 
+test('table header cells carry scope=col and body cells stay plain', function () {
+    $html = ($this->convert)(<<<'MD'
+| 欄位 | 說明 |
+| :-- | --- |
+| A | B |
+MD);
+
+    expect($html)
+        ->toContain('<th scope="col" align="left">欄位</th>')
+        ->toContain('<th scope="col">說明</th>')
+        ->toContain('<td align="left">A</td>')
+        ->not->toContain('<td scope');
+});
+
 test('a bare url autolinks when immediately preceded by cjk punctuation', function () {
     $html = ($this->convert)('示範：https://example.com');
 

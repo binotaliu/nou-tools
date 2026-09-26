@@ -42,6 +42,7 @@ use NouTools\Domains\Articles\Markdown\Inline\CjkAutolinkParser;
 use NouTools\Domains\Articles\Markdown\Inline\Mark;
 use NouTools\Domains\Articles\Markdown\Inline\MarkDelimiterProcessor;
 use NouTools\Domains\Articles\Markdown\Inline\MarkRenderer;
+use NouTools\Domains\Articles\Markdown\Table\TableHeaderScopeProcessor;
 use NouTools\Domains\Articles\Markdown\Toc\TocPlaceholderNode;
 use NouTools\Domains\Articles\Markdown\Toc\TocPlaceholderRenderer;
 use NouTools\Domains\Articles\Markdown\Toc\TocPlaceholderStartParser;
@@ -123,6 +124,9 @@ final readonly class NouMarkdownExtension implements ExtensionInterface
         // Heading anchors (h2-h4): `id` + trailing `#` permalink
         $environment->addEventListener(DocumentParsedEvent::class, new HeadingSlugProcessor, -100);
         $environment->addRenderer(HeadingAnchorNode::class, new HeadingAnchorRenderer);
+
+        // Table header cells get `scope="col"`
+        $environment->addEventListener(DocumentParsedEvent::class, new TableHeaderScopeProcessor);
 
         // External link handling
         $environment->addEventListener(DocumentParsedEvent::class, new ExternalLinkProcessor(
