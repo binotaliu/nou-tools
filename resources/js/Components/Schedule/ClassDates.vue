@@ -199,6 +199,7 @@ const cells = computed(() => {
                 :class="cell.count > 0 ? 'bg-theme-600 dark:bg-theme-500' : ''"
                 aria-hidden="true"
               ></span>
+              <span v-if="cell.iso === todayYmd" class="sr-only">，今天</span>
               <span v-if="cell.count > 0" class="sr-only">
                 ，{{ cell.count }} 堂面授
               </span>
