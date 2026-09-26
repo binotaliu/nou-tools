@@ -5,6 +5,8 @@
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import FieldError from '../../Components/FieldError.vue'
+import { focusFirstInvalid } from '../../Composables/useFormErrorFocus'
 
 const props = defineProps({
   viewModel: {
@@ -41,6 +43,7 @@ const form = useForm({
 function submit() {
   form.put(`/schedules/${props.viewModel.uuid}/calendar-settings`, {
     preserveScroll: true,
+    onError: () => focusFirstInvalid(),
   })
 }
 </script>
@@ -230,13 +233,23 @@ function submit() {
                 <div class="mt-3 grid gap-3 sm:grid-cols-2">
                   <div>
                     <label
+                      for="reminder-offset-0"
                       class="mb-1 block text-xs font-semibold text-theme-700 dark:text-zinc-300"
                     >
                       第一次提醒
                     </label>
 
                     <select
+                      id="reminder-offset-0"
                       v-model="form.reminder_offsets[0]"
+                      :aria-invalid="
+                        form.errors['reminder_offsets.0'] ? 'true' : null
+                      "
+                      :aria-describedby="
+                        form.errors['reminder_offsets.0']
+                          ? 'reminder-offsets-error'
+                          : null
+                      "
                       class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
                     >
                       <option
@@ -251,13 +264,23 @@ function submit() {
 
                   <div>
                     <label
+                      for="reminder-offset-1"
                       class="mb-1 block text-xs font-semibold text-theme-700 dark:text-zinc-300"
                     >
                       第二次提醒（可留空）
                     </label>
 
                     <select
+                      id="reminder-offset-1"
                       v-model="form.reminder_offsets[1]"
+                      :aria-invalid="
+                        form.errors['reminder_offsets.1'] ? 'true' : null
+                      "
+                      :aria-describedby="
+                        form.errors['reminder_offsets.1']
+                          ? 'reminder-offsets-error'
+                          : null
+                      "
                       class="w-full appearance-none rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900"
                     >
                       <option value="">不設定第二次提醒</option>
@@ -273,18 +296,13 @@ function submit() {
                 </div>
               </div>
 
-              <p
-                v-if="
+              <FieldError
+                id="reminder-offsets-error"
+                :message="
                   form.errors['reminder_offsets.0'] ||
                   form.errors['reminder_offsets.1']
                 "
-                class="text-sm text-red-700"
-              >
-                {{
-                  form.errors['reminder_offsets.0'] ||
-                  form.errors['reminder_offsets.1']
-                }}
-              </p>
+              />
             </div>
           </div>
 

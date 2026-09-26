@@ -9,6 +9,7 @@ import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import QrScanner from '../../Components/QrScanner.vue'
 import decodeQrImage from '../../Composables/decodeQrImage'
+import { focusFirstInvalid } from '../../Composables/useFormErrorFocus'
 
 const hasCreatedBefore = ref(false)
 const scanning = ref(false)
@@ -22,7 +23,7 @@ const canScan = computed(
 )
 
 function submit() {
-  form.post('/schedules/my')
+  form.post('/schedules/my', { onError: () => focusFirstInvalid() })
 }
 
 function onScanned(text) {

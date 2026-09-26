@@ -7,6 +7,8 @@ import { computed, reactive, ref } from 'vue'
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import FieldError from '../../Components/FieldError.vue'
+import { focusFirstInvalid } from '../../Composables/useFormErrorFocus'
 import useScheduleCustomize from '../../Composables/useScheduleCustomize'
 import useAnnouncementPreferences from '../../Composables/useAnnouncementPreferences'
 
@@ -73,6 +75,7 @@ function submit() {
 
   form.put(`/schedules/${props.viewModel.scheduleUuid}/customize`, {
     preserveScroll: true,
+    onError: () => focusFirstInvalid(),
   })
 }
 
@@ -255,19 +258,11 @@ function submitAnnouncementPreferences() {
             </div>
           </div>
 
-          <div
-            v-if="
-              form.errors.custom_links ||
-              Object.keys(form.errors).some(k => k.startsWith('custom_links.'))
-            "
-            class="mb-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-          >
-            <ul class="space-y-1">
-              <li v-for="(error, key) in form.errors" :key="key">
-                {{ error }}
-              </li>
-            </ul>
-          </div>
+          <FieldError
+            id="custom-links-error"
+            :message="form.errors.custom_links"
+            class="mb-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm"
+          />
 
           <div class="space-y-3">
             <div
@@ -278,31 +273,65 @@ function submitAnnouncementPreferences() {
               <div class="grid gap-3 md:grid-cols-[1fr_2fr_auto] md:items-end">
                 <div>
                   <label
+                    :for="`custom-link-title-${index}`"
                     class="mb-1 block text-sm font-semibold text-theme-800 dark:text-zinc-200"
                   >
                     連結名稱
                   </label>
                   <input
+                    :id="`custom-link-title-${index}`"
                     v-model="link.title"
                     type="text"
                     maxlength="50"
+                    autocomplete="off"
+                    enterkeyhint="next"
+                    :aria-invalid="
+                      form.errors[`custom_links.${index}.title`] ? 'true' : null
+                    "
+                    :aria-describedby="
+                      form.errors[`custom_links.${index}.title`]
+                        ? `custom-link-title-${index}-error`
+                        : null
+                    "
                     placeholder="例如：我的課程群組"
                     class="w-full rounded-lg border border-theme-300 px-3 py-2 text-sm focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-600"
+                  />
+                  <FieldError
+                    :id="`custom-link-title-${index}-error`"
+                    :message="form.errors[`custom_links.${index}.title`]"
                   />
                 </div>
 
                 <div>
                   <label
+                    :for="`custom-link-url-${index}`"
                     class="mb-1 block text-sm font-semibold text-theme-800 dark:text-zinc-200"
                   >
                     網址
                   </label>
                   <input
+                    :id="`custom-link-url-${index}`"
                     v-model="link.url"
                     type="url"
+                    inputmode="url"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
                     maxlength="2048"
+                    :aria-invalid="
+                      form.errors[`custom_links.${index}.url`] ? 'true' : null
+                    "
+                    :aria-describedby="
+                      form.errors[`custom_links.${index}.url`]
+                        ? `custom-link-url-${index}-error`
+                        : null
+                    "
                     placeholder="https://example.com"
                     class="w-full rounded-lg border border-theme-300 px-3 py-2 text-sm focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-600"
+                  />
+                  <FieldError
+                    :id="`custom-link-url-${index}-error`"
+                    :message="form.errors[`custom_links.${index}.url`]"
                   />
                 </div>
 
@@ -326,6 +355,7 @@ function submitAnnouncementPreferences() {
             <button
               type="button"
               class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-200 bg-white px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-50 disabled:border-theme-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              data-testid="customize-add-link"
               :disabled="links.length >= 20"
               @click="addLink()"
             >
@@ -338,6 +368,7 @@ function submitAnnouncementPreferences() {
         <div class="flex flex-col gap-3 sm:flex-row">
           <button
             type="submit"
+            data-testid="customize-submit"
             :disabled="form.processing"
             class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400 sm:w-auto"
           >
