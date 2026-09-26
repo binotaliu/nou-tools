@@ -66,6 +66,7 @@ import {
   TagIcon,
   TruckIcon,
   VideoCameraIcon,
+  ViewColumnsIcon,
   XCircleIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
@@ -133,6 +134,7 @@ const ICONS = {
   tag: TagIcon,
   truck: TruckIcon,
   'video-camera': VideoCameraIcon,
+  'view-columns': ViewColumnsIcon,
   'x-circle': XCircleIcon,
   'x-mark': XMarkIcon,
 }

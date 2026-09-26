@@ -7,6 +7,7 @@
 // route paths (there is no Ziggy route() helper on the frontend).
 import { computed, ref, watch } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
+import AdaptableNav from '../Components/AdaptableNav.vue'
 import BottomNav from '../Components/BottomNav.vue'
 import CookieConsentBanner from '../Components/CookieConsentBanner.vue'
 import Icon from '../Components/Icon.vue'
@@ -137,6 +138,25 @@ const moreMenuItems = [
   },
 ]
 
+const homeItem = { href: '/', prefix: '/', label: '首頁', icon: 'book-open' }
+const settingsItem = {
+  href: '/settings',
+  prefix: '/settings',
+  label: '設定',
+  icon: 'cog-6-tooth',
+}
+const aboutItem = {
+  href: '/about',
+  prefix: '/about',
+  label: '關於本站',
+  icon: 'information-circle',
+}
+
+const withActive = item => ({
+  ...item,
+  active: item.prefix === '/' ? currentPath.value === '/' : isItemActive(item),
+})
+
 // Installed-PWA bottom tab bar (see BottomNav.vue): the first four primary
 // links become tabs (優惠店家, the fifth, moves into its "更多" sheet along
 // with everything else). The header is hidden there, so 設定 (which holds the
@@ -146,26 +166,20 @@ const bottomTabs = computed(() =>
 )
 const bottomMoreItems = computed(() =>
   [
-    { href: '/', prefix: '/', label: '首頁', icon: 'book-open' },
+    homeItem,
     ...navItems.slice(4),
     ...moreMenuItems,
-    {
-      href: '/settings',
-      prefix: '/settings',
-      label: '設定',
-      icon: 'cog-6-tooth',
-    },
-    {
-      href: '/about',
-      prefix: '/about',
-      label: '關於本站',
-      icon: 'information-circle',
-    },
-  ].map(item => ({
-    ...item,
-    active:
-      item.prefix === '/' ? currentPath.value === '/' : isItemActive(item),
-  }))
+    settingsItem,
+    aboutItem,
+  ].map(withActive)
+)
+
+// Installed-PWA tablet/desktop nav (see AdaptableNav.vue): all five primary
+// links as tabs, the rest as overflow.
+const adaptablePrimary = computed(() => navItems.map(withActive))
+const adaptableMore = computed(() => moreMenuItems.map(withActive))
+const adaptableOther = computed(() =>
+  [homeItem, settingsItem, aboutItem].map(withActive)
 )
 </script>
 
@@ -202,7 +216,7 @@ const bottomMoreItems = computed(() =>
 
   <header
     data-testid="site-header"
-    class="sticky top-0 z-40 border-b border-theme-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 print:static bottom-nav:hidden"
+    class="sticky top-0 z-40 border-b border-theme-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 print:static bottom-nav:hidden wide-pwa:hidden"
   >
     <div class="relative mx-auto max-w-7xl px-3 py-2 md:px-6 md:py-4">
       <div class="flex items-center justify-between">
@@ -340,13 +354,22 @@ const bottomMoreItems = computed(() =>
     </div>
   </header>
 
+  <!-- Before <main>, not with BottomNav: its tab bar is sticky at the top, so
+       its place in the flow is its place on the page. -->
+  <AdaptableNav
+    :primary="adaptablePrimary"
+    :more="adaptableMore"
+    :other="adaptableOther"
+    :current-path="currentPath"
+  />
+
   <main
     id="main-content"
     tabindex="-1"
     :class="
       reserveBottomSpace
-        ? 'bottom-nav:pb-[calc(var(--pwa-nav-height)+26rem)] sm:bottom-nav:pb-[calc(var(--pwa-nav-height)+20rem)]'
-        : 'bottom-nav:pb-[calc(var(--pwa-nav-height)+2rem)]'
+        ? 'pwa:pb-[calc(var(--pwa-nav-height)+26rem)] sm:pwa:pb-[calc(var(--pwa-nav-height)+20rem)] lg:pwa:pb-48'
+        : 'pwa:pb-[calc(var(--pwa-nav-height)+2rem)]'
     "
     class="mx-auto max-w-7xl px-6 py-8 focus:outline-none"
   >
@@ -373,7 +396,7 @@ const bottomMoreItems = computed(() =>
 
   <footer
     :class="reserveBottomSpace ? 'pb-96! sm:pb-72! lg:pb-48!' : ''"
-    class="mt-12 border-t border-theme-200 bg-theme-100 py-8 text-theme-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 print:bg-white print:text-black bottom-nav:hidden"
+    class="mt-12 border-t border-theme-200 bg-theme-100 py-8 text-theme-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 print:bg-white print:text-black bottom-nav:hidden wide-pwa:hidden"
     data-testid="site-footer"
   >
     <div class="mx-auto max-w-7xl px-6">
