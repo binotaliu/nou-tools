@@ -16,13 +16,17 @@ defineProps({
 })
 
 const message =
-  'NOU 小幫手是給空大同學的非官方小工具，由學生自發製作、免費使用：可以建立自己的課表並收到上課提醒、查看今日視訊面授與學校公告、瀏覽開課表與優惠店家，還有線上自習室陪你一起讀書。'
+  'NOU 小幫手是給空大同學的非官方小工具，由學生自製、完全免費、不需安裝：建立自己的課表並收到上課提醒、檢視今日視訊面授與學校公告、瀏覽開課表與優惠店家，更有線上自習室陪你一起讀書。'
 
 const features = [
   { icon: 'calendar-days', label: '專屬課表', hint: '上課提醒、列印成 PDF' },
-  { icon: 'video-camera', label: '今日視訊面授', hint: '一眼看到今天的課' },
-  { icon: 'megaphone', label: '學校公告', hint: '不漏掉重要消息' },
-  { icon: 'building-storefront', label: '優惠店家', hint: '同學整理的好康' },
+  { icon: 'video-camera', label: '今日視訊面授', hint: '所有正在進行的課程' },
+  { icon: 'megaphone', label: '學校公告', hint: '即時了解學校最新消息' },
+  {
+    icon: 'building-storefront',
+    label: '優惠店家',
+    hint: '由空大同學整理的好康',
+  },
   { icon: 'academic-cap', label: '自習室', hint: '和同學一起專注' },
   { icon: 'newspaper', label: '雙週報', hint: '浣熊的空大雙週報' },
 ]
@@ -58,14 +62,11 @@ const features = [
         data-testid="share-card"
       >
         <h3 class="text-lg font-semibold text-theme-800 dark:text-zinc-100">
-          你的朋友會收到這段話
+          向同學分享 NOU 小幫手
         </h3>
-        <p class="mt-1 text-sm text-theme-700 dark:text-zinc-400">
-          分享時會連同下面的介紹和網址一起送出，對方不用打開就知道這是什麼。
-        </p>
 
         <blockquote
-          class="mt-4 rounded-lg border-l-4 border-theme-300 bg-theme-50 p-4 text-sm leading-relaxed text-theme-800 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
+          class="mt-4 rounded-lg border border-theme-300 bg-theme-50 p-4 text-sm leading-relaxed text-theme-800 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
         >
           <p data-testid="share-message">{{ message }}</p>
           <p class="mt-2 font-mono break-all text-theme-700 dark:text-zinc-400">
@@ -119,7 +120,7 @@ const features = [
       </section>
 
       <p class="text-center text-sm text-theme-700 dark:text-zinc-400">
-        謝謝你幫忙推廣，讓更多同學用得上 🦝
+        謝謝你幫忙推廣，讓更多同學加入 🦝
       </p>
     </div>
   </AppLayout>
