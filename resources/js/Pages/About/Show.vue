@@ -65,6 +65,7 @@ const linkIconClass = 'size-4 shrink-0 text-theme-700 dark:text-zinc-200'
 
       <section
         class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        id="about-disclaimer"
         data-testid="about-disclaimer"
       >
         <h3 class="text-lg font-semibold text-theme-800 dark:text-zinc-100">

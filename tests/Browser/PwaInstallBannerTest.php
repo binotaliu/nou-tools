@@ -102,14 +102,14 @@ it('only hides the banner for this visit when it is closed with the X', function
     $page->assertVisible('[data-testid="pwa-banner"]');
 });
 
-it('links to the install page from the footer', function () {
+it('links to the install page from the about page', function () {
     $page = visit(route('about'));
 
     dismissCookieConsentBanner($page);
 
-    $page->assertVisible('[data-testid="footer-install-link"]')
-        ->assertSeeIn('[data-testid="footer-install-link"]', '安裝 NOU 小幫手')
-        ->click('[data-testid="footer-install-link"]')
+    $page->assertVisible('[data-testid="about-link-install"]')
+        ->assertSeeIn('[data-testid="about-link-install"]', '安裝 NOU 小幫手')
+        ->click('[data-testid="about-link-install"]')
         ->assertPathIs('/install');
 });
 

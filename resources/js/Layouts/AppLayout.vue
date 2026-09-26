@@ -20,6 +20,9 @@ defineProps({ reserveBottomSpace: { type: Boolean, default: false } })
 import ThemeSwitcherPopover from '../Components/ThemeSwitcherPopover.vue'
 
 const page = usePage()
+
+const footerLinkClass =
+  'text-theme-700 hover:text-theme-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100'
 const currentPath = computed(() => page.url.split('?')[0])
 
 // Toast notifications for flash messages and validation errors.
@@ -415,16 +418,13 @@ const adaptableOther = computed(() =>
       </div>
 
       <div
-        class="flex flex-col items-center justify-between gap-10 md:flex-row md:gap-6 print:hidden"
+        class="flex flex-col items-center justify-between gap-8 md:flex-row md:items-center md:gap-12 print:hidden"
       >
-        <div class="flex flex-col items-center gap-1 md:flex-row md:gap-4">
-          <div class="p-3">
-            <Icon
-              name="book-open"
-              class="size-6 text-theme-700 dark:text-zinc-300"
-            />
-          </div>
-
+        <div class="flex items-center gap-3">
+          <Icon
+            name="book-open"
+            class="size-6 text-theme-700 dark:text-zinc-300"
+          />
           <div class="text-center md:text-left">
             <Link
               href="/"
@@ -432,111 +432,95 @@ const adaptableOther = computed(() =>
             >
               NOU 小幫手
             </Link>
-            <p class="mt-1 text-xs text-theme-700 dark:text-zinc-400">
+            <p class="text-xs text-theme-700 dark:text-zinc-400">
               給 NOU 同學的非官方小工具
             </p>
           </div>
         </div>
 
-        <div class="flex flex-col items-center gap-6 sm:flex-row">
-          <div
-            class="max-w-lg text-center text-sm text-theme-700 md:text-left dark:text-zinc-400"
-          >
-            <span class="font-semibold">免責聲明：</span>
-            <p class="text-justify text-xs md:text-left">
-              本網站為學生自發製作之工具，僅供同學參考使用，並非學校官方發布；所有資訊以學校正式公告為準；本網站已盡可能提供準確資訊，但不保證其完整性或正確性；針對重要資訊，請使用者自行查證並以學校官方公告為準；課程相關資訊係搜集整理自學校官方公告、網站，與其他官方資料，採用合理使用原則提供同學參考使用；使用本網站即表示同意此免責聲明之內容。
-            </p>
+        <nav
+          aria-label="頁尾連結"
+          class="grid shrink-0 grid-cols-2 gap-x-12 gap-y-6 text-sm text-theme-700 dark:text-zinc-400"
+        >
+          <div>
+            <h2
+              class="mb-2 text-xs font-semibold text-theme-900 dark:text-zinc-100"
+            >
+              關於本站
+            </h2>
+            <ul class="space-y-2">
+              <li>
+                <Link href="/about" :class="footerLinkClass">關於</Link>
+              </li>
+              <li>
+                <Link href="/changelog" :class="footerLinkClass">
+                  更新日誌
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/accessibility"
+                  data-testid="footer-accessibility-link"
+                  :class="footerLinkClass"
+                >
+                  無障礙說明
+                </Link>
+              </li>
+            </ul>
           </div>
-        </div>
+          <div>
+            <h2
+              class="mb-2 text-xs font-semibold text-theme-900 dark:text-zinc-100"
+            >
+              狀態與聯絡
+            </h2>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="https://kuma.binota.org/status/nou"
+                  :class="footerLinkClass"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  學校網站狀態
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/binotaliu/nou-tools"
+                  :class="footerLinkClass"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  網站原始碼
+                </a>
+              </li>
+              <li>
+                <a
+                  href="mailto:nou-tools-contact@binota.org"
+                  :class="footerLinkClass"
+                >
+                  聯絡作者
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
       </div>
 
       <div
-        class="mt-6 flex flex-col-reverse items-center justify-between gap-6 border-t border-theme-200 pt-4 text-xs text-theme-700 md:flex-row md:gap-3 dark:border-zinc-700 dark:text-zinc-400 print:hidden"
+        class="mt-6 flex flex-col items-center justify-between gap-2 border-t border-theme-200 pt-4 text-center text-xs text-theme-700 md:flex-row md:gap-6 dark:border-zinc-700 dark:text-zinc-400 print:hidden"
       >
+        <p data-testid="footer-disclaimer" class="md:text-left">
+          本網站為學生自發製作之工具，非學校官方發布，資訊僅供參考，請以學校正式公告為準。
+          <Link
+            href="/about#about-disclaimer"
+            class="underline hover:text-theme-900 dark:hover:text-zinc-100"
+          >
+            完整免責聲明
+          </Link>
+        </p>
         <div>&copy; {{ new Date().getFullYear() }} NOU 小幫手</div>
-        <div
-          class="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 md:justify-end"
-        >
-          <div class="text-xs">
-            <Link
-              href="/about"
-              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
-            >
-              <Icon name="information-circle" class="size-3" />
-              關於
-            </Link>
-          </div>
-          <div class="text-xs">
-            <Link
-              href="/accessibility"
-              data-testid="footer-accessibility-link"
-              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
-            >
-              <Icon name="eye" class="size-3" />
-              無障礙說明
-            </Link>
-          </div>
-          <div class="text-xs">
-            <Link
-              href="/share"
-              data-testid="footer-share-link"
-              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
-            >
-              <Icon name="share" class="size-3" />
-              分享 NOU 小幫手
-            </Link>
-          </div>
-          <div class="text-xs">
-            <Link
-              href="/changelog"
-              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
-            >
-              <Icon name="sparkles" class="size-3" />
-              更新日誌
-            </Link>
-          </div>
-          <div class="text-xs">
-            <Link
-              href="/install"
-              data-testid="footer-install-link"
-              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
-            >
-              <Icon name="device-phone-mobile" class="size-3" />
-              安裝 NOU 小幫手
-            </Link>
-          </div>
-          <div class="text-xs">
-            <a
-              href="https://kuma.binota.org/status/nou"
-              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Icon name="computer-desktop" class="size-3" />
-              學校網站狀態
-            </a>
-          </div>
-          <div class="text-xs">
-            <a
-              href="https://github.com/binotaliu/nou-tools"
-              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Icon name="code-bracket" class="size-3" />
-              網站原始碼
-            </a>
-          </div>
-          <div class="text-xs">
-            <a
-              href="mailto:nou-tools-contact@binota.org"
-              class="inline-flex items-center gap-1 text-theme-700 hover:text-theme-800 dark:text-zinc-400 dark:hover:text-zinc-300"
-            >
-              <Icon name="envelope" class="size-3" />
-              聯絡作者
-            </a>
-          </div>
-        </div>
       </div>
     </div>
   </footer>
