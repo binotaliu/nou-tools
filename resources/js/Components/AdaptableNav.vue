@@ -147,7 +147,7 @@ const toggleClass =
             <div
               v-show="moreOpen"
               id="adaptable-nav-more-menu"
-              class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-lg border border-black/5 bg-white/90 p-2 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/90"
+              class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-lg border border-theme-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
             >
               <Link
                 v-for="item in [...more, ...other]"
