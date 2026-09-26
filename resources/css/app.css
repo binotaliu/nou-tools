@@ -214,11 +214,11 @@
     }
   }
 
-  /* The adaptable nav's top tab bar (h-12) is sticky, so docked content sits
+  /* The adaptable nav's top tab bar (h-14) is sticky, so docked content sits
    * beneath it; the sidebar mode has no bar. */
   @media (width >= 48rem) {
     html[data-pwa]:not([data-nav-style='sidebar']) {
-      --mobile-header-height: 3rem;
+      --mobile-header-height: 3.5rem;
     }
     html[data-pwa][data-nav-style='sidebar'] {
       --mobile-header-height: 0px;

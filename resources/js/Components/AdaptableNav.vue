@@ -66,59 +66,88 @@ const itemClass = active =>
     ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
     : 'text-theme-700 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
 
+// Active tab: a solid accent capsule. Inactive tabs are plain text: a native
+// tab bar has no hover boxes.
+const capsuleClass = active =>
+  active
+    ? 'bg-theme-600 text-white shadow-sm dark:bg-theme-500'
+    : 'text-theme-800 hover:text-theme-900 dark:text-zinc-300 dark:hover:text-zinc-100'
+
+// Borderless icon buttons for the bar's edges.
+const flatButtonClass =
+  'inline-flex size-11 items-center justify-center rounded-full text-theme-700 transition active:scale-95 hover:bg-black/5 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:text-zinc-300 dark:hover:bg-white/10'
+
 const toggleClass =
   'inline-flex items-center justify-center rounded-md border border-theme-200 bg-white p-2 text-theme-700 transition hover:bg-theme-50 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800'
 </script>
 
 <template>
   <div class="hidden print:hidden wide-pwa:contents">
-    <!-- Top tab bar -->
+    <!-- Top tab bar: a centred capsule of tabs between the sidebar toggle and
+         the utility buttons, on a translucent bar, like iPadOS. -->
     <header
-      class="sticky top-0 z-40 box-content h-12 border-b border-theme-200 bg-white pt-[env(safe-area-inset-top)] dark:border-zinc-700 dark:bg-zinc-900 pwa-sidebar:hidden"
+      class="sticky top-0 z-40 box-content h-14 border-b border-black/5 bg-white/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/70 pwa-sidebar:hidden"
       data-testid="adaptable-nav-tabs"
     >
       <div
-        class="mx-auto flex h-full max-w-7xl items-center justify-between gap-2 px-3 md:px-6"
+        class="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 md:px-6"
       >
+        <div class="flex items-center justify-self-start">
+          <button
+            type="button"
+            :class="flatButtonClass"
+            data-testid="nav-style-to-sidebar"
+            @click="setNavStyle('sidebar')"
+          >
+            <span class="sr-only">切換為側邊欄</span>
+            <Icon name="view-columns" class="size-6" />
+          </button>
+        </div>
+
         <nav
           aria-label="主要導覽"
           data-testid="adaptable-nav-tabs-list"
-          class="flex min-w-0 items-center gap-1"
+          class="flex min-w-0 items-center gap-0.5 rounded-full bg-theme-100/70 p-1 dark:bg-zinc-800/70"
         >
           <Link
             v-for="item in primary"
             :key="item.href"
             :href="item.href"
             :aria-current="item.active ? 'page' : null"
-            class="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors"
-            :class="itemClass(item.active)"
+            class="inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium whitespace-nowrap transition-all active:scale-95 lg:px-4"
+            :class="capsuleClass(item.active)"
           >
-            <Icon :name="item.icon" class="size-4 shrink-0" />
+            <Icon :name="item.icon" class="hidden size-4 shrink-0 lg:block" />
             <span>{{ item.label }}</span>
           </Link>
+        </nav>
+
+        <div class="flex items-center justify-self-end">
+          <ThemeSwitcherPopover
+            flat
+            :accesskey="navStyle === 'tabs' ? '3' : undefined"
+          />
 
           <div ref="moreRoot" class="relative">
             <button
               type="button"
-              class="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors"
-              :class="itemClass(moreActive())"
+              :class="[
+                flatButtonClass,
+                moreActive() ? 'text-theme-700 dark:text-theme-300' : '',
+              ]"
               :aria-expanded="moreOpen.toString()"
               aria-controls="adaptable-nav-more-menu"
               data-testid="adaptable-nav-more"
               @click="moreOpen = !moreOpen"
             >
-              <span>更多</span>
-              <Icon
-                name="chevron-down"
-                class="size-4 shrink-0 transition-transform"
-                :class="moreOpen ? 'rotate-180' : ''"
-              />
+              <span class="sr-only">更多</span>
+              <Icon name="ellipsis-horizontal" class="size-6" />
             </button>
 
             <div
               v-show="moreOpen"
               id="adaptable-nav-more-menu"
-              class="absolute top-full left-0 z-10 mt-2 w-60 space-y-1 rounded-md border border-theme-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+              class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-2xl border border-black/5 bg-white/90 p-2 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/90"
             >
               <Link
                 v-for="item in [...more, ...other]"
@@ -126,7 +155,7 @@ const toggleClass =
                 :href="item.href"
                 :data-offline-allow="item.offlineAllow ? '' : null"
                 :aria-current="item.active ? 'page' : null"
-                class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
+                class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors"
                 :class="itemClass(item.active)"
               >
                 <Icon :name="item.icon" class="size-4 shrink-0" />
@@ -134,21 +163,6 @@ const toggleClass =
               </Link>
             </div>
           </div>
-        </nav>
-
-        <div class="flex shrink-0 items-center gap-2">
-          <ThemeSwitcherPopover
-            :accesskey="navStyle === 'tabs' ? '3' : undefined"
-          />
-          <button
-            type="button"
-            :class="toggleClass"
-            data-testid="nav-style-to-sidebar"
-            @click="setNavStyle('sidebar')"
-          >
-            <span class="sr-only">切換為側邊欄</span>
-            <Icon name="view-columns" class="size-5" />
-          </button>
         </div>
       </div>
     </header>
