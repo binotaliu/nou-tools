@@ -43,7 +43,7 @@ final class ManageStudyRoom extends SettingsPage
                     ->helperText('關閉後，學生將無法進入自習室、佔位或計時，僅能看到目前的公告。'),
                 MarkdownEditor::make('announcement')
                     ->label('公告板內容')
-                    ->helperText('以 Markdown 撰寫，將顯示在自習室頁面的公告板中。')
+                    ->helperText('以 Markdown 撰寫，將顯示在自習室頁面的公告板中。圖片請寫替代文字：![替代文字](圖片網址)；只有純裝飾的圖片才留空。')
                     ->columnSpanFull(),
                 TagsInput::make('forbiddenNicknames')
                     ->label('暱稱黑名單')

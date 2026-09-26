@@ -30,7 +30,8 @@ const clipId = useId()
   <svg
     viewBox="0 0 224 126"
     class="mx-2 mt-2.5 aspect-video w-[calc(100%-1rem)] rounded-lg"
-    role="presentation"
+    aria-hidden="true"
+    focusable="false"
   >
     <defs>
       <clipPath :id="clipId">

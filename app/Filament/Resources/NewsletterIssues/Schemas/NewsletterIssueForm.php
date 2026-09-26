@@ -133,7 +133,8 @@ class NewsletterIssueForm
                 Section::make('前言')
                     ->schema([
                         MarkdownEditor::make('highlights_intro')
-                            ->hiddenLabel(),
+                            ->hiddenLabel()
+                            ->helperText('圖片請寫替代文字：![替代文字](圖片網址)；只有純裝飾的圖片才留空。'),
                     ])
                     ->columnSpanFull()
                     ->hiddenOn('create'),
@@ -201,6 +202,7 @@ class NewsletterIssueForm
                                     ->maxLength(255),
                                 MarkdownEditor::make('body')
                                     ->label('內文')
+                                    ->helperText('圖片請寫替代文字：![替代文字](圖片網址)；只有純裝飾的圖片才留空。')
                                     ->required()
                                     ->columnSpanFull(),
                             ])
@@ -382,6 +384,7 @@ class NewsletterIssueForm
                 ->columnSpanFull(),
             MarkdownEditor::make('summary')
                 ->label('摘要')
+                ->helperText('圖片請寫替代文字：![替代文字](圖片網址)；只有純裝飾的圖片才留空。')
                 ->columnSpanFull(),
         ];
     }

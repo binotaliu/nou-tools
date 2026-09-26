@@ -91,6 +91,7 @@ const faqOpenState = ref(faqs.map(() => false))
               >
                 <IconAppStoreDownload
                   class="h-14"
+                  role="img"
                   aria-label="在 App Store 上下載"
                 />
               </a>
@@ -102,6 +103,7 @@ const faqOpenState = ref(faqs.map(() => false))
               >
                 <IconGooglePlayDownload
                   class="h-14"
+                  role="img"
                   aria-label="在 Google Play 上下載"
                 />
               </a>
