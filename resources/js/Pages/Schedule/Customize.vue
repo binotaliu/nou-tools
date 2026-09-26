@@ -49,7 +49,7 @@ const DISPLAY_OPTION_LABELS = [
   ['show_school_calendar', '學校行事曆'],
   ['show_exam_info', '考試資訊'],
   ['show_announcements', '最新公告'],
-  ['show_share_section', '分享連結與 QRCode'],
+  ['show_share_section', '備份課表連結卡片'],
   ['show_print_button', '列印按鈕'],
 ]
 

@@ -11,11 +11,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Milon\Barcode\Facades\DNS2DFacade as DNS2D;
 use NouTools\Domains\Schedules\Actions\BuildScheduleAnnouncementsWidget;
 use NouTools\Domains\Schedules\Actions\BuildScheduleEditorPage;
 use NouTools\Domains\Schedules\Actions\BuildStudentScheduleCookie;
 use NouTools\Domains\Schedules\Actions\CreateSchedule;
+use NouTools\Domains\Schedules\Actions\ShowScheduleBackup;
 use NouTools\Domains\Schedules\Actions\ShowSchedulePage;
 use NouTools\Domains\Schedules\Actions\UpdateSchedule;
 use NouTools\Domains\Schedules\DataTransferObjects\StudentScheduleUpsertData;
@@ -77,14 +77,13 @@ final class ScheduleController extends Controller
         ShowSchedulePage $showSchedulePage,
         ListUpcomingSchoolEvents $listUpcomingSchoolEvents,
         BuildScheduleAnnouncementsWidget $buildScheduleAnnouncementsWidget,
+        ShowScheduleBackup $showScheduleBackup,
     ): Response {
         $linkedSchedule = $request->studentScheduleFromCookie();
         $viewModel = $showSchedulePage($schedule, $request->query('term'));
 
         $currentSemester = (string) config('app.current_semester');
         $showPastEvents = $viewModel->selectedTerm !== $currentSemester;
-
-        $shareUrl = url(route('schedules.show', $viewModel->uuid));
 
         $range = config('app.current_semester_range', []);
 
@@ -105,8 +104,7 @@ final class ScheduleController extends Controller
                 'showPastEvents' => $showPastEvents,
             ],
             'announcementsWidget' => $buildScheduleAnnouncementsWidget($schedule),
-            'shareUrl' => $shareUrl,
-            'qrCodeSvg' => DNS2D::getBarcodeSVG($shareUrl, 'QRCODE'),
+            'backup' => $showScheduleBackup($schedule),
         ]);
     }
 }

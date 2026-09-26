@@ -1,7 +1,7 @@
 <script setup>
 // The page's own small widgets (remember-schedule modal, push notification
-// toggle, "Add to bookmarks" hint, copy-link box) use the
-// usePwaStandalone/usePushSubscription/useCopyLink composables. The item
+// toggle, "Add to bookmarks" hint, backup-link card and nudge) use the
+// usePwaStandalone/usePushSubscription composables. The item
 // table's row-sorting/"next class" logic is inline here rather than a
 // shared composable, since it's only used on this page — mirroring how
 // Courses/Schedule.vue inlines its one-off logic.
@@ -21,9 +21,10 @@ import AnnouncementsWidget from '../../Components/AnnouncementsWidget.vue'
 import ClassCode from '../../Components/ClassCode.vue'
 import ClassDates from '../../Components/Schedule/ClassDates.vue'
 import PwaInstallBanner from '../../Components/PwaInstallBanner.vue'
+import BackupLinkCard from '../../Components/Schedule/BackupLinkCard.vue'
+import BackupLinkDialog from '../../Components/Schedule/BackupLinkDialog.vue'
 import usePwaStandalone from '../../Composables/usePwaStandalone'
 import usePushSubscription from '../../Composables/usePushSubscription'
-import useCopyLink from '../../Composables/useCopyLink'
 import useSchedulePdfShare from '../../Composables/useSchedulePdfShare'
 import { localTimeHint } from '../../Composables/useLocalTimeHint'
 
@@ -56,12 +57,8 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  shareUrl: {
-    type: String,
-    required: true,
-  },
-  qrCodeSvg: {
-    type: String,
+  backup: {
+    type: Object,
     required: true,
   },
   greeting: {
@@ -241,13 +238,45 @@ onUnmounted(() => {
   document.removeEventListener('keydown', onActionsKeydown)
 })
 
-// --- copy share link ---
-const shareInput = ref(null)
-const {
-  shareUrl: copyShareUrl,
-  copied,
-  copy,
-} = useCopyLink({ shareUrl: props.shareUrl }, shareInput)
+// --- backup link (the schedule's URL is the only way back once cookies are
+// gone; see BackupLinkDialog) ---
+const backupOpen = ref(false)
+
+// One-time nudge for the schedule's owner, until they open the backup or
+// dismiss it. Per browser, since a browser remembers one schedule.
+const NUDGE_KEY = 'nou:schedule-backup-nudge:v1'
+const nudgeDismissed = ref(true)
+
+onMounted(() => {
+  try {
+    nudgeDismissed.value = localStorage.getItem(NUDGE_KEY) === '1'
+  } catch {
+    nudgeDismissed.value = false
+  }
+})
+
+function dismissNudge() {
+  nudgeDismissed.value = true
+
+  try {
+    localStorage.setItem(NUDGE_KEY, '1')
+  } catch {
+    // Storage blocked: the nudge just comes back next visit.
+  }
+}
+
+function openBackup() {
+  closeActions()
+  dismissNudge()
+  backupOpen.value = true
+}
+
+const showBackupNudge = computed(
+  () =>
+    props.isLinkedSchedule &&
+    !props.shouldPromptRememberSchedule &&
+    !nudgeDismissed.value
+)
 
 // --- schedule items table (port of resources/js/schedule-items.js /
 // nouToolsScheduleItems) ---
@@ -482,6 +511,39 @@ function localHint(next) {
       </div>
 
       <div
+        v-if="showBackupNudge"
+        data-testid="schedule-backup-nudge"
+        class="mb-6 flex items-start gap-3 rounded-lg border border-theme-200 bg-theme-50 px-4 py-3 text-sm text-theme-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+        role="status"
+      >
+        <Icon name="lock-closed" class="mt-0.5 size-5 shrink-0" />
+        <div class="min-w-0 flex-1">
+          <p class="font-semibold">請備份課表連結，以避免資料遺失</p>
+          <p class="mt-1 text-theme-700 dark:text-zinc-400">
+            清除瀏覽器資料或換裝置後，可通過備份連結找回你的課表。
+          </p>
+          <div class="mt-2 flex gap-2">
+            <button
+              type="button"
+              data-testid="schedule-backup-nudge-open"
+              class="rounded-lg border border-theme-700 bg-theme-700 px-3 py-1.5 font-semibold text-white transition hover:bg-theme-800"
+              @click="openBackup"
+            >
+              立即備份
+            </button>
+            <button
+              type="button"
+              data-testid="schedule-backup-nudge-dismiss"
+              class="rounded-lg border border-theme-500 bg-white px-3 py-1.5 font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              @click="dismissNudge"
+            >
+              稍後再說
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
         class="mb-8 flex flex-col items-start justify-between gap-y-4 lg:flex-row"
       >
         <div>
@@ -683,6 +745,19 @@ function localHint(next) {
                   <Icon name="cog-6-tooth" class="size-5 shrink-0" />
                   自訂
                 </Link>
+
+                <button
+                  type="button"
+                  role="menuitem"
+                  data-testid="schedule-actions-backup"
+                  data-analytics-event="schedule_backup_open"
+                  data-analytics-feature="schedule"
+                  class="flex w-full items-center gap-3 rounded-md px-3 py-3 text-left text-sm font-medium text-theme-800 transition-colors hover:bg-theme-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                  @click="openBackup"
+                >
+                  <Icon name="lock-closed" class="size-5 shrink-0" />
+                  備份課表連結
+                </button>
 
                 <div
                   v-if="push && push.supported.value"
@@ -1418,72 +1493,12 @@ function localHint(next) {
         />
       </div>
 
-      <!-- Share Section -->
-      <div
+      <!-- Backup link. Installed PWAs have it in the 更多 menu and 設定 instead. -->
+      <BackupLinkCard
         v-if="viewModel.displayOptions.show_share_section"
-        class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
-      >
-        <div class="flex items-center justify-between gap-4">
-          <div class="w-full md:w-auto md:flex-1">
-            <p class="mb-3 text-theme-700 dark:text-zinc-300">
-              您可以使用以下連結來編輯或檢視此課表，請妥善保管此連結。
-              <br />
-              <span
-                class="inline-flex items-center gap-1 font-semibold text-red-600 dark:text-red-400"
-              >
-                <Icon name="exclamation-triangle" class="size-4" />
-                注意：任何擁有此連結的人都可以編輯您的課表。
-              </span>
-            </p>
-
-            <div
-              class="rounded border border-theme-300 bg-white text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
-            >
-              <div class="flex items-stretch gap-3">
-                <input
-                  ref="shareInput"
-                  class="flex-1 px-3 py-2 font-mono break-all text-theme-700 dark:text-zinc-400"
-                  :value="copyShareUrl"
-                  readonly
-                  aria-label="我的課表連結"
-                  @click="$event.target.select()"
-                />
-
-                <div class="shrink-0">
-                  <button
-                    type="button"
-                    :aria-pressed="copied.toString()"
-                    class="ml-2 h-full rounded-l-none rounded-r border border-theme-200 bg-theme-200 px-3 py-1 text-sm font-semibold whitespace-nowrap text-theme-900 transition hover:bg-theme-300 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
-                    @click="copy()"
-                  >
-                    <span v-show="!copied">
-                      <Icon name="clipboard-document" class="inline size-4" />
-                      複製連結
-                    </span>
-                    <span v-show="copied">
-                      <Icon name="check" class="inline size-4" />
-                      已複製！
-                    </span>
-                  </button>
-
-                  <div class="sr-only" role="status" aria-live="polite">
-                    {{ copied ? '已複製' : '' }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="hidden w-28 flex-col items-center justify-center md:flex">
-            <!-- Decorative: the same URL is already exposed via the readonly input above. -->
-            <div
-              class="rounded border border-theme-200 bg-white p-2"
-              aria-hidden="true"
-              v-html="qrCodeSvg"
-            ></div>
-          </div>
-        </div>
-      </div>
+        class="pwa:hidden"
+        @open="openBackup"
+      />
 
       <div
         v-if="viewModel.displayOptions.show_print_button"
@@ -1561,5 +1576,11 @@ function localHint(next) {
         </div>
       </div>
     </div>
+
+    <BackupLinkDialog
+      :open="backupOpen"
+      :backup="backup"
+      @close="backupOpen = false"
+    />
   </AppLayout>
 </template>
