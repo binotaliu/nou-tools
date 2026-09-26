@@ -19,6 +19,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  text: {
+    type: String,
+    default: '',
+  },
   dialogTitle: {
     type: String,
     required: true,
@@ -35,8 +39,11 @@ const props = defineProps({
 
 const shareInput = ref(null)
 
-const { showShareModal, copied, shareUrl, shareTitle, share, copy } =
-  useArticleShare({ shareTitle: props.title, shareUrl: props.url }, shareInput)
+const { showShareModal, copied, shareUrl, shareTitle, shareText, share, copy } =
+  useArticleShare(
+    { shareTitle: props.title, shareUrl: props.url, shareText: props.text },
+    shareInput
+  )
 
 // Inertia reuses the page component between articles/issues, so the props can
 // change under a mounted button.
@@ -50,6 +57,13 @@ watch(
   () => props.url,
   value => {
     shareUrl.value = value
+  }
+)
+
+watch(
+  () => props.text,
+  value => {
+    shareText.value = value
   }
 )
 
@@ -97,6 +111,14 @@ onUnmounted(() => window.removeEventListener('keydown', handleEscape))
         >
           {{ dialogTitle }}
         </h3>
+
+        <p
+          v-if="text"
+          class="mb-3 text-sm leading-relaxed text-theme-700 dark:text-zinc-300"
+          :data-testid="`${testIdPrefix}-text`"
+        >
+          {{ text }}
+        </p>
 
         <div
           class="flex items-stretch gap-3 rounded border border-theme-300 bg-white text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-400"
