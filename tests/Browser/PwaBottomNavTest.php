@@ -324,3 +324,23 @@ it('points a visitor without a remembered schedule to their schedule instead of 
         ->assertMissing('[data-testid="settings-notify-class-reminders"]')
         ->assertMissing('[data-testid="settings-notify-timer-end"]');
 });
+
+// iOS 26+ blurs an installed PWA's status-bar inset unless a fixed element
+// with a real background touches the top edge, so PWAs carry a 1px sampler.
+it('adds a fixed status-bar sampler only when running as an installed PWA', function () use ($enterPwaMode) {
+    $page = visit('/newsletter')->resize(...PHONE);
+
+    $page->assertSee('浣熊的空大雙週報');
+    expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"status-bar-sampler\"]')).display"))->toBe('none');
+
+    $enterPwaMode($page);
+
+    expect(json_decode($page->script(<<<'JS'
+        (() => {
+            const s = getComputedStyle(document.querySelector('[data-testid="status-bar-sampler"]'))
+            return JSON.stringify([s.display, s.position, s.top, s.height, s.backgroundColor])
+        })()
+    JS), true))->toMatchArray(['block', 'fixed', '0px', '1px'])
+        ->and(json_decode($page->script("JSON.stringify(getComputedStyle(document.querySelector('[data-testid=\"status-bar-sampler\"]')).backgroundColor)"), true))
+        ->not->toBe('rgba(0, 0, 0, 0)');
+});

@@ -219,6 +219,18 @@ const adaptableOther = computed(() =>
     我的課表
   </Link>
 
+  <!-- iOS 26+ blurs the status-bar inset of an installed PWA (viewport-fit=cover
+       lets the page run under it) unless a fixed box touches the top edge, in
+       which case WebKit takes that box's real background-color instead. It has
+       to be an element: gradients and pseudo-elements are not sampled. The
+       colour follows what sits at the top: the page on phones, the nav bar
+       from md up. -->
+  <div
+    aria-hidden="true"
+    data-testid="status-bar-sampler"
+    class="pointer-events-none fixed inset-x-0 top-0 z-0 hidden h-px bg-theme-50 dark:bg-zinc-950 print:hidden wide-pwa:bg-white dark:wide-pwa:bg-zinc-900 pwa:block"
+  ></div>
+
   <header
     data-testid="site-header"
     class="sticky top-0 z-40 border-b border-theme-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 print:static bottom-nav:hidden wide-pwa:hidden"
