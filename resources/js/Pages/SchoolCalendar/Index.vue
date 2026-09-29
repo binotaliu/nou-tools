@@ -213,6 +213,7 @@ function changeTerm(event) {
           :highlights-from="month.from"
           :highlights-to="month.to"
           :events="month.calendarEvents"
+          :days="viewModel.days"
           :today="today"
           test-id="school-calendar-month"
           class="mb-3"

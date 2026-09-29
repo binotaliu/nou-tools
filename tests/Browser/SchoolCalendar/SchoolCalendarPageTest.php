@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CalendarDay;
 use App\Models\SchoolCalendarEvent;
 
 // Past / ongoing / upcoming are decided in the browser from the viewer's
@@ -57,4 +58,27 @@ it('shows the month calendar by default and remembers a switch to the list', fun
         ->assertMissing('[data-testid="school-calendar-month"]')
         ->click('[data-testid="school-calendar-view-calendar"]')
         ->assertPresent('[data-testid="school-calendar-month"]');
+});
+
+it('paints marked dates red with their note and lets a weekend be plain', function () {
+    config(['app.current_semester' => '2026A']);
+
+    SchoolCalendarEvent::factory()->forTerm('2026A')
+        ->between('2026-10-05', '2026-10-25')
+        ->create(['name' => '標註月曆活動']);
+    // 2026-10-10 is a Saturday that is a holiday; the 17th is a Saturday made a workday; the 14th is a plain Wednesday.
+    CalendarDay::factory()->on('2026-10-10')->labelled('國慶日')->create();
+    CalendarDay::factory()->on('2026-10-17')->plain()->labelled('補班')->create();
+    CalendarDay::factory()->on('2026-10-14')->labelled('校慶')->create();
+
+    visit(route('school-calendar.index', ['term' => '2026A']))
+        ->withTimezone('Asia/Taipei')
+        ->assertNoJavaScriptErrors()
+        ->assertSeeIn('[data-testid="calendar-day-note-2026-10-10"]', '國慶日')
+        ->assertSeeIn('[data-testid="calendar-day-note-2026-10-17"]', '補班')
+        ->assertAttribute('[data-testid="calendar-day-label-2026-10-10"]', 'data-red', 'true')
+        ->assertAttribute('[data-testid="calendar-day-label-2026-10-14"]', 'data-red', 'true')
+        ->assertAttribute('[data-testid="calendar-day-label-2026-10-17"]', 'data-red', 'false')
+        ->assertAttribute('[data-testid="calendar-day-label-2026-10-11"]', 'data-red', 'true')
+        ->assertAttribute('[data-testid="calendar-day-label-2026-10-13"]', 'data-red', 'false');
 });

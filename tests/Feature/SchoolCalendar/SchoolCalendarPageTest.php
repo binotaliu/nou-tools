@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\CalendarDay;
 use App\Models\SchoolCalendarEvent;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -24,6 +25,26 @@ it('lists every event of the current semester, important or not', function () {
             ->where('viewModel.events', fn ($events) => collect($events)->pluck('name')->all() === ['學期開始', '課程開播'])
             ->where('viewModel.events.0.important', false)
             ->where('viewModel.events.1.important', true));
+});
+
+it('sends the day marks that fall inside the semester’s span', function () {
+    SchoolCalendarEvent::factory()->forTerm('2026A')->between('2026-09-07', '2026-10-31')->create();
+    CalendarDay::factory()->on('2026-10-10')->labelled('國慶日')->create();
+    CalendarDay::factory()->on('2026-10-17')->plain()->labelled('補班')->create();
+    CalendarDay::factory()->on('2026-11-01')->create();
+
+    $this->get(route('school-calendar.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('viewModel.days', 2)
+            ->where('viewModel.days.0', ['date' => '2026-10-10', 'isRed' => true, 'label' => '國慶日'])
+            ->where('viewModel.days.1.isRed', false));
+});
+
+it('sends no day marks for a semester without events', function () {
+    CalendarDay::factory()->on('2026-10-10')->create();
+
+    $this->get(route('school-calendar.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('viewModel.days', []));
 });
 
 it('shows another semester when one is requested and offers every known term', function () {

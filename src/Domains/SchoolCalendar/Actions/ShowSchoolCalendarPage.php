@@ -8,9 +8,12 @@ use App\Models\SchoolCalendarEvent;
 use Illuminate\Support\Str;
 use NouTools\Domains\SchoolCalendar\DataTransferObjects\ShowSchoolCalendarData;
 use NouTools\Domains\SchoolCalendar\PageData\SchoolCalendarPageData;
+use NouTools\Domains\Shared\Actions\ListCalendarDaysBetween;
 
 final readonly class ShowSchoolCalendarPage
 {
+    public function __construct(private ListCalendarDaysBetween $listCalendarDaysBetween) {}
+
     /**
      * Every event of a semester, important or not, oldest first. Whether an
      * event is past, ongoing or upcoming is decided in the browser, like the
@@ -45,12 +48,20 @@ final readonly class ShowSchoolCalendarPage
             ])
             ->all();
 
+        $days = $events === []
+            ? []
+            : ($this->listCalendarDaysBetween)(
+                min(array_column($events, 'start')),
+                max(array_column($events, 'end')),
+            );
+
         return new SchoolCalendarPageData(
             term: $term,
             termLabel: Str::toSemesterDisplay($term),
             isCurrentTerm: $term === $currentTerm,
             terms: $terms,
             events: $events,
+            days: $days,
         );
     }
 }
