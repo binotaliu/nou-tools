@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\SchoolCalendarEvent;
+
 // WCAG 1.4.3 (text contrast), 1.4.11 (non-text contrast) and 1.4.1 (links in
 // running text are not distinguished by colour alone), measured from
 // getComputedStyle in a real browser in both colour schemes.
@@ -89,6 +91,19 @@ JSON.stringify((() => {
 })())
 JS;
 
+// Past, ongoing and upcoming events, so the calendar card and page are measured in every state.
+beforeEach(function () {
+    config(['app.current_semester' => '2026A']);
+
+    $today = now('Asia/Taipei');
+
+    foreach ([[-10, -9, '對比已結束活動'], [-1, 1, '對比進行中活動'], [20, 20, '對比未來活動']] as [$from, $to, $name]) {
+        SchoolCalendarEvent::factory()->forTerm('2026A')
+            ->between($today->copy()->addDays($from)->toDateString(), $today->copy()->addDays($to)->toDateString())
+            ->create(['name' => $name]);
+    }
+});
+
 $contrastAudit = function (string $url, bool $dark): array {
     $page = visit($url)->resize(1280, 900);
     $page->assertNoJavaScriptErrors()->assertPresent('main#main-content');
@@ -119,6 +134,7 @@ $pages = [
     'discount store form' => '/discount-stores/create',
     'announcements' => '/announcements',
     'directory' => '/directory',
+    'school calendar' => '/school-calendar',
 ];
 
 it('keeps text at WCAG AA contrast', function (string $url, bool $dark) use ($contrastAudit) {

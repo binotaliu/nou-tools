@@ -106,12 +106,20 @@ function changeTerm(event) {
           <li
             v-for="event in month.events"
             :key="event.start + event.name"
-            :class="event.status === 'past' ? 'opacity-60' : ''"
             :data-testid="`school-calendar-event-${event.status}`"
             class="flex flex-col-reverse items-start justify-between gap-x-2 gap-y-1 border-b border-theme-100 py-2 last:border-0 sm:flex-row sm:items-center dark:border-zinc-800"
           >
             <span class="flex flex-wrap items-center gap-2">
-              <span class="font-medium text-theme-800 dark:text-zinc-200">
+              <!-- Past events get the quieter theme-700 / zinc-400 instead of
+                   an opacity fade, which would drop the text below 4.5:1. -->
+              <span
+                :class="
+                  event.status === 'past'
+                    ? 'text-theme-700 dark:text-zinc-400'
+                    : 'text-theme-800 dark:text-zinc-200'
+                "
+                class="font-medium"
+              >
                 {{ event.name }}
               </span>
               <span
