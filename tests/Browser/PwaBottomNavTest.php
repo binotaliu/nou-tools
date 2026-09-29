@@ -52,7 +52,7 @@ it('swaps the hamburger menu for a bottom tab bar when running as an installed P
 
     expect($activeTab)->toBe('雙週報');
 
-    // The active tab carries a bar on its top edge (and only that tab).
+    // The active tab carries a filled pill (and only that tab).
     $indicators = $page->script('document.querySelectorAll(\'[data-testid="bottom-nav-indicator"]\').length');
     $indicatorInActiveTab = $page->script('document.querySelectorAll(\'[data-testid="bottom-nav"] [aria-current="page"] [data-testid="bottom-nav-indicator"]\').length');
 
@@ -325,22 +325,39 @@ it('points a visitor without a remembered schedule to their schedule instead of 
         ->assertMissing('[data-testid="settings-notify-timer-end"]');
 });
 
-// iOS 26+ blurs an installed PWA's status-bar inset unless a fixed element
-// with a real background touches the top edge, so PWAs carry a 1px sampler.
-it('adds a fixed status-bar sampler only when running as an installed PWA', function () use ($enterPwaMode) {
+// Without viewport-fit=cover the page never runs under the home indicator, so
+// the tab bar floats: inset from the edges, rounded, and narrower than the screen.
+it('floats the bottom tab bar as a rounded bar inset from the screen edges', function () use ($enterPwaMode) {
     $page = visit('/newsletter')->resize(...PHONE);
 
     $page->assertSee('浣熊的空大雙週報');
-    expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"status-bar-sampler\"]')).display"))->toBe('none');
-
     $enterPwaMode($page);
+    $page->assertVisible('[data-testid="bottom-nav"]');
 
-    expect(json_decode($page->script(<<<'JS'
+    $box = json_decode($page->script(<<<'JS'
         (() => {
-            const s = getComputedStyle(document.querySelector('[data-testid="status-bar-sampler"]'))
-            return JSON.stringify([s.display, s.position, s.top, s.height, s.backgroundColor])
+            const nav = document.querySelector('[data-testid="bottom-nav"]')
+            const r = nav.getBoundingClientRect()
+            const tab = nav.querySelector('a, button').getBoundingClientRect()
+            return JSON.stringify({
+                left: r.left,
+                right: window.innerWidth - r.right,
+                bottom: window.innerHeight - r.bottom,
+                radius: parseFloat(getComputedStyle(nav).borderTopLeftRadius),
+                tabHeight: tab.height,
+                tabWidth: tab.width,
+            })
         })()
-    JS), true))->toMatchArray(['block', 'fixed', '0px', '1px'])
-        ->and(json_decode($page->script("JSON.stringify(getComputedStyle(document.querySelector('[data-testid=\"status-bar-sampler\"]')).backgroundColor)"), true))
-        ->not->toBe('rgba(0, 0, 0, 0)');
+    JS), true);
+
+    expect($box['left'])->toBeGreaterThanOrEqual(12)
+        ->and($box['right'])->toBeGreaterThanOrEqual(12)
+        ->and($box['bottom'])->toBeGreaterThanOrEqual(12)
+        ->and($box['radius'])->toBeGreaterThanOrEqual(16)
+        // WCAG 2.5.8 target size (24px) with room to spare; Apple asks for 44pt.
+        ->and($box['tabHeight'])->toBeGreaterThanOrEqual(44)
+        ->and($box['tabWidth'])->toBeGreaterThanOrEqual(44);
+
+    expect($page->script("document.querySelector('[data-testid=\"status-bar-sampler\"]')"))->toBeNull()
+        ->and($page->script("document.querySelector('meta[name=viewport]').content"))->not->toContain('viewport-fit');
 });

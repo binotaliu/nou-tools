@@ -1,7 +1,8 @@
 <script setup>
 // Installed-PWA navigation from `md` up (tablet, desktop), after Apple's
 // `sidebarAdaptable`: a top tab bar or a sidebar, switched by the reader
-// (useNavStyle). Like BottomNav it always renders and CSS decides what shows:
+// (useNavStyle). Both are floating, rounded surfaces inset from the screen
+// edge (the page is not laid out under the status bar: no viewport-fit=cover). Like BottomNav it always renders and CSS decides what shows:
 // nothing unless `html[data-pwa]` is set and the screen is `md` or wider (the
 // `wide-pwa:` variant in app.css), and then the tab bar or the sidebar
 // depending on `html[data-nav-style]`. Only one is ever displayed, so the
@@ -86,14 +87,16 @@ const toggleClass =
 
 <template>
   <div class="hidden print:hidden wide-pwa:contents">
-    <!-- Top tab bar: a centred rounded tray of tabs between the sidebar toggle and
-         the utility buttons, on a translucent bar, like iPadOS. -->
+    <!-- Top tab bar: a floating rounded bar, inset 0.5rem from the top and
+         sides, holding a centred tray of tabs between the sidebar toggle and
+         the utility buttons, like iPadOS. Mostly opaque so text keeps its
+         contrast over scrolling content. -->
     <header
-      class="sticky top-0 z-40 box-content h-14 border-b border-black/5 bg-white/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/70 pwa-sidebar:hidden"
+      class="sticky top-2 z-40 mx-auto mt-2 h-14 w-[calc(100%-1.5rem)] max-w-7xl rounded-2xl border border-theme-200 bg-white/90 shadow-sm backdrop-blur-xl md:w-[calc(100%-3rem)] dark:border-zinc-700 dark:bg-zinc-900/90 pwa-sidebar:hidden"
       data-testid="adaptable-nav-tabs"
     >
       <div
-        class="mx-auto grid h-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 md:px-6"
+        class="grid h-full grid-cols-[1fr_auto_1fr] items-center gap-2 px-2 md:px-3"
       >
         <div class="flex items-center justify-self-start">
           <button
@@ -172,7 +175,7 @@ const toggleClass =
 
     <!-- Sidebar -->
     <aside
-      class="fixed inset-y-0 left-0 z-40 hidden w-(--pwa-sidebar-width) flex-col border-r border-theme-200 bg-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] dark:border-zinc-700 dark:bg-zinc-900 pwa-sidebar:flex"
+      class="fixed inset-y-3 left-3 z-40 hidden w-64 flex-col rounded-2xl border border-theme-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900 pwa-sidebar:flex"
       data-testid="adaptable-nav-sidebar"
     >
       <nav

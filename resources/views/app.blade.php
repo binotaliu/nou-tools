@@ -110,20 +110,10 @@
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {{-- The installed PWA's bottom tab bar needs env(safe-area-inset-bottom),
-    which is only non-zero with viewport-fit=cover. Browser tabs keep the
-    plain viewport so landscape notches don't clip content. Pinch-zoom is
-    deliberately left enabled (WCAG 1.4.4). --}}
-    <script @cspNonce>
-        if (document.documentElement.hasAttribute('data-pwa')) {
-            document
-                .querySelector('meta[name="viewport"]')
-                .setAttribute(
-                    'content',
-                    'width=device-width, initial-scale=1, viewport-fit=cover'
-                )
-        }
-    </script>
+    {{-- No viewport-fit=cover, even for the installed PWA: with it iOS 26 blurs
+    the status-bar inset, so the page stays inside the safe area and the PWA
+    navs float over it instead. Pinch-zoom is deliberately left enabled
+    (WCAG 1.4.4). --}}
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     {{-- Read by resources/js/app.js so Inertia's progress-bar <style> tag can
     carry the same nonce our CSP (style-src with no 'unsafe-inline') requires,

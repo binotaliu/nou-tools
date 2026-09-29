@@ -1,7 +1,9 @@
 <script setup>
-// Installed-PWA navigation on phones: a native-style bottom tab bar (plus a
-// "更多" bottom sheet laying the overflow links out as a launcher grid) that replaces the web-style
-// header menu. It renders everywhere but is `hidden` unless `html[data-pwa]`
+// Installed-PWA navigation on phones: a small floating, rounded tab bar (plus
+// a "更多" sheet, floating above it, laying the overflow links out as a
+// launcher grid) that replaces the web-style header menu. It floats, rather
+// than docking to the edge, because the page is not laid out under the home
+// indicator (no viewport-fit=cover, which makes iOS blur the status bar). It renders everywhere but is `hidden` unless `html[data-pwa]`
 // is set and the screen is below `md` (the `bottom-nav:` variant in app.css),
 // so browser tabs, tablets and desktops never show it and the standalone
 // check needs no JS — no flash on cold start.
@@ -39,12 +41,15 @@ onMounted(() => document.addEventListener('keydown', onKeydown))
 onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
 // The active tab is marked three ways so it doesn't hinge on colour alone: a
-// bar along its top edge, the saturated accent colour against a muted dark
-// tone, and a bolder label.
+// filled pill behind it, the darker accent colour against a muted tone, and a
+// bolder label (plus `aria-current` for assistive tech).
 const tabClass = active =>
   active
-    ? 'font-bold text-theme-700 dark:text-theme-400'
+    ? 'font-bold text-theme-900 dark:text-theme-100'
     : 'font-medium text-theme-900/70 dark:text-zinc-300'
+
+const tabBase =
+  'relative flex flex-col items-center justify-center gap-0.5 rounded-2xl text-xs transition-colors focus-visible:outline-offset-[-2px]'
 </script>
 
 <template>
@@ -72,7 +77,7 @@ const tabClass = active =>
       <div
         v-if="sheetOpen"
         id="bottom-nav-sheet"
-        class="fixed inset-x-0 bottom-(--pwa-nav-height) z-40 max-h-[70vh] overflow-y-auto rounded-t-2xl border-t border-theme-200 bg-white px-3 pt-2 pb-4 shadow-[0_-10px_40px_rgba(0,0,0,0.14)] dark:border-zinc-700 dark:bg-zinc-900"
+        class="fixed inset-x-3 bottom-(--pwa-nav-height) z-40 mx-auto max-h-[calc(100dvh-var(--pwa-nav-height)-2rem)] max-w-md overflow-y-auto rounded-3xl border border-theme-200 bg-white px-3 pt-2 pb-4 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
         role="dialog"
         aria-label="更多"
         data-testid="bottom-nav-sheet"
@@ -116,33 +121,31 @@ const tabClass = active =>
     </Transition>
 
     <nav
-      class="fixed inset-x-0 bottom-0 z-40 border-t border-theme-200 bg-white pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] dark:border-zinc-700 dark:bg-zinc-900"
+      class="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-md rounded-3xl border border-theme-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
       aria-label="主要導覽"
       data-testid="bottom-nav"
     >
-      <div class="mx-auto grid h-14 max-w-xl grid-cols-5">
+      <div class="grid h-12 grid-cols-5 gap-0.5">
         <Link
           v-for="tab in tabs"
           :key="tab.href"
           :href="tab.href"
           :aria-current="tab.active ? 'page' : null"
-          class="relative flex flex-col items-center justify-center gap-0.5 text-xs transition-colors"
-          :class="tabClass(tab.active)"
+          :class="[tabBase, tabClass(tab.active)]"
         >
           <span
             v-if="tab.active"
-            class="absolute inset-x-3 top-0 h-[3px] bg-theme-600 dark:bg-theme-400"
+            class="absolute inset-0 rounded-2xl bg-theme-100 dark:bg-theme-900/50"
             aria-hidden="true"
             data-testid="bottom-nav-indicator"
           ></span>
-          <Icon :name="tab.icon" class="size-6 shrink-0" />
-          <span class="max-w-full truncate px-1">{{ tab.label }}</span>
+          <Icon :name="tab.icon" class="relative size-5 shrink-0" />
+          <span class="relative max-w-full truncate px-1">{{ tab.label }}</span>
         </Link>
 
         <button
           type="button"
-          class="relative flex flex-col items-center justify-center gap-0.5 text-xs transition-colors"
-          :class="tabClass(moreActive || sheetOpen)"
+          :class="[tabBase, tabClass(moreActive || sheetOpen)]"
           :aria-expanded="sheetOpen.toString()"
           aria-controls="bottom-nav-sheet"
           data-testid="bottom-nav-more"
@@ -150,12 +153,12 @@ const tabClass = active =>
         >
           <span
             v-if="moreActive || sheetOpen"
-            class="absolute inset-x-3 top-0 h-[3px] bg-theme-600 dark:bg-theme-400"
+            class="absolute inset-0 rounded-2xl bg-theme-100 dark:bg-theme-900/50"
             aria-hidden="true"
             data-testid="bottom-nav-indicator"
           ></span>
-          <Icon name="squares-plus" class="size-6 shrink-0" />
-          <span>更多</span>
+          <Icon name="squares-plus" class="relative size-5 shrink-0" />
+          <span class="relative">更多</span>
         </button>
       </div>
     </nav>

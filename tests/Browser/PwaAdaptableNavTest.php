@@ -33,7 +33,7 @@ it('shows a brandless top tab bar at the top of the page, without header or foot
         ->and($isShown($page, '[data-testid="site-header"]'))->toBeFalse()
         ->and($isShown($page, '[data-testid="site-footer"]'))->toBeFalse()
         ->and($page->script("document.querySelector('[data-testid=\"adaptable-nav-tabs\"]').textContent.includes('NOU 小幫手')"))->toBeFalse()
-        ->and($page->script("document.querySelector('[data-testid=\"adaptable-nav-tabs\"]').getBoundingClientRect().top"))->toBe(0)
+        ->and($page->script("document.querySelector('[data-testid=\"adaptable-nav-tabs\"]').getBoundingClientRect().top"))->toBe(8)
         ->and($page->script("document.querySelector('[data-testid=\"adaptable-nav-tabs\"]').getBoundingClientRect().top < document.querySelector('main').getBoundingClientRect().top"))->toBeTrue();
 })->with([
     'tablet' => [WIDE_TABLET],

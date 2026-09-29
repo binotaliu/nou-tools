@@ -181,7 +181,7 @@ defineProps({
             <button
               v-show="minimized"
               type="button"
-              class="relative flex w-full items-center gap-3 px-4 pt-3 pb-[calc(var(--safe-bottom)+0.75rem)] text-left sm:px-6"
+              class="relative flex w-full items-center gap-3 px-4 pt-3 pb-3 text-left sm:px-6"
               data-testid="study-room-banner-expand"
               @click="toggleMinimized(false)"
             >
@@ -221,7 +221,7 @@ defineProps({
 
             <div
               v-show="!minimized"
-              class="relative max-h-[70dvh] overflow-y-auto overscroll-contain px-4 pt-0 pb-[calc(var(--safe-bottom)+1rem)] sm:px-6 sm:pt-6 sm:pb-[calc(var(--safe-bottom)+1.25rem)]"
+              class="relative max-h-[70dvh] overflow-y-auto overscroll-contain px-4 pt-0 pb-4 sm:px-6 sm:pt-6 sm:pb-5"
             >
               <!-- Spoken through the page's announcer; shown here so a
               failed start/pause/leave isn't silent on screen either. -->
