@@ -6,7 +6,13 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 // upcoming/ongoing events array; `showPastEvents` is true when browsing a
 // non-current semester's full calendar. `events` may be a getter so a page
 // Inertia reuses across terms (`() => props.events`) follows its prop.
-export default function useSchoolCalendar(events, showPastEvents = false) {
+// `allowCountdown` defaults to off while browsing past events; the full
+// calendar page turns it on, since it lists the current semester too.
+export default function useSchoolCalendar(
+  events,
+  showPastEvents = false,
+  allowCountdown = !showPastEvents
+) {
   const T = window.NouTime
 
   const today = ref(T.taipeiYmd(new Date()))
@@ -73,11 +79,15 @@ export default function useSchoolCalendar(events, showPastEvents = false) {
   // Nearest countdown-flagged event that is still upcoming or ongoing.
   // Never shown when browsing a past semester's full calendar.
   const countdownEvent = computed(() => {
-    if (showPastEvents) {
+    if (!allowCountdown) {
       return null
     }
 
-    return activeEvents.value.find(event => event.countdown) ?? null
+    return (
+      activeEvents.value.find(
+        event => event.countdown && event.status !== 'past'
+      ) ?? null
+    )
   })
 
   // Remaining active events, excluding whichever one is shown as the

@@ -119,3 +119,28 @@ it('shows one month at a time, steps between months and can expand them all', fu
         ->assertSee('本月單月活動')
         ->assertSee('下月單月活動');
 });
+
+it('shows the countdown event above the calendar, skipping ended ones and past semesters', function () {
+    config(['app.current_semester' => '2026A']);
+
+    $today = now('Asia/Taipei');
+
+    SchoolCalendarEvent::factory()->forTerm('2026A')
+        ->between($today->copy()->subDays(10)->toDateString(), $today->copy()->subDays(9)->toDateString())
+        ->create(['name' => '已結束倒數活動', 'is_countdown' => true]);
+    SchoolCalendarEvent::factory()->forTerm('2026A')
+        ->between($today->copy()->addDays(5)->toDateString(), $today->copy()->addDays(6)->toDateString())
+        ->create(['name' => '即將到來倒數活動', 'is_countdown' => true]);
+    SchoolCalendarEvent::factory()->forTerm('2025B')
+        ->between($today->copy()->subYear()->toDateString(), $today->copy()->subYear()->toDateString())
+        ->create(['name' => '另一學期倒數活動', 'is_countdown' => true]);
+
+    visit(route('school-calendar.index'))
+        ->withTimezone('Asia/Taipei')
+        ->assertNoJavaScriptErrors()
+        ->assertSeeIn('[data-testid="school-calendar-countdown"]', '即將到來倒數活動')
+        ->assertSeeIn('[data-testid="school-calendar-countdown"]', '天後')
+        ->assertDontSeeIn('[data-testid="school-calendar-countdown"]', '已結束倒數活動')
+        ->select('[data-testid="school-calendar-term"]', '2025B')
+        ->assertMissing('[data-testid="school-calendar-countdown"]');
+});

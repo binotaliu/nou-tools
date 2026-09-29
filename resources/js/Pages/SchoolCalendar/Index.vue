@@ -14,8 +14,14 @@ const props = defineProps({
   },
 })
 
-const { today, showTaipeiHint, activeEvents, shortDateRange } =
-  useSchoolCalendar(() => props.viewModel.events, true)
+const {
+  today,
+  showTaipeiHint,
+  activeEvents,
+  countdownEvent,
+  dateRange,
+  shortDateRange,
+} = useSchoolCalendar(() => props.viewModel.events, true, true)
 
 function monthKey(year, month) {
   return `${year}-${String(month).padStart(2, '0')}`
@@ -280,6 +286,37 @@ function changeTerm(event) {
       >
         {{ viewModel.termLabel }}尚無行事曆資料。
       </p>
+
+      <div
+        v-if="countdownEvent"
+        class="flex items-center justify-between gap-3 rounded-lg border border-theme-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+        data-testid="school-calendar-countdown"
+      >
+        <div>
+          <div class="font-semibold text-theme-800 dark:text-zinc-200">
+            {{ countdownEvent.name }}
+          </div>
+          <p
+            class="mt-1 text-sm text-theme-700 tabular-nums dark:text-zinc-400"
+          >
+            {{ dateRange(countdownEvent) }}
+          </p>
+        </div>
+        <div class="text-right">
+          <div
+            v-if="countdownEvent.status === 'ongoing'"
+            class="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800"
+          >
+            進行中
+          </div>
+          <div v-else>
+            <div class="text-3xl font-bold text-theme-700 dark:text-zinc-300">
+              {{ countdownEvent.daysUntil }}
+            </div>
+            <div class="text-sm text-theme-700 dark:text-zinc-400">天後</div>
+          </div>
+        </div>
+      </div>
 
       <div v-if="displayedMonths.length" class="flex items-center gap-2">
         <Button
