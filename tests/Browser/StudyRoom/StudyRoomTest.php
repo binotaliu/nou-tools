@@ -750,6 +750,49 @@ it('updates a floor\'s occupied count live and closes it once its last occupant 
     $page->assertMissing('[data-testid="study-room-floor-2"]');
 });
 
+it('floats the action banner as a rounded card above the PWA bottom nav', function () use ($createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule))->resize(390, 844);
+    $page->script('navigator.serviceWorker.ready');
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-root"]\') !== null');
+    $page->script("document.documentElement.dataset.pwa = ''");
+    $page->click('[data-testid="seat-1-S01"]');
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-control-panel"]\') !== null');
+
+    // Let the 300ms slide-in finish so the measurements are of the resting card.
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-control-panel"] > div > div\').getBoundingClientRect().bottom <= document.querySelector(\'[data-testid="bottom-nav"]\').getBoundingClientRect().top');
+
+    $box = json_decode($page->script(<<<'JS'
+        (() => {
+            const panel = document.querySelector('[data-testid="study-room-control-panel"] > div > div')
+            const nav = document.querySelector('[data-testid="bottom-nav"]').getBoundingClientRect()
+            const r = panel.getBoundingClientRect()
+            return JSON.stringify({
+                left: r.left,
+                right: window.innerWidth - r.right,
+                gapAboveNav: nav.top - r.bottom,
+                radius: parseFloat(getComputedStyle(panel).borderBottomLeftRadius),
+            })
+        })()
+    JS), true);
+
+    expect($box['left'])->toBeGreaterThanOrEqual(12)
+        ->and($box['right'])->toBeGreaterThanOrEqual(12)
+        ->and($box['gapAboveNav'])->toBeGreaterThanOrEqual(0)
+        ->and($box['radius'])->toBeGreaterThanOrEqual(16);
+});
+
 it('clears the held-seat highlight and action banner once a realtime delta releases your own seat', function () use ($createScheduleWithCourse) {
     // Regression test for patchSeat() not clearing heldSeatCode when the
     // viewer's own seat is released by something other than a heartbeat

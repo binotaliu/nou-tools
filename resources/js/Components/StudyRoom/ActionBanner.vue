@@ -142,7 +142,7 @@ defineProps({
         ref="panel"
         role="region"
         aria-labelledby="study-room-control-panel-heading"
-        class="fixed right-0 bottom-(--pwa-nav-height) left-(--pwa-sidebar-width) z-40 mb-0"
+        class="fixed right-0 bottom-(--pwa-nav-height) left-(--pwa-sidebar-width) z-40 mb-0 wide-pwa:pb-3"
         data-testid="study-room-control-panel"
         @focusin="onPanelFocusIn"
         @focusout="onPanelFocusOut"
@@ -155,9 +155,9 @@ defineProps({
         >
           你的座位：{{ timer.mySeatLabel() }}
         </h3>
-        <div class="mx-auto max-w-6xl sm:px-4">
+        <div class="mx-auto max-w-6xl sm:px-4 pwa:px-3 pwa:sm:px-4">
           <div
-            class="relative overflow-hidden border-t-[6px] border-theme-300 bg-theme-50 bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(0,0,0,0.035)_5.5rem_calc(5.5rem+1px))] shadow-[0_-10px_40px_rgba(0,0,0,0.14)] sm:rounded-t-2xl sm:border-x-[6px] dark:border-zinc-600 dark:bg-zinc-900 dark:bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(255,255,255,0.05)_5.5rem_calc(5.5rem+1px))]"
+            class="relative overflow-hidden border-t-[6px] border-theme-300 bg-theme-50 bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(0,0,0,0.035)_5.5rem_calc(5.5rem+1px))] shadow-[0_-10px_40px_rgba(0,0,0,0.14)] sm:rounded-t-2xl sm:border-x-[6px] dark:border-zinc-600 dark:bg-zinc-900 dark:bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(255,255,255,0.05)_5.5rem_calc(5.5rem+1px))] pwa:rounded-2xl pwa:border-[6px] pwa:shadow-lg"
           >
             <div
               class="pointer-events-none absolute -top-16 -left-12 size-64 rounded-full bg-amber-300/50 blur-3xl transition-opacity duration-1000 dark:bg-amber-400/25"
