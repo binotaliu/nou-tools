@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Models\CalendarDay;
 use App\Models\NewsletterColumn;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
@@ -129,6 +130,17 @@ it('has no highlight or past issues before the first issue is published', functi
         ->assertInertia(fn (Assert $page) => $page
             ->where('viewModel.latestIssue', null)
             ->has('viewModel.issues.data', 0));
+});
+
+it('sends the day marks inside the highlights window', function () use ($publishedIssueWithContent) {
+    $publishedIssueWithContent('2026-09-21');
+    CalendarDay::factory()->on('2026-09-23')->labelled('測試假日')->create();
+    CalendarDay::factory()->on('2026-08-01')->create();
+
+    get('/newsletter/2026-W39')
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('viewModel.issue.highlightDays', 1)
+            ->where('viewModel.issue.highlightDays.0', ['date' => '2026-09-23', 'isRed' => true, 'label' => '測試假日']));
 });
 
 it('renders an issue with sections and server-rendered markdown', function () use ($publishedIssueWithContent) {

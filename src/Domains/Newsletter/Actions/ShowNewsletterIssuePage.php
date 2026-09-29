@@ -10,6 +10,7 @@ use NouTools\Domains\Directory\Actions\ListCentersInDirectoryOrder;
 use NouTools\Domains\Newsletter\PageData\NewsletterIssuePageData;
 use NouTools\Domains\Newsletter\ViewModels\NewsletterIssueSummaryViewModel;
 use NouTools\Domains\Newsletter\ViewModels\NewsletterIssueViewModel;
+use NouTools\Domains\Shared\Actions\ListCalendarDaysBetween;
 
 final readonly class ShowNewsletterIssuePage
 {
@@ -19,6 +20,7 @@ final readonly class ShowNewsletterIssuePage
         private ListCentersInDirectoryOrder $listCentersInDirectoryOrder,
         private RecordNewsletterIssueView $recordNewsletterIssueView,
         private SummarizeNewsletterReactions $summarizeNewsletterReactions,
+        private ListCalendarDaysBetween $listCalendarDaysBetween,
     ) {}
 
     public function __invoke(string $issueKey, Session $session, bool $includeUnpublished = false): ?NewsletterIssuePageData
@@ -49,6 +51,7 @@ final readonly class ShowNewsletterIssuePage
                 $issue,
                 $this->renderNewsletterMarkdown,
                 ($this->listCentersInDirectoryOrder)()->pluck('name')->all(),
+                ($this->listCalendarDaysBetween)($issue->highlights_from->toDateString(), $issue->highlights_to->toDateString()),
             ),
             previousIssue: $previousIssue !== null ? NewsletterIssueSummaryViewModel::fromModel($previousIssue) : null,
             nextIssue: $nextIssue !== null ? NewsletterIssueSummaryViewModel::fromModel($nextIssue) : null,

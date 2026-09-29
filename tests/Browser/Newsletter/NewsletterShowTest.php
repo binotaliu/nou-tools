@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CalendarDay;
 use App\Models\NewsletterColumn;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
@@ -20,6 +21,7 @@ beforeEach(function (): void {
             ['start' => '2026-09-21', 'end' => '2026-09-30', 'name' => '115上學期加退選'],
         ],
     ]);
+    CalendarDay::factory()->on('2026-09-23')->labelled('測試假日')->create();
     NewsletterItem::factory()->for($issue, 'issue')->create(['headline' => '期中考開始報名', 'source_name' => '教務處']);
     NewsletterItem::factory()->for($issue, 'issue')->arts('學務處')->create(['headline' => '校園攝影展徵件']);
     NewsletterItem::factory()->for($issue, 'issue')->centers('臺北中心')->create(['headline' => '讀書會招募']);
@@ -53,6 +55,9 @@ it('renders every section of an issue', function () {
         ->assertSeeIn('[data-testid="newsletter-highlights"]', '逾期不受理')
         ->assertSee('9/25（五）')
         ->assertPresent('[data-testid="calendar-day-2026-09-25"]')
+        ->assertAttribute('[data-testid="calendar-day-label-2026-09-23"]', 'data-red', 'true')
+        ->assertAttribute('[data-testid="calendar-day-label-2026-09-24"]', 'data-red', 'false')
+        ->assertSeeIn('[data-testid="calendar-day-note-2026-09-23"]', '測試假日')
         ->assertSeeIn('[data-testid="calendar-event-1-0"]', '期中考報名截止')
         // The 9/21–9/30 event is one bar per week, not repeated in every day.
         ->assertSeeIn('[data-testid="calendar-event-2-0"]', '115上學期加退選')

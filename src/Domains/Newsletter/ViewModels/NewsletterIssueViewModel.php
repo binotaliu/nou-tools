@@ -10,6 +10,7 @@ use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
 use Illuminate\Support\Facades\Storage;
 use NouTools\Domains\Newsletter\Actions\RenderNewsletterMarkdown;
+use NouTools\Domains\Shared\ViewModels\CalendarDayViewModel;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -18,6 +19,7 @@ final class NewsletterIssueViewModel extends Data
 {
     /**
      * @param  DataCollection<int, NewsletterHighlightEventViewModel>  $highlightEvents
+     * @param  array<int, CalendarDayViewModel>  $highlightDays  Read live rather than snapshotted: they only recolour and annotate dates.
      * @param  DataCollection<int, NewsletterItemViewModel>  $newsItems
      * @param  DataCollection<int, NewsletterItemViewModel>  $artItems
      * @param  DataCollection<int, NewsletterItemViewModel>  $centerItems
@@ -41,6 +43,7 @@ final class NewsletterIssueViewModel extends Data
         public string $highlightsIntro,
         #[DataCollectionOf(NewsletterHighlightEventViewModel::class)]
         public DataCollection $highlightEvents,
+        public array $highlightDays,
         #[DataCollectionOf(NewsletterItemViewModel::class)]
         public DataCollection $newsItems,
         #[DataCollectionOf(NewsletterItemViewModel::class)]
@@ -56,8 +59,9 @@ final class NewsletterIssueViewModel extends Data
      * directory's center order (`$centerOrder`); unlisted sources go last.
      *
      * @param  list<string>  $centerOrder
+     * @param  array<int, CalendarDayViewModel>  $highlightDays
      */
-    public static function fromModel(NewsletterIssue $issue, RenderNewsletterMarkdown $renderMarkdown, array $centerOrder = []): self
+    public static function fromModel(NewsletterIssue $issue, RenderNewsletterMarkdown $renderMarkdown, array $centerOrder = [], array $highlightDays = []): self
     {
         $centerPosition = array_flip($centerOrder);
 
@@ -92,6 +96,7 @@ final class NewsletterIssueViewModel extends Data
                 array_map(NewsletterHighlightEventViewModel::fromSnapshot(...), $issue->highlights_events ?? []),
                 DataCollection::class,
             ),
+            highlightDays: $highlightDays,
             newsItems: $itemsFor(NewsletterSection::News),
             artItems: $itemsFor(NewsletterSection::Arts),
             centerItems: NewsletterItemViewModel::collect(

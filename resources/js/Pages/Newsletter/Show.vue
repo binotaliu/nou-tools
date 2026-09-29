@@ -230,6 +230,7 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
             :highlights-from="issue.highlightsFrom"
             :highlights-to="issue.highlightsTo"
             :events="issue.highlightEvents"
+            :days="issue.highlightDays"
           />
           <ol
             class="mt-4 space-y-2 rounded-lg bg-theme-50 p-4 dark:bg-zinc-800"
