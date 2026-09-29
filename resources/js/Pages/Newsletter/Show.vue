@@ -9,7 +9,7 @@ import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import ShareButton from '../../Components/ShareButton.vue'
-import HighlightsCalendar from '../../Components/Newsletter/HighlightsCalendar.vue'
+import EventCalendar from '../../Components/EventCalendar.vue'
 import useMarkdownContainers from '../../Composables/useMarkdownContainers'
 import useNewsletterReactions from '../../Composables/useNewsletterReactions'
 import {
@@ -225,7 +225,8 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.issue])
             <Icon name="calendar-days" class="size-6" />
             本期行事曆
           </h2>
-          <HighlightsCalendar
+          <EventCalendar
+            test-id="newsletter-highlights-calendar"
             :highlights-from="issue.highlightsFrom"
             :highlights-to="issue.highlightsTo"
             :events="issue.highlightEvents"

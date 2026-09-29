@@ -10,7 +10,7 @@ import {
   dateRangeDays,
   newsletterDateParts,
   newsletterWeekdayIndex,
-} from '../../Composables/useNewsletterDates'
+} from '../Composables/useNewsletterDates'
 
 const props = defineProps({
   highlightsFrom: {
@@ -24,6 +24,15 @@ const props = defineProps({
   events: {
     type: Array,
     required: true,
+  },
+  // A `Y-m-d` date to mark as today; omitted where there's no "now" (newsletters).
+  today: {
+    type: String,
+    default: null,
+  },
+  testId: {
+    type: String,
+    default: 'event-calendar',
   },
 })
 
@@ -85,7 +94,7 @@ function dayLabelClass(day, dayIndex) {
   if (dayIndex >= 5) {
     return day.inWindow
       ? 'text-red-600 dark:text-red-400'
-      : 'text-red-300 dark:text-red-900'
+      : 'text-red-700 dark:text-red-300'
   }
 
   return day.inWindow
@@ -123,7 +132,7 @@ const weeks = computed(() => {
 <template>
   <div
     class="overflow-hidden rounded-lg border border-theme-200 dark:border-zinc-700"
-    data-testid="newsletter-highlights-calendar"
+    :data-testid="testId"
   >
     <div
       class="grid grid-cols-7 border-b border-theme-200 bg-theme-50 text-center text-xs font-medium dark:border-zinc-700 dark:bg-zinc-800"
@@ -175,7 +184,17 @@ const weeks = computed(() => {
           :class="dayLabelClass(day, dayIndex)"
           :style="{ gridColumn: dayIndex + 1, gridRow: 1 }"
         >
-          {{ day.label }}
+          <span
+            :class="
+              day.date === today
+                ? 'inline-block rounded-full bg-theme-700 px-1.5 text-white dark:bg-theme-300 dark:text-zinc-900'
+                : ''
+            "
+            :data-testid="day.date === today ? 'calendar-today' : undefined"
+          >
+            {{ day.label }}
+            <span v-if="day.date === today" class="sr-only">（今天）</span>
+          </span>
         </p>
 
         <div
