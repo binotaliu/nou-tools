@@ -8,6 +8,7 @@ use App\Models\StudentSchedule;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 use NouTools\Domains\Schedules\ViewModels\ScheduleViewModel;
 
 final class ShowSchedulePage
@@ -55,6 +56,7 @@ final class ShowSchedulePage
 
         return $terms
             ->unique()
+            ->sortByDesc(fn (string $code): string => Str::toSemesterSortKey($code))
             ->values()
             ->all();
     }

@@ -6,6 +6,7 @@ namespace NouTools\Domains\Courses\Actions;
 
 use App\Models\Course;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use NouTools\Domains\Courses\PageData\CourseSchedulePageData;
 use NouTools\Domains\Courses\ViewModels\CourseScheduleCourseViewModel;
 use NouTools\Domains\Courses\ViewModels\CourseScheduleGroupViewModel;
@@ -67,6 +68,10 @@ final readonly class BuildCourseSchedulePage
             $terms->prepend($selectedTerm);
         }
 
-        return $terms->unique()->values()->all();
+        return $terms
+            ->unique()
+            ->sortByDesc(fn (string $code): string => Str::toSemesterSortKey($code))
+            ->values()
+            ->all();
     }
 }

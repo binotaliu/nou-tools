@@ -172,7 +172,7 @@ final class ManageSchoolCalendar extends Page
             ->flatMap(fn (int $year): array => ["{$year}A", "{$year}B", "{$year}C"])
             ->merge(SchoolCalendarEvent::query()->distinct()->pluck('term'))
             ->unique()
-            ->sortDesc()
+            ->sortByDesc(fn (string $code): string => Str::toSemesterSortKey($code))
             ->values();
 
         return $codes

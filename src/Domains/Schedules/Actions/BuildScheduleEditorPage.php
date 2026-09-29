@@ -7,6 +7,7 @@ namespace NouTools\Domains\Schedules\Actions;
 use App\Models\Course;
 use App\Models\StudentSchedule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use NouTools\Domains\Schedules\PageData\ScheduleEditorPageData;
 use NouTools\Domains\Schedules\ViewModels\ScheduleEditorCourseViewModel;
 use NouTools\Domains\Schedules\ViewModels\ScheduleEditorSelectedItemViewModel;
@@ -86,6 +87,10 @@ final readonly class BuildScheduleEditorPage
             $terms->prepend($selectedTerm);
         }
 
-        return $terms->unique()->values()->all();
+        return $terms
+            ->unique()
+            ->sortByDesc(fn (string $code): string => Str::toSemesterSortKey($code))
+            ->values()
+            ->all();
     }
 }

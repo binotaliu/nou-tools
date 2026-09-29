@@ -29,7 +29,7 @@ final readonly class ShowSchoolCalendarPage
             ->pluck('term')
             ->push($currentTerm, $term)
             ->unique()
-            ->sortDesc()
+            ->sortByDesc(fn (string $code): string => Str::toSemesterSortKey($code))
             ->values()
             ->map(fn (string $code): array => ['code' => $code, 'label' => Str::toSemesterDisplay($code)])
             ->all();

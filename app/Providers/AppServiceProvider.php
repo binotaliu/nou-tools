@@ -105,6 +105,15 @@ final class AppServiceProvider extends ServiceProvider
         CarbonImmutable::setLocale(config('app.locale'));
         Date::use(CarbonImmutable::class);
 
+        // Sort key for semester codes: year, then C (summer) < A < B within it.
+        Str::macro('toSemesterSortKey', function (string $semester): string {
+            if (! preg_match('/^(\d{4})([ABC])$/', $semester, $m)) {
+                return $semester;
+            }
+
+            return $m[1].['C' => 0, 'A' => 1, 'B' => 2][$m[2]];
+        });
+
         // Register a Str macro to format semester codes (always full format).
         Str::macro('toSemesterDisplay', function (string $semester): string {
             if (! preg_match('/^(\d{4})([ABC])$/', (string) $semester, $m)) {
