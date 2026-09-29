@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
+import Button from '../../Components/Button.vue'
 import Icon from '../../Components/Icon.vue'
 import EventCalendar from '../../Components/EventCalendar.vue'
 import useSchoolCalendar from '../../Composables/useSchoolCalendar'
@@ -281,25 +282,24 @@ function changeTerm(event) {
       </p>
 
       <div v-if="displayedMonths.length" class="flex items-center gap-2">
-        <button
+        <Button
           v-if="!expanded && !onCurrentMonth"
-          type="button"
-          class="h-9 rounded-lg border border-zinc-500 px-3 text-sm font-medium text-theme-800 hover:bg-theme-50 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          size="sm"
           data-testid="school-calendar-current-month"
           @click="selectedKey = currentMonthKey"
         >
           回到本月
-        </button>
+        </Button>
 
-        <button
-          type="button"
-          class="ml-auto h-9 rounded-lg border border-zinc-500 px-3 text-sm font-medium text-theme-800 hover:bg-theme-50 dark:text-zinc-200 dark:hover:bg-zinc-800"
-          :aria-pressed="expanded"
+        <Button
+          size="sm"
+          class="ml-auto"
+          :pressed="expanded"
           data-testid="school-calendar-expand-all"
           @click="setExpanded(!expanded)"
         >
           {{ expanded ? '按月份檢視' : '展開全部月份' }}
-        </button>
+        </Button>
       </div>
 
       <section
@@ -309,17 +309,17 @@ function changeTerm(event) {
         :data-testid="`school-calendar-section-${month.key}`"
       >
         <div class="mb-2 flex items-center justify-between gap-2">
-          <button
+          <Button
             v-if="!expanded"
-            type="button"
-            class="inline-flex size-10 items-center justify-center rounded-lg border border-zinc-500 text-theme-800 hover:bg-theme-50 disabled:opacity-40 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            variant="icon"
+            class="border border-zinc-500"
             aria-label="上個月"
             :disabled="!canGoPrevious"
             data-testid="school-calendar-previous"
             @click="goToMonth(-1)"
           >
             <Icon name="chevron-left" class="size-5" />
-          </button>
+          </Button>
 
           <h3
             class="text-lg font-semibold text-theme-900 dark:text-zinc-100"
@@ -329,17 +329,17 @@ function changeTerm(event) {
             {{ month.label }}
           </h3>
 
-          <button
+          <Button
             v-if="!expanded"
-            type="button"
-            class="inline-flex size-10 items-center justify-center rounded-lg border border-zinc-500 text-theme-800 hover:bg-theme-50 disabled:opacity-40 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            variant="icon"
+            class="border border-zinc-500"
             aria-label="下個月"
             :disabled="!canGoNext"
             data-testid="school-calendar-next"
             @click="goToMonth(1)"
           >
             <Icon name="chevron-right" class="size-5" />
-          </button>
+          </Button>
         </div>
 
         <EventCalendar
