@@ -26,6 +26,7 @@ it('marks events as ended, ongoing or upcoming and switches semesters', function
     visit(route('school-calendar.index'))
         ->withTimezone('Asia/Taipei')
         ->assertNoJavaScriptErrors()
+        ->click('[data-testid="school-calendar-expand-all"]')
         ->assertSee('瀏覽器已結束活動')
         ->assertSee('已結束')
         ->assertSee('瀏覽器進行中活動')
@@ -81,4 +82,40 @@ it('paints marked dates red with their note and lets a weekend be plain', functi
         ->assertAttribute('[data-testid="calendar-day-label-2026-10-17"]', 'data-red', 'false')
         ->assertAttribute('[data-testid="calendar-day-label-2026-10-11"]', 'data-red', 'true')
         ->assertAttribute('[data-testid="calendar-day-label-2026-10-13"]', 'data-red', 'false');
+});
+
+it('shows one month at a time, steps between months and can expand them all', function () {
+    config(['app.current_semester' => '2026A']);
+
+    $today = now('Asia/Taipei')->startOfMonth();
+
+    SchoolCalendarEvent::factory()->forTerm('2026A')
+        ->between($today->copy()->subMonth()->toDateString(), $today->copy()->subMonth()->toDateString())
+        ->create(['name' => '上月單月活動']);
+    SchoolCalendarEvent::factory()->forTerm('2026A')
+        ->between($today->copy()->addDay()->toDateString(), $today->copy()->addDay()->toDateString())
+        ->create(['name' => '本月單月活動']);
+    SchoolCalendarEvent::factory()->forTerm('2026A')
+        ->between($today->copy()->addMonth()->toDateString(), $today->copy()->addMonth()->toDateString())
+        ->create(['name' => '下月單月活動']);
+
+    visit(route('school-calendar.index', ['term' => '2026A']))
+        ->withTimezone('Asia/Taipei')
+        ->assertNoJavaScriptErrors()
+        ->click('[data-testid="school-calendar-view-list"]')
+        ->assertSee('本月單月活動')
+        ->assertDontSee('上月單月活動')
+        ->assertDontSee('下月單月活動')
+        ->click('[data-testid="school-calendar-next"]')
+        ->assertSee('下月單月活動')
+        ->assertDontSee('本月單月活動')
+        ->assertPresent('[data-testid="school-calendar-current-month"]')
+        ->click('[data-testid="school-calendar-current-month"]')
+        ->assertSee('本月單月活動')
+        ->click('[data-testid="school-calendar-previous"]')
+        ->assertSee('上月單月活動')
+        ->click('[data-testid="school-calendar-expand-all"]')
+        ->assertSee('上月單月活動')
+        ->assertSee('本月單月活動')
+        ->assertSee('下月單月活動');
 });

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
@@ -16,6 +16,10 @@ const props = defineProps({
 const { today, showTaipeiHint, activeEvents, shortDateRange } =
   useSchoolCalendar(() => props.viewModel.events, true)
 
+function monthKey(year, month) {
+  return `${year}-${String(month).padStart(2, '0')}`
+}
+
 // Events arrive sorted by start date, so grouping keeps chronological order.
 const months = computed(() => {
   const groups = []
@@ -26,7 +30,7 @@ const months = computed(() => {
     let group = groups.at(-1)
 
     if (!group || group.label !== label) {
-      group = { label, events: [] }
+      group = { key: monthKey(year, month), label, events: [] }
       groups.push(group)
     }
 
@@ -88,6 +92,7 @@ const calendarMonths = computed(() => {
 
     if (events.length) {
       result.push({
+        key: monthKey(year, month),
         label: `${year} 年 ${month} 月`,
         from,
         to,
@@ -114,6 +119,84 @@ const calendarMonths = computed(() => {
 const displayedMonths = computed(() =>
   view.value === 'calendar' ? calendarMonths.value : months.value
 )
+
+const EXPANDED_KEY = 'nou:school-calendar:expanded:v1'
+
+// Show every month at once instead of one at a time.
+const expanded = ref(false)
+
+onMounted(() => {
+  try {
+    expanded.value = localStorage.getItem(EXPANDED_KEY) === '1'
+  } catch {
+    // Storage can be blocked; one month at a time is a fine default.
+  }
+})
+
+function setExpanded(next) {
+  expanded.value = next
+
+  try {
+    localStorage.setItem(EXPANDED_KEY, next ? '1' : '0')
+  } catch {
+    // Not remembering the choice is harmless.
+  }
+}
+
+// The month containing today, else the next one that has anything, else the
+// last (a finished term). Keyed rather than indexed so it survives switching
+// between the list and calendar views, whose month sets differ.
+const currentMonthKey = computed(() => {
+  const todayKey = today.value.slice(0, 7)
+  const keys = displayedMonths.value.map(month => month.key)
+
+  return keys.find(key => key >= todayKey) ?? keys.at(-1) ?? null
+})
+
+const selectedKey = ref(null)
+
+watch(
+  () => props.viewModel.term,
+  () => {
+    selectedKey.value = null
+  }
+)
+
+const selectedIndex = computed(() => {
+  const index = displayedMonths.value.findIndex(
+    month => month.key === selectedKey.value
+  )
+
+  return index === -1
+    ? displayedMonths.value.findIndex(
+        month => month.key === currentMonthKey.value
+      )
+    : index
+})
+
+const onCurrentMonth = computed(
+  () =>
+    displayedMonths.value[selectedIndex.value]?.key === currentMonthKey.value
+)
+
+const visibleMonths = computed(() =>
+  expanded.value
+    ? displayedMonths.value
+    : displayedMonths.value.slice(selectedIndex.value, selectedIndex.value + 1)
+)
+
+const canGoPrevious = computed(() => selectedIndex.value > 0)
+const canGoNext = computed(
+  () => selectedIndex.value < displayedMonths.value.length - 1
+)
+
+function goToMonth(offset) {
+  const target = displayedMonths.value[selectedIndex.value + offset]
+
+  if (target) {
+    selectedKey.value = target.key
+  }
+}
 
 function changeTerm(event) {
   router.get(
@@ -197,16 +280,67 @@ function changeTerm(event) {
         {{ viewModel.termLabel }}尚無行事曆資料。
       </p>
 
+      <div v-if="displayedMonths.length" class="flex items-center gap-2">
+        <button
+          v-if="!expanded && !onCurrentMonth"
+          type="button"
+          class="h-9 rounded-lg border border-zinc-500 px-3 text-sm font-medium text-theme-800 hover:bg-theme-50 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          data-testid="school-calendar-current-month"
+          @click="selectedKey = currentMonthKey"
+        >
+          回到本月
+        </button>
+
+        <button
+          type="button"
+          class="ml-auto h-9 rounded-lg border border-zinc-500 px-3 text-sm font-medium text-theme-800 hover:bg-theme-50 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          :aria-pressed="expanded"
+          data-testid="school-calendar-expand-all"
+          @click="setExpanded(!expanded)"
+        >
+          {{ expanded ? '按月份檢視' : '展開全部月份' }}
+        </button>
+      </div>
+
       <section
-        v-for="month in displayedMonths"
+        v-for="month in visibleMonths"
         :key="`${view}-${month.label}`"
         class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        :data-testid="`school-calendar-section-${month.key}`"
       >
-        <h3
-          class="mb-2 text-lg font-semibold text-theme-900 dark:text-zinc-100"
-        >
-          {{ month.label }}
-        </h3>
+        <div class="mb-2 flex items-center justify-between gap-2">
+          <button
+            v-if="!expanded"
+            type="button"
+            class="inline-flex size-10 items-center justify-center rounded-lg border border-zinc-500 text-theme-800 hover:bg-theme-50 disabled:opacity-40 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            aria-label="上個月"
+            :disabled="!canGoPrevious"
+            data-testid="school-calendar-previous"
+            @click="goToMonth(-1)"
+          >
+            <Icon name="chevron-left" class="size-5" />
+          </button>
+
+          <h3
+            class="text-lg font-semibold text-theme-900 dark:text-zinc-100"
+            :class="{ 'flex-1 text-center': !expanded }"
+            :aria-live="expanded ? undefined : 'polite'"
+          >
+            {{ month.label }}
+          </h3>
+
+          <button
+            v-if="!expanded"
+            type="button"
+            class="inline-flex size-10 items-center justify-center rounded-lg border border-zinc-500 text-theme-800 hover:bg-theme-50 disabled:opacity-40 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            aria-label="下個月"
+            :disabled="!canGoNext"
+            data-testid="school-calendar-next"
+            @click="goToMonth(1)"
+          >
+            <Icon name="chevron-right" class="size-5" />
+          </button>
+        </div>
 
         <EventCalendar
           v-if="view === 'calendar'"
