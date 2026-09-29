@@ -28,7 +28,7 @@ it('accepts a typed YYYY-MM-DD date and saves it', function () {
 it('fills the field from the calendar button', function () {
     $page = visit('/admin/calendar-days')
         ->click('新增標註')
-        ->assertPresent('button[aria-label="開啟日曆"]');
+        ->assertPresent('input[type=date][aria-label="開啟日曆"]');
 
     $page->script("const input = document.querySelector('input[type=date]'); input.value = '2026-11-11'; input.dispatchEvent(new Event('change', { bubbles: true }));");
 

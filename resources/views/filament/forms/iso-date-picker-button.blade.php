@@ -1,20 +1,37 @@
-{{-- The native date input is only a calendar popup; the text field stays the source of truth. --}}
-<span x-data class="relative inline-flex">
+{{--
+    A transparent native date input laid over the icon: clicking it opens the
+    browser's own calendar, which then closes itself (calling showPicker() from
+    a separate button left it open in Safari). The text field stays the source
+    of truth. Sizes are inline because the admin panel's stylesheet only
+    contains the utilities Filament's own views use, not this app's Tailwind.
+--}}
+<span
+    style="
+        position: relative;
+        display: inline-flex;
+        flex: none;
+        width: 1.25rem;
+        height: 1.25rem;
+    "
+>
+    <x-filament::icon
+        icon="heroicon-o-calendar-days"
+        style="width: 1.25rem; height: 1.25rem"
+        aria-hidden="true"
+    />
     <input
         type="date"
-        tabindex="-1"
-        aria-hidden="true"
-        x-ref="calendar"
-        class="pointer-events-none absolute inset-0 size-full opacity-0"
-        x-on:change="if ($event.target.value) { $wire.$set(@js($statePath), $event.target.value); $event.target.blur() }"
-    />
-    <button
-        type="button"
-        class="inline-flex text-gray-400 hover:text-gray-600 disabled:cursor-not-allowed dark:hover:text-gray-200"
         aria-label="開啟日曆"
         @disabled($disabled)
-        x-on:click="$refs.calendar.showPicker()"
-    >
-        <x-filament::icon icon="heroicon-o-calendar-days" class="size-5" />
-    </button>
+        style="
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        "
+        x-data
+        x-on:change="if ($event.target.value) { $wire.$set(@js($statePath), $event.target.value) }"
+    />
 </span>
