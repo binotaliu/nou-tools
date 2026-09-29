@@ -381,12 +381,6 @@ function changeTerm(event) {
               >
                 {{ event.name }}
               </span>
-              <span
-                v-if="event.important"
-                class="inline-flex items-center rounded bg-theme-100 px-2 py-0.5 text-xs font-medium text-theme-800 dark:bg-zinc-800 dark:text-zinc-200"
-              >
-                重點
-              </span>
             </span>
 
             <span
