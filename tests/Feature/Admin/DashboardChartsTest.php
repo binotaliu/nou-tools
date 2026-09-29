@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Enums\NewsletterIssueStatus;
 use App\Enums\UserRole;
+use App\Filament\Widgets\LatestNewsletterIssues;
 use App\Filament\Widgets\NewSchedulesChart;
 use App\Filament\Widgets\PushDeliveryChart;
+use App\Models\NewsletterIssue;
 use App\Models\PushNotificationDelivery;
 use App\Models\StudentSchedule;
 use App\Models\User;
@@ -53,4 +56,19 @@ it('renders the chart widgets', function (): void {
 
 it('renders the push chart with no deliveries', function (): void {
     Livewire::test(PushDeliveryChart::class)->assertSee('沒有失敗紀錄');
+});
+
+it('lists published newsletter issues with their engagement', function (): void {
+    $issue = NewsletterIssue::factory()->create([
+        'status' => NewsletterIssueStatus::Published,
+        'published_at' => now(),
+        'title' => '第一期測試電子報',
+        'view_count' => 42,
+    ]);
+    NewsletterIssue::factory()->create(['status' => NewsletterIssueStatus::Draft, 'title' => '草稿不應出現']);
+
+    Livewire::test(LatestNewsletterIssues::class)
+        ->assertCanSeeTableRecords([$issue])
+        ->assertSee('第一期測試電子報')
+        ->assertDontSee('草稿不應出現');
 });
