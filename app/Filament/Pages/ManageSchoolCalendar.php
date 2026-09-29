@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Filament\Forms\Components\IsoDateInput;
 use App\Models\SchoolCalendarEvent;
 use App\Models\User;
 use BackedEnum;
 use Carbon\CarbonImmutable;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
@@ -22,6 +23,7 @@ use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\EmbeddedSchema;
 use Filament\Schemas\Components\Form;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -88,8 +90,14 @@ final class ManageSchoolCalendar extends Page
                         TableColumn::make('重要')->width('5rem')->alignCenter(),
                     ])
                     ->schema([
-                        DatePicker::make('start_date')->required()->native(false)->format('Y-m-d'),
-                        DatePicker::make('end_date')->required()->native(false)->format('Y-m-d')->afterOrEqual('start_date'),
+                        IsoDateInput::make('start_date')->required(),
+                        IsoDateInput::make('end_date')
+                            ->required()
+                            ->rule(fn (Get $get): Closure => function (string $attribute, mixed $value, Closure $fail) use ($get): void {
+                                if (filled($get('start_date')) && (string) $value < $get('start_date')) {
+                                    $fail('結束日不可早於開始日。');
+                                }
+                            }),
                         TextInput::make('name')->required()->maxLength(255),
                         Toggle::make('is_countdown')->default(false),
                         Toggle::make('is_important')->default(true),

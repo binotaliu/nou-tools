@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use App\Filament\Forms\Components\IsoDateInput;
 use App\Models\CalendarDay;
 use App\Models\User;
 use BackedEnum;
 use Carbon\CarbonImmutable;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
@@ -88,13 +89,16 @@ final class ManageCalendarDays extends Page
                         TableColumn::make('標註文字'),
                     ])
                     ->schema([
-                        DatePicker::make('date')
+                        IsoDateInput::make('date')
                             ->required()
-                            ->native(false)
-                            ->format('Y-m-d')
                             ->distinct()
-                            ->afterOrEqual(fn (Get $get): string => $get('../../year').'-01-01')
-                            ->beforeOrEqual(fn (Get $get): string => $get('../../year').'-12-31'),
+                            ->rule(fn (Get $get): Closure => function (string $attribute, mixed $value, Closure $fail) use ($get): void {
+                                $year = $get('../../year');
+
+                                if (! str_starts_with((string) $value, "{$year}-")) {
+                                    $fail("日期必須在 {$year} 年內。");
+                                }
+                            }),
                         Toggle::make('is_red')->default(true),
                         TextInput::make('label')->maxLength(20),
                     ])

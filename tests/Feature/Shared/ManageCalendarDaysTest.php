@@ -88,3 +88,12 @@ it('rejects the same date twice', function () {
         ->call('save')
         ->assertHasFormErrors();
 });
+
+it('rejects a date that is not YYYY-MM-DD', function () {
+    Livewire::test(ManageCalendarDays::class)
+        ->fillForm(['days' => [
+            'new' => ['date' => '2026/10/10', 'is_red' => true, 'label' => ''],
+        ]])
+        ->call('save')
+        ->assertHasFormErrors(['days.new.date']);
+});
