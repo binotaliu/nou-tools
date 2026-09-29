@@ -35,3 +35,26 @@ it('marks events as ended, ongoing or upcoming and switches semesters', function
         ->assertSee('瀏覽器另一學期活動')
         ->assertDontSee('瀏覽器進行中活動');
 });
+
+it('shows the month calendar by default and remembers a switch to the list', function () {
+    config(['app.current_semester' => '2026A']);
+
+    $today = now('Asia/Taipei');
+
+    SchoolCalendarEvent::factory()->forTerm('2026A')
+        ->between($today->copy()->subDay()->toDateString(), $today->copy()->addDay()->toDateString())
+        ->create(['name' => '月曆檢視活動']);
+
+    visit(route('school-calendar.index'))
+        ->withTimezone('Asia/Taipei')
+        ->assertNoJavaScriptErrors()
+        ->assertPresent('[data-testid="school-calendar-month"]')
+        ->assertSee('月曆檢視活動')
+        ->assertPresent('[data-testid="calendar-today"]')
+        ->click('[data-testid="school-calendar-view-list"]')
+        ->assertMissing('[data-testid="school-calendar-month"]')
+        ->refresh()
+        ->assertMissing('[data-testid="school-calendar-month"]')
+        ->click('[data-testid="school-calendar-view-calendar"]')
+        ->assertPresent('[data-testid="school-calendar-month"]');
+});

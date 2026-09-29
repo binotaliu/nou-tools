@@ -1,8 +1,9 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import EventCalendar from '../../Components/EventCalendar.vue'
 import useSchoolCalendar from '../../Composables/useSchoolCalendar'
 
 const props = defineProps({
@@ -12,10 +13,8 @@ const props = defineProps({
   },
 })
 
-const { showTaipeiHint, activeEvents, shortDateRange } = useSchoolCalendar(
-  () => props.viewModel.events,
-  true
-)
+const { today, showTaipeiHint, activeEvents, shortDateRange } =
+  useSchoolCalendar(() => props.viewModel.events, true)
 
 // Events arrive sorted by start date, so grouping keeps chronological order.
 const months = computed(() => {
@@ -36,6 +35,85 @@ const months = computed(() => {
 
   return groups
 })
+
+const VIEW_KEY = 'nou:school-calendar:view:v1'
+
+const view = ref('calendar')
+
+onMounted(() => {
+  try {
+    if (localStorage.getItem(VIEW_KEY) === 'list') {
+      view.value = 'list'
+    }
+  } catch {
+    // Storage can be blocked; the calendar view is a fine default.
+  }
+})
+
+function setView(next) {
+  view.value = next
+
+  try {
+    localStorage.setItem(VIEW_KEY, next)
+  } catch {
+    // Not remembering the choice is harmless.
+  }
+}
+
+// One entry per calendar month between the first event's start and the last
+// event's end. Unlike the list (grouped by start month) an event appears in
+// every month it touches, so a break that spans a month end is drawn in both.
+// `events` keeps the list order, so a bar's number is its row's number.
+const calendarMonths = computed(() => {
+  if (!activeEvents.value.length) {
+    return []
+  }
+
+  const first = activeEvents.value[0].start
+  const last = activeEvents.value.reduce(
+    (latest, event) => (event.end > latest ? event.end : latest),
+    first
+  )
+  const [lastYear, lastMonth] = last.split('-').map(Number)
+  let [year, month] = first.split('-').map(Number)
+  const result = []
+
+  while (year < lastYear || (year === lastYear && month <= lastMonth)) {
+    const from = `${year}-${String(month).padStart(2, '0')}-01`
+    const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate()
+    const to = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+    const events = activeEvents.value.filter(
+      event => event.start <= to && event.end >= from
+    )
+
+    if (events.length) {
+      result.push({
+        label: `${year} 年 ${month} 月`,
+        from,
+        to,
+        events,
+        calendarEvents: events.map(event => ({
+          name: event.name,
+          startDate: event.start,
+          endDate: event.end,
+        })),
+      })
+    }
+
+    month += 1
+
+    if (month > 12) {
+      month = 1
+      year += 1
+    }
+  }
+
+  return result
+})
+
+const displayedMonths = computed(() =>
+  view.value === 'calendar' ? calendarMonths.value : months.value
+)
 
 function changeTerm(event) {
   router.get(
@@ -58,42 +136,70 @@ function changeTerm(event) {
           學校行事曆
         </h2>
 
-        <div class="relative sm:w-64">
-          <label for="school-calendar-term" class="sr-only">選擇學期</label>
-          <select
-            id="school-calendar-term"
-            data-testid="school-calendar-term"
-            data-offline-disable
-            class="h-10 w-full appearance-none rounded-lg border border-zinc-500 bg-white px-3 dark:border-zinc-500 dark:bg-zinc-900"
-            :value="viewModel.term"
-            @change="changeTerm"
-          >
-            <option
-              v-for="term in viewModel.terms"
-              :key="term.code"
-              :value="term.code"
-            >
-              {{ term.label }}
-            </option>
-          </select>
+        <div class="flex items-center gap-2">
           <div
-            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
+            class="inline-flex shrink-0 rounded-lg border border-zinc-500 p-0.5"
+            role="group"
+            aria-label="檢視方式"
           >
-            <Icon name="chevron-down" class="size-5 text-zinc-400" />
+            <button
+              v-for="option in [
+                { key: 'list', label: '列表' },
+                { key: 'calendar', label: '月曆' },
+              ]"
+              :key="option.key"
+              type="button"
+              class="h-9 rounded-md px-3 text-sm font-medium"
+              :class="
+                view === option.key
+                  ? 'bg-theme-700 text-white dark:bg-theme-300 dark:text-zinc-900'
+                  : 'text-theme-800 hover:bg-theme-50 dark:text-zinc-200 dark:hover:bg-zinc-800'
+              "
+              :aria-pressed="view === option.key"
+              :data-testid="`school-calendar-view-${option.key}`"
+              @click="setView(option.key)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+
+          <div class="relative min-w-0 flex-1 sm:w-64 sm:flex-none">
+            <label for="school-calendar-term" class="sr-only">選擇學期</label>
+            <select
+              id="school-calendar-term"
+              data-testid="school-calendar-term"
+              data-offline-disable
+              class="h-10 w-full appearance-none rounded-lg border border-zinc-500 bg-white px-3 dark:border-zinc-500 dark:bg-zinc-900"
+              :value="viewModel.term"
+              @change="changeTerm"
+            >
+              <option
+                v-for="term in viewModel.terms"
+                :key="term.code"
+                :value="term.code"
+              >
+                {{ term.label }}
+              </option>
+            </select>
+            <div
+              class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
+            >
+              <Icon name="chevron-down" class="size-5 text-zinc-400" />
+            </div>
           </div>
         </div>
       </div>
 
       <p
-        v-if="!months.length"
+        v-if="!displayedMonths.length"
         class="rounded-lg border border-theme-200 bg-white p-6 text-theme-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
       >
         {{ viewModel.termLabel }}尚無行事曆資料。
       </p>
 
       <section
-        v-for="month in months"
-        :key="month.label"
+        v-for="month in displayedMonths"
+        :key="`${view}-${month.label}`"
         class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
       >
         <h3
@@ -102,14 +208,32 @@ function changeTerm(event) {
           {{ month.label }}
         </h3>
 
+        <EventCalendar
+          v-if="view === 'calendar'"
+          :highlights-from="month.from"
+          :highlights-to="month.to"
+          :events="month.calendarEvents"
+          :today="today"
+          test-id="school-calendar-month"
+          class="mb-3"
+        />
+
         <ul>
           <li
-            v-for="event in month.events"
+            v-for="(event, eventIndex) in month.events"
             :key="event.start + event.name"
             :data-testid="`school-calendar-event-${event.status}`"
             class="flex flex-col-reverse items-start justify-between gap-x-2 gap-y-1 border-b border-theme-100 py-2 last:border-0 sm:flex-row sm:items-center dark:border-zinc-800"
           >
             <span class="flex flex-wrap items-center gap-2">
+              <!-- On narrow screens the calendar's bars show only this number. -->
+              <span
+                v-if="view === 'calendar'"
+                class="inline-flex size-5 shrink-0 items-center justify-center rounded bg-theme-200 text-xs font-medium text-theme-900 sm:hidden dark:bg-theme-800/70 dark:text-theme-100"
+                aria-hidden="true"
+              >
+                {{ eventIndex + 1 }}
+              </span>
               <!-- Past events get the quieter theme-700 / zinc-400 instead of
                    an opacity fade, which would drop the text below 4.5:1. -->
               <span

@@ -127,6 +127,7 @@ export default function useSchoolCalendar(events, showPastEvents = false) {
   }
 
   return {
+    today,
     showTaipeiHint,
     activeEvents,
     countdownEvent,
