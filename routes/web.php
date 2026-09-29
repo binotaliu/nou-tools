@@ -30,6 +30,7 @@ use App\Http\Controllers\Markdown\HomeIndexMarkdownController;
 use App\Http\Controllers\Markdown\NewsletterIndexMarkdownController;
 use App\Http\Controllers\Markdown\NewsletterShowMarkdownController;
 use App\Http\Controllers\Markdown\ScheduleShowMarkdownController;
+use App\Http\Controllers\Markdown\SchoolCalendarIndexMarkdownController;
 use App\Http\Controllers\Markdown\StudyRoomMarkdownController;
 use App\Http\Controllers\Markdown\VideoClassIndexMarkdownController;
 use App\Http\Controllers\MusicPlaylistController;
@@ -53,6 +54,7 @@ use App\Http\Controllers\SchedulePushSubscriptionDestroyController;
 use App\Http\Controllers\SchedulePushSubscriptionStoreController;
 use App\Http\Controllers\ScheduleRememberController;
 use App\Http\Controllers\ScheduleSubscribeController;
+use App\Http\Controllers\SchoolCalendarController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\SitemapController;
@@ -127,6 +129,9 @@ Route::put('/newsletter/{issueKey}/reaction', NewsletterReactionController::clas
 
 Route::get('/video-classes', [VideoClassController::class, 'index'])->name('video-classes.index')
     ->withMarkdown(VideoClassIndexMarkdownController::class);
+
+Route::get('/school-calendar', [SchoolCalendarController::class, 'index'])->name('school-calendar.index')
+    ->withMarkdown(SchoolCalendarIndexMarkdownController::class);
 
 Route::get('/directory', [DirectoryController::class, 'index'])->name('directory.index')
     ->withMarkdown(DirectoryIndexMarkdownController::class);

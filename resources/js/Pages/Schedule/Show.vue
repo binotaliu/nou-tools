@@ -1290,6 +1290,7 @@ function localHint(next) {
         class="mb-8"
         :events="schoolCalendar.events"
         :show-past-events="schoolCalendar.showPastEvents"
+        :term="viewModel.selectedTerm"
       />
 
       <div

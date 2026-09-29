@@ -4,7 +4,8 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 // viewer's own, so "today" and every day count here are anchored to
 // Asia/Taipei rather than the local clock. `events` is the raw
 // upcoming/ongoing events array; `showPastEvents` is true when browsing a
-// non-current semester's full calendar.
+// non-current semester's full calendar. `events` may be a getter so a page
+// Inertia reuses across terms (`() => props.events`) follows its prop.
 export default function useSchoolCalendar(events, showPastEvents = false) {
   const T = window.NouTime
 
@@ -41,9 +42,11 @@ export default function useSchoolCalendar(events, showPastEvents = false) {
   })
 
   function statusOf(event) {
-    return today.value >= event.start && today.value <= event.end
-      ? 'ongoing'
-      : 'upcoming'
+    if (today.value > event.end) {
+      return 'past'
+    }
+
+    return today.value >= event.start ? 'ongoing' : 'upcoming'
   }
 
   function daysUntilOf(event) {
@@ -57,7 +60,7 @@ export default function useSchoolCalendar(events, showPastEvents = false) {
   // the semester's whole calendar. Decorated with status/count, sorted by
   // start date.
   const activeEvents = computed(() =>
-    events
+    (typeof events === 'function' ? events() : events)
       .filter(event => showPastEvents || event.end >= today.value)
       .map(event => ({
         ...event,

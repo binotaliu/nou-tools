@@ -26,6 +26,7 @@ it('server-renders title, description and Open Graph tags on static pages', func
 })->with([
     'home' => ['home', 'NOU 小幫手'],
     'announcements' => ['announcements.index', '學校公告 - NOU 小幫手'],
+    'school calendar' => ['school-calendar.index', '學校行事曆 - NOU 小幫手'],
     'directory' => ['directory.index', '連結 / 學習指導中心目錄 - NOU 小幫手'],
     'course schedule' => ['course.schedule', '本學期開課表 - NOU 小幫手'],
     'about' => ['about', '關於 - NOU 小幫手'],

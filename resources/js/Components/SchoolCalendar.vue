@@ -1,5 +1,6 @@
 <script setup>
 // See useSchoolCalendar.js for the calendar logic.
+import { Link } from '@inertiajs/vue3'
 import useSchoolCalendar from '../Composables/useSchoolCalendar'
 
 const props = defineProps({
@@ -10,6 +11,11 @@ const props = defineProps({
   showPastEvents: {
     type: Boolean,
     default: false,
+  },
+  // Semester code (e.g. 2026A) the full-calendar link opens; omitted = current.
+  term: {
+    type: String,
+    default: null,
   },
 })
 
@@ -28,10 +34,16 @@ const {
     v-if="events.length > 0"
     class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
   >
-    <div class="mb-4">
+    <div class="mb-4 flex items-baseline justify-between gap-3">
       <h2 class="text-xl font-semibold text-theme-900 dark:text-zinc-100">
         學校行事曆
       </h2>
+      <Link
+        :href="term ? `/school-calendar?term=${term}` : '/school-calendar'"
+        class="text-sm text-theme-700 underline underline-offset-2 hover:text-theme-900 dark:text-zinc-400 dark:hover:text-zinc-200 print:hidden"
+      >
+        完整行事曆
+      </Link>
     </div>
 
     <div class="flex flex-col md:flex-row md:items-start md:gap-6">

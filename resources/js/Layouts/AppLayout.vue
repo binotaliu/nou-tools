@@ -127,6 +127,12 @@ const moreMenuItems = [
     icon: 'video-camera',
   },
   {
+    href: '/school-calendar',
+    prefix: '/school-calendar',
+    label: '學校行事曆',
+    icon: 'calendar',
+  },
+  {
     href: '/courses/schedule',
     prefix: '/courses/schedule',
     label: '本學期開課表',
