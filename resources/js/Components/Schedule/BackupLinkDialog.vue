@@ -8,6 +8,7 @@
 // code, the schedule's name and what the picture is for all sit inside it.
 // Find.vue can read such a screenshot back.
 import { computed, ref } from 'vue'
+import Button from '../Button.vue'
 import Icon from '../Icon.vue'
 import useCopyLink from '../../Composables/useCopyLink'
 import useDialogFocus from '../../Composables/useDialogFocus'
@@ -108,11 +109,10 @@ const mailtoHref = computed(() => {
         </p>
 
         <div class="mt-4 flex flex-col gap-2 sm:flex-row">
-          <button
-            type="button"
+          <Button
             data-testid="schedule-backup-copy"
-            :aria-pressed="copied.toString()"
-            class="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 font-semibold whitespace-nowrap text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            :pressed="copied"
+            class="flex-1 whitespace-nowrap"
             @click="copy()"
           >
             <template v-if="copied">
@@ -123,7 +123,7 @@ const mailtoHref = computed(() => {
               <Icon name="clipboard-document" class="size-4" />
               複製連結
             </template>
-          </button>
+          </Button>
           <a
             :href="mailtoHref"
             data-testid="schedule-backup-email"
@@ -148,14 +148,13 @@ const mailtoHref = computed(() => {
         </div>
 
         <div class="mt-4 flex justify-end">
-          <button
-            type="button"
+          <Button
+            variant="primary"
             data-testid="schedule-backup-close"
-            class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-4 py-2 font-semibold text-white transition hover:bg-theme-800"
             @click="emit('close')"
           >
             完成
-          </button>
+          </Button>
         </div>
       </div>
     </div>

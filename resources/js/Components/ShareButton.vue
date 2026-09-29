@@ -5,6 +5,7 @@
 // `testIdPrefix` keeps each page's own test ids (`article-share-button`,
 // `newsletter-share-button`, ...).
 import { onMounted, onUnmounted, ref, watch } from 'vue'
+import Button from './Button.vue'
 import Icon from './Icon.vue'
 import useArticleShare from '../Composables/useArticleShare'
 
@@ -78,15 +79,15 @@ onUnmounted(() => window.removeEventListener('keydown', handleEscape))
 </script>
 
 <template>
-  <button
-    type="button"
-    class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-theme-200 bg-white px-3 py-1 text-sm font-semibold text-theme-900 transition hover:bg-theme-50 disabled:border-theme-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:disabled:border-zinc-800"
+  <Button
+    size="xs"
+    class="shrink-0"
     :data-testid="`${testIdPrefix}-button`"
     @click="share()"
   >
     <Icon name="share" class="size-4" />
     分享
-  </button>
+  </Button>
 
   <Teleport to="body">
     <div
@@ -132,10 +133,11 @@ onUnmounted(() => window.removeEventListener('keydown', handleEscape))
             @click="$event.target.select()"
           />
 
-          <button
-            type="button"
-            class="my-1 mr-1 inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-theme-200 bg-theme-200 px-3 py-1 text-sm font-semibold whitespace-nowrap text-theme-900 transition hover:bg-theme-300 disabled:bg-theme-100 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600 dark:disabled:bg-zinc-900"
-            :aria-pressed="copied.toString()"
+          <Button
+            variant="tonal"
+            size="xs"
+            class="my-1 mr-1 shrink-0 whitespace-nowrap"
+            :pressed="copied"
             :data-testid="`${testIdPrefix}-copy`"
             @click="copy()"
           >
@@ -147,18 +149,17 @@ onUnmounted(() => window.removeEventListener('keydown', handleEscape))
               <Icon name="check" class="inline size-4" />
               已複製！
             </span>
-          </button>
+          </Button>
         </div>
 
         <div class="mt-4 flex justify-end">
-          <button
-            type="button"
-            class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 text-sm font-semibold text-theme-900 transition hover:bg-theme-50 disabled:border-theme-200 disabled:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:disabled:border-zinc-700 dark:disabled:bg-zinc-950"
+          <Button
+            class="text-sm"
             :data-testid="`${testIdPrefix}-close`"
             @click="showShareModal = false"
           >
             關閉
-          </button>
+          </Button>
         </div>
       </div>
     </div>

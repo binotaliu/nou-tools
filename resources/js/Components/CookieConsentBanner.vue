@@ -1,4 +1,5 @@
 <script setup>
+import Button from './Button.vue'
 import { Link } from '@inertiajs/vue3'
 import useAnalyticsConsent from '../Composables/useAnalyticsConsent'
 
@@ -35,22 +36,21 @@ const { showBanner, accept, decline } = useAnalyticsConsent()
         </p>
 
         <div class="flex shrink-0 items-center gap-2">
-          <button
-            type="button"
+          <Button
+            class="text-sm"
             data-testid="cookie-consent-decline"
-            class="inline-flex items-center justify-center rounded-lg border border-theme-500 bg-white px-4 py-2 text-sm font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
             @click="decline"
           >
             拒絕
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="primary"
+            class="text-sm"
             data-testid="cookie-consent-accept"
-            class="inline-flex items-center justify-center rounded-lg bg-theme-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-theme-800 dark:bg-zinc-300 dark:text-zinc-900 dark:hover:bg-zinc-200"
             @click="accept"
           >
             接受
-          </button>
+          </Button>
         </div>
       </div>
     </div>

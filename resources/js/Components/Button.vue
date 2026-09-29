@@ -27,7 +27,7 @@ const props = defineProps({
   size: {
     type: String,
     default: 'md',
-    validator: value => ['sm', 'md', 'lg'].includes(value),
+    validator: value => ['xs', 'sm', 'md', 'lg'].includes(value),
   },
   type: {
     type: String,
@@ -67,12 +67,14 @@ const variants = {
 
 // `sm` is the compact 36px control; `icon` squares follow the same steps.
 const sizes = {
+  xs: 'px-3 py-1 text-sm',
   sm: 'h-9 px-3 text-sm',
   md: 'px-4 py-2',
   lg: 'px-6 py-3 text-lg',
 }
 
 const iconSizes = {
+  xs: 'size-8',
   sm: 'size-8 pointer-coarse:size-11',
   md: 'size-10',
   lg: 'size-12',

@@ -1,5 +1,6 @@
 <script setup>
 import { Link } from '@inertiajs/vue3'
+import Button from './Button.vue'
 import Icon from './Icon.vue'
 import usePwaInstallBanner from '../Composables/usePwaInstallBanner'
 
@@ -13,15 +14,16 @@ const { visible, isIos, showDismissedNotice, install, close, optOut } =
       class="relative rounded-lg border border-theme-300 dark:border-zinc-600"
       role="region"
     >
-      <button
-        type="button"
-        class="absolute top-4 right-4 inline-flex items-center justify-center rounded-md border border-theme-600 bg-white p-1.5 text-theme-700 transition hover:bg-theme-100 hover:text-theme-900 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
+      <Button
+        variant="icon"
+        size="xs"
+        class="absolute top-4 right-4 border border-theme-600 bg-white dark:bg-zinc-900"
         aria-label="關閉安裝提示"
         data-testid="pwa-banner-close"
         @click="close()"
       >
         <Icon name="x-mark" class="size-4" />
-      </button>
+      </Button>
 
       <div
         class="flex flex-col overflow-hidden rounded-lg bg-white sm:flex-row dark:bg-zinc-900"
@@ -53,24 +55,23 @@ const { visible, isIos, showDismissedNotice, install, close, optOut } =
           </p>
 
           <div class="flex flex-wrap items-center justify-end gap-2 sm:-mr-8">
-            <button
+            <Button
               v-if="showDismissedNotice"
-              type="button"
-              class="inline-flex items-center justify-center rounded-md bg-theme-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-theme-600 focus:ring-2 focus:ring-theme-500 focus:outline-none"
+              variant="primary"
+              class="text-sm"
               data-testid="pwa-banner-notice-ok"
               @click="close()"
             >
               好
-            </button>
+            </Button>
             <template v-else>
-              <button
-                type="button"
-                class="inline-flex items-center justify-center rounded-md border border-theme-600 bg-white px-4 py-2 text-sm font-medium text-theme-700 transition hover:bg-theme-100 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              <Button
+                class="text-sm"
                 data-testid="pwa-banner-opt-out"
                 @click="optOut()"
               >
                 不再提示我安裝
-              </button>
+              </Button>
               <Link
                 v-if="isIos"
                 href="/install"
@@ -79,15 +80,15 @@ const { visible, isIos, showDismissedNotice, install, close, optOut } =
               >
                 檢視安裝說明
               </Link>
-              <button
+              <Button
                 v-else
-                type="button"
-                class="inline-flex items-center justify-center rounded-md bg-theme-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-theme-600 focus:ring-2 focus:ring-theme-500 focus:outline-none"
+                variant="primary"
+                class="text-sm"
                 data-testid="pwa-banner-install"
                 @click="install()"
               >
                 安裝為 App
-              </button>
+              </Button>
             </template>
           </div>
         </div>

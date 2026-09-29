@@ -4,6 +4,7 @@
 // everything else is a polite role="status" that hides after a reading-friendly
 // delay, which pauses while the pointer or focus is on the toast (WCAG 2.2.1).
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import Button from './Button.vue'
 import Icon from './Icon.vue'
 
 const props = defineProps({
@@ -136,14 +137,15 @@ onBeforeUnmount(() => clearTimeout(timer))
                 <slot />
               </p>
             </div>
-            <button
-              type="button"
-              class="-my-1 -mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-theme-700 transition hover:bg-theme-100 hover:text-theme-900 focus:outline-2 focus:outline-offset-1 focus:outline-theme-700 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white dark:focus:outline-theme-400"
+            <Button
+              variant="icon"
+              size="xs"
+              class="-my-1 -mr-1 shrink-0"
               @click="show = false"
             >
               <span class="sr-only">關閉</span>
               <Icon name="x-mark" class="size-5" />
-            </button>
+            </Button>
           </div>
         </div>
       </Transition>

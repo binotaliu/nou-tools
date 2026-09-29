@@ -2,6 +2,7 @@
 // Live camera QR scanner. Emits `detected` once with the decoded text, then
 // stops the camera. Uses the browser's BarcodeDetector where it exists and
 // falls back to jsQR (lazy-loaded, so it costs nothing until a scan starts).
+import Button from './Button.vue'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 const emit = defineEmits(['detected', 'close'])
@@ -161,14 +162,9 @@ onBeforeUnmount(stop)
       不方便使用相機？請按「關閉相機」，改用貼上備份連結，或選取備份截圖。
     </p>
     <div class="mt-3 flex justify-end">
-      <button
-        type="button"
-        data-testid="qr-scanner-close"
-        class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
-        @click="emit('close')"
-      >
+      <Button data-testid="qr-scanner-close" @click="emit('close')">
         關閉相機
-      </button>
+      </Button>
     </div>
   </div>
 </template>
