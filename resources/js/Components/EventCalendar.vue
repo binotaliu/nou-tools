@@ -30,6 +30,12 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  // Per-date overrides `{ date, isRed, label }`: `isRed` replaces the
+  // Saturday/Sunday default for that date, `label` is a note beside the number.
+  days: {
+    type: Array,
+    default: () => [],
+  },
   testId: {
     type: String,
     default: 'event-calendar',
@@ -90,8 +96,12 @@ function buildBars(weekDates) {
   return { bars: segments, laneCount: laneEnds.length }
 }
 
-function dayLabelClass(day, dayIndex) {
-  if (dayIndex >= 5) {
+const daysByDate = computed(
+  () => new Map(props.days.map(override => [override.date, override]))
+)
+
+function dayLabelClass(day) {
+  if (day.isRed) {
     return day.inWindow
       ? 'text-red-600 dark:text-red-400'
       : 'text-red-700 dark:text-red-300'
@@ -112,9 +122,12 @@ const weeks = computed(() => {
       start,
       days: dates.map(date => {
         const { month, day } = newsletterDateParts(date)
+        const override = daysByDate.value.get(date)
 
         return {
           date,
+          isRed: override ? override.isRed : newsletterWeekdayIndex(date) >= 5,
+          note: override?.label ?? null,
           label: day === 1 || date === gridFrom.value ? `${month}/${day}` : day,
           inWindow: date >= props.highlightsFrom && date <= props.highlightsTo,
         }
@@ -180,9 +193,11 @@ const weeks = computed(() => {
         <p
           v-for="(day, dayIndex) in week.days"
           :key="`label-${day.date}`"
-          class="relative px-1.5 pt-1 pb-1 text-xs font-medium sm:px-2 sm:text-sm"
-          :class="dayLabelClass(day, dayIndex)"
+          class="relative flex min-w-0 items-baseline gap-1 px-1.5 pt-1 pb-1 text-xs font-medium sm:px-2 sm:text-sm"
+          :class="dayLabelClass(day)"
           :style="{ gridColumn: dayIndex + 1, gridRow: 1 }"
+          :data-testid="`calendar-day-label-${day.date}`"
+          :data-red="day.isRed ? 'true' : 'false'"
         >
           <span
             :class="
@@ -190,10 +205,19 @@ const weeks = computed(() => {
                 ? 'inline-block rounded-full bg-theme-700 px-1.5 text-white dark:bg-theme-300 dark:text-zinc-900'
                 : ''
             "
+            class="shrink-0"
             :data-testid="day.date === today ? 'calendar-today' : undefined"
           >
             {{ day.label }}
             <span v-if="day.date === today" class="sr-only">（今天）</span>
+          </span>
+          <span
+            v-if="day.note"
+            class="min-w-0 truncate text-[10px] leading-tight font-normal sm:text-xs"
+            :title="day.note"
+            :data-testid="`calendar-day-note-${day.date}`"
+          >
+            {{ day.note }}
           </span>
         </p>
 
