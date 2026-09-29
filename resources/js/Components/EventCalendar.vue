@@ -193,7 +193,7 @@ const weeks = computed(() => {
         <p
           v-for="(day, dayIndex) in week.days"
           :key="`label-${day.date}`"
-          class="relative flex min-w-0 items-baseline gap-1 px-1.5 pt-1 pb-1 text-xs font-medium sm:px-2 sm:text-sm"
+          class="relative flex min-w-0 flex-col items-start gap-0 px-1.5 pt-1 pb-1 text-xs font-medium sm:flex-row sm:items-baseline sm:gap-1 sm:px-2 sm:text-sm"
           :class="dayLabelClass(day)"
           :style="{ gridColumn: dayIndex + 1, gridRow: 1 }"
           :data-testid="`calendar-day-label-${day.date}`"
@@ -213,7 +213,7 @@ const weeks = computed(() => {
           </span>
           <span
             v-if="day.note"
-            class="min-w-0 truncate text-[10px] leading-tight font-normal sm:text-xs"
+            class="max-w-full min-w-0 text-[10px] leading-tight font-normal break-all sm:truncate sm:text-xs"
             :title="day.note"
             :data-testid="`calendar-day-note-${day.date}`"
           >
