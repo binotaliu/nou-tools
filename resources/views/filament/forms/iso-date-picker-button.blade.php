@@ -6,7 +6,7 @@
         aria-hidden="true"
         x-ref="calendar"
         class="pointer-events-none absolute inset-0 size-full opacity-0"
-        x-on:change="if ($event.target.value) { $wire.$set(@js($statePath), $event.target.value) }"
+        x-on:change="if ($event.target.value) { $wire.$set(@js($statePath), $event.target.value); $event.target.blur() }"
     />
     <button
         type="button"
