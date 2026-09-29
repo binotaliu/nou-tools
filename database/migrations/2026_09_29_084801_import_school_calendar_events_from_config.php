@@ -40,6 +40,11 @@ return new class extends Migration
 
     public function up(): void
     {
+        // Tests build their own calendar rows; the real semesters would leak into every assertion.
+        if (app()->environment('testing')) {
+            return;
+        }
+
         $now = now();
 
         DB::table('school_calendar_events')->insert(array_map(

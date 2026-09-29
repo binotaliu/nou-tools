@@ -57,8 +57,8 @@ final class SchoolCalendarEvent extends Model
     protected function casts(): array
     {
         return [
-            'start_date' => 'immutable_date',
-            'end_date' => 'immutable_date',
+            'start_date' => 'immutable_date:Y-m-d',
+            'end_date' => 'immutable_date:Y-m-d',
             'is_countdown' => 'boolean',
             'is_important' => 'boolean',
         ];

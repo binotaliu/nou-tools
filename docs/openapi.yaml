@@ -78,7 +78,7 @@ paths:
         - School Calendar
       summary: 取得 當期學校行事曆
       description: |
-        回傳當期學期的行事曆事件（如開學、期中考、期末考、註冊期間）。
+        回傳當期學期的重要行事曆事件（如開學、期中考、期末考、註冊期間），依開始日期排序。完整行事曆請見 /school-calendar。
       operationId: getCurrentSchoolCalendar
       responses:
         '200':

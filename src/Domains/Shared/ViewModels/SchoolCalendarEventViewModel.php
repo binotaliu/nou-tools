@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Shared\ViewModels;
 
+use App\Models\SchoolCalendarEvent;
 use Spatie\LaravelData\Data;
 
 /**
@@ -18,16 +19,13 @@ final class SchoolCalendarEventViewModel extends Data
         public bool $isCountdown,
     ) {}
 
-    /**
-     * @param  array{name: string, start: string, end: string, countdown: bool}  $event
-     */
-    public static function fromConfig(array $event): self
+    public static function fromModel(SchoolCalendarEvent $event): self
     {
         return new self(
-            name: $event['name'],
-            startDate: $event['start'],
-            endDate: $event['end'],
-            isCountdown: $event['countdown'],
+            name: $event->name,
+            startDate: $event->start_date->format('Y-m-d'),
+            endDate: $event->end_date->format('Y-m-d'),
+            isCountdown: $event->is_countdown,
         );
     }
 }

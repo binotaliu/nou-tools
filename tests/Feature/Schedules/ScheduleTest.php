@@ -3,6 +3,7 @@
 use App\Models\ClassSchedule;
 use App\Models\Course;
 use App\Models\CourseClass;
+use App\Models\SchoolCalendarEvent;
 use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
 use Carbon\Carbon;
@@ -228,14 +229,7 @@ it('saves calendar subscription settings with form post and flashes success', fu
 
 it('calendar output includes school events exams and reminders when defaults are enabled', function () {
     config()->set('app.current_semester', '2026A');
-    config()->set('school-schedules.2026A', [
-        [
-            'name' => '學校重要日',
-            'start' => '2026-03-01',
-            'end' => '2026-03-01',
-            'countdown' => true,
-        ],
-    ]);
+    SchoolCalendarEvent::factory()->forTerm('2026A')->between('2026-03-01', '2026-03-01')->countdown()->create(['name' => '學校重要日']);
 
     $course = Course::factory()->create([
         'name' => '提醒測試課程',
@@ -296,14 +290,7 @@ it('calendar output includes school events exams and reminders when defaults are
 
 it('calendar output excludes school events exams and reminders when defaults are disabled', function () {
     config()->set('app.current_semester', '2026A');
-    config()->set('school-schedules.2026A', [
-        [
-            'name' => '不應出現的學校事件',
-            'start' => '2026-03-01',
-            'end' => '2026-03-01',
-            'countdown' => true,
-        ],
-    ]);
+    SchoolCalendarEvent::factory()->forTerm('2026A')->between('2026-03-01', '2026-03-01')->countdown()->create(['name' => '不應出現的學校事件']);
 
     $course = Course::factory()->create([
         'name' => '不應出現的考試課程',

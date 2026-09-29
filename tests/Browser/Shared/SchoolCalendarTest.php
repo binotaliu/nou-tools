@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\SchoolCalendarEvent;
 use Illuminate\Support\Carbon;
 
 // Countdown days, status ("進行中"), date formatting, and the "Taiwan time"
@@ -14,14 +15,7 @@ it('shows the countdown anchored to Asia/Taipei without a hint for a viewer in A
 
     $start = now('Asia/Taipei')->addDays(5)->toDateString();
 
-    config(['school-schedules.2025B' => [
-        [
-            'start' => $start,
-            'end' => $start,
-            'name' => '瀏覽器倒數活動',
-            'countdown' => true,
-        ],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between($start, $start)->countdown()->create(['name' => '瀏覽器倒數活動']);
 
     visit('/')
         ->withTimezone('Asia/Taipei')
@@ -37,14 +31,7 @@ it('shows the same Taipei-anchored countdown plus a "Taiwan time" hint for a vie
 
     $start = now('Asia/Taipei')->addDays(5)->toDateString();
 
-    config(['school-schedules.2025B' => [
-        [
-            'start' => $start,
-            'end' => $start,
-            'name' => '瀏覽器倒數活動',
-            'countdown' => true,
-        ],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between($start, $start)->countdown()->create(['name' => '瀏覽器倒數活動']);
 
     visit('/')
         ->withTimezone('America/Los_Angeles')
@@ -61,14 +48,7 @@ it('shows 進行中 for an event that is ongoing on the Taipei calendar', functi
     $start = now('Asia/Taipei')->subDays(2)->toDateString();
     $end = now('Asia/Taipei')->addDays(2)->toDateString();
 
-    config(['school-schedules.2025B' => [
-        [
-            'start' => $start,
-            'end' => $end,
-            'name' => '瀏覽器進行中活動',
-            'countdown' => true,
-        ],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between($start, $end)->countdown()->create(['name' => '瀏覽器進行中活動']);
 
     visit('/')
         ->withTimezone('Asia/Taipei')
@@ -84,14 +64,7 @@ it('formats a multi-day event date range in Chinese', function () {
     $start = Carbon::now('Asia/Taipei')->addDays(10);
     $end = Carbon::now('Asia/Taipei')->addDays(15);
 
-    config(['school-schedules.2025B' => [
-        [
-            'start' => $start->toDateString(),
-            'end' => $end->toDateString(),
-            'name' => '瀏覽器選課期間',
-            'countdown' => false,
-        ],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between($start->toDateString(), $end->toDateString())->create(['name' => '瀏覽器選課期間']);
 
     visit('/')
         ->withTimezone('Asia/Taipei')

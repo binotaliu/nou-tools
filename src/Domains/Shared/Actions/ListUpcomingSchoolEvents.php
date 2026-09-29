@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Shared\Actions;
 
+use App\Models\SchoolCalendarEvent;
 use Illuminate\Support\Facades\Date;
 
 final class ListUpcomingSchoolEvents
@@ -20,43 +21,34 @@ final class ListUpcomingSchoolEvents
      * requested via $term, all of that semester's events are returned,
      * since a past semester's calendar has no "upcoming" events to hide.
      *
+     * Only events flagged important are returned unless $onlyImportant is
+     * false; the full calendar page lists everything.
+     *
      * @return array<int, array{start: string, end: string, name: string, countdown: bool}>
      */
-    public function __invoke(?string $referenceDate = null, ?string $term = null): array
+    public function __invoke(?string $referenceDate = null, ?string $term = null, bool $onlyImportant = true): array
     {
         $currentSemester = (string) config('app.current_semester');
         $semester = $term ?: $currentSemester;
         $showAllEvents = $term !== null && $term !== $currentSemester;
 
-        $schedules = config('school-schedules.'.$semester, []);
-
-        if (empty($schedules)) {
-            return [];
-        }
-
-        $now = $referenceDate
+        $today = ($referenceDate
             ? Date::parse($referenceDate, 'Asia/Taipei')
-            : Date::now('Asia/Taipei');
+            : Date::now('Asia/Taipei'))->format('Y-m-d');
 
-        $today = $now->copy()->startOfDay();
-
-        $events = [];
-
-        foreach ($schedules as $schedule) {
-            $end = Date::parse($schedule['end'], 'Asia/Taipei');
-
-            if ($showAllEvents || $end->gte($today)) {
-                $events[] = [
-                    'start' => Date::parse($schedule['start'], 'Asia/Taipei')->format('Y-m-d'),
-                    'end' => $end->format('Y-m-d'),
-                    'name' => $schedule['name'],
-                    'countdown' => $schedule['countdown'],
-                ];
-            }
-        }
-
-        usort($events, fn (array $left, array $right) => $left['start'] <=> $right['start']);
-
-        return $events;
+        return SchoolCalendarEvent::query()
+            ->forTerm($semester)
+            ->when($onlyImportant, fn ($query) => $query->important())
+            ->when(! $showAllEvents, fn ($query) => $query->where('end_date', '>=', $today))
+            ->orderBy('start_date')
+            ->orderBy('end_date')
+            ->get()
+            ->map(fn (SchoolCalendarEvent $event): array => [
+                'start' => $event->start_date->format('Y-m-d'),
+                'end' => $event->end_date->format('Y-m-d'),
+                'name' => $event->name,
+                'countdown' => $event->is_countdown,
+            ])
+            ->all();
     }
 }

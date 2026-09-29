@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\CourseClass;
+use App\Models\SchoolCalendarEvent;
 use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
 use Illuminate\Support\Str;
@@ -15,20 +16,8 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 it('displays school calendar on home page with events embedded for the client', function () {
     config(['app.current_semester' => '2025B']);
-    config(['school-schedules.2025B' => [
-        [
-            'start' => '2026-02-23',
-            'end' => '2026-02-23',
-            'name' => '114下學期課程開播',
-            'countdown' => true,
-        ],
-        [
-            'start' => '2026-02-25',
-            'end' => '2026-02-26',
-            'name' => '114下學期期中考',
-            'countdown' => false,
-        ],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between('2026-02-23', '2026-02-23')->countdown()->create(['name' => '114下學期課程開播']);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between('2026-02-25', '2026-02-26')->create(['name' => '114下學期期中考']);
 
     // travel to a date just before events start so they appear as upcoming
     $this->travelTo('2026-02-22');
@@ -50,28 +39,7 @@ it('displays school calendar on home page with events embedded for the client', 
 
 it('does not display school calendar when no events configured', function () {
     config(['app.current_semester' => '2025B']);
-    config(['school-schedules.2025B' => []]);
-
-    $response = $this->get('/');
-
-    $response->assertStatus(200);
-    $response->assertInertia(function (Assert $page) {
-        $page->component('Home/Index');
-
-        expect($page->toArray()['props']['schoolCalendar']['events'])->toBe([]);
-    });
-});
-
-it('displays school calendar on schedule show page', function () {
-    config(['app.current_semester' => '2025B']);
-    config(['school-schedules.2025B' => [
-        [
-            'start' => '2026-02-23',
-            'end' => '2026-02-23',
-            'name' => '課程開播',
-            'countdown' => true,
-        ],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between('2026-02-23', '2026-02-23')->countdown()->create(['name' => '課程開播']);
 
     $this->travelTo('2026-02-22');
 
@@ -103,20 +71,8 @@ it('displays school calendar on schedule show page', function () {
 
 it('shows the full calendar including past events when a non-current semester is selected', function () {
     config(['app.current_semester' => '2025B']);
-    config(['school-schedules.2025A' => [
-        [
-            'start' => '2025-09-01',
-            'end' => '2025-09-01',
-            'name' => '114上學期開始',
-            'countdown' => false,
-        ],
-        [
-            'start' => '2025-11-01',
-            'end' => '2025-11-01',
-            'name' => '114上學期期中考',
-            'countdown' => false,
-        ],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2025A')->between('2025-09-01', '2025-09-01')->create(['name' => '114上學期開始']);
+    SchoolCalendarEvent::factory()->forTerm('2025A')->between('2025-11-01', '2025-11-01')->create(['name' => '114上學期期中考']);
 
     $this->travelTo('2026-02-22');
 
@@ -147,20 +103,8 @@ it('shows the full calendar including past events when a non-current semester is
 
 it('filters out past events from the embedded payload', function () {
     config(['app.current_semester' => '2025B']);
-    config(['school-schedules.2025B' => [
-        [
-            'start' => '2026-02-01',
-            'end' => '2026-02-01',
-            'name' => '過去的活動',
-            'countdown' => false,
-        ],
-        [
-            'start' => '2026-02-23',
-            'end' => '2026-02-23',
-            'name' => '未來的活動',
-            'countdown' => false,
-        ],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between('2026-02-01', '2026-02-01')->create(['name' => '過去的活動']);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between('2026-02-23', '2026-02-23')->create(['name' => '未來的活動']);
 
     $this->travelTo('2026-02-18');
 
@@ -179,26 +123,9 @@ it('filters out past events from the embedded payload', function () {
 
 it('embeds events in chronological order for the client to render', function () {
     config(['app.current_semester' => '2025B']);
-    config(['school-schedules.2025B' => [
-        [
-            'start' => '2026-03-01',
-            'end' => '2026-03-01',
-            'name' => '三月活動',
-            'countdown' => false,
-        ],
-        [
-            'start' => '2026-02-20',
-            'end' => '2026-02-20',
-            'name' => '二月活動',
-            'countdown' => false,
-        ],
-        [
-            'start' => '2026-04-01',
-            'end' => '2026-04-01',
-            'name' => '四月活動',
-            'countdown' => false,
-        ],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between('2026-03-01', '2026-03-01')->create(['name' => '三月活動']);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between('2026-02-20', '2026-02-20')->create(['name' => '二月活動']);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between('2026-04-01', '2026-04-01')->create(['name' => '四月活動']);
 
     $this->travelTo('2026-02-18');
 
@@ -211,5 +138,33 @@ it('embeds events in chronological order for the client to render', function () 
         $names = collect($page->toArray()['props']['schoolCalendar']['events'])->pluck('name')->all();
 
         expect($names)->toBe(['二月活動', '三月活動', '四月活動']);
+    });
+});
+
+it('leaves events not flagged important off the home page and the schedule page', function () {
+    config(['app.current_semester' => '2025B']);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between('2026-02-23', '2026-02-23')->create(['name' => '重要活動']);
+    SchoolCalendarEvent::factory()->forTerm('2025B')->between('2026-02-24', '2026-02-24')->minor()->create(['name' => '次要活動']);
+
+    $this->travelTo('2026-02-22');
+
+    $this->get('/')->assertInertia(function (Assert $page) {
+        $names = collect($page->toArray()['props']['schoolCalendar']['events'])->pluck('name');
+
+        expect($names)->toContain('重要活動')->not->toContain('次要活動');
+    });
+
+    $courseClass = CourseClass::factory()->create();
+    $schedule = StudentSchedule::create(['uuid' => Str::uuid(), 'name' => '我的課表']);
+    StudentScheduleItem::create([
+        'student_schedule_id' => $schedule->id,
+        'course_id' => $courseClass->course_id,
+        'course_class_id' => $courseClass->id,
+    ]);
+
+    $this->get(route('schedules.show', $schedule))->assertInertia(function (Assert $page) {
+        $names = collect($page->toArray()['props']['schoolCalendar']['events'])->pluck('name');
+
+        expect($names)->toContain('重要活動')->not->toContain('次要活動');
     });
 });

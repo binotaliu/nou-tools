@@ -5,6 +5,7 @@ use App\Enums\NewsletterSection;
 use App\Models\Announcement;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
+use App\Models\SchoolCalendarEvent;
 use Illuminate\Support\Facades\Date;
 use Laravel\Ai\Providers\Tools\WebFetch;
 use NouTools\Domains\Newsletter\Ai\NewsletterHighlightsWriter;
@@ -13,12 +14,8 @@ use NouTools\Domains\Newsletter\Ai\NewsletterItemCurator;
 beforeEach(function () {
     config(['newsletter.anchor_date' => '2026-09-21']);
     config(['announcements.source_groups' => ['教務處' => 'administrative', '臺北中心' => 'center']]);
-    config(['school-schedules' => [
-        '2026A' => [
-            ['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '期中考報名截止', 'countdown' => false],
-            ['start' => '2026-10-10', 'end' => '2026-10-10', 'name' => '國慶日放假', 'countdown' => false],
-        ],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2026A')->between('2026-09-25', '2026-09-25')->create(['name' => '期中考報名截止']);
+    SchoolCalendarEvent::factory()->forTerm('2026A')->between('2026-10-10', '2026-10-10')->create(['name' => '國慶日放假']);
 });
 
 it('does nothing on a Monday that does not start an editing week', function () {

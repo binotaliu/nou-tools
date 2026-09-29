@@ -10,6 +10,7 @@ use App\Jobs\DraftNewsletterIssueWithAi;
 use App\Models\Announcement;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
+use App\Models\SchoolCalendarEvent;
 use App\Models\User;
 use Filament\Actions\Exceptions\ActionNotResolvableException;
 use Filament\Actions\Testing\TestAction;
@@ -24,9 +25,7 @@ use function Pest\Laravel\get;
 
 beforeEach(function () {
     config(['newsletter.anchor_date' => '2026-09-21']);
-    config(['school-schedules' => [
-        '2026A' => [['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '期中考報名截止', 'countdown' => false]],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2026A')->between('2026-09-25', '2026-09-25')->create(['name' => '期中考報名截止']);
 
     actingAs(User::factory()->create(['roles' => [UserRole::Admin->value]]));
 });

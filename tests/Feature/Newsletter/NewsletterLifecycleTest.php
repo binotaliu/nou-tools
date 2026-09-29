@@ -5,6 +5,7 @@ use App\Enums\NewsletterSection;
 use App\Models\Announcement;
 use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
+use App\Models\SchoolCalendarEvent;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Log;
 use NouTools\Domains\Newsletter\Actions\ChangeNewsletterIssueReadiness;
@@ -16,12 +17,8 @@ use NouTools\Domains\Newsletter\Schedule\NewsletterCadence;
 
 beforeEach(function () {
     config(['newsletter.anchor_date' => '2026-09-21']);
-    config(['school-schedules' => [
-        '2026A' => [
-            ['start' => '2026-09-25', 'end' => '2026-09-25', 'name' => '期中考報名截止', 'countdown' => false],
-            ['start' => '2026-11-01', 'end' => '2026-11-01', 'name' => '期中考', 'countdown' => true],
-        ],
-    ]]);
+    SchoolCalendarEvent::factory()->forTerm('2026A')->between('2026-09-25', '2026-09-25')->create(['name' => '期中考報名截止']);
+    SchoolCalendarEvent::factory()->forTerm('2026A')->between('2026-11-01', '2026-11-01')->countdown()->create(['name' => '期中考']);
 });
 
 it('creates a draft with windows and a calendar snapshot, idempotently', function () {
