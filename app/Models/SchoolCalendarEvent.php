@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Database\Factories\SchoolCalendarEventFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,8 +13,8 @@ use NouTools\Domains\Shared\DataTransferObjects\SchoolCalendarEventDTO;
 
 /**
  * @property string $term
- * @property CarbonImmutable $start_date
- * @property CarbonImmutable $end_date
+ * @property CarbonInterface $start_date
+ * @property CarbonInterface $end_date
  * @property string $name
  * @property bool $is_countdown
  * @property bool $is_important

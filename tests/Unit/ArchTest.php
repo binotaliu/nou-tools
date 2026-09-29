@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use App\Models\CalendarDay;
 use App\Models\ChangelogPost;
 use App\Models\ClassSchedule;
 use App\Models\Course;
@@ -16,6 +17,7 @@ use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
 use App\Models\NewsletterReaction;
 use App\Models\PushNotificationDelivery;
+use App\Models\SchoolCalendarEvent;
 use App\Models\StudentScheduleItem;
 use App\Models\User;
 use App\Providers\AppServiceProvider;
@@ -46,6 +48,7 @@ arch()->preset()->strict()
         // Override Eloquent's protected `casts()` / `booted()` hooks, per Laravel convention.
         Announcement::class,
         ChangelogPost::class,
+        CalendarDay::class,
         ClassSchedule::class,
         Course::class,
         CourseClass::class,
@@ -59,6 +62,7 @@ arch()->preset()->strict()
         NewsletterItem::class,
         NewsletterReaction::class,
         PushNotificationDelivery::class,
+        SchoolCalendarEvent::class,
         StudentScheduleItem::class,
         User::class,
 

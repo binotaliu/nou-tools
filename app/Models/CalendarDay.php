@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Database\Factories\CalendarDayFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +15,7 @@ use NouTools\Domains\Shared\DataTransferObjects\CalendarDayDTO;
  * A per-date override for calendars: whether the date number is drawn red
  * (replacing the Saturday/Sunday default) and an optional note beside it.
  *
- * @property CarbonImmutable $date
+ * @property CarbonInterface $date
  * @property bool $is_red
  * @property string|null $label
  */

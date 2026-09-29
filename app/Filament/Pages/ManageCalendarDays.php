@@ -8,7 +8,7 @@ use App\Filament\Forms\Components\IsoDateInput;
 use App\Models\CalendarDay;
 use App\Models\User;
 use BackedEnum;
-use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -27,6 +27,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Date;
 use NouTools\Domains\Shared\Actions\SaveCalendarDays;
 use NouTools\Domains\Shared\DataTransferObjects\CalendarDayDTO;
 use UnitEnum;
@@ -61,7 +62,7 @@ final class ManageCalendarDays extends Page
 
     public function mount(): void
     {
-        $year = CarbonImmutable::now('Asia/Taipei')->year;
+        $year = Date::now('Asia/Taipei')->year;
 
         $this->form->fill([
             'year' => $year,
@@ -126,7 +127,7 @@ final class ManageCalendarDays extends Page
         $days = collect($data['days'] ?? [])
             ->sortBy('date')
             ->map(fn (array $day): CalendarDayDTO => new CalendarDayDTO(
-                date: CarbonImmutable::parse($day['date']),
+                date: Date::parse($day['date']),
                 isRed: (bool) $day['is_red'],
                 label: filled($day['label'] ?? null) ? $day['label'] : null,
             ))
@@ -163,13 +164,13 @@ final class ManageCalendarDays extends Page
      */
     private function yearOptions(): array
     {
-        $currentYear = CarbonImmutable::now('Asia/Taipei')->year;
+        $currentYear = Date::now('Asia/Taipei')->year;
 
         return collect(range($currentYear - 1, $currentYear + 2))
             ->merge(
                 CalendarDay::query()
                     ->pluck('date')
-                    ->map(fn (CarbonImmutable $date): int => $date->year)
+                    ->map(fn (CarbonInterface $date): int => $date->year)
             )
             ->unique()
             ->sortDesc()

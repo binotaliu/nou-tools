@@ -20,8 +20,7 @@ beforeEach(function (): void {
     actingAs(User::factory()->create(['roles' => [UserRole::Admin->value]]));
 });
 
-function pushDelivery(bool $success, ?string $reason = null, ?DateTimeInterface $at = null): void
-{
+$pushDelivery = function (bool $success, ?string $reason = null, ?DateTimeInterface $at = null): void {
     (new PushNotificationDelivery)->forceFill([
         'subscribable_type' => 'schedule',
         'subscribable_id' => '1',
@@ -30,14 +29,14 @@ function pushDelivery(bool $success, ?string $reason = null, ?DateTimeInterface 
         'reason' => $reason,
         'created_at' => $at ?? now(),
     ])->save();
-}
+};
 
-it('summarises recent push deliveries and ranks failure reasons', function (): void {
-    pushDelivery(true);
-    pushDelivery(false, 'Gone');
-    pushDelivery(false, 'Gone');
-    pushDelivery(false);
-    pushDelivery(false, 'Gone', now()->subDays(10));
+it('summarises recent push deliveries and ranks failure reasons', function () use ($pushDelivery): void {
+    $pushDelivery(true);
+    $pushDelivery(false, 'Gone');
+    $pushDelivery(false, 'Gone');
+    $pushDelivery(false);
+    $pushDelivery(false, 'Gone', now()->subDays(10));
 
     expect(app(ResolvePushDeliveryMetrics::class)())->toBe([
         'succeeded' => 1,
@@ -46,9 +45,9 @@ it('summarises recent push deliveries and ranks failure reasons', function (): v
     ]);
 });
 
-it('renders the chart widgets', function (): void {
+it('renders the chart widgets', function () use ($pushDelivery): void {
     StudentSchedule::factory()->create();
-    pushDelivery(false, 'Gone');
+    $pushDelivery(false, 'Gone');
 
     Livewire::test(NewSchedulesChart::class)->assertSee('每日新增課表');
     Livewire::test(PushDeliveryChart::class)->assertSee('推播送達')->assertSee('Gone');

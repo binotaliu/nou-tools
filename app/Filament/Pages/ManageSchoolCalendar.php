@@ -8,7 +8,7 @@ use App\Filament\Forms\Components\IsoDateInput;
 use App\Models\SchoolCalendarEvent;
 use App\Models\User;
 use BackedEnum;
-use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -27,6 +27,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use NouTools\Domains\Shared\Actions\SaveSchoolCalendar;
 use NouTools\Domains\Shared\DataTransferObjects\SchoolCalendarEventDTO;
@@ -202,8 +203,8 @@ final class ManageSchoolCalendar extends Page
             ->all();
     }
 
-    private function date(string $value): CarbonImmutable
+    private function date(string $value): CarbonInterface
     {
-        return CarbonImmutable::parse($value);
+        return Date::parse($value);
     }
 }
