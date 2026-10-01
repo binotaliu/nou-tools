@@ -185,6 +185,12 @@ const activeTab = computed(
     (hasSlotIn('live') ? 'live' : hasSlotIn('soon') ? 'soon' : 'all')
 )
 
+// Someone who opened the page before class and came back later may still be
+// on a tab that no longer holds their classroom, so point them at 上課中.
+const showLiveNotice = computed(
+  () => activeTab.value !== 'live' && hasSlotIn('live')
+)
+
 const visibleCourses = computed(() =>
   groupedCourses.value
     .map(course => {
@@ -260,6 +266,23 @@ const visibleCourses = computed(() =>
         @click="pickedTab = tab.key"
       >
         {{ tab.label }}
+      </button>
+    </div>
+
+    <div
+      v-if="groupedCourses.length > 0 && showLiveNotice"
+      role="status"
+      data-testid="video-courses-live-notice"
+      class="mb-4 flex flex-col gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 sm:flex-row sm:items-center sm:justify-between dark:border-green-900 dark:bg-green-950 dark:text-green-200"
+    >
+      <p>在找上課中的教室嗎？請切換到「上課中」分頁。</p>
+      <button
+        type="button"
+        data-testid="video-courses-live-notice-switch"
+        class="shrink-0 rounded-md bg-green-700 px-3 py-1.5 font-medium text-white transition hover:bg-green-800 dark:bg-green-800 dark:hover:bg-green-700"
+        @click="pickedTab = 'live'"
+      >
+        切換到上課中
       </button>
     </div>
 

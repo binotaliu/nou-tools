@@ -129,3 +129,23 @@ it('defaults to the 所有教室 tab when nothing is running or upcoming', funct
     visit(route('video-classes.index', ['date' => '2026-03-05']))
         ->assertAttribute('[data-testid="video-courses-tab-all"]', 'aria-selected', 'true');
 });
+
+it('offers a switch to 上課中 when a class is running but another tab is open', function () use ($videoClassAroundNow) {
+    $videoClassAroundNow('進行中的課', -20, 80);
+
+    visit(route('video-classes.index'))
+        ->assertMissing('[data-testid="video-courses-live-notice"]')
+        ->click('[data-testid="video-courses-tab-soon"]')
+        ->assertSee('在找上課中的教室嗎？')
+        ->click('[data-testid="video-courses-live-notice-switch"]')
+        ->assertAttribute('[data-testid="video-courses-tab-live"]', 'aria-selected', 'true')
+        ->assertMissing('[data-testid="video-courses-live-notice"]');
+});
+
+it('shows no live notice when nothing is running', function () use ($videoClassAroundNow) {
+    $videoClassAroundNow('還很久的課', 180, 280);
+
+    visit(route('video-classes.index'))
+        ->click('[data-testid="video-courses-tab-all"]')
+        ->assertMissing('[data-testid="video-courses-live-notice"]');
+});
