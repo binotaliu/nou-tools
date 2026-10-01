@@ -15,7 +15,7 @@ import {
   ref,
   watch,
 } from 'vue'
-import { Head, Link, useForm } from '@inertiajs/vue3'
+import { Head, Link, router, useForm } from '@inertiajs/vue3'
 import { CheckIcon } from '@heroicons/vue/24/solid'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
@@ -420,14 +420,40 @@ function onFormScroll() {
   scrollDebounceTimer = setTimeout(checkGradientVisibility, 100)
 }
 
+const LEAVE_WARNING = '你有尚未儲存的變更，確定要離開嗎？'
+
+// Native tab close / reload / external link.
+function warnBeforeUnload(event) {
+  if (hasUnsavedChanges.value) {
+    event.preventDefault()
+    // Legacy browsers need a returnValue to show the prompt.
+    event.returnValue = ''
+  }
+}
+
+// In-app Inertia navigation. Saving is a PUT, so only GET visits are guarded;
+// prefetches are not navigations.
+const removeInertiaGuard = router.on('before', event => {
+  const { method, prefetch } = event.detail.visit
+
+  if (!hasUnsavedChanges.value || method !== 'get' || prefetch) {
+    return
+  }
+
+  return window.confirm(LEAVE_WARNING)
+})
+
 onMounted(() => {
   init()
   scrollWeekBoardToStart()
   window.addEventListener('resize', checkGradientVisibility)
+  window.addEventListener('beforeunload', warnBeforeUnload)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkGradientVisibility)
+  window.removeEventListener('beforeunload', warnBeforeUnload)
+  removeInertiaGuard()
   clearTimeout(scrollDebounceTimer)
 })
 
