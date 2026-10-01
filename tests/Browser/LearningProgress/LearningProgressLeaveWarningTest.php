@@ -72,4 +72,12 @@ it('stops warning once the changes are saved', function () use ($openLearningPro
         ->assertSee('學習進度已更新');
 
     expect($page->script(BEFOREUNLOAD_PREVENTED))->toBeFalse();
+
+    // An in-app navigation goes through without any confirm.
+    $page->script('window.__confirmed = []; window.confirm = m => { window.__confirmed.push(m); return false }');
+    $page->script("document.querySelector('a[href=\\'/announcements\\']').click()");
+
+    waitUntil($page, "location.pathname === '/announcements'");
+
+    expect($page->script('window.__confirmed'))->not->toContain('你有尚未儲存的變更，確定要離開嗎？');
 });
