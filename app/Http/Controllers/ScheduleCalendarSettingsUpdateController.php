@@ -22,7 +22,7 @@ final class ScheduleCalendarSettingsUpdateController extends Controller
             is_array($schedule->display_options['calendar_settings'] ?? null) ? $schedule->display_options['calendar_settings'] : null,
         );
 
-        if ($request->wantsJson() || $request->isJson()) {
+        if (! $request->header('X-Inertia') && ($request->wantsJson() || $request->isJson())) {
             return response()->json([
                 'success' => true,
                 'calendar_settings' => $calendarSettings->toArray(),

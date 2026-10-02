@@ -227,6 +227,21 @@ it('saves calendar subscription settings with form post and flashes success', fu
     ]);
 });
 
+it('redirects instead of returning JSON when an Inertia JSON request saves calendar settings', function () {
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'Calendar Inertia Settings',
+    ]);
+
+    $this->putJson(route('schedules.calendar-settings.update', $schedule), [
+        'include_school_calendar' => true,
+        'include_exams' => true,
+        'class_reminders_enabled' => false,
+        'reminder_offsets' => [30, null],
+    ], ['X-Inertia' => 'true'])
+        ->assertRedirect(route('schedules.subscribe', $schedule));
+});
+
 it('calendar output includes school events exams and reminders when defaults are enabled', function () {
     config()->set('app.current_semester', '2026A');
     SchoolCalendarEvent::factory()->forTerm('2026A')->between('2026-03-01', '2026-03-01')->countdown()->create(['name' => '學校重要日']);
