@@ -359,3 +359,45 @@ it('tags each source selection with its group, ordered like the schedule prefere
             ->and($selections->pluck('groupLabel')->all())->toBe(['各處室', '學習指導中心', '學系']);
     });
 });
+
+it('searches announcements by title', function () {
+    Announcement::factory()->create(['title' => '期中考試時間公告']);
+    Announcement::factory()->create(['title' => '迎新活動']);
+
+    $response = get(route('announcements.index', ['q' => ' 期中考 ']));
+
+    $response->assertSuccessful();
+    $response->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+        $titles = collect($viewModel['announcements']['data'])->pluck('title');
+
+        expect($titles->all())->toBe(['期中考試時間公告']);
+        expect($viewModel['search'])->toBe('期中考');
+    });
+});
+
+it('treats like wildcards in the search as literal text', function () {
+    Announcement::factory()->create(['title' => '優惠100%折扣']);
+    Announcement::factory()->create(['title' => '一般公告']);
+
+    $response = get(route('announcements.index', ['q' => '%']));
+
+    $response->assertInertia(function (Assert $page) {
+        $titles = collect($page->toArray()['props']['viewModel']['announcements']['data'])->pluck('title');
+
+        expect($titles->all())->toBe(['優惠100%折扣']);
+    });
+});
+
+it('combines the search with the source filter', function () {
+    Announcement::factory()->create(['source_name' => '教務處', 'category' => '考試資訊', 'title' => '考試公告甲']);
+    Announcement::factory()->create(['source_name' => '學務處', 'category' => '考試資訊', 'title' => '考試公告乙']);
+
+    $response = get(route('announcements.index', ['source' => ['教務處'], 'q' => '考試']));
+
+    $response->assertInertia(function (Assert $page) {
+        $titles = collect($page->toArray()['props']['viewModel']['announcements']['data'])->pluck('title');
+
+        expect($titles->all())->toBe(['考試公告甲']);
+    });
+});

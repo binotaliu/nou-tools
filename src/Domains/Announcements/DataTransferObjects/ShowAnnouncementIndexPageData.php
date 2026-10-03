@@ -14,6 +14,7 @@ final class ShowAnnouncementIndexPageData extends Data
         public array|string|null $sourceCategories = null,
         public string|array|null $source = null,
         public string|array|null $category = null,
+        public ?string $q = null,
     ) {}
 
     public static function rules(): array
@@ -26,6 +27,7 @@ final class ShowAnnouncementIndexPageData extends Data
             'source.*' => ['sometimes', 'string'],
             'category' => ['nullable'],
             'category.*' => ['sometimes', 'string'],
+            'q' => ['nullable', 'string', 'max:100'],
         ];
     }
 }

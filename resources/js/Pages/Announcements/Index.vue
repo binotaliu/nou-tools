@@ -260,6 +260,12 @@ function isExpired(announcement) {
             action="/announcements"
             class="flex max-h-[85dvh] flex-col rounded-t-2xl border border-theme-200 bg-white lg:max-h-[calc(100dvh-3rem)] lg:rounded-xl dark:border-zinc-700 dark:bg-zinc-900"
           >
+            <input
+              v-if="viewModel.search"
+              type="hidden"
+              name="q"
+              :value="viewModel.search"
+            />
             <div
               class="flex items-center justify-between gap-2 border-b border-theme-100 px-4 py-3 dark:border-zinc-800"
             >
@@ -425,6 +431,69 @@ function isExpired(announcement) {
         </aside>
 
         <section class="space-y-3 lg:col-span-8 xl:col-span-9">
+          <form
+            method="GET"
+            action="/announcements"
+            role="search"
+            class="flex gap-2"
+            data-testid="announcement-search-form"
+          >
+            <template
+              v-for="(categories, source) in appliedSelection"
+              :key="source"
+            >
+              <input
+                v-for="category in categories"
+                :key="category"
+                type="hidden"
+                :name="`source_categories[${source}][]`"
+                :value="category"
+              />
+            </template>
+            <input
+              type="search"
+              name="q"
+              :value="viewModel.search"
+              maxlength="100"
+              aria-label="搜尋公告標題"
+              placeholder="搜尋公告標題"
+              class="min-w-0 flex-1 rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm text-theme-900 placeholder:text-theme-700/70 focus:border-theme-500 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              data-testid="announcement-search-input"
+            />
+            <button
+              type="submit"
+              class="inline-flex shrink-0 items-center justify-center rounded-lg bg-theme-800 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-theme-900 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
+            >
+              搜尋
+            </button>
+          </form>
+
+          <p
+            v-if="viewModel.search"
+            class="text-sm text-theme-700 dark:text-zinc-400"
+          >
+            標題包含「{{ viewModel.search }}」
+            <Link
+              :href="
+                '/announcements' +
+                (appliedSourceCount > 0
+                  ? '?' +
+                    Object.entries(appliedSelection)
+                      .flatMap(([source, categories]) =>
+                        categories.map(
+                          category =>
+                            `source_categories[${encodeURIComponent(source)}][]=${encodeURIComponent(category)}`
+                        )
+                      )
+                      .join('&')
+                  : '')
+              "
+              class="ml-2 font-medium hover:underline"
+            >
+              清除搜尋
+            </Link>
+          </p>
+
           <div
             v-if="appliedSourceCount > 0"
             class="flex items-center gap-2 text-sm"

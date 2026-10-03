@@ -6,6 +6,7 @@ namespace NouTools\Domains\Announcements\Actions;
 
 use App\Enums\AnnouncementSourceGroup;
 use App\Models\Announcement;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use NouTools\Domains\Announcements\DataTransferObjects\ShowAnnouncementIndexPageData;
 use NouTools\Domains\Announcements\PageData\AnnouncementIndexPageData;
@@ -27,7 +28,12 @@ final readonly class ShowAnnouncementIndexPage
         $selectedSources = collect(array_keys($selectedSourceCategories))->sort()->values()->all();
         $availableCategories = $this->availableCategoriesForSources($selectedSources, $configuredSourceCategories);
 
+        $search = trim((string) $input->q);
+
         $announcements = ($this->filterAnnouncementsBySourceCategories)(Announcement::query(), $selectedSourceCategories)
+            ->when($search !== '', function (Builder $query) use ($search): void {
+                $query->whereRaw("title LIKE ? ESCAPE '!'", ['%'.preg_replace('/[!%_]/', '!$0', $search).'%']);
+            })
             ->orderByDesc('published_at')
             ->orderByDesc('fetched_at')
             ->orderByDesc('id')
@@ -41,6 +47,7 @@ final readonly class ShowAnnouncementIndexPage
             sourceCategorySelections: $this->buildSourceCategorySelections($configuredSourceCategories, $selectedSourceCategories),
             selectedSources: $selectedSources,
             totalAnnouncements: Announcement::query()->count(),
+            search: $search,
         );
     }
 

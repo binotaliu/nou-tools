@@ -27,5 +27,6 @@ final class AnnouncementIndexPageData extends Resource
         public DataCollection $sourceCategorySelections,
         public array $selectedSources,
         public int $totalAnnouncements,
+        public string $search = '',
     ) {}
 }
