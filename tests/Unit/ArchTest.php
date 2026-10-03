@@ -17,6 +17,7 @@ use App\Models\NewsletterIssue;
 use App\Models\NewsletterItem;
 use App\Models\NewsletterReaction;
 use App\Models\PushNotificationDelivery;
+use App\Models\ScheduleDevice;
 use App\Models\SchoolCalendarEvent;
 use App\Models\StudentScheduleItem;
 use App\Models\User;
@@ -61,6 +62,7 @@ arch()->preset()->strict()
         NewsletterIssue::class,
         NewsletterItem::class,
         NewsletterReaction::class,
+        ScheduleDevice::class,
         PushNotificationDelivery::class,
         SchoolCalendarEvent::class,
         StudentScheduleItem::class,
