@@ -289,7 +289,7 @@ const rows = computed(() => [
           class="mt-1 text-sm text-theme-700 dark:text-zinc-400"
           data-testid="settings-notifications-no-schedule"
         >
-          通知是綁在課表上的，請先
+          若要接收推播通知，請先
           <Link
             href="/schedules/my"
             class="font-medium underline underline-offset-2"
