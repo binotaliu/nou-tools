@@ -222,9 +222,9 @@ it('prepends the countdown and phase to the tab title, and swaps the favicon, on
     $seat = StudyRoomSeat::query()->where('student_schedule_id', $schedule->id)->sole();
     $seat->update(['timer_ends_at' => now()->subSecond()]);
 
-    $page->script('window.__studyRoomTest.socket.refresh()');
-
-    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-timer-phase"]\')?.textContent.includes(\'這一輪完成了\')');
+    // Refresh on every poll: a broadcast from starting the timer can land
+    // after the first refresh on a slow runner and put the older state back.
+    waitUntil($page, '(window.__studyRoomTest.socket.refresh(), document.querySelector(\'[data-testid="study-room-timer-phase"]\')?.textContent.includes(\'這一輪完成了\'))', 10000);
 
     $page->script(
         'Object.defineProperty(document, "hidden", { configurable: true, get: () => true }); '.
