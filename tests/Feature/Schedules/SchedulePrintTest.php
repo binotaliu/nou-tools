@@ -56,7 +56,7 @@ it('lists courses with their credits', function () use ($printableSchedule) {
         ->and($page->courses)->toHaveCount(1)
         ->and($page->courses[0]->name)->toBe('經濟學')
         ->and($page->courses[0]->credits)->toBe(4)
-        ->and($page->shareUrl)->toBe(route('schedules.show', $schedule))
+        ->and($page->backupUrl)->toBe(route('schedules.show', $schedule))
         ->and($page->qrCodeSvg)->toContain('<svg');
 });
 

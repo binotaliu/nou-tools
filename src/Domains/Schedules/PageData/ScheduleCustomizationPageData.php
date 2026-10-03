@@ -24,6 +24,13 @@ final class ScheduleCustomizationPageData extends Resource
         public DataCollection $customLinks,
     ) {}
 
+    /**
+     * Display-option keys that were renamed, new => old. Rows saved before the
+     * `show_share_section` → `show_backup_section` rename are migrated, but a
+     * stale browser tab can still post the old name, so it is read as a fallback.
+     */
+    private const array LEGACY_DISPLAY_OPTION_KEYS = ['show_backup_section' => 'show_share_section'];
+
     public static function defaultDisplayOptions(): ScheduleDisplayOptionsViewModel
     {
         return new ScheduleDisplayOptionsViewModel(
@@ -34,7 +41,7 @@ final class ScheduleCustomizationPageData extends Resource
             showSchoolCalendar: true,
             showExamInfo: true,
             showAnnouncements: true,
-            showShareSection: true,
+            showBackupSection: true,
             showPrintButton: true,
         );
     }
@@ -59,7 +66,7 @@ final class ScheduleCustomizationPageData extends Resource
             'showSchoolCalendar' => 'show_school_calendar',
             'showExamInfo' => 'show_exam_info',
             'showAnnouncements' => 'show_announcements',
-            'showShareSection' => 'show_share_section',
+            'showBackupSection' => 'show_backup_section',
             'showPrintButton' => 'show_print_button',
         ];
 
@@ -67,7 +74,7 @@ final class ScheduleCustomizationPageData extends Resource
 
         foreach ($propertyToKey as $property => $key) {
             $defaultValue = $defaults->{$property};
-            $rawValue = $displayOptions[$key] ?? $defaultValue;
+            $rawValue = $displayOptions[$key] ?? $displayOptions[self::LEGACY_DISPLAY_OPTION_KEYS[$key] ?? ''] ?? $defaultValue;
             $values[$property] = filter_var($rawValue, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $defaultValue;
         }
 

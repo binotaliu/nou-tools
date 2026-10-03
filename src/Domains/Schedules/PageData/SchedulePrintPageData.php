@@ -14,7 +14,7 @@ final class SchedulePrintPageData extends Resource
     public function __construct(
         public string $name,
         public string $semesterLabel,
-        public string $shareUrl,
+        public string $backupUrl,
         public string $qrCodeSvg,
         /** @var array<int, SchedulePrintCourseViewModel> */
         public array $courses,

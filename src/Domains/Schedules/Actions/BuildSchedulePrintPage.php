@@ -33,15 +33,15 @@ final readonly class BuildSchedulePrintPage
             ->map(fn ($item) => $item->course)
             ->unique('id')
             ->values();
-        $shareUrl = route('schedules.show', $viewModel->uuid);
+        $backupUrl = route('schedules.show', $viewModel->uuid);
         $sittings = $this->sittings($viewModel);
         $months = $this->months($viewModel, $sittings, $weekStart);
 
         return new SchedulePrintPageData(
             name: $viewModel->name ?: '我的課表',
             semesterLabel: Str::toSemesterDisplay($viewModel->selectedTerm),
-            shareUrl: $shareUrl,
-            qrCodeSvg: $this->addSvgViewBox(DNS2D::getBarcodeSVG($shareUrl, 'QRCODE')),
+            backupUrl: $backupUrl,
+            qrCodeSvg: $this->addSvgViewBox(DNS2D::getBarcodeSVG($backupUrl, 'QRCODE')),
             courses: $courseModels
                 ->map(fn ($course) => new SchedulePrintCourseViewModel(name: $course->name, credits: $course->credits))
                 ->all(),

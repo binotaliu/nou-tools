@@ -1518,7 +1518,7 @@ function localHint(next) {
 
       <!-- Backup link. Installed PWAs have it in the 更多 menu and 設定 instead. -->
       <BackupLinkCard
-        v-if="viewModel.displayOptions.show_share_section"
+        v-if="viewModel.displayOptions.show_backup_section"
         class="pwa:hidden"
         @open="openBackup"
       />

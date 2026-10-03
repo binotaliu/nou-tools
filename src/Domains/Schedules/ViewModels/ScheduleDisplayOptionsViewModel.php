@@ -19,7 +19,7 @@ final class ScheduleDisplayOptionsViewModel extends Data
         public bool $showSchoolCalendar,
         public bool $showExamInfo,
         public bool $showAnnouncements,
-        public bool $showShareSection,
+        public bool $showBackupSection,
         public bool $showPrintButton,
     ) {}
 }

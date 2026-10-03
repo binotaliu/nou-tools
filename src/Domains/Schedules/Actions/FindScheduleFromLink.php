@@ -9,9 +9,9 @@ use Illuminate\Validation\ValidationException;
 use NouTools\Domains\Schedules\DataTransferObjects\RememberScheduleFromLinkData;
 
 /**
- * Resolves the schedule a shared link (or a bare schedule id) points at, so a
- * viewer can save it to this browser. Accepts what the schedule page's share
- * URL and QR code carry: `https://…/schedules/{token}`, the legacy
+ * Resolves the schedule a backup link (or a bare schedule id) points at, so a
+ * viewer can save it to this browser. Accepts what the schedule page's backup
+ * link and QR code carry: `https://…/schedules/{token}`, the legacy
  * `/schedule/{token}` form, or just the token itself.
  */
 final class FindScheduleFromLink

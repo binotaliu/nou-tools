@@ -163,7 +163,7 @@ it('saves calendar subscription settings as schedule defaults', function () {
             'show_class_dates' => true,
             'show_school_calendar' => true,
             'show_exam_info' => true,
-            'show_share_section' => true,
+            'show_backup_section' => true,
             'show_print_button' => true,
         ],
     ]);
@@ -203,7 +203,7 @@ it('saves calendar subscription settings with form post and flashes success', fu
             'show_class_dates' => true,
             'show_school_calendar' => true,
             'show_exam_info' => true,
-            'show_share_section' => true,
+            'show_backup_section' => true,
             'show_print_button' => true,
         ],
     ]);
@@ -272,7 +272,7 @@ it('calendar output includes school events exams and reminders when defaults are
             'show_class_dates' => true,
             'show_school_calendar' => true,
             'show_exam_info' => true,
-            'show_share_section' => true,
+            'show_backup_section' => true,
             'show_print_button' => true,
             'calendar_settings' => [
                 'include_school_calendar' => true,
@@ -333,7 +333,7 @@ it('calendar output excludes school events exams and reminders when defaults are
             'show_class_dates' => true,
             'show_school_calendar' => true,
             'show_exam_info' => true,
-            'show_share_section' => true,
+            'show_backup_section' => true,
             'show_print_button' => true,
             'calendar_settings' => [
                 'include_school_calendar' => false,
@@ -740,7 +740,7 @@ it('shows the find-your-schedule page at /schedules/my when no cookie exists', f
         ->assertInertia(fn (Assert $page) => $page->component('Schedule/Find'));
 });
 
-it('remembers a schedule from its shared link and redirects to it', function (string $format) {
+it('remembers a schedule from its backup link and redirects to it', function (string $format) {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
         'name' => 'Recovered Schedule',
@@ -1005,7 +1005,7 @@ it('customize page can update display options and custom links', function () {
             'show_school_calendar' => 0,
             'show_exam_info' => 1,
             'show_announcements' => 1,
-            'show_share_section' => 1,
+            'show_backup_section' => 1,
             'show_print_button' => 0,
         ],
         'custom_links' => [
@@ -1026,7 +1026,7 @@ it('customize page can update display options and custom links', function () {
         'show_school_calendar' => false,
         'show_exam_info' => true,
         'show_announcements' => true,
-        'show_share_section' => true,
+        'show_backup_section' => true,
         'show_print_button' => false,
     ]);
 
@@ -1053,7 +1053,7 @@ it('customize page rejects custom link domains outside allowed list', function (
                 'show_class_dates' => 1,
                 'show_school_calendar' => 1,
                 'show_exam_info' => 1,
-                'show_share_section' => 1,
+                'show_backup_section' => 1,
                 'show_print_button' => 1,
             ],
             'custom_links' => [
@@ -1081,7 +1081,7 @@ it('customize page preserves old input after validation failure', function () {
                 'show_class_dates' => 1,
                 'show_school_calendar' => 1,
                 'show_exam_info' => 1,
-                'show_share_section' => 1,
+                'show_backup_section' => 1,
                 'show_print_button' => 1,
             ],
             'custom_links' => [
@@ -1123,7 +1123,7 @@ it('schedule show page hides disabled sections and shows custom links', function
             'show_class_dates' => true,
             'show_school_calendar' => false,
             'show_exam_info' => true,
-            'show_share_section' => false,
+            'show_backup_section' => false,
             'show_print_button' => false,
         ],
         'custom_links' => [
@@ -1141,7 +1141,7 @@ it('schedule show page hides disabled sections and shows custom links', function
         $page->component('Schedule/Show')
             ->where('viewModel.displayOptions.show_greeting', false)
             ->where('viewModel.displayOptions.show_school_calendar', false)
-            ->where('viewModel.displayOptions.show_share_section', false)
+            ->where('viewModel.displayOptions.show_backup_section', false)
             ->where('viewModel.displayOptions.show_print_button', false);
 
         $customLinks = $page->toArray()['props']['viewModel']['customLinks'];

@@ -18,7 +18,7 @@ final readonly class RenderSchedulePdf
      *
      * The key ignores inline SVGs: the QR code's bytes differ from one PHP
      * process to the next for the same URL (it is valid every time), which
-     * would defeat the cache. The share URL is printed as text too, so two
+     * would defeat the cache. The backup URL is printed as text too, so two
      * schedules never share a key.
      */
     public function __invoke(string $html): string
