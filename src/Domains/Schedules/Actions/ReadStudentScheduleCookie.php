@@ -24,6 +24,12 @@ final readonly class ReadStudentScheduleCookie
     /** Set when a legacy cookie was converted, so a sign-out in the same request can revoke the new device. */
     public const MINTED_TOKEN_ATTRIBUTE = 'schedule_device_minted_token';
 
+    /**
+     * `{persistent: bool, fingerprint: string}` of the device the request was resolved
+     * through, for the page to decide whether its local backup is current.
+     */
+    public const DEVICE_STATE_ATTRIBUTE = 'schedule_device_state';
+
     private const RENEW_AFTER_DAYS = 1;
 
     public function __construct(
@@ -64,6 +70,11 @@ final readonly class ReadStudentScheduleCookie
         }
 
         $this->renewIfStale($device, $token);
+
+        $request->attributes->set(self::DEVICE_STATE_ATTRIBUTE, [
+            'persistent' => $device->is_persistent,
+            'fingerprint' => ScheduleDevice::fingerprint($device->token_hash),
+        ]);
 
         return StudentScheduleCookie::fromModel($device->studentSchedule);
     }
@@ -110,6 +121,10 @@ final readonly class ReadStudentScheduleCookie
 
         $deviceCookie = ($this->rememberScheduleDevice)($model, true, $request->userAgent());
         $request->attributes->set(self::MINTED_TOKEN_ATTRIBUTE, $deviceCookie->getValue());
+        $request->attributes->set(self::DEVICE_STATE_ATTRIBUTE, [
+            'persistent' => true,
+            'fingerprint' => ScheduleDevice::fingerprint(ScheduleDevice::hashToken($deviceCookie->getValue())),
+        ]);
         Cookie::queue($deviceCookie);
         Cookie::queue(Cookie::forget('student_schedule'));
 

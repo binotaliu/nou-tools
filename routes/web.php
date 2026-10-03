@@ -44,7 +44,9 @@ use App\Http\Controllers\ScheduleCalendarController;
 use App\Http\Controllers\ScheduleCalendarSettingsUpdateController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ScheduleCustomizationController;
+use App\Http\Controllers\ScheduleDeviceBackupController;
 use App\Http\Controllers\ScheduleDeviceDestroyController;
+use App\Http\Controllers\ScheduleDeviceRestoreController;
 use App\Http\Controllers\ScheduleLiteController;
 use App\Http\Controllers\ScheduleMyController;
 use App\Http\Controllers\ScheduleMyLearningProgressController;
@@ -153,6 +155,8 @@ Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules
 Route::get('/schedules/my', ScheduleMyController::class)->name('schedules.my');
 Route::post('/schedules/my', ScheduleMyStoreController::class)->name('schedules.my.store');
 Route::delete('/schedules/device', ScheduleDeviceDestroyController::class)->name('schedules.device.destroy');
+Route::post('/schedules/device/backup', ScheduleDeviceBackupController::class)->name('schedules.device.backup')->middleware('throttle:30,1');
+Route::post('/schedules/device/restore', ScheduleDeviceRestoreController::class)->name('schedules.device.restore')->middleware('throttle:20,1');
 Route::get('/schedules/my/learning-progress', ScheduleMyLearningProgressController::class)->name('schedules.my.learning-progress');
 Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show')
     ->withMarkdown(ScheduleShowMarkdownController::class);

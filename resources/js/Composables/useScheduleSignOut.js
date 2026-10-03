@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { clearDeviceBackup } from './scheduleDeviceStorage'
 
 // Signs this browser out of the remembered schedule. The server cannot know
 // which push subscription belongs to this browser, so it is looked up here,
@@ -28,6 +29,10 @@ export default function useScheduleSignOut() {
     }
 
     processing.value = true
+
+    // Before the request, so the local copy can never sign this browser back
+    // in even if the page is closed mid-way.
+    clearDeviceBackup()
 
     const subscription = await currentSubscription()
 

@@ -36,6 +36,16 @@ final class ScheduleDevice extends Model
         return hash('sha256', $token);
     }
 
+    /**
+     * A short public label for a token, safe to put in page props: it lets the
+     * browser tell whether its local backup matches the cookie without the
+     * token itself ever being shipped with the page.
+     */
+    public static function fingerprint(string $tokenHash): string
+    {
+        return substr($tokenHash, 0, 12);
+    }
+
     public function fillFromDTO(IssueScheduleDeviceData $data): self
     {
         $this->student_schedule_id = $data->studentScheduleId;

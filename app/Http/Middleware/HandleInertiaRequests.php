@@ -7,6 +7,7 @@ namespace App\Http\Middleware;
 use App\Enums\AnalyticsConsentState;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use NouTools\Domains\Schedules\Actions\ReadStudentScheduleCookie;
 use NouTools\Domains\Shared\Actions\ResolveAnalyticsConsent;
 
 final class HandleInertiaRequests extends Middleware
@@ -44,9 +45,28 @@ final class HandleInertiaRequests extends Middleware
             'analyticsPage' => self::analyticsPagePath($request),
             'analyticsTitle' => self::analyticsTitle($request),
             'analyticsConsent' => self::analyticsConsent($request),
+            'scheduleDevice' => fn () => self::scheduleDevice($request),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
             ],
+        ];
+    }
+
+    /**
+     * Whether this browser is signed in to a schedule and, for a device that
+     * is remembered, the fingerprint the page compares with its local backup
+     * (`useScheduleDeviceBackup`). A session-only device has no fingerprint.
+     *
+     * @return array{signedIn: bool, fingerprint: string|null}
+     */
+    private static function scheduleDevice(Request $request): array
+    {
+        $viewer = $request->studentScheduleFromCookie();
+        $state = $request->attributes->get(ReadStudentScheduleCookie::DEVICE_STATE_ATTRIBUTE);
+
+        return [
+            'signedIn' => $viewer !== null,
+            'fingerprint' => is_array($state) && $state['persistent'] ? $state['fingerprint'] : null,
         ];
     }
 

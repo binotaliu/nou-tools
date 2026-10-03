@@ -10,6 +10,7 @@ import { Link, usePage } from '@inertiajs/vue3'
 import AdaptableNav from '../Components/AdaptableNav.vue'
 import BottomNav from '../Components/BottomNav.vue'
 import usePwaStandalone from '../Composables/usePwaStandalone'
+import useScheduleDeviceBackup from '../Composables/useScheduleDeviceBackup'
 import CookieConsentBanner from '../Components/CookieConsentBanner.vue'
 import Icon from '../Components/Icon.vue'
 import Notification from '../Components/Notification.vue'
@@ -22,6 +23,7 @@ import ThemeSwitcherPopover from '../Components/ThemeSwitcherPopover.vue'
 
 const page = usePage()
 const { isPwa } = usePwaStandalone()
+useScheduleDeviceBackup()
 
 const footerLinkClass =
   'inline-block py-1 pointer-coarse:py-2.5 text-theme-700 hover:text-theme-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100'
