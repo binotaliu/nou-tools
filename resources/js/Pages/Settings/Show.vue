@@ -16,6 +16,7 @@ import Icon from '../../Components/Icon.vue'
 import BackupLinkDialog from '../../Components/Schedule/BackupLinkDialog.vue'
 import useNavStyle, { NAV_STYLES } from '../../Composables/useNavStyle'
 import usePushSubscription from '../../Composables/usePushSubscription'
+import useScheduleSignOut from '../../Composables/useScheduleSignOut'
 
 const props = defineProps({
   // null when no schedule is remembered on this device.
@@ -30,6 +31,7 @@ const props = defineProps({
 })
 
 const { navStyle, setNavStyle } = useNavStyle()
+const { processing: signingOut, signOut } = useScheduleSignOut()
 
 const permissionError = ref('')
 const backupOpen = ref(false)
@@ -250,6 +252,31 @@ const rows = computed(() => [
         >
           備份連結能在清除瀏覽器資料或換裝置後找回課表。建議現在就截圖存進相簿。
         </p>
+
+        <div
+          v-if="notifications"
+          class="mt-4 border-t border-theme-200 pt-4 dark:border-zinc-700"
+          data-testid="settings-schedule-sign-out-section"
+        >
+          <p class="text-sm text-theme-700 dark:text-zinc-400">
+            在共用的電腦上用完後，請登出：此<span class="pwa:hidden"
+              >瀏覽器</span
+            ><span class="hidden pwa:inline">裝置</span
+            >會忘記你的課表，也不再收到推播通知；自習室的座位會一併釋出。其他裝置不受影響，之後可用備份連結找回。
+          </p>
+          <button
+            type="button"
+            data-testid="settings-schedule-sign-out"
+            data-analytics-event="schedule_sign_out"
+            data-analytics-feature="schedule"
+            :disabled="signingOut"
+            class="mt-3 inline-flex items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-50 disabled:opacity-60 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            @click="signOut"
+          >
+            登出此<span class="pwa:hidden">瀏覽器</span
+            ><span class="hidden pwa:inline">裝置</span>
+          </button>
+        </div>
       </section>
 
       <section

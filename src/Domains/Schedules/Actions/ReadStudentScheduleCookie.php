@@ -21,6 +21,9 @@ final readonly class ReadStudentScheduleCookie
 {
     private const RESOLVED_ATTRIBUTE = 'student_schedule_cookie';
 
+    /** Set when a legacy cookie was converted, so a sign-out in the same request can revoke the new device. */
+    public const MINTED_TOKEN_ATTRIBUTE = 'schedule_device_minted_token';
+
     private const RENEW_AFTER_DAYS = 1;
 
     public function __construct(
@@ -105,7 +108,9 @@ final readonly class ReadStudentScheduleCookie
             return null;
         }
 
-        Cookie::queue(($this->rememberScheduleDevice)($model, true, $request->userAgent()));
+        $deviceCookie = ($this->rememberScheduleDevice)($model, true, $request->userAgent());
+        $request->attributes->set(self::MINTED_TOKEN_ATTRIBUTE, $deviceCookie->getValue());
+        Cookie::queue($deviceCookie);
         Cookie::queue(Cookie::forget('student_schedule'));
 
         return StudentScheduleCookie::fromModel($model);

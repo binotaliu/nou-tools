@@ -44,6 +44,7 @@ use App\Http\Controllers\ScheduleCalendarController;
 use App\Http\Controllers\ScheduleCalendarSettingsUpdateController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ScheduleCustomizationController;
+use App\Http\Controllers\ScheduleDeviceDestroyController;
 use App\Http\Controllers\ScheduleLiteController;
 use App\Http\Controllers\ScheduleMyController;
 use App\Http\Controllers\ScheduleMyLearningProgressController;
@@ -151,6 +152,7 @@ Route::get('/schedules/create', [ScheduleController::class, 'create'])->name('sc
 Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
 Route::get('/schedules/my', ScheduleMyController::class)->name('schedules.my');
 Route::post('/schedules/my', ScheduleMyStoreController::class)->name('schedules.my.store');
+Route::delete('/schedules/device', ScheduleDeviceDestroyController::class)->name('schedules.device.destroy');
 Route::get('/schedules/my/learning-progress', ScheduleMyLearningProgressController::class)->name('schedules.my.learning-progress');
 Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show')
     ->withMarkdown(ScheduleShowMarkdownController::class);
