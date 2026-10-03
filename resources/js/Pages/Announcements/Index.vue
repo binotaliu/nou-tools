@@ -430,7 +430,7 @@ function isExpired(announcement) {
           </form>
         </aside>
 
-        <section class="space-y-3 lg:col-span-8 xl:col-span-9">
+        <section class="min-w-0 space-y-3 lg:col-span-8 xl:col-span-9">
           <form
             method="GET"
             action="/announcements"
@@ -457,7 +457,7 @@ function isExpired(announcement) {
               maxlength="100"
               aria-label="搜尋公告標題"
               placeholder="搜尋公告標題"
-              class="min-w-0 flex-1 rounded-lg border border-theme-200 bg-white px-3 py-2 text-sm text-theme-900 placeholder:text-theme-700/70 focus:border-theme-500 focus:ring-theme-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              class="min-w-0 flex-1 rounded-lg border border-zinc-500 bg-white px-3 py-2 text-sm text-theme-900 placeholder:text-theme-700/70 focus:border-theme-500 focus:ring-theme-300 dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-100"
               data-testid="announcement-search-input"
             />
             <button
