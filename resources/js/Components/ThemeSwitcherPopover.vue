@@ -2,6 +2,7 @@
 // Header trigger that opens a panel with the appearance controls (ThemeSettings:
 // mode, accent color, font size).
 // Replaces the old icon-only cycle button.
+import { Link } from '@inertiajs/vue3'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import Icon from './Icon.vue'
 import ThemeSettings from './ThemeSettings.vue'
@@ -15,6 +16,9 @@ defineProps({
   // The adaptable nav renders two of these (tab bar, sidebar) and gives the
   // key only to the one for the current mode.
   accesskey: { type: String, default: '3' },
+  // The header's cog variant: a cog icon and a link to the settings page
+  // under the controls.
+  cog: { type: Boolean, default: false },
 })
 
 const open = ref(false)
@@ -67,7 +71,10 @@ onBeforeUnmount(() => {
     >
       <span class="sr-only">外觀與文字大小設定</span>
 
-      <Icon name="paint-brush" :class="flat ? 'size-6' : 'size-5'" />
+      <Icon
+        :name="cog ? 'cog-6-tooth' : 'paint-brush'"
+        :class="flat ? 'size-6' : 'size-5'"
+      />
     </button>
 
     <div
@@ -80,6 +87,17 @@ onBeforeUnmount(() => {
       class="absolute z-10 w-72 rounded-md border border-theme-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
     >
       <ThemeSettings />
+
+      <Link
+        v-if="cog"
+        href="/settings"
+        class="mt-3 flex items-center gap-2 rounded-md border-t border-theme-200 px-3 pt-3 pb-1 text-sm font-medium text-theme-700 hover:text-theme-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:text-zinc-100"
+        data-testid="theme-switcher-settings-link"
+        @click="close()"
+      >
+        <Icon name="cog-6-tooth" class="size-4 shrink-0" />
+        更多設定
+      </Link>
     </div>
   </div>
 </template>

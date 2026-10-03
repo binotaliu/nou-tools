@@ -33,6 +33,23 @@ it('offers the font size choice in the header popover too', function () {
     expect($page->script('getComputedStyle(document.documentElement).fontSize'))->toBe('18px');
 });
 
+it('links from the header popover to the settings page', function () {
+    $page = visit('/')->resize(1280, 800);
+
+    $page->click('header [data-testid="theme-switcher-toggle"] >> visible=true')
+        ->click('header [data-testid="theme-switcher-settings-link"] >> visible=true')
+        ->assertPathIs('/settings');
+});
+
+it('lays the header 更多 menu out as launcher tiles', function () {
+    $page = visit('/')->resize(1280, 800);
+
+    $page->click('header [aria-controls="header-more-menu"]')
+        ->assertPresent('header [data-testid="header-more-item"] >> visible=true')
+        ->click('[data-testid="site-header"] h1')
+        ->assertNotPresent('header [data-testid="header-more-item"] >> visible=true');
+});
+
 it('falls back to the default size for an unknown stored value', function () {
     $page = visit('/settings');
 

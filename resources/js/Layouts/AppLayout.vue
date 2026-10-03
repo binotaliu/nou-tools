@@ -5,7 +5,7 @@
 //
 // Nav active-state checks use Inertia's `usePage().url`, matched against
 // route paths (there is no Ziggy route() helper on the frontend).
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import AdaptableNav from '../Components/AdaptableNav.vue'
 import BottomNav from '../Components/BottomNav.vue'
@@ -72,6 +72,33 @@ function isItemActive(item) {
 
 const mobileMenuOpen = ref(false)
 const moreMenuOpen = ref(false)
+const moreMenuRoot = ref(null)
+
+function onDocumentClick(event) {
+  if (
+    moreMenuOpen.value &&
+    moreMenuRoot.value &&
+    !moreMenuRoot.value.contains(event.target)
+  ) {
+    moreMenuOpen.value = false
+  }
+}
+
+function onDocumentKeydown(event) {
+  if (moreMenuOpen.value && event.key === 'Escape') {
+    moreMenuOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', onDocumentClick)
+  document.addEventListener('keydown', onDocumentKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocumentClick)
+  document.removeEventListener('keydown', onDocumentKeydown)
+})
 
 const navItems = [
   {
@@ -265,7 +292,7 @@ const adaptableOther = computed(() =>
               <span class="hidden sm:inline">{{ item.label }}</span>
             </Link>
 
-            <div class="relative -mt-px" @click.self="moreMenuOpen = false">
+            <div ref="moreMenuRoot" class="relative -mt-px">
               <button
                 type="button"
                 class="-m-2 inline-flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition-colors md:px-3"
@@ -289,28 +316,44 @@ const adaptableOther = computed(() =>
               <div
                 id="header-more-menu"
                 v-show="moreMenuOpen"
-                class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-md border border-theme-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+                class="absolute top-full right-0 z-10 mt-2 w-80 rounded-2xl border border-theme-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
               >
-                <Link
-                  v-for="item in moreMenuItems"
-                  :key="item.href"
-                  :href="item.href"
-                  :data-offline-allow="item.offlineAllow ? '' : null"
-                  class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
-                  :class="
-                    isItemActive(item)
-                      ? 'bg-theme-100 text-theme-900 dark:bg-theme-900/40 dark:text-theme-100'
-                      : 'text-theme-700 hover:bg-theme-100 hover:text-theme-900 dark:text-zinc-400 dark:hover:bg-theme-900/40 dark:hover:text-theme-100'
-                  "
-                >
-                  <Icon :name="item.icon" class="size-4 shrink-0" />
-                  {{ item.label }}
-                </Link>
+                <div class="grid grid-cols-3 gap-x-2 gap-y-3">
+                  <Link
+                    v-for="item in moreMenuItems"
+                    :key="item.href"
+                    :href="item.href"
+                    :data-offline-allow="item.offlineAllow ? '' : null"
+                    :aria-current="isItemActive(item) ? 'page' : null"
+                    class="group flex flex-col items-center gap-1.5 rounded-xl px-1 py-1.5 text-center text-xs leading-tight transition-colors"
+                    :class="
+                      isItemActive(item)
+                        ? 'font-bold text-theme-900 dark:text-theme-100'
+                        : 'font-medium text-theme-900/80 dark:text-zinc-300'
+                    "
+                    data-testid="header-more-item"
+                    @click="moreMenuOpen = false"
+                  >
+                    <span
+                      class="flex size-12 items-center justify-center rounded-2xl transition-colors"
+                      :class="
+                        isItemActive(item)
+                          ? 'bg-theme-700 text-white'
+                          : 'bg-theme-100 text-theme-700 group-hover:bg-theme-200 dark:bg-zinc-800 dark:text-theme-300 dark:group-hover:bg-zinc-700'
+                      "
+                    >
+                      <Icon :name="item.icon" class="size-6 shrink-0" />
+                    </span>
+                    <span class="line-clamp-2 break-all">{{
+                      item.shortLabel ?? item.label
+                    }}</span>
+                  </Link>
+                </div>
               </div>
             </div>
           </nav>
 
-          <ThemeSwitcherPopover :accesskey="isPwa ? null : '3'" />
+          <ThemeSwitcherPopover :accesskey="isPwa ? null : '3'" cog />
 
           <button
             type="button"
