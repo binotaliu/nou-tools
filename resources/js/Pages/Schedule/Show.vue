@@ -67,7 +67,7 @@ const props = defineProps({
   },
 })
 
-const rememberForm = useForm({})
+const rememberForm = useForm({ remember: true })
 
 function rememberSchedule() {
   rememberForm.post(`/schedules/${props.viewModel.uuid}/remember`)
@@ -482,9 +482,24 @@ function localHint(next) {
             </p>
 
             <form
-              class="flex justify-end gap-2"
+              class="flex flex-wrap justify-end gap-2"
               @submit.prevent="rememberSchedule"
             >
+              <label
+                class="mb-2 flex w-full items-start gap-2 text-sm text-theme-900 dark:text-zinc-100"
+              >
+                <input
+                  v-model="rememberForm.remember"
+                  type="checkbox"
+                  data-testid="remember-schedule-keep"
+                  class="mt-0.5 size-4 shrink-0"
+                />
+                <span
+                  >記住這<span class="pwa:hidden">個瀏覽器</span
+                  ><span class="hidden pwa:inline">台裝置</span
+                  >。在共用電腦上請取消勾選，關閉瀏覽器後就會登出。</span
+                >
+              </label>
               <button
                 type="button"
                 data-testid="remember-schedule-dismiss"

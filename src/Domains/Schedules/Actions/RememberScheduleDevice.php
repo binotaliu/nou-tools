@@ -16,10 +16,16 @@ final readonly class RememberScheduleDevice
 
     /**
      * Signs a browser in to the schedule. The returned cookie carries the raw
-     * token, which exists nowhere else once this returns.
+     * token, which exists nowhere else once this returns. A device the browser
+     * already held (`$replacesToken`) is revoked so signing in as someone else
+     * leaves no live session behind.
      */
-    public function __invoke(StudentSchedule $schedule, bool $isPersistent, ?string $userAgent): Cookie
+    public function __invoke(StudentSchedule $schedule, bool $isPersistent, ?string $userAgent, ?string $replacesToken = null): Cookie
     {
+        if (is_string($replacesToken) && $replacesToken !== '') {
+            ScheduleDevice::query()->where('token_hash', ScheduleDevice::hashToken($replacesToken))->delete();
+        }
+
         $token = Str::random(64);
         $now = now();
 

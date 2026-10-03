@@ -12,9 +12,10 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use NouTools\Domains\Schedules\Actions\BuildScheduleAnnouncementsWidget;
+use NouTools\Domains\Schedules\Actions\BuildScheduleDeviceCookie;
 use NouTools\Domains\Schedules\Actions\BuildScheduleEditorPage;
-use NouTools\Domains\Schedules\Actions\BuildStudentScheduleCookie;
 use NouTools\Domains\Schedules\Actions\CreateSchedule;
+use NouTools\Domains\Schedules\Actions\RememberScheduleDevice;
 use NouTools\Domains\Schedules\Actions\ShowScheduleBackup;
 use NouTools\Domains\Schedules\Actions\ShowSchedulePage;
 use NouTools\Domains\Schedules\Actions\UpdateSchedule;
@@ -37,10 +38,15 @@ final class ScheduleController extends Controller
         return Inertia::render('Schedule/Editor', ['viewModel' => $page]);
     }
 
-    public function store(StudentScheduleUpsertData $input, Request $request, CreateSchedule $createSchedule, BuildStudentScheduleCookie $buildStudentScheduleCookie): JsonResponse|RedirectResponse
+    public function store(StudentScheduleUpsertData $input, Request $request, CreateSchedule $createSchedule, RememberScheduleDevice $rememberScheduleDevice): JsonResponse|RedirectResponse
     {
         $schedule = $createSchedule($input);
-        $cookie = $buildStudentScheduleCookie($schedule);
+        $cookie = $rememberScheduleDevice(
+            $schedule,
+            true,
+            $request->userAgent(),
+            $request->cookie(BuildScheduleDeviceCookie::NAME),
+        );
 
         if (! $request->header('X-Inertia') && ($request->wantsJson() || $request->isJson())) {
             return response()->json([
@@ -54,21 +60,19 @@ final class ScheduleController extends Controller
             ->cookie($cookie);
     }
 
-    public function update(StudentSchedule $schedule, StudentScheduleUpsertData $input, Request $request, UpdateSchedule $updateSchedule, BuildStudentScheduleCookie $buildStudentScheduleCookie): JsonResponse|RedirectResponse
+    public function update(StudentSchedule $schedule, StudentScheduleUpsertData $input, Request $request, UpdateSchedule $updateSchedule): JsonResponse|RedirectResponse
     {
         $schedule = $updateSchedule($schedule, $input);
-        $cookie = $buildStudentScheduleCookie($schedule);
 
         if (! $request->header('X-Inertia') && ($request->wantsJson() || $request->isJson())) {
             return response()->json([
                 'success' => true,
                 'redirect_url' => route('schedules.show', [$schedule, 'term' => $input->term]),
-            ])->cookie($cookie);
+            ]);
         }
 
         return redirect()->route('schedules.show', [$schedule, 'term' => $input->term])
-            ->with('success', '課表已更新！')
-            ->cookie($cookie);
+            ->with('success', '課表已更新！');
     }
 
     public function show(

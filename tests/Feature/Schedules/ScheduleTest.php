@@ -3,6 +3,7 @@
 use App\Models\ClassSchedule;
 use App\Models\Course;
 use App\Models\CourseClass;
+use App\Models\ScheduleDevice;
 use App\Models\SchoolCalendarEvent;
 use App\Models\StudentSchedule;
 use App\Models\StudentScheduleItem;
@@ -50,7 +51,7 @@ it('redirects instead of returning JSON when an Inertia request creates or updat
     $this->withHeaders($headers)->post(route('schedules.store'), $payload)
         ->assertRedirect()
         ->assertSessionHas('success', '課表已保存！')
-        ->assertCookie('student_schedule');
+        ->assertCookie('schedule_device');
 
     $schedule = StudentSchedule::where('name', 'Inertia 課表')->firstOrFail();
 
@@ -640,7 +641,7 @@ it('schedule show page shows empty state for selected semester without courses',
     });
 });
 
-it('stores schedule metadata in an encrypted cookie when saving', function () {
+it('signs the creator in with a device cookie when saving', function () {
     $courseClass = CourseClass::factory()->create();
 
     $payload = [
@@ -659,11 +660,8 @@ it('stores schedule metadata in an encrypted cookie when saving', function () {
     $schedule = StudentSchedule::where('name', 'Cookie Test')->first();
     expect($schedule)->not->toBeNull();
 
-    $response->assertCookie('student_schedule', json_encode([
-        'id' => $schedule->id,
-        'uuid' => $schedule->uuid,
-        'name' => 'Cookie Test',
-    ]));
+    $response->assertCookie('schedule_device');
+    $this->assertDatabaseHas('schedule_devices', ['student_schedule_id' => $schedule->id, 'is_persistent' => true]);
 });
 
 it('shows previous schedule on home when cookie exists', function () {
@@ -758,19 +756,41 @@ it('remembers a schedule from its shared link and redirects to it', function (st
     $response = $this->post(route('schedules.my.store'), ['url' => "  {$link}  "]);
 
     $response->assertRedirect(route('schedules.show', $schedule));
-    $response->assertCookie('student_schedule', json_encode([
-        'id' => $schedule->id,
-        'uuid' => $schedule->uuid,
-        'name' => 'Recovered Schedule',
-    ]));
+    $response->assertCookie('schedule_device');
+    $this->assertDatabaseHas('schedule_devices', ['student_schedule_id' => $schedule->id]);
 })->with(['url', 'legacy url', 'canonical uuid url', 'bare token']);
+
+it('signs in for the browser session only when remember is unticked', function () {
+    $schedule = StudentSchedule::factory()->create();
+
+    $response = $this->post(route('schedules.my.store'), [
+        'url' => $schedule->getRouteKey(),
+        'remember' => false,
+    ]);
+
+    expect($response->getCookie('schedule_device')->getExpiresTime())->toBe(0);
+    $this->assertDatabaseHas('schedule_devices', ['student_schedule_id' => $schedule->id, 'is_persistent' => false]);
+    expect(ScheduleDevice::query()->first()->expires_at->lt(now()->addDay()))->toBeTrue();
+});
+
+it('revokes the device the browser already held when it signs in again', function () {
+    $first = StudentSchedule::factory()->create();
+    $second = StudentSchedule::factory()->create();
+    ScheduleDevice::factory()->for($first)->withToken('old-device')->create();
+
+    $this->withCookie('schedule_device', 'old-device')
+        ->post(route('schedules.my.store'), ['url' => $second->getRouteKey()]);
+
+    $this->assertDatabaseCount('schedule_devices', 1);
+    $this->assertDatabaseHas('schedule_devices', ['student_schedule_id' => $second->id]);
+});
 
 it('rejects links that do not point at a schedule', function (string $link) {
     $this->from(route('schedules.my'))
         ->post(route('schedules.my.store'), ['url' => $link])
         ->assertRedirect(route('schedules.my'))
         ->assertSessionHasErrors('url')
-        ->assertCookieMissing('student_schedule');
+        ->assertCookieMissing('schedule_device');
 })->with([
     'unknown token' => 'https://nou.tools/schedules/AAAAAAAAAAAAAAAAAAAAAA',
     'other page' => 'https://nou.tools/schedules/create',
@@ -782,7 +802,7 @@ it('requires a link when remembering a schedule', function () {
         ->assertSessionHasErrors('url');
 });
 
-it('updates the stored cookie when schedule is updated', function () {
+it('does not sign the editor in when a schedule is updated', function () {
     $courseClass = CourseClass::factory()->create();
 
     $schedule = StudentSchedule::create([
@@ -801,11 +821,8 @@ it('updates the stored cookie when schedule is updated', function () {
     $response = $this->put(route('schedules.update', $schedule), $payload);
 
     $response->assertRedirect(route('schedules.show', [$schedule, 'term' => '2025B']));
-    $response->assertCookie('student_schedule', json_encode([
-        'id' => $schedule->id,
-        'uuid' => $schedule->uuid,
-        'name' => 'New Name',
-    ]));
+    $response->assertCookieMissing('schedule_device');
+    $this->assertDatabaseCount('schedule_devices', 0);
 });
 
 it('updating schedule redirects back with the selected term carried over', function () {
@@ -1285,7 +1302,7 @@ it('hides the push notification toggle when a different schedule is linked in th
     );
 });
 
-it('remembering a schedule sets the student_schedule cookie and redirects back', function () {
+it('remembering a schedule sets the device cookie and redirects back', function () {
     $schedule = StudentSchedule::create([
         'uuid' => Str::uuid(),
         'name' => 'Remember Me',
@@ -1294,11 +1311,8 @@ it('remembering a schedule sets the student_schedule cookie and redirects back',
     $response = $this->post(route('schedules.remember', $schedule));
 
     $response->assertRedirect(route('schedules.show', $schedule));
-    $response->assertCookie('student_schedule', json_encode([
-        'id' => $schedule->id,
-        'uuid' => $schedule->uuid,
-        'name' => 'Remember Me',
-    ]));
+    $response->assertCookie('schedule_device');
+    $this->assertDatabaseHas('schedule_devices', ['student_schedule_id' => $schedule->id, 'is_persistent' => true]);
 });
 
 it('schedule show page includes link to subscribe page', function () {

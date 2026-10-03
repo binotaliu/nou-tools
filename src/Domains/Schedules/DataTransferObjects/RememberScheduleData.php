@@ -6,25 +6,19 @@ namespace NouTools\Domains\Schedules\DataTransferObjects;
 
 use Spatie\LaravelData\Data;
 
-final class RememberScheduleFromLinkData extends Data
+final class RememberScheduleData extends Data
 {
+    /**
+     * @param  bool  $remember  false signs in for this browser session only (a shared computer).
+     */
     public function __construct(
-        public string $url,
         public bool $remember = true,
     ) {}
 
     public static function rules(): array
     {
         return [
-            'url' => ['required', 'string', 'max:2048'],
             'remember' => ['sometimes', 'boolean'],
-        ];
-    }
-
-    public static function attributes(): array
-    {
-        return [
-            'url' => __('課表連結'),
         ];
     }
 }

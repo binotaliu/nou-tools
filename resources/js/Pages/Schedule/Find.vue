@@ -23,7 +23,7 @@ const { onKeydown: onScannerKeydown } = useDialogFocus(
   () => scanning.value
 )
 
-const form = useForm({ url: '' })
+const form = useForm({ url: '', remember: true })
 
 const canScan = computed(
   () =>
@@ -175,6 +175,22 @@ async function onImagePicked(event) {
           >
             {{ imageError }}
           </p>
+
+          <label
+            class="mt-4 flex items-start gap-2 text-sm text-theme-900 dark:text-zinc-100"
+          >
+            <input
+              v-model="form.remember"
+              type="checkbox"
+              data-testid="find-schedule-keep"
+              class="mt-0.5 size-4 shrink-0"
+            />
+            <span
+              >記住這<span class="pwa:hidden">個瀏覽器</span
+              ><span class="hidden pwa:inline">台裝置</span
+              >。在共用電腦上請取消勾選，關閉瀏覽器後就會登出。</span
+            >
+          </label>
 
           <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
             <label
