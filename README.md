@@ -1,5 +1,15 @@
 <h1 align="center">📖 NOU 小幫手・NOU Tools</h1>
 
+<p align="center">
+  <a href="https://github.com/binotaliu/nou-tools/actions/workflows/ci.yml"><img src="https://github.com/binotaliu/nou-tools/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--or--later-blue" alt="License: AGPL-3.0-or-later"></a>
+  <img src="https://img.shields.io/badge/PHP-8.4%2B-777BB4?logo=php&logoColor=white" alt="PHP 8.4+">
+  <img src="https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white" alt="Laravel 13">
+  <img src="https://img.shields.io/badge/Vue-3-4FC08D?logo=vuedotjs&logoColor=white" alt="Vue 3">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4">
+  <a href="https://www.conventionalcommits.org/"><img src="https://img.shields.io/badge/Conventional_Commits-1.0.0-FE5196?logo=conventionalcommits&logoColor=white" alt="Conventional Commits"></a>
+</p>
+
 NOU 小幫手 (NOU Tools) 是一款由 NOU 學生為同學打造的非官方小工具，旨在為 NOU 學生提供便利的功能，包含課表管理與學習進度追蹤等。
 
 ## 功能 / Features
