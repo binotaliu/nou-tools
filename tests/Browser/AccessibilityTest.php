@@ -77,7 +77,7 @@ it('puts accesskey 8 on the course search field of the schedule editor', functio
     $page = visit('/schedules/create');
 
     $page->assertNoJavaScriptErrors()
-        ->assertPresent('input#course-search[accesskey="8"]');
+        ->assertPresent('input#search[accesskey="8"]');
 });
 
 it('keeps accesskey 2 usable when the header nav is collapsed', function () {

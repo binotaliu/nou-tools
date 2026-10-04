@@ -13,8 +13,9 @@ it('creates a schedule from the selected courses and lands on its page', functio
     $course = Course::factory()->create(['term' => '2025B', 'name' => '瀏覽器測試課程']);
 
     visit(route('schedules.create', ['term' => '2025B']))
-        ->fill('#course-search', '瀏覽器測試')
-        ->click('[data-testid="course-option-'.$course->id.'"]')
+        ->fill('#search', '瀏覽器測試')
+        ->click('[data-testid="course-checkbox-'.$course->id.'"]')
+        ->click('[data-testid="schedule-next"]')
         ->fill('#schedule-name', 'Inertia Editor Schedule')
         ->click('[data-testid="schedule-submit"]')
         ->assertSee('課表已保存！')
@@ -23,4 +24,31 @@ it('creates a schedule from the selected courses and lands on its page', functio
     $schedule = StudentSchedule::where('name', 'Inertia Editor Schedule')->firstOrFail();
 
     expect($schedule->items()->pluck('course_id')->all())->toBe([$course->id]);
+});
+
+it('keeps the picked courses when going back from the class step', function () {
+    config()->set('app.current_semester', '2025B');
+
+    $course = Course::factory()->create(['term' => '2025B', 'name' => '上一步測試課程']);
+
+    visit(route('schedules.create', ['term' => '2025B']))
+        ->assertSee('已選 0 / 14 門課程')
+        ->click('[data-testid="course-checkbox-'.$course->id.'"]')
+        ->assertSee('已選 1 / 14 門課程')
+        ->click('[data-testid="schedule-next"]')
+        ->assertPresent('[data-testid="selected-item-'.$course->id.'"]')
+        ->click('[data-testid="schedule-back"]')
+        ->assertChecked('[data-testid="course-checkbox-'.$course->id.'"]');
+});
+
+it('opens an existing schedule on the class step', function () {
+    config()->set('app.current_semester', '2025B');
+
+    $course = Course::factory()->create(['term' => '2025B', 'name' => '編輯測試課程']);
+    $schedule = StudentSchedule::factory()->create();
+    $schedule->items()->create(['course_id' => $course->id]);
+
+    visit(route('schedules.edit', $schedule))
+        ->assertPresent('[data-testid="schedule-step-classes"]')
+        ->assertPresent('[data-testid="selected-item-'.$course->id.'"]');
 });

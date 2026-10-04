@@ -2,10 +2,18 @@
 // Serves both the create ('/schedules/create') and edit
 // ('/schedules/{schedule}/edit') routes, since
 // ScheduleController::create()/edit() share this one view.
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+//
+// Two client-side steps on one page: 1 picks courses (browsed like
+// 本學期開課表), 2 picks a class for each and saves.
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { Head, Link, router, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
-import Icon from '../../Components/Icon.vue'
+import Select from '../../Components/Select.vue'
+import CourseFilters from '../../Components/Courses/CourseFilters.vue'
+import CourseGroupList from '../../Components/Courses/CourseGroupList.vue'
+import ClassOptions from '../../Components/Schedule/ClassOptions.vue'
+import { toSemesterDisplay } from '../../Composables/semesterDisplay.js'
+import { useCourseFilters } from '../../Composables/useCourseFilters.js'
 
 const props = defineProps({
   viewModel: {
@@ -14,19 +22,7 @@ const props = defineProps({
   },
 })
 
-// Port of the `Str::toSemesterDisplay()` macro (app/Providers/AppServiceProvider.php).
-function toSemesterDisplay(semester) {
-  const match = /^(\d{4})([ABC])$/.exec(semester ?? '')
-
-  if (!match) {
-    return semester
-  }
-
-  const rocYear = Number(match[1]) - 1911
-  const termName = { A: '上學期', B: '下學期', C: '暑期' }[match[2]]
-
-  return `${rocYear} 學年度${termName}`
-}
+const MAX_COURSES = 14
 
 const editing = computed(() => props.viewModel.scheduleUuid !== null)
 const pageTitle = computed(() => (editing.value ? '編輯課表' : '新增課表'))
@@ -42,6 +38,85 @@ const formAction = computed(() =>
   editing.value ? `/schedules/${props.viewModel.scheduleUuid}` : '/schedules'
 )
 
+const allCourses = computed(() => props.viewModel.courses)
+
+// Flat rows for the shared course list; `section` mirrors the schedule page
+// (courses with an exam slot are 一般課程, the rest 微學分與全遠距).
+const courseRows = computed(() =>
+  allCourses.value.map(course => ({
+    id: course.id,
+    name: course.name,
+    department: course.department,
+    credits: course.credits,
+    section: course.exam_label ? 'general' : 'micro',
+    examLabel: course.exam_label,
+    examWeekdayOrder: course.exam_weekday_order,
+    examTimeStart: course.exam_time_start,
+  }))
+)
+
+const filters = reactive(useCourseFilters(courseRows))
+
+const scheduleName = ref(props.viewModel.scheduleName ?? '')
+
+function initialSelection() {
+  return (props.viewModel.selectedItems ?? []).flatMap(item => {
+    const fullCourse = allCourses.value.find(c => c.id === item.courseId)
+
+    return fullCourse
+      ? [{ course: fullCourse, selectedClassId: item.classId }]
+      : []
+  })
+}
+
+const selectedItems = ref(initialSelection())
+const step = ref(editing.value && selectedItems.value.length > 0 ? 2 : 1)
+const stepError = ref('')
+
+const selectedIds = computed(() => selectedItems.value.map(i => i.course.id))
+const limitReached = computed(() => selectedItems.value.length >= MAX_COURSES)
+
+function toggleCourse(row) {
+  const index = selectedItems.value.findIndex(i => i.course.id === row.id)
+
+  if (index !== -1) {
+    selectedItems.value.splice(index, 1)
+    return
+  }
+
+  if (limitReached.value) {
+    return
+  }
+
+  const course = allCourses.value.find(c => c.id === row.id)
+
+  selectedItems.value.push({
+    course,
+    selectedClassId: course.classes.length > 0 ? course.classes[0].id : null,
+  })
+}
+
+function removeItem(index) {
+  selectedItems.value.splice(index, 1)
+  stepError.value = ''
+
+  if (selectedItems.value.length === 0) {
+    goToStep(1)
+  }
+}
+
+const stepHeading = ref(null)
+
+function goToStep(target) {
+  step.value = target
+  stepError.value = ''
+
+  nextTick(() => {
+    stepHeading.value?.focus()
+    window.scrollTo({ top: 0 })
+  })
+}
+
 function selectTerm(term) {
   const url = editing.value
     ? `/schedules/${props.viewModel.scheduleUuid}/edit`
@@ -50,138 +125,31 @@ function selectTerm(term) {
   router.get(url, { term }, { preserveScroll: true })
 }
 
-// --- scheduleEditor() state (port of resources/js/schedule-editor.js) ---
-const allCourses = props.viewModel.courses
-const searchQuery = ref('')
-const filteredCourses = ref([])
-const showResults = ref(false)
-const scheduleName = ref(props.viewModel.scheduleName ?? '')
-
-const selectedItems = ref(
-  (props.viewModel.selectedItems ?? []).flatMap(item => {
-    const fullCourse = allCourses.find(c => c.id === item.courseId)
-
-    return fullCourse
-      ? [{ course: fullCourse, selectedClassId: item.classId }]
-      : []
-  })
-)
-
-function filterCourses() {
-  const query = searchQuery.value.trim().toLowerCase()
-
-  if (!query) {
-    filteredCourses.value = []
-    showResults.value = false
-    return
+// Inertia reuses this component when only the term changes, so the picks
+// belong to the old term's courses and must be rebuilt.
+watch(
+  () => props.viewModel.selectedTerm,
+  () => {
+    selectedItems.value = initialSelection()
+    step.value = editing.value && selectedItems.value.length > 0 ? 2 : 1
+    stepError.value = ''
   }
-
-  filteredCourses.value = allCourses.filter(course =>
-    course.name.toLowerCase().includes(query)
-  )
-  showResults.value = true
-}
-
-function selectCourse(course) {
-  if (selectedItems.value.length >= 14) {
-    alert('最多只能選擇 14 門課程')
-    return
-  }
-
-  if (!selectedItems.value.some(item => item.course.id === course.id)) {
-    const selectedClassId =
-      course.classes.length > 0 ? course.classes[0].id : null
-
-    selectedItems.value.push({
-      course,
-      selectedClassId,
-    })
-  }
-
-  searchQuery.value = ''
-  filteredCourses.value = []
-  showResults.value = false
-}
-
-function removeItem(index) {
-  selectedItems.value.splice(index, 1)
-}
-
-const TYPE_ORDER = { morning: 0, afternoon: 1, evening: 2, full_remote: 3 }
-const TYPE_LABELS = {
-  morning: '上午班',
-  afternoon: '下午班',
-  evening: '夜間班',
-  full_remote: '全遠距',
-}
-
-function getClassTypes(course) {
-  const types = [...new Set(course.classes.map(c => c.type))]
-  return types.sort((a, b) => (TYPE_ORDER[a] ?? 99) - (TYPE_ORDER[b] ?? 99))
-}
-
-function getClassesByType(course, type) {
-  return course.classes.filter(c => c.type === type)
-}
-
-function getTypeLabel(type) {
-  return TYPE_LABELS[type] || type
-}
-
-// Mirrors the visible content of a class-option label (code/type label,
-// tentative note, time range, teacher name) so the radio's aria-label
-// carries the same information the sighted layout shows, instead of the
-// class option's text content leaking into the tree as a duplicate node
-// (see the aria-hidden wrapper below it).
-function classOptionAriaLabel(courseClass) {
-  const parts = [
-    courseClass.is_tentative ? courseClass.type_label : courseClass.code,
-  ]
-
-  if (courseClass.is_tentative) {
-    parts.push('尚未正式分班')
-  }
-
-  if (courseClass.start_time) {
-    parts.push(`${courseClass.start_time} - ${courseClass.end_time}`)
-  }
-
-  if (courseClass.teacher_name) {
-    parts.push(courseClass.teacher_name)
-  }
-
-  return parts.join(' ')
-}
-
-function closeDropdownOnOutsideClick(event) {
-  if (!event.target.closest('.relative')) {
-    showResults.value = false
-  }
-}
-
-onMounted(() => document.addEventListener('click', closeDropdownOnOutsideClick))
-onUnmounted(() =>
-  document.removeEventListener('click', closeDropdownOnOutsideClick)
 )
 
 const form = useForm({})
 
 function submitForm() {
   if (selectedItems.value.length === 0) {
-    alert('請至少選擇一門課程')
+    stepError.value = '請至少選擇一門課程'
     return
   }
 
-  if (selectedItems.value.length > 14) {
-    alert('最多只能選擇 14 門課程')
-    return
-  }
-
-  const invalidItems = selectedItems.value.filter(
+  const missing = selectedItems.value.filter(
     item => item.course.has_classes && !item.selectedClassId
   )
-  if (invalidItems.length > 0) {
-    alert('請為所有課程選擇班級')
+
+  if (missing.length > 0) {
+    stepError.value = `請為所有課程選擇班級：${missing.map(i => i.course.name).join('、')}`
     return
   }
 
@@ -196,6 +164,11 @@ function submitForm() {
     }))
     .submit(editing.value ? 'put' : 'post', formAction.value)
 }
+
+const steps = [
+  { number: 1, label: '選擇課程' },
+  { number: 2, label: '選擇班級' },
+]
 </script>
 
 <template>
@@ -208,30 +181,21 @@ function submitForm() {
           {{ headingText }}
         </h2>
         <div class="w-full sm:w-auto sm:min-w-40">
-          <label for="term" class="sr-only">選擇學期</label>
-          <div class="relative">
-            <select
-              id="term"
-              name="term"
-              aria-label="選擇學期"
-              class="w-full appearance-none rounded-lg border border-zinc-500 bg-white px-3 py-2 text-sm focus:border-theme-300 focus:ring-theme-300 dark:border-zinc-500 dark:bg-zinc-900"
-              :value="viewModel.selectedTerm"
-              @change="selectTerm($event.target.value)"
+          <Select
+            id="term"
+            name="term"
+            aria-label="選擇學期"
+            :model-value="viewModel.selectedTerm"
+            @update:model-value="selectTerm"
+          >
+            <option
+              v-for="term in viewModel.availableTerms"
+              :key="term"
+              :value="term"
             >
-              <option
-                v-for="term in viewModel.availableTerms"
-                :key="term"
-                :value="term"
-              >
-                {{ toSemesterDisplay(term) }}
-              </option>
-            </select>
-            <div
-              class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
-            >
-              <Icon name="chevron-down" class="size-5 text-zinc-400" />
-            </div>
-          </div>
+              {{ toSemesterDisplay(term) }}
+            </option>
+          </Select>
         </div>
       </div>
 
@@ -260,98 +224,94 @@ function submitForm() {
         </div>
       </div>
 
-      <!-- Search Section -->
-      <div
-        class="mb-8 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
-      >
-        <label
-          class="mb-1 block text-xl font-semibold text-theme-900 dark:text-zinc-100"
-          for="course-search"
+      <ol class="mb-6 flex flex-wrap gap-3" data-testid="schedule-steps">
+        <li
+          v-for="item in steps"
+          :key="item.number"
+          :aria-current="step === item.number ? 'step' : null"
+          class="flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-semibold"
+          :class="
+            step === item.number
+              ? 'border-theme-700 bg-theme-700 text-white'
+              : 'border-theme-300 text-theme-800 dark:border-zinc-600 dark:text-zinc-200'
+          "
         >
-          搜尋課程
-        </label>
-        <div class="relative">
-          <input
-            id="course-search"
-            v-model="searchQuery"
-            type="text"
-            accesskey="8"
-            placeholder="輸入課程名稱..."
-            class="w-full rounded-lg border-2 border-zinc-500 px-4 py-3 text-lg focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-500"
-            autocomplete="off"
-            :disabled="selectedItems.length >= 14"
-            :aria-describedby="
-              selectedItems.length >= 14 ? 'course-search-limit-note' : null
-            "
-            @input="filterCourses()"
-          />
-        </div>
-        <p
-          v-if="selectedItems.length >= 14"
-          id="course-search-limit-note"
-          class="mt-1 text-sm text-theme-700 dark:text-zinc-400"
+          <span class="tabular-nums">{{ item.number }}</span>
+          {{ item.label }}
+        </li>
+      </ol>
+
+      <!-- Step 1: courses -->
+      <div v-if="step === 1" data-testid="schedule-step-courses">
+        <h3
+          ref="stepHeading"
+          tabindex="-1"
+          class="mb-1 text-xl font-semibold text-theme-900 focus:outline-none dark:text-zinc-100"
         >
-          已選滿 14 門課程上限，請先移除課程後再搜尋新增。
+          選擇課程
+        </h3>
+        <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
+          勾選這學期要修的課程（最多 {{ MAX_COURSES }} 門），下一步再選擇班級。
         </p>
 
-        <div
-          v-show="showResults && filteredCourses.length > 0"
-          class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-theme-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
-        >
-          <div
-            v-for="course in filteredCourses"
-            :key="course.id"
-            :data-testid="'course-option-' + course.id"
-            class="cursor-pointer border-b border-theme-100 p-4 hover:bg-theme-50 dark:border-zinc-800 dark:hover:bg-zinc-950"
-            @click="selectCourse(course)"
-          >
-            <div class="font-semibold text-theme-900 dark:text-zinc-100">
-              {{ course.name }}
-            </div>
-          </div>
-        </div>
+        <CourseFilters :filters="filters" />
+
+        <CourseGroupList
+          :sections="filters.sections"
+          :columns="filters.columns"
+          selectable
+          :selected-ids="selectedIds"
+          :limit-reached="limitReached"
+          @toggle="toggleCourse"
+        />
 
         <div
-          v-if="
-            showResults && filteredCourses.length === 0 && searchQuery.trim()
-          "
-          class="mt-2 rounded-lg border border-theme-200 bg-theme-50 p-4 text-theme-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300"
+          class="sticky bottom-(--pwa-nav-height,0px) z-10 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-theme-200 bg-white p-4 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
         >
-          找不到符合的課程。請試試其他關鍵字。
+          <p
+            class="text-sm text-theme-800 dark:text-zinc-200"
+            data-testid="selected-count"
+            aria-live="polite"
+          >
+            已選 {{ selectedItems.length }} / {{ MAX_COURSES }} 門課程
+            <span v-if="limitReached">，已達上限，請先取消勾選再新增。</span>
+          </p>
+          <button
+            type="button"
+            data-testid="schedule-next"
+            :disabled="selectedItems.length === 0"
+            class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-6 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
+            @click="goToStep(2)"
+          >
+            下一步：選擇班級
+          </button>
         </div>
       </div>
 
-      <!-- Selected Schedule Section -->
-      <div
-        class="mb-8 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
-      >
-        <div class="mb-4">
-          <h2 class="text-xl font-semibold text-theme-900 dark:text-zinc-100">
-            您的課表
-          </h2>
-        </div>
+      <!-- Step 2: classes -->
+      <div v-else data-testid="schedule-step-classes">
+        <h3
+          ref="stepHeading"
+          tabindex="-1"
+          class="mb-1 text-xl font-semibold text-theme-900 focus:outline-none dark:text-zinc-100"
+        >
+          選擇班級
+        </h3>
+        <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
+          為每門課程選擇要上的班級。
+        </p>
 
-        <div v-if="selectedItems.length === 0">
-          <div
-            class="rounded-lg border-2 border-dashed border-theme-300 bg-theme-50 p-6 text-center text-theme-700 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-300"
-          >
-            <p class="text-lg">還沒有選擇任何課程。請在上方搜尋並選擇課程。</p>
-          </div>
-        </div>
-
-        <div class="space-y-4">
+        <div class="mb-8 space-y-4">
           <div
             v-for="(item, index) in selectedItems"
-            :key="index"
+            :key="item.course.id"
             :data-testid="'selected-item-' + item.course.id"
             class="rounded-lg border-2 border-theme-300 bg-theme-50 p-4 dark:border-zinc-600 dark:bg-zinc-950"
           >
-            <div class="mb-3 flex items-start justify-between">
-              <div>
-                <h3 class="text-lg font-bold text-theme-900 dark:text-zinc-100">
-                  {{ item.course.name }}
-                </h3>
-              </div>
+            <div class="mb-3 flex items-start justify-between gap-3">
+              <h4 class="text-lg font-bold text-theme-900 dark:text-zinc-100">
+                {{ item.course.name }}
+              </h4>
               <button
                 type="button"
                 :aria-label="`移除 ${item.course.name}`"
@@ -362,220 +322,84 @@ function submitForm() {
               </button>
             </div>
 
-            <div class="mt-3">
-              <div
-                v-if="!item.course.has_classes"
-                data-testid="pending-class-note"
-                class="rounded-lg border-2 border-dashed border-theme-300 bg-theme-100 p-3 text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-300"
-              >
-                尚未開課，選課後將自動列入課表，開課後請記得回來選擇班級。
-              </div>
-
-              <div v-else>
-                <template v-if="getClassTypes(item.course).length > 1">
-                  <fieldset class="mb-4">
-                    <legend
-                      class="mb-2 text-sm font-semibold text-theme-800 dark:text-zinc-200"
-                    >
-                      選擇班級：
-                    </legend>
-
-                    <fieldset
-                      v-for="type in getClassTypes(item.course)"
-                      :key="type"
-                      class="mb-4"
-                    >
-                      <legend
-                        class="mb-2 text-sm font-semibold text-theme-700 dark:text-zinc-300"
-                      >
-                        {{ getTypeLabel(type) }}
-                      </legend>
-                      <div
-                        class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3"
-                      >
-                        <label
-                          v-for="courseClass in getClassesByType(
-                            item.course,
-                            type
-                          )"
-                          :key="courseClass.id"
-                          :data-testid="
-                            courseClass.is_tentative
-                              ? 'tentative-session-' + courseClass.type
-                              : null
-                          "
-                          class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-theme-300 dark:bg-zinc-900"
-                          :class="
-                            item.selectedClassId === courseClass.id
-                              ? 'border-theme-500 bg-theme-50'
-                              : 'border-theme-200 dark:border-zinc-700'
-                          "
-                        >
-                          <input
-                            v-model.number="item.selectedClassId"
-                            type="radio"
-                            :name="'class_' + index"
-                            :value="courseClass.id"
-                            :aria-label="classOptionAriaLabel(courseClass)"
-                            class="mt-1 mr-3 h-5 w-5 cursor-pointer"
-                          />
-                          <div aria-hidden="true" class="min-w-0 flex-1">
-                            <div
-                              class="font-semibold text-theme-900 dark:text-zinc-100"
-                            >
-                              {{
-                                courseClass.is_tentative
-                                  ? courseClass.type_label
-                                  : courseClass.code
-                              }}
-                            </div>
-                            <div
-                              v-if="courseClass.is_tentative"
-                              class="text-xs font-semibold text-amber-700 dark:text-amber-400"
-                            >
-                              尚未正式分班
-                            </div>
-                            <div
-                              v-if="courseClass.start_time"
-                              class="text-sm text-theme-700 dark:text-zinc-400"
-                            >
-                              <span>
-                                {{ courseClass.start_time }} -
-                                {{ courseClass.end_time }}
-                              </span>
-                            </div>
-                            <div
-                              v-if="courseClass.teacher_name"
-                              class="truncate text-sm text-theme-700 dark:text-zinc-400"
-                            >
-                              {{ courseClass.teacher_name }}
-                            </div>
-                          </div>
-                        </label>
-                      </div>
-                    </fieldset>
-                  </fieldset>
-                </template>
-
-                <template v-else>
-                  <fieldset>
-                    <legend
-                      class="mb-2 text-sm font-semibold text-theme-800 dark:text-zinc-200"
-                    >
-                      班級：
-                    </legend>
-                    <div
-                      class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3"
-                    >
-                      <label
-                        v-for="courseClass in item.course.classes"
-                        :key="courseClass.id"
-                        :data-testid="
-                          courseClass.is_tentative
-                            ? 'tentative-session-' + courseClass.type
-                            : null
-                        "
-                        class="flex cursor-pointer items-start rounded-lg border-2 bg-white p-3 transition hover:border-theme-300 dark:bg-zinc-900"
-                        :class="
-                          item.selectedClassId === courseClass.id
-                            ? 'border-theme-500 bg-theme-50'
-                            : 'border-theme-200 dark:border-zinc-700'
-                        "
-                      >
-                        <input
-                          v-model.number="item.selectedClassId"
-                          type="radio"
-                          :name="'class_' + index"
-                          :value="courseClass.id"
-                          :aria-label="classOptionAriaLabel(courseClass)"
-                          class="mt-1 mr-3 h-5 w-5 cursor-pointer"
-                        />
-                        <div aria-hidden="true" class="min-w-0 flex-1">
-                          <div
-                            class="font-semibold text-theme-900 dark:text-zinc-100"
-                          >
-                            {{
-                              courseClass.is_tentative
-                                ? courseClass.type_label
-                                : courseClass.code
-                            }}
-                          </div>
-                          <div
-                            v-if="courseClass.is_tentative"
-                            class="text-xs font-semibold text-amber-700 dark:text-amber-400"
-                          >
-                            尚未正式分班
-                          </div>
-                          <div
-                            v-if="courseClass.start_time"
-                            class="text-sm text-theme-700 dark:text-zinc-400"
-                          >
-                            <span>
-                              {{ courseClass.start_time }} -
-                              {{ courseClass.end_time }}
-                            </span>
-                          </div>
-                          <div
-                            v-if="courseClass.teacher_name"
-                            class="truncate text-sm text-theme-700 dark:text-zinc-400"
-                          >
-                            {{ courseClass.teacher_name }}
-                          </div>
-                        </div>
-                      </label>
-                    </div>
-                  </fieldset>
-                </template>
-              </div>
+            <div
+              v-if="!item.course.has_classes"
+              data-testid="pending-class-note"
+              class="rounded-lg border-2 border-dashed border-theme-300 bg-theme-100 p-3 text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-300"
+            >
+              尚未開課，選課後將自動列入課表，開課後請記得回來選擇班級。
             </div>
+
+            <ClassOptions
+              v-else
+              v-model="item.selectedClassId"
+              :course="item.course"
+              :name="'class_' + index"
+            />
           </div>
         </div>
+
+        <form
+          class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+          @submit.prevent="submitForm"
+        >
+          <div class="mb-4">
+            <label
+              class="mb-1 block text-xl font-semibold text-theme-900 dark:text-zinc-100"
+              for="schedule-name"
+            >
+              課表名稱（可選）
+            </label>
+            <input
+              id="schedule-name"
+              v-model="scheduleName"
+              type="text"
+              name="name"
+              placeholder="例如：浣熊的課表"
+              class="w-full rounded-lg border-2 border-zinc-500 px-4 py-3 focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-500"
+            />
+          </div>
+
+          <p
+            v-if="stepError"
+            role="alert"
+            data-testid="schedule-error"
+            class="mb-4 text-sm font-semibold text-red-700 dark:text-red-400"
+          >
+            {{ stepError }}
+          </p>
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              data-testid="schedule-back"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-6 py-3 text-lg font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              @click="goToStep(1)"
+            >
+              {{ editing ? '調整課程' : '上一步' }}
+            </button>
+            <button
+              type="submit"
+              data-testid="schedule-submit"
+              :disabled="selectedItems.length === 0 || form.processing"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-6 py-3 text-lg font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
+            >
+              <span v-if="!form.processing">{{ submitLabel }}</span>
+              <span v-else>{{ submittingLabel }}</span>
+            </button>
+            <Link
+              :href="
+                editing
+                  ? `/schedules/${viewModel.scheduleUuid}`
+                  : '/schedules/create'
+              "
+              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-6 py-3 text-lg font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            >
+              取消
+            </Link>
+          </div>
+        </form>
       </div>
-
-      <!-- Submit Section -->
-      <form
-        class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
-        @submit.prevent="submitForm"
-      >
-        <div class="mb-4">
-          <label
-            class="mb-1 block text-xl font-semibold text-theme-900 dark:text-zinc-100"
-            for="schedule-name"
-          >
-            課表名稱（可選）
-          </label>
-          <input
-            id="schedule-name"
-            v-model="scheduleName"
-            type="text"
-            name="name"
-            placeholder="例如：浣熊的課表"
-            class="w-full rounded-lg border-2 border-zinc-500 px-4 py-3 focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-500"
-          />
-        </div>
-
-        <div class="flex gap-4">
-          <button
-            type="submit"
-            data-testid="schedule-submit"
-            :disabled="selectedItems.length === 0 || form.processing"
-            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-6 py-3 text-lg font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
-          >
-            <span v-if="!form.processing">{{ submitLabel }}</span>
-            <span v-else>{{ submittingLabel }}</span>
-          </button>
-          <Link
-            :href="
-              editing
-                ? `/schedules/${viewModel.scheduleUuid}`
-                : '/schedules/create'
-            "
-            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-6 py-3 text-lg font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
-          >
-            取消
-          </Link>
-        </div>
-      </form>
     </div>
   </AppLayout>
 </template>
