@@ -28,6 +28,7 @@ final class StudentScheduleUpsertData extends Data
             'items.*.course_id' => [
                 'required',
                 'integer',
+                'distinct',
                 Rule::exists('courses', 'id')->where('term', $term),
             ],
             'items.*.class_id' => [

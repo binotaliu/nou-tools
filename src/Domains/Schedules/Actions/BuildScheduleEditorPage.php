@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace NouTools\Domains\Schedules\Actions;
 
 use App\Models\Course;
+use App\Models\Program;
 use App\Models\StudentSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use NouTools\Domains\Schedules\PageData\ScheduleEditorPageData;
 use NouTools\Domains\Schedules\ViewModels\ScheduleEditorCourseViewModel;
+use NouTools\Domains\Schedules\ViewModels\ScheduleEditorProgramViewModel;
 use NouTools\Domains\Schedules\ViewModels\ScheduleEditorSelectedItemViewModel;
 use Spatie\LaravelData\DataCollection;
 
@@ -59,6 +61,15 @@ final readonly class BuildScheduleEditorPage
 
         return new ScheduleEditorPageData(
             courses: $courses,
+            programs: ScheduleEditorProgramViewModel::collect(
+                Program::query()
+                    ->where('term', $selectedTerm)
+                    ->with('classes.course')
+                    ->orderBy('position')
+                    ->get()
+                    ->map(fn (Program $program) => ScheduleEditorProgramViewModel::fromModel($program)),
+                DataCollection::class,
+            ),
             currentSemester: $currentSemester,
             selectedTerm: $selectedTerm,
             availableTerms: $availableTerms,
