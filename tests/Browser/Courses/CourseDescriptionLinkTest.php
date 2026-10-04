@@ -24,7 +24,7 @@ it('opens the coursemap homepage first, then points the same tab at the descript
 
     expect($page->script('window.__opened'))->toContain('https://coursemap.nou.edu.tw/');
 
-    $page->wait(2);
+    waitUntil($page, "window.__tab.location.href !== ''", 4000);
 
     expect($page->script('window.__tab.location.href'))
         ->toBe('https://coursemap.nou.edu.tw/sp.asp?xdurl=mp1ap/CourseDetail.asp&ctNode=1051&xitem=1');

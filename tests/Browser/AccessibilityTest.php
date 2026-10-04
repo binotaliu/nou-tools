@@ -161,8 +161,9 @@ it('announces the new title and focuses main after a client-side page change', f
     expect($page->script("document.querySelector('[data-testid=\"route-announcer\"]').getAttribute('aria-live')"))->toBe('polite');
 
     $page->click('[data-testid="footer-accessibility-link"]')
-        ->assertPathIs('/accessibility')
-        ->wait(0.6);
+        ->assertPathIs('/accessibility');
+
+    waitUntil($page, "document.querySelector('[data-testid=\"route-announcer\"]').textContent !== ''");
 
     expect($page->script("document.querySelector('[data-testid=\"route-announcer\"]').textContent"))->toBe('無障礙說明 - NOU 小幫手');
     expect($page->script('document.activeElement.id'))->toBe('main-content');
@@ -179,6 +180,6 @@ it('shows error toasts as an alert that stays past the old 4 second timeout', fu
         ->assertPresent('[data-testid="notification"][role="alert"]');
 
     // Not dismissed on its own within the old 4 second window.
-    $page->wait(5);
+    $page->wait(4.5);
     expect($page->script("getComputedStyle(document.querySelector('[data-testid=\"notification\"] > div > div')).display"))->not->toBe('none');
 });

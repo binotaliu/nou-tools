@@ -154,7 +154,9 @@ it('persists checklist ticks across a reload', function () use ($markdownContain
 });
 
 it('renders countdown day counts against Asia/Taipei today', function () use ($markdownContainerFixtureUrl) {
-    $page = visit($markdownContainerFixtureUrl())->wait(1);
+    $page = visit($markdownContainerFixtureUrl());
+
+    waitUntil($page, "document.querySelector('.md-countdown-item .md-countdown-days')?.textContent.trim() !== ''");
 
     $page->assertNoJavaScriptErrors();
 

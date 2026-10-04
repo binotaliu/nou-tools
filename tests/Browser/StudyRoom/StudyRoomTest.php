@@ -1084,7 +1084,7 @@ it('pauses and resumes a running timer, freezing the countdown while paused', fu
     );
 
     $frozen = $countdown();
-    $page->wait(2);
+    $page->wait(1.5);
     expect($countdown())->toBe($frozen);
 
     $page->click('[data-testid="study-room-resume-timer"]');
@@ -1099,6 +1099,6 @@ it('pauses and resumes a running timer, freezing the countdown while paused', fu
 
     // ...and it ticks again once resumed.
     $running = $countdown();
-    $page->wait(2);
+    $page->wait(1.5);
     expect($countdown())->not->toBe($running);
 });

@@ -72,6 +72,7 @@ it('signs a browser back in from its local copy when the cookie is gone', functi
 
 it('discards a local copy the server no longer accepts', function () {
     $page = visit('/settings');
+    $page->assertPresent('[data-testid="settings-schedule-no-schedule"]');
 
     $page->script("localStorage.setItem('schedule-device:v1', JSON.stringify({ token: 'revoked-elsewhere', fingerprint: 'stale' })); 0");
     $page->navigate('/settings');
