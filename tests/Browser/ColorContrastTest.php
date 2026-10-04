@@ -2,7 +2,7 @@
 
 use App\Models\SchoolCalendarEvent;
 
-// WCAG 1.4.3 (text contrast), 1.4.11 (non-text contrast) and 1.4.1 (links in
+// WCAG 1.4.11 (non-text contrast) and 1.4.1 (links in
 // running text are not distinguished by colour alone), measured from
 // getComputedStyle in a real browser in both colour schemes.
 //
@@ -104,20 +104,28 @@ beforeEach(function () {
     }
 });
 
-$contrastAudit = function (string $url, bool $dark): array {
+// One visit per page: measure the light scheme, then switch to dark and measure again.
+// Text contrast is left to AxeTest (its color-contrast rule), which covers the same pages.
+$contrastAudit = function (string $url): array {
     $page = visit($url)->resize(1280, 900);
     $page->assertNoJavaScriptErrors()->assertPresent('main#main-content');
 
-    if ($dark) {
-        // The CSP blocks injected styles, so let colour transitions settle instead
-        // of measuring them half-way between the schemes.
-        $page->script("document.documentElement.classList.add('dark')");
-        $page->script('new Promise(resolve => setTimeout(resolve, 800))');
-    }
+    $light = json_decode($page->script(CONTRAST_AUDIT_SCRIPT), true);
 
-    $result = json_decode($page->script(CONTRAST_AUDIT_SCRIPT), true);
+    // The CSP blocks injected styles, so let colour transitions settle instead
+    // of measuring them half-way between the schemes.
+    $page->script("document.documentElement.classList.add('dark')");
+    $page->script('new Promise(resolve => setTimeout(resolve, 800))');
 
-    return array_map(fn (array $items) => array_map(fn (string $item) => ($dark ? 'dark ' : 'light ')."{$url}: {$item}", $items), $result);
+    $dark = json_decode($page->script(CONTRAST_AUDIT_SCRIPT), true);
+
+    return [
+        'border' => [
+            ...array_map(fn (string $item) => "light {$url}: {$item}", $light['border']),
+            ...array_map(fn (string $item) => "dark {$url}: {$item}", $dark['border']),
+        ],
+        'links' => array_map(fn (string $item) => "{$url}: {$item}", $light['links']),
+    ];
 };
 
 $pages = [
@@ -137,14 +145,9 @@ $pages = [
     'school calendar' => '/school-calendar',
 ];
 
-it('keeps text at WCAG AA contrast', function (string $url, bool $dark) use ($contrastAudit) {
-    expect($contrastAudit($url, $dark)['text'])->toBe([]);
-})->with($pages)->with([false, true]);
+it('keeps input borders and switch tracks at 3:1 and underlines links in running text', function (string $url) use ($contrastAudit) {
+    $audit = $contrastAudit($url);
 
-it('keeps input borders and switch tracks at 3:1 against their surroundings', function (string $url, bool $dark) use ($contrastAudit) {
-    expect($contrastAudit($url, $dark)['border'])->toBe([]);
-})->with($pages)->with([false, true]);
-
-it('underlines links inside running text', function (string $url) use ($contrastAudit) {
-    expect($contrastAudit($url, false)['links'])->toBe([]);
+    expect($audit['border'])->toBe([])
+        ->and($audit['links'])->toBe([]);
 })->with($pages);
