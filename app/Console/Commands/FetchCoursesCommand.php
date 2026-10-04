@@ -63,6 +63,10 @@ final class FetchCoursesCommand extends Command
                     ['name' => $courseData['name'], 'term' => $term],
                 );
 
+                if ($course->is_special_program_only) {
+                    $course->update(['is_special_program_only' => false]);
+                }
+
                 foreach ($courseData['classes'] as $classData) {
                     $code = $this->normalizeClassCode($classData['code'], $term);
                     $type = $classData['type']->value;
