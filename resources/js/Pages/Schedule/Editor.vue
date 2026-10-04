@@ -117,6 +117,13 @@ function goToStep(target) {
   })
 }
 
+// Switching through the step radios keeps focus on the radio so arrow keys
+// keep working; the buttons move focus to the new step's heading instead.
+function switchStep(target) {
+  step.value = target
+  stepError.value = ''
+}
+
 function selectTerm(term) {
   const url = editing.value
     ? `/schedules/${props.viewModel.scheduleUuid}/edit`
@@ -224,22 +231,38 @@ const steps = [
         </div>
       </div>
 
-      <ol class="mb-6 flex flex-wrap gap-3" data-testid="schedule-steps">
-        <li
-          v-for="item in steps"
-          :key="item.number"
-          :aria-current="step === item.number ? 'step' : null"
-          class="flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-semibold"
-          :class="
-            step === item.number
-              ? 'border-theme-700 bg-theme-700 text-white'
-              : 'border-theme-300 text-theme-800 dark:border-zinc-600 dark:text-zinc-200'
-          "
-        >
-          <span class="tabular-nums">{{ item.number }}</span>
-          {{ item.label }}
-        </li>
-      </ol>
+      <fieldset class="mb-6" data-testid="schedule-steps">
+        <legend class="sr-only">步驟</legend>
+        <div class="flex flex-wrap gap-3">
+          <label
+            v-for="item in steps"
+            :key="item.number"
+            :data-testid="'schedule-step-label-' + item.number"
+            class="flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-semibold focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-theme-700"
+            :class="[
+              step === item.number
+                ? 'border-theme-700 bg-theme-700 text-white'
+                : 'border-theme-300 text-theme-800 dark:border-zinc-600 dark:text-zinc-200',
+              item.number === 2 && selectedItems.length === 0
+                ? 'cursor-not-allowed opacity-60'
+                : 'cursor-pointer',
+            ]"
+          >
+            <input
+              type="radio"
+              name="schedule-step"
+              class="sr-only"
+              :value="item.number"
+              :data-testid="'schedule-step-' + item.number"
+              :checked="step === item.number"
+              :disabled="item.number === 2 && selectedItems.length === 0"
+              @change="switchStep(item.number)"
+            />
+            <span class="tabular-nums">{{ item.number }}</span>
+            {{ item.label }}
+          </label>
+        </div>
+      </fieldset>
 
       <!-- Step 1: courses -->
       <div v-if="step === 1" data-testid="schedule-step-courses">
@@ -251,7 +274,7 @@ const steps = [
           選擇課程
         </h3>
         <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
-          勾選這學期要修的課程（最多 {{ MAX_COURSES }} 門），下一步再選擇班級。
+          請選擇本學期課程（最多 {{ MAX_COURSES }} 門）。
         </p>
 
         <CourseFilters :filters="filters" />

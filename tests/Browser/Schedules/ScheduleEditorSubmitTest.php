@@ -52,3 +52,18 @@ it('opens an existing schedule on the class step', function () {
         ->assertPresent('[data-testid="schedule-step-classes"]')
         ->assertPresent('[data-testid="selected-item-'.$course->id.'"]');
 });
+
+it('switches between the steps with the step radios', function () {
+    config()->set('app.current_semester', '2025B');
+
+    $course = Course::factory()->create(['term' => '2025B', 'name' => '步驟切換課程']);
+
+    visit(route('schedules.create', ['term' => '2025B']))
+        ->assertPresent('[data-testid="schedule-step-2"][disabled]')
+        ->assertSee('請選擇本學期課程（最多 14 門）。')
+        ->click('[data-testid="course-checkbox-'.$course->id.'"]')
+        ->click('[data-testid="schedule-step-label-2"]')
+        ->assertPresent('[data-testid="selected-item-'.$course->id.'"]')
+        ->click('[data-testid="schedule-step-label-1"]')
+        ->assertChecked('[data-testid="course-checkbox-'.$course->id.'"]');
+});
