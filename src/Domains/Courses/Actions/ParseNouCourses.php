@@ -10,8 +10,10 @@ use DOMElement;
 use DOMNode;
 use DOMXPath;
 
-final class ParseNouCourses
+final readonly class ParseNouCourses
 {
+    public function __construct(private ParseNouClassText $text = new ParseNouClassText) {}
+
     public function __invoke(string $html, CourseClassType $type): array
     {
         if (trim($html) === '') {
@@ -35,7 +37,7 @@ final class ParseNouCourses
                 continue;
             }
 
-            $courseName = $this->extractCourseName(trim($titleNode->textContent));
+            $courseName = $this->text->courseName(trim($titleNode->textContent));
 
             if ($courseName === '') {
                 continue;
@@ -43,8 +45,8 @@ final class ParseNouCourses
 
             $timeNode = $xpath->query('.//h6[contains(@class, "card-subtitle")]', $card)->item(0);
             $timeText = $timeNode ? trim($timeNode->textContent) : '';
-            $defaultTime = $this->extractTime($timeText);
-            $sessionTimeOverrides = $this->extractSessionTimeOverrides($timeText);
+            $defaultTime = $this->text->time($timeText);
+            $sessionTimeOverrides = $this->text->sessionTimeOverrides($timeText);
             $footers = $xpath->query('.//div[contains(@class, "card-footer")]', $card);
             $classes = [];
 
@@ -139,60 +141,6 @@ final class ParseNouCourses
         return null;
     }
 
-    private function extractCourseName(string $titleText): string
-    {
-        if (preg_match('/^\d+\.(.+)$/', $titleText, $matches)) {
-            return $this->stripClassTimeSuffix(trim($matches[1]));
-        }
-
-        return '';
-    }
-
-    /**
-     * Strip a trailing class-time-slot suffix like "(上午班)" or "（夜間班）" so that
-     * the same course offered across multiple time slots is treated as one course.
-     */
-    private function stripClassTimeSuffix(string $courseName): string
-    {
-        return trim(preg_replace('/[（(][^（）()]*班[）)]$/u', '', $courseName) ?? $courseName);
-    }
-
-    private function extractTime(string $text): ?array
-    {
-        if (preg_match('/(\d{1,2}:\d{2})\s*[-~]\s*(\d{1,2}:\d{2})/', $text, $matches)) {
-            return [
-                'start' => $matches[1],
-                'end' => $matches[2],
-            ];
-        }
-
-        return null;
-    }
-
-    private function extractSessionTimeOverrides(string $text): array
-    {
-        $overrides = [];
-
-        if (preg_match_all('/第([\d、,]+)次[：:]\s*(\d{1,2}:\d{2})\s*[-~]\s*(\d{1,2}:\d{2})/u', $text, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $match) {
-                $sessionNumbers = preg_split('/[、,]/u', $match[1]);
-
-                foreach ($sessionNumbers as $sessionNumber) {
-                    $session = (int) trim($sessionNumber);
-
-                    if ($session > 0) {
-                        $overrides[$session] = [
-                            'start_time' => $match[2],
-                            'end_time' => $match[3],
-                        ];
-                    }
-                }
-            }
-        }
-
-        return $overrides;
-    }
-
     private function parseClassFooter(DOMNode $footer, DOMXPath $xpath, CourseClassType $type, ?array $defaultTime, array $sessionTimeOverrides): ?array
     {
         $imgNode = $xpath->query('.//class_icon//img', $footer)->item(0);
@@ -225,10 +173,10 @@ final class ParseNouCourses
             'type' => $type,
             'start_time' => $time['start'],
             'end_time' => $time['end'],
-            'teacher_name' => $teacherNode ? $this->extractTeacherName(trim($teacherNode->textContent)) : '',
+            'teacher_name' => $teacherNode ? $this->text->teacherName(trim($teacherNode->textContent)) : '',
             'link' => $linkNode instanceof DOMElement ? $linkNode->getAttribute('href') : '',
             'backup_classroom_url' => null,
-            'dates' => $dateNode ? $this->extractDates(trim($dateNode->textContent)) : [],
+            'dates' => $dateNode ? $this->text->dates(trim($dateNode->textContent)) : [],
             'schedule_time_overrides' => $sessionTimeOverrides,
         ];
     }
@@ -264,23 +212,5 @@ final class ParseNouCourses
         }
 
         return '';
-    }
-
-    private function extractTeacherName(string $text): string
-    {
-        $text = preg_replace('/\s+/', ' ', $text) ?? $text;
-
-        if (preg_match('/^(.+?老師)/', $text, $matches)) {
-            return trim($matches[1]);
-        }
-
-        return trim($text);
-    }
-
-    private function extractDates(string $text): array
-    {
-        preg_match_all('/(\d{2}\/\d{2})/', $text, $matches);
-
-        return $matches[1] ?? [];
     }
 }
