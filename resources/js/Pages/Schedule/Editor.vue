@@ -59,9 +59,25 @@ const filters = reactive(useCourseFilters(courseRows))
 
 const scheduleName = ref(props.viewModel.scheduleName ?? '')
 
+// 專班: each entry's courses carry exactly that 專班's class, so a saved item
+// whose class belongs to one is resolved from here rather than from the
+// 一般生 course list (專班-only courses are not in it).
+const programs = computed(() => props.viewModel.programs ?? [])
+
+const programCourseByClassId = computed(
+  () =>
+    new Map(
+      programs.value.flatMap(program =>
+        program.courses.map(course => [course.classes[0].id, course])
+      )
+    )
+)
+
 function initialSelection() {
   return (props.viewModel.selectedItems ?? []).flatMap(item => {
-    const fullCourse = allCourses.value.find(c => c.id === item.courseId)
+    const fullCourse =
+      programCourseByClassId.value.get(item.classId) ??
+      allCourses.value.find(c => c.id === item.courseId)
 
     return fullCourse
       ? [{ course: fullCourse, selectedClassId: item.classId }]
@@ -93,6 +109,69 @@ function toggleCourse(row) {
   selectedItems.value.push({
     course,
     selectedClassId: course.classes.length > 0 ? course.classes[0].id : null,
+  })
+}
+
+const selectedRegion = ref('')
+const selectedProgramId = ref('')
+const programError = ref('')
+
+const regions = computed(() => {
+  const seen = new Map()
+
+  programs.value.forEach(program => {
+    if (!seen.has(program.region)) {
+      seen.set(program.region, program.region_label)
+    }
+  })
+
+  return [...seen].map(([region, label]) => ({ region, label }))
+})
+
+const programsInRegion = computed(() =>
+  programs.value.filter(program => program.region === selectedRegion.value)
+)
+
+watch(selectedRegion, () => {
+  selectedProgramId.value = ''
+  programError.value = ''
+})
+
+function isProgramItem(item) {
+  return item.course.classes.every(c => c.type === 'special_program')
+}
+
+// Adds every course of the chosen 專班. A course already picked (e.g. as a
+// 一般課程) switches to the 專班's class instead of being added twice.
+function addProgram() {
+  const program = programs.value.find(
+    p => String(p.id) === selectedProgramId.value
+  )
+
+  if (!program) {
+    return
+  }
+
+  const added = program.courses.filter(
+    course => !selectedIds.value.includes(course.id)
+  )
+
+  if (selectedItems.value.length + added.length > MAX_COURSES) {
+    programError.value = `加入後會超過 ${MAX_COURSES} 門課程的上限，請先移除部分課程。`
+    return
+  }
+
+  programError.value = ''
+
+  program.courses.forEach(course => {
+    const entry = { course, selectedClassId: course.classes[0].id }
+    const index = selectedItems.value.findIndex(i => i.course.id === course.id)
+
+    if (index === -1) {
+      selectedItems.value.push(entry)
+    } else {
+      selectedItems.value.splice(index, 1, entry)
+    }
   })
 }
 
@@ -140,6 +219,8 @@ watch(
     selectedItems.value = initialSelection()
     step.value = editing.value && selectedItems.value.length > 0 ? 2 : 1
     stepError.value = ''
+    selectedRegion.value = ''
+    programError.value = ''
   }
 )
 
@@ -277,6 +358,84 @@ const steps = [
           請選擇本學期課程（最多 {{ MAX_COURSES }} 門）。
         </p>
 
+        <section
+          v-if="programs.length > 0"
+          data-testid="program-picker"
+          aria-labelledby="program-picker-heading"
+          class="mb-6 rounded-lg border border-theme-200 bg-theme-50 p-4 dark:border-zinc-700 dark:bg-zinc-950"
+        >
+          <h4
+            id="program-picker-heading"
+            class="mb-3 text-lg font-semibold text-theme-900 dark:text-zinc-100"
+          >
+            加入專班課程
+          </h4>
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div class="flex-1">
+              <label
+                for="program-region"
+                class="mb-1 block text-sm font-semibold text-theme-800 dark:text-zinc-200"
+              >
+                地區
+              </label>
+              <Select
+                id="program-region"
+                v-model="selectedRegion"
+                data-testid="program-region"
+              >
+                <option value="">請選擇地區</option>
+                <option
+                  v-for="item in regions"
+                  :key="item.region"
+                  :value="item.region"
+                >
+                  {{ item.label }}
+                </option>
+              </Select>
+            </div>
+            <div class="flex-1">
+              <label
+                for="program-name"
+                class="mb-1 block text-sm font-semibold text-theme-800 dark:text-zinc-200"
+              >
+                專班
+              </label>
+              <Select
+                id="program-name"
+                v-model="selectedProgramId"
+                :disabled="selectedRegion === ''"
+                data-testid="program-name"
+              >
+                <option value="">請選擇專班</option>
+                <option
+                  v-for="program in programsInRegion"
+                  :key="program.id"
+                  :value="String(program.id)"
+                >
+                  {{ program.name }}
+                </option>
+              </Select>
+            </div>
+            <button
+              type="button"
+              data-testid="program-add"
+              :disabled="selectedProgramId === ''"
+              class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-5 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
+              @click="addProgram"
+            >
+              加入
+            </button>
+          </div>
+          <p
+            v-if="programError"
+            role="alert"
+            data-testid="program-error"
+            class="mt-3 text-sm font-semibold text-red-700 dark:text-red-400"
+          >
+            {{ programError }}
+          </p>
+        </section>
+
         <CourseFilters :filters="filters" />
 
         <CourseGroupList
@@ -351,6 +510,29 @@ const steps = [
               class="rounded-lg border-2 border-dashed border-theme-300 bg-theme-100 p-3 text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-300"
             >
               尚未開課，選課後將自動列入課表，開課後請記得回來選擇班級。
+            </div>
+
+            <div
+              v-else-if="isProgramItem(item)"
+              data-testid="program-class-note"
+              class="rounded-lg border-2 border-theme-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900"
+            >
+              <div class="font-semibold text-theme-900 dark:text-zinc-100">
+                專班：{{ item.course.classes[0].code }}
+              </div>
+              <div
+                v-if="item.course.classes[0].start_time"
+                class="text-sm text-theme-700 dark:text-zinc-400"
+              >
+                {{ item.course.classes[0].start_time }} -
+                {{ item.course.classes[0].end_time }}
+              </div>
+              <div
+                v-if="item.course.classes[0].teacher_name"
+                class="text-sm text-theme-700 dark:text-zinc-400"
+              >
+                {{ item.course.classes[0].teacher_name }}
+              </div>
             </div>
 
             <ClassOptions
