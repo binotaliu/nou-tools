@@ -19,6 +19,7 @@ final class CourseClass extends Model
 
     protected $fillable = [
         'course_id',
+        'program_id',
         'code',
         'type',
         'start_time',
@@ -57,11 +58,30 @@ final class CourseClass extends Model
     }
 
     /**
+     * @return BelongsTo<Program, $this>
+     */
+    public function program(): BelongsTo
+    {
+        return $this->belongsTo(Program::class);
+    }
+
+    /**
      * @return HasMany<ClassSchedule, $this>
      */
     public function schedules(): HasMany
     {
         return $this->hasMany(ClassSchedule::class, 'class_id');
+    }
+
+    /**
+     * Classes open to 一般生, i.e. not tied to a 專班.
+     *
+     * @param  Builder<CourseClass>  $query
+     * @return Builder<CourseClass>
+     */
+    public function scopeGeneral(Builder $query): Builder
+    {
+        return $query->whereNull('program_id');
     }
 
     /**

@@ -12,6 +12,7 @@ enum CourseClassType: string
     case FullRemote = 'full_remote';
     case MicroCredit = 'micro_credit';
     case ComputerLab = 'computer_lab';
+    case SpecialProgram = 'special_program';
 
     /**
      * @return array{start: string, end: string}|null
@@ -25,6 +26,7 @@ enum CourseClassType: string
             self::FullRemote => null,
             self::MicroCredit => null,
             self::ComputerLab => null,
+            self::SpecialProgram => null,
         };
     }
 
@@ -37,6 +39,7 @@ enum CourseClassType: string
             self::FullRemote => '全遠距',
             self::MicroCredit => '微學分',
             self::ComputerLab => '電腦實習',
+            self::SpecialProgram => '專班',
         };
     }
 

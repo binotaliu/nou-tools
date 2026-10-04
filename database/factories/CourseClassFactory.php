@@ -23,11 +23,15 @@ final class CourseClassFactory extends Factory
      */
     public function definition(): array
     {
-        $type = fake()->randomElement(CourseClassType::cases());
+        $type = fake()->randomElement(array_filter(
+            CourseClassType::cases(),
+            fn (CourseClassType $case): bool => $case !== CourseClassType::SpecialProgram,
+        ));
         $timeSlot = $type->defaultTimeSlot();
 
         return [
             'course_id' => Course::factory(),
+            'program_id' => null,
             'code' => 'zzz'.fake()->numerify('###'),
             'type' => $type,
             'start_time' => $timeSlot ? $timeSlot['start'] : '09:00',

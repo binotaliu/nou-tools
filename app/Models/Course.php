@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Database\Factories\CourseFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,6 +19,7 @@ final class Course extends Model
     protected $fillable = [
         'name',
         'term',
+        'is_special_program_only',
         'description_url',
         'credit_type',
         'credits',
@@ -40,7 +42,19 @@ final class Course extends Model
         return [
             'midterm_date' => 'date',
             'final_date' => 'date',
+            'is_special_program_only' => 'bool',
         ];
+    }
+
+    /**
+     * Courses 一般生 can pick, i.e. not offered only inside a 專班.
+     *
+     * @param  Builder<Course>  $query
+     * @return Builder<Course>
+     */
+    public function scopeGeneral(Builder $query): Builder
+    {
+        return $query->where('is_special_program_only', false);
     }
 
     /**
