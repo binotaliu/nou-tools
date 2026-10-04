@@ -7,6 +7,7 @@ namespace NouTools\Domains\Courses\Actions;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
+use NouTools\Domains\Courses\Support\ParseNouClassText;
 
 /**
  * Parses one 專班 region page under vc.nou.edu.tw/svc/. Each `<h2>` is a

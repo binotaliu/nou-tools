@@ -1,6 +1,6 @@
 <?php
 
-use NouTools\Domains\Courses\Actions\ParseNouClassText;
+use NouTools\Domains\Courses\Support\ParseNouClassText;
 
 beforeEach(function () {
     $this->text = new ParseNouClassText;

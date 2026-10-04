@@ -11,22 +11,21 @@ use Inertia\Testing\AssertableInertia as Assert;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\withoutVite;
 
+$programClassFor = function (Course $course, ?Program $program = null): CourseClass {
+    return CourseClass::factory()->for($course)->create([
+        'program_id' => ($program ?? Program::factory()->create())->id,
+        'type' => CourseClassType::SpecialProgram,
+    ]);
+};
+
 beforeEach(function () {
     withoutVite();
     config(['app.current_semester' => '2026A']);
 });
 
-function programClassFor(Course $course, ?Program $program = null): CourseClass
-{
-    return CourseClass::factory()->for($course)->create([
-        'program_id' => ($program ?? Program::factory()->create())->id,
-        'type' => CourseClassType::SpecialProgram,
-    ]);
-}
-
-it('includes 專班-only courses in the course list API', function () {
+it('includes 專班-only courses in the course list API', function () use ($programClassFor) {
     Course::factory()->create(['term' => '2026A', 'name' => '一般課程']);
-    programClassFor(Course::factory()->create(['term' => '2026A', 'name' => '專班專屬課程', 'is_special_program_only' => true]));
+    $programClassFor(Course::factory()->create(['term' => '2026A', 'name' => '專班專屬課程', 'is_special_program_only' => true]));
 
     getJson('/api/v1/courses')
         ->assertOk()
@@ -35,10 +34,10 @@ it('includes 專班-only courses in the course list API', function () {
         ->assertJsonFragment(['name' => '專班專屬課程', 'isSpecialProgramOnly' => true]);
 });
 
-it('includes 專班 classes in the course detail API', function () {
+it('includes 專班 classes in the course detail API', function () use ($programClassFor) {
     $course = Course::factory()->create(['term' => '2026A']);
     $general = CourseClass::factory()->for($course)->create(['code' => 'ZZZ900', 'type' => CourseClassType::Morning]);
-    $program = programClassFor($course, Program::factory()->create(['name' => '某某專班']));
+    $program = $programClassFor($course, Program::factory()->create(['name' => '某某專班']));
     ClassSchedule::factory()->for($program, 'courseClass')->create(['date' => '2026-10-17']);
 
     getJson("/api/v1/courses/{$course->id}")
@@ -48,11 +47,11 @@ it('includes 專班 classes in the course detail API', function () {
         ->assertJsonFragment(['id' => $program->id, 'programName' => '某某專班', 'type' => 'special_program']);
 });
 
-it('keeps 專班-only courses and classes out of the schedule editor', function () {
+it('keeps 專班-only courses and classes out of the schedule editor', function () use ($programClassFor) {
     $shared = Course::factory()->create(['term' => '2026A', 'name' => '共用課程']);
     $generalClass = CourseClass::factory()->for($shared)->create(['type' => CourseClassType::Morning]);
-    programClassFor($shared);
-    programClassFor(Course::factory()->create(['term' => '2026A', 'name' => '專班專屬課程', 'is_special_program_only' => true]));
+    $programClassFor($shared);
+    $programClassFor(Course::factory()->create(['term' => '2026A', 'name' => '專班專屬課程', 'is_special_program_only' => true]));
 
     $this->get(route('schedules.create'))
         ->assertOk()
@@ -63,9 +62,9 @@ it('keeps 專班-only courses and classes out of the schedule editor', function 
             ->where('viewModel.courses.0.classes.0.id', $generalClass->id));
 });
 
-it('keeps 專班-only courses and classes out of the course schedule page', function () {
+it('keeps 專班-only courses and classes out of the course schedule page', function () use ($programClassFor) {
     Course::factory()->create(['term' => '2026A', 'name' => '一般課程']);
-    programClassFor(Course::factory()->create(['term' => '2026A', 'name' => '專班專屬課程', 'is_special_program_only' => true]));
+    $programClassFor(Course::factory()->create(['term' => '2026A', 'name' => '專班專屬課程', 'is_special_program_only' => true]));
 
     $this->get(route('course.schedule'))
         ->assertOk()
@@ -74,10 +73,10 @@ it('keeps 專班-only courses and classes out of the course schedule page', func
             ->where('viewModel.microCreditOrRemoteCourses.0.name', '一般課程'));
 });
 
-it('keeps 專班 classes off the course detail page and the sitemap', function () {
+it('keeps 專班 classes off the course detail page and the sitemap', function () use ($programClassFor) {
     $course = Course::factory()->create(['term' => '2026A']);
     CourseClass::factory()->for($course)->create(['code' => 'ZZZ900', 'type' => CourseClassType::Morning]);
-    programClassFor($course, Program::factory()->create(['name' => '某某專班']));
+    $programClassFor($course, Program::factory()->create(['name' => '某某專班']));
     $only = Course::factory()->create(['term' => '2026A', 'is_special_program_only' => true]);
 
     $this->get(route('course.show', $course))
@@ -90,10 +89,10 @@ it('keeps 專班 classes off the course detail page and the sitemap', function (
         ->assertDontSee(route('course.show', $only), false);
 });
 
-it('keeps 專班 classes out of today\'s video courses', function () {
+it('keeps 專班 classes out of today\'s video courses', function () use ($programClassFor) {
     $today = Carbon::now('Asia/Taipei')->format('Y-m-d');
     $course = Course::factory()->create(['term' => '2026A', 'name' => '今日課程']);
-    $class = programClassFor($course);
+    $class = $programClassFor($course);
     ClassSchedule::factory()->for($class, 'courseClass')->create(['date' => $today]);
 
     $this->get(route('video-classes.index'))

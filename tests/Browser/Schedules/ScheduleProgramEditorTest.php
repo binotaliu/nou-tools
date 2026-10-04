@@ -9,8 +9,7 @@ use App\Models\StudentSchedule;
 // 專班生 add the school's ready-made course set from the editor's picker; the
 // courses carry the 專班's own class, so there is no class to choose.
 
-function browserProgramClass(Program $program, string $courseName): CourseClass
-{
+$browserProgramClass = function (Program $program, string $courseName): CourseClass {
     $course = Course::query()->firstOrCreate(
         ['term' => '2025B', 'name' => $courseName],
         ['is_special_program_only' => true],
@@ -21,14 +20,18 @@ function browserProgramClass(Program $program, string $courseName): CourseClass
         'code' => $program->name,
         'type' => CourseClassType::SpecialProgram,
     ]);
-}
+};
 
-it('adds a 專班\'s courses, keeps their class and saves the schedule', function () {
+$studentScheduleItemClassIds = function (): array {
+    return StudentSchedule::query()->firstOrFail()->items()->pluck('course_class_id')->all();
+};
+
+it('adds a 專班\'s courses, keeps their class and saves the schedule', function () use ($browserProgramClass) {
     config()->set('app.current_semester', '2025B');
 
     $program = Program::factory()->create(['term' => '2025B', 'region' => 'tc', 'name' => '測試甲專班']);
-    $first = browserProgramClass($program, '測試課程甲');
-    $second = browserProgramClass($program, '測試課程乙');
+    $first = $browserProgramClass($program, '測試課程甲');
+    $second = $browserProgramClass($program, '測試課程乙');
 
     visit(route('schedules.create', ['term' => '2025B']))
         ->assertSee('已選 0 / 14 門課程')
@@ -50,7 +53,7 @@ it('adds a 專班\'s courses, keeps their class and saves the schedule', functio
         ->toBe([$first->id, $second->id]);
 });
 
-it('swaps an already picked 一般課程 for the 專班\'s class instead of duplicating it', function () {
+it('swaps an already picked 一般課程 for the 專班\'s class instead of duplicating it', function () use ($studentScheduleItemClassIds) {
     config()->set('app.current_semester', '2025B');
 
     $general = Course::factory()->create(['term' => '2025B', 'name' => '共用課程']);
@@ -75,14 +78,14 @@ it('swaps an already picked 一般課程 for the 專班\'s class instead of dupl
         ->click('[data-testid="schedule-submit"]')
         ->assertSee('課表已保存！');
 
-    expect(StudentScheduleItemClassIds())->toBe([$programClass->id]);
+    expect($studentScheduleItemClassIds())->toBe([$programClass->id]);
 });
 
-it('opens a saved 專班 schedule on the class step without dropping its courses', function () {
+it('opens a saved 專班 schedule on the class step without dropping its courses', function () use ($browserProgramClass) {
     config()->set('app.current_semester', '2025B');
 
     $program = Program::factory()->create(['term' => '2025B', 'region' => 'tc', 'name' => '測試甲專班']);
-    $class = browserProgramClass($program, '測試課程甲');
+    $class = $browserProgramClass($program, '測試課程甲');
 
     $schedule = StudentSchedule::factory()->create();
     $schedule->items()->create(['course_id' => $class->course_id, 'course_class_id' => $class->id]);
@@ -94,8 +97,3 @@ it('opens a saved 專班 schedule on the class step without dropping its courses
 
     expect($schedule->items()->pluck('course_class_id')->all())->toBe([$class->id]);
 });
-
-function StudentScheduleItemClassIds(): array
-{
-    return StudentSchedule::query()->firstOrFail()->items()->pluck('course_class_id')->all();
-}

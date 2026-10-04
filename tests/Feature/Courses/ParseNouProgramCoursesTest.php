@@ -4,7 +4,7 @@ use NouTools\Domains\Courses\Actions\ParseNouProgramCourses;
 
 beforeEach(function () {
     $this->programs = (new ParseNouProgramCourses)(
-        file_get_contents(__DIR__.'/../../Fixtures/svc_sample.html'),
+        file_get_contents(__DIR__.'/../../fixtures/svc_sample.html'),
     );
 });
 

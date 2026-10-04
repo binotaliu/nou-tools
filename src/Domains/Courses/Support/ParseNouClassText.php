@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NouTools\Domains\Courses\Actions;
+namespace NouTools\Domains\Courses\Support;
 
 /**
  * Text snippets shared by the course pages under vc.nou.edu.tw (the 一般生

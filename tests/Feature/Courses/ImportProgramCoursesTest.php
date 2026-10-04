@@ -11,15 +11,14 @@ use Illuminate\Support\Facades\Http;
 use NouTools\Domains\Courses\Actions\ImportProgramCourses;
 use NouTools\Domains\Courses\Actions\ParseNouProgramCourses;
 
-function sampleProgramsByRegion(): array
-{
-    $html = file_get_contents(__DIR__.'/../../Fixtures/svc_sample.html');
+$sampleProgramsByRegion = function (): array {
+    $html = file_get_contents(__DIR__.'/../../fixtures/svc_sample.html');
 
     return ['tc' => (new ParseNouProgramCourses)($html)];
-}
+};
 
-it('stores programs, courses, classes and class dates', function () {
-    app(ImportProgramCourses::class)('2026A', sampleProgramsByRegion());
+it('stores programs, courses, classes and class dates', function () use ($sampleProgramsByRegion) {
+    app(ImportProgramCourses::class)('2026A', $sampleProgramsByRegion());
 
     expect(Program::query()->count())->toBe(2)
         ->and(Program::query()->orderBy('position')->pluck('region')->all())->toBe(['tc', 'tc']);
@@ -41,8 +40,8 @@ it('stores programs, courses, classes and class dates', function () {
         ->and($second->start_time)->toBe('14:00');
 });
 
-it('rolls January dates of a fall term into the next year', function () {
-    app(ImportProgramCourses::class)('2026A', sampleProgramsByRegion());
+it('rolls January dates of a fall term into the next year', function () use ($sampleProgramsByRegion) {
+    app(ImportProgramCourses::class)('2026A', $sampleProgramsByRegion());
 
     $class = Course::query()->where('name', '測試課程丙')->firstOrFail()->classes()->firstOrFail();
 
@@ -50,9 +49,9 @@ it('rolls January dates of a fall term into the next year', function () {
         ->toBe(['2026-10-17', '2026-10-24', '2027-01-09']);
 });
 
-it('is idempotent', function () {
-    app(ImportProgramCourses::class)('2026A', sampleProgramsByRegion());
-    app(ImportProgramCourses::class)('2026A', sampleProgramsByRegion());
+it('is idempotent', function () use ($sampleProgramsByRegion) {
+    app(ImportProgramCourses::class)('2026A', $sampleProgramsByRegion());
+    app(ImportProgramCourses::class)('2026A', $sampleProgramsByRegion());
 
     expect(Program::query()->count())->toBe(2)
         ->and(Course::query()->count())->toBe(4)
@@ -60,20 +59,20 @@ it('is idempotent', function () {
         ->and(ClassSchedule::query()->count())->toBe(4 + 4 + 3 + 2 + 2);
 });
 
-it('shares an existing general course without flagging it', function () {
+it('shares an existing general course without flagging it', function () use ($sampleProgramsByRegion) {
     $general = Course::factory()->create(['name' => '測試課程甲', 'term' => '2026A']);
 
-    app(ImportProgramCourses::class)('2026A', sampleProgramsByRegion());
+    app(ImportProgramCourses::class)('2026A', $sampleProgramsByRegion());
 
     expect(Course::query()->where('name', '測試課程甲')->count())->toBe(1)
         ->and($general->fresh()->is_special_program_only)->toBeFalse()
         ->and($general->classes()->whereNotNull('program_id')->count())->toBe(2);
 });
 
-it('drops dates the page no longer lists', function () {
-    app(ImportProgramCourses::class)('2026A', sampleProgramsByRegion());
+it('drops dates the page no longer lists', function () use ($sampleProgramsByRegion) {
+    app(ImportProgramCourses::class)('2026A', $sampleProgramsByRegion());
 
-    $programs = sampleProgramsByRegion();
+    $programs = $sampleProgramsByRegion();
     $programs['tc'][0]['courses'][0]['dates'] = ['09/19'];
 
     app(ImportProgramCourses::class)('2026A', $programs);
@@ -84,10 +83,10 @@ it('drops dates the page no longer lists', function () {
     expect($class->schedules)->toHaveCount(1);
 });
 
-it('removes stale programs only when asked', function () {
-    app(ImportProgramCourses::class)('2026A', sampleProgramsByRegion());
+it('removes stale programs only when asked', function () use ($sampleProgramsByRegion) {
+    app(ImportProgramCourses::class)('2026A', $sampleProgramsByRegion());
 
-    $fewer = sampleProgramsByRegion();
+    $fewer = $sampleProgramsByRegion();
     array_pop($fewer['tc']);
 
     app(ImportProgramCourses::class)('2026A', $fewer);
@@ -100,8 +99,8 @@ it('removes stale programs only when asked', function () {
         ->and(Course::query()->where('name', '測試課程甲')->exists())->toBeTrue();
 });
 
-it('keeps stale classes that a schedule already uses', function () {
-    app(ImportProgramCourses::class)('2026A', sampleProgramsByRegion());
+it('keeps stale classes that a schedule already uses', function () use ($sampleProgramsByRegion) {
+    app(ImportProgramCourses::class)('2026A', $sampleProgramsByRegion());
 
     $class = Course::query()->where('name', '測試課程丁')->firstOrFail()->classes()->firstOrFail();
     $item = StudentScheduleItem::query()->create([
@@ -110,7 +109,7 @@ it('keeps stale classes that a schedule already uses', function () {
         'course_class_id' => $class->id,
     ]);
 
-    $fewer = sampleProgramsByRegion();
+    $fewer = $sampleProgramsByRegion();
     array_pop($fewer['tc']);
 
     app(ImportProgramCourses::class)('2026A', $fewer, removeStale: true);
@@ -119,18 +118,18 @@ it('keeps stale classes that a schedule already uses', function () {
         ->and(Program::query()->count())->toBe(2);
 });
 
-it('leaves other terms alone when removing stale data', function () {
+it('leaves other terms alone when removing stale data', function () use ($sampleProgramsByRegion) {
     $other = Program::factory()->create(['term' => '2025B']);
     CourseClass::factory()->create(['program_id' => $other->id, 'type' => CourseClassType::SpecialProgram]);
 
-    app(ImportProgramCourses::class)('2026A', sampleProgramsByRegion(), removeStale: true);
+    app(ImportProgramCourses::class)('2026A', $sampleProgramsByRegion(), removeStale: true);
 
     expect(Program::query()->where('term', '2025B')->count())->toBe(1)
         ->and(CourseClass::query()->where('program_id', $other->id)->count())->toBe(1);
 });
 
 it('fetches every region through program:fetch', function () {
-    $html = file_get_contents(__DIR__.'/../../Fixtures/svc_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/svc_sample.html');
 
     Http::fake([
         'vc.nou.edu.tw/svc/tc.html' => Http::response($html, 200),
@@ -143,7 +142,7 @@ it('fetches every region through program:fetch', function () {
 });
 
 it('succeeds and removes stale data when every region page has programs', function () {
-    $html = file_get_contents(__DIR__.'/../../Fixtures/svc_sample.html');
+    $html = file_get_contents(__DIR__.'/../../fixtures/svc_sample.html');
     Http::fake(['vc.nou.edu.tw/svc/*' => Http::response($html, 200)]);
 
     Program::factory()->create(['term' => '2026A', 'name' => '已不存在的專班']);

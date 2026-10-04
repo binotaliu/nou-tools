@@ -2,8 +2,8 @@
 
 use App\Enums\CourseClassType;
 
-it('has six cases', function () {
-    expect(CourseClassType::cases())->toHaveCount(6);
+it('has seven cases', function () {
+    expect(CourseClassType::cases())->toHaveCount(7);
 });
 
 it('has correct string values', function (CourseClassType $type, string $value) {

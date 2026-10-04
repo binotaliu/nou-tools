@@ -9,6 +9,7 @@ use DOMDocument;
 use DOMElement;
 use DOMNode;
 use DOMXPath;
+use NouTools\Domains\Courses\Support\ParseNouClassText;
 
 final readonly class ParseNouCourses
 {
