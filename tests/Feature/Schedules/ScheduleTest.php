@@ -976,6 +976,38 @@ it('edit page shows tentative classes for a course that has no official class ye
     });
 });
 
+it('editor page hands over the department, credits and exam slot used by the course picker', function () {
+    config()->set('app.current_semester', '2025B');
+
+    $withExam = Course::factory()->create([
+        'term' => '2025B',
+        'name' => 'With Exam',
+        'department' => '管理學系',
+        'credits' => 3,
+        'final_date' => '2026-01-10',
+        'exam_time_start' => '15:00',
+        'exam_time_end' => '16:10',
+    ]);
+    $withoutExam = Course::factory()->create([
+        'term' => '2025B',
+        'name' => 'Without Exam',
+        'final_date' => null,
+        'exam_time_start' => null,
+        'exam_time_end' => null,
+    ]);
+
+    $this->get(route('schedules.create'))->assertInertia(function (Assert $page) use ($withExam, $withoutExam) {
+        $courses = collect($page->toArray()['props']['viewModel']['courses'])->keyBy('id');
+
+        expect($courses[$withExam->id])
+            ->department->toBe('管理學系')
+            ->credits->toBe(3)
+            ->exam_label->toContain('15:00 - 16:10')
+            ->exam_weekday_order->toBe(6);
+        expect($courses[$withoutExam->id]['exam_label'])->toBeNull();
+    });
+});
+
 it('create page form posts to store route and does not include method spoofing', function () {
     $response = $this->get(route('schedules.create'));
 

@@ -20,6 +20,16 @@ final class CourseScheduleGroupViewModel extends Data
         public DataCollection $courses,
     ) {}
 
+    public static function examLabel(Course $course): string
+    {
+        return sprintf(
+            '%s %s - %s',
+            $course->final_date->isoFormat('dddd'),
+            $course->exam_time_start,
+            $course->exam_time_end,
+        );
+    }
+
     /**
      * @param  Collection<int, Course>  $courses
      */
@@ -28,12 +38,7 @@ final class CourseScheduleGroupViewModel extends Data
         $first = $courses->first();
 
         return new self(
-            label: sprintf(
-                '%s %s - %s',
-                $first->final_date->isoFormat('dddd'),
-                $first->exam_time_start,
-                $first->exam_time_end,
-            ),
+            label: self::examLabel($first),
             weekdayOrder: $first->final_date->dayOfWeekIso,
             examTimeStart: $first->exam_time_start,
             courses: CourseScheduleCourseViewModel::collect(
