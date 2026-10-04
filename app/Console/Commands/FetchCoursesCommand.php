@@ -7,12 +7,12 @@ namespace App\Console\Commands;
 use App\Enums\CourseClassType;
 use App\Models\Course;
 use App\Models\CourseClass;
-use Carbon\CarbonInterface;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use NouTools\Domains\Courses\Actions\ParseNouCourses;
+use NouTools\Domains\Courses\Actions\ResolveClassDate;
 
 final class FetchCoursesCommand extends Command
 {
@@ -20,7 +20,7 @@ final class FetchCoursesCommand extends Command
 
     protected $description = 'Fetch course data from NOU website and save to database';
 
-    public function handle(ParseNouCourses $parseNouCourses): int
+    public function handle(ParseNouCourses $parseNouCourses, ResolveClassDate $resolveClassDate): int
     {
         $term = $this->argument('term');
 
@@ -29,8 +29,6 @@ final class FetchCoursesCommand extends Command
 
             return self::FAILURE;
         }
-
-        $year = $this->extractYear($term);
 
         $this->info("Fetching courses for term: {$term}");
 
@@ -94,7 +92,7 @@ final class FetchCoursesCommand extends Command
                     ]);
 
                     foreach ($classData['dates'] as $index => $dateString) {
-                        $date = $this->parseDate($dateString, $year, $term);
+                        $date = $resolveClassDate($dateString, $term);
 
                         if ($date !== null) {
                             $dateStr = $date->format('Y-m-d');
@@ -165,21 +163,6 @@ final class FetchCoursesCommand extends Command
         return $response->body();
     }
 
-    /**
-     * Extract the ROC year from the term and determine the calendar year.
-     */
-    private function extractYear(string $term): int
-    {
-        $yearPart = (int) substr($term, 0, 4);
-        $semester = substr($term, 4, 1);
-
-        if ($semester === 'B') {
-            return $yearPart + 1;
-        }
-
-        return $yearPart;
-    }
-
     private function isSummerTerm(string $term): bool
     {
         return substr($term, 4, 1) === 'C';
@@ -192,38 +175,5 @@ final class FetchCoursesCommand extends Command
         }
 
         return strtoupper($code);
-    }
-
-    /**
-     * Parse a date string like "03/09" into a Carbon date for the given year.
-     *
-     * Semester A runs from around September through January, crossing a
-     * calendar year boundary, so early-year months roll over to $year + 1.
-     */
-    private function parseDate(string $dateString, int $year, string $term): ?CarbonInterface
-    {
-        $parts = explode('/', $dateString);
-
-        if (count($parts) !== 2) {
-            return null;
-        }
-
-        $month = (int) $parts[0];
-        $day = (int) $parts[1];
-
-        if ($month < 1 || $month > 12 || $day < 1 || $day > 31) {
-            return null;
-        }
-
-        if ($this->isFallTerm($term) && $month <= 2) {
-            $year++;
-        }
-
-        return Date::create($year, $month, $day);
-    }
-
-    private function isFallTerm(string $term): bool
-    {
-        return substr($term, 4, 1) === 'A';
     }
 }
