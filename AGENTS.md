@@ -88,6 +88,7 @@ Shown on the homepage (`Components/Home/VideoCourses.vue`) and on its own page, 
 - **Parsing:** `ParseNouProgramCourses` (one `<h2>` per 專班, one card per course) shares `ParseNouClassText` with `ParseNouCourses`, including per-session time changes in both `第2次：HH:MM-HH:MM` and `第二次改1400-1540` forms. `ResolveClassDate` turns `MM/DD` into a date for the term.
 - **Import (`ImportProgramCourses`) is conservative:** it only removes 專班, classes and special-only courses that vanished from the pages when every region page was fetched, and it never deletes a class that a schedule already uses (that would cascade into students' items).
 - **Editor:** the schedule editor's step 1 has a 加入專班課程 picker (region, then 專班). Adding a 專班 adds all its courses with their fixed class (no class choice in step 2) and swaps any same course already picked. Saved items are resolved from `viewModel.programs` by class id, since 專班-only courses are not in the 一般生 list. `items.*.course_id` must be distinct.
+- **The public API includes 專班:** `/api/v1/courses` lists 專班-only courses (`isSpecialProgramOnly`) and `/api/v1/courses/{course}` returns every class, 專班 ones with `type: special_program` and `programName`. Only the web pages filter them out. Keep `docs/openapi.yaml` in step with these view models.
 - Test data uses made-up course and teacher names, never real ones (`tests/Fixtures/svc_sample.html`).
 
 ## 浣熊的空大雙週報 (Newsletter)

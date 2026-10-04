@@ -22,7 +22,6 @@ final readonly class ListCourses
         $term ??= config('app.current_semester');
 
         $courses = Course::query()
-            ->general()
             ->where('term', $term)
             ->orderBy('name')
             ->get();

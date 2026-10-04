@@ -16,6 +16,7 @@ final class CourseSummaryViewModel extends Data
         public int $id,
         public string $name,
         public string $term,
+        public bool $isSpecialProgramOnly,
     ) {}
 
     public static function fromModel(Course $course): self
@@ -24,6 +25,7 @@ final class CourseSummaryViewModel extends Data
             id: $course->id,
             name: $course->name,
             term: $course->term,
+            isSpecialProgramOnly: $course->is_special_program_only,
         );
     }
 }

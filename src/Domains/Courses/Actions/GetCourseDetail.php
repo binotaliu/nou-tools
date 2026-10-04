@@ -14,11 +14,18 @@ use NouTools\Domains\Courses\ViewModels\Api\CourseDetailViewModel;
  */
 final readonly class GetCourseDetail
 {
-    public function __invoke(Course $course): CourseDetailViewModel
+    /**
+     * @param  bool  $includePrograms  also load the 專班 classes; the public course page only shows 一般生 classes
+     */
+    public function __invoke(Course $course, bool $includePrograms = false): CourseDetailViewModel
     {
         $course->load([
             'textbook',
-            'classes' => fn ($q) => $q->official()->general()->orderBy('type')->orderBy('code'),
+            'classes' => fn ($q) => $q->official()
+                ->when(! $includePrograms, fn ($query) => $query->general())
+                ->with('program')
+                ->orderBy('type')
+                ->orderBy('code'),
             'classes.schedules' => fn ($q) => $q->orderBy('date'),
         ]);
 

@@ -27,6 +27,6 @@ final class CourseController extends Controller
 
     public function show(Course $course, GetCourseDetail $action): CourseDetailViewModel
     {
-        return $action($course);
+        return $action($course, includePrograms: true);
     }
 }

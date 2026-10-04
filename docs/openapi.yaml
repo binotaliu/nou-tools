@@ -23,7 +23,7 @@ paths:
         - Courses
       summary: 列出 指定學期的課程
       description: |
-        回傳精簡課程列表（課程 ID、名稱、學期）。
+        回傳精簡課程列表（課程 ID、名稱、學期）。包含專班專屬課程，可用 `isSpecialProgramOnly` 區分。
         未提供 `term` 時，會使用系統判定的目前學期。
       operationId: listCourses
       parameters:
@@ -52,7 +52,7 @@ paths:
         - Courses
       summary: 取得 課程詳細資訊
       description: |
-        回傳課程完整內容，包含考試日期、參考書、考古題與班級資訊。
+        回傳課程完整內容，包含考試日期、參考書、考古題與班級資訊。班級包含一般生的班級與專班的班級，專班班級的 `type` 為 `special_program`，`programName` 為專班名稱。
       operationId: getCourseDetail
       parameters:
         - name: course
@@ -99,6 +99,7 @@ components:
         - id
         - name
         - term
+        - isSpecialProgramOnly
       properties:
         id:
           type: integer
@@ -109,12 +110,17 @@ components:
         term:
           type: string
           example: 2025B
+        isSpecialProgramOnly:
+          type: boolean
+          description: 是否為專班專屬課程（一般生沒有開課）
+          example: false
     CourseDetail:
       type: object
       required:
         - id
         - name
         - term
+        - isSpecialProgramOnly
         - previousExams
         - classes
       properties:
@@ -127,6 +133,10 @@ components:
         term:
           type: string
           example: 2025B
+        isSpecialProgramOnly:
+          type: boolean
+          description: 是否為專班專屬課程（一般生沒有開課）
+          example: false
         descriptionUrl:
           type:
             - string
@@ -256,6 +266,7 @@ components:
         - endTime
         - teacherName
         - link
+        - programName
         - sessions
       properties:
         id:
@@ -290,6 +301,12 @@ components:
             - 'null'
           format: uri
           example: https://meet.example.com/backup-room
+        programName:
+          type:
+            - string
+            - 'null'
+          description: 專班班級所屬的專班名稱；一般生班級為 `null`
+          example: null
         sessions:
           type: array
           items:
@@ -322,6 +339,7 @@ components:
         - full_remote
         - micro_credit
         - computer_lab
+        - special_program
       description: 班別代碼
       x-enumDescriptions:
         morning: 上午班
@@ -330,6 +348,7 @@ components:
         full_remote: 全遠距
         micro_credit: 微學分
         computer_lab: 電腦實習
+        special_program: 專班
     SchoolCalendarEvent:
       type: object
       required:

@@ -24,14 +24,28 @@ function programClassFor(Course $course, ?Program $program = null): CourseClass
     ]);
 }
 
-it('keeps 專班-only courses out of the course list API', function () {
+it('includes 專班-only courses in the course list API', function () {
     Course::factory()->create(['term' => '2026A', 'name' => '一般課程']);
     programClassFor(Course::factory()->create(['term' => '2026A', 'name' => '專班專屬課程', 'is_special_program_only' => true]));
 
     getJson('/api/v1/courses')
         ->assertOk()
-        ->assertJsonCount(1)
-        ->assertJsonFragment(['name' => '一般課程']);
+        ->assertJsonCount(2)
+        ->assertJsonFragment(['name' => '一般課程', 'isSpecialProgramOnly' => false])
+        ->assertJsonFragment(['name' => '專班專屬課程', 'isSpecialProgramOnly' => true]);
+});
+
+it('includes 專班 classes in the course detail API', function () {
+    $course = Course::factory()->create(['term' => '2026A']);
+    $general = CourseClass::factory()->for($course)->create(['code' => 'ZZZ900', 'type' => CourseClassType::Morning]);
+    $program = programClassFor($course, Program::factory()->create(['name' => '某某專班']));
+    ClassSchedule::factory()->for($program, 'courseClass')->create(['date' => '2026-10-17']);
+
+    getJson("/api/v1/courses/{$course->id}")
+        ->assertOk()
+        ->assertJsonCount(2, 'classes')
+        ->assertJsonFragment(['id' => $general->id, 'programName' => null])
+        ->assertJsonFragment(['id' => $program->id, 'programName' => '某某專班', 'type' => 'special_program']);
 });
 
 it('keeps 專班-only courses and classes out of the schedule editor', function () {
