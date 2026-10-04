@@ -52,7 +52,7 @@ final readonly class GenerateSitemap
      */
     private function courseUrls(): Collection
     {
-        return Course::query()->get(['id', 'updated_at'])
+        return Course::query()->general()->get(['id', 'updated_at'])
             ->map(fn (Course $course): SitemapUrlViewModel => new SitemapUrlViewModel(
                 url: route('course.show', $course),
                 lastModified: $course->updated_at,

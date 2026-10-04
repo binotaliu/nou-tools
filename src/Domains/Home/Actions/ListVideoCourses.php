@@ -20,14 +20,14 @@ final readonly class ListVideoCourses
     public function __invoke(string $selectedDate): DataCollection
     {
         $courses = Course::with(['classes' => function ($query) use ($selectedDate) {
-            $query->official()->with(['schedules' => function ($scheduleQuery) use ($selectedDate) {
+            $query->official()->general()->with(['schedules' => function ($scheduleQuery) use ($selectedDate) {
                 $scheduleQuery->whereDate('date', $selectedDate);
             }])->whereHas('schedules', function ($scheduleQuery) use ($selectedDate) {
                 $scheduleQuery->whereDate('date', $selectedDate);
             });
         }])
             ->whereHas('classes', function ($query) use ($selectedDate) {
-                $query->official()->whereHas('schedules', function ($scheduleQuery) use ($selectedDate) {
+                $query->official()->general()->whereHas('schedules', function ($scheduleQuery) use ($selectedDate) {
                     $scheduleQuery->whereDate('date', $selectedDate);
                 });
             })

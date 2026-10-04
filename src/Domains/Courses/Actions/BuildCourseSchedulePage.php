@@ -20,6 +20,7 @@ final readonly class BuildCourseSchedulePage
         $selectedTerm = $term ?: $currentSemester;
 
         $courses = Course::query()
+            ->general()
             ->where('term', $selectedTerm)
             ->orderBy('name')
             ->get();

@@ -31,14 +31,16 @@ final readonly class BuildScheduleEditorPage
 
         $courses = ScheduleEditorCourseViewModel::collect(
             Course::query()
+                ->general()
                 ->where('term', $selectedTerm)
                 ->with(['classes' => function ($query) {
-                    $query->where(function ($query) {
+                    $query->general()->where(function ($query) {
                         $query->where('is_tentative', false)
                             ->orWhereNotExists(function ($subQuery) {
                                 $subQuery->selectRaw('1')
                                     ->from('course_classes as official_classes')
                                     ->whereColumn('official_classes.course_id', 'course_classes.course_id')
+                                    ->whereNull('official_classes.program_id')
                                     ->where('official_classes.is_tentative', false);
                             });
                     })->orderBy('is_tentative')->orderBy('type');
