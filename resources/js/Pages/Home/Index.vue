@@ -11,6 +11,12 @@ import VideoCourses from '../../Components/Home/VideoCourses.vue'
 import Greeting from '../../Components/Greeting.vue'
 import CommonLinks from '../../Components/CommonLinks.vue'
 import SchoolCalendar from '../../Components/SchoolCalendar.vue'
+import {
+  aboutItem,
+  moreMenuItems,
+  navItems,
+  settingsItem,
+} from '../../navigation'
 
 defineProps({
   viewModel: {
@@ -26,6 +32,14 @@ defineProps({
     required: true,
   },
 })
+
+// Every navigation entry except 我的課表 (the primary button above) and 首頁.
+const launcherItems = [
+  ...navItems.slice(1),
+  ...moreMenuItems,
+  settingsItem,
+  aboutItem,
+]
 
 // --- offline banner (same one-off pattern as Directory/Index.vue and
 // Schedule/Show.vue) ---
@@ -86,7 +100,7 @@ onUnmounted(() => {
         class="flex flex-col gap-4 md:flex-row md:items-stretch md:justify-between"
       >
         <div
-          class="w-full rounded-lg border border-theme-200 bg-white p-6 md:w-auto dark:border-zinc-700 dark:bg-zinc-900"
+          class="w-full rounded-lg border border-theme-200 bg-white p-6 md:w-xl dark:border-zinc-700 dark:bg-zinc-900"
         >
           <div class="mb-4">
             <h2 class="text-xl font-semibold text-theme-900 dark:text-zinc-100">
@@ -119,24 +133,28 @@ onUnmounted(() => {
             建立我的課表
           </Link>
 
-          <Link
-            href="/announcements"
-            class="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          <div
+            class="mt-5 grid grid-cols-4 gap-x-2 gap-y-4 md:grid-cols-6"
+            data-testid="home-launcher"
           >
-            <Icon name="megaphone" class="size-4" />
-
-            學校公告
-          </Link>
-
-          <Link
-            href="/directory"
-            data-offline-allow
-            class="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
-          >
-            <Icon name="map" class="size-4" />
-
-            連結 / 學習指導中心目錄
-          </Link>
+            <Link
+              v-for="item in launcherItems"
+              :key="item.href"
+              :href="item.href"
+              :data-offline-allow="item.offlineAllow ? '' : null"
+              class="group flex flex-col items-center gap-1.5 rounded-xl px-1 py-1.5 text-center text-xs leading-tight font-medium text-theme-900/80 transition-colors dark:text-zinc-300"
+              data-testid="home-launcher-item"
+            >
+              <span
+                class="flex size-12 items-center justify-center rounded-2xl bg-theme-100 text-theme-700 transition-colors group-hover:bg-theme-200 dark:bg-zinc-800 dark:text-theme-300 dark:group-hover:bg-zinc-700"
+              >
+                <Icon :name="item.icon" class="size-6 shrink-0" />
+              </span>
+              <span class="line-clamp-2 break-all">{{
+                item.shortLabel ?? item.label
+              }}</span>
+            </Link>
+          </div>
 
           <div
             v-if="viewModel.previousSchedule"

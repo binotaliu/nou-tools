@@ -13,6 +13,13 @@ import usePwaStandalone from '../Composables/usePwaStandalone'
 import useScheduleDeviceBackup from '../Composables/useScheduleDeviceBackup'
 import CookieConsentBanner from '../Components/CookieConsentBanner.vue'
 import Icon from '../Components/Icon.vue'
+import {
+  aboutItem,
+  homeItem,
+  moreMenuItems,
+  navItems,
+  settingsItem,
+} from '../navigation'
 import Notification from '../Components/Notification.vue'
 
 // Room for a fixed bottom banner (study room's ActionBanner) to sit over
@@ -58,13 +65,6 @@ function isActive(prefix) {
   )
 }
 
-// Learning progress lives under /schedules/..., so the plain '/schedules'
-// prefix would keep 我的課表 highlighted there too. Covers both the
-// /schedules/my/learning-progress shortcut and
-// /schedules/{schedule}/{term}/learning-progress.
-const LEARNING_PROGRESS_PATH =
-  /^\/schedules\/(?:my|[^/]+\/[^/]+)\/learning-progress$/
-
 // Items may carry their own `match(path)`; otherwise the route prefix decides.
 function isItemActive(item) {
   return item.match ? item.match(currentPath.value) : isActive(item.prefix)
@@ -99,98 +99,6 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', onDocumentClick)
   document.removeEventListener('keydown', onDocumentKeydown)
 })
-
-const navItems = [
-  {
-    href: '/schedules/my',
-    prefix: '/schedules',
-    match: path =>
-      path.startsWith('/schedules') && !LEARNING_PROGRESS_PATH.test(path),
-    label: '我的課表',
-    icon: 'table-cells',
-  },
-  {
-    href: '/schedules/my/learning-progress',
-    prefix: '/schedules/my/learning-progress',
-    match: path => LEARNING_PROGRESS_PATH.test(path),
-    label: '學習進度',
-    icon: 'clipboard',
-  },
-  {
-    href: '/study-room',
-    prefix: '/study-room',
-    label: '自習室',
-    icon: 'academic-cap',
-  },
-  {
-    href: '/newsletter',
-    prefix: '/newsletter',
-    label: '雙週報',
-    icon: 'newspaper',
-  },
-  {
-    href: '/discount-stores',
-    prefix: '/discount-stores',
-    label: '優惠店家',
-    icon: 'tag',
-  },
-]
-
-const moreMenuItems = [
-  {
-    href: '/alt-uu',
-    prefix: '/alt-uu',
-    label: 'Alt UU',
-    icon: 'device-phone-mobile',
-  },
-  {
-    href: '/announcements',
-    prefix: '/announcements',
-    label: '學校公告',
-    icon: 'megaphone',
-  },
-  {
-    href: '/video-classes',
-    prefix: '/video-classes',
-    label: '今日視訊面授',
-    icon: 'video-camera',
-  },
-  {
-    href: '/school-calendar',
-    prefix: '/school-calendar',
-    label: '學校行事曆',
-    icon: 'calendar',
-  },
-  {
-    href: '/courses/schedule',
-    prefix: '/courses/schedule',
-    label: '本學期開課表',
-    icon: 'calendar-days',
-  },
-  {
-    href: '/directory',
-    prefix: '/directory',
-    label: '連結 / 學習指導中心目錄',
-    // The more sheet's launcher tiles fit about two short lines.
-    shortLabel: '連結目錄',
-    icon: 'map',
-    offlineAllow: true,
-  },
-]
-
-const homeItem = { href: '/', prefix: '/', label: '首頁', icon: 'book-open' }
-const settingsItem = {
-  href: '/settings',
-  prefix: '/settings',
-  label: '設定',
-  icon: 'cog-6-tooth',
-}
-const aboutItem = {
-  href: '/about',
-  prefix: '/about',
-  label: '關於',
-  icon: 'information-circle',
-}
 
 const withActive = item => ({
   ...item,
