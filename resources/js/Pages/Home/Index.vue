@@ -150,7 +150,7 @@ onUnmounted(() => {
               >
                 <Icon :name="item.icon" class="size-6 shrink-0" />
               </span>
-              <span class="line-clamp-2 break-all">{{
+              <span class="break-words">{{
                 item.shortLabel ?? item.label
               }}</span>
             </Link>
