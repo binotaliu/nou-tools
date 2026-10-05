@@ -17,6 +17,17 @@ test('authenticated user can access filament profile page', function () {
         ->assertSuccessful();
 });
 
+test('admin user menu links back to the public site', function () {
+    /** @var User&Authenticatable $user */
+    $user = User::factory()->createOne();
+
+    actingAs($user);
+
+    get(route('filament.admin.auth.profile'))
+        ->assertSee('回到 NOU 小幫手')
+        ->assertSee(route('home'), false);
+});
+
 test('password default rule requires minimum 8 and uncompromised', function () {
     $passwordRule = Password::default();
 
