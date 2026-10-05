@@ -51,6 +51,10 @@ it('saves ticked weeks, notes and homework without a full page load', function (
         note.dispatchEvent(new Event('input', { bubbles: true }));
     })()");
 
+    $label = $page->script("document.querySelector('[data-testid=\"learning-progress-header\"] button[data-analytics-event=\"learning_progress_save\"]').dataset.analyticsLabel");
+
+    expect(['table', 'homework', 'week', 'subject'])->toContain($label);
+
     $page->click('[data-testid="learning-progress-header"] button[data-analytics-event="learning_progress_save"]')
         ->assertSee('學習進度已更新');
 

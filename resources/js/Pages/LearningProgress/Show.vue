@@ -499,6 +499,7 @@ function print() {
             class="inline-flex w-1/2 items-center justify-center gap-2 rounded-md bg-theme-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-theme-600 md:w-auto"
             data-analytics-event="learning_progress_save"
             data-analytics-feature="learning_progress"
+            :data-analytics-label="viewMode"
             :disabled="form.processing"
             @click="save"
           >
@@ -1298,6 +1299,7 @@ function print() {
           data-testid="learning-progress-floating-save"
           data-analytics-event="learning_progress_save"
           data-analytics-feature="learning_progress"
+          :data-analytics-label="viewMode"
           :disabled="form.processing"
           @click="save"
         >
