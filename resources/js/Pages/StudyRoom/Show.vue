@@ -31,6 +31,7 @@ import AccessKeys from '../../Components/StudyRoom/AccessKeys.vue'
 import ActionBanner from '../../Components/StudyRoom/ActionBanner.vue'
 import FocusMode from '../../Components/StudyRoom/FocusMode.vue'
 import Modal from '../../Components/StudyRoom/Modal.vue'
+import GoalForm from '../../Components/StudyRoom/GoalForm.vue'
 import PersonalInfoForm from '../../Components/StudyRoom/PersonalInfoForm.vue'
 import RoomToolbar from '../../Components/StudyRoom/RoomToolbar.vue'
 import SeatList from '../../Components/StudyRoom/SeatList.vue'
@@ -44,6 +45,7 @@ import useStudyRoomAnnouncer from '../../Composables/useStudyRoomAnnouncer'
 import useStudyRoomAnnouncements from '../../Composables/useStudyRoomAnnouncements'
 import useStudyRoomDemo from '../../Composables/useStudyRoomDemo'
 import useStudyRoomMusic from '../../Composables/useStudyRoomMusic'
+import useStudyGoal from '../../Composables/useStudyGoal'
 import useStudyRoomProfile from '../../Composables/useStudyRoomProfile'
 import usePushSubscription from '../../Composables/usePushSubscription'
 import useStudyRoomSky from '../../Composables/useStudyRoomSky'
@@ -75,6 +77,7 @@ const grid = useSeatGrid(socket, props.clientConfig)
 const roving = useSeatRovingFocus(socket)
 const sky = useStudyRoomSky(props.clientConfig)
 const profile = useStudyRoomProfile(props.profile, props.emojiChoices)
+const goal = useStudyGoal(props.profile.goal)
 const music = useStudyRoomMusic()
 const announcer = useStudyRoomAnnouncer()
 
@@ -369,6 +372,7 @@ onMounted(async () => {
     timer,
     sky,
     profile,
+    goal,
     grid,
     music,
     announcer,
@@ -533,13 +537,29 @@ onUnmounted(() => {
         <Wall
           :sky="sky"
           :profile="profile"
+          :goal="goal"
           :music="music"
           :demo="!hasSchedule"
           :announcement-html="announcementHtml"
           :your-focus-seconds-today="
             socket.state ? socket.state.totals.yourFocusSecondsToday : 0
           "
+          :your-focus-seconds-this-week="
+            socket.state ? socket.state.totals.yourFocusSecondsThisWeek : 0
+          "
         />
+
+        <Modal
+          v-if="hasSchedule"
+          :open="goal.open"
+          title="學習目標與提醒"
+          max-width="max-w-lg"
+          teleport-to="#study-room-modal-target"
+          data-testid="study-room-goal-modal"
+          @close="goal.open = false"
+        >
+          <GoalForm :key="String(goal.open)" :goal="goal" :push="push" />
+        </Modal>
 
         <Modal
           v-if="hasSchedule"

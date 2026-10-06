@@ -39,7 +39,8 @@ it('reports both notification opt-ins for the remembered schedule', function () 
             ->where('notifications.scheduleToken', $schedule->getRouteKey())
             ->where('notifications.classReminders', true)
             ->where('notifications.hasStudyRoomProfile', true)
-            ->where('notifications.timerEnd', true));
+            ->where('notifications.timerEnd', true)
+            ->where('notifications.goalReminder', false));
 });
 
 it('marks the timer-end notification unavailable until a study room profile exists', function () {
@@ -50,7 +51,8 @@ it('marks the timer-end notification unavailable until a study room profile exis
         ->assertInertia(fn (Assert $page) => $page
             ->where('notifications.classReminders', false)
             ->where('notifications.hasStudyRoomProfile', false)
-            ->where('notifications.timerEnd', false));
+            ->where('notifications.timerEnd', false)
+            ->where('notifications.goalReminder', false));
 });
 
 it('server-renders its head tags and keeps the page out of search results', function () {

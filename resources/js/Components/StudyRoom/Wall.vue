@@ -3,9 +3,9 @@
 // player under it, a wall clock running on Taipei time, the announcement
 // board, and the viewer's own nameplate (click to edit nickname/emoji, or
 // open the stats modal).
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
-import { ChartBarIcon, PencilIcon } from '@heroicons/vue/24/outline'
+import { ChartBarIcon, FlagIcon, PencilIcon } from '@heroicons/vue/24/outline'
 import CassettePlayer from './CassettePlayer.vue'
 import GardenScene from './GardenScene.vue'
 import useMarkdownContainers from '../../Composables/useMarkdownContainers'
@@ -16,8 +16,41 @@ const props = defineProps({
   music: { type: Object, required: true },
   announcementHtml: { type: String, required: true },
   yourFocusSecondsToday: { type: Number, required: true },
+  yourFocusSecondsThisWeek: { type: Number, default: 0 },
+  goal: { type: Object, default: null },
   // The visitor has no schedule, so there is no profile to show or edit.
   demo: { type: Boolean, default: false },
+})
+
+// Today's and this week's goal next to what has been focused so far; a goal
+// that isn't set is simply left out.
+const goalProgress = computed(() => {
+  if (!props.goal) {
+    return []
+  }
+
+  const items = []
+  const todayMinutes = props.goal.todayMinutes(props.sky.clockNow)
+
+  if (todayMinutes !== null) {
+    items.push({
+      key: 'today',
+      label: '今日目標',
+      doneMinutes: Math.floor(props.yourFocusSecondsToday / 60),
+      goalMinutes: todayMinutes,
+    })
+  }
+
+  if (props.goal.weeklyGoalMinutes !== null) {
+    items.push({
+      key: 'week',
+      label: '本週目標',
+      doneMinutes: Math.floor(props.yourFocusSecondsThisWeek / 60),
+      goalMinutes: props.goal.weeklyGoalMinutes,
+    })
+  }
+
+  return items
 })
 
 // The announcement is admin-authored Markdown run through the same
@@ -231,7 +264,28 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
                 <span class="sr-only">你</span>今天專注了
                 {{ profile.formatDurationLabel(yourFocusSecondsToday) }}
               </p>
+              <p
+                v-if="goalProgress.length"
+                class="text-xs text-theme-700 dark:text-zinc-400"
+                data-testid="study-room-goal-progress"
+              >
+                <template v-for="(item, index) in goalProgress" :key="item.key">
+                  <span v-if="index > 0" aria-hidden="true"> · </span>
+                  {{ item.label }}
+                  {{ item.doneMinutes }}/{{ item.goalMinutes }} 分鐘
+                </template>
+              </p>
             </div>
+            <button
+              v-if="goal"
+              type="button"
+              aria-label="設定學習目標與提醒"
+              data-testid="study-room-personal-info-goal"
+              class="shrink-0 rounded-full p-1.5 text-theme-700 transition hover:bg-theme-100 hover:text-theme-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
+              @click.stop="goal.open = true"
+            >
+              <FlagIcon class="size-4" />
+            </button>
             <button
               type="button"
               aria-label="檢視專注紀錄與統計"

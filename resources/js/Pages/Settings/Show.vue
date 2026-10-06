@@ -48,49 +48,61 @@ const classReminders = usePushSubscription({
   enabled: props.notifications?.classReminders,
 })
 
-// Timer-end notification: the study room's endpoint only registers the
-// browser, so the opt-in is saved separately once that has succeeded.
-const timerEnd = usePushSubscription({
-  vapidPublicKey: props.vapidPublicKey,
-  subscribeUrl: '/study-room/push-subscriptions',
-  enabled: props.notifications?.timerEnd,
-})
-const timerEndSaving = ref(false)
+// 自習室 notifications (timer end, goal reminder): the study room's endpoint
+// only registers the browser, so each opt-in is saved separately to its own
+// endpoint once that has succeeded.
+function useStudyRoomNotification(enabled, saveUrl) {
+  const push = usePushSubscription({
+    vapidPublicKey: props.vapidPublicKey,
+    subscribeUrl: '/study-room/push-subscriptions',
+    enabled,
+  })
+  const saving = ref(false)
 
-async function saveTimerEnd(value) {
-  timerEndSaving.value = true
+  async function save(value) {
+    saving.value = true
 
-  try {
-    await window.axios.put('/study-room/timer-end-notification', {
-      enabled: value,
-    })
-    timerEnd.enabled.value = value
-  } catch (error) {
-    timerEnd.enabled.value = !value
-    permissionError.value =
-      error.response?.data?.message ?? '儲存失敗，請稍後再試。'
-  } finally {
-    timerEndSaving.value = false
+    try {
+      await window.axios.put(saveUrl, { enabled: value })
+      push.enabled.value = value
+    } catch (error) {
+      push.enabled.value = !value
+      permissionError.value =
+        error.response?.data?.message ?? '儲存失敗，請稍後再試。'
+    } finally {
+      saving.value = false
+    }
   }
+
+  async function toggle() {
+    permissionError.value = ''
+
+    if (push.enabled.value) {
+      await save(false)
+
+      return
+    }
+
+    if (!(await push.enable())) {
+      permissionError.value = '沒有取得通知權限，請在瀏覽器設定中允許本站通知。'
+
+      return
+    }
+
+    await save(true)
+  }
+
+  return { push, saving, toggle }
 }
 
-async function toggleTimerEnd() {
-  permissionError.value = ''
-
-  if (timerEnd.enabled.value) {
-    await saveTimerEnd(false)
-
-    return
-  }
-
-  if (!(await timerEnd.enable())) {
-    permissionError.value = '沒有取得通知權限，請在瀏覽器設定中允許本站通知。'
-
-    return
-  }
-
-  await saveTimerEnd(true)
-}
+const timerEnd = useStudyRoomNotification(
+  props.notifications?.timerEnd,
+  '/study-room/timer-end-notification'
+)
+const goalReminder = useStudyRoomNotification(
+  props.notifications?.goalReminder,
+  '/study-room/goal-reminder'
+)
 
 async function toggleClassReminders() {
   permissionError.value = ''
@@ -123,12 +135,25 @@ const rows = computed(() => [
     description: props.notifications?.hasStudyRoomProfile
       ? '計時器時間到時接收推播通知。'
       : '要先到自習室設定暱稱才能開啟。',
-    enabled: timerEnd.enabled.value,
+    enabled: timerEnd.push.enabled.value,
     disabled:
-      timerEnd.busy.value ||
-      timerEndSaving.value ||
+      timerEnd.push.busy.value ||
+      timerEnd.saving.value ||
       !props.notifications?.hasStudyRoomProfile,
-    toggle: toggleTimerEnd,
+    toggle: timerEnd.toggle,
+  },
+  {
+    key: 'goal-reminder',
+    label: '學習目標提醒',
+    description: props.notifications?.hasStudyRoomProfile
+      ? '在自習室設定的提醒時間，目標還沒達成時接收推播通知。'
+      : '要先到自習室設定暱稱才能開啟。',
+    enabled: goalReminder.push.enabled.value,
+    disabled:
+      goalReminder.push.busy.value ||
+      goalReminder.saving.value ||
+      !props.notifications?.hasStudyRoomProfile,
+    toggle: goalReminder.toggle,
   },
 ])
 </script>
