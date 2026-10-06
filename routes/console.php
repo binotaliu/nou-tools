@@ -5,6 +5,7 @@ use App\Console\Commands\FetchAnnouncementsCommand;
 use App\Console\Commands\PublishDueNewsletterIssuesCommand;
 use App\Console\Commands\ReleaseIdleStudyRoomSeatsCommand;
 use App\Console\Commands\SendClassStartingRemindersCommand;
+use App\Console\Commands\SendStudyGoalRemindersCommand;
 use App\Models\ScheduleDevice;
 use Illuminate\Support\Facades\Schedule;
 use NouTools\Domains\StudyRoom\Actions\SendStudyTimerEndPushes;
@@ -14,6 +15,8 @@ use NouTools\Domains\StudyRoom\Actions\SendStudyTimerEndPushes;
 Schedule::command(ReleaseIdleStudyRoomSeatsCommand::class)->everyMinute();
 
 Schedule::command(SendClassStartingRemindersCommand::class)->everyMinute();
+
+Schedule::command(SendStudyGoalRemindersCommand::class)->everyMinute();
 
 Schedule::command('model:prune', ['--model' => ScheduleDevice::class])->daily();
 
