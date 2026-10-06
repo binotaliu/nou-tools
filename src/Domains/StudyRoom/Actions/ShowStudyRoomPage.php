@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use NouTools\Domains\StudyRoom\PageData\StudyRoomPageData;
 use NouTools\Domains\StudyRoom\ValueObjects\PomodoroCycle;
+use NouTools\Domains\StudyRoom\ViewModels\StudyRoomGoalViewModel;
 use NouTools\Domains\StudyRoom\ViewModels\StudyRoomPomodoroCycleViewModel;
 use NouTools\Domains\StudyRoom\ViewModels\StudyRoomProfileViewModel;
 use NouTools\Domains\StudyRoom\ViewModels\StudyRoomSubjectViewModel;
@@ -74,6 +75,7 @@ final readonly class ShowStudyRoomPage
             pomodoroCycle: StudyRoomPomodoroCycleViewModel::fromCycle(PomodoroCycle::forProfile($profile)),
             playSoundOnTimerEnd: $profile?->play_sound_on_timer_end ?? true,
             notifyOnTimerEnd: $profile?->notify_on_timer_end ?? false,
+            goal: StudyRoomGoalViewModel::fromProfile($profile),
         );
     }
 

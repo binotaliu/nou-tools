@@ -12,5 +12,6 @@ final class StudyRoomTotalsViewModel extends Data
         public int $occupantCount,
         public int $siteFocusSecondsToday,
         public int $yourFocusSecondsToday,
+        public int $yourFocusSecondsThisWeek,
     ) {}
 }

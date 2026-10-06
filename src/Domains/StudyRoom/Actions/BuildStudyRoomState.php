@@ -7,6 +7,7 @@ namespace NouTools\Domains\StudyRoom\Actions;
 use App\Enums\StudySeatKind;
 use App\Models\StudyRoomSeat;
 use App\Models\StudyRoomSession;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Date;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
@@ -108,10 +109,16 @@ final readonly class BuildStudyRoomState
             ->whereBetween('ended_at', [$startOfDayUtc, $endOfDayUtc])
             ->sum('focus_seconds');
 
+        $yourFocusSecondsThisWeek = $viewer === null ? 0 : (int) StudyRoomSession::query()
+            ->where('student_schedule_id', $viewer->id)
+            ->whereBetween('ended_at', [Date::now($timezone)->startOfWeek(CarbonInterface::MONDAY)->utc(), $endOfDayUtc])
+            ->sum('focus_seconds');
+
         return new StudyRoomTotalsViewModel(
             occupantCount: $seats->whereNotNull('student_schedule_id')->count(),
             siteFocusSecondsToday: $siteFocusSecondsToday,
             yourFocusSecondsToday: $yourFocusSecondsToday,
+            yourFocusSecondsThisWeek: $yourFocusSecondsThisWeek,
         );
     }
 
@@ -150,7 +157,7 @@ final readonly class BuildStudyRoomState
         // touching the seat's timer fields in the same instant. Without
         // folding them in here, a totals-only change would keep matching
         // the client's cached version and never make it past a 304.
-        $signature .= '|'.$totals->siteFocusSecondsToday.'|'.$totals->yourFocusSecondsToday;
+        $signature .= '|'.$totals->siteFocusSecondsToday.'|'.$totals->yourFocusSecondsToday.'|'.$totals->yourFocusSecondsThisWeek;
 
         return hash('xxh128', $signature);
     }

@@ -21,6 +21,7 @@ final readonly class ShowNotificationSettings
             classReminders: $schedule->notify_on_class_start,
             hasStudyRoomProfile: $schedule->studyRoomProfile !== null,
             timerEnd: $schedule->studyRoomProfile?->notify_on_timer_end ?? false,
+            goalReminder: $schedule->studyRoomProfile?->notify_on_goal_reminder ?? false,
             backup: ($this->showScheduleBackup)($schedule),
         );
     }

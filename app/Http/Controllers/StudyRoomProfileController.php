@@ -12,6 +12,7 @@ use NouTools\Domains\StudyRoom\Actions\SetStudyRoomProfile;
 use NouTools\Domains\StudyRoom\DataTransferObjects\SetStudyRoomProfileData;
 use NouTools\Domains\StudyRoom\Exceptions\NicknameCooldownException;
 use NouTools\Domains\StudyRoom\ValueObjects\PomodoroCycle;
+use NouTools\Domains\StudyRoom\ViewModels\StudyRoomGoalViewModel;
 use NouTools\Domains\StudyRoom\ViewModels\StudyRoomPomodoroCycleViewModel;
 use NouTools\Domains\StudyRoom\ViewModels\StudyRoomProfileViewModel;
 
@@ -62,6 +63,7 @@ final class StudyRoomProfileController extends Controller
             pomodoroCycle: StudyRoomPomodoroCycleViewModel::fromCycle(PomodoroCycle::forProfile($profile)),
             playSoundOnTimerEnd: $profile->play_sound_on_timer_end,
             notifyOnTimerEnd: $profile->notify_on_timer_end,
+            goal: StudyRoomGoalViewModel::fromProfile($profile),
         );
     }
 }

@@ -24,5 +24,6 @@ final class StudyRoomProfileViewModel extends Data
         public StudyRoomPomodoroCycleViewModel $pomodoroCycle,
         public bool $playSoundOnTimerEnd,
         public bool $notifyOnTimerEnd,
+        public StudyRoomGoalViewModel $goal,
     ) {}
 }

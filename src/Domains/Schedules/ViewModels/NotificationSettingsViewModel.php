@@ -7,7 +7,7 @@ namespace NouTools\Domains\Schedules\ViewModels;
 use Spatie\LaravelData\Data;
 
 /**
- * The remembered schedule's two push opt-ins for the 設定 page. Both are the
+ * The remembered schedule's three push opt-ins for the 設定 page. Both are the
  * server-side intent only: whether this browser also holds a push
  * subscription is something the page finds out for itself. It also carries the
  * schedule's backup link, since 設定 is where an installed PWA (which hides the
@@ -20,6 +20,7 @@ final class NotificationSettingsViewModel extends Data
         public bool $classReminders,
         public bool $hasStudyRoomProfile,
         public bool $timerEnd,
+        public bool $goalReminder,
         public ScheduleBackupViewModel $backup,
     ) {}
 }

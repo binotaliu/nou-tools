@@ -35,6 +35,10 @@ final class StudyRoomProfile extends Model
         'pomodoro_rounds_per_cycle' => 'integer',
         'play_sound_on_timer_end' => 'boolean',
         'notify_on_timer_end' => 'boolean',
+        'weekly_goal_minutes' => 'integer',
+        'daily_goals' => 'array',
+        'notify_on_goal_reminder' => 'boolean',
+        'goal_reminder_sent_on' => 'date',
         'nickname_changed_at' => 'datetime',
         'nickname_reset_at' => 'datetime',
     ];

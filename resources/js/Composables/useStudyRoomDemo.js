@@ -132,7 +132,11 @@ export default function useStudyRoomDemo(config) {
         },
       ],
       openFloors: 1,
-      totals: { siteFocusSecondsToday: 0, yourFocusSecondsToday: 0 },
+      totals: {
+        siteFocusSecondsToday: 0,
+        yourFocusSecondsToday: 0,
+        yourFocusSecondsThisWeek: 0,
+      },
       serverTime: new Date(mountedAt).toISOString(),
       version: 'demo',
     }

@@ -63,6 +63,8 @@ use App\Http\Controllers\ShareController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StudyRoomBreakController;
 use App\Http\Controllers\StudyRoomController;
+use App\Http\Controllers\StudyRoomGoalController;
+use App\Http\Controllers\StudyRoomGoalReminderController;
 use App\Http\Controllers\StudyRoomHeartbeatController;
 use App\Http\Controllers\StudyRoomNextRoundController;
 use App\Http\Controllers\StudyRoomPauseController;
@@ -213,6 +215,8 @@ Route::prefix('study-room')->name('study-room.')->group(function (): void {
     Route::post('/timer/resume', StudyRoomResumeController::class)->name('timer.resume')->middleware('throttle:60,1');
     Route::post('/push-subscriptions', StudyRoomPushSubscriptionController::class)->name('push-subscriptions.store')->middleware('throttle:10,1');
     Route::put('/timer-end-notification', StudyRoomTimerEndNotificationController::class)->name('timer-end-notification.update')->middleware('throttle:10,1');
+    Route::put('/goal', StudyRoomGoalController::class)->name('goal.update')->middleware('throttle:10,1');
+    Route::put('/goal-reminder', StudyRoomGoalReminderController::class)->name('goal-reminder.update')->middleware('throttle:10,1');
     Route::post('/heartbeat', StudyRoomHeartbeatController::class)->name('heartbeat')->middleware('throttle:60,1');
 });
 
