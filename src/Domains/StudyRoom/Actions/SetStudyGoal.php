@@ -38,6 +38,7 @@ final readonly class SetStudyGoal
         }
 
         $profile->weekly_goal_minutes = $data->weeklyGoalMinutes;
+        $profile->goal_excludes_in_person_class = $data->excludeInPersonClass;
         $profile->daily_goals = $dailyGoals === [] ? null : $dailyGoals;
         $profile->saveOrFail();
 

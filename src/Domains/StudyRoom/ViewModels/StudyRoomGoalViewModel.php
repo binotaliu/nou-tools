@@ -20,6 +20,7 @@ final class StudyRoomGoalViewModel extends Data
         public ?int $weeklyGoalMinutes,
         public array $dailyGoals,
         public bool $notifyOnGoalReminder,
+        public bool $excludeInPersonClass,
     ) {}
 
     public static function fromProfile(?StudyRoomProfile $profile): self
@@ -37,6 +38,7 @@ final class StudyRoomGoalViewModel extends Data
             weeklyGoalMinutes: $profile?->weekly_goal_minutes,
             dailyGoals: $dailyGoals,
             notifyOnGoalReminder: $profile?->notify_on_goal_reminder ?? false,
+            excludeInPersonClass: $profile?->goal_excludes_in_person_class ?? true,
         );
     }
 }

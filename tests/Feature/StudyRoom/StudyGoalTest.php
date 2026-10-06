@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\StudyActivityVerb;
 use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSession;
@@ -123,4 +124,39 @@ it('reports this week\'s focus seconds from Monday in Taipei time', function () 
         ->assertOk()
         ->assertJsonPath('totals.yourFocusSecondsToday', 300)
         ->assertJsonPath('totals.yourFocusSecondsThisWeek', 900);
+});
+
+it('leaves in-person class time out of goal progress by default', function () use ($goalCookie) {
+    $this->travelTo(Date::parse('2026-09-16 10:00:00', 'Asia/Taipei'));
+    $schedule = StudentSchedule::factory()->create();
+    $profile = StudyRoomProfile::factory()->create(['student_schedule_id' => $schedule->id]);
+
+    foreach ([StudyActivityVerb::Reading, StudyActivityVerb::InPersonClass, null] as $verb) {
+        StudyRoomSession::factory()->for($schedule, 'schedule')->create([
+            'activity_verb' => $verb,
+            'started_at' => Date::now()->subHour(),
+            'ended_at' => Date::now()->subMinutes(30),
+            'focus_seconds' => 600,
+        ]);
+    }
+
+    $state = fn () => $this->withCredentials()->withCookie('student_schedule', $goalCookie($schedule))
+        ->getJson(route('study-room.state'))
+        ->assertOk();
+
+    $state()
+        ->assertJsonPath('totals.yourFocusSecondsToday', 1800)
+        ->assertJsonPath('totals.yourGoalSecondsToday', 1200)
+        ->assertJsonPath('totals.yourGoalSecondsThisWeek', 1200);
+
+    $this->withCredentials()->withCookie('student_schedule', $goalCookie($schedule))
+        ->putJson(route('study-room.goal.update'), ['weeklyGoalMinutes' => 300, 'dailyGoals' => [], 'excludeInPersonClass' => false])
+        ->assertOk()
+        ->assertJsonPath('goal.excludeInPersonClass', false);
+
+    expect($profile->fresh()->goal_excludes_in_person_class)->toBeFalse();
+
+    $state()
+        ->assertJsonPath('totals.yourGoalSecondsToday', 1800)
+        ->assertJsonPath('totals.yourGoalSecondsThisWeek', 1800);
 });

@@ -136,6 +136,8 @@ export default function useStudyRoomDemo(config) {
         siteFocusSecondsToday: 0,
         yourFocusSecondsToday: 0,
         yourFocusSecondsThisWeek: 0,
+        yourGoalSecondsToday: 0,
+        yourGoalSecondsThisWeek: 0,
       },
       serverTime: new Date(mountedAt).toISOString(),
       version: 'demo',

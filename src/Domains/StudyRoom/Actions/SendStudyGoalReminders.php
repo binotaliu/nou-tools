@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\StudyRoom\Actions;
 
+use App\Enums\StudyActivityVerb;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSession;
 use App\Notifications\StudyGoalReminder;
@@ -89,6 +90,9 @@ final readonly class SendStudyGoalReminders
     {
         return (int) StudyRoomSession::query()
             ->where('student_schedule_id', $profile->student_schedule_id)
+            ->when($profile->goal_excludes_in_person_class, fn ($query) => $query->where(fn ($query) => $query
+                ->whereNull('activity_verb')
+                ->orWhere('activity_verb', '!=', StudyActivityVerb::InPersonClass)))
             ->whereBetween('ended_at', [$from->copy()->utc(), $to->copy()->utc()])
             ->sum('focus_seconds');
     }

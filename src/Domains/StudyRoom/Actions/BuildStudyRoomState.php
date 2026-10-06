@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\StudyRoom\Actions;
 
+use App\Enums\StudyActivityVerb;
 use App\Enums\StudySeatKind;
+use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
 use App\Models\StudyRoomSession;
 use Carbon\CarbonInterface;
@@ -109,17 +111,44 @@ final readonly class BuildStudyRoomState
             ->whereBetween('ended_at', [$startOfDayUtc, $endOfDayUtc])
             ->sum('focus_seconds');
 
+        $startOfWeekUtc = Date::now($timezone)->startOfWeek(CarbonInterface::MONDAY)->utc();
+
         $yourFocusSecondsThisWeek = $viewer === null ? 0 : (int) StudyRoomSession::query()
             ->where('student_schedule_id', $viewer->id)
-            ->whereBetween('ended_at', [Date::now($timezone)->startOfWeek(CarbonInterface::MONDAY)->utc(), $endOfDayUtc])
+            ->whereBetween('ended_at', [$startOfWeekUtc, $endOfDayUtc])
             ->sum('focus_seconds');
+
+        // Goal progress can leave in-person class hours out (the default); the
+        // plain totals above always count everything.
+        $excludesInPersonClass = $viewer !== null && (StudyRoomProfile::query()
+            ->where('student_schedule_id', $viewer->id)
+            ->value('goal_excludes_in_person_class') ?? true);
+
+        $yourGoalSecondsToday = $yourFocusSecondsToday;
+        $yourGoalSecondsThisWeek = $yourFocusSecondsThisWeek;
+
+        if ($excludesInPersonClass) {
+            $yourGoalSecondsToday -= $this->inPersonClassSeconds($viewer, $startOfDayUtc, $endOfDayUtc);
+            $yourGoalSecondsThisWeek -= $this->inPersonClassSeconds($viewer, $startOfWeekUtc, $endOfDayUtc);
+        }
 
         return new StudyRoomTotalsViewModel(
             occupantCount: $seats->whereNotNull('student_schedule_id')->count(),
             siteFocusSecondsToday: $siteFocusSecondsToday,
             yourFocusSecondsToday: $yourFocusSecondsToday,
             yourFocusSecondsThisWeek: $yourFocusSecondsThisWeek,
+            yourGoalSecondsToday: $yourGoalSecondsToday,
+            yourGoalSecondsThisWeek: $yourGoalSecondsThisWeek,
         );
+    }
+
+    private function inPersonClassSeconds(StudentScheduleCookie $viewer, CarbonInterface $from, CarbonInterface $to): int
+    {
+        return (int) StudyRoomSession::query()
+            ->where('student_schedule_id', $viewer->id)
+            ->where('activity_verb', StudyActivityVerb::InPersonClass)
+            ->whereBetween('ended_at', [$from, $to])
+            ->sum('focus_seconds');
     }
 
     /**
@@ -157,7 +186,7 @@ final readonly class BuildStudyRoomState
         // touching the seat's timer fields in the same instant. Without
         // folding them in here, a totals-only change would keep matching
         // the client's cached version and never make it past a 304.
-        $signature .= '|'.$totals->siteFocusSecondsToday.'|'.$totals->yourFocusSecondsToday.'|'.$totals->yourFocusSecondsThisWeek;
+        $signature .= '|'.$totals->siteFocusSecondsToday.'|'.$totals->yourFocusSecondsToday.'|'.$totals->yourFocusSecondsThisWeek.'|'.$totals->yourGoalSecondsToday.'|'.$totals->yourGoalSecondsThisWeek;
 
         return hash('xxh128', $signature);
     }

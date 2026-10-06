@@ -17,6 +17,8 @@ const props = defineProps({
   announcementHtml: { type: String, required: true },
   yourFocusSecondsToday: { type: Number, required: true },
   yourFocusSecondsThisWeek: { type: Number, default: 0 },
+  yourGoalSecondsToday: { type: Number, default: 0 },
+  yourGoalSecondsThisWeek: { type: Number, default: 0 },
   goal: { type: Object, default: null },
   // The visitor has no schedule, so there is no profile to show or edit.
   demo: { type: Boolean, default: false },
@@ -36,7 +38,7 @@ const goalProgress = computed(() => {
     items.push({
       key: 'today',
       label: '今日目標',
-      doneMinutes: Math.floor(props.yourFocusSecondsToday / 60),
+      doneMinutes: Math.floor(props.yourGoalSecondsToday / 60),
       goalMinutes: todayMinutes,
     })
   }
@@ -45,7 +47,7 @@ const goalProgress = computed(() => {
     items.push({
       key: 'week',
       label: '本週目標',
-      doneMinutes: Math.floor(props.yourFocusSecondsThisWeek / 60),
+      doneMinutes: Math.floor(props.yourGoalSecondsThisWeek / 60),
       goalMinutes: props.goal.weeklyGoalMinutes,
     })
   }

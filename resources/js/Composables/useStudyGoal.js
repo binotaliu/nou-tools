@@ -38,6 +38,7 @@ export default function useStudyGoal(initialGoal) {
   const weeklyGoalMinutes = ref(initialGoal.weeklyGoalMinutes)
   const dailyGoals = ref(initialGoal.dailyGoals ?? {})
   const notifyOnGoalReminder = ref(initialGoal.notifyOnGoalReminder)
+  const excludeInPersonClass = ref(initialGoal.excludeInPersonClass)
 
   const open = ref(false)
   const saving = ref(false)
@@ -48,6 +49,7 @@ export default function useStudyGoal(initialGoal) {
     weeklyGoalMinutes.value = goal.weeklyGoalMinutes
     dailyGoals.value = goal.dailyGoals ?? {}
     notifyOnGoalReminder.value = goal.notifyOnGoalReminder
+    excludeInPersonClass.value = goal.excludeInPersonClass
   }
 
   function dailyMinutes(weekday) {
@@ -106,6 +108,7 @@ export default function useStudyGoal(initialGoal) {
     weeklyGoalMinutes,
     dailyGoals,
     notifyOnGoalReminder,
+    excludeInPersonClass,
     open,
     saving,
     errors,

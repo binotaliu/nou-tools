@@ -27,6 +27,7 @@ final class StudyRoomProfileFactory extends Factory
             'play_sound_on_timer_end' => true,
             'notify_on_timer_end' => false,
             'notify_on_goal_reminder' => false,
+            'goal_excludes_in_person_class' => true,
         ];
     }
 }

@@ -547,6 +547,12 @@ onUnmounted(() => {
           :your-focus-seconds-this-week="
             socket.state ? socket.state.totals.yourFocusSecondsThisWeek : 0
           "
+          :your-goal-seconds-today="
+            socket.state ? socket.state.totals.yourGoalSecondsToday : 0
+          "
+          :your-goal-seconds-this-week="
+            socket.state ? socket.state.totals.yourGoalSecondsThisWeek : 0
+          "
         />
 
         <Modal

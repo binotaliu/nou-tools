@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\StudyActivityVerb;
 use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSession;
@@ -109,3 +110,19 @@ it('skips students who opted out or have no push subscription', function () use 
     expect(app(SendStudyGoalReminders::class)())->toBe(0);
     Notification::assertNothingSent();
 });
+
+it('does not count in-person class time towards a met goal unless the student opts in', function (bool $excludes, int $expectedSent) use ($goalReminderStudent) {
+    $schedule = $goalReminderStudent(['goal_excludes_in_person_class' => $excludes]);
+
+    StudyRoomSession::factory()->for($schedule, 'schedule')->create([
+        'activity_verb' => StudyActivityVerb::InPersonClass,
+        'started_at' => Date::now()->subHours(4),
+        'ended_at' => Date::now()->subHours(2),
+        'focus_seconds' => 61 * 60,
+    ]);
+
+    expect(app(SendStudyGoalReminders::class)())->toBe($expectedSent);
+})->with([
+    'excluded by default' => [true, 1],
+    'opted in' => [false, 0],
+]);

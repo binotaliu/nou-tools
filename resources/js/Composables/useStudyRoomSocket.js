@@ -190,6 +190,8 @@ export default function useStudyRoomSocket(config) {
       ...payload.totals,
       yourFocusSecondsToday: state.value.totals.yourFocusSecondsToday,
       yourFocusSecondsThisWeek: state.value.totals.yourFocusSecondsThisWeek,
+      yourGoalSecondsToday: state.value.totals.yourGoalSecondsToday,
+      yourGoalSecondsThisWeek: state.value.totals.yourGoalSecondsThisWeek,
     }
     state.value.version = payload.version
 

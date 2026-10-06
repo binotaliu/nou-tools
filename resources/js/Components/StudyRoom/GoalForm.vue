@@ -14,6 +14,7 @@ function blank(value) {
 
 const form = reactive({
   weeklyGoalMinutes: blank(props.goal.weeklyGoalMinutes),
+  excludeInPersonClass: props.goal.excludeInPersonClass,
   days: Object.fromEntries(
     GOAL_WEEKDAYS.map(({ value }) => [
       value,
@@ -45,6 +46,7 @@ function submit() {
 
   props.goal.save({
     weeklyGoalMinutes: toNumberOrNull(form.weeklyGoalMinutes),
+    excludeInPersonClass: form.excludeInPersonClass,
     dailyGoals,
   })
 }
@@ -143,6 +145,17 @@ const inputClass =
         </div>
       </div>
     </fieldset>
+
+    <label
+      class="flex items-center gap-2 text-sm text-theme-900 dark:text-zinc-100"
+    >
+      <input
+        v-model="form.excludeInPersonClass"
+        type="checkbox"
+        data-testid="study-room-goal-exclude-in-person"
+      />
+      不包含面授課的時數
+    </label>
 
     <div>
       <label

@@ -37,6 +37,7 @@ final class StudyRoomProfile extends Model
         'notify_on_timer_end' => 'boolean',
         'weekly_goal_minutes' => 'integer',
         'daily_goals' => 'array',
+        'goal_excludes_in_person_class' => 'boolean',
         'notify_on_goal_reminder' => 'boolean',
         'goal_reminder_sent_on' => 'date',
         'nickname_changed_at' => 'datetime',
