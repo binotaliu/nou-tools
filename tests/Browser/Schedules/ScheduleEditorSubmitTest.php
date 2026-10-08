@@ -67,3 +67,40 @@ it('switches between the steps with the step radios', function () {
         ->click('[data-testid="schedule-step-label-1"]')
         ->assertChecked('[data-testid="course-checkbox-'.$course->id.'"]');
 });
+
+it('clears the filters when adding another course from the class step', function () {
+    config()->set('app.current_semester', '2025B');
+
+    $first = Course::factory()->create(['term' => '2025B', 'name' => '甲種測試課程']);
+    $second = Course::factory()->create(['term' => '2025B', 'name' => '乙種測試課程']);
+
+    visit(route('schedules.create', ['term' => '2025B']))
+        ->fill('#search', '甲種')
+        ->click('[data-testid="course-checkbox-'.$first->id.'"]')
+        ->click('[data-testid="schedule-next"]')
+        ->assertMissing('[data-testid="schedule-back"]:has-text("調整課程")')
+        ->click('[data-testid="schedule-add-more"]')
+        ->assertValue('#search', '')
+        ->assertPresent('[data-testid="course-checkbox-'.$second->id.'"]')
+        ->assertChecked('[data-testid="course-checkbox-'.$first->id.'"]');
+});
+
+it('asks whether to add to the existing schedule or start over', function () {
+    config()->set('app.current_semester', '2025B');
+
+    $course = Course::factory()->create(['term' => '2025B', 'name' => '重新開始課程']);
+    $schedule = StudentSchedule::factory()->create();
+
+    $this->withCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => $schedule->name,
+    ]));
+
+    visit(route('schedules.create', ['term' => '2025B']))
+        ->assertPresent('[data-testid="schedule-existing-choice"]')
+        ->assertMissing('[data-testid="course-checkbox-'.$course->id.'"]')
+        ->click('[data-testid="schedule-choice-restart"]')
+        ->assertMissing('[data-testid="schedule-existing-choice"]')
+        ->assertPresent('[data-testid="course-checkbox-'.$course->id.'"]');
+});

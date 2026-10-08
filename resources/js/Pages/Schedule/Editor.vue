@@ -186,6 +186,22 @@ function removeItem(index) {
 
 const stepHeading = ref(null)
 
+// Back to step 1 for another course, with the search and filters cleared so
+// the full list is showing again.
+function addAnotherCourse() {
+  filters.clearFilters()
+  filters.groupBy = 'exam'
+  goToStep(1)
+}
+
+// A visitor who already has a schedule is asked first whether they mean to add
+// to it or start over; "start over" just reveals the normal create flow.
+const startedFresh = ref(false)
+const needsChoice = computed(
+  () =>
+    !editing.value && !!props.viewModel.previousSchedule && !startedFresh.value
+)
+
 function goToStep(target) {
   step.value = target
   stepError.value = ''
@@ -287,324 +303,346 @@ const steps = [
         </div>
       </div>
 
-      <div
-        v-if="viewModel.previousSchedule && !editing"
-        class="mb-6 flex items-center justify-between gap-3 rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-900 dark:border-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-200"
+      <section
+        v-if="needsChoice"
+        data-testid="schedule-existing-choice"
+        class="mb-6 rounded-lg border border-theme-200 bg-theme-50 p-6 dark:border-zinc-700 dark:bg-zinc-950"
       >
-        <div>
-          <div class="font-medium">
-            你曾建立過課表：
-            <span class="text-theme-900 dark:text-zinc-100">
-              {{ viewModel.previousSchedule.name || '（未命名）' }}
-            </span>
-            ，確定要繼續新增新課表嗎？
-          </div>
-        </div>
-        <div class="flex gap-2">
-          <Link
-            :href="`/schedules/${viewModel.previousSchedule.token}`"
-            class="rounded bg-yellow-400 px-4 py-2 font-semibold text-yellow-900 hover:bg-yellow-500 dark:bg-yellow-600 dark:text-yellow-950 dark:hover:bg-yellow-500"
-            data-analytics-event="schedule_open_previous"
-            data-analytics-feature="schedule"
-          >
-            檢視舊課表
-          </Link>
-        </div>
-      </div>
-
-      <fieldset class="mb-6" data-testid="schedule-steps">
-        <legend class="sr-only">步驟</legend>
-        <div class="flex flex-wrap gap-3">
-          <label
-            v-for="item in steps"
-            :key="item.number"
-            :data-testid="'schedule-step-label-' + item.number"
-            class="flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-semibold focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-theme-700"
-            :class="[
-              step === item.number
-                ? 'border-theme-700 bg-theme-700 text-white'
-                : 'border-theme-300 text-theme-800 dark:border-zinc-600 dark:text-zinc-200',
-              item.number === 2 && selectedItems.length === 0
-                ? 'cursor-not-allowed opacity-60'
-                : 'cursor-pointer',
-            ]"
-          >
-            <input
-              type="radio"
-              name="schedule-step"
-              class="sr-only"
-              :value="item.number"
-              :data-testid="'schedule-step-' + item.number"
-              :checked="step === item.number"
-              :disabled="item.number === 2 && selectedItems.length === 0"
-              @change="switchStep(item.number)"
-            />
-            <span class="tabular-nums">{{ item.number }}</span>
-            {{ item.label }}
-          </label>
-        </div>
-      </fieldset>
-
-      <!-- Step 1: courses -->
-      <div v-if="step === 1" data-testid="schedule-step-courses">
         <h3
-          ref="stepHeading"
-          tabindex="-1"
-          class="mb-1 text-xl font-semibold text-theme-900 focus:outline-none dark:text-zinc-100"
+          class="mb-1 text-xl font-semibold text-theme-900 dark:text-zinc-100"
         >
-          選擇課程
+          你已經有課表，你想新增課程到課表，還是要建立新課表呢？
         </h3>
         <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
-          請選擇本學期課程（最多 {{ MAX_COURSES }} 門）。
+          目前的課表：{{ viewModel.previousSchedule.name || '（未命名）' }}
         </p>
-
-        <section
-          v-if="programs.length > 0"
-          data-testid="program-picker"
-          aria-labelledby="program-picker-heading"
-          class="mb-6 rounded-lg border border-theme-200 bg-theme-50 p-4 dark:border-zinc-700 dark:bg-zinc-950"
-        >
-          <h4
-            id="program-picker-heading"
-            class="mb-3 text-lg font-semibold text-theme-900 dark:text-zinc-100"
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <Link
+            :href="`/schedules/${viewModel.previousSchedule.token}/edit`"
+            data-testid="schedule-choice-add"
+            data-analytics-event="schedule_choice_add"
+            data-analytics-feature="schedule"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-6 py-3 text-lg font-semibold text-white transition hover:bg-theme-800"
           >
-            加入專班課程
-          </h4>
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
-            <div class="flex-1">
-              <label
-                for="program-region"
-                class="mb-1 block text-sm font-semibold text-theme-800 dark:text-zinc-200"
-              >
-                地區
-              </label>
-              <Select
-                id="program-region"
-                v-model="selectedRegion"
-                data-testid="program-region"
-              >
-                <option value="">請選擇地區</option>
-                <option
-                  v-for="item in regions"
-                  :key="item.region"
-                  :value="item.region"
-                >
-                  {{ item.label }}
-                </option>
-              </Select>
-            </div>
-            <div class="flex-1">
-              <label
-                for="program-name"
-                class="mb-1 block text-sm font-semibold text-theme-800 dark:text-zinc-200"
-              >
-                專班
-              </label>
-              <Select
-                id="program-name"
-                v-model="selectedProgramId"
-                :disabled="selectedRegion === ''"
-                data-testid="program-name"
-              >
-                <option value="">請選擇專班</option>
-                <option
-                  v-for="program in programsInRegion"
-                  :key="program.id"
-                  :value="String(program.id)"
-                >
-                  {{ program.name }}
-                </option>
-              </Select>
-            </div>
-            <button
-              type="button"
-              data-testid="program-add"
-              :disabled="selectedProgramId === ''"
-              class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-5 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
-              @click="addProgram"
-            >
-              加入
-            </button>
-          </div>
-          <p
-            v-if="programError"
-            role="alert"
-            data-testid="program-error"
-            class="mt-3 text-sm font-semibold text-red-700 dark:text-red-400"
-          >
-            {{ programError }}
-          </p>
-        </section>
-
-        <CourseFilters :filters="filters" />
-
-        <CourseGroupList
-          :sections="filters.sections"
-          :columns="filters.columns"
-          selectable
-          :selected-ids="selectedIds"
-          :limit-reached="limitReached"
-          @toggle="toggleCourse"
-        />
-
-        <div
-          class="sticky bottom-(--pwa-nav-height,0px) z-10 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-theme-200 bg-white p-4 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
-        >
-          <p
-            class="text-sm text-theme-800 dark:text-zinc-200"
-            data-testid="selected-count"
-            aria-live="polite"
-          >
-            已選 {{ selectedItems.length }} / {{ MAX_COURSES }} 門課程
-            <span v-if="limitReached">，已達上限，請先取消勾選再新增。</span>
-          </p>
+            新增課程到我的課表
+          </Link>
           <button
             type="button"
-            data-testid="schedule-next"
-            :disabled="selectedItems.length === 0"
-            class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-6 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
-            @click="goToStep(2)"
+            data-testid="schedule-choice-restart"
+            data-analytics-event="schedule_choice_restart"
+            data-analytics-feature="schedule"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-6 py-3 text-lg font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            @click="startedFresh = true"
           >
-            下一步：選擇班級
+            刪除我的課程，重新開始
           </button>
         </div>
-      </div>
+      </section>
 
-      <!-- Step 2: classes -->
-      <div v-else data-testid="schedule-step-classes">
-        <h3
-          ref="stepHeading"
-          tabindex="-1"
-          class="mb-1 text-xl font-semibold text-theme-900 focus:outline-none dark:text-zinc-100"
-        >
-          選擇班級
-        </h3>
-        <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
-          為每門課程選擇要上的班級。
-        </p>
+      <template v-if="!needsChoice">
+        <fieldset class="mb-6" data-testid="schedule-steps">
+          <legend class="sr-only">步驟</legend>
+          <div class="flex flex-wrap gap-3">
+            <label
+              v-for="item in steps"
+              :key="item.number"
+              :data-testid="'schedule-step-label-' + item.number"
+              class="flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-semibold focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-theme-700"
+              :class="[
+                step === item.number
+                  ? 'border-theme-700 bg-theme-700 text-white'
+                  : 'border-theme-300 text-theme-800 dark:border-zinc-600 dark:text-zinc-200',
+                item.number === 2 && selectedItems.length === 0
+                  ? 'cursor-not-allowed opacity-60'
+                  : 'cursor-pointer',
+              ]"
+            >
+              <input
+                type="radio"
+                name="schedule-step"
+                class="sr-only"
+                :value="item.number"
+                :data-testid="'schedule-step-' + item.number"
+                :checked="step === item.number"
+                :disabled="item.number === 2 && selectedItems.length === 0"
+                @change="switchStep(item.number)"
+              />
+              <span class="tabular-nums">{{ item.number }}</span>
+              {{ item.label }}
+            </label>
+          </div>
+        </fieldset>
 
-        <div class="mb-8 space-y-4">
-          <div
-            v-for="(item, index) in selectedItems"
-            :key="item.course.id"
-            :data-testid="'selected-item-' + item.course.id"
-            class="rounded-lg border-2 border-theme-300 bg-theme-50 p-4 dark:border-zinc-600 dark:bg-zinc-950"
+        <!-- Step 1: courses -->
+        <div v-if="step === 1" data-testid="schedule-step-courses">
+          <h3
+            ref="stepHeading"
+            tabindex="-1"
+            class="mb-1 text-xl font-semibold text-theme-900 focus:outline-none dark:text-zinc-100"
           >
-            <div class="mb-3 flex items-start justify-between gap-3">
-              <h4 class="text-lg font-bold text-theme-900 dark:text-zinc-100">
-                {{ item.course.name }}
-              </h4>
+            選擇課程
+          </h3>
+          <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
+            請選擇本學期課程（最多 {{ MAX_COURSES }} 門）。
+          </p>
+
+          <section
+            v-if="programs.length > 0"
+            data-testid="program-picker"
+            aria-labelledby="program-picker-heading"
+            class="mb-6 rounded-lg border border-theme-200 bg-theme-50 p-4 dark:border-zinc-700 dark:bg-zinc-950"
+          >
+            <h4
+              id="program-picker-heading"
+              class="mb-3 text-lg font-semibold text-theme-900 dark:text-zinc-100"
+            >
+              加入專班課程
+            </h4>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+              <div class="flex-1">
+                <label
+                  for="program-region"
+                  class="mb-1 block text-sm font-semibold text-theme-800 dark:text-zinc-200"
+                >
+                  地區
+                </label>
+                <Select
+                  id="program-region"
+                  v-model="selectedRegion"
+                  data-testid="program-region"
+                >
+                  <option value="">請選擇地區</option>
+                  <option
+                    v-for="item in regions"
+                    :key="item.region"
+                    :value="item.region"
+                  >
+                    {{ item.label }}
+                  </option>
+                </Select>
+              </div>
+              <div class="flex-1">
+                <label
+                  for="program-name"
+                  class="mb-1 block text-sm font-semibold text-theme-800 dark:text-zinc-200"
+                >
+                  專班
+                </label>
+                <Select
+                  id="program-name"
+                  v-model="selectedProgramId"
+                  :disabled="selectedRegion === ''"
+                  data-testid="program-name"
+                >
+                  <option value="">請選擇專班</option>
+                  <option
+                    v-for="program in programsInRegion"
+                    :key="program.id"
+                    :value="String(program.id)"
+                  >
+                    {{ program.name }}
+                  </option>
+                </Select>
+              </div>
               <button
                 type="button"
-                :aria-label="`移除 ${item.course.name}`"
-                class="inline-flex items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-100 px-3 py-1 text-sm font-semibold text-red-700 transition hover:bg-red-200"
-                @click="removeItem(index)"
+                data-testid="program-add"
+                :disabled="selectedProgramId === ''"
+                class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-5 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
+                @click="addProgram"
               >
-                移除
+                加入
               </button>
             </div>
-
-            <div
-              v-if="!item.course.has_classes"
-              data-testid="pending-class-note"
-              class="rounded-lg border-2 border-dashed border-theme-300 bg-theme-100 p-3 text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-300"
+            <p
+              v-if="programError"
+              role="alert"
+              data-testid="program-error"
+              class="mt-3 text-sm font-semibold text-red-700 dark:text-red-400"
             >
-              尚未開課，選課後將自動列入課表，開課後請記得回來選擇班級。
-            </div>
+              {{ programError }}
+            </p>
+          </section>
 
-            <div
-              v-else-if="isProgramItem(item)"
-              data-testid="program-class-note"
-              class="rounded-lg border-2 border-theme-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900"
+          <CourseFilters :filters="filters" />
+
+          <CourseGroupList
+            :sections="filters.sections"
+            :columns="filters.columns"
+            selectable
+            :selected-ids="selectedIds"
+            :limit-reached="limitReached"
+            @toggle="toggleCourse"
+          />
+
+          <div
+            class="sticky bottom-(--pwa-nav-height,0px) z-10 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-theme-200 bg-white p-4 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+          >
+            <p
+              class="text-sm text-theme-800 dark:text-zinc-200"
+              data-testid="selected-count"
+              aria-live="polite"
             >
-              <div class="font-semibold text-theme-900 dark:text-zinc-100">
-                專班：{{ item.course.classes[0].code }}
-              </div>
-              <div
-                v-if="item.course.classes[0].start_time"
-                class="text-sm text-theme-700 dark:text-zinc-400"
-              >
-                {{ item.course.classes[0].start_time }} -
-                {{ item.course.classes[0].end_time }}
-              </div>
-              <div
-                v-if="item.course.classes[0].teacher_name"
-                class="text-sm text-theme-700 dark:text-zinc-400"
-              >
-                {{ item.course.classes[0].teacher_name }}
-              </div>
-            </div>
-
-            <ClassOptions
-              v-else
-              v-model="item.selectedClassId"
-              :course="item.course"
-              :name="'class_' + index"
-            />
+              已選 {{ selectedItems.length }} / {{ MAX_COURSES }} 門課程
+              <span v-if="limitReached">，已達上限，請先取消勾選再新增。</span>
+            </p>
+            <button
+              type="button"
+              data-testid="schedule-next"
+              :disabled="selectedItems.length === 0"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-6 py-2 font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
+              @click="goToStep(2)"
+            >
+              下一步：選擇班級
+            </button>
           </div>
         </div>
 
-        <form
-          class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
-          @submit.prevent="submitForm"
-        >
-          <div class="mb-4">
-            <label
-              class="mb-1 block text-xl font-semibold text-theme-900 dark:text-zinc-100"
-              for="schedule-name"
-            >
-              課表名稱（可選）
-            </label>
-            <input
-              id="schedule-name"
-              v-model="scheduleName"
-              type="text"
-              name="name"
-              placeholder="例如：浣熊的課表"
-              class="w-full rounded-lg border-2 border-zinc-500 px-4 py-3 focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-500"
-            />
-          </div>
-
-          <p
-            v-if="stepError"
-            role="alert"
-            data-testid="schedule-error"
-            class="mb-4 text-sm font-semibold text-red-700 dark:text-red-400"
+        <!-- Step 2: classes -->
+        <div v-else data-testid="schedule-step-classes">
+          <h3
+            ref="stepHeading"
+            tabindex="-1"
+            class="mb-1 text-xl font-semibold text-theme-900 focus:outline-none dark:text-zinc-100"
           >
-            {{ stepError }}
+            選擇班級
+          </h3>
+          <p class="mb-4 text-sm text-theme-700 dark:text-zinc-400">
+            為每門課程選擇要上的班級。
           </p>
 
-          <div class="flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              data-testid="schedule-back"
-              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-6 py-3 text-lg font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
-              @click="goToStep(1)"
+          <div class="mb-8 space-y-4">
+            <div
+              v-for="(item, index) in selectedItems"
+              :key="item.course.id"
+              :data-testid="'selected-item-' + item.course.id"
+              class="rounded-lg border-2 border-theme-300 bg-theme-50 p-4 dark:border-zinc-600 dark:bg-zinc-950"
             >
-              {{ editing ? '調整課程' : '上一步' }}
-            </button>
-            <button
-              type="submit"
-              data-testid="schedule-submit"
-              :disabled="selectedItems.length === 0 || form.processing"
-              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-6 py-3 text-lg font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
-            >
-              <span v-if="!form.processing">{{ submitLabel }}</span>
-              <span v-else>{{ submittingLabel }}</span>
-            </button>
-            <Link
-              :href="
-                editing
-                  ? `/schedules/${viewModel.scheduleUuid}`
-                  : '/schedules/create'
-              "
-              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-6 py-3 text-lg font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
-            >
-              取消
-            </Link>
+              <div class="mb-3 flex items-start justify-between gap-3">
+                <h4 class="text-lg font-bold text-theme-900 dark:text-zinc-100">
+                  {{ item.course.name }}
+                </h4>
+                <button
+                  type="button"
+                  :aria-label="`移除 ${item.course.name}`"
+                  class="inline-flex items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-100 px-3 py-1 text-sm font-semibold text-red-700 transition hover:bg-red-200"
+                  @click="removeItem(index)"
+                >
+                  移除
+                </button>
+              </div>
+
+              <div
+                v-if="!item.course.has_classes"
+                data-testid="pending-class-note"
+                class="rounded-lg border-2 border-dashed border-theme-300 bg-theme-100 p-3 text-sm text-theme-700 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-300"
+              >
+                尚未開課，選課後將自動列入課表，開課後請記得回來選擇班級。
+              </div>
+
+              <div
+                v-else-if="isProgramItem(item)"
+                data-testid="program-class-note"
+                class="rounded-lg border-2 border-theme-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900"
+              >
+                <div class="font-semibold text-theme-900 dark:text-zinc-100">
+                  專班：{{ item.course.classes[0].code }}
+                </div>
+                <div
+                  v-if="item.course.classes[0].start_time"
+                  class="text-sm text-theme-700 dark:text-zinc-400"
+                >
+                  {{ item.course.classes[0].start_time }} -
+                  {{ item.course.classes[0].end_time }}
+                </div>
+                <div
+                  v-if="item.course.classes[0].teacher_name"
+                  class="text-sm text-theme-700 dark:text-zinc-400"
+                >
+                  {{ item.course.classes[0].teacher_name }}
+                </div>
+              </div>
+
+              <ClassOptions
+                v-else
+                v-model="item.selectedClassId"
+                :course="item.course"
+                :name="'class_' + index"
+              />
+            </div>
           </div>
-        </form>
-      </div>
+
+          <form
+            class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
+            @submit.prevent="submitForm"
+          >
+            <div class="mb-4">
+              <label
+                class="mb-1 block text-xl font-semibold text-theme-900 dark:text-zinc-100"
+                for="schedule-name"
+              >
+                課表名稱（可選）
+              </label>
+              <input
+                id="schedule-name"
+                v-model="scheduleName"
+                type="text"
+                name="name"
+                placeholder="例如：浣熊的課表"
+                class="w-full rounded-lg border-2 border-zinc-500 px-4 py-3 focus:border-theme-500 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:border-zinc-500"
+              />
+            </div>
+
+            <p
+              v-if="stepError"
+              role="alert"
+              data-testid="schedule-error"
+              class="mb-4 text-sm font-semibold text-red-700 dark:text-red-400"
+            >
+              {{ stepError }}
+            </p>
+
+            <div class="flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                data-testid="schedule-back"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-6 py-3 text-lg font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+                @click="goToStep(1)"
+              >
+                上一步
+              </button>
+              <button
+                v-if="!limitReached"
+                type="button"
+                data-testid="schedule-add-more"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-6 py-3 text-lg font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+                @click="addAnotherCourse"
+              >
+                新增其他課程
+              </button>
+              <button
+                type="submit"
+                data-testid="schedule-submit"
+                :disabled="selectedItems.length === 0 || form.processing"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-700 bg-theme-700 px-6 py-3 text-lg font-semibold text-white transition hover:bg-theme-800 disabled:bg-theme-400"
+              >
+                <span v-if="!form.processing">{{ submitLabel }}</span>
+                <span v-else>{{ submittingLabel }}</span>
+              </button>
+              <Link
+                :href="
+                  editing
+                    ? `/schedules/${viewModel.scheduleUuid}`
+                    : '/schedules/create'
+                "
+                class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-6 py-3 text-lg font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              >
+                取消
+              </Link>
+            </div>
+          </form>
+        </div>
+      </template>
     </div>
   </AppLayout>
 </template>
