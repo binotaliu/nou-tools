@@ -41,3 +41,17 @@ it('brings a side phone to the front when it is clicked', function () {
         ->and($position('player'))->toBe('right')
         ->and($position('courses'))->toBe('left');
 });
+
+it('hides the site header and footer with ?embed', function () {
+    visit(route('alt-uu', ['embed' => 1]))
+        ->assertSee('常見問題')
+        ->assertScript("getComputedStyle(document.querySelector('[data-testid=\"site-header\"]')).display", 'none')
+        ->assertScript("getComputedStyle(document.querySelector('[data-testid=\"site-footer\"]')).display", 'none');
+});
+
+it('keeps the site header and footer without ?embed', function () {
+    visit(route('alt-uu'))
+        ->assertSee('常見問題')
+        ->assertVisible('[data-testid="site-header"]')
+        ->assertVisible('[data-testid="site-footer"]');
+});

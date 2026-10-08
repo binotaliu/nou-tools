@@ -209,6 +209,13 @@
     scroll-padding-bottom: calc(var(--pwa-nav-height) + 5rem);
   }
 
+  /* /alt-uu?embed (flag set by the head script, never in an installed PWA):
+   * page content only, without the site header and footer. */
+  html[data-embed] [data-testid='site-header'],
+  html[data-embed] [data-testid='site-footer'] {
+    display: none;
+  }
+
   /* Inertia root as a full-height column: AppLayout's <main> grows (flex-1),
    * so the footer sits at the window's bottom edge on short pages. */
   #app {

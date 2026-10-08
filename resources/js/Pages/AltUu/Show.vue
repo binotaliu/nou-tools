@@ -2,7 +2,7 @@
 // Purely static marketing content (no ViewModel/props), so this page only
 // needs the layout chrome and its own inline markup.
 import { Head } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
 import HeroIllustration from '../../Components/AltUu/HeroIllustration.vue'
@@ -52,6 +52,10 @@ const faqs = [
 // button/expanded semantics unless the summary carries an explicit button
 // role, so this state mirrors the native `open` attribute onto
 // `aria-expanded` via the `toggle` event.
+// The embed flag comes from the head script on first load; drop it if the
+// reader navigates on inside the app so other pages keep their chrome.
+onBeforeUnmount(() => delete document.documentElement.dataset.embed)
+
 const faqOpenState = ref(faqs.map(() => false))
 </script>
 

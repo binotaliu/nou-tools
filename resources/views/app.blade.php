@@ -88,6 +88,16 @@
                 }
             }
 
+            // /alt-uu?embed: content only, no NOU Tools header/footer (CSS in
+            // app.css). Installed PWAs keep the shell.
+            if (
+                location.pathname === '/alt-uu' &&
+                new URLSearchParams(location.search).has('embed') &&
+                !document.documentElement.hasAttribute('data-pwa')
+            ) {
+                document.documentElement.dataset.embed = ''
+            }
+
             const accent = localStorage.getItem('accent-color')
             if (accent) {
                 document.documentElement.dataset.accent = accent
