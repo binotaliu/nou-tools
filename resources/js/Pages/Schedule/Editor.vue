@@ -572,6 +572,16 @@ const steps = [
             </div>
           </div>
 
+          <button
+            v-if="!limitReached"
+            type="button"
+            data-testid="schedule-add-more"
+            class="mb-8 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-6 py-3 text-lg font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            @click="addAnotherCourse"
+          >
+            新增更多課程
+          </button>
+
           <form
             class="rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"
             @submit.prevent="submitForm"
@@ -610,15 +620,6 @@ const steps = [
                 @click="goToStep(1)"
               >
                 上一步
-              </button>
-              <button
-                v-if="!limitReached"
-                type="button"
-                data-testid="schedule-add-more"
-                class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-6 py-3 text-lg font-semibold text-theme-900 transition hover:bg-theme-50 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
-                @click="addAnotherCourse"
-              >
-                新增其他課程
               </button>
               <button
                 type="submit"
