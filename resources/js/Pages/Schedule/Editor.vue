@@ -86,7 +86,7 @@ function initialSelection() {
 }
 
 const selectedItems = ref(initialSelection())
-const step = ref(editing.value && selectedItems.value.length > 0 ? 2 : 1)
+const step = ref(1)
 const stepError = ref('')
 
 const selectedIds = computed(() => selectedItems.value.map(i => i.course.id))
@@ -233,7 +233,7 @@ watch(
   () => props.viewModel.selectedTerm,
   () => {
     selectedItems.value = initialSelection()
-    step.value = editing.value && selectedItems.value.length > 0 ? 2 : 1
+    step.value = 1
     stepError.value = ''
     selectedRegion.value = ''
     programError.value = ''

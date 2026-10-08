@@ -41,7 +41,7 @@ it('keeps the picked courses when going back from the class step', function () {
         ->assertChecked('[data-testid="course-checkbox-'.$course->id.'"]');
 });
 
-it('opens an existing schedule on the class step', function () {
+it('opens an existing schedule on the course step with its courses checked', function () {
     config()->set('app.current_semester', '2025B');
 
     $course = Course::factory()->create(['term' => '2025B', 'name' => '編輯測試課程']);
@@ -49,8 +49,8 @@ it('opens an existing schedule on the class step', function () {
     $schedule->items()->create(['course_id' => $course->id]);
 
     visit(route('schedules.edit', $schedule))
-        ->assertPresent('[data-testid="schedule-step-classes"]')
-        ->assertPresent('[data-testid="selected-item-'.$course->id.'"]');
+        ->assertPresent('[data-testid="schedule-step-courses"]')
+        ->assertChecked('[data-testid="course-checkbox-'.$course->id.'"]');
 });
 
 it('switches between the steps with the step radios', function () {
