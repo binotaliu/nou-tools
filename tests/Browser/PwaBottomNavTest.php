@@ -180,7 +180,7 @@ it('collapses the schedule page actions into one menu in an installed PWA on a p
         ->screenshot(filename: 'pwa-schedule-actions-open');
 
     expect($linkTexts($page, '[data-testid="schedule-actions-menu"] a'))
-        ->toBe(['學習進度表', '成績計算機', '訂閱行事曆', '編輯', '自訂']);
+        ->toBe(['學習進度表', '訂閱行事曆', '編輯', '自訂']);
 
     // Tapping outside dismisses it.
     $page->click('[data-testid="schedule-title"]')->assertMissing('[data-testid="schedule-actions-menu"]');
