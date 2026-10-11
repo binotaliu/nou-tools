@@ -55,5 +55,8 @@
     "jsqr": "^1.4.0",
     "leaflet": "^1.9.4",
     "vue": "^3.5.42"
+  },
+  "overrides": {
+    "postcss-selector-parser": "^7.1.6"
   }
 }
