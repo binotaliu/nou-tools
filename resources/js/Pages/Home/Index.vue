@@ -11,12 +11,7 @@ import VideoCourses from '../../Components/Home/VideoCourses.vue'
 import Greeting from '../../Components/Greeting.vue'
 import CommonLinks from '../../Components/CommonLinks.vue'
 import SchoolCalendar from '../../Components/SchoolCalendar.vue'
-import {
-  aboutItem,
-  moreMenuItems,
-  navItems,
-  settingsItem,
-} from '../../navigation'
+import { moreMenuItems, navItems } from '../../navigation'
 
 defineProps({
   viewModel: {
@@ -33,13 +28,9 @@ defineProps({
   },
 })
 
-// Every navigation entry except 我的課表 (the primary button above) and 首頁.
-const launcherItems = [
-  ...navItems.slice(1),
-  ...moreMenuItems,
-  settingsItem,
-  aboutItem,
-]
+// Every navigation entry except 我的課表 (the primary button above), 首頁,
+// 設定 and 關於.
+const launcherItems = [...navItems.slice(1), ...moreMenuItems]
 
 // --- offline banner (same one-off pattern as Directory/Index.vue and
 // Schedule/Show.vue) ---
