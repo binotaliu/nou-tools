@@ -69,6 +69,7 @@ $classCode = ($item->courseClass === null || $item->courseClass->isTentative) ? 
 - [完整檢視]({{ route('schedules.show', $viewModel->uuid) }}): 以網頁方式完整檢視課表
 - [編輯課表]({{ route('schedules.edit', $viewModel->uuid) }}): 編輯課表資訊（網頁）
 - [學習進度表]({{ route('learning-progress.show', ['schedule' => $viewModel->uuid, 'term' => $viewModel->selectedTerm]) }}): 學習進度表，可用於管理自己的學習進度與課程完成狀態
+- [成績計算機]({{ route('grade-calculator.show', ['schedule' => $viewModel->uuid, 'term' => $viewModel->selectedTerm]) }}): 輸入平時、期中、期末成績，計算學期成績與期末考及格所需分數
 - [訂閱行事曆設定]({{ route('schedules.subscribe', $viewModel->uuid) }}): 調整訂閱通知與提醒設定（網頁）
 
 ## 備註

@@ -614,6 +614,16 @@ function localHint(next) {
             </Link>
 
             <Link
+              :href="`/schedules/${viewModel.uuid}/${viewModel.selectedTerm}/grade-calculator`"
+              data-analytics-event="grade_calculator_open"
+              data-analytics-feature="grade_calculator"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-theme-500 bg-white px-4 py-2 font-semibold text-theme-900 transition hover:bg-theme-50 sm:w-1/2 lg:w-auto dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            >
+              <Icon name="calculator" class="size-4" />
+              成績計算機
+            </Link>
+
+            <Link
               :href="`/schedules/${viewModel.uuid}/subscribe`"
               data-analytics-event="calendar_subscribe_open"
               data-analytics-feature="schedule"
@@ -729,6 +739,16 @@ function localHint(next) {
                 >
                   <Icon name="clipboard" class="size-5 shrink-0" />
                   學習進度表
+                </Link>
+                <Link
+                  :href="`/schedules/${viewModel.uuid}/${viewModel.selectedTerm}/grade-calculator`"
+                  role="menuitem"
+                  data-analytics-event="grade_calculator_open"
+                  data-analytics-feature="grade_calculator"
+                  class="flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-theme-800 transition-colors hover:bg-theme-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                >
+                  <Icon name="calculator" class="size-5 shrink-0" />
+                  成績計算機
                 </Link>
                 <Link
                   :href="`/schedules/${viewModel.uuid}/subscribe`"

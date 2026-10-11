@@ -8,12 +8,18 @@
 const LEARNING_PROGRESS_PATH =
   /^\/schedules\/(?:my|[^/]+\/[^/]+)\/learning-progress$/
 
+// Same for the grade calculator, which lives next to it.
+const GRADE_CALCULATOR_PATH =
+  /^\/schedules\/(?:my|[^/]+\/[^/]+)\/grade-calculator$/
+
 export const navItems = [
   {
     href: '/schedules/my',
     prefix: '/schedules',
     match: path =>
-      path.startsWith('/schedules') && !LEARNING_PROGRESS_PATH.test(path),
+      path.startsWith('/schedules') &&
+      !LEARNING_PROGRESS_PATH.test(path) &&
+      !GRADE_CALCULATOR_PATH.test(path),
     label: '我的課表',
     icon: 'table-cells',
   },
@@ -74,6 +80,13 @@ export const moreMenuItems = [
     prefix: '/courses/schedule',
     label: '本學期開課表',
     icon: 'calendar-days',
+  },
+  {
+    href: '/schedules/my/grade-calculator',
+    prefix: '/schedules/my/grade-calculator',
+    match: path => GRADE_CALCULATOR_PATH.test(path),
+    label: '成績計算機',
+    icon: 'calculator',
   },
   {
     href: '/directory',

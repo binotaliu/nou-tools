@@ -132,6 +132,13 @@
     "viewports": ["desktop", "mobile"]
   },
   {
+    "name": "schedules-my-grade-calculator",
+    "path": "/schedules/my/grade-calculator",
+    "needsSchedule": true,
+    "auth": true,
+    "viewports": ["desktop", "mobile"]
+  },
+  {
     "name": "study-room-authed",
     "path": "/study-room",
     "needsSchedule": true,
