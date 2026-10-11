@@ -16,6 +16,17 @@ return [
             'tracks_expiry' => false,
             'is_active' => true,
         ],
+        'post-bac' => [
+            'name' => '30⁺ 大學',
+            'category' => '最新消息',
+            'fetch_url' => 'https://www2.nou.edu.tw/30/docList.aspx?uid=6134&pid=6134',
+            'fetcher_type' => AnnouncementFetcherType::HTML_SCRAPE->value,
+            'fetcher_config' => [
+                'base_url' => 'https://www2.nou.edu.tw/30',
+            ],
+            'tracks_expiry' => false,
+            'is_active' => true,
+        ],
 
         // region 各處室
         'academic-affairs-course-selection' => [
