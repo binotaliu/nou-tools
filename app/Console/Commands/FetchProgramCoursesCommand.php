@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use NouTools\Domains\Courses\Actions\ImportProgramCourses;
 use NouTools\Domains\Courses\Actions\ParseNouProgramCourses;
+use NouTools\Domains\Courses\Actions\ParsePostBacCourses;
 
 final class FetchProgramCoursesCommand extends Command
 {
@@ -15,8 +16,11 @@ final class FetchProgramCoursesCommand extends Command
 
     protected $description = 'Fetch 專班 courses and classes from the NOU video-class region pages';
 
-    public function handle(ParseNouProgramCourses $parseNouProgramCourses, ImportProgramCourses $importProgramCourses): int
-    {
+    public function handle(
+        ParseNouProgramCourses $parseNouProgramCourses,
+        ParsePostBacCourses $parsePostBacCourses,
+        ImportProgramCourses $importProgramCourses,
+    ): int {
         $term = $this->argument('term') ?? config('app.current_semester');
 
         if (! is_string($term) || ! preg_match('/^\d{4}[ABC]$/', $term)) {
@@ -31,6 +35,21 @@ final class FetchProgramCoursesCommand extends Command
         $complete = true;
 
         foreach ((array) config('special_programs.regions') as $region => $config) {
+            if (isset($config['file'])) {
+                $path = base_path($config['file']);
+                $programs = is_file($path) ? $parsePostBacCourses((string) file_get_contents($path), $term) : [];
+
+                if ($programs === []) {
+                    $this->warn("No 專班 for {$term} in {$config['file']}");
+                    $complete = false;
+                }
+
+                $programsByRegion[$region] = $programs;
+                $this->info("  {$config['label']}: ".count($programs).' 專班');
+
+                continue;
+            }
+
             $response = Http::timeout(30)->get($config['url']);
 
             if (! $response->successful()) {

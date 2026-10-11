@@ -6,6 +6,9 @@ declare(strict_types=1);
  * The 專班 pages under https://vc.nou.edu.tw/svc/, one per region. Each page
  * lists several 專班, each with its own courses and classes for the current
  * semester. Order here is the order shown in the schedule editor.
+ *
+ * A region with a `file` instead of a `url` is read from a local JSON file by
+ * ParsePostBacCourses (the 學士後 classes, which have no page to fetch).
  */
 return [
     'regions' => [
@@ -19,5 +22,6 @@ return [
         'tt' => ['label' => '台東', 'url' => 'https://vc.nou.edu.tw/svc/tt.html'],
         'km' => ['label' => '金門', 'url' => 'https://vc.nou.edu.tw/svc/km.html'],
         'arcs' => ['label' => '馬祖', 'url' => 'https://vc.nou.edu.tw/svc/arcs.html'],
+        'pb' => ['label' => '30⁺', 'file' => 'resources/data/post-bac.json'],
     ],
 ];

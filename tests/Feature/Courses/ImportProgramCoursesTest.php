@@ -10,6 +10,7 @@ use App\Models\StudentScheduleItem;
 use Illuminate\Support\Facades\Http;
 use NouTools\Domains\Courses\Actions\ImportProgramCourses;
 use NouTools\Domains\Courses\Actions\ParseNouProgramCourses;
+use NouTools\Domains\Courses\Actions\ParsePostBacCourses;
 
 $sampleProgramsByRegion = function (): array {
     $html = file_get_contents(__DIR__.'/../../fixtures/svc_sample.html');
@@ -138,7 +139,8 @@ it('fetches every region through program:fetch', function () {
 
     $this->artisan('program:fetch', ['term' => '2026A'])->assertFailed();
 
-    expect(Program::query()->count())->toBe(2);
+    expect(Program::query()->where('region', 'tc')->count())->toBe(2)
+        ->and(Program::query()->where('region', 'pb')->count())->toBe(8);
 });
 
 it('succeeds and removes stale data when every region page has programs', function () {
@@ -184,4 +186,27 @@ it('unflags a special-program-only course once course:fetch sees it', function (
 
     expect($course->fresh()->is_special_program_only)->toBeFalse()
         ->and($course->classes()->count())->toBe(1);
+});
+
+it('imports the post-bac classes as 專班 in the 30⁺ region, in the evening slot', function () {
+    $json = file_get_contents(base_path(config('special_programs.regions.pb.file')));
+    $programs = (new ParsePostBacCourses)($json, '2026A');
+
+    expect($programs)->toHaveCount(8);
+
+    app(ImportProgramCourses::class)('2026A', ['pb' => $programs]);
+
+    $program = Program::query()->where('name', '人工智慧跨域應用')->firstOrFail();
+    $class = $program->classes()->whereHas('course', fn ($query) => $query->where('name', '機器學習的原理與應用'))->firstOrFail();
+
+    expect($program->region)->toBe('pb')
+        ->and($program->classes)->toHaveCount(6)
+        ->and($class->start_time)->toBe('19:00')
+        ->and($class->end_time)->toBe('20:50')
+        ->and($class->schedules()->orderBy('date')->pluck('date')->map->format('Y-m-d')->all())
+        ->toBe(['2026-09-07', '2026-10-05', '2026-11-09', '2026-12-21']);
+});
+
+it('returns no post-bac programs for a term missing from the file', function () {
+    expect((new ParsePostBacCourses)('{"2026A":{"courses":[],"classes":[]}}', '2026B'))->toBe([]);
 });
