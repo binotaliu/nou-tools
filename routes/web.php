@@ -16,6 +16,7 @@ use App\Http\Controllers\DiscountStoreCommentController;
 use App\Http\Controllers\DiscountStoreController;
 use App\Http\Controllers\DiscountStoreReportController;
 use App\Http\Controllers\DiscountStoreSubmittedController;
+use App\Http\Controllers\GradeCalculatorController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LearningProgressController;
 use App\Http\Controllers\Markdown\AnnouncementIndexMarkdownController;
@@ -49,6 +50,7 @@ use App\Http\Controllers\ScheduleDeviceDestroyController;
 use App\Http\Controllers\ScheduleDeviceRestoreController;
 use App\Http\Controllers\ScheduleLiteController;
 use App\Http\Controllers\ScheduleMyController;
+use App\Http\Controllers\ScheduleMyGradeCalculatorController;
 use App\Http\Controllers\ScheduleMyLearningProgressController;
 use App\Http\Controllers\ScheduleMyStoreController;
 use App\Http\Controllers\SchedulePrintController;
@@ -160,6 +162,7 @@ Route::delete('/schedules/device', ScheduleDeviceDestroyController::class)->name
 Route::post('/schedules/device/backup', ScheduleDeviceBackupController::class)->name('schedules.device.backup')->middleware('throttle:30,1');
 Route::post('/schedules/device/restore', ScheduleDeviceRestoreController::class)->name('schedules.device.restore')->middleware('throttle:20,1');
 Route::get('/schedules/my/learning-progress', ScheduleMyLearningProgressController::class)->name('schedules.my.learning-progress');
+Route::get('/schedules/my/grade-calculator', ScheduleMyGradeCalculatorController::class)->name('schedules.my.grade-calculator');
 Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show')
     ->withMarkdown(ScheduleShowMarkdownController::class);
 Route::get('/schedules/{schedule}/lite', ScheduleLiteController::class)->name('schedules.lite');
@@ -181,6 +184,11 @@ Route::get('/schedules/{schedule}/{term}/learning-progress', [LearningProgressCo
     ->name('learning-progress.show');
 Route::put('/schedules/{schedule}/{term}/learning-progress', [LearningProgressController::class, 'update'])
     ->name('learning-progress.update');
+
+Route::get('/schedules/{schedule}/{term}/grade-calculator', [GradeCalculatorController::class, 'show'])
+    ->name('grade-calculator.show');
+Route::put('/schedules/{schedule}/{term}/grade-calculator', [GradeCalculatorController::class, 'update'])
+    ->name('grade-calculator.update');
 
 Route::get('/discount-stores', [DiscountStoreController::class, 'index'])->name('discount-stores.index')
     ->withMarkdown(DiscountStoreIndexMarkdownController::class);

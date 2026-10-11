@@ -103,6 +103,7 @@ final class HandleInertiaRequests extends Middleware
             'schedules.customize' => '自訂課表 - NOU 小幫手',
             'schedules.subscribe' => '訂閱行事曆 - NOU 小幫手',
             'learning-progress.show' => '學習進度表 - NOU 小幫手',
+            'grade-calculator.show' => '成績計算機 - NOU 小幫手',
             default => null,
         };
     }

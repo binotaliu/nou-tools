@@ -89,6 +89,14 @@ final class StudentSchedule extends Model
     }
 
     /**
+     * @return HasMany<GradeCalculation, $this>
+     */
+    public function gradeCalculations(): HasMany
+    {
+        return $this->hasMany(GradeCalculation::class);
+    }
+
+    /**
      * @return HasOne<StudyRoomProfile, $this>
      */
     public function studyRoomProfile(): HasOne
