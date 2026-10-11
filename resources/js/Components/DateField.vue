@@ -365,7 +365,7 @@ onBeforeUnmount(() => {
         ? 'h-full w-full'
         : variant === 'box'
           ? 'w-full'
-          : 'inline-block'
+          : 'inline-block max-w-full'
     "
   >
     <input v-if="name" type="hidden" :name="name" :value="value" />
@@ -374,12 +374,12 @@ onBeforeUnmount(() => {
       ref="trigger"
       type="button"
       v-bind="$attrs"
-      class="cursor-pointer whitespace-nowrap text-theme-900 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:text-zinc-100"
+      class="max-w-full cursor-pointer text-theme-900 focus:ring-2 focus:ring-theme-500 focus:outline-none dark:text-zinc-100"
       :class="[
         variant === 'cell'
-          ? 'm-0 h-full w-full px-2 py-2 text-center text-xs focus:ring-inset'
+          ? 'm-0 h-full w-full px-2 py-2 text-center text-xs whitespace-nowrap focus:ring-inset'
           : variant === 'box'
-            ? 'flex w-full items-center justify-center rounded-md border border-theme-200 px-3 py-2.5 text-sm dark:border-zinc-700'
+            ? 'flex w-full items-center justify-center rounded-md border border-theme-200 px-3 py-2.5 text-sm whitespace-nowrap dark:border-zinc-700'
             : 'rounded border border-theme-200 bg-white px-3 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-900',
         {
           'text-zinc-500 dark:text-zinc-400 print:text-transparent': !selected,
