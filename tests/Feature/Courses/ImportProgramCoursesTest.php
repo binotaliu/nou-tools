@@ -140,7 +140,7 @@ it('fetches every region through program:fetch', function () {
     $this->artisan('program:fetch', ['term' => '2026A'])->assertFailed();
 
     expect(Program::query()->where('region', 'tc')->count())->toBe(2)
-        ->and(Program::query()->where('region', 'pb')->count())->toBe(8);
+        ->and(Program::query()->where('region', 'pb')->count())->toBe(10);
 });
 
 it('succeeds and removes stale data when every region page has programs', function () {
@@ -192,7 +192,7 @@ it('imports the post-bac classes as 專班 in the 30⁺ region, in the evening s
     $json = file_get_contents(base_path(config('special_programs.regions.pb.file')));
     $programs = (new ParsePostBacCourses)($json, '2026A');
 
-    expect($programs)->toHaveCount(8);
+    expect($programs)->toHaveCount(10);
 
     app(ImportProgramCourses::class)('2026A', ['pb' => $programs]);
 
@@ -200,7 +200,7 @@ it('imports the post-bac classes as 專班 in the 30⁺ region, in the evening s
     $class = $program->classes()->whereHas('course', fn ($query) => $query->where('name', '機器學習的原理與應用'))->firstOrFail();
 
     expect($program->region)->toBe('pb')
-        ->and($program->classes)->toHaveCount(6)
+        ->and($program->classes)->toHaveCount(5)
         ->and($class->start_time)->toBe('19:00')
         ->and($class->end_time)->toBe('20:50')
         ->and($class->schedules()->orderBy('date')->pluck('date')->map->format('Y-m-d')->all())
