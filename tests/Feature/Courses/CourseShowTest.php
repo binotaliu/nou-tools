@@ -207,6 +207,27 @@ test('course show page shows previous-schedule link when cookie exists', functio
     });
 });
 
+test('course show page has no previous exams for a viewer with a schedule when the course has none', function () {
+    $course = Course::factory()->create();
+
+    $schedule = StudentSchedule::create([
+        'uuid' => Str::uuid(),
+        'name' => 'My Saved Schedule',
+    ]);
+
+    $this->withCookie('student_schedule', json_encode([
+        'id' => $schedule->id,
+        'uuid' => $schedule->uuid,
+        'name' => $schedule->name,
+    ]))->get(route('course.show', $course))
+        ->assertInertia(function (Assert $page) {
+            $viewModel = $page->toArray()['props']['viewModel'];
+
+            expect($viewModel['previousSchedule'])->not->toBeNull();
+            expect($viewModel['course']['previousExams'])->toBeEmpty();
+        });
+});
+
 // new test for multiple previous exams
 
 test('course show page displays all previous exams for course when cookie exists', function () {

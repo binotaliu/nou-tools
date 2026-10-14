@@ -560,6 +560,22 @@ function examReferenceUrl(reference) {
 
       <!-- Previous Exams Section (only shown when user has a schedule cookie) -->
       <div
+        v-if="viewModel.previousSchedule && course.previousExams.length === 0"
+        id="previous-exams"
+        data-testid="previous-exams-empty"
+        class="mb-6 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900 print:hidden"
+      >
+        <h2
+          class="mb-1 text-xl font-semibold text-theme-900 dark:text-zinc-100"
+        >
+          考古題
+        </h2>
+        <p class="text-theme-700 dark:text-zinc-300">
+          這門課目前沒有考古題。可能原因：這是本學期新開設的課程，或是本課程是全遠距課程，因此沒有實體考試。
+        </p>
+      </div>
+
+      <div
         v-if="viewModel.previousSchedule && course.previousExams.length > 0"
         id="previous-exams"
         class="mb-6 rounded-lg border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900 print:hidden"
