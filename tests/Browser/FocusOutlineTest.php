@@ -86,7 +86,7 @@ it('does not clip the focus outline on public pages', function (string $url) use
     'schedule find' => '/schedules/my',
     'about' => '/about',
     'settings' => '/settings',
-    'article list' => '/kb',
+    'article list' => '/manual',
     'announcements' => '/announcements',
     'discount stores' => '/discount-stores',
     'study room preview' => '/study-room',

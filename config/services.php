@@ -40,6 +40,7 @@ return [
             'new_store' => env('DISCORD_WEBHOOK_URL_NEW_STORE'),
             'new_report' => env('DISCORD_WEBHOOK_URL_NEW_REPORT'),
             'new_comment' => env('DISCORD_WEBHOOK_URL_NEW_COMMENT'),
+            'wiki_review' => env('DISCORD_WEBHOOK_URL_WIKI_REVIEW'),
         ],
     ],
 

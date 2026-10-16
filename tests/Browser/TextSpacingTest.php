@@ -67,7 +67,7 @@ JS), true);
     'schedule create' => '/schedules/create',
     'video classes' => '/video-classes',
     'announcements' => '/announcements',
-    'article' => '/kb/about-nou',
+    'wiki page' => '/wiki/about-nou',
     'settings' => '/settings',
     'study room preview' => '/study-room',
 ]);

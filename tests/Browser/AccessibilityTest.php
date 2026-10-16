@@ -51,7 +51,7 @@ it('names the header navigation and lets the skip link land on main', function (
 });
 
 it('renders a single main landmark on article pages', function () {
-    $page = visit('/kb/about-nou');
+    $page = visit('/manual/welcome');
 
     $page->assertNoJavaScriptErrors()
         ->assertPresent('[data-testid="article-share-button"]');

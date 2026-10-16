@@ -34,6 +34,8 @@ use App\Http\Controllers\Markdown\ScheduleShowMarkdownController;
 use App\Http\Controllers\Markdown\SchoolCalendarIndexMarkdownController;
 use App\Http\Controllers\Markdown\StudyRoomMarkdownController;
 use App\Http\Controllers\Markdown\VideoClassIndexMarkdownController;
+use App\Http\Controllers\Markdown\WikiIndexMarkdownController;
+use App\Http\Controllers\Markdown\WikiShowMarkdownController;
 use App\Http\Controllers\MusicPlaylistController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NewsletterFeedController;
@@ -80,6 +82,15 @@ use App\Http\Controllers\StudyRoomStateController;
 use App\Http\Controllers\StudyRoomTimerController;
 use App\Http\Controllers\StudyRoomTimerEndNotificationController;
 use App\Http\Controllers\VideoClassController;
+use App\Http\Controllers\WikiAllPagesController;
+use App\Http\Controllers\WikiCategoryController;
+use App\Http\Controllers\WikiController;
+use App\Http\Controllers\WikiEditRequestController;
+use App\Http\Controllers\WikiEditRequestRedraftController;
+use App\Http\Controllers\WikiEditRequestRefineController;
+use App\Http\Controllers\WikiEditRequestSubmitController;
+use App\Http\Controllers\WikiHistoryController;
+use App\Http\Controllers\WikiRevisionController;
 use Illuminate\Support\Facades\Route;
 use Spatie\Csp\AddCspHeaders;
 
@@ -227,6 +238,37 @@ Route::prefix('study-room')->name('study-room.')->group(function (): void {
     Route::put('/goal-reminder', StudyRoomGoalReminderController::class)->name('goal-reminder.update')->middleware('throttle:10,1');
     Route::post('/heartbeat', StudyRoomHeartbeatController::class)->name('heartbeat')->middleware('throttle:60,1');
 });
+
+Route::prefix('wiki')->name('wiki.')->group(function (): void {
+    Route::get('/new', [WikiEditRequestController::class, 'create'])->name('new');
+    Route::get('/all', WikiAllPagesController::class)->name('all');
+    Route::get('/category/{category}', WikiCategoryController::class)->name('category');
+
+    Route::post('/edit-requests', [WikiEditRequestController::class, 'store'])->name('edit-requests.store')->middleware('throttle:10,1');
+    Route::get('/edit-requests/{editRequest}', [WikiEditRequestController::class, 'show'])->name('edit-requests.show');
+    Route::post('/edit-requests/{editRequest}/refine', WikiEditRequestRefineController::class)->name('edit-requests.refine')->middleware('throttle:10,1');
+    Route::post('/edit-requests/{editRequest}/submit', WikiEditRequestSubmitController::class)->name('edit-requests.submit')->middleware('throttle:10,1');
+    Route::post('/edit-requests/{editRequest}/redraft', WikiEditRequestRedraftController::class)->name('edit-requests.redraft')->middleware('throttle:10,1');
+    Route::delete('/edit-requests/{editRequest}', [WikiEditRequestController::class, 'destroy'])->name('edit-requests.destroy')->middleware('throttle:10,1');
+
+    Route::get('/{slug}/edit', [WikiEditRequestController::class, 'edit'])->name('edit')->where('slug', '[a-z0-9-]+');
+    Route::get('/{slug}/history', WikiHistoryController::class)->name('history')->where('slug', '[a-z0-9-]+');
+    Route::get('/{slug}/revisions/{revision}', WikiRevisionController::class)->name('revision')->where('slug', '[a-z0-9-]+')->whereNumber('revision');
+});
+
+// Registered outside the wiki group: withMarkdown() registers its sibling
+// route from inside the current group, so a prefixed group would apply the
+// prefix twice.
+Route::get('/wiki', [WikiController::class, 'index'])->name('wiki.index')
+    ->withMarkdown(WikiIndexMarkdownController::class);
+Route::get('/wiki/{slug}', [WikiController::class, 'show'])->name('wiki.show')
+    ->where('slug', '[a-z0-9-]+')
+    ->withMarkdown(WikiShowMarkdownController::class);
+
+// The file-based 知識庫 (/kb) became the wiki.
+Route::permanentRedirect('/kb', '/wiki');
+Route::permanentRedirect('/kb.md', '/wiki.md');
+Route::get('/kb/{slug}', fn (string $slug) => redirect('/wiki/'.$slug, 301))->where('slug', '[a-z0-9_-]+(?:\.md)?');
 
 Route::get('/{type}', [ArticleController::class, 'index'])->name('articles.index')
     ->whereIn('type', ArticleType::cases())

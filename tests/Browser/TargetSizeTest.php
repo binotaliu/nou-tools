@@ -68,7 +68,7 @@ it('keeps every control at least 24x24 CSS px and text at least 12px', function 
     'accessibility' => '/accessibility',
     'settings' => '/settings',
     'about' => '/about',
-    'article list' => '/kb',
+    'article list' => '/manual',
     'study room preview' => '/study-room',
     'video classes' => '/video-classes',
 ]);

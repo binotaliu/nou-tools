@@ -64,6 +64,12 @@ export const moreMenuItems = [
     icon: 'megaphone',
   },
   {
+    href: '/wiki',
+    prefix: '/wiki',
+    label: '知識庫',
+    icon: 'question-mark-circle',
+  },
+  {
     href: '/video-classes',
     prefix: '/video-classes',
     label: '今日視訊面授',

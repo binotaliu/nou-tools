@@ -35,5 +35,10 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- Never reach the real Discord webhooks from .env; tests that check notifications set their own URL and fake them. -->
+        <env name="DISCORD_WEBHOOK_URL_NEW_STORE" value=""/>
+        <env name="DISCORD_WEBHOOK_URL_NEW_REPORT" value=""/>
+        <env name="DISCORD_WEBHOOK_URL_NEW_COMMENT" value=""/>
+        <env name="DISCORD_WEBHOOK_URL_WIKI_REVIEW" value=""/>
     </php>
 </phpunit>

@@ -1,7 +1,7 @@
 <script setup>
 // The share button and modal are the shared ShareButton component
 // (driven by `useArticleShare`). `viewModel.article.type` only survives
-// Inertia's JSON serialization as the enum's string value (`kb` / `manual`),
+// Inertia's JSON serialization as the enum's string value (`manual`),
 // so `App\Enums\ArticleType::label()` is re-implemented here from that
 // value. `viewModel.article.content` / `viewModel.sidebarContent` are plain
 // HTML (rendered Markdown) straight from the ViewModel, rendered with
@@ -21,7 +21,6 @@ const props = defineProps({
 })
 
 const ARTICLE_TYPE_LABELS = {
-  kb: '知識庫',
   manual: '操作手冊',
 }
 
