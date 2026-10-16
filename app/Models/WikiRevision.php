@@ -10,6 +10,7 @@ use Database\Factories\WikiRevisionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use NouTools\Domains\Wiki\DataTransferObjects\PublishWikiRevisionDTO;
 
 /**
  * One immutable version of a wiki page. Publishing never edits a revision;
@@ -44,6 +45,21 @@ final class WikiRevision extends Model
             'categories' => 'array',
             'origin' => WikiRevisionOrigin::class,
         ];
+    }
+
+    public function fillFromDTO(PublishWikiRevisionDTO $data): self
+    {
+        $this->title = $data->title;
+        $this->description = $data->description;
+        $this->body = $data->body;
+        $this->categories = $data->categories;
+        $this->edit_summary = $data->editSummary;
+        $this->origin = $data->origin;
+        $this->wiki_edit_request_id = $data->editRequestId;
+        $this->user_id = $data->userId;
+        $this->student_schedule_id = $data->studentScheduleId;
+
+        return $this;
     }
 
     /**
