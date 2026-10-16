@@ -20,13 +20,27 @@ final readonly class ArticleMarkdownConverterFactory
 {
     public function make(): MarkdownConverter
     {
-        $environment = new Environment($this->config());
-        $environment->addExtension(new CommonMarkCoreExtension);
-        $environment->addExtension(new GithubFlavoredMarkdownExtension);
+        $environment = $this->baseEnvironment();
         $environment->addExtension(new FrontMatterExtension);
-        $environment->addExtension(new NouMarkdownExtension);
 
         return new MarkdownConverter($environment);
+    }
+
+    /**
+     * The pipeline without front matter, for callers that build their own
+     * dialect on top of it (the wiki adds `[[links]]` and footnotes, and its
+     * bodies must not lose a leading `---` to the front matter parser).
+     *
+     * @param  array<string, mixed>  $extraConfig
+     */
+    public function baseEnvironment(array $extraConfig = []): Environment
+    {
+        $environment = new Environment([...$this->config(), ...$extraConfig]);
+        $environment->addExtension(new CommonMarkCoreExtension);
+        $environment->addExtension(new GithubFlavoredMarkdownExtension);
+        $environment->addExtension(new NouMarkdownExtension);
+
+        return $environment;
     }
 
     /**
