@@ -124,14 +124,8 @@ final class FetchWikiSource implements Tool
             return '[This PDF could not be read: the server has no PDF text extractor (pdftotext). Tell the user the PDF could not be read.]';
         }
 
-        $path = tempnam(sys_get_temp_dir(), 'wikipdf');
-        file_put_contents($path, $pdf);
-
-        try {
-            $result = Process::timeout(30)->run([$binary, '-layout', '-enc', 'UTF-8', $path, '-']);
-        } finally {
-            @unlink($path);
-        }
+        // `-` as the input reads the PDF from stdin, so no temporary file.
+        $result = Process::timeout(30)->input($pdf)->run([$binary, '-layout', '-enc', 'UTF-8', '-', '-']);
 
         return $result->successful() && trim($result->output()) !== ''
             ? trim($result->output())

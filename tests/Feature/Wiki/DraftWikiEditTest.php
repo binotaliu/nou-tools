@@ -267,3 +267,19 @@ it('says so when the server cannot read PDFs instead of calling them empty', fun
 
     expect($result)->toContain('could not be read')->not->toContain('no extractable text');
 })->skip(fn (): bool => is_executable('/opt/homebrew/bin/pdftotext') || is_executable('/usr/local/bin/pdftotext') || is_executable('/usr/bin/pdftotext'), 'pdftotext is installed in a standard location');
+
+it('reads a PDF source through pdftotext without a temporary file', function (): void {
+    config(['wiki.source_domains' => ['nou.edu.tw']]);
+
+    // A minimal one-page PDF that says "Exam rules"; pdftotext rebuilds
+    // the missing cross-reference table itself.
+    $pdf = "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n"
+        ."3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 100]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj\n"
+        ."4 0 obj<</Length 44>>stream\nBT /F1 18 Tf 20 40 Td (Exam rules) Tj ET\nendstream endobj\n"
+        ."5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF\n";
+
+    Http::fake(['www.nou.edu.tw/a.pdf' => Http::response($pdf, 200, ['Content-Type' => 'application/pdf'])]);
+
+    expect((string) (new FetchWikiSource(1))->handle(new Request(['url' => 'https://www.nou.edu.tw/a.pdf'])))
+        ->toContain('Exam rules');
+})->skip(fn (): bool => ! is_executable('/opt/homebrew/bin/pdftotext') && ! is_executable('/usr/local/bin/pdftotext') && ! is_executable('/usr/bin/pdftotext'), 'pdftotext is not installed');
