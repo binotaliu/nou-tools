@@ -8,7 +8,7 @@ use League\CommonMark\MarkdownConverter;
 use NouTools\Domains\Wiki\Markdown\WikiMarkdownConverterFactory;
 
 /**
- * Renders wiki Markdown (page bodies, drafts and the guides) to HTML that is
+ * Renders wiki Markdown (page bodies and drafts) to HTML that is
  * mounted with `v-html` and hydrated by useMarkdownContainers.
  */
 final class RenderWikiMarkdown

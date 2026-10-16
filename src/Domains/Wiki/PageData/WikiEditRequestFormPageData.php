@@ -26,7 +26,5 @@ final class WikiEditRequestFormPageData extends Resource
         public int $instructionMaxLength,
         public int $maxSourceUrls,
         public array $sourceDomains,
-        public string $writingGuideUrl,
-        public string $syntaxGuideUrl,
     ) {}
 }

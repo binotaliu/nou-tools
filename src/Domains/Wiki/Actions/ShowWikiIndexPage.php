@@ -58,8 +58,6 @@ final readonly class ShowWikiIndexPage
             query: $query,
             searchResults: $query === '' ? null : $this->search($query),
             newPageUrl: route('wiki.new'),
-            writingGuideUrl: route('wiki.guide', 'writing'),
-            syntaxGuideUrl: route('wiki.guide', 'syntax'),
         );
     }
 

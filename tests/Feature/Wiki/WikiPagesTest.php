@@ -103,7 +103,7 @@ it('serves the raw markdown twin', function (): void {
     $this->get('/wiki.md')->assertOk()->assertSee('[空大考試要去哪裡考？]', false);
 });
 
-it('shows history, a revision with its diff, a category and the guides', function (): void {
+it('shows history, a revision with its diff and a category', function (): void {
     $this->get(route('wiki.history', 'nou-exams-info'))
         ->assertInertia(fn (Assert $page) => $page->component('Wiki/History')->has('viewModel.revisions', 1));
 
@@ -116,10 +116,11 @@ it('shows history, a revision with its diff, a category and the guides', functio
     $this->get(route('wiki.category', ['category' => '考試']))
         ->assertInertia(fn (Assert $page) => $page->component('Wiki/Category')->where('viewModel.pages.0.slug', 'nou-exams-info'));
 
-    $this->get(route('wiki.guide', 'syntax'))
-        ->assertInertia(fn (Assert $page) => $page->component('Wiki/Guide')->where('viewModel.title', '語法說明'));
+});
 
-    $this->get('/wiki/guide/other')->assertNotFound();
+it('keeps the writing and syntax guides to the AI editor', function (): void {
+    $this->get('/wiki/guide/syntax')->assertNotFound();
+    $this->get('/wiki/guide/writing')->assertNotFound();
 });
 
 it('shows the edit form with sign-in state', function (): void {

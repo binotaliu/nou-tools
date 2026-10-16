@@ -39,7 +39,6 @@ final class WikiPage extends Model
      */
     public const array RESERVED_SLUGS = [
         'new',
-        'guide',
         'category',
         'categories',
         'edit-requests',

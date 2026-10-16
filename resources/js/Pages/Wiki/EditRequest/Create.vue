@@ -136,11 +136,8 @@ const labelClasses =
         <p class="text-theme-800 dark:text-zinc-300">
           知識庫不能直接編輯。請說明{{
             isNewPage ? '新條目要寫什麼' : '這個條目要怎麼改'
-          }}，並附上來源；AI 編輯會依照<Link
-            :href="viewModel.writingGuideUrl"
-            class="underline hover:no-underline"
-            >撰寫指南</Link
-          >寫出草稿，你確認差異後再送出。
+          }}，並附上來源；AI
+          編輯會依照知識庫的寫作規則寫出草稿，你確認差異後再送出。
         </p>
       </header>
 
@@ -311,11 +308,6 @@ const labelClasses =
             <Icon name="paper-airplane" class="size-4" />
             請 AI 編輯撰寫草稿
           </Button>
-          <Link
-            :href="viewModel.syntaxGuideUrl"
-            class="text-sm text-theme-700 underline hover:no-underline dark:text-zinc-400"
-            >語法說明</Link
-          >
         </div>
       </form>
     </div>

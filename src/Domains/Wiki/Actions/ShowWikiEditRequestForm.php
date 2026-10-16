@@ -31,8 +31,6 @@ final readonly class ShowWikiEditRequestForm
             instructionMaxLength: (int) config('wiki.instruction_max_length'),
             maxSourceUrls: (int) config('wiki.max_source_urls'),
             sourceDomains: WikiSourceDomains::all(),
-            writingGuideUrl: route('wiki.guide', 'writing'),
-            syntaxGuideUrl: route('wiki.guide', 'syntax'),
         );
     }
 }

@@ -24,9 +24,9 @@ use Stringable;
 /**
  * Turns a visitor's description of a change (or of a new page) into the
  * complete new page, or declines it. Its rules are `resources/wiki/ai/editor.md`
- * followed by the same writing and syntax guides contributors read, so the
- * model and the people follow one text. It may fetch the cited sources (only
- * on the allowed hosts) and look up other wiki pages and categories.
+ * followed by the writing and syntax guides in `resources/wiki/guides/`
+ * (editor-only, never served to visitors). It may fetch the cited sources
+ * (only on the allowed hosts) and look up other wiki pages and categories.
  */
 final class WikiEditor implements Agent, HasStructuredOutput, HasTools
 {

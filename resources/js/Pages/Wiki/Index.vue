@@ -5,10 +5,7 @@ import AppLayout from '../../Layouts/AppLayout.vue'
 import Button from '../../Components/Button.vue'
 import Icon from '../../Components/Icon.vue'
 import { formatWikiDate } from '../../Composables/useWikiDates'
-import {
-  WIKI_OUTLINE_LINK,
-  WIKI_PRIMARY_LINK,
-} from '../../Components/Wiki/linkClasses'
+import { WIKI_PRIMARY_LINK } from '../../Components/Wiki/linkClasses'
 
 const props = defineProps({
   viewModel: {
@@ -39,11 +36,7 @@ function search() {
         </h2>
         <p class="text-theme-800 dark:text-zinc-300">
           由空大同學一起整理的知識庫。任何人都可以提出修改：說明想改什麼、附上來源，AI
-          編輯會依照<Link
-            :href="viewModel.writingGuideUrl"
-            class="underline hover:no-underline"
-            >撰寫指南</Link
-          >改寫條目，確認後送出。內容僅供參考，請以學校公告為準。
+          編輯會改寫條目並送出。內容僅供參考，請以學校公告為準。
         </p>
         <div class="flex flex-wrap gap-2">
           <Link
@@ -53,10 +46,6 @@ function search() {
           >
             <Icon name="squares-plus" class="size-4" />
             建立新條目
-          </Link>
-          <Link :href="viewModel.syntaxGuideUrl" :class="WIKI_OUTLINE_LINK">
-            <Icon name="code-bracket" class="size-4" />
-            語法說明
           </Link>
         </div>
       </header>

@@ -42,8 +42,6 @@ final readonly class GenerateSitemap
             new SitemapUrlViewModel(url: route('discount-stores.create'), changeFrequency: 'yearly', priority: 0.3),
             new SitemapUrlViewModel(url: route('study-room.show'), changeFrequency: 'daily', priority: 0.6),
             new SitemapUrlViewModel(url: route('wiki.index'), changeFrequency: 'daily', priority: 0.7),
-            new SitemapUrlViewModel(url: route('wiki.guide', 'writing'), changeFrequency: 'monthly', priority: 0.3),
-            new SitemapUrlViewModel(url: route('wiki.guide', 'syntax'), changeFrequency: 'monthly', priority: 0.3),
         ])
             ->merge($this->courseUrls())
             ->merge($this->discountStoreUrls())

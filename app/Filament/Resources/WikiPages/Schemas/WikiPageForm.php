@@ -52,7 +52,7 @@ class WikiPageForm
                     ]),
                 MarkdownEditor::make('body')
                     ->label('內文')
-                    ->helperText('語法請見 /wiki/guide/syntax。')
+                    ->helperText('Markdown，另支援 [[代稱]] 內部連結與註腳。')
                     ->required()
                     ->columnSpanFull(),
                 TextInput::make('edit_summary')

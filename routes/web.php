@@ -88,7 +88,6 @@ use App\Http\Controllers\WikiEditRequestController;
 use App\Http\Controllers\WikiEditRequestRedraftController;
 use App\Http\Controllers\WikiEditRequestRefineController;
 use App\Http\Controllers\WikiEditRequestSubmitController;
-use App\Http\Controllers\WikiGuideController;
 use App\Http\Controllers\WikiHistoryController;
 use App\Http\Controllers\WikiRevisionController;
 use Illuminate\Support\Facades\Route;
@@ -241,7 +240,6 @@ Route::prefix('study-room')->name('study-room.')->group(function (): void {
 
 Route::prefix('wiki')->name('wiki.')->group(function (): void {
     Route::get('/new', [WikiEditRequestController::class, 'create'])->name('new');
-    Route::get('/guide/{guide}', WikiGuideController::class)->name('guide')->whereIn('guide', ['writing', 'syntax']);
     Route::get('/category/{category}', WikiCategoryController::class)->name('category');
 
     Route::post('/edit-requests', [WikiEditRequestController::class, 'store'])->name('edit-requests.store')->middleware('throttle:10,1');

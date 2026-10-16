@@ -25,7 +25,5 @@ final class WikiIndexPageData extends Resource
         public string $query,
         public ?array $searchResults,
         public string $newPageUrl,
-        public string $writingGuideUrl,
-        public string $syntaxGuideUrl,
     ) {}
 }
