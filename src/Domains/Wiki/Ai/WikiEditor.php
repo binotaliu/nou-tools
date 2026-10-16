@@ -6,12 +6,15 @@ namespace NouTools\Domains\Wiki\Ai;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\File;
+use Laravel\Ai\Ai;
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Contracts\HasStructuredOutput;
 use Laravel\Ai\Contracts\HasTools;
+use Laravel\Ai\Contracts\Providers\SupportsWebFetch;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Promptable;
 use Laravel\Ai\Providers\Tools\WebFetch;
+use NouTools\Domains\Wiki\Ai\Tools\FetchWikiSource;
 use NouTools\Domains\Wiki\Ai\Tools\ListWikiCategories;
 use NouTools\Domains\Wiki\Ai\Tools\ReadWikiPage;
 use NouTools\Domains\Wiki\Ai\Tools\SearchWikiPages;
@@ -50,9 +53,9 @@ final class WikiEditor implements Agent, HasStructuredOutput, HasTools
         ];
 
         if ($this->maxFetches() > 0) {
-            $tools[] = (new WebFetch)
-                ->max($this->maxFetches())
-                ->allow(WikiSourceDomains::all());
+            $tools[] = $this->providerFetchesServerSide()
+                ? (new WebFetch)->max($this->maxFetches())->allow(WikiSourceDomains::all())
+                : new FetchWikiSource($this->maxFetches());
         }
 
         return $tools;
@@ -92,6 +95,15 @@ final class WikiEditor implements Agent, HasStructuredOutput, HasTools
     public function timeout(): int
     {
         return 180 + 30 * $this->maxFetches();
+    }
+
+    /**
+     * Anthropic and Gemini fetch inside the provider; OpenAI cannot, so it
+     * gets our own `FetchWikiSource` tool instead.
+     */
+    private function providerFetchesServerSide(): bool
+    {
+        return Ai::textProvider($this->provider()) instanceof SupportsWebFetch;
     }
 
     private function maxFetches(): int

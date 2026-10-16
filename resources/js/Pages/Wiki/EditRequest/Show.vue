@@ -328,7 +328,10 @@ const panelClasses =
             role="alert"
             class="rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950/50 dark:text-amber-100"
           >
-            上一次的再調整沒有成功，以下仍是先前的草稿。
+            上一次的再調整沒有成功，以下仍是先前的草稿。<template
+              v-if="request.lastRefinementDeclineReason"
+              >編輯的說明：{{ request.lastRefinementDeclineReason }}</template
+            >
           </p>
 
           <div role="tablist" aria-label="草稿檢視方式" class="flex gap-2">

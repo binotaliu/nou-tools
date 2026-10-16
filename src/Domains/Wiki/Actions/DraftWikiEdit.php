@@ -52,6 +52,19 @@ final readonly class DraftWikiEdit
             return $this->fail($editRequest, ['editor error']);
         }
 
+        if (! $draft->applies && $editRequest->refinements !== [] && filled($editRequest->draft_body)) {
+            $editRequest->refinements = array_slice($editRequest->refinements, 0, -1);
+            $editRequest->ai_verdict = [
+                ...($editRequest->ai_verdict ?? []),
+                'lastRefinementFailed' => true,
+                'lastRefinementDeclineReason' => $draft->declineReason,
+            ];
+            $editRequest->status = WikiEditRequestStatus::AwaitingConfirmation;
+            $editRequest->saveOrFail();
+
+            return $editRequest;
+        }
+
         $editRequest->ai_verdict = $draft->verdict();
 
         if (! $draft->applies) {

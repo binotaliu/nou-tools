@@ -6,9 +6,11 @@ use App\Enums\WikiEditRequestStatus;
 use App\Models\WikiCategory;
 use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
+use Illuminate\Support\Facades\Http;
 use Laravel\Ai\Providers\Tools\WebFetch;
 use Laravel\Ai\Tools\Request;
 use NouTools\Domains\Wiki\Actions\DraftWikiEdit;
+use NouTools\Domains\Wiki\Ai\Tools\FetchWikiSource;
 use NouTools\Domains\Wiki\Ai\Tools\ListWikiCategories;
 use NouTools\Domains\Wiki\Ai\Tools\ReadWikiPage;
 use NouTools\Domains\Wiki\Ai\Tools\SearchWikiPages;
@@ -179,7 +181,7 @@ it('gives the editor the guides and treats the request as data', function (): vo
 });
 
 it('gives the editor wiki tools and a capped fetch limited to the allowed hosts', function (): void {
-    config(['wiki.ai.max_fetches' => 3, 'wiki.source_domains' => ['nou.edu.tw']]);
+    config(['wiki.ai.provider' => 'anthropic', 'wiki.ai.max_fetches' => 3, 'wiki.source_domains' => ['nou.edu.tw']]);
 
     $tools = collect((new WikiEditor)->tools());
     $fetch = $tools->first(fn ($tool): bool => $tool instanceof WebFetch);
@@ -205,4 +207,48 @@ it('searches, reads and lists wiki content for the editor', function (): void {
         ->and((string) app(ReadWikiPage::class)->handle(new Request(['slug' => 'nou-exams-info'])))->toContain('## 考場')
         ->and((string) app(ReadWikiPage::class)->handle(new Request(['slug' => 'missing'])))->toContain('No page')
         ->and((string) app(ListWikiCategories::class)->handle(new Request([])))->toContain('考試 (1)');
+});
+
+it('gives providers without a server-side fetch our own capped fetch tool', function (): void {
+    config(['wiki.ai.provider' => 'openai', 'wiki.ai.max_fetches' => 2]);
+
+    $tools = collect((new WikiEditor)->tools());
+
+    expect($tools->contains(fn ($tool): bool => $tool instanceof WebFetch))->toBeFalse()
+        ->and($tools->first(fn ($tool): bool => $tool instanceof FetchWikiSource))->toBeInstanceOf(FetchWikiSource::class);
+});
+
+it('fetches only allowed hosts, follows allowed redirects and honours the limit', function (): void {
+    config(['wiki.source_domains' => ['nou.edu.tw']]);
+    Http::fake([
+        'www.nou.edu.tw/a' => Http::response('<html><nav>menu</nav><script>x()</script><p>二次考查</p><p>30分以上</p></html>'),
+        'www.nou.edu.tw/b' => Http::response('', 302, ['Location' => 'https://evil.example.com/x']),
+    ]);
+    $tool = new FetchWikiSource(2);
+    $call = fn (string $url) => (string) $tool->handle(new Request(['url' => $url]));
+
+    expect($call('https://evil.example.com/x'))->toContain('not on an allowed host')
+        ->and($call('https://www.nou.edu.tw/a'))->toContain("二次考查\n30分以上")->not->toContain('menu')
+        ->and($call('https://www.nou.edu.tw/b'))->toContain('redirects to a host that is not allowed')
+        ->and($call('https://www.nou.edu.tw/a'))->toContain('limit');
+});
+
+it('keeps the earlier draft when the editor declines a refinement', function (): void {
+    WikiEditor::fake([($this->response)(), ['decision' => 'decline', 'decline_reason' => '來源沒有這項規定。']]);
+    $editRequest = WikiEditRequest::factory()->create(['wiki_page_id' => $this->page->id, 'base_revision_id' => $this->page->current_revision_id]);
+    app(DraftWikiEdit::class)($editRequest);
+
+    $editRequest->refresh();
+    $editRequest->refinements = ['加上期末考沒有二次考查'];
+    $editRequest->status = WikiEditRequestStatus::Drafting;
+    $editRequest->save();
+    app(DraftWikiEdit::class)($editRequest);
+
+    $editRequest->refresh();
+
+    expect($editRequest->status)->toBe(WikiEditRequestStatus::AwaitingConfirmation)
+        ->and($editRequest->refinements)->toBe([])
+        ->and($editRequest->draft_body)->toContain('各學習指導中心')
+        ->and($editRequest->ai_verdict['lastRefinementFailed'])->toBeTrue()
+        ->and($editRequest->ai_verdict['lastRefinementDeclineReason'])->toBe('來源沒有這項規定。');
 });
