@@ -15,7 +15,7 @@ final readonly class AbandonWikiEditRequest
      */
     public function __invoke(WikiEditRequest $editRequest): WikiEditRequest
     {
-        if (! in_array($editRequest->status, [WikiEditRequestStatus::AwaitingConfirmation, WikiEditRequestStatus::Conflict, WikiEditRequestStatus::Failed, WikiEditRequestStatus::DeclinedByAi], true)) {
+        if (! $editRequest->canBeAbandoned()) {
             throw new DomainException('這個修改目前無法放棄。');
         }
 

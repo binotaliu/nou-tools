@@ -5,7 +5,7 @@ use App\Models\ScheduleDevice;
 use App\Models\StudentSchedule;
 use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
-use NouTools\Domains\Wiki\Actions\DraftWikiEdit;
+use NouTools\Domains\Wiki\Actions\DraftAndSubmitWikiEdit;
 use NouTools\Domains\Wiki\Ai\WikiEditor;
 
 // The whole loop needs a real browser: the device cookie is HttpOnly, the
@@ -41,7 +41,7 @@ it('asks a visitor without a schedule to sign in first', function (): void {
         ->assertMissing('[data-testid="wiki-edit-request-form"]');
 });
 
-it('polls for the draft, shows the diff and preview, and publishes it on confirmation', function (): void {
+it('shows the editor at work, then the published edit with its diff, preview and refine form', function (): void {
     WikiEditor::fake([[
         'decision' => 'apply',
         'decline_reason' => '',
@@ -70,21 +70,23 @@ it('polls for the draft, shows the diff and preview, and publishes it on confirm
     ]);
 
     $browser->navigate(route('wiki.edit-requests.show', $editRequest))
-        ->assertVisible('[data-testid="wiki-request-drafting"]');
+        ->assertVisible('[data-testid="wiki-request-drafting"]')
+        ->assertVisible('[data-testid="wiki-drafting-step"]');
 
-    app(DraftWikiEdit::class)($editRequest);
+    // What the job does after the response: no 確認送出 in between.
+    app(DraftAndSubmitWikiEdit::class)($editRequest);
 
-    waitUntil($browser, 'document.querySelector(\'[data-testid="wiki-diff"]\') !== null', 10000);
+    waitUntil($browser, 'document.querySelector(\'[data-testid="wiki-request-published"]\') !== null', 10000);
+
+    expect($editRequest->refresh()->status)->toBe(WikiEditRequestStatus::Published);
 
     $browser->assertSee('更新考試開始時間')
         ->assertPresent('[data-diff-type="added"]')
+        ->assertMissing('[data-testid="wiki-request-submit"]')
+        ->assertVisible('[data-testid="wiki-refine-instruction"]')
         ->click('[data-testid="wiki-tab-preview"]')
         ->assertVisible('[data-testid="wiki-draft-preview"]')
-        ->click('[data-testid="wiki-request-submit"]');
-
-    waitUntil($browser, 'document.querySelector(\'[data-testid="wiki-request-published"]\') !== null');
-
-    expect($editRequest->refresh()->status)->toBe(WikiEditRequestStatus::Published);
+        ->assertNoJavaScriptErrors();
 
     $browser->navigate('/wiki/nou-exams-info')
         ->assertSeeIn('[data-testid="wiki-page-content"]', '上午九點半開始');

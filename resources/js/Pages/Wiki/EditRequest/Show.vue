@@ -1,9 +1,11 @@
 <script setup>
 // Status page of an edit request. While the AI editor is drafting (it runs
-// after the response that created the request) the page polls itself; then
-// the visitor reviews the diff and preview and submits, refines (再調整) or
-// abandons. Anyone with the link can watch; only the device's schedule that
-// made the request gets the controls (`isOwner`).
+// after the response that created the request) the page polls itself; the
+// draft is submitted as soon as it is written, so closing the page loses
+// nothing. Afterwards the visitor sees what was published or queued for
+// review, with its diff and preview, and can still refine it (再調整) or
+// withdraw a queued one. Anyone with the link can watch; only the device's
+// schedule that made the request gets the controls (`canRefine` etc.).
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { Head, Link, router, useForm, usePage, usePoll } from '@inertiajs/vue3'
 import AppLayout from '../../../Layouts/AppLayout.vue'
@@ -11,6 +13,7 @@ import Button from '../../../Components/Button.vue'
 import FieldError from '../../../Components/FieldError.vue'
 import Icon from '../../../Components/Icon.vue'
 import DiffView from '../../../Components/Wiki/DiffView.vue'
+import DraftingIndicator from '../../../Components/Wiki/DraftingIndicator.vue'
 import useMarkdownContainers from '../../../Composables/useMarkdownContainers'
 import { WIKI_PRIMARY_LINK } from '../../../Components/Wiki/linkClasses'
 
@@ -90,6 +93,17 @@ function abandon() {
   router.delete(`/wiki/edit-requests/${request.value.uuid}`)
 }
 
+// Drafts are submitted on their own; 確認送出 is only for requests left
+// waiting from before that, or whose automatic submission didn't go through.
+const hasActions = computed(
+  () =>
+    status.value !== 'drafting' &&
+    request.value.isOwner &&
+    (status.value === 'awaiting_confirmation' ||
+      request.value.canRefine ||
+      request.value.canAbandon)
+)
+
 const retryUrl = computed(() =>
   request.value.page ? `${request.value.page.url}/edit` : '/wiki/new'
 )
@@ -164,22 +178,11 @@ const panelClasses =
         {{ errors.request }}
       </p>
 
-      <div
+      <DraftingIndicator
         v-if="status === 'drafting'"
-        role="status"
-        :class="panelClasses"
-        class="flex items-center gap-3"
-        data-testid="wiki-request-drafting"
-      >
-        <Icon
-          name="arrow-path"
-          class="size-5 animate-spin motion-reduce:animate-none"
-        />
-        <span
-          >AI
-          編輯正在撰寫草稿，可能需要一到兩分鐘，完成後這個頁面會自動更新。</span
-        >
-      </div>
+        :is-refinement="request.refinements.length > 0"
+        :has-sources="request.sourceUrls.length > 0"
+      />
 
       <div
         v-else-if="status === 'declined_by_ai'"
@@ -229,6 +232,13 @@ const panelClasses =
           class="mt-2 text-sm text-theme-700 dark:text-zinc-400"
         >
           需要審核的原因：{{ request.reviewReasons.join('、') }}
+        </p>
+        <p v-if="request.publishedUrl" class="mt-2 text-sm">
+          <Link
+            :href="request.publishedUrl"
+            class="text-theme-900 underline hover:no-underline dark:text-zinc-100"
+            >先前的版本</Link
+          >已經發布，這次的調整通過審核後會接著發布。
         </p>
       </div>
 
@@ -296,7 +306,7 @@ const panelClasses =
         這個修改已經放棄。
       </div>
 
-      <template v-if="request.draftContent && status !== 'published'">
+      <template v-if="request.draftContent">
         <section
           :class="panelClasses"
           class="space-y-4"
@@ -368,13 +378,20 @@ const panelClasses =
         </section>
 
         <section
-          v-if="request.isOwner && status === 'awaiting_confirmation'"
+          v-if="hasActions"
           :class="panelClasses"
           class="space-y-6"
-          aria-label="確認草稿"
+          :aria-label="
+            status === 'awaiting_confirmation' ? '確認草稿' : '調整修改'
+          "
+          data-testid="wiki-request-actions"
         >
-          <div class="flex flex-wrap gap-2">
+          <div
+            v-if="status === 'awaiting_confirmation' || request.canAbandon"
+            class="flex flex-wrap gap-2"
+          >
             <Button
+              v-if="status === 'awaiting_confirmation'"
               variant="primary"
               :disabled="processing"
               data-testid="wiki-request-submit"
@@ -384,24 +401,28 @@ const panelClasses =
               確認送出
             </Button>
             <Button
+              v-if="request.canAbandon"
               variant="ghost"
               data-testid="wiki-request-abandon"
               @click="abandon"
             >
-              放棄
+              {{ status === 'pending_review' ? '撤回' : '放棄' }}
             </Button>
           </div>
 
           <form
-            v-if="request.refinementsLeft > 0"
+            v-if="request.canRefine"
             class="space-y-2"
             @submit.prevent="refine"
           >
             <label
               for="refine-instruction"
               class="block text-sm font-medium text-theme-700 dark:text-zinc-300"
-              >還想調整什麼？（還可以再調整
-              {{ request.refinementsLeft }} 次）</label
+              >{{
+                status === 'published'
+                  ? '發現問題？還可以再調整'
+                  : '還想調整什麼？'
+              }}（還可以再調整 {{ request.refinementsLeft }} 次）</label
             >
             <textarea
               id="refine-instruction"

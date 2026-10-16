@@ -13,10 +13,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 
 /**
- * The visitor confirmed the draft: publish it when the rules allow,
- * otherwise queue it for an admin. If the page changed since the draft was
- * written, the request becomes a conflict instead and the visitor can have
- * it redrafted against the new version.
+ * Sends a fresh draft on: publish it when the rules allow, otherwise queue
+ * it for an admin. Runs on its own once the editor has drafted
+ * (DraftAndSubmitWikiEdit); the visitor's 確認送出 is left only for drafts
+ * that were not submitted automatically. If the page changed since the draft
+ * was written, the request becomes a conflict instead and the visitor can
+ * have it redrafted against the new version.
  */
 final readonly class SubmitWikiEditRequest
 {
@@ -42,7 +44,7 @@ final readonly class SubmitWikiEditRequest
                 : WikiPage::query()->lockForUpdate()->findOrFail($editRequest->wiki_page_id);
 
             $isStale = $page !== null
-                ? $page->current_revision_id !== $editRequest->base_revision_id
+                ? $page->current_revision_id !== $editRequest->expectedCurrentRevisionId()
                 : ! WikiPage::isSlugAvailable((string) $editRequest->draft_slug);
 
             if ($isStale) {

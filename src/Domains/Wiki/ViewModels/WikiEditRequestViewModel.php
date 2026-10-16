@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Wiki\ViewModels;
 
-use App\Enums\WikiEditRequestStatus;
 use App\Models\WikiEditRequest;
 use NouTools\Domains\Wiki\Actions\RenderWikiMarkdown;
 use Spatie\LaravelData\Data;
@@ -32,6 +31,8 @@ final class WikiEditRequestViewModel extends Data
         public array $sourceUrls,
         public array $refinements,
         public int $refinementsLeft,
+        public bool $canRefine,
+        public bool $canAbandon,
         public ?string $draftSlug,
         public ?string $draftTitle,
         public ?string $draftDescription,
@@ -53,18 +54,22 @@ final class WikiEditRequestViewModel extends Data
     public static function fromModel(WikiEditRequest $editRequest, RenderWikiMarkdown $render, bool $isOwner): self
     {
         $hasDraft = filled($editRequest->draft_body);
-        $publishedPage = $editRequest->status === WikiEditRequestStatus::Published ? $editRequest->page : null;
+        // Also while a refinement of a published edit waits for review: the
+        // earlier version is live.
+        $publishedPage = $editRequest->published_revision_id !== null ? $editRequest->page : null;
 
         return new self(
             uuid: $editRequest->uuid,
             status: $editRequest->status->value,
             statusLabel: $editRequest->status->label(),
-            isNewPage: $editRequest->isNewPage() && $editRequest->status !== WikiEditRequestStatus::Published,
+            isNewPage: $editRequest->isNewPage() && $editRequest->published_revision_id === null,
             page: $editRequest->page?->currentRevision !== null ? WikiPageLinkViewModel::fromModel($editRequest->page) : null,
             instruction: $editRequest->instruction,
             sourceUrls: $editRequest->source_urls,
             refinements: $editRequest->refinements,
             refinementsLeft: max(0, (int) config('wiki.max_refinements') - count($editRequest->refinements)),
+            canRefine: $isOwner && $hasDraft && $editRequest->canBeRefined(),
+            canAbandon: $isOwner && $editRequest->canBeAbandoned(),
             draftSlug: $editRequest->draft_slug,
             draftTitle: $editRequest->draft_title,
             draftDescription: $editRequest->draft_description,

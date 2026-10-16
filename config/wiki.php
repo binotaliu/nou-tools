@@ -8,7 +8,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Nobody edits wiki text directly: a visitor describes the change, the AI
-    | editor rewrites the page and the visitor confirms the diff. Low-risk
+    | editor rewrites the page and the draft is submitted at once. Low-risk
     | edits publish on their own (see `auto_publish`), everything else waits
     | for an admin in Filament.
     |

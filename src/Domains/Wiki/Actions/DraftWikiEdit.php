@@ -14,8 +14,8 @@ use Throwable;
 
 /**
  * Runs the AI editor on a request that is drafting and records the outcome:
- * a draft awaiting the visitor's confirmation, a decline with its reason, or
- * a failure. The model call happens before anything is written, and a draft
+ * a draft ready to submit (DraftAndSubmitWikiEdit sends it on), a decline
+ * with its reason, or a failure. The model call happens before anything is written, and a draft
  * that fails validation never replaces the previous one.
  */
 final readonly class DraftWikiEdit
@@ -59,7 +59,7 @@ final readonly class DraftWikiEdit
                 'lastRefinementFailed' => true,
                 'lastRefinementDeclineReason' => $draft->declineReason,
             ];
-            $editRequest->status = WikiEditRequestStatus::AwaitingConfirmation;
+            $editRequest->status = $this->statusBeforeRefinement($editRequest);
             $editRequest->saveOrFail();
 
             return $editRequest;
@@ -87,6 +87,18 @@ final readonly class DraftWikiEdit
     }
 
     /**
+     * A refinement the editor couldn't carry out leaves the earlier draft
+     * where it was: still published, still waiting for review, or (for a
+     * request from before drafts were submitted automatically) waiting for
+     * the visitor.
+     */
+    private function statusBeforeRefinement(WikiEditRequest $editRequest): WikiEditRequestStatus
+    {
+        return WikiEditRequestStatus::tryFrom((string) ($editRequest->ai_verdict['statusBeforeRefinement'] ?? ''))
+            ?? WikiEditRequestStatus::AwaitingConfirmation;
+    }
+
+    /**
      * A refinement that fails keeps the earlier draft, so the visitor can
      * still submit or try a different wording.
      *
@@ -98,7 +110,7 @@ final readonly class DraftWikiEdit
 
         if ($editRequest->refinements !== [] && filled($editRequest->draft_body)) {
             $editRequest->refinements = array_slice($editRequest->refinements, 0, -1);
-            $editRequest->status = WikiEditRequestStatus::AwaitingConfirmation;
+            $editRequest->status = $this->statusBeforeRefinement($editRequest);
             $editRequest->ai_verdict = [...$editRequest->ai_verdict, 'lastRefinementFailed' => true];
         } else {
             $editRequest->status = WikiEditRequestStatus::Failed;

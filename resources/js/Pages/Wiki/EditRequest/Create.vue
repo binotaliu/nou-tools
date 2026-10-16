@@ -1,6 +1,7 @@
 <script setup>
 // 提出修改 / 建立新條目. Nobody edits text here: the visitor describes the
-// change and cites sources, and the AI editor drafts it on the next page.
+// change and cites sources, and the AI editor drafts and submits it while the
+// next page shows its progress.
 // Needs a browser signed in to a schedule (the closest thing to an account).
 import { computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
@@ -137,7 +138,7 @@ const labelClasses =
           知識庫不能直接編輯。請說明{{
             isNewPage ? '新條目要寫什麼' : '這個條目要怎麼改'
           }}，並附上來源；AI
-          編輯會依照知識庫的寫作規則寫出草稿，你確認差異後再送出。
+          編輯會依照知識庫的寫作規則改寫，完成後自動送出。小幅修改會直接發布，其餘交由管理員審核。送出後即使關閉頁面，修改也不會遺失。
         </p>
       </header>
 
@@ -298,17 +299,15 @@ const labelClasses =
           />
         </div>
 
-        <div class="flex flex-wrap items-center gap-3">
-          <Button
-            type="submit"
-            variant="primary"
-            :disabled="form.processing"
-            data-testid="wiki-edit-request-submit"
-          >
-            <Icon name="paper-airplane" class="size-4" />
-            請 AI 編輯撰寫草稿
-          </Button>
-        </div>
+        <Button
+          type="submit"
+          variant="primary"
+          :disabled="form.processing"
+          data-testid="wiki-edit-request-submit"
+        >
+          <Icon name="paper-airplane" class="size-4" />
+          送出
+        </Button>
       </form>
     </div>
   </AppLayout>

@@ -174,6 +174,39 @@
   }
 }
 
+/* A line of text being written out, then cleared for the next pass. */
+@keyframes write-line {
+  0% {
+    transform: scaleX(0);
+    opacity: 1;
+  }
+  35%,
+  80% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+@keyframes quill {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(3px, -2px) rotate(-8deg);
+  }
+  50% {
+    transform: translate(6px, 0) rotate(0deg);
+  }
+  75% {
+    transform: translate(3px, 2px) rotate(8deg);
+  }
+}
+
 @keyframes twinkle {
   0%,
   100% {
@@ -461,6 +494,16 @@
 
 @utility animate-focus-in {
   animation: focus-in 0.5s ease-out both;
+}
+
+/* Stagger lines with `animation-delay`; the origin is the line's start. */
+@utility animate-write-line {
+  transform-origin: left;
+  animation: write-line 4.8s ease-in-out infinite both;
+}
+
+@utility animate-quill {
+  animation: quill 1.2s ease-in-out infinite;
 }
 
 @utility animate-twinkle {

@@ -37,7 +37,7 @@ use NouTools\Domains\Wiki\DataTransferObjects\CreateWikiEditRequestDTO;
  * @property string|null $draft_body
  * @property list<string>|null $draft_categories
  * @property string|null $draft_edit_summary
- * @property array{decision?: string, declineReason?: string|null, risk?: string, riskReasons?: list<string>, sourcesUsed?: list<string>}|null $ai_verdict
+ * @property array{decision?: string, declineReason?: string|null, risk?: string, riskReasons?: list<string>, sourcesUsed?: list<string>, reviewReasons?: list<string>, problems?: list<string>, lastRefinementFailed?: bool, lastRefinementDeclineReason?: string|null, statusBeforeRefinement?: string}|null $ai_verdict
  * @property int|null $reviewed_by
  * @property CarbonInterface|null $reviewed_at
  * @property string|null $review_note
@@ -105,6 +105,52 @@ final class WikiEditRequest extends Model
     public function declineReason(): ?string
     {
         return $this->ai_verdict['declineReason'] ?? null;
+    }
+
+    /**
+     * The revision the page must still be on for the draft to apply: the one
+     * this request last published (it is refined on top of that), else the
+     * one it was drafted against.
+     */
+    public function expectedCurrentRevisionId(): ?int
+    {
+        return $this->published_revision_id ?? $this->base_revision_id;
+    }
+
+    /**
+     * 再調整 stays open after the draft was submitted, so a visitor who keeps
+     * the page open can still correct it. A published edit is refined on top
+     * of what went live, so only while nobody else has edited since; a page
+     * this request created has no base to diff against and is left alone.
+     */
+    public function canBeRefined(): bool
+    {
+        if (count($this->refinements) >= (int) config('wiki.max_refinements')) {
+            return false;
+        }
+
+        return match ($this->status) {
+            WikiEditRequestStatus::AwaitingConfirmation, WikiEditRequestStatus::PendingReview => true,
+            WikiEditRequestStatus::Published => $this->base_revision_id !== null
+                && $this->page !== null
+                && $this->page->current_revision_id === $this->published_revision_id,
+            default => false,
+        };
+    }
+
+    /**
+     * Whether the visitor may still drop the request (放棄 / 撤回). A
+     * published edit is live and stays.
+     */
+    public function canBeAbandoned(): bool
+    {
+        return in_array($this->status, [
+            WikiEditRequestStatus::AwaitingConfirmation,
+            WikiEditRequestStatus::PendingReview,
+            WikiEditRequestStatus::Conflict,
+            WikiEditRequestStatus::Failed,
+            WikiEditRequestStatus::DeclinedByAi,
+        ], true);
     }
 
     public function belongsToSchedule(?StudentScheduleCookie $viewer): bool

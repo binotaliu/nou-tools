@@ -34,7 +34,7 @@ final readonly class ApproveWikiEditRequest
             if ($editRequest->wiki_page_id !== null) {
                 $page = WikiPage::query()->lockForUpdate()->findOrFail($editRequest->wiki_page_id);
 
-                if ($page->current_revision_id !== $editRequest->base_revision_id) {
+                if ($page->current_revision_id !== $editRequest->expectedCurrentRevisionId()) {
                     throw new DomainException('條目在這份草稿之後已經被修改過，請退回並請提出者依最新版本重新產生。');
                 }
             }
