@@ -3,7 +3,8 @@
 // write themselves out, the step the editor is probably on and how long it
 // has taken. The steps are a guess paced by the clock (the editor reports no
 // progress), so they are hidden from screen readers; the status sentence is
-// what gets announced, once. Under reduced motion the lines stand still.
+// what gets announced, once. Under reduced motion (the OS setting or the app's own toggle) the lines
+// stand still and fill in step by step.
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Icon from '../Icon.vue'
 
@@ -22,10 +23,10 @@ const STEP_SECONDS = 8
 
 const steps = computed(() =>
   [
-    props.isRefinement ? '讀你的調整說明' : '讀你的修改說明',
-    props.hasSources ? '查證你附上的來源' : '查找知識庫裡的相關條目',
-    props.isRefinement ? '修改草稿' : '撰寫內容',
-    '檢查格式與連結',
+    props.isRefinement ? '正在確認調整說明' : '正在確認修改說明',
+    props.hasSources ? '正在查證來源' : '正在檢視知識庫裡的相關條目',
+    props.isRefinement ? '正在修改草稿' : '正在撰寫內容',
+    '正在檢查格式與連結',
   ].map(step => `${step}…`)
 )
 
@@ -44,15 +45,18 @@ onMounted(() => {
 onUnmounted(() => window.clearInterval(timer))
 
 // Walks through the steps once and stays on the last one.
-const currentStep = computed(
-  () =>
-    steps.value[
-      Math.min(
-        Math.floor(elapsedSeconds.value / STEP_SECONDS),
-        steps.value.length - 1
-      )
-    ]
+const currentStepIndex = computed(() =>
+  Math.min(
+    Math.floor(elapsedSeconds.value / STEP_SECONDS),
+    steps.value.length - 1
+  )
 )
+
+const currentStep = computed(() => steps.value[currentStepIndex.value])
+
+// Under reduced motion nothing animates, so the page fills in one step at a
+// time instead: the lines past this count stay dimmed.
+const writtenLines = computed(() => currentStepIndex.value + 3)
 
 const elapsedLabel = computed(() => {
   const minutes = Math.floor(elapsedSeconds.value / 60)
@@ -75,19 +79,20 @@ const elapsedLabel = computed(() => {
         <div
           v-for="(width, index) in LINE_WIDTHS"
           :key="index"
-          class="h-2 rounded-full motion-safe:animate-write-line"
+          class="h-2 animate-write-line rounded-full transition-opacity motion-reduce:animate-none"
           :class="[
             width,
+            index >= writtenLines ? 'motion-reduce:opacity-30' : '',
             index === 0
-              ? 'mb-3 h-3 bg-theme-400 dark:bg-zinc-500'
-              : 'bg-theme-200 dark:bg-zinc-600',
+              ? 'mb-3 h-3 bg-theme-500 dark:bg-zinc-400'
+              : 'bg-theme-300 dark:bg-zinc-600',
           ]"
           :style="{ animationDelay: `${index * 0.35}s` }"
         ></div>
       </div>
       <Icon
         name="pencil-square"
-        class="absolute -right-3 -bottom-3 size-8 rounded-full bg-white p-1.5 text-theme-700 shadow motion-safe:animate-quill dark:bg-zinc-900 dark:text-zinc-200"
+        class="absolute -right-3 -bottom-3 size-8 rounded-full bg-white p-1.5 text-theme-700 shadow dark:bg-zinc-900 dark:text-zinc-200"
       />
     </div>
 
@@ -98,7 +103,7 @@ const elapsedLabel = computed(() => {
       >
         <Icon
           name="sparkles"
-          class="size-5 shrink-0 motion-safe:animate-pulse"
+          class="size-5 shrink-0 animate-pulse motion-reduce:animate-none"
         />
         {{ isRefinement ? 'AI 編輯正在依照你的調整修改…' : 'AI 編輯正在撰寫…' }}
       </p>
