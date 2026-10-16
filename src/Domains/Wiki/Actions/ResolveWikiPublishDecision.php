@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\Wiki\Actions;
 
 use App\Enums\WikiEditRisk;
+use App\Models\StudentSchedule;
 use App\Models\WikiEditRequest;
 use App\Models\WikiRevision;
 use NouTools\Domains\Wiki\Support\WikiPublishDecision;
@@ -20,6 +21,10 @@ final readonly class ResolveWikiPublishDecision
 {
     public function __invoke(WikiEditRequest $editRequest): WikiPublishDecision
     {
+        if (StudentSchedule::isUnlimitedWikiEditor($editRequest->student_schedule_id)) {
+            return new WikiPublishDecision([]);
+        }
+
         $reasons = [];
         $page = $editRequest->page;
         $base = $editRequest->baseRevision;

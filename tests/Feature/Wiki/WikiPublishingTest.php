@@ -51,6 +51,13 @@ beforeEach(function (): void {
         ->create();
 });
 
+it('publishes everything from an unlimited schedule without review', function (): void {
+    $editRequest = ($this->smallEdit)(['draft_title' => '新標題', 'draft_body' => '完全不同的內容。']);
+    config(['wiki.unlimited_schedule_ids' => [$editRequest->student_schedule_id]]);
+
+    expect(app(ResolveWikiPublishDecision::class)($editRequest)->publishesAutomatically())->toBeTrue();
+});
+
 it('publishes a new page with indexes', function (): void {
     $revision = app(PublishWikiRevision::class)(null, ($this->revisionData)([
         'body' => '詳見[[nou-exams-info]]與[[credit-transfer|抵免]]，以及自己[[credit-rules]]。',

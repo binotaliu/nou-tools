@@ -244,12 +244,12 @@ Route::prefix('wiki')->name('wiki.')->group(function (): void {
     Route::get('/all', WikiAllPagesController::class)->name('all');
     Route::get('/category/{category}', WikiCategoryController::class)->name('category');
 
-    Route::post('/edit-requests', [WikiEditRequestController::class, 'store'])->name('edit-requests.store')->middleware('throttle:10,1');
+    Route::post('/edit-requests', [WikiEditRequestController::class, 'store'])->name('edit-requests.store')->middleware('throttle:wiki-edit');
     Route::get('/edit-requests/{editRequest}', [WikiEditRequestController::class, 'show'])->name('edit-requests.show');
-    Route::post('/edit-requests/{editRequest}/refine', WikiEditRequestRefineController::class)->name('edit-requests.refine')->middleware('throttle:10,1');
-    Route::post('/edit-requests/{editRequest}/submit', WikiEditRequestSubmitController::class)->name('edit-requests.submit')->middleware('throttle:10,1');
-    Route::post('/edit-requests/{editRequest}/redraft', WikiEditRequestRedraftController::class)->name('edit-requests.redraft')->middleware('throttle:10,1');
-    Route::delete('/edit-requests/{editRequest}', [WikiEditRequestController::class, 'destroy'])->name('edit-requests.destroy')->middleware('throttle:10,1');
+    Route::post('/edit-requests/{editRequest}/refine', WikiEditRequestRefineController::class)->name('edit-requests.refine')->middleware('throttle:wiki-edit');
+    Route::post('/edit-requests/{editRequest}/submit', WikiEditRequestSubmitController::class)->name('edit-requests.submit')->middleware('throttle:wiki-edit');
+    Route::post('/edit-requests/{editRequest}/redraft', WikiEditRequestRedraftController::class)->name('edit-requests.redraft')->middleware('throttle:wiki-edit');
+    Route::delete('/edit-requests/{editRequest}', [WikiEditRequestController::class, 'destroy'])->name('edit-requests.destroy')->middleware('throttle:wiki-edit');
 
     Route::get('/{slug}/edit', [WikiEditRequestController::class, 'edit'])->name('edit')->where('slug', '[a-z0-9-]+');
     Route::get('/{slug}/history', WikiHistoryController::class)->name('history')->where('slug', '[a-z0-9-]+');

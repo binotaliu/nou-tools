@@ -12,6 +12,7 @@ use App\Models\DiscountStoreCategory;
 use App\Models\MusicPlaylist;
 use App\Models\MusicTrack;
 use App\Models\NewsletterIssue;
+use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
 use App\Models\User;
 use App\Models\WikiEditRequest;
@@ -29,10 +30,12 @@ use App\Policies\UserPolicy;
 use App\Policies\WikiEditRequestPolicy;
 use App\Policies\WikiPagePolicy;
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
@@ -156,6 +159,14 @@ final class AppServiceProvider extends ServiceProvider
             };
 
             return "{$rocYear} {$termName}";
+        });
+
+        RateLimiter::for('wiki-edit', function (Request $request): Limit {
+            if (StudentSchedule::isUnlimitedWikiEditor($request->studentScheduleFromCookie()?->id)) {
+                return Limit::none();
+            }
+
+            return Limit::perMinute(10)->by($request->user()?->getAuthIdentifier() ?: $request->ip());
         });
 
         // Request macro: parse the encrypted `student_schedule` cookie and

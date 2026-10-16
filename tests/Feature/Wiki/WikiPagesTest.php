@@ -219,6 +219,25 @@ it('limits drafts per device', function (): void {
     expect(WikiEditRequest::query()->count())->toBe(2);
 });
 
+it('lets an unlimited schedule past the draft limits', function (): void {
+    Bus::fake();
+    ($this->passTurnstile)();
+    config([
+        'wiki.rate_limits.per_schedule_per_hour' => 1,
+        'wiki.unlimited_schedule_ids' => [$this->schedule->id],
+    ]);
+
+    foreach (range(1, 3) as $attempt) {
+        ($this->signedIn)()->post(route('wiki.edit-requests.store'), [
+            'instruction' => "第 {$attempt} 次修改請求。",
+            'source_urls' => [],
+            'cf-turnstile-response' => 'token',
+        ])->assertSessionHasNoErrors();
+    }
+
+    expect(WikiEditRequest::query()->count())->toBe(3);
+});
+
 it('stops at the site-wide daily cap', function (): void {
     Bus::fake();
     ($this->passTurnstile)();

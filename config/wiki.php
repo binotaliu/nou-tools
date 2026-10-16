@@ -37,6 +37,13 @@ return [
 
     'max_categories' => 5,
 
+    // Comma-separated student_schedules.id values (WIKI_UNLIMITED_SCHEDULE_IDS)
+    // for trusted editors: no draft or request rate limits, and their edits
+    // publish without review.
+    'unlimited_schedule_ids' => array_values(array_filter(
+        array_map('intval', explode(',', (string) env('WIKI_UNLIMITED_SCHEDULE_IDS', ''))),
+    )),
+
     'rate_limits' => [
         // Every draft the editor writes counts: the first one, each 再調整
         // and each redraft after a conflict.

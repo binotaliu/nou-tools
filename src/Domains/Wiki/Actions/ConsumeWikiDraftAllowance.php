@@ -27,6 +27,10 @@ final readonly class ConsumeWikiDraftAllowance
      */
     public function __invoke(StudentSchedule $schedule, string $ipHash): void
     {
+        if (StudentSchedule::isUnlimitedWikiEditor($schedule->id)) {
+            return;
+        }
+
         $limits = [
             ["wiki-draft:schedule-hour:{$schedule->id}", (int) config('wiki.rate_limits.per_schedule_per_hour'), self::HOUR, '你這一小時內的修改次數已達上限，請稍後再試。'],
             ["wiki-draft:schedule-day:{$schedule->id}", (int) config('wiki.rate_limits.per_schedule_per_day'), self::DAY, '你今天的修改次數已達上限，請明天再試。'],

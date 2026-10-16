@@ -112,4 +112,14 @@ final class StudentSchedule extends Model
     {
         return $this->hasOne(StudyRoomSeat::class);
     }
+
+    /**
+     * Trusted wiki editors (WIKI_UNLIMITED_SCHEDULE_IDS) skip the draft rate
+     * limits and the review queue.
+     */
+    public static function isUnlimitedWikiEditor(?int $scheduleId): bool
+    {
+        return $scheduleId !== null
+            && in_array($scheduleId, config('wiki.unlimited_schedule_ids'), true);
+    }
 }
