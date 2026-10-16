@@ -252,3 +252,18 @@ it('keeps the earlier draft when the editor declines a refinement', function ():
         ->and($editRequest->ai_verdict['lastRefinementFailed'])->toBeTrue()
         ->and($editRequest->ai_verdict['lastRefinementDeclineReason'])->toBe('來源沒有這項規定。');
 });
+
+it('says so when the server cannot read PDFs instead of calling them empty', function (): void {
+    config(['wiki.source_domains' => ['nou.edu.tw'], 'wiki.pdftotext_path' => null]);
+    Http::fake(['www.nou.edu.tw/a.pdf' => Http::response('%PDF-1.4 fake', 200, ['Content-Type' => 'application/pdf'])]);
+    $original = getenv('PATH');
+    putenv('PATH=/nonexistent');
+
+    try {
+        $result = (string) (new FetchWikiSource(1))->handle(new Request(['url' => 'https://www.nou.edu.tw/a.pdf']));
+    } finally {
+        putenv("PATH={$original}");
+    }
+
+    expect($result)->toContain('could not be read')->not->toContain('no extractable text');
+})->skip(fn (): bool => is_executable('/opt/homebrew/bin/pdftotext') || is_executable('/usr/local/bin/pdftotext') || is_executable('/usr/bin/pdftotext'), 'pdftotext is installed in a standard location');

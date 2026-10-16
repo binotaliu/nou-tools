@@ -7,12 +7,14 @@ namespace NouTools\Domains\Wiki\Ai\Tools;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Tools\Request;
 use NouTools\Domains\Wiki\Support\WikiSourceDomains;
 use Stringable;
+use Symfony\Component\Process\ExecutableFinder;
 use Throwable;
 
 /**
@@ -113,18 +115,27 @@ final class FetchWikiSource implements Tool
 
     private function pdfText(string $pdf): string
     {
+        $binary = config('wiki.pdftotext_path')
+            ?: (new ExecutableFinder)->find('pdftotext', null, ['/opt/homebrew/bin', '/usr/local/bin', '/usr/bin']);
+
+        if ($binary === null) {
+            Log::error('Wiki source fetch: pdftotext was not found, so PDF sources cannot be read. Install poppler or set WIKI_PDFTOTEXT_PATH.');
+
+            return '[This PDF could not be read: the server has no PDF text extractor (pdftotext). Tell the user the PDF could not be read.]';
+        }
+
         $path = tempnam(sys_get_temp_dir(), 'wikipdf');
         file_put_contents($path, $pdf);
 
         try {
-            $result = Process::timeout(30)->run(['pdftotext', '-layout', '-enc', 'UTF-8', $path, '-']);
+            $result = Process::timeout(30)->run([$binary, '-layout', '-enc', 'UTF-8', $path, '-']);
         } finally {
             @unlink($path);
         }
 
         return $result->successful() && trim($result->output()) !== ''
             ? trim($result->output())
-            : '[This PDF has no extractable text, or PDF text extraction is not available.]';
+            : '[This PDF has no extractable text (it may be a scan).]';
     }
 
     private function htmlText(Response $response): string

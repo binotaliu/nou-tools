@@ -20,6 +20,11 @@ return [
     // fetch. Anything else is rejected at submission and never fetched.
     'source_domains' => ['nou.edu.tw', 'moe.gov.tw', 'edu.tw', 'gov.tw'],
 
+    // `pdftotext` (poppler) reads PDF sources for providers without a
+    // server-side fetch. Web workers often lack Homebrew on PATH, so set the
+    // full path here if it is not found automatically.
+    'pdftotext_path' => env('WIKI_PDFTOTEXT_PATH'),
+
     'max_source_urls' => 3,
 
     'instruction_max_length' => 2000,
