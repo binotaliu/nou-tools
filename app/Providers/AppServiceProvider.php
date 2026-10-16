@@ -14,6 +14,8 @@ use App\Models\MusicTrack;
 use App\Models\NewsletterIssue;
 use App\Models\StudyRoomProfile;
 use App\Models\User;
+use App\Models\WikiEditRequest;
+use App\Models\WikiPage;
 use App\Policies\AnnouncementPolicy;
 use App\Policies\ChangelogPostPolicy;
 use App\Policies\CoursePolicy;
@@ -24,6 +26,8 @@ use App\Policies\MusicTrackPolicy;
 use App\Policies\NewsletterIssuePolicy;
 use App\Policies\StudyRoomProfilePolicy;
 use App\Policies\UserPolicy;
+use App\Policies\WikiEditRequestPolicy;
+use App\Policies\WikiPagePolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RoutingRoute;
@@ -101,6 +105,8 @@ final class AppServiceProvider extends ServiceProvider
         Gate::policy(StudyRoomProfile::class, StudyRoomProfilePolicy::class);
         Gate::policy(MusicTrack::class, MusicTrackPolicy::class);
         Gate::policy(MusicPlaylist::class, MusicPlaylistPolicy::class);
+        Gate::policy(WikiPage::class, WikiPagePolicy::class);
+        Gate::policy(WikiEditRequest::class, WikiEditRequestPolicy::class);
 
         CarbonImmutable::setLocale(config('app.locale'));
         Date::use(CarbonImmutable::class);

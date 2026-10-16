@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Notifications;
 
+use App\Filament\Resources\WikiEditRequests\WikiEditRequestResource;
 use App\Models\WikiEditRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
@@ -36,7 +37,7 @@ final class WikiEditRequestNeedsReview extends Notification
                 DiscordEmbed::make(
                     title: $this->editRequest->isNewPage() ? '知識庫新條目待審核' : '知識庫修改待審核',
                     description: '**'.$this->editRequest->draft_title.'**：'.$this->editRequest->draft_edit_summary,
-                    url: url("/admin/wiki-edit-requests/{$this->editRequest->id}"),
+                    url: WikiEditRequestResource::getUrl('view', ['record' => $this->editRequest]),
                 )->with([
                     'color' => '16426522',
                     'fields' => [
