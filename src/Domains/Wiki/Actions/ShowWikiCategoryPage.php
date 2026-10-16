@@ -16,7 +16,7 @@ final readonly class ShowWikiCategoryPage
         return new WikiCategoryPageData(
             name: $category->name,
             pages: $category->pages()
-                ->live()
+                ->listed()
                 ->with('currentRevision:id,title,description')
                 ->get()
                 ->sortBy(fn (WikiPage $page): string => (string) $page->currentRevision?->title)

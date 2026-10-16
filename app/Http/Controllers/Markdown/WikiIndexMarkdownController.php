@@ -6,15 +6,15 @@ namespace App\Http\Controllers\Markdown;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
-use NouTools\Domains\Wiki\Actions\ShowWikiIndexPage;
+use NouTools\Domains\Wiki\Actions\ShowWikiAllPagesPage;
 
 final class WikiIndexMarkdownController extends Controller
 {
-    public function __invoke(ShowWikiIndexPage $showWikiIndexPage): Response
+    public function __invoke(ShowWikiAllPagesPage $showWikiAllPagesPage): Response
     {
         return response()
             ->view('wiki.markdown.index', [
-                'viewModel' => $showWikiIndexPage(),
+                'viewModel' => $showWikiAllPagesPage(),
             ])
             ->header('Content-Type', 'text/markdown; charset=utf-8');
     }

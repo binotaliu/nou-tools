@@ -28,6 +28,9 @@ class WikiPagesTable
                 IconColumn::make('is_protected')
                     ->label('受保護')
                     ->boolean(),
+                IconColumn::make('is_featured')
+                    ->label('精選')
+                    ->boolean(),
                 TextColumn::make('currentRevision.created_at')
                     ->label('最後更新')
                     ->dateTime('Y-m-d H:i', timezone: 'Asia/Taipei')
@@ -39,6 +42,7 @@ class WikiPagesTable
             ->defaultSort('updated_at', 'desc')
             ->filters([
                 TernaryFilter::make('is_protected')->label('受保護'),
+                TernaryFilter::make('is_featured')->label('精選'),
                 TrashedFilter::make(),
             ])
             ->recordActions([

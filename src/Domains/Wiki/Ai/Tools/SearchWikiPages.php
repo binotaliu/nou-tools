@@ -39,7 +39,7 @@ final class SearchWikiPages implements Tool
         $like = '%'.addcslashes($query, '%_\\').'%';
 
         $pages = WikiPage::query()
-            ->live()
+            ->listed()
             ->join('wiki_revisions', 'wiki_revisions.id', '=', 'wiki_pages.current_revision_id')
             ->where(fn ($where) => $where
                 ->where('wiki_revisions.title', 'like', $like)

@@ -19,7 +19,7 @@ use NouTools\Domains\Wiki\DataTransferObjects\PublishWikiRevisionDTO;
 
 /**
  * Saving publishes a new `admin` revision whenever the content or the slug
- * changed; toggling protection alone doesn't add one.
+ * changed; toggling protection or 精選 alone doesn't add one.
  *
  * @property WikiPage $record
  */
@@ -94,6 +94,7 @@ class EditWikiPage extends EditRecord
 
         $record->refresh();
         $record->is_protected = (bool) ($data['is_protected'] ?? false);
+        $record->is_featured = (bool) ($data['is_featured'] ?? false);
         $record->save();
 
         return $record;

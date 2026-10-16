@@ -1,4 +1,4 @@
-# {{ $viewModel->title }}
+# {{ $viewModel->wikiTitle }}
 
 > 由空大同學提出修改、AI 協助編輯的知識庫。內容僅供參考，請以學校公告為準。
 

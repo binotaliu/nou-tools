@@ -101,7 +101,7 @@ final readonly class GenerateSitemap
      */
     private function wikiPageUrls(): Collection
     {
-        return WikiPage::query()->live()->with('currentRevision:id,created_at')->get(['id', 'slug', 'current_revision_id'])
+        return WikiPage::query()->listed()->with('currentRevision:id,created_at')->get(['id', 'slug', 'current_revision_id'])
             ->map(fn (WikiPage $page): SitemapUrlViewModel => new SitemapUrlViewModel(
                 url: route('wiki.show', $page->slug),
                 lastModified: $page->currentRevision?->created_at,

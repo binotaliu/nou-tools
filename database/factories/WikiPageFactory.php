@@ -25,6 +25,7 @@ final class WikiPageFactory extends Factory
         return [
             'slug' => fake()->unique()->slug(2),
             'is_protected' => false,
+            'is_featured' => false,
         ];
     }
 
@@ -46,5 +47,10 @@ final class WikiPageFactory extends Factory
     public function protected(): static
     {
         return $this->state(fn (): array => ['is_protected' => true]);
+    }
+
+    public function featured(): static
+    {
+        return $this->state(fn (): array => ['is_featured' => true]);
     }
 }

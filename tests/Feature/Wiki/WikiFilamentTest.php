@@ -86,13 +86,14 @@ it('edits a page into a new revision and renames with a redirect', function (): 
         ->and($page->slugRedirects()->pluck('old_slug')->all())->toBe(['nou-exams-info']);
 });
 
-it('toggles protection without a new revision', function (): void {
+it('toggles protection and 精選 without a new revision', function (): void {
     Livewire::test(EditWikiPage::class, ['record' => $this->page->slug])
-        ->fillForm(['is_protected' => true])
+        ->fillForm(['is_protected' => true, 'is_featured' => true])
         ->call('save')
         ->assertHasNoFormErrors();
 
     expect($this->page->fresh()->is_protected)->toBeTrue()
+        ->and($this->page->fresh()->is_featured)->toBeTrue()
         ->and($this->page->revisions()->count())->toBe(1);
 });
 

@@ -49,6 +49,9 @@ class WikiPageForm
                             ->columnSpanFull(),
                         Toggle::make('is_protected')
                             ->label('受保護（只有管理員可以修改）'),
+                        Toggle::make('is_featured')
+                            ->label('精選條目')
+                            ->helperText('知識庫首頁每天輪流介紹一個精選條目。'),
                     ]),
                 MarkdownEditor::make('body')
                     ->label('內文')

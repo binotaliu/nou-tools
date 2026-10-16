@@ -21,7 +21,7 @@ final readonly class ShowWikiPage
         $incomingSlugs = [$page->slug, ...$page->slugRedirects->pluck('old_slug')->all()];
 
         $backlinks = WikiPage::query()
-            ->live()
+            ->listed()
             ->whereIn('id', WikiLink::query()->whereIn('to_slug', $incomingSlugs)->select('from_page_id'))
             ->with('currentRevision:id,title,description')
             ->get()

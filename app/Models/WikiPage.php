@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $slug
  * @property int|null $current_revision_id
  * @property bool $is_protected
+ * @property bool $is_featured
  */
 final class WikiPage extends Model
 {
@@ -34,11 +35,19 @@ final class WikiPage extends Model
     public const int SLUG_MAX_LENGTH = 60;
 
     /**
+     * The page whose body opens the wiki's homepage (`/wiki`). It is an
+     * ordinary, protected page so it has history and the wiki dialect, but
+     * it is left out of lists and `/wiki/main-page` leads to the homepage.
+     */
+    public const string MAIN_PAGE_SLUG = 'main-page';
+
+    /**
      * Path segments the wiki's own routes use under `/wiki/`, so no page may
      * take them as a slug.
      */
     public const array RESERVED_SLUGS = [
         'new',
+        'all',
         'category',
         'categories',
         'edit-requests',
@@ -56,6 +65,7 @@ final class WikiPage extends Model
     {
         return [
             'is_protected' => 'boolean',
+            'is_featured' => 'boolean',
         ];
     }
 
@@ -133,6 +143,21 @@ final class WikiPage extends Model
     public function scopeLive(Builder $query): void
     {
         $query->whereNotNull('current_revision_id');
+    }
+
+    /**
+     * Live pages readers browse: everything but the homepage's own text.
+     *
+     * @param  Builder<WikiPage>  $query
+     */
+    public function scopeListed(Builder $query): void
+    {
+        $query->live()->where('wiki_pages.slug', '!=', self::MAIN_PAGE_SLUG);
+    }
+
+    public function isMainPage(): bool
+    {
+        return $this->slug === self::MAIN_PAGE_SLUG;
     }
 
     public function getRouteKeyName(): string

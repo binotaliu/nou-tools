@@ -42,6 +42,7 @@ class CreateWikiPage extends CreateRecord
 
         $page = WikiPage::query()->findOrFail($revision->wiki_page_id);
         $page->is_protected = (bool) ($data['is_protected'] ?? false);
+        $page->is_featured = (bool) ($data['is_featured'] ?? false);
         $page->save();
 
         return $page;

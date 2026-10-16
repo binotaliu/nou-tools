@@ -43,14 +43,14 @@ beforeEach(function (): void {
     $this->passTurnstile = fn () => LaravelTurnstile::shouldReceive('validate')->andReturn(['success' => true]);
 });
 
-it('shows the wiki index with pages, categories and recent changes', function (): void {
+it('shows the wiki homepage with categories and recent changes', function (): void {
     $this->get(route('wiki.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Wiki/Index')
-            ->where('viewModel.pages.0.slug', 'nou-exams-info')
             ->where('viewModel.categories.0.name', '考試')
             ->where('viewModel.categories.0.pageCount', 1)
+            ->where('viewModel.categories.0.pages.0.slug', 'nou-exams-info')
             ->where('viewModel.recentChanges.0.pageSlug', 'nou-exams-info')
             ->where('viewModel.searchResults', null));
 });

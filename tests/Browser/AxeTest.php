@@ -64,6 +64,7 @@ it('has no serious or critical axe violations', function (string $url) use ($axe
     'article list' => '/manual',
     'article' => '/manual/welcome',
     'wiki' => '/wiki',
+    'wiki all pages' => '/wiki/all',
     'wiki page' => '/wiki/about-nou',
     'wiki edit form' => '/wiki/about-nou/edit',
     'video classes' => '/video-classes',

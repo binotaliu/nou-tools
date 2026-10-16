@@ -240,6 +240,7 @@ Route::prefix('study-room')->name('study-room.')->group(function (): void {
 
 Route::prefix('wiki')->name('wiki.')->group(function (): void {
     Route::get('/new', [WikiEditRequestController::class, 'create'])->name('new');
+    Route::get('/all', [WikiController::class, 'all'])->name('all');
     Route::get('/category/{category}', WikiCategoryController::class)->name('category');
 
     Route::post('/edit-requests', [WikiEditRequestController::class, 'store'])->name('edit-requests.store')->middleware('throttle:10,1');
