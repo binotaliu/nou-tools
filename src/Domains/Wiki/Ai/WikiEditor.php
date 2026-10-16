@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\Wiki\Ai;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
+use Illuminate\Support\Facades\File;
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Contracts\HasStructuredOutput;
 use Laravel\Ai\Contracts\HasTools;
@@ -31,9 +32,9 @@ final class WikiEditor implements Agent, HasStructuredOutput, HasTools
     public function instructions(): Stringable|string
     {
         return implode("\n\n", [
-            trim((string) file_get_contents(resource_path('wiki/ai/editor.md'))),
-            "# Writing guide (撰寫指南)\n\n".trim((string) file_get_contents(resource_path('wiki/guides/writing-guide.md'))),
-            "# Syntax guide (語法說明)\n\n".trim((string) file_get_contents(resource_path('wiki/guides/syntax-guide.md'))),
+            trim(File::get(resource_path('wiki/ai/editor.md'))),
+            "# Writing guide (撰寫指南)\n\n".trim(File::get(resource_path('wiki/guides/writing-guide.md'))),
+            "# Syntax guide (語法說明)\n\n".trim(File::get(resource_path('wiki/guides/syntax-guide.md'))),
         ]);
     }
 

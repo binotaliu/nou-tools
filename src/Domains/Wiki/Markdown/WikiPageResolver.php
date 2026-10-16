@@ -11,7 +11,7 @@ use App\Models\WikiSlugRedirect;
  * Looks up the live pages behind a set of slugs, following rename redirects,
  * so `[[old-slug]]` still points at the page under its current slug.
  */
-class WikiPageResolver
+final class WikiPageResolver
 {
     /**
      * @param  list<string>  $slugs

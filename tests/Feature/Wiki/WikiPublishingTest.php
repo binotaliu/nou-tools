@@ -21,11 +21,9 @@ use NouTools\Domains\Wiki\Actions\SubmitWikiEditRequest;
 use NouTools\Domains\Wiki\DataTransferObjects\PublishWikiRevisionDTO;
 use NouTools\Domains\Wiki\Support\WikiTextDiff;
 
-const WIKI_BASE_BODY = "期中考與期末考都在週末舉行。\n\n## 考場\n\n各學習指導中心。\n\n## 時間\n\n上午九點開始。\n\n## 攜帶物品\n\n學生證與文具。\n\n## 注意事項\n\n遲到二十分鐘不得入場。\n";
-
-function wikiRevisionData(array $overrides = []): PublishWikiRevisionDTO
-{
-    return new PublishWikiRevisionDTO(...[
+beforeEach(function (): void {
+    $this->baseBody = "期中考與期末考都在週末舉行。\n\n## 考場\n\n各學習指導中心。\n\n## 時間\n\n上午九點開始。\n\n## 攜帶物品\n\n學生證與文具。\n\n## 注意事項\n\n遲到二十分鐘不得入場。\n";
+    $this->revisionData = fn (array $overrides = []): PublishWikiRevisionDTO => new PublishWikiRevisionDTO(...[
         'title' => '考試',
         'description' => null,
         'body' => '內容。',
@@ -34,12 +32,10 @@ function wikiRevisionData(array $overrides = []): PublishWikiRevisionDTO
         'origin' => WikiRevisionOrigin::Admin,
         ...$overrides,
     ]);
-}
 
-beforeEach(function (): void {
     $this->page = WikiPage::factory()->live([
         'title' => '空大考試要去哪裡考？',
-        'body' => WIKI_BASE_BODY,
+        'body' => $this->baseBody,
         'categories' => ['考試'],
         'created_at' => now()->subDay(),
     ])->create(['slug' => 'nou-exams-info']);
@@ -49,14 +45,14 @@ beforeEach(function (): void {
         ->awaitingConfirmation([
             'draft_title' => '空大考試要去哪裡考？',
             'draft_categories' => ['考試'],
-            'draft_body' => str_replace('上午九點開始。', '上午九點開始，請提早十分鐘到場。', WIKI_BASE_BODY),
+            'draft_body' => str_replace('上午九點開始。', '上午九點開始，請提早十分鐘到場。', $this->baseBody),
             ...$draft,
         ])
         ->create();
 });
 
 it('publishes a new page with indexes', function (): void {
-    $revision = app(PublishWikiRevision::class)(null, wikiRevisionData([
+    $revision = app(PublishWikiRevision::class)(null, ($this->revisionData)([
         'body' => '詳見[[nou-exams-info]]與[[credit-transfer|抵免]]，以及自己[[credit-rules]]。',
         'categories' => ['選課', '學分'],
     ]), 'credit-rules');
@@ -72,26 +68,26 @@ it('publishes a new page with indexes', function (): void {
 it('chains revisions and drops empty categories', function (): void {
     $first = $this->page->current_revision_id;
 
-    app(PublishWikiRevision::class)($this->page, wikiRevisionData(['categories' => ['報名']]));
+    app(PublishWikiRevision::class)($this->page, ($this->revisionData)(['categories' => ['報名']]));
 
     expect($this->page->fresh()->currentRevision->parent_revision_id)->toBe($first)
         ->and(WikiCategory::query()->pluck('name')->all())->toBe(['報名']);
 });
 
 it('leaves a redirect when the slug changes and can take it back', function (): void {
-    app(PublishWikiRevision::class)($this->page, wikiRevisionData(), 'exams');
+    app(PublishWikiRevision::class)($this->page, ($this->revisionData)(), 'exams');
 
     expect($this->page->fresh()->slug)->toBe('exams')
         ->and(WikiPage::isSlugAvailable('nou-exams-info'))->toBeFalse();
 
-    app(PublishWikiRevision::class)($this->page->fresh(), wikiRevisionData(), 'nou-exams-info');
+    app(PublishWikiRevision::class)($this->page->fresh(), ($this->revisionData)(), 'nou-exams-info');
 
     expect($this->page->fresh()->slug)->toBe('nou-exams-info')
         ->and($this->page->slugRedirects()->pluck('old_slug')->all())->toBe(['exams']);
 });
 
 it('refuses a taken slug', function (): void {
-    app(PublishWikiRevision::class)(null, wikiRevisionData(), 'nou-exams-info');
+    app(PublishWikiRevision::class)(null, ($this->revisionData)(), 'nou-exams-info');
 })->throws(DomainException::class);
 
 it('auto-publishes a small, low-risk edit', function (): void {
@@ -141,8 +137,8 @@ it('sends edits to review for each rule', function (Closure $setUp, string $reas
 it('measures removed text, not reworded text', function (): void {
     $diff = WikiTextDiff::compare("一\n二\n三\n", "一\n二改\n三\n");
 
-    expect($diff->addedLines)->toBe(['二改'])
-        ->and($diff->removedLines)->toBe(['二'])
+    expect($diff->addedLines())->toBe(['二改'])
+        ->and($diff->removedLines())->toBe(['二'])
         ->and($diff->removedChars())->toBe(0)
         ->and(WikiTextDiff::compare("一\n很長的一段文字\n", "一\n")->removedChars())->toBe(7);
 });
@@ -163,7 +159,7 @@ it('queues a reviewed edit and notifies discord', function (): void {
 
 it('marks a stale draft as a conflict', function (): void {
     $editRequest = ($this->smallEdit)();
-    app(PublishWikiRevision::class)($this->page, wikiRevisionData());
+    app(PublishWikiRevision::class)($this->page, ($this->revisionData)());
 
     app(SubmitWikiEditRequest::class)($editRequest);
 
@@ -196,7 +192,7 @@ it('lets an admin approve a new page under another slug', function (): void {
 
 it('refuses to approve a stale edit', function (): void {
     $editRequest = ($this->smallEdit)(['status' => WikiEditRequestStatus::PendingReview]);
-    app(PublishWikiRevision::class)($this->page, wikiRevisionData());
+    app(PublishWikiRevision::class)($this->page, ($this->revisionData)());
 
     app(ApproveWikiEditRequest::class)($editRequest, User::factory()->create());
 })->throws(DomainException::class);
@@ -208,4 +204,16 @@ it('lets an admin reject with a note', function (): void {
 
     expect($editRequest->refresh()->status)->toBe(WikiEditRequestStatus::Rejected)
         ->and($editRequest->review_note)->toBe('來源不足');
+});
+
+it('folds unchanged stretches into gaps for display', function (): void {
+    $base = implode("\n", range(1, 20));
+    $new = str_replace("\n10\n", "\n十\n", $base);
+
+    $hunks = WikiTextDiff::compare($base, $new, ignoreBlankLines: false)->hunks(2);
+
+    expect($hunks[0])->toBe(['type' => 'gap', 'text' => '7'])
+        ->and(collect($hunks)->where('type', 'removed')->pluck('text')->all())->toBe(['10'])
+        ->and(collect($hunks)->where('type', 'added')->pluck('text')->all())->toBe(['十'])
+        ->and(end($hunks))->toBe(['type' => 'gap', 'text' => '8']);
 });

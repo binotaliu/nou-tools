@@ -14,13 +14,8 @@ use NouTools\Domains\Wiki\Ai\Tools\ReadWikiPage;
 use NouTools\Domains\Wiki\Ai\Tools\SearchWikiPages;
 use NouTools\Domains\Wiki\Ai\WikiEditor;
 
-/**
- * @param  array<string, mixed>  $overrides
- * @return array<string, mixed>
- */
-function wikiEditorResponse(array $overrides = []): array
-{
-    return [
+beforeEach(function (): void {
+    $this->response = fn (array $overrides = []): array => [
         'decision' => 'apply',
         'decline_reason' => '',
         'slug' => '',
@@ -34,9 +29,6 @@ function wikiEditorResponse(array $overrides = []): array
         'sources_used' => ['https://www.nou.edu.tw/calendar'],
         ...$overrides,
     ];
-}
-
-beforeEach(function (): void {
     $this->page = WikiPage::factory()->live([
         'title' => '空大考試要去哪裡考？',
         'body' => "期中考與期末考都在週末舉行。\n\n## 考場\n\n各學習指導中心。\n",
@@ -45,7 +37,7 @@ beforeEach(function (): void {
 });
 
 it('stores an applied draft and waits for confirmation', function (): void {
-    WikiEditor::fake([wikiEditorResponse()]);
+    WikiEditor::fake([($this->response)()]);
 
     $editRequest = WikiEditRequest::factory()->forPage($this->page)->create([
         'instruction' => '補充考試時間',
@@ -69,7 +61,7 @@ it('stores an applied draft and waits for confirmation', function (): void {
 });
 
 it('records a decline with its reason', function (): void {
-    WikiEditor::fake([wikiEditorResponse(['decision' => 'decline', 'decline_reason' => '這個請求與空大無關。'])]);
+    WikiEditor::fake([($this->response)(['decision' => 'decline', 'decline_reason' => '這個請求與空大無關。'])]);
 
     $editRequest = WikiEditRequest::factory()->forPage($this->page)->create();
 
@@ -81,7 +73,7 @@ it('records a decline with its reason', function (): void {
 });
 
 it('fails a draft that links outside the allowed sources', function (): void {
-    WikiEditor::fake([wikiEditorResponse(['body' => "內容。[^1]\n\n[^1]: [部落格](https://example.com/post)\n"])]);
+    WikiEditor::fake([($this->response)(['body' => "內容。[^1]\n\n[^1]: [部落格](https://example.com/post)\n"])]);
 
     $editRequest = WikiEditRequest::factory()->forPage($this->page)->create();
 
@@ -94,7 +86,7 @@ it('fails a draft that links outside the allowed sources', function (): void {
 
 it('keeps links that the page already had', function (): void {
     $page = WikiPage::factory()->live(['body' => "[部落格](https://example.com/post)\n"])->create();
-    WikiEditor::fake([wikiEditorResponse(['body' => "[部落格](https://example.com/post) 與補充。\n"])]);
+    WikiEditor::fake([($this->response)(['body' => "[部落格](https://example.com/post) 與補充。\n"])]);
 
     $editRequest = WikiEditRequest::factory()->forPage($page)->create();
 
@@ -104,7 +96,7 @@ it('keeps links that the page already had', function (): void {
 });
 
 it('requires a free, valid slug for a new page', function (string $slug): void {
-    WikiEditor::fake([wikiEditorResponse(['slug' => $slug])]);
+    WikiEditor::fake([($this->response)(['slug' => $slug])]);
 
     $editRequest = WikiEditRequest::factory()->create(['requested_title' => '學分抵免']);
 
@@ -114,7 +106,7 @@ it('requires a free, valid slug for a new page', function (string $slug): void {
 })->with(['nou-exams-info', 'Credit Transfer', 'new', '']);
 
 it('stores the proposed slug of a new page', function (): void {
-    WikiEditor::fake([wikiEditorResponse(['slug' => 'credit-transfer', 'title' => '學分抵免'])]);
+    WikiEditor::fake([($this->response)(['slug' => 'credit-transfer', 'title' => '學分抵免'])]);
 
     $editRequest = WikiEditRequest::factory()->create(['requested_title' => '學分抵免']);
 
@@ -153,7 +145,7 @@ it('keeps the earlier draft when a refinement fails', function (): void {
 });
 
 it('sends the current draft and refinements when refining', function (): void {
-    WikiEditor::fake([wikiEditorResponse()]);
+    WikiEditor::fake([($this->response)()]);
 
     $editRequest = WikiEditRequest::factory()->forPage($this->page)->awaitingConfirmation()->create([
         'status' => WikiEditRequestStatus::Drafting,
