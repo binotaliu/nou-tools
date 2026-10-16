@@ -4,6 +4,8 @@ use App\Enums\DiscountStoreStatus;
 use App\Models\Course;
 use App\Models\DiscountStore;
 use App\Models\StudentSchedule;
+use App\Models\WikiCategory;
+use App\Models\WikiPage;
 use Illuminate\Support\Str;
 
 test('sitemap returns xml with static and dynamic pages', function () {
@@ -21,7 +23,19 @@ test('sitemap returns xml with static and dynamic pages', function () {
         ->assertSee(route('articles.index', 'manual'), false)
         ->assertSee(route('articles.show', ['manual', 'welcome']), false)
         ->assertSee(route('wiki.index'), false)
-        ->assertSee(route('wiki.show', 'about-nou'), false);
+        ->assertSee(route('wiki.show', 'about-nou'), false)
+        ->assertSee(route('wiki.all'), false);
+});
+
+test('sitemap lists wiki categories that have a listed page', function () {
+    $page = WikiPage::factory()->live(['categories' => ['考試']])->create(['slug' => 'exam-page']);
+    $category = WikiCategory::query()->forceCreate(['name' => '考試']);
+    $category->pages()->attach($page);
+    $empty = WikiCategory::query()->forceCreate(['name' => '空分類']);
+
+    $this->get(route('sitemap'))
+        ->assertSee(route('wiki.category', $category), false)
+        ->assertDontSee(route('wiki.category', $empty), false);
 });
 
 test('sitemap does not include noindexed schedule pages but does include online store pages', function () {

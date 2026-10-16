@@ -9,6 +9,7 @@ use App\Enums\DiscountStoreStatus;
 use App\Models\Course;
 use App\Models\DiscountStore;
 use App\Models\NewsletterIssue;
+use App\Models\WikiCategory;
 use App\Models\WikiPage;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -42,12 +43,14 @@ final readonly class GenerateSitemap
             new SitemapUrlViewModel(url: route('discount-stores.create'), changeFrequency: 'yearly', priority: 0.3),
             new SitemapUrlViewModel(url: route('study-room.show'), changeFrequency: 'daily', priority: 0.6),
             new SitemapUrlViewModel(url: route('wiki.index'), changeFrequency: 'daily', priority: 0.7),
+            new SitemapUrlViewModel(url: route('wiki.all'), changeFrequency: 'daily', priority: 0.6),
         ])
             ->merge($this->courseUrls())
             ->merge($this->discountStoreUrls())
             ->merge($this->newsletterIssueUrls())
             ->merge($this->articleUrls())
-            ->merge($this->wikiPageUrls());
+            ->merge($this->wikiPageUrls())
+            ->merge($this->wikiCategoryUrls());
     }
 
     /**
@@ -107,6 +110,21 @@ final readonly class GenerateSitemap
                 lastModified: $page->currentRevision?->created_at,
                 changeFrequency: 'weekly',
                 priority: 0.6,
+            ));
+    }
+
+    /**
+     * @return Collection<int, SitemapUrlViewModel>
+     */
+    private function wikiCategoryUrls(): Collection
+    {
+        return WikiCategory::query()
+            ->whereHas('pages', fn ($query) => $query->listed())
+            ->get(['id', 'name'])
+            ->map(fn (WikiCategory $category): SitemapUrlViewModel => new SitemapUrlViewModel(
+                url: route('wiki.category', $category),
+                changeFrequency: 'weekly',
+                priority: 0.5,
             ));
     }
 
