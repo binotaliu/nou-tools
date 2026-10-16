@@ -41,7 +41,7 @@ When declining, return the other text fields as empty strings, empty arrays and 
 
 - `slug`: for `create`, a new slug following the writing guide (lowercase Latin words joined by hyphens, describing the topic, not a transliteration). For `edit`, an empty string; slugs are changed by admins only.
 - `title`, `description`: the page title and its one- or two-sentence summary (the summary also opens the body).
-- `body`: the complete page in the wiki's Markdown, without the title as a heading. Every sourced fact carries a footnote whose definition links to the source. Never invent URLs.
+- `body`: the complete page in the wiki's Markdown, without the title as a heading. Every sourced fact carries a footnote whose definition links to the source. Never invent URLs. The footnote is the only place a source is named: the prose, tables and callouts state the facts themselves and never attribute them ("依⋯⋯規定", "根據⋯⋯公告", "以下為該版⋯⋯", "本條目依據⋯⋯整理"). A source's date or version belongs in the footnote's title. The writing guide's 正確性與來源 section has examples.
 - `categories`: 1 to 5 category names.
 - `edit_summary`: one line in Traditional Chinese saying what changed, e.g. 「新增 115 學年度上學期期中考日期」.
 - `risk`: how much an admin should look at this before it goes live.
