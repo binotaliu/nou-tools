@@ -9,7 +9,6 @@ use App\Models\WikiLink;
 use App\Models\WikiPage;
 use App\Models\WikiRevision;
 use App\Models\WikiSlugRedirect;
-use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
@@ -95,7 +94,8 @@ final readonly class ShowWikiIndexPage
             return null;
         }
 
-        $day = intdiv(CarbonImmutable::parse(now('Asia/Taipei')->toDateString(), 'UTC')->getTimestamp(), 86400);
+        $taipeiNow = now('Asia/Taipei');
+        $day = intdiv($taipeiNow->getTimestamp() + $taipeiNow->getOffset(), 86400);
 
         /** @var WikiPage $page */
         $page = $candidates($isFeatured)
