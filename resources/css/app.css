@@ -955,6 +955,27 @@
     @apply underline decoration-dotted underline-offset-2;
   }
 
+  /* Wiki: `[[slug]]` links to pages that don't exist yet, and footnote citations */
+  .wiki-link-missing {
+    @apply text-red-700 decoration-red-700/50 dark:text-red-400 dark:decoration-red-400/50;
+  }
+
+  .wiki-references {
+    @apply mt-10 border-t border-theme-200 pt-2 text-sm dark:border-zinc-700;
+  }
+
+  .wiki-references h2 {
+    @apply mt-4! mb-2! text-lg;
+  }
+
+  .wiki-references li p {
+    @apply my-1!;
+  }
+
+  .footnote-ref {
+    @apply no-underline;
+  }
+
   @media print {
     .md-faq-item {
       @apply border-0;

@@ -5,27 +5,34 @@ declare(strict_types=1);
 namespace NouTools\Domains\Wiki\Support;
 
 /**
- * Line-level comparison of two page bodies (longest common subsequence),
- * enough to size an edit for the auto-publish rules. Pages are capped at
- * `wiki.max_body_chars`, so the quadratic table stays small.
+ * Line-level comparison of two page bodies (longest common subsequence):
+ * sizes an edit for the auto-publish rules and feeds the diff views. Pages
+ * are capped at `wiki.max_body_chars`, so the quadratic table stays small.
  */
 final readonly class WikiTextDiff
 {
+    public const string EQUAL = 'equal';
+
+    public const string ADDED = 'added';
+
+    public const string REMOVED = 'removed';
+
     /**
-     * @param  list<string>  $addedLines
-     * @param  list<string>  $removedLines
+     * @param  list<array{type: string, text: string}>  $operations
      */
     private function __construct(
-        public array $addedLines,
-        public array $removedLines,
+        public array $operations,
         public int $baseLineCount,
         public int $newLineCount,
     ) {}
 
-    public static function compare(string $base, string $new): self
+    /**
+     * @param  bool  $ignoreBlankLines  blank-line shuffles are no edit worth counting, but a diff view shows them
+     */
+    public static function compare(string $base, string $new, bool $ignoreBlankLines = true): self
     {
-        $baseLines = self::lines($base);
-        $newLines = self::lines($new);
+        $baseLines = self::lines($base, $ignoreBlankLines);
+        $newLines = self::lines($new, $ignoreBlankLines);
         $baseCount = count($baseLines);
         $newCount = count($newLines);
 
@@ -40,26 +47,39 @@ final readonly class WikiTextDiff
             }
         }
 
-        $added = [];
-        $removed = [];
+        $operations = [];
         $i = 0;
         $j = 0;
 
-        while ($i < $baseCount && $j < $newCount) {
-            if ($baseLines[$i] === $newLines[$j]) {
+        while ($i < $baseCount || $j < $newCount) {
+            if ($i < $baseCount && $j < $newCount && $baseLines[$i] === $newLines[$j]) {
+                $operations[] = ['type' => self::EQUAL, 'text' => $baseLines[$i]];
                 $i++;
                 $j++;
-            } elseif ($lengths[$i + 1][$j] >= $lengths[$i][$j + 1]) {
-                $removed[] = $baseLines[$i++];
+            } elseif ($j >= $newCount || ($i < $baseCount && $lengths[$i + 1][$j] >= $lengths[$i][$j + 1])) {
+                $operations[] = ['type' => self::REMOVED, 'text' => $baseLines[$i++]];
             } else {
-                $added[] = $newLines[$j++];
+                $operations[] = ['type' => self::ADDED, 'text' => $newLines[$j++]];
             }
         }
 
-        array_push($removed, ...array_slice($baseLines, $i));
-        array_push($added, ...array_slice($newLines, $j));
+        return new self($operations, $baseCount, $newCount);
+    }
 
-        return new self($added, $removed, $baseCount, $newCount);
+    /**
+     * @return list<string>
+     */
+    public function addedLines(): array
+    {
+        return $this->textOf(self::ADDED);
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function removedLines(): array
+    {
+        return $this->textOf(self::REMOVED);
     }
 
     /**
@@ -69,7 +89,7 @@ final readonly class WikiTextDiff
     {
         $longest = max($this->baseLineCount, $this->newLineCount, 1);
 
-        return (count($this->addedLines) + count($this->removedLines)) / $longest;
+        return (count($this->addedLines()) + count($this->removedLines())) / $longest;
     }
 
     /**
@@ -78,22 +98,79 @@ final readonly class WikiTextDiff
      */
     public function removedChars(): int
     {
-        $removed = mb_strlen(implode('', $this->removedLines));
-        $added = mb_strlen(implode('', $this->addedLines));
+        $removed = mb_strlen(implode('', $this->removedLines()));
+        $added = mb_strlen(implode('', $this->addedLines()));
 
         return max(0, $removed - $added);
     }
 
     /**
-     * Non-blank lines; blank-line shuffles are not edits worth counting.
+     * The operations with long unchanged stretches folded into gaps, keeping
+     * `$context` lines around each change, for display.
      *
+     * @return list<array{type: string, text: string}> type `gap` carries the number of hidden lines as text
+     */
+    public function hunks(int $context = 3): array
+    {
+        $changed = [];
+
+        foreach ($this->operations as $index => $operation) {
+            if ($operation['type'] !== self::EQUAL) {
+                $changed[] = $index;
+            }
+        }
+
+        $visible = [];
+
+        foreach ($changed as $index) {
+            for ($k = max(0, $index - $context); $k <= min(count($this->operations) - 1, $index + $context); $k++) {
+                $visible[$k] = true;
+            }
+        }
+
+        $lines = [];
+        $hidden = 0;
+
+        foreach ($this->operations as $index => $operation) {
+            if (isset($visible[$index])) {
+                if ($hidden > 0) {
+                    $lines[] = ['type' => 'gap', 'text' => (string) $hidden];
+                    $hidden = 0;
+                }
+
+                $lines[] = $operation;
+            } else {
+                $hidden++;
+            }
+        }
+
+        if ($hidden > 0 && $lines !== []) {
+            $lines[] = ['type' => 'gap', 'text' => (string) $hidden];
+        }
+
+        return $lines;
+    }
+
+    /**
      * @return list<string>
      */
-    private static function lines(string $text): array
+    private function textOf(string $type): array
     {
-        return array_values(array_filter(
-            array_map('rtrim', explode("\n", str_replace("\r\n", "\n", $text))),
-            fn (string $line): bool => $line !== '',
+        return array_values(array_map(
+            fn (array $operation): string => $operation['text'],
+            array_filter($this->operations, fn (array $operation): bool => $operation['type'] === $type),
         ));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function lines(string $text, bool $ignoreBlankLines): array
+    {
+        $lines = array_map('rtrim', explode("\n", rtrim(str_replace("\r\n", "\n", $text))));
+
+        return $ignoreBlankLines
+            ? array_values(array_filter($lines, fn (string $line): bool => $line !== ''))
+            : $lines;
     }
 }

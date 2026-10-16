@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
+use NouTools\Domains\Wiki\DataTransferObjects\CreateWikiEditRequestDTO;
 
 /**
  * A visitor's description of how a page should change (or what a new page
@@ -71,6 +73,20 @@ final class WikiEditRequest extends Model
         ];
     }
 
+    /**
+     * The visitor's part of a new request; the caller links page, base
+     * revision, schedule and ip.
+     */
+    public function fillFromDTO(CreateWikiEditRequestDTO $data): self
+    {
+        $this->instruction = trim($data->instruction);
+        $this->source_urls = array_values(array_unique(array_map('trim', $data->sourceUrls)));
+        $this->requested_slug = filled($data->requestedSlug) ? $data->requestedSlug : null;
+        $this->requested_title = filled($data->requestedTitle) ? trim((string) $data->requestedTitle) : null;
+
+        return $this;
+    }
+
     public static function hashIp(?string $ip): string
     {
         return hash_hmac('sha256', (string) $ip, (string) config('app.key'));
@@ -91,9 +107,9 @@ final class WikiEditRequest extends Model
         return $this->ai_verdict['declineReason'] ?? null;
     }
 
-    public function belongsToSchedule(?StudentSchedule $schedule): bool
+    public function belongsToSchedule(?StudentScheduleCookie $viewer): bool
     {
-        return $schedule !== null && $this->student_schedule_id === $schedule->id;
+        return $viewer !== null && $this->student_schedule_id === $viewer->id;
     }
 
     /**
