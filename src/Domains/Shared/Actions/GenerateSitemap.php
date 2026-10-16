@@ -9,6 +9,7 @@ use App\Enums\DiscountStoreStatus;
 use App\Models\Course;
 use App\Models\DiscountStore;
 use App\Models\NewsletterIssue;
+use App\Models\WikiPage;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use NouTools\Domains\Articles\Actions\ShowArticlePage;
@@ -40,11 +41,15 @@ final readonly class GenerateSitemap
             new SitemapUrlViewModel(url: route('discount-stores.index'), changeFrequency: 'daily', priority: 0.7),
             new SitemapUrlViewModel(url: route('discount-stores.create'), changeFrequency: 'yearly', priority: 0.3),
             new SitemapUrlViewModel(url: route('study-room.show'), changeFrequency: 'daily', priority: 0.6),
+            new SitemapUrlViewModel(url: route('wiki.index'), changeFrequency: 'daily', priority: 0.7),
+            new SitemapUrlViewModel(url: route('wiki.guide', 'writing'), changeFrequency: 'monthly', priority: 0.3),
+            new SitemapUrlViewModel(url: route('wiki.guide', 'syntax'), changeFrequency: 'monthly', priority: 0.3),
         ])
             ->merge($this->courseUrls())
             ->merge($this->discountStoreUrls())
             ->merge($this->newsletterIssueUrls())
-            ->merge($this->articleUrls());
+            ->merge($this->articleUrls())
+            ->merge($this->wikiPageUrls());
     }
 
     /**
@@ -89,6 +94,20 @@ final readonly class GenerateSitemap
                 url: route('newsletter.show', $issue->issue_key),
                 lastModified: $issue->updated_at,
                 changeFrequency: 'monthly',
+                priority: 0.6,
+            ));
+    }
+
+    /**
+     * @return Collection<int, SitemapUrlViewModel>
+     */
+    private function wikiPageUrls(): Collection
+    {
+        return WikiPage::query()->live()->with('currentRevision:id,created_at')->get(['id', 'slug', 'current_revision_id'])
+            ->map(fn (WikiPage $page): SitemapUrlViewModel => new SitemapUrlViewModel(
+                url: route('wiki.show', $page->slug),
+                lastModified: $page->currentRevision?->created_at,
+                changeFrequency: 'weekly',
                 priority: 0.6,
             ));
     }

@@ -1,6 +1,6 @@
 <script setup>
 // `viewModel.type` only survives Inertia's JSON serialization as the enum's
-// string value (`kb` / `manual`), so the `App\Enums\ArticleType::label()`
+// string value (`manual`), so the `App\Enums\ArticleType::label()`
 // mapping is re-implemented here from that value. `viewModel.indexContent`
 // is plain HTML (rendered Markdown) coming straight from the ViewModel, so
 // it's rendered with v-html.
@@ -17,7 +17,6 @@ const props = defineProps({
 })
 
 const ARTICLE_TYPE_LABELS = {
-  kb: '知識庫',
   manual: '操作手冊',
 }
 

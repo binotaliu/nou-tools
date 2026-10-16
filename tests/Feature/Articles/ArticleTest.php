@@ -16,11 +16,8 @@ test('article index page loads successfully', function () {
     });
 });
 
-test('knowledge base index page loads successfully', function () {
-    $response = $this->get(route('articles.index', ['type' => ArticleType::KNOWLEDGE_BASE->value]));
-
-    $response->assertSuccessful();
-    $response->assertInertia(fn (Assert $page) => $page->component('Articles/Index'));
+test('the old knowledge base type is no longer an article type', function () {
+    expect(ArticleType::tryFrom('kb'))->toBeNull();
 });
 
 test('article index displays index content with links', function () {
@@ -53,15 +50,15 @@ test('article show page loads successfully', function () {
 
 test('article show page displays article content', function () {
     $response = $this->get(route('articles.show', [
-        'type' => ArticleType::KNOWLEDGE_BASE->value,
-        'slug' => 'about-nou',
+        'type' => ArticleType::MANUAL->value,
+        'slug' => 'welcome',
     ]));
 
     $response->assertSuccessful();
     $response->assertInertia(function (Assert $page) {
         $article = $page->toArray()['props']['viewModel']['article'];
 
-        expect($article['content'])->toContain('關於國立空中大學');
+        expect($article['content'])->toContain('歡迎使用 NOU 小幫手');
     });
 });
 
@@ -137,28 +134,28 @@ test('returns markdown from the article index when the client prefers it in the 
 
 test('displays the article show markdown page', function () {
     $response = $this->get(route('articles.show.md', [
-        'type' => ArticleType::KNOWLEDGE_BASE->value,
-        'slug' => 'about-nou',
+        'type' => ArticleType::MANUAL->value,
+        'slug' => 'welcome',
     ]));
 
     $response->assertSuccessful()
         ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
-        ->assertSee('# 關於國立空中大學', false)
+        ->assertSee('# 歡迎使用 NOU 小幫手', false)
         ->assertSee('作者：浣熊站長')
-        ->assertDontSee('title: 關於國立空中大學', false);
+        ->assertDontSee('title: 歡迎使用 NOU 小幫手', false);
 });
 
 test('returns markdown from the article show page when the client prefers it in the Accept header', function () {
     $response = $this->get(route('articles.show', [
-        'type' => ArticleType::KNOWLEDGE_BASE->value,
-        'slug' => 'about-nou',
+        'type' => ArticleType::MANUAL->value,
+        'slug' => 'welcome',
     ]), [
         'Accept' => 'text/markdown, text/html;q=0.8',
     ]);
 
     $response->assertSuccessful()
         ->assertHeader('Content-Type', 'text/markdown; charset=utf-8')
-        ->assertSee('# 關於國立空中大學', false);
+        ->assertSee('# 歡迎使用 NOU 小幫手', false);
 });
 
 test('article show markdown page returns 404 for non-existent article', function () {

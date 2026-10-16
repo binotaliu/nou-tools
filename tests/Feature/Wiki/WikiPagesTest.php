@@ -302,3 +302,25 @@ it('caps refinements', function (): void {
     ($this->signedIn)()->post(route('wiki.edit-requests.refine', $editRequest), ['instruction' => '再一次'])
         ->assertSessionHasErrors('instruction');
 });
+
+it('redirects the old knowledge base to the wiki', function (): void {
+    $this->get('/kb')->assertStatus(301)->assertRedirect('/wiki');
+    $this->get('/kb/about-nou')->assertStatus(301)->assertRedirect('/wiki/about-nou');
+    $this->get('/kb/about-nou.md')->assertStatus(301)->assertRedirect('/wiki/about-nou.md');
+});
+
+it('imported the old about-nou page', function (): void {
+    $this->get('/wiki/about-nou')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('viewModel.page.title', '關於國立空中大學'));
+});
+
+it('server-renders seo tags for a page and keeps edit forms out of the index', function (): void {
+    $this->get(route('wiki.show', 'nou-exams-info'))
+        ->assertSee('<title>空大考試要去哪裡考？ - 空大知識庫 - NOU 小幫手</title>', false)
+        ->assertSee('<meta data-seo name="description" content="期中考與期末考都在週末舉行。" />', false)
+        ->assertSee('<template data-og-image', false);
+
+    $this->get(route('wiki.edit', 'nou-exams-info'))
+        ->assertSee('<meta data-seo name="robots" content="noindex, nofollow" />', false);
+});

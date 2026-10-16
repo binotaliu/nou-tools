@@ -126,9 +126,9 @@ it('server-renders an article page with its own description and JSON-LD', functi
 });
 
 it('server-renders an article index page', function () {
-    $this->get(route('articles.index', ['type' => ArticleType::KNOWLEDGE_BASE->value]))
+    $this->get(route('articles.index', ['type' => ArticleType::MANUAL->value]))
         ->assertSuccessful()
-        ->assertSee('<title>知識庫 - NOU 小幫手</title>', false)
+        ->assertSee('<title>操作手冊 - NOU 小幫手</title>', false)
         ->assertSee('"@type":"CollectionPage"', false);
 });
 
@@ -236,10 +236,10 @@ it('advertises a generated og:image card on an article page', function () {
 });
 
 it('advertises a generated og:image card on an article index page', function () {
-    $this->get(route('articles.index', ['type' => ArticleType::KNOWLEDGE_BASE->value]))
+    $this->get(route('articles.index', ['type' => ArticleType::MANUAL->value]))
         ->assertSuccessful()
         ->assertSee('<template data-og-image', false)
-        ->assertSee('知識庫', false)
+        ->assertSee('操作手冊', false)
         ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
         ->assertDontSee(asset('og-image.png'), false);
 });

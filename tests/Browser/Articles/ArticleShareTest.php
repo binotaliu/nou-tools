@@ -4,13 +4,13 @@
 // component (also used by the newsletter); this keeps the article's own test
 // ids and copy-link fallback working.
 it('falls back to a copy-link dialog on articles when the browser cannot share', function () {
-    $page = visit('/kb/about-nou');
+    $page = visit('/manual/welcome');
 
     $page->script('Object.defineProperty(navigator, "share", { value: undefined, configurable: true })');
 
     $page->click('[data-testid="article-share-button"]')
         ->assertPresent('[data-testid="article-share-modal"]')
-        ->assertValue('[data-testid="article-share-modal"] input', url('/kb/about-nou'))
+        ->assertValue('[data-testid="article-share-modal"] input', url('/manual/welcome'))
         ->click('[data-testid="article-share-close"]')
         ->assertNotPresent('[data-testid="article-share-modal"]');
 });

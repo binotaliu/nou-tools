@@ -18,8 +18,10 @@ test('sitemap returns xml with static and dynamic pages', function () {
         ->assertSee(route('video-classes.index'), false)
         ->assertSee(route('discount-stores.index'), false)
         ->assertSee(route('course.show', $course), false)
-        ->assertSee(route('articles.index', 'kb'), false)
-        ->assertSee(route('articles.show', ['kb', 'about-nou']), false);
+        ->assertSee(route('articles.index', 'manual'), false)
+        ->assertSee(route('articles.show', ['manual', 'welcome']), false)
+        ->assertSee(route('wiki.index'), false)
+        ->assertSee(route('wiki.show', 'about-nou'), false);
 });
 
 test('sitemap does not include noindexed schedule pages but does include online store pages', function () {

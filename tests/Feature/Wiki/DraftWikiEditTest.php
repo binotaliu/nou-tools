@@ -204,5 +204,5 @@ it('searches, reads and lists wiki content for the editor', function (): void {
         ->and((string) app(SearchWikiPages::class)->handle(new Request(['query' => '學分'])))->toBe('No pages match.')
         ->and((string) app(ReadWikiPage::class)->handle(new Request(['slug' => 'nou-exams-info'])))->toContain('## 考場')
         ->and((string) app(ReadWikiPage::class)->handle(new Request(['slug' => 'missing'])))->toContain('No page')
-        ->and((string) app(ListWikiCategories::class)->handle(new Request([])))->toBe('考試 (1)');
+        ->and((string) app(ListWikiCategories::class)->handle(new Request([])))->toContain('考試 (1)');
 });

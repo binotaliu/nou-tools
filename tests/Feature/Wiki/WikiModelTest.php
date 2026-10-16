@@ -9,7 +9,7 @@ it('creates a live page with a current revision', function (): void {
     $page = WikiPage::factory()->live(['title' => '空大考試要去哪裡考？'])->create();
 
     expect($page->fresh()->currentRevision->title)->toBe('空大考試要去哪裡考？')
-        ->and(WikiPage::query()->live()->count())->toBe(1);
+        ->and(WikiPage::query()->live()->whereKey($page->id)->exists())->toBeTrue();
 });
 
 it('validates slugs', function (string $slug, bool $valid): void {

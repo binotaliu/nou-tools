@@ -265,6 +265,11 @@ Route::get('/wiki/{slug}', [WikiController::class, 'show'])->name('wiki.show')
     ->where('slug', '[a-z0-9-]+')
     ->withMarkdown(WikiShowMarkdownController::class);
 
+// The file-based 知識庫 (/kb) became the wiki.
+Route::permanentRedirect('/kb', '/wiki');
+Route::permanentRedirect('/kb.md', '/wiki.md');
+Route::get('/kb/{slug}', fn (string $slug) => redirect('/wiki/'.$slug, 301))->where('slug', '[a-z0-9_-]+(?:\.md)?');
+
 Route::get('/{type}', [ArticleController::class, 'index'])->name('articles.index')
     ->whereIn('type', ArticleType::cases())
     ->withMarkdown(ArticleIndexMarkdownController::class);

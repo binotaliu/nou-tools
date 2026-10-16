@@ -110,8 +110,8 @@ test('returns null for non-existent article', function () {
 });
 
 test('article content is converted from markdown to html', function () {
-    $type = ArticleType::KNOWLEDGE_BASE;
-    $slug = 'about-nou';
+    $type = ArticleType::MANUAL;
+    $slug = 'welcome';
     $path = ($this->articlePath)($type, $slug);
 
     // add minimal frontmatter so the service returns an Article instance

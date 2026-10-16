@@ -71,7 +71,7 @@ it('chains revisions and drops empty categories', function (): void {
     app(PublishWikiRevision::class)($this->page, ($this->revisionData)(['categories' => ['報名']]));
 
     expect($this->page->fresh()->currentRevision->parent_revision_id)->toBe($first)
-        ->and(WikiCategory::query()->pluck('name')->all())->toBe(['報名']);
+        ->and(WikiCategory::query()->pluck('name')->all())->toContain('報名')->not->toContain('考試');
 });
 
 it('leaves a redirect when the slug changes and can take it back', function (): void {
