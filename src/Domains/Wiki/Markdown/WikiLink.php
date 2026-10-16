@@ -7,15 +7,12 @@ namespace NouTools\Domains\Wiki\Markdown;
 use League\CommonMark\Node\Inline\AbstractInline;
 
 /**
- * `[[slug]]`, `[[slug|label]]` or `[[slug#heading|label]]`. The target is
- * filled in by {@see WikiLinkResolutionProcessor} once the whole document is
- * parsed, so every link in a page costs one query, not one each.
+ * `[[slug]]`, `[[slug|label]]` or `[[slug#heading|label]]` as parsed. It only
+ * lives until {@see WikiLinkResolutionProcessor} has looked up every target in
+ * the document at once and swapped it for a plain link.
  */
 final class WikiLink extends AbstractInline
 {
-    /** Canonical slug and title of the live page, null when there isn't one (a red link). */
-    public ?WikiLinkTarget $target = null;
-
     public function __construct(
         public readonly string $slug,
         public readonly ?string $anchor,

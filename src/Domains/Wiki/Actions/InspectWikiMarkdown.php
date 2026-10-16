@@ -6,7 +6,7 @@ namespace NouTools\Domains\Wiki\Actions;
 
 use League\CommonMark\Extension\CommonMark\Node\Inline\Link;
 use League\CommonMark\Parser\MarkdownParser;
-use NouTools\Domains\Wiki\Markdown\WikiLink;
+use NouTools\Domains\Wiki\Markdown\WikiLinkResolutionProcessor;
 use NouTools\Domains\Wiki\Markdown\WikiMarkdownConverterFactory;
 
 /**
@@ -33,9 +33,13 @@ final class InspectWikiMarkdown
         $externalUrls = [];
 
         foreach ($this->parser->parse($markdown)->iterator() as $node) {
-            if ($node instanceof WikiLink) {
-                $wikiLinks[] = $node->slug;
-            } elseif ($node instanceof Link && preg_match('#^https?://#i', $node->getUrl()) === 1) {
+            if (! $node instanceof Link) {
+                continue;
+            }
+
+            if ($node->data->has(WikiLinkResolutionProcessor::SLUG_DATA_KEY)) {
+                $wikiLinks[] = (string) $node->data->get(WikiLinkResolutionProcessor::SLUG_DATA_KEY);
+            } elseif (preg_match('#^https?://#i', $node->getUrl()) === 1) {
                 $externalUrls[] = $node->getUrl();
             }
         }

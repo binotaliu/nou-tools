@@ -15,7 +15,7 @@ it('links to a live page with its title', function (): void {
     WikiPage::factory()->live(['title' => '空大考試要去哪裡考？'])->create(['slug' => 'nou-exams-info']);
 
     expect(($this->render)('詳見[[nou-exams-info]]。'))
-        ->toContain('<a href="/wiki/nou-exams-info" class="wiki-link" data-wiki-slug="nou-exams-info">空大考試要去哪裡考？</a>');
+        ->toContain('<a class="wiki-link" href="/wiki/nou-exams-info">空大考試要去哪裡考？</a>');
 });
 
 it('uses the label and turns the anchor into a heading id', function (): void {
@@ -86,3 +86,17 @@ it('reports wiki links and external urls', function (): void {
     expect($result['wikiLinks'])->toBe(['nou-exams-info', 'nou-credits'])
         ->and($result['externalUrls'])->toBe(['https://www.nou.edu.tw/a']);
 });
+
+it('renders wiki links inside cards', function (): void {
+    WikiPage::factory()->live(['title' => '考試'])->create(['slug' => 'nou-exams-info']);
+
+    expect(($this->render)(":::cards\n- [[nou-exams-info|考試怎麼考？]] — 考場與時間\n:::\n"))
+        ->toContain('<a class="md-card" href="/wiki/nou-exams-info">')
+        ->toContain('考試怎麼考？');
+});
+
+it('renders every documented example of the guides without losing a wiki link', function (string $guide): void {
+    $html = ($this->render)(file_get_contents(resource_path("wiki/guides/{$guide}.md")));
+
+    expect($html)->not->toBeEmpty()->not->toContain('<script');
+})->with(['writing-guide', 'syntax-guide']);

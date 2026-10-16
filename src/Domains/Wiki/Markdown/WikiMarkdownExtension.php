@@ -24,8 +24,8 @@ final readonly class WikiMarkdownExtension implements ExtensionInterface
 
         // Above CommonMark's bracket parsers, so `[[` never starts a link.
         $environment->addInlineParser(new WikiLinkParser, 100);
-        $environment->addRenderer(WikiLink::class, new WikiLinkRenderer);
-        $environment->addEventListener(DocumentParsedEvent::class, new WikiLinkResolutionProcessor($this->resolver));
+        // Before ExternalLinkProcessor (-50) and anything else that inspects links.
+        $environment->addEventListener(DocumentParsedEvent::class, new WikiLinkResolutionProcessor($this->resolver), 50);
 
         $environment->addRenderer(FootnoteContainer::class, new WikiReferencesRenderer, 10);
     }
