@@ -11,6 +11,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 /**
@@ -45,7 +46,8 @@ class WikiPageForm
                             ->columnSpanFull(),
                         TagsInput::make('categories')
                             ->label('分類')
-                            ->required()
+                            // The homepage's intro belongs to no category.
+                            ->required(fn (Get $get): bool => $get('slug') !== WikiPage::MAIN_PAGE_SLUG)
                             ->columnSpanFull(),
                         Toggle::make('is_protected')
                             ->label('受保護（只有管理員可以修改）'),

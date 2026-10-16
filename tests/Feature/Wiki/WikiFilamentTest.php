@@ -86,6 +86,20 @@ it('edits a page into a new revision and renames with a redirect', function (): 
         ->and($page->slugRedirects()->pluck('old_slug')->all())->toBe(['nou-exams-info']);
 });
 
+it('edits the homepage intro without categories', function (): void {
+    Livewire::test(EditWikiPage::class, ['record' => WikiPage::MAIN_PAGE_SLUG])
+        ->fillForm(['body' => "歡迎！\n", 'categories' => []])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect(WikiPage::query()->where('slug', WikiPage::MAIN_PAGE_SLUG)->first()->currentRevision->body)->toBe("歡迎！\n");
+
+    Livewire::test(EditWikiPage::class, ['record' => $this->page->slug])
+        ->fillForm(['categories' => []])
+        ->call('save')
+        ->assertHasFormErrors(['categories' => 'required']);
+});
+
 it('toggles protection and 精選 without a new revision', function (): void {
     Livewire::test(EditWikiPage::class, ['record' => $this->page->slug])
         ->fillForm(['is_protected' => true, 'is_featured' => true])

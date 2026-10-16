@@ -3,16 +3,19 @@
 declare(strict_types=1);
 
 use App\Enums\WikiRevisionOrigin;
+use App\Models\WikiLink;
 use App\Models\WikiPage;
 use App\Models\WikiSlugRedirect;
-use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Date;
 use Inertia\Testing\AssertableInertia as Assert;
 use NouTools\Domains\Wiki\Actions\PublishWikiRevision;
 use NouTools\Domains\Wiki\DataTransferObjects\PublishWikiRevisionDTO;
 
 beforeEach(function (): void {
-    // The page the old knowledge base was imported into.
+    // The page the old knowledge base was imported into, and the intro's
+    // link to it, which would otherwise turn red.
     WikiPage::query()->where('slug', 'about-nou')->forceDelete();
+    WikiLink::query()->where('to_slug', 'about-nou')->delete();
 
     $this->exams = WikiPage::factory()->live([
         'title' => '空大考試要去哪裡考？',
@@ -27,7 +30,7 @@ it('features a page marked 精選 and rotates through them by day', function ():
     $other = WikiPage::factory()->featured()->live(['title' => '選課流程'])->create(['slug' => 'course-selection']);
 
     $slugOn = function (string $date): string {
-        $this->travelTo(CarbonImmutable::parse($date.' 12:00', 'Asia/Taipei'));
+        $this->travelTo(Date::parse($date.' 12:00', 'Asia/Taipei'));
 
         return $this->get(route('wiki.index'))->viewData('page')['props']['viewModel']['featured']['page']['slug'];
     };
@@ -90,4 +93,36 @@ it('lists every page on 所有條目 and in the markdown twin', function (): voi
 
 it('reserves the 所有條目 path', function (): void {
     expect(WikiPage::isValidSlug('all'))->toBeFalse();
+});
+
+it('opens with the main-page intro, which stays out of every list', function (): void {
+    // Created by migration; the beforeEach left it alone.
+    $mainPage = WikiPage::query()->where('slug', WikiPage::MAIN_PAGE_SLUG)->firstOrFail();
+
+    expect($mainPage->is_protected)->toBeTrue();
+
+    $this->get(route('wiki.index', ['q' => '歡迎']))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('viewModel.intro', fn (string $intro): bool => str_contains($intro, '歡迎來到空大知識庫') && str_contains($intro, 'md-cards'))
+            ->where('viewModel.introHistoryUrl', route('wiki.history', WikiPage::MAIN_PAGE_SLUG))
+            ->where('viewModel.pageCount', 1)
+            ->where('viewModel.featured.page.slug', 'nou-exams-info')
+            ->where('viewModel.newPages', fn ($pages): bool => collect($pages)->pluck('slug')->doesntContain(WikiPage::MAIN_PAGE_SLUG))
+            ->where('viewModel.recentChanges', fn ($changes): bool => collect($changes)->pluck('pageSlug')->doesntContain(WikiPage::MAIN_PAGE_SLUG))
+            ->has('viewModel.searchResults', 0));
+
+    $this->get(route('wiki.all'))
+        ->assertInertia(fn (Assert $page) => $page->has('viewModel.pages', 1));
+
+    $this->get('/wiki/main-page')->assertRedirect(route('wiki.index'));
+    $this->get(route('wiki.history', WikiPage::MAIN_PAGE_SLUG))->assertOk();
+});
+
+it('shows no intro without a main page', function (): void {
+    WikiPage::query()->where('slug', WikiPage::MAIN_PAGE_SLUG)->forceDelete();
+
+    $this->get(route('wiki.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('viewModel.intro', null)
+            ->where('viewModel.introHistoryUrl', null));
 });
