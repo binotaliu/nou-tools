@@ -11,6 +11,7 @@ use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
 use App\Models\WikiRevision;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Testing\AssertableInertia as Assert;
 use NouTools\Domains\Schedules\Actions\BuildScheduleDeviceCookie;
 use NouTools\Domains\Wiki\Actions\ApproveWikiEditRequest;
@@ -18,6 +19,8 @@ use NouTools\Domains\Wiki\Actions\DraftAndSubmitWikiEdit;
 use NouTools\Domains\Wiki\Ai\WikiEditor;
 
 beforeEach(function (): void {
+    Notification::fake();
+
     $this->baseBody = "期中考與期末考都在週末舉行。\n\n## 考場\n\n各學習指導中心。\n\n## 時間\n\n上午九點開始。\n\n## 攜帶物品\n\n學生證與文具。\n\n## 注意事項\n\n遲到二十分鐘不得入場。\n";
 
     $this->response = fn (array $overrides = []): array => [
@@ -58,6 +61,10 @@ it('publishes a small, low-risk draft as soon as it is written', function (): vo
 
     expect($editRequest->refresh()->status)->toBe(WikiEditRequestStatus::Published)
         ->and($this->page->fresh()->current_revision_id)->toBe($editRequest->published_revision_id);
+});
+
+it('never reaches the real discord webhooks from .env', function (): void {
+    expect(config('services.discord.webhooks'))->each->toBeEmpty();
 });
 
 it('queues a draft the rules hold back without waiting for the visitor', function (): void {
