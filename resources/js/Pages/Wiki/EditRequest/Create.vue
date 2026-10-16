@@ -135,10 +135,9 @@ const labelClasses =
           {{ heading }}
         </h2>
         <p class="text-theme-800 dark:text-zinc-300">
-          知識庫不能直接編輯。請說明{{
-            isNewPage ? '新條目要寫什麼' : '這個條目要怎麼改'
-          }}，並附上來源；AI
-          編輯會依照知識庫的寫作規則改寫，完成後自動送出。小幅修改會直接發布，其餘交由管理員審核。送出後即使關閉頁面，修改也不會遺失。
+          要{{ isNewPage ? '建立新條目' : '編輯條目' }}非常簡單，只需要說明{{
+            isNewPage ? '新條目需要有什麼內容' : '需要修改什麼內容'
+          }}，NOU 小幫手的 AI 編輯會自動撰寫內文。如果有來源資料，請附上網址。
         </p>
       </header>
 
@@ -204,7 +203,7 @@ const labelClasses =
 
         <div>
           <label for="instruction" :class="labelClasses">
-            {{ isNewPage ? '這個條目要寫什麼？' : '要改什麼？為什麼？' }}
+            {{ isNewPage ? '條目內容說明' : '要改什麼？為什麼？' }}
             <span class="text-red-500" aria-hidden="true">*</span>
           </label>
           <textarea
@@ -227,9 +226,7 @@ const labelClasses =
             id="instruction-hint"
             class="mt-1 text-xs text-theme-700 dark:text-zinc-400"
           >
-            越具體越好。修改說明會公開顯示在編輯歷史中。{{
-              form.instruction.length
-            }}/{{ viewModel.instructionMaxLength }}
+            {{ form.instruction.length }}/{{ viewModel.instructionMaxLength }}
           </p>
           <FieldError
             id="instruction-error"
@@ -240,7 +237,7 @@ const labelClasses =
         <fieldset class="space-y-2">
           <legend :class="labelClasses">來源網址（選填）</legend>
           <p class="text-xs text-theme-700 dark:text-zinc-400">
-            學校規定、日期、費用等資料請附上來源。只接受這些網站：{{
+            若有資料來源，請附上連結。目前可使用的網址為：{{
               viewModel.sourceDomains.join('、')
             }}。
           </p>

@@ -211,7 +211,7 @@ const panelClasses =
         class="space-y-3"
       >
         <p class="text-theme-900 dark:text-zinc-100">
-          這次沒有成功產生草稿，請換個說法或稍後再試。
+          產生草稿失敗。請試著換個說法或稍後再試。
         </p>
         <Link v-if="request.isOwner" :href="retryUrl" :class="WIKI_PRIMARY_LINK"
           >重新提出修改</Link
@@ -225,7 +225,7 @@ const panelClasses =
         data-testid="wiki-request-pending"
       >
         <p class="text-theme-900 dark:text-zinc-100">
-          已送出，正在等待管理員審核，通過後就會發布。
+          已送出。本次編輯需要管理員審核，待審核通過即會發布。
         </p>
         <p
           v-if="request.reviewReasons.length"
@@ -282,7 +282,7 @@ const panelClasses =
         data-testid="wiki-request-conflict"
       >
         <p class="text-theme-900 dark:text-zinc-100">
-          在你確認之前，這個條目已經被其他人修改過，這份草稿不能直接套用。
+          糟糕，有其他人搶先一步在你送出修改前編輯了本文件，因此無法直接套用編輯。
         </p>
         <div v-if="request.isOwner" class="flex flex-wrap gap-2">
           <Button
@@ -303,7 +303,7 @@ const panelClasses =
         role="status"
         :class="panelClasses"
       >
-        這個修改已經放棄。
+        已放棄本修改。
       </div>
 
       <template v-if="request.draftContent">
@@ -338,7 +338,7 @@ const panelClasses =
             role="alert"
             class="rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950/50 dark:text-amber-100"
           >
-            上一次的再調整沒有成功，以下仍是先前的草稿。<template
+            上次調整未成功套用。以下為先前的草稿。<template
               v-if="request.lastRefinementDeclineReason"
               >編輯的說明：{{ request.lastRefinementDeclineReason }}</template
             >

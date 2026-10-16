@@ -53,12 +53,12 @@ const pageLinkClasses =
           {{ viewModel.title }}
         </h2>
         <p class="text-theme-800 dark:text-zinc-300">
-          由空大同學一起整理的知識庫，目前共有
+          NOU
+          小幫手知識庫是一個自由且開放的維基知識庫，任何人都可以參與編輯。目前共有
           <strong data-testid="wiki-page-count">{{
             viewModel.pageCount
           }}</strong>
-          個條目。任何人都可以提出修改：說明想改什麼、附上來源，AI
-          編輯會改寫條目並送出。內容僅供參考，請以學校公告為準。
+          個條目。
         </p>
       </header>
 
