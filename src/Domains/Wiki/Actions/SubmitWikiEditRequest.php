@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Wiki\Actions;
 
+use App\Enums\WikiEditEventType;
 use App\Enums\WikiEditRequestStatus;
 use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
@@ -25,6 +26,7 @@ final readonly class SubmitWikiEditRequest
     public function __construct(
         private ResolveWikiPublishDecision $resolveWikiPublishDecision,
         private PublishWikiEditRequest $publishWikiEditRequest,
+        private RecordWikiEditEvent $recordWikiEditEvent,
     ) {}
 
     /**
@@ -68,11 +70,27 @@ final readonly class SubmitWikiEditRequest
             return $editRequest;
         });
 
-        if ($editRequest->status === WikiEditRequestStatus::PendingReview && filled(config('services.discord.webhooks.wiki_review'))) {
+        match ($editRequest->status) {
+            WikiEditRequestStatus::Published => ($this->recordWikiEditEvent)(WikiEditEventType::Published, $editRequest, '自動發布'),
+            WikiEditRequestStatus::Conflict => ($this->recordWikiEditEvent)(WikiEditEventType::Conflict, $editRequest, '條目在草稿寫成後已被修改'),
+            WikiEditRequestStatus::PendingReview => $this->queueForReview($editRequest),
+            default => null,
+        };
+
+        return $editRequest;
+    }
+
+    private function queueForReview(WikiEditRequest $editRequest): void
+    {
+        ($this->recordWikiEditEvent)(
+            WikiEditEventType::QueuedForReview,
+            $editRequest,
+            implode('、', $editRequest->ai_verdict['reviewReasons'] ?? []),
+        );
+
+        if (filled(config('services.discord.webhooks.wiki_review'))) {
             Notification::route('discord-webhook', config('services.discord.webhooks.wiki_review'))
                 ->notifyNow(new WikiEditRequestNeedsReview($editRequest));
         }
-
-        return $editRequest;
     }
 }

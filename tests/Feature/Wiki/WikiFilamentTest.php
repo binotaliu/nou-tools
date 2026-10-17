@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\UserRole;
 use App\Enums\WikiEditRequestStatus;
 use App\Enums\WikiRevisionOrigin;
+use App\Filament\Resources\WikiEditEvents\Pages\ListWikiEditEvents;
 use App\Filament\Resources\WikiEditRequests\Pages\ListWikiEditRequests;
 use App\Filament\Resources\WikiEditRequests\Pages\ViewWikiEditRequest;
 use App\Filament\Resources\WikiPages\Pages\CreateWikiPage;
@@ -12,6 +13,7 @@ use App\Filament\Resources\WikiPages\Pages\EditWikiPage;
 use App\Filament\Resources\WikiPages\Pages\ListWikiPages;
 use App\Filament\Resources\WikiPages\RelationManagers\RevisionsRelationManager;
 use App\Models\User;
+use App\Models\WikiEditEvent;
 use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
 use App\Models\WikiRevision;
@@ -167,4 +169,11 @@ it('rejects with a note and blocks the device', function (): void {
     expect($editRequest->refresh()->status)->toBe(WikiEditRequestStatus::Rejected)
         ->and($editRequest->review_note)->toBe('來源不足')
         ->and($editRequest->studentSchedule->wiki_blocked_at)->not->toBeNull();
+});
+
+it('lists the edit audit log for an admin', function (): void {
+    $events = WikiEditEvent::factory()->count(2)->create();
+
+    Livewire::test(ListWikiEditEvents::class)
+        ->assertCanSeeTableRecords($events);
 });

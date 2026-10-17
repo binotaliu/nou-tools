@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Wiki\Actions;
 
+use App\Enums\WikiEditEventType;
 use App\Enums\WikiEditRequestStatus;
 use App\Models\User;
 use App\Models\WikiEditRequest;
@@ -17,14 +18,17 @@ use Illuminate\Support\Facades\DB;
  */
 final readonly class ApproveWikiEditRequest
 {
-    public function __construct(private PublishWikiEditRequest $publishWikiEditRequest) {}
+    public function __construct(
+        private PublishWikiEditRequest $publishWikiEditRequest,
+        private RecordWikiEditEvent $recordWikiEditEvent,
+    ) {}
 
     /**
      * @throws DomainException when the request isn't pending or the page moved on
      */
     public function __invoke(WikiEditRequest $editRequest, User $reviewer, ?string $slug = null): WikiEditRequest
     {
-        return DB::transaction(function () use ($editRequest, $reviewer, $slug): WikiEditRequest {
+        $editRequest = DB::transaction(function () use ($editRequest, $reviewer, $slug): WikiEditRequest {
             $editRequest = WikiEditRequest::query()->lockForUpdate()->findOrFail($editRequest->id);
 
             if ($editRequest->status !== WikiEditRequestStatus::PendingReview) {
@@ -41,5 +45,9 @@ final readonly class ApproveWikiEditRequest
 
             return ($this->publishWikiEditRequest)($editRequest, $reviewer, filled($slug) ? $slug : null);
         });
+
+        ($this->recordWikiEditEvent)(WikiEditEventType::Published, $editRequest, '審核通過', $reviewer);
+
+        return $editRequest;
     }
 }

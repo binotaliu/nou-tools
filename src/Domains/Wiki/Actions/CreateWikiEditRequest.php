@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Wiki\Actions;
 
+use App\Enums\WikiEditEventType;
 use App\Jobs\GenerateWikiEditDraft;
 use App\Models\WikiEditRequest;
 use Illuminate\Support\Str;
@@ -13,8 +14,8 @@ use NouTools\Domains\Wiki\Exceptions\WikiDraftLimitReachedException;
 use NouTools\Domains\Wiki\Exceptions\WikiEditingNotAllowedException;
 
 /**
- * Records a visitor's request and has the AI editor draft it after the
- * response; the status page polls until the draft is there.
+ * Records a visitor's request and queues the AI editor to draft it; the
+ * status page polls until the draft is there.
  */
 final readonly class CreateWikiEditRequest
 {
@@ -23,6 +24,7 @@ final readonly class CreateWikiEditRequest
         private EnsureWikiEditingAllowed $ensureWikiEditingAllowed,
         private ConsumeWikiDraftAllowance $consumeWikiDraftAllowance,
         private StoreWikiScreenshots $storeWikiScreenshots,
+        private RecordWikiEditEvent $recordWikiEditEvent,
     ) {}
 
     /**
@@ -59,7 +61,9 @@ final readonly class CreateWikiEditRequest
 
         $editRequest->saveOrFail();
 
-        GenerateWikiEditDraft::dispatchAfterResponse($editRequest);
+        ($this->recordWikiEditEvent)(WikiEditEventType::Requested, $editRequest);
+
+        GenerateWikiEditDraft::dispatch($editRequest);
 
         return $editRequest;
     }

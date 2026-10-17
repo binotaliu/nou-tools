@@ -176,7 +176,7 @@ it('creates an edit request and drafts it after the response', function (): void
         ->and($editRequest->student_schedule_id)->toBe($this->schedule->id)
         ->and($editRequest->source_urls)->toBe(['https://www.nou.edu.tw/calendar']);
 
-    Bus::assertDispatchedAfterResponse(GenerateWikiEditDraft::class);
+    Bus::assertDispatched(GenerateWikiEditDraft::class);
 });
 
 it('stores screenshots with the request, up to ten references in all', function (): void {
@@ -346,7 +346,7 @@ it('submits, refines, redrafts and abandons through the owner device', function 
     expect($refining->refresh()->status)->toBe(WikiEditRequestStatus::Drafting)
         ->and($refining->refinements)->toBe(['再短一點']);
 
-    Bus::assertDispatchedAfterResponse(GenerateWikiEditDraft::class);
+    Bus::assertDispatched(GenerateWikiEditDraft::class);
 
     $conflicted = WikiEditRequest::factory()->forPage($this->page)->awaitingConfirmation()->create([
         'student_schedule_id' => $this->schedule->id,

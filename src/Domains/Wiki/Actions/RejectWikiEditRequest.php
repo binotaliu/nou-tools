@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Wiki\Actions;
 
+use App\Enums\WikiEditEventType;
 use App\Enums\WikiEditRequestStatus;
 use App\Models\User;
 use App\Models\WikiEditRequest;
@@ -11,6 +12,8 @@ use DomainException;
 
 final readonly class RejectWikiEditRequest
 {
+    public function __construct(private RecordWikiEditEvent $recordWikiEditEvent) {}
+
     /**
      * @throws DomainException when the request isn't pending
      */
@@ -25,6 +28,8 @@ final readonly class RejectWikiEditRequest
         $editRequest->reviewed_by = $reviewer->id;
         $editRequest->reviewed_at = now();
         $editRequest->saveOrFail();
+
+        ($this->recordWikiEditEvent)(WikiEditEventType::Rejected, $editRequest, $note, $reviewer);
 
         return $editRequest;
     }

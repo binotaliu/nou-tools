@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Wiki\Actions;
 
+use App\Enums\WikiEditEventType;
 use App\Enums\WikiEditRequestStatus;
 use App\Jobs\GenerateWikiEditDraft;
 use App\Models\WikiEditRequest;
@@ -25,6 +26,7 @@ final readonly class RefineWikiEditRequest
     public function __construct(
         private EnsureWikiEditingAllowed $ensureWikiEditingAllowed,
         private ConsumeWikiDraftAllowance $consumeWikiDraftAllowance,
+        private RecordWikiEditEvent $recordWikiEditEvent,
     ) {}
 
     /**
@@ -63,7 +65,9 @@ final readonly class RefineWikiEditRequest
             return $editRequest;
         });
 
-        GenerateWikiEditDraft::dispatchAfterResponse($editRequest);
+        ($this->recordWikiEditEvent)(WikiEditEventType::Refined, $editRequest, trim($data->instruction));
+
+        GenerateWikiEditDraft::dispatch($editRequest);
 
         return $editRequest;
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Wiki\Actions;
 
+use App\Enums\WikiEditEventType;
 use App\Enums\WikiEditRequestStatus;
 use App\Models\WikiEditRequest;
 use Illuminate\Support\Facades\Log;
@@ -24,6 +25,7 @@ final readonly class DraftWikiEdit
     public function __construct(
         private BuildWikiEditorPrompt $buildWikiEditorPrompt,
         private ValidateWikiDraft $validateWikiDraft,
+        private RecordWikiEditEvent $recordWikiEditEvent,
     ) {}
 
     public function __invoke(WikiEditRequest $editRequest): WikiEditRequest
@@ -63,6 +65,8 @@ final readonly class DraftWikiEdit
             $editRequest->status = $this->statusBeforeRefinement($editRequest);
             $editRequest->saveOrFail();
 
+            ($this->recordWikiEditEvent)(WikiEditEventType::RefinementFailed, $editRequest, $draft->declineReason);
+
             return $editRequest;
         }
 
@@ -71,6 +75,8 @@ final readonly class DraftWikiEdit
         if (! $draft->applies) {
             $editRequest->status = WikiEditRequestStatus::DeclinedByAi;
             $editRequest->saveOrFail();
+
+            ($this->recordWikiEditEvent)(WikiEditEventType::Declined, $editRequest, $draft->declineReason);
 
             return $editRequest;
         }
@@ -120,7 +126,9 @@ final readonly class DraftWikiEdit
     {
         $editRequest->ai_verdict = [...($editRequest->ai_verdict ?? []), 'problems' => $problems];
 
-        if ($editRequest->refinements !== [] && filled($editRequest->draft_body)) {
+        $isRefinement = $editRequest->refinements !== [] && filled($editRequest->draft_body);
+
+        if ($isRefinement) {
             $editRequest->refinements = array_slice($editRequest->refinements, 0, -1);
             $editRequest->status = $this->statusBeforeRefinement($editRequest);
             $editRequest->ai_verdict = [...$editRequest->ai_verdict, 'lastRefinementFailed' => true];
@@ -129,6 +137,12 @@ final readonly class DraftWikiEdit
         }
 
         $editRequest->saveOrFail();
+
+        ($this->recordWikiEditEvent)(
+            $isRefinement ? WikiEditEventType::RefinementFailed : WikiEditEventType::Failed,
+            $editRequest,
+            implode('；', $problems),
+        );
 
         return $editRequest;
     }

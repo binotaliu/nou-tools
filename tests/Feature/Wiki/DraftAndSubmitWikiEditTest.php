@@ -2,20 +2,25 @@
 
 declare(strict_types=1);
 
+use App\Enums\WikiEditEventType;
 use App\Enums\WikiEditRequestStatus;
 use App\Jobs\GenerateWikiEditDraft;
 use App\Models\ScheduleDevice;
 use App\Models\StudentSchedule;
 use App\Models\User;
+use App\Models\WikiEditEvent;
 use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
 use App\Models\WikiRevision;
+use App\Notifications\WikiEditRequestNotPublished;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Testing\AssertableInertia as Assert;
 use NouTools\Domains\Schedules\Actions\BuildScheduleDeviceCookie;
 use NouTools\Domains\Wiki\Actions\ApproveWikiEditRequest;
 use NouTools\Domains\Wiki\Actions\DraftAndSubmitWikiEdit;
+use NouTools\Domains\Wiki\Actions\RejectWikiEditRequest;
 use NouTools\Domains\Wiki\Ai\WikiEditor;
 
 beforeEach(function (): void {
@@ -177,7 +182,7 @@ it('drafts and submits a refinement after the response', function (): void {
         'status' => WikiEditRequestStatus::PendingReview,
     ])), ['instruction' => '再短一點']);
 
-    Bus::assertDispatchedAfterResponse(GenerateWikiEditDraft::class);
+    Bus::assertDispatched(GenerateWikiEditDraft::class);
 });
 
 it('offers refining and withdrawing only to the owner', function (): void {
@@ -195,4 +200,68 @@ it('offers refining and withdrawing only to the owner', function (): void {
         ->assertInertia(fn (Assert $page) => $page
             ->where('viewModel.request.canRefine', true)
             ->where('viewModel.request.canAbandon', true));
+});
+
+it('logs a declined edit and tells the webhook', function (): void {
+    config(['services.discord.webhooks.wiki_review' => 'https://discord.test/webhook']);
+    WikiEditor::fake([($this->response)(['decision' => 'decline', 'decline_reason' => '沒有來源'])]);
+
+    $editRequest = app(DraftAndSubmitWikiEdit::class)(($this->drafting)());
+
+    $event = WikiEditEvent::query()->sole();
+
+    expect($event->event)->toBe(WikiEditEventType::Declined)
+        ->and($event->detail)->toBe('沒有來源')
+        ->and($event->wiki_edit_request_id)->toBe($editRequest->id)
+        ->and($event->page_slug)->toBe('nou-exams-info')
+        ->and($event->student_schedule_id)->toBe($this->schedule->id);
+
+    Notification::assertSentOnDemand(WikiEditRequestNotPublished::class);
+});
+
+it('logs a failed draft and tells the webhook', function (): void {
+    config(['services.discord.webhooks.wiki_review' => 'https://discord.test/webhook']);
+    WikiEditor::fake([($this->response)(['body' => $this->baseBody."\n[外部](https://evil.example.com/x)\n"])]);
+
+    app(DraftAndSubmitWikiEdit::class)(($this->drafting)());
+
+    expect(WikiEditEvent::query()->sole()->event)->toBe(WikiEditEventType::Failed);
+    Notification::assertSentOnDemand(WikiEditRequestNotPublished::class);
+});
+
+it('logs a rejection by the reviewer', function (): void {
+    config(['services.discord.webhooks.wiki_review' => 'https://discord.test/webhook']);
+    WikiEditor::fake([($this->response)(['risk' => 'medium'])]);
+    $editRequest = app(DraftAndSubmitWikiEdit::class)(($this->drafting)());
+    $reviewer = User::factory()->create();
+
+    app(RejectWikiEditRequest::class)($editRequest, $reviewer, '來源不足');
+
+    $event = WikiEditEvent::query()->where('event', WikiEditEventType::Rejected)->sole();
+
+    expect($event->user_id)->toBe($reviewer->id)
+        ->and($event->detail)->toBe('來源不足');
+    Notification::assertSentOnDemand(WikiEditRequestNotPublished::class);
+});
+
+it('logs a success without raising the unsuccessful-edit webhook', function (): void {
+    config(['services.discord.webhooks.wiki_review' => 'https://discord.test/webhook']);
+    WikiEditor::fake([($this->response)()]);
+
+    app(DraftAndSubmitWikiEdit::class)(($this->drafting)());
+
+    expect(WikiEditEvent::query()->sole()->event)->toBe(WikiEditEventType::Published);
+    Notification::assertNotSentTo(
+        new AnonymousNotifiable,
+        WikiEditRequestNotPublished::class,
+    );
+});
+
+it('marks a request failed when its queue job dies', function (): void {
+    $editRequest = ($this->drafting)();
+
+    (new GenerateWikiEditDraft($editRequest))->failed(new RuntimeException('timed out'));
+
+    expect($editRequest->refresh()->status)->toBe(WikiEditRequestStatus::Failed)
+        ->and(WikiEditEvent::query()->sole()->event)->toBe(WikiEditEventType::Failed);
 });

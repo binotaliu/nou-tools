@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Wiki\Actions;
 
+use App\Enums\WikiEditEventType;
 use App\Enums\WikiEditRequestStatus;
 use App\Jobs\GenerateWikiEditDraft;
 use App\Models\WikiEditRequest;
@@ -22,6 +23,7 @@ final readonly class RedraftWikiEditRequest
     public function __construct(
         private EnsureWikiEditingAllowed $ensureWikiEditingAllowed,
         private ConsumeWikiDraftAllowance $consumeWikiDraftAllowance,
+        private RecordWikiEditEvent $recordWikiEditEvent,
     ) {}
 
     /**
@@ -55,7 +57,9 @@ final readonly class RedraftWikiEditRequest
         $editRequest->status = WikiEditRequestStatus::Drafting;
         $editRequest->saveOrFail();
 
-        GenerateWikiEditDraft::dispatchAfterResponse($editRequest);
+        ($this->recordWikiEditEvent)(WikiEditEventType::Redrafted, $editRequest);
+
+        GenerateWikiEditDraft::dispatch($editRequest);
 
         return $editRequest;
     }
