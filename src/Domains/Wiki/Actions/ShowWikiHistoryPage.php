@@ -19,7 +19,8 @@ final readonly class ShowWikiHistoryPage
         return new WikiHistoryPageData(
             page: WikiPageLinkViewModel::fromModel($page),
             revisions: $page->revisions()
-                ->get(['id', 'wiki_page_id', 'title', 'edit_summary', 'origin', 'created_at'])
+                ->with('studentSchedule.studyRoomProfile:id,student_schedule_id,nickname')
+                ->get(['id', 'wiki_page_id', 'student_schedule_id', 'title', 'edit_summary', 'origin', 'created_at'])
                 ->map(fn (WikiRevision $revision): WikiRevisionSummaryViewModel => WikiRevisionSummaryViewModel::fromModel($revision, $page->slug, $page->current_revision_id))
                 ->all(),
         );

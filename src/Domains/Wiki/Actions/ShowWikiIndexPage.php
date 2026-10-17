@@ -175,6 +175,7 @@ final readonly class ShowWikiIndexPage
             ->where('wiki_pages.slug', '!=', WikiPage::MAIN_PAGE_SLUG)
             ->orderByDesc('wiki_revisions.id')
             ->limit(self::RECENT_CHANGES)
+            ->with('studentSchedule.studyRoomProfile:id,student_schedule_id,nickname')
             ->get(['wiki_revisions.*', 'wiki_pages.slug as page_slug', 'wiki_pages.current_revision_id as page_current_revision_id'])
             ->map(fn (WikiRevision $revision): WikiRevisionSummaryViewModel => WikiRevisionSummaryViewModel::fromModel(
                 $revision,

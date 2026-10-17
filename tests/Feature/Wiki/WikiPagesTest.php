@@ -7,9 +7,11 @@ use App\Enums\WikiRevisionOrigin;
 use App\Jobs\GenerateWikiEditDraft;
 use App\Models\ScheduleDevice;
 use App\Models\StudentSchedule;
+use App\Models\StudyRoomProfile;
 use App\Models\WikiCategory;
 use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
+use App\Models\WikiRevision;
 use App\Models\WikiSlugRedirect;
 use Coderflex\LaravelTurnstile\Facades\LaravelTurnstile;
 use Illuminate\Support\Facades\Bus;
@@ -116,6 +118,20 @@ it('shows history, a revision with its diff and a category', function (): void {
     $this->get(route('wiki.category', ['category' => '考試']))
         ->assertInertia(fn (Assert $page) => $page->component('Wiki/Category')->where('viewModel.pages.0.slug', 'nou-exams-info'));
 
+});
+
+it('names the editor in the history by study room nickname, with a default', function (): void {
+    $schedule = StudentSchedule::factory()->create();
+    StudyRoomProfile::factory()->create(['student_schedule_id' => $schedule->id, 'nickname' => '小浣熊']);
+    $anonymous = StudentSchedule::factory()->create();
+
+    WikiRevision::factory()->create(['wiki_page_id' => $this->page->id, 'student_schedule_id' => $schedule->id]);
+    WikiRevision::factory()->create(['wiki_page_id' => $this->page->id, 'student_schedule_id' => $anonymous->id]);
+
+    $this->get(route('wiki.history', 'nou-exams-info'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('viewModel.revisions', fn ($revisions): bool => collect($revisions)->pluck('editorName')->sort()->values()->all()
+                === collect(['NOU 小幫手使用者', 'NOU 小幫手使用者', '小浣熊'])->sort()->values()->all()));
 });
 
 it('keeps the writing and syntax guides to the AI editor', function (): void {

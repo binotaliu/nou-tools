@@ -126,3 +126,9 @@ it('shows no intro without a main page', function (): void {
             ->where('viewModel.intro', null)
             ->where('viewModel.introHistoryUrl', null));
 });
+
+it('links 最近更新 to the entry, not to the revision diff', function (): void {
+    $this->get(route('wiki.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('viewModel.recentChanges.0.pageUrl', route('wiki.show', 'nou-exams-info')));
+});

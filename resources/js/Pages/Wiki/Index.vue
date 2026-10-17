@@ -255,7 +255,7 @@ const pageLinkClasses =
             </h3>
             <ul class="space-y-3 text-sm" data-testid="wiki-recent-changes">
               <li v-for="change in viewModel.recentChanges" :key="change.id">
-                <Link :href="change.url" :class="pageLinkClasses">{{
+                <Link :href="change.pageUrl" :class="pageLinkClasses">{{
                   change.title
                 }}</Link>
                 <p class="text-theme-700 dark:text-zinc-400">

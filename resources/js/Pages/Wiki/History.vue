@@ -52,7 +52,7 @@ defineProps({
               >目前版本</span
             >
             <p class="text-sm text-theme-700 dark:text-zinc-400">
-              {{ revision.originLabel }}
+              {{ revision.editorName }} · {{ revision.originLabel }}
             </p>
           </div>
           <time

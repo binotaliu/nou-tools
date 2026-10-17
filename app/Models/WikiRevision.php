@@ -93,4 +93,12 @@ final class WikiRevision extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * @return BelongsTo<StudentSchedule, $this>
+     */
+    public function studentSchedule(): BelongsTo
+    {
+        return $this->belongsTo(StudentSchedule::class);
+    }
 }
