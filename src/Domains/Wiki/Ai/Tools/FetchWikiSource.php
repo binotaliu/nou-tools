@@ -5,28 +5,22 @@ declare(strict_types=1);
 namespace NouTools\Domains\Wiki\Ai\Tools;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Tools\Request;
+use NouTools\Domains\Wiki\Exceptions\WikiSourceFetchException;
+use NouTools\Domains\Wiki\Support\FetchWikiSourceText;
 use NouTools\Domains\Wiki\Support\WikiSourceDomains;
 use Stringable;
-use Symfony\Component\Process\ExecutableFinder;
 use Throwable;
 
 /**
  * Our own `web_fetch` for providers that have no server-side fetch tool
- * (OpenAI). Only hosts in `wiki.source_domains` are fetched, every redirect
- * hop is checked again, and the number of fetches per draft is capped. HTML
- * becomes plain text and PDFs go through `pdftotext`.
+ * (OpenAI). The download and text extraction are {@see FetchWikiSourceText};
+ * this adds the per-draft fetch cap and a character cap on what the model gets.
  */
 final class FetchWikiSource implements Tool
 {
-    private const MAX_REDIRECTS = 4;
-
     private const MAX_DOWNLOAD_BYTES = 8_000_000;
 
     private const MAX_TEXT_CHARS = 40_000;
@@ -62,6 +56,8 @@ final class FetchWikiSource implements Tool
 
         try {
             return $this->fetch($url);
+        } catch (WikiSourceFetchException $exception) {
+            return $exception->getMessage();
         } catch (Throwable $exception) {
             return 'Could not fetch the page: '.Str::limit($exception->getMessage(), 200);
         }
@@ -76,75 +72,8 @@ final class FetchWikiSource implements Tool
 
     private function fetch(string $url): string
     {
-        $response = null;
+        $source = app(FetchWikiSourceText::class)($url, self::MAX_DOWNLOAD_BYTES);
 
-        for ($hop = 0; $hop <= self::MAX_REDIRECTS; $hop++) {
-            $response = Http::timeout(30)->withoutRedirecting()->withUserAgent('NouToolsWikiBot/1.0')->get($url);
-
-            if (! $response->redirect()) {
-                break;
-            }
-
-            $url = (string) Str::of($response->header('Location'))->pipe(
-                fn (string $location): string => str_starts_with($location, '/')
-                    ? parse_url($url, PHP_URL_SCHEME).'://'.parse_url($url, PHP_URL_HOST).$location
-                    : $location,
-            );
-
-            if (! WikiSourceDomains::allows($url)) {
-                return 'Refused: the page redirects to a host that is not allowed.';
-            }
-        }
-
-        if ($response === null || $response->redirect() || ! $response->successful()) {
-            return 'Could not fetch the page: HTTP '.($response?->status() ?? 'error');
-        }
-
-        $body = $response->body();
-
-        if (strlen($body) > self::MAX_DOWNLOAD_BYTES) {
-            return 'Refused: the file is too large.';
-        }
-
-        $text = str_contains(strtolower($response->header('Content-Type')), 'pdf') || str_starts_with($body, '%PDF')
-            ? $this->pdfText($body)
-            : $this->htmlText($response);
-
-        return "url: {$url}\n\n".Str::limit($text, self::MAX_TEXT_CHARS, "\n[truncated]");
-    }
-
-    private function pdfText(string $pdf): string
-    {
-        $binary = config('wiki.pdftotext_path')
-            ?: (new ExecutableFinder)->find('pdftotext', null, ['/opt/homebrew/bin', '/usr/local/bin', '/usr/bin']);
-
-        if ($binary === null) {
-            Log::error('Wiki source fetch: pdftotext was not found, so PDF sources cannot be read. Install poppler or set WIKI_PDFTOTEXT_PATH.');
-
-            return '[This PDF could not be read: the server has no PDF text extractor (pdftotext). Tell the user the PDF could not be read.]';
-        }
-
-        // `-` as the input reads the PDF from stdin, so no temporary file.
-        $result = Process::timeout(30)->input($pdf)->run([$binary, '-layout', '-enc', 'UTF-8', '-', '-']);
-
-        return $result->successful() && trim($result->output()) !== ''
-            ? trim($result->output())
-            : '[This PDF has no extractable text (it may be a scan).]';
-    }
-
-    private function htmlText(Response $response): string
-    {
-        $html = $response->body();
-
-        if (! mb_check_encoding($html, 'UTF-8')) {
-            $html = mb_convert_encoding($html, 'UTF-8', 'BIG5,GBK,ISO-8859-1');
-        }
-
-        $html = preg_replace('#<(script|style|noscript|svg|nav|footer)\b[^>]*>.*?</\1>#is', ' ', $html) ?? $html;
-        $html = preg_replace('#<(br|/p|/div|/li|/tr|/h[1-6])\b[^>]*>#i', "\n", $html) ?? $html;
-        $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $text = preg_replace(["/[ \t\x{00A0}\x{3000}]+/u", "/\s*\n\s*/"], [' ', "\n"], $text) ?? $text;
-
-        return trim($text);
+        return "url: {$source->url}\n\n".Str::limit($source->text, self::MAX_TEXT_CHARS, "\n[truncated]");
     }
 }
