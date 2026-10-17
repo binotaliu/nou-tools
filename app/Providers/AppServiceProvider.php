@@ -17,6 +17,8 @@ use App\Models\StudyRoomProfile;
 use App\Models\User;
 use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
+use App\Models\WikiSourceDocument;
+use App\Models\WikiSourceSection;
 use App\Policies\AnnouncementPolicy;
 use App\Policies\ChangelogPostPolicy;
 use App\Policies\CoursePolicy;
@@ -29,6 +31,8 @@ use App\Policies\StudyRoomProfilePolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WikiEditRequestPolicy;
 use App\Policies\WikiPagePolicy;
+use App\Policies\WikiSourceDocumentPolicy;
+use App\Policies\WikiSourceSectionPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -110,6 +114,8 @@ final class AppServiceProvider extends ServiceProvider
         Gate::policy(MusicPlaylist::class, MusicPlaylistPolicy::class);
         Gate::policy(WikiPage::class, WikiPagePolicy::class);
         Gate::policy(WikiEditRequest::class, WikiEditRequestPolicy::class);
+        Gate::policy(WikiSourceDocument::class, WikiSourceDocumentPolicy::class);
+        Gate::policy(WikiSourceSection::class, WikiSourceSectionPolicy::class);
 
         CarbonImmutable::setLocale(config('app.locale'));
         Date::use(CarbonImmutable::class);
