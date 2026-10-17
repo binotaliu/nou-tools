@@ -28,27 +28,11 @@ use NouTools\Domains\Wiki\Support\WikiRolloverPlan;
  */
 final readonly class FindWikiRolloverPlan
 {
-    /**
-     * The ready document this one replaces in its series: the latest earlier
-     * term, or for an evergreen document the latest earlier version.
-     */
-    public function previousDocument(WikiSourceDocument $document): ?WikiSourceDocument
-    {
-        $query = WikiSourceDocument::query()
-            ->where('series', $document->series)
-            ->where('status', WikiSourceDocumentStatus::Ready)
-            ->whereKeyNot($document->id);
-
-        if ($document->term !== null) {
-            return $query->where('term', '<', $document->term)->orderByDesc('term')->first();
-        }
-
-        return $query->whereNull('term')->where('id', '<', $document->id)->orderByDesc('id')->first();
-    }
+    public function __construct(private FindPreviousWikiSourceDocument $findPreviousWikiSourceDocument) {}
 
     public function __invoke(WikiSourceDocument $current): ?WikiRolloverPlan
     {
-        $previous = $this->previousDocument($current);
+        $previous = ($this->findPreviousWikiSourceDocument)($current);
 
         if ($previous === null || $current->status !== WikiSourceDocumentStatus::Ready) {
             return null;

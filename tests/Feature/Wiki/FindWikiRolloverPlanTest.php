@@ -6,6 +6,7 @@ use App\Models\WikiPage;
 use App\Models\WikiSourceDocument;
 use App\Models\WikiSourceSection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use NouTools\Domains\Wiki\Actions\FindPreviousWikiSourceDocument;
 use NouTools\Domains\Wiki\Actions\FindWikiRolloverPlan;
 
 uses(RefreshDatabase::class);
@@ -41,23 +42,23 @@ beforeEach(function () use ($oldUrl, $section): void {
 });
 
 it('finds the previous document in the series', function () {
-    $find = app(FindWikiRolloverPlan::class);
+    $find = app(FindPreviousWikiSourceDocument::class);
     $newer = WikiSourceDocument::factory()->ready()->create(['term' => '115-2']);
     WikiSourceDocument::factory()->create(['term' => '113-2', 'status' => 'failed']);
     $other = WikiSourceDocument::factory()->ready()->create(['series' => 'exam-schedule', 'term' => '115-1']);
 
-    expect($find->previousDocument($newer)->is($this->new))->toBeTrue()
-        ->and($find->previousDocument($this->new)->is($this->old))->toBeTrue()
-        ->and($find->previousDocument($this->old))->toBeNull()
-        ->and($find->previousDocument($other))->toBeNull();
+    expect($find($newer)->is($this->new))->toBeTrue()
+        ->and($find($this->new)->is($this->old))->toBeTrue()
+        ->and($find($this->old))->toBeNull()
+        ->and($find($other))->toBeNull();
 });
 
 it('finds the previous version of an evergreen document by order', function () {
     $first = WikiSourceDocument::factory()->ready()->create(['series' => 'academic-regulations', 'term' => null]);
     $second = WikiSourceDocument::factory()->ready()->create(['series' => 'academic-regulations', 'term' => null]);
 
-    expect(app(FindWikiRolloverPlan::class)->previousDocument($second)->is($first))->toBeTrue()
-        ->and(app(FindWikiRolloverPlan::class)->previousDocument($first))->toBeNull();
+    expect(app(FindPreviousWikiSourceDocument::class)($second)->is($first))->toBeTrue()
+        ->and(app(FindPreviousWikiSourceDocument::class)($first))->toBeNull();
 });
 
 it('pairs sections by title, so a section that moved from 八 to 九 is compared with its new self', function () use ($oldUrl) {
