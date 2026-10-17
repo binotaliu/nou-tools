@@ -8,6 +8,7 @@ use App\Enums\WikiEditRequestStatus;
 use App\Models\StudentSchedule;
 use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
+use App\Models\WikiSourceDocument;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -32,6 +33,18 @@ final class WikiEditRequestFactory extends Factory
             'ip_hash' => WikiEditRequest::hashIp('127.0.0.1'),
             'status' => WikiEditRequestStatus::Drafting,
         ];
+    }
+
+    /**
+     * A semester rollover request: no visitor, so no schedule or ip.
+     */
+    public function rollover(WikiSourceDocument $document): static
+    {
+        return $this->state(fn (): array => [
+            'student_schedule_id' => null,
+            'ip_hash' => null,
+            'wiki_source_document_id' => $document->id,
+        ]);
     }
 
     /**

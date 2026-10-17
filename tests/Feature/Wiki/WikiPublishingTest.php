@@ -11,6 +11,7 @@ use App\Models\WikiEditRequest;
 use App\Models\WikiLink;
 use App\Models\WikiPage;
 use App\Models\WikiRevision;
+use App\Models\WikiSourceDocument;
 use App\Notifications\WikiEditRequestNeedsReview;
 use Illuminate\Support\Facades\Notification;
 use NouTools\Domains\Wiki\Actions\ApproveWikiEditRequest;
@@ -49,6 +50,17 @@ beforeEach(function (): void {
             ...$draft,
         ])
         ->create();
+});
+
+it('never publishes a semester rollover on its own, however small and low-risk', function (): void {
+    $document = WikiSourceDocument::factory()->ready()->create();
+    $editRequest = ($this->smallEdit)();
+    $editRequest->forceFill(['student_schedule_id' => null, 'ip_hash' => null, 'wiki_source_document_id' => $document->id, 'ai_verdict' => ['risk' => 'low']])->save();
+
+    $decision = app(ResolveWikiPublishDecision::class)($editRequest);
+
+    expect($decision->publishesAutomatically())->toBeFalse()
+        ->and($decision->reviewReasons)->toBe(['換學期更新']);
 });
 
 it('publishes everything from an unlimited schedule without review', function (): void {

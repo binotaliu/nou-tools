@@ -20,6 +20,13 @@ final class GenerateWikiEditDraft implements ShouldQueue
 {
     use Queueable;
 
+    // Only applies on a queue worker (the semester rollover queues drafts
+    // there): writing a page with source reads takes minutes, and DraftWikiEdit
+    // records its own failures, so there is nothing to retry.
+    public int $tries = 1;
+
+    public int $timeout = 600;
+
     public function __construct(
         public WikiEditRequest $editRequest,
     ) {}

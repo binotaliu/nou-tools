@@ -31,7 +31,8 @@ use NouTools\Domains\Wiki\DataTransferObjects\CreateWikiEditRequestDTO;
  * @property list<array{path: string, name: string}>|null $screenshots
  * @property list<string> $refinements
  * @property int|null $student_schedule_id
- * @property string $ip_hash
+ * @property int|null $wiki_source_document_id the new document of a 換學期更新, null for a visitor's request
+ * @property string|null $ip_hash
  * @property WikiEditRequestStatus $status
  * @property string|null $draft_slug
  * @property string|null $draft_title
@@ -95,6 +96,15 @@ final class WikiEditRequest extends Model
     public static function hashIp(?string $ip): string
     {
         return hash_hmac('sha256', (string) $ip, (string) config('app.key'));
+    }
+
+    /**
+     * Whether an admin created it for a semester rollover rather than a
+     * visitor asking for it.
+     */
+    public function isRollover(): bool
+    {
+        return $this->wiki_source_document_id !== null;
     }
 
     public function isNewPage(): bool
@@ -185,6 +195,14 @@ final class WikiEditRequest extends Model
     public function publishedRevision(): BelongsTo
     {
         return $this->belongsTo(WikiRevision::class, 'published_revision_id');
+    }
+
+    /**
+     * @return BelongsTo<WikiSourceDocument, $this>
+     */
+    public function sourceDocument(): BelongsTo
+    {
+        return $this->belongsTo(WikiSourceDocument::class, 'wiki_source_document_id');
     }
 
     /**

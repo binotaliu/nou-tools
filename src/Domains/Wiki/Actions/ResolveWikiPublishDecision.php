@@ -13,7 +13,8 @@ use NouTools\Domains\Wiki\Support\WikiTextDiff;
 
 /**
  * Decides whether a confirmed draft goes live on its own or waits for an
- * admin. It publishes only when every rule holds; each failed rule is kept
+ * admin. It publishes only when every rule holds (a semester rollover never
+ * does); each failed rule is kept
  * as a reason so the review queue shows why it is there. Links outside the
  * allowed sources never get this far (ValidateWikiDraft rejects them).
  */
@@ -25,7 +26,8 @@ final readonly class ResolveWikiPublishDecision
             return new WikiPublishDecision([]);
         }
 
-        $reasons = [];
+        // A rollover touches many pages at once, so an admin always looks.
+        $reasons = $editRequest->isRollover() ? ['換學期更新'] : [];
         $page = $editRequest->page;
         $base = $editRequest->baseRevision;
 
