@@ -63,9 +63,11 @@ class WikiEditRequestInfolist
                             ->columnSpanFull(),
                         TextEntry::make('studentSchedule.blocked')
                             ->label('提出的裝置')
-                            ->state(fn (WikiEditRequest $record): string => $record->studentSchedule === null
+                            ->state(fn (WikiEditRequest $record): string => $record->isRollover()
+                                ? '換學期更新（'.$record->sourceDocument?->title.'）'
+                                : ($record->studentSchedule === null
                                 ? '—'
-                                : '課表 #'.$record->student_schedule_id.($record->studentSchedule->wiki_blocked_at !== null ? '（已封鎖）' : '')),
+                                : '課表 #'.$record->student_schedule_id.($record->studentSchedule->wiki_blocked_at !== null ? '（已封鎖）' : ''))),
                         TextEntry::make('review_note')
                             ->label('審核備註')
                             ->placeholder('—'),

@@ -4,23 +4,38 @@ declare(strict_types=1);
 
 use App\Enums\UserRole;
 use App\Enums\WikiSourceDocumentStatus;
+use App\Filament\Resources\WikiEditRequests\Pages\ViewWikiEditRequest;
 use App\Filament\Resources\WikiSourceDocuments\Pages\CreateWikiSourceDocument;
 use App\Filament\Resources\WikiSourceDocuments\Pages\EditWikiSourceDocument;
 use App\Filament\Resources\WikiSourceDocuments\Pages\ListWikiSourceDocuments;
 use App\Filament\Resources\WikiSourceDocuments\RelationManagers\SectionsRelationManager;
 use App\Jobs\FetchWikiSourceDocument;
 use App\Models\User;
+use App\Models\WikiEditRequest;
+use App\Models\WikiPage;
 use App\Models\WikiSourceDocument;
 use App\Models\WikiSourceSection;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Livewire\Livewire;
+use NouTools\Domains\Wiki\Actions\FindWikiRolloverPlan;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
 
 uses(RefreshDatabase::class);
+
+$rolloverDocuments = function (): array {
+    $old = WikiSourceDocument::factory()->ready()->create(['term' => '114-2', 'url' => 'https://www.nou.edu.tw/114-2.pdf']);
+    $new = WikiSourceDocument::factory()->ready()->create(['term' => '115-1']);
+
+    foreach ([[$old, '舊'], [$new, '新']] as [$document, $body]) {
+        WikiSourceSection::factory()->for($document, 'document')->create(['key' => 'part-8', 'title' => '八、減免', 'body' => $body, 'content_hash' => hash('sha256', $body), 'page_start' => 6, 'page_end' => 6]);
+    }
+
+    return [$old, $new];
+};
 
 beforeEach(function (): void {
     config(['wiki.source_domains' => ['nou.edu.tw']]);
@@ -173,4 +188,59 @@ it('lists sections and lets the key and title be corrected', function () {
         ->assertHasFormErrors(['key']);
 
     expect($sections->first()->refresh())->key->toBe('registration')->title->toBe('註冊方式');
+});
+
+it('hides the rollover action for a document with no earlier version', function () {
+    $document = WikiSourceDocument::factory()->ready()->create(['term' => '115-1']);
+
+    Livewire::test(EditWikiSourceDocument::class, ['record' => $document->id])
+        ->assertActionHidden('rollover');
+});
+
+it('queues a request for each page a rollover touches', function () use ($rolloverDocuments) {
+    Bus::fake();
+    [$old, $new] = $rolloverDocuments();
+    WikiPage::factory()->live(['title' => '減免說明', 'body' => "免繳。[^1]\n\n[^1]: [注意事項](https://www.nou.edu.tw/114-2.pdf#page=6)\n"])->create(['slug' => 'fees']);
+
+    Livewire::test(EditWikiSourceDocument::class, ['record' => $new->id])
+        ->assertActionVisible('rollover')
+        ->callAction('rollover')
+        ->assertNotified('已為 1 個條目建立修改請求');
+
+    expect(WikiEditRequest::query()->sole()->isRollover())->toBeTrue();
+});
+
+it('previews the pages a rollover touches and the ones it leaves alone', function () use ($rolloverDocuments) {
+    [$old, $new] = $rolloverDocuments();
+    WikiSourceSection::factory()->for($old, 'document')->create(['key' => 'part-2', 'title' => '二、日期', 'body' => 'x', 'content_hash' => hash('sha256', 'x'), 'page_start' => 3, 'page_end' => 3]);
+    WikiSourceSection::factory()->for($new, 'document')->create(['key' => 'part-2', 'title' => '二、日期', 'body' => 'x', 'content_hash' => hash('sha256', 'x'), 'page_start' => 3, 'page_end' => 3]);
+    WikiPage::factory()->live(['title' => '減免說明', 'body' => "免繳。[^1]\n\n[^1]: [注意事項](https://www.nou.edu.tw/114-2.pdf#page=6)\n"])->create(['slug' => 'fees']);
+    WikiPage::factory()->live(['body' => "日期。[^1]\n\n[^1]: [注意事項](https://www.nou.edu.tw/114-2.pdf#page=3)\n"])->create(['slug' => 'dates']);
+
+    $html = view('filament.wiki.rollover-preview', ['plan' => app(FindWikiRolloverPlan::class)($new)])->render();
+
+    expect($html)
+        ->toContain('減免說明')
+        ->toContain('八、減免')
+        ->toContain('part-8 → part-8')
+        ->toContain('另有 1 個條目只引用沒有變動的段落')
+        ->toContain('dates');
+});
+
+it('says so in the preview when no page relies on a changed section', function () use ($rolloverDocuments) {
+    [$old, $new] = $rolloverDocuments();
+
+    $html = view('filament.wiki.rollover-preview', ['plan' => app(FindWikiRolloverPlan::class)($new)])->render();
+
+    expect($html)->toContain('沒有條目引用到有變動的段落');
+});
+
+it('shows a rollover request as one in the review screen', function () use ($rolloverDocuments) {
+    [$old, $new] = $rolloverDocuments();
+    $page = WikiPage::factory()->live()->create(['slug' => 'fees']);
+    $editRequest = WikiEditRequest::factory()->forPage($page)->rollover($new)->create();
+
+    Livewire::test(ViewWikiEditRequest::class, ['record' => $editRequest->uuid])
+        ->assertSee('換學期更新')
+        ->assertSee($new->title);
 });
