@@ -99,6 +99,19 @@ final class WikiEditRequest extends Model
     }
 
     /**
+     * Requests that can still change (see {@see WikiEditRequestStatus::isOpen()}).
+     *
+     * @param  Builder<WikiEditRequest>  $query
+     */
+    public function scopeOpen(Builder $query): void
+    {
+        $query->whereIn('status', array_map(
+            fn (WikiEditRequestStatus $status): string => $status->value,
+            array_filter(WikiEditRequestStatus::cases(), fn (WikiEditRequestStatus $status): bool => $status->isOpen()),
+        ));
+    }
+
+    /**
      * Whether an admin created it for a semester rollover rather than a
      * visitor asking for it.
      */
