@@ -16,6 +16,7 @@ final class WikiEditRequestViewModel extends Data
 {
     /**
      * @param  list<string>  $sourceUrls
+     * @param  list<WikiScreenshotViewModel>  $screenshots
      * @param  list<string>  $refinements
      * @param  list<string>  $draftCategories
      * @param  list<WikiDiffLineViewModel>  $diff
@@ -29,6 +30,7 @@ final class WikiEditRequestViewModel extends Data
         public ?WikiPageLinkViewModel $page,
         public string $instruction,
         public array $sourceUrls,
+        public array $screenshots,
         public array $refinements,
         public int $refinementsLeft,
         public bool $canRefine,
@@ -66,6 +68,7 @@ final class WikiEditRequestViewModel extends Data
             page: $editRequest->page?->currentRevision !== null ? WikiPageLinkViewModel::fromModel($editRequest->page) : null,
             instruction: $editRequest->instruction,
             sourceUrls: $editRequest->source_urls,
+            screenshots: WikiScreenshotViewModel::listFor($editRequest),
             refinements: $editRequest->refinements,
             refinementsLeft: max(0, (int) config('wiki.max_refinements') - count($editRequest->refinements)),
             canRefine: $isOwner && $hasDraft && $editRequest->canBeRefined(),

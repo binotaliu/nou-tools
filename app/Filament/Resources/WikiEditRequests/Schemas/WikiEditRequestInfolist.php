@@ -48,6 +48,19 @@ class WikiEditRequestInfolist
                             ->openUrlInNewTab()
                             ->placeholder('—')
                             ->columnSpanFull(),
+                        TextEntry::make('screenshots')
+                            ->label('截圖')
+                            ->state(fn (WikiEditRequest $record): array => array_map(
+                                fn (array $screenshot, int $index): string => route('wiki.edit-requests.screenshots.show', ['editRequest' => $record, 'index' => $index]),
+                                $record->screenshots ?? [],
+                                array_keys($record->screenshots ?? []),
+                            ))
+                            ->listWithLineBreaks()
+                            ->formatStateUsing(fn (string $state): string => '檢視截圖')
+                            ->url(fn (?string $state): ?string => $state)
+                            ->openUrlInNewTab()
+                            ->placeholder('—')
+                            ->columnSpanFull(),
                         TextEntry::make('studentSchedule.blocked')
                             ->label('提出的裝置')
                             ->state(fn (WikiEditRequest $record): string => $record->studentSchedule === null

@@ -168,6 +168,27 @@ const panelClasses =
             >
           </li>
         </ul>
+        <ul
+          v-if="request.screenshots.length"
+          class="mt-3 flex flex-wrap gap-2"
+          data-testid="wiki-screenshots"
+        >
+          <li v-for="screenshot in request.screenshots" :key="screenshot.url">
+            <a
+              :href="screenshot.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block overflow-hidden rounded-md border border-theme-200 dark:border-zinc-700"
+            >
+              <img
+                :src="screenshot.url"
+                :alt="`截圖：${screenshot.name}`"
+                loading="lazy"
+                class="size-24 object-cover"
+              />
+            </a>
+          </li>
+        </ul>
       </section>
 
       <p
@@ -181,7 +202,9 @@ const panelClasses =
       <DraftingIndicator
         v-if="status === 'drafting'"
         :is-refinement="request.refinements.length > 0"
-        :has-sources="request.sourceUrls.length > 0"
+        :has-sources="
+          request.sourceUrls.length > 0 || request.screenshots.length > 0
+        "
       />
 
       <div

@@ -3,7 +3,7 @@
 // change and cites sources, and the AI editor drafts and submits it while the
 // next page shows its progress.
 // Needs a browser signed in to a schedule (the closest thing to an account).
-import { computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '../../../Layouts/AppLayout.vue'
 import Button from '../../../Components/Button.vue'
@@ -36,17 +36,67 @@ const canSubmit = computed(
 const form = useForm({
   instruction: '',
   source_urls: [''],
+  screenshots: [],
   page_slug: props.viewModel.page?.slug ?? null,
   requested_slug: props.viewModel.requestedSlug,
   requested_title: props.viewModel.requestedTitle ?? '',
   'cf-turnstile-response': '',
 })
 
+// URLs and screenshots share one cap. An empty URL box is not a reference.
+const referenceCount = computed(
+  () =>
+    form.source_urls.filter(url => url.trim() !== '').length +
+    form.screenshots.length
+)
+
+const canAddReference = computed(
+  () =>
+    form.source_urls.length + form.screenshots.length <
+    props.viewModel.maxReferences
+)
+
 function addSource() {
-  if (form.source_urls.length < props.viewModel.maxSourceUrls) {
+  if (canAddReference.value) {
     form.source_urls.push('')
   }
 }
+
+const screenshotInput = ref(null)
+const screenshotPreviews = ref([])
+const screenshotNotice = ref('')
+
+function addScreenshots(event) {
+  const room = props.viewModel.maxReferences - referenceCount.value
+  const files = Array.from(event.target.files ?? [])
+  const maxBytes = props.viewModel.screenshotMaxKb * 1024
+  const tooBig = files.filter(file => file.size > maxBytes)
+  const accepted = files.filter(file => file.size <= maxBytes).slice(0, room)
+
+  screenshotNotice.value =
+    tooBig.length > 0
+      ? `每張截圖最大 ${Math.floor(props.viewModel.screenshotMaxKb / 1024)} MB，已略過 ${tooBig.length} 張。`
+      : accepted.length < files.length
+        ? `最多 ${props.viewModel.maxReferences} 項，已略過 ${files.length - accepted.length} 張。`
+        : ''
+
+  for (const file of accepted) {
+    form.screenshots.push(file)
+    screenshotPreviews.value.push(URL.createObjectURL(file))
+  }
+
+  event.target.value = ''
+}
+
+function removeScreenshot(index) {
+  URL.revokeObjectURL(screenshotPreviews.value[index])
+  screenshotPreviews.value.splice(index, 1)
+  form.screenshots.splice(index, 1)
+}
+
+const screenshotError = index =>
+  form.errors[`screenshots.${index}`] ??
+  (index === 0 ? form.errors.screenshots : '')
 
 function removeSource(index) {
   form.source_urls.splice(index, 1)
@@ -90,6 +140,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  screenshotPreviews.value.forEach(url => URL.revokeObjectURL(url))
   removeTurnstileWidget()
 })
 
@@ -100,6 +151,7 @@ function submit() {
       source_urls: data.source_urls.map(url => url.trim()).filter(Boolean),
     }))
     .post('/wiki/edit-requests', {
+      forceFormData: true,
       onError: () => {
         focusFirstInvalid()
         removeTurnstileWidget()
@@ -235,11 +287,11 @@ const labelClasses =
         </div>
 
         <fieldset class="space-y-2">
-          <legend :class="labelClasses">來源網址（選填）</legend>
+          <legend :class="labelClasses">參考資料（選填）</legend>
           <p class="text-xs text-theme-700 dark:text-zinc-400">
-            若有資料來源，請附上連結。目前可使用的網址為：{{
-              viewModel.sourceDomains.join('、')
-            }}。
+            若有資料來源，請附上連結或截圖，合計最多
+            {{ viewModel.maxReferences }}
+            項。目前可使用的網址為：{{ viewModel.sourceDomains.join('、') }}。
           </p>
           <div
             v-for="(url, index) in form.source_urls"
@@ -278,14 +330,79 @@ const labelClasses =
               :message="sourceError(index)"
             />
           </div>
-          <Button
-            v-if="form.source_urls.length < viewModel.maxSourceUrls"
-            size="sm"
-            @click="addSource"
+          <div class="flex flex-wrap gap-2">
+            <Button v-if="canAddReference" size="sm" @click="addSource">
+              <Icon name="plus" class="size-4" />
+              新增來源
+            </Button>
+            <Button
+              v-if="canAddReference"
+              size="sm"
+              data-testid="wiki-add-screenshot"
+              @click="screenshotInput.click()"
+            >
+              <Icon name="photo" class="size-4" />
+              上傳截圖
+            </Button>
+          </div>
+          <input
+            ref="screenshotInput"
+            type="file"
+            multiple
+            accept="image/png,image/jpeg,image/webp"
+            class="sr-only"
+            tabindex="-1"
+            aria-label="上傳截圖"
+            data-testid="wiki-screenshot-input"
+            @change="addScreenshots"
+          />
+          <p
+            v-if="screenshotNotice"
+            role="status"
+            class="text-xs text-amber-800 dark:text-amber-300"
           >
-            <Icon name="plus" class="size-4" />
-            新增來源
-          </Button>
+            {{ screenshotNotice }}
+          </p>
+          <ul
+            v-if="form.screenshots.length"
+            class="flex flex-wrap gap-3"
+            data-testid="wiki-screenshot-previews"
+          >
+            <li
+              v-for="(file, index) in form.screenshots"
+              :key="screenshotPreviews[index]"
+              class="w-24 space-y-1"
+            >
+              <div class="relative">
+                <img
+                  :src="screenshotPreviews[index]"
+                  :alt="`截圖：${file.name}`"
+                  class="size-24 rounded-md border border-theme-200 object-cover dark:border-zinc-700"
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="absolute top-0 right-0 bg-white/80 dark:bg-zinc-900/80"
+                  :aria-label="`移除截圖 ${file.name}`"
+                  @click="removeScreenshot(index)"
+                >
+                  <Icon name="x-mark" class="size-4" />
+                </Button>
+              </div>
+              <FieldError
+                :id="`screenshot-${index}-error`"
+                :message="screenshotError(index)"
+              />
+            </li>
+          </ul>
+          <FieldError
+            v-if="form.screenshots.length === 0"
+            id="screenshots-error"
+            :message="form.errors.screenshots"
+          />
+          <p class="text-xs text-theme-700 dark:text-zinc-400">
+            截圖會顯示在修改紀錄上，請勿包含個人資料。
+          </p>
         </fieldset>
 
         <div>

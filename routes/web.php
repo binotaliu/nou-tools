@@ -88,6 +88,7 @@ use App\Http\Controllers\WikiController;
 use App\Http\Controllers\WikiEditRequestController;
 use App\Http\Controllers\WikiEditRequestRedraftController;
 use App\Http\Controllers\WikiEditRequestRefineController;
+use App\Http\Controllers\WikiEditRequestScreenshotController;
 use App\Http\Controllers\WikiEditRequestSubmitController;
 use App\Http\Controllers\WikiHistoryController;
 use App\Http\Controllers\WikiRevisionController;
@@ -246,6 +247,7 @@ Route::prefix('wiki')->name('wiki.')->group(function (): void {
 
     Route::post('/edit-requests', [WikiEditRequestController::class, 'store'])->name('edit-requests.store')->middleware('throttle:wiki-edit');
     Route::get('/edit-requests/{editRequest}', [WikiEditRequestController::class, 'show'])->name('edit-requests.show');
+    Route::get('/edit-requests/{editRequest}/screenshots/{index}', WikiEditRequestScreenshotController::class)->name('edit-requests.screenshots.show')->whereNumber('index');
     Route::post('/edit-requests/{editRequest}/refine', WikiEditRequestRefineController::class)->name('edit-requests.refine')->middleware('throttle:wiki-edit');
     Route::post('/edit-requests/{editRequest}/submit', WikiEditRequestSubmitController::class)->name('edit-requests.submit')->middleware('throttle:wiki-edit');
     Route::post('/edit-requests/{editRequest}/redraft', WikiEditRequestRedraftController::class)->name('edit-requests.redraft')->middleware('throttle:wiki-edit');

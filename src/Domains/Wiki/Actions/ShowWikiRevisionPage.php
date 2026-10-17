@@ -10,6 +10,7 @@ use NouTools\Domains\Wiki\PageData\WikiRevisionPageData;
 use NouTools\Domains\Wiki\ViewModels\WikiDiffLineViewModel;
 use NouTools\Domains\Wiki\ViewModels\WikiPageLinkViewModel;
 use NouTools\Domains\Wiki\ViewModels\WikiRevisionSummaryViewModel;
+use NouTools\Domains\Wiki\ViewModels\WikiScreenshotViewModel;
 
 /**
  * One revision with what changed since its parent and, for AI edits, the
@@ -29,6 +30,7 @@ final readonly class ShowWikiRevisionPage
             revision: WikiRevisionSummaryViewModel::fromModel($revision, $page->slug, $page->current_revision_id),
             instruction: $revision->editRequest?->instruction,
             sourceUrls: $revision->editRequest->source_urls ?? [],
+            screenshots: $revision->editRequest !== null ? WikiScreenshotViewModel::listFor($revision->editRequest) : [],
             content: ($this->renderWikiMarkdown)($revision->body),
             diff: WikiDiffLineViewModel::between((string) $revision->parent?->body, $revision->body),
             isFirstRevision: $revision->parent === null,

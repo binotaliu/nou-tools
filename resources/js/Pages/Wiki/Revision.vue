@@ -82,6 +82,27 @@ useMarkdownContainers(contentRoot, [() => props.viewModel.content])
             >
           </li>
         </ul>
+        <ul
+          v-if="viewModel.screenshots.length"
+          class="mt-3 flex flex-wrap gap-2"
+          data-testid="wiki-screenshots"
+        >
+          <li v-for="screenshot in viewModel.screenshots" :key="screenshot.url">
+            <a
+              :href="screenshot.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block overflow-hidden rounded-md border border-theme-200 dark:border-zinc-700"
+            >
+              <img
+                :src="screenshot.url"
+                :alt="`截圖：${screenshot.name}`"
+                loading="lazy"
+                class="size-24 object-cover"
+              />
+            </a>
+          </li>
+        </ul>
       </section>
 
       <section aria-labelledby="wiki-revision-diff" class="space-y-2">

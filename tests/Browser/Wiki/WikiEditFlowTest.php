@@ -125,3 +125,20 @@ it('hydrates markdown containers on wiki pages, also after navigating between pa
 
     $browser->assertNoJavaScriptErrors();
 });
+
+it('previews attached screenshots and lets the visitor remove them', function (): void {
+    $path = tempnam(sys_get_temp_dir(), 'shot').'.png';
+    file_put_contents($path, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='));
+
+    $browser = ($this->signIn)();
+
+    $browser->navigate('/wiki/nou-exams-info/edit')
+        ->assertVisible('[data-testid="wiki-edit-request-form"]')
+        ->attach('[data-testid="wiki-screenshot-input"]', $path)
+        ->assertVisible('[data-testid="wiki-screenshot-previews"]');
+
+    $browser->click('[aria-label^="移除截圖"]')
+        ->assertMissing('[data-testid="wiki-screenshot-previews"]');
+
+    unlink($path);
+});

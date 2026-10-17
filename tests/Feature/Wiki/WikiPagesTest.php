@@ -202,6 +202,25 @@ it('stores screenshots with the request, up to ten references in all', function 
     }
 });
 
+it('serves a request\'s screenshots from the private disk and lists them on the status page', function (): void {
+    Storage::fake(WikiEditRequest::SCREENSHOT_DISK);
+    $path = UploadedFile::fake()->image('notice.png')->store('', ['disk' => WikiEditRequest::SCREENSHOT_DISK]);
+
+    $editRequest = WikiEditRequest::factory()->forPage($this->page)->create([
+        'screenshots' => [['path' => $path, 'name' => 'notice.png']],
+    ]);
+
+    $url = route('wiki.edit-requests.screenshots.show', ['editRequest' => $editRequest, 'index' => 0]);
+
+    $this->get($url)->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
+    $this->get(route('wiki.edit-requests.screenshots.show', ['editRequest' => $editRequest, 'index' => 1]))->assertNotFound();
+
+    $this->get(route('wiki.edit-requests.show', $editRequest))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('viewModel.request.screenshots.0.name', 'notice.png')
+            ->where('viewModel.request.screenshots.0.url', $url));
+});
+
 it('rejects requests without a device, from a blocked device, on protected pages or with foreign sources', function (Closure $setUp, array $payload, string $field): void {
     Bus::fake();
     ($this->passTurnstile)();
