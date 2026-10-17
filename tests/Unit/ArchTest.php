@@ -21,6 +21,7 @@ use App\Models\ScheduleDevice;
 use App\Models\SchoolCalendarEvent;
 use App\Models\StudentScheduleItem;
 use App\Models\User;
+use App\Models\WikiEditEvent;
 use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
 use App\Models\WikiRevision;
@@ -71,6 +72,7 @@ arch()->preset()->strict()
         SchoolCalendarEvent::class,
         StudentScheduleItem::class,
         User::class,
+        WikiEditEvent::class,
         WikiEditRequest::class,
         WikiPage::class,
         WikiRevision::class,
