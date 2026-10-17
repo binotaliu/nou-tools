@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use NouTools\Domains\Wiki\DataTransferObjects\FetchWikiSourceDocumentDTO;
 
 /**
  * A school document (e.g. 選課注意事項 of one semester) fetched once and split
@@ -34,6 +35,14 @@ final class WikiSourceDocument extends Model
     /** @use HasFactory<WikiSourceDocumentFactory> */
     use HasFactory;
 
+    public const int SERIES_MAX_LENGTH = 60;
+
+    /** Lowercase Latin words joined by hyphens, e.g. course-selection-notes. */
+    public const string SERIES_PATTERN = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
+
+    /** Academic year and semester, e.g. 115-1. */
+    public const string TERM_PATTERN = '/^\d{3}-\d$/';
+
     /**
      * @return array<string, string>
      */
@@ -45,6 +54,16 @@ final class WikiSourceDocument extends Model
             'effective_from' => 'date',
             'effective_to' => 'date',
         ];
+    }
+
+    public function fillFromDTO(FetchWikiSourceDocumentDTO $data): self
+    {
+        $this->series = $data->series;
+        $this->term = $data->term;
+        $this->title = $data->title;
+        $this->url = $data->url;
+
+        return $this;
     }
 
     /**

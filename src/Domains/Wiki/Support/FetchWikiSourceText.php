@@ -27,6 +27,10 @@ final class FetchWikiSourceText
      */
     public function __invoke(string $url, int $maxDownloadBytes): FetchedWikiSource
     {
+        if (! WikiSourceDomains::allows($url)) {
+            throw new WikiSourceFetchException('Refused: this URL is not on an allowed host.');
+        }
+
         $response = null;
 
         for ($hop = 0; $hop <= self::MAX_REDIRECTS; $hop++) {
