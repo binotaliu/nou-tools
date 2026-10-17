@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Wiki\Actions;
 
+use App\Enums\WikiSourceDocumentStatus;
 use App\Models\WikiEditRequest;
+use App\Models\WikiSourceDocument;
+use App\Models\WikiSourceSection;
 
 /**
  * Builds the editor's user message as tagged plain-text blocks. URLs sit
@@ -57,6 +60,12 @@ final readonly class BuildWikiEditorPrompt
             ? '(none)'
             : implode("\n", $editRequest->source_urls));
 
+        $documents = $this->documentsCatalog($editRequest);
+
+        if ($documents !== null) {
+            $blocks[] = $this->block('documents', $documents);
+        }
+
         if (($editRequest->screenshots ?? []) !== []) {
             $blocks[] = $this->block('screenshots', collect($editRequest->screenshots)
                 ->map(fn (array $screenshot, int $index): string => 'Image '.($index + 1).': '.$screenshot['name'])
@@ -64,6 +73,43 @@ final readonly class BuildWikiEditorPrompt
         }
 
         return implode("\n\n", $blocks);
+    }
+
+    /**
+     * The stored school documents the editor can read by section. Current
+     * documents list their sections; older ones only say they exist. URLs sit
+     * alone on their lines, and a document the visitor cited is marked.
+     */
+    private function documentsCatalog(WikiEditRequest $editRequest): ?string
+    {
+        $documents = WikiSourceDocument::query()
+            ->where('status', WikiSourceDocumentStatus::Ready)
+            ->with(['sections' => fn ($sections) => $sections->select(['id', 'wiki_source_document_id', 'key', 'title', 'page_start', 'page_end', 'position'])])
+            ->orderBy('series')
+            ->orderByDesc('term')
+            ->get();
+
+        if ($documents->isEmpty()) {
+            return null;
+        }
+
+        $currentIds = WikiSourceDocument::query()->current()->pluck('id')->all();
+
+        return $documents
+            ->map(function (WikiSourceDocument $document) use ($currentIds, $editRequest): string {
+                $isCurrent = in_array($document->id, $currentIds, true);
+
+                return implode("\n", array_filter([
+                    implode(' | ', [$document->series, $document->term ?? '常態', $isCurrent ? 'current' : 'older', $document->title]),
+                    $document->url,
+                    in_array($document->url, $editRequest->source_urls, true) ? 'cited by the visitor' : null,
+                    $isCurrent ? 'sections:' : 'sections: see list_source_sections',
+                    ...($isCurrent
+                        ? $document->sections->map(fn (WikiSourceSection $section): string => "- {$section->key} | {$section->title} | ".($section->page_start === $section->page_end ? "p{$section->page_start}" : "p{$section->page_start}-{$section->page_end}"))->all()
+                        : []),
+                ]));
+            })
+            ->implode("\n\n");
     }
 
     private function block(string $tag, string $content): string

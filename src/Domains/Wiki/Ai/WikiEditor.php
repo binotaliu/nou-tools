@@ -16,7 +16,10 @@ use Laravel\Ai\Promptable;
 use Laravel\Ai\Providers\Tools\WebFetch;
 use NouTools\Domains\Wiki\Ai\Tools\FetchWikiSource;
 use NouTools\Domains\Wiki\Ai\Tools\ListWikiCategories;
+use NouTools\Domains\Wiki\Ai\Tools\ListWikiSourceDocuments;
+use NouTools\Domains\Wiki\Ai\Tools\ListWikiSourceSections;
 use NouTools\Domains\Wiki\Ai\Tools\ReadWikiPage;
+use NouTools\Domains\Wiki\Ai\Tools\ReadWikiSourceSection;
 use NouTools\Domains\Wiki\Ai\Tools\SearchWikiPages;
 use NouTools\Domains\Wiki\Support\WikiSourceDomains;
 use Stringable;
@@ -26,7 +29,8 @@ use Stringable;
  * complete new page, or declines it. Its rules are `resources/wiki/ai/editor.md`
  * followed by the writing and syntax guides in `resources/wiki/guides/`
  * (editor-only, never served to visitors). It may fetch the cited sources
- * (only on the allowed hosts) and look up other wiki pages and categories.
+ * (only on the allowed hosts), look up other wiki pages and categories, and
+ * read stored school documents section by section.
  */
 final class WikiEditor implements Agent, HasStructuredOutput, HasTools
 {
@@ -50,6 +54,9 @@ final class WikiEditor implements Agent, HasStructuredOutput, HasTools
             app(SearchWikiPages::class),
             app(ReadWikiPage::class),
             app(ListWikiCategories::class),
+            app(ListWikiSourceDocuments::class),
+            app(ListWikiSourceSections::class),
+            app(ReadWikiSourceSection::class),
         ];
 
         if ($this->maxFetches() > 0) {

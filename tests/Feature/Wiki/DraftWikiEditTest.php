@@ -188,7 +188,7 @@ it('gives the editor wiki tools and a capped fetch limited to the allowed hosts'
     $tools = collect((new WikiEditor)->tools());
     $fetch = $tools->first(fn ($tool): bool => $tool instanceof WebFetch);
 
-    expect($tools)->toHaveCount(4)
+    expect($tools)->toHaveCount(7)
         ->and($fetch->maxSearches)->toBe(3)
         ->and($fetch->allowedDomains)->toBe(['nou.edu.tw']);
 
