@@ -22,6 +22,7 @@ final readonly class CreateWikiEditRequest
         private FindWikiPageBySlug $findWikiPageBySlug,
         private EnsureWikiEditingAllowed $ensureWikiEditingAllowed,
         private ConsumeWikiDraftAllowance $consumeWikiDraftAllowance,
+        private StoreWikiScreenshots $storeWikiScreenshots,
     ) {}
 
     /**
@@ -44,6 +45,7 @@ final readonly class CreateWikiEditRequest
 
         $editRequest = new WikiEditRequest;
         $editRequest->fillFromDTO($data);
+        $editRequest->screenshots = ($this->storeWikiScreenshots)($data->screenshots);
         $editRequest->uuid = (string) Str::uuid();
         $editRequest->wiki_page_id = $page?->id;
         $editRequest->base_revision_id = $page?->current_revision_id;

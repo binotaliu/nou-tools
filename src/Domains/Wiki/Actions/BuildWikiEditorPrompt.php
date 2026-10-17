@@ -57,6 +57,12 @@ final readonly class BuildWikiEditorPrompt
             ? '(none)'
             : implode("\n", $editRequest->source_urls));
 
+        if (($editRequest->screenshots ?? []) !== []) {
+            $blocks[] = $this->block('screenshots', collect($editRequest->screenshots)
+                ->map(fn (array $screenshot, int $index): string => 'Image '.($index + 1).': '.$screenshot['name'])
+                ->implode("\n"));
+        }
+
         return implode("\n\n", $blocks);
     }
 

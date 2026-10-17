@@ -29,7 +29,8 @@ final readonly class ShowWikiEditRequestForm
             isProtected: (bool) $page?->is_protected,
             turnstileSiteKey: config('turnstile.turnstile_site_key'),
             instructionMaxLength: (int) config('wiki.instruction_max_length'),
-            maxSourceUrls: (int) config('wiki.max_source_urls'),
+            maxReferences: (int) config('wiki.max_references'),
+            screenshotMaxKb: (int) config('wiki.screenshot_max_kb'),
             sourceDomains: WikiSourceDomains::all(),
         );
     }

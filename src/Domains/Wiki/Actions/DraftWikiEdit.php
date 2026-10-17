@@ -7,6 +7,7 @@ namespace NouTools\Domains\Wiki\Actions;
 use App\Enums\WikiEditRequestStatus;
 use App\Models\WikiEditRequest;
 use Illuminate\Support\Facades\Log;
+use Laravel\Ai\Files\Image;
 use NouTools\Domains\Wiki\Ai\WikiEditor;
 use NouTools\Domains\Wiki\Ai\WikiEditorDraft;
 use NouTools\Domains\Wiki\Exceptions\InvalidWikiDraftException;
@@ -35,7 +36,7 @@ final readonly class DraftWikiEdit
 
         try {
             $draft = WikiEditorDraft::fromResponse(
-                (new WikiEditor)->prompt(($this->buildWikiEditorPrompt)($editRequest)),
+                (new WikiEditor)->prompt(($this->buildWikiEditorPrompt)($editRequest), $this->screenshotAttachments($editRequest)),
             );
 
             if ($draft->applies) {
@@ -84,6 +85,17 @@ final readonly class DraftWikiEdit
         $editRequest->saveOrFail();
 
         return $editRequest;
+    }
+
+    /**
+     * @return list<Image>
+     */
+    private function screenshotAttachments(WikiEditRequest $editRequest): array
+    {
+        return array_map(
+            fn (array $screenshot): Image => Image::fromStorage($screenshot['path'], WikiEditRequest::SCREENSHOT_DISK),
+            $editRequest->screenshots ?? [],
+        );
     }
 
     /**

@@ -24,7 +24,8 @@ final class WikiEditRequestFormPageData extends Resource
         public bool $isProtected,
         public ?string $turnstileSiteKey,
         public int $instructionMaxLength,
-        public int $maxSourceUrls,
+        public int $maxReferences,
+        public int $screenshotMaxKb,
         public array $sourceDomains,
     ) {}
 }

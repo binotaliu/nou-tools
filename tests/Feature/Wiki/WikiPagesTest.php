@@ -14,7 +14,9 @@ use App\Models\WikiPage;
 use App\Models\WikiRevision;
 use App\Models\WikiSlugRedirect;
 use Coderflex\LaravelTurnstile\Facades\LaravelTurnstile;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use NouTools\Domains\Schedules\Actions\BuildScheduleDeviceCookie;
 use NouTools\Domains\Wiki\Actions\PublishWikiRevision;
@@ -177,6 +179,29 @@ it('creates an edit request and drafts it after the response', function (): void
     Bus::assertDispatchedAfterResponse(GenerateWikiEditDraft::class);
 });
 
+it('stores screenshots with the request, up to ten references in all', function (): void {
+    Bus::fake();
+    Storage::fake(WikiEditRequest::SCREENSHOT_DISK);
+    ($this->passTurnstile)();
+
+    ($this->signedIn)()->post(route('wiki.edit-requests.store'), [
+        'instruction' => '補充考試時間是上午九點。',
+        'source_urls' => ['https://www.nou.edu.tw/calendar'],
+        'screenshots' => array_map(fn (int $number): UploadedFile => UploadedFile::fake()->image("shot-{$number}.png"), range(1, 9)),
+        'page_slug' => 'nou-exams-info',
+        'cf-turnstile-response' => 'token',
+    ])->assertSessionHasNoErrors();
+
+    $editRequest = WikiEditRequest::query()->sole();
+
+    expect($editRequest->screenshots)->toHaveCount(9)
+        ->and($editRequest->screenshots[0]['name'])->toBe('shot-1.png');
+
+    foreach ($editRequest->screenshots as $screenshot) {
+        Storage::disk(WikiEditRequest::SCREENSHOT_DISK)->assertExists($screenshot['path']);
+    }
+});
+
 it('rejects requests without a device, from a blocked device, on protected pages or with foreign sources', function (Closure $setUp, array $payload, string $field): void {
     Bus::fake();
     ($this->passTurnstile)();
@@ -207,7 +232,13 @@ it('rejects requests without a device, from a blocked device, on protected pages
         return ($this->signedIn)();
     }, [], 'instruction'],
     'foreign source' => [fn () => ($this->signedIn)(), ['source_urls' => ['https://example.com/a']], 'source_urls.0'],
-    'too many sources' => [fn () => ($this->signedIn)(), ['source_urls' => ['https://www.nou.edu.tw/1', 'https://www.nou.edu.tw/2', 'https://www.nou.edu.tw/3', 'https://www.nou.edu.tw/4']], 'source_urls'],
+    'too many sources' => [fn () => ($this->signedIn)(), ['source_urls' => array_map(fn (int $number): string => "https://www.nou.edu.tw/{$number}", range(1, 11))], 'source_urls'],
+    'too many references together' => [fn () => ($this->signedIn)(), [
+        'source_urls' => array_map(fn (int $number): string => "https://www.nou.edu.tw/{$number}", range(1, 5)),
+        'screenshots' => array_map(fn (int $number): UploadedFile => UploadedFile::fake()->image("shot-{$number}.png"), range(1, 6)),
+    ], 'screenshots'],
+    'screenshot that is not an image' => [fn () => ($this->signedIn)(), ['screenshots' => [UploadedFile::fake()->create('notes.pdf', 10, 'application/pdf')]], 'screenshots.0'],
+    'screenshot too large' => [fn () => ($this->signedIn)(), ['screenshots' => [UploadedFile::fake()->create('big.png', 6000, 'image/png')]], 'screenshots.0'],
     'bad slug hint' => [fn () => ($this->signedIn)(), ['page_slug' => null, 'requested_slug' => 'Not A Slug'], 'requested_slug'],
 ]);
 

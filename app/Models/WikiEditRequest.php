@@ -10,9 +10,10 @@ use Carbon\CarbonInterface;
 use Database\Factories\WikiEditRequestFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\MassPrunable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 use NouTools\Domains\Wiki\DataTransferObjects\CreateWikiEditRequestDTO;
 
@@ -27,6 +28,7 @@ use NouTools\Domains\Wiki\DataTransferObjects\CreateWikiEditRequestDTO;
  * @property int|null $base_revision_id
  * @property string $instruction
  * @property list<string> $source_urls
+ * @property list<array{path: string, name: string}>|null $screenshots
  * @property list<string> $refinements
  * @property int|null $student_schedule_id
  * @property string $ip_hash
@@ -50,7 +52,9 @@ final class WikiEditRequest extends Model
     /** @use HasFactory<WikiEditRequestFactory> */
     use HasFactory;
 
-    use MassPrunable;
+    use Prunable;
+
+    public const string SCREENSHOT_DISK = 'wiki_screenshots';
 
     protected $attributes = [
         'status' => 'drafting',
@@ -65,6 +69,7 @@ final class WikiEditRequest extends Model
     {
         return [
             'source_urls' => 'array',
+            'screenshots' => 'array',
             'refinements' => 'array',
             'draft_categories' => 'array',
             'ai_verdict' => 'array',
@@ -215,6 +220,16 @@ final class WikiEditRequest extends Model
                 WikiEditRequestStatus::Failed,
             ])
             ->where('updated_at', '<', now()->subDays(7));
+    }
+
+    /**
+     * Drops the screenshots of a request that is being pruned.
+     */
+    protected function pruning(): void
+    {
+        foreach ($this->screenshots ?? [] as $screenshot) {
+            Storage::disk(self::SCREENSHOT_DISK)->delete($screenshot['path']);
+        }
     }
 
     public function getRouteKeyName(): string

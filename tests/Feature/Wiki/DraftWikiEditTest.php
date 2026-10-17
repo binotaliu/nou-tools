@@ -6,7 +6,9 @@ use App\Enums\WikiEditRequestStatus;
 use App\Models\WikiCategory;
 use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Ai\Providers\Tools\WebFetch;
 use Laravel\Ai\Tools\Request;
 use NouTools\Domains\Wiki\Actions\DraftWikiEdit;
@@ -283,3 +285,20 @@ it('reads a PDF source through pdftotext without a temporary file', function ():
     expect((string) (new FetchWikiSource(1))->handle(new Request(['url' => 'https://www.nou.edu.tw/a.pdf'])))
         ->toContain('Exam rules');
 })->skip(fn (): bool => ! is_executable('/opt/homebrew/bin/pdftotext') && ! is_executable('/usr/local/bin/pdftotext') && ! is_executable('/usr/bin/pdftotext'), 'pdftotext is not installed');
+
+it('attaches the visitor\'s screenshots to the editor prompt', function (): void {
+    Storage::fake(WikiEditRequest::SCREENSHOT_DISK);
+    WikiEditor::fake([($this->response)()]);
+
+    $path = UploadedFile::fake()->image('notice.png')->store('', ['disk' => WikiEditRequest::SCREENSHOT_DISK]);
+
+    $editRequest = WikiEditRequest::factory()->forPage($this->page)->create([
+        'instruction' => '補充考試時間',
+        'screenshots' => [['path' => $path, 'name' => 'notice.png']],
+    ]);
+
+    app(DraftWikiEdit::class)($editRequest);
+
+    WikiEditor::assertPrompted(fn ($prompt): bool => str_contains($prompt->prompt, "<screenshots>\nImage 1: notice.png\n</screenshots>")
+        && $prompt->attachments->count() === 1);
+});

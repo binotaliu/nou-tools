@@ -76,6 +76,16 @@ return [
         | the newsletter covers, each lives under the "public" disk by default
         | and can be pointed at "s3" via env.
         */
+        /*
+        | Screenshots visitors attach to a wiki edit request. Private by
+        | default: they are served through the app, never by URL.
+        */
+        'wiki_screenshots' => [
+            'driver' => 'scoped',
+            'disk' => env('WIKI_SCREENSHOTS_DISK', 'local'),
+            'prefix' => 'wiki-screenshots',
+        ],
+
         'music_tracks' => [
             'driver' => 'scoped',
             'disk' => env('MUSIC_TRACKS_DISK', 'public'),

@@ -25,7 +25,10 @@ return [
     // full path here if it is not found automatically.
     'pdftotext_path' => env('WIKI_PDFTOTEXT_PATH'),
 
-    'max_source_urls' => 3,
+    // Cited URLs and uploaded screenshots share this cap per edit.
+    'max_references' => 10,
+
+    'screenshot_max_kb' => 5120,
 
     'instruction_max_length' => 2000,
 
