@@ -24,6 +24,7 @@ use App\Models\User;
 use App\Models\WikiEditRequest;
 use App\Models\WikiPage;
 use App\Models\WikiRevision;
+use App\Models\WikiSourceDocument;
 use App\Providers\AppServiceProvider;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
@@ -73,6 +74,7 @@ arch()->preset()->strict()
         WikiEditRequest::class,
         WikiPage::class,
         WikiRevision::class,
+        WikiSourceDocument::class,
 
         // Filament resource/page/relation-manager classes are built around
         // Filament's own protected hook overrides (getHeaderActions, form,

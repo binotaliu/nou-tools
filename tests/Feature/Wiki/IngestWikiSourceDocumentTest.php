@@ -17,34 +17,30 @@ use NouTools\Domains\Wiki\DataTransferObjects\FetchWikiSourceDocumentDTO;
 
 uses(RefreshDatabase::class);
 
-const SOURCE_URL = 'https://studadm.nou.edu.tw/files/notes.pdf';
+$sourceUrl = 'https://studadm.nou.edu.tw/files/notes.pdf';
 
-function noticeHtml(string $fees = '每學分 940 元。'): string
-{
-    return '<p>一、註冊方式：</p><p>臨櫃辦理。</p><p>二、費用：</p><p>'.$fees.'</p><p>【附錄一】</p><p>課程表</p><p>甲課程</p>';
-}
+$noticeHtml = fn (string $fees = '每學分 940 元。'): string => '<p>一、註冊方式：</p><p>臨櫃辦理。</p><p>二、費用：</p><p>'.$fees.'</p><p>【附錄一】</p><p>課程表</p><p>甲課程</p>';
 
 /**
  * Each fetch of the notice gets the next response: an html string, or an HTTP status.
  */
-function fakeNotice(string|int ...$responses): void
-{
+$fakeNotice = function (string|int ...$responses) use ($sourceUrl): void {
     $sequence = Http::sequence();
 
     foreach ($responses as $response) {
         $sequence->push(...is_int($response) ? ['', $response] : [$response, 200, ['Content-Type' => 'text/html']]);
     }
 
-    Http::fake([SOURCE_URL => $sequence]);
-}
+    Http::fake([$sourceUrl => $sequence]);
+};
 
 beforeEach(function (): void {
     config(['wiki.source_domains' => ['nou.edu.tw']]);
 });
 
-it('fetches, splits and stores the sections and marks the document ready', function () {
-    fakeNotice(noticeHtml());
-    $document = WikiSourceDocument::factory()->create(['url' => SOURCE_URL]);
+it('fetches, splits and stores the sections and marks the document ready', function () use ($sourceUrl, $fakeNotice, $noticeHtml) {
+    $fakeNotice($noticeHtml());
+    $document = WikiSourceDocument::factory()->create(['url' => $sourceUrl]);
 
     $result = app(IngestWikiSourceDocument::class)($document);
 
@@ -59,9 +55,9 @@ it('fetches, splits and stores the sections and marks the document ready', funct
         ->and($result)->toBe(['added' => ['part-1', 'part-2', 'appendix-1'], 'changed' => [], 'removed' => []]);
 });
 
-it('on a re-fetch reports changed sections and keeps unchanged ones as they are', function () {
-    fakeNotice(noticeHtml(), noticeHtml('每學分 1000 元。'));
-    $document = WikiSourceDocument::factory()->create(['url' => SOURCE_URL]);
+it('on a re-fetch reports changed sections and keeps unchanged ones as they are', function () use ($sourceUrl, $fakeNotice, $noticeHtml) {
+    $fakeNotice($noticeHtml(), $noticeHtml('每學分 1000 元。'));
+    $document = WikiSourceDocument::factory()->create(['url' => $sourceUrl]);
     app(IngestWikiSourceDocument::class)($document);
     $unchangedId = $document->sections()->where('key', 'part-1')->value('id');
 
@@ -72,9 +68,9 @@ it('on a re-fetch reports changed sections and keeps unchanged ones as they are'
         ->and($document->sections()->where('key', 'part-2')->value('body'))->toContain('1000');
 });
 
-it('removes sections that are gone from the new version', function () {
-    fakeNotice(noticeHtml(), '<p>一、註冊方式：</p><p>臨櫃辦理。</p><p>【附錄一】</p><p>課程表</p>');
-    $document = WikiSourceDocument::factory()->create(['url' => SOURCE_URL]);
+it('removes sections that are gone from the new version', function () use ($sourceUrl, $fakeNotice, $noticeHtml) {
+    $fakeNotice($noticeHtml(), '<p>一、註冊方式：</p><p>臨櫃辦理。</p><p>【附錄一】</p><p>課程表</p>');
+    $document = WikiSourceDocument::factory()->create(['url' => $sourceUrl]);
     app(IngestWikiSourceDocument::class)($document);
 
     $result = app(IngestWikiSourceDocument::class)($document);
@@ -83,9 +79,9 @@ it('removes sections that are gone from the new version', function () {
         ->and($document->sections()->pluck('key')->all())->toBe(['part-1', 'appendix-1']);
 });
 
-it('keeps earlier sections and records the reason when a re-fetch fails', function () {
-    fakeNotice(noticeHtml(), 404);
-    $document = WikiSourceDocument::factory()->create(['url' => SOURCE_URL]);
+it('keeps earlier sections and records the reason when a re-fetch fails', function () use ($sourceUrl, $fakeNotice, $noticeHtml) {
+    $fakeNotice($noticeHtml(), 404);
+    $document = WikiSourceDocument::factory()->create(['url' => $sourceUrl]);
     app(IngestWikiSourceDocument::class)($document);
 
     $result = app(IngestWikiSourceDocument::class)($document);
@@ -109,9 +105,9 @@ it('fails a document whose url is not on an allowed host', function () {
     Http::assertNothingSent();
 });
 
-it('fails a page with no text', function () {
-    fakeNotice('<html><script>x()</script></html>');
-    $document = WikiSourceDocument::factory()->create(['url' => SOURCE_URL]);
+it('fails a page with no text', function () use ($sourceUrl, $fakeNotice) {
+    $fakeNotice('<html><script>x()</script></html>');
+    $document = WikiSourceDocument::factory()->create(['url' => $sourceUrl]);
 
     app(IngestWikiSourceDocument::class)($document);
 
@@ -119,11 +115,11 @@ it('fails a page with no text', function () {
         ->and(WikiSourceSection::query()->count())->toBe(0);
 });
 
-it('registers a document and queues its first fetch', function () {
+it('registers a document and queues its first fetch', function () use ($sourceUrl) {
     Bus::fake();
 
     $document = app(CreateWikiSourceDocument::class)(new FetchWikiSourceDocumentDTO(
-        url: SOURCE_URL,
+        url: $sourceUrl,
         series: 'course-selection-notes',
         term: '115-1',
         title: '115 學年度上學期選課注意事項',
@@ -134,17 +130,17 @@ it('registers a document and queues its first fetch', function () {
     Bus::assertDispatched(FetchWikiSourceDocument::class, fn (FetchWikiSourceDocument $job): bool => $job->document->is($document));
 });
 
-it('refuses a second document for the same series and term, evergreen included', function (?string $term) {
+it('refuses a second document for the same series and term, evergreen included', function (?string $term) use ($sourceUrl) {
     Bus::fake();
-    $dto = new FetchWikiSourceDocumentDTO(SOURCE_URL, 'course-selection-notes', $term, '標題');
+    $dto = new FetchWikiSourceDocumentDTO($sourceUrl, 'course-selection-notes', $term, '標題');
 
     app(CreateWikiSourceDocument::class)($dto);
     app(CreateWikiSourceDocument::class)($dto);
 })->with(['a term' => '115-1', 'no term' => null])->throws(DomainException::class);
 
-it('queues a re-fetch and marks the document pending', function () {
+it('queues a re-fetch and marks the document pending', function () use ($sourceUrl) {
     Bus::fake();
-    $document = WikiSourceDocument::factory()->ready()->create(['url' => SOURCE_URL]);
+    $document = WikiSourceDocument::factory()->ready()->create(['url' => $sourceUrl]);
     $document->forceFill(['status' => WikiSourceDocumentStatus::Failed, 'failure_reason' => '舊的原因'])->save();
 
     app(QueueWikiSourceDocumentFetch::class)($document);
@@ -154,18 +150,18 @@ it('queues a re-fetch and marks the document pending', function () {
     Bus::assertDispatched(FetchWikiSourceDocument::class);
 });
 
-it('runs the ingest when the job is handled', function () {
-    fakeNotice(noticeHtml());
-    $document = WikiSourceDocument::factory()->create(['url' => SOURCE_URL]);
+it('runs the ingest when the job is handled', function () use ($sourceUrl, $fakeNotice, $noticeHtml) {
+    $fakeNotice($noticeHtml());
+    $document = WikiSourceDocument::factory()->create(['url' => $sourceUrl]);
 
     (new FetchWikiSourceDocument($document))->handle(app(IngestWikiSourceDocument::class));
 
     expect($document->refresh()->status)->toBe(WikiSourceDocumentStatus::Ready);
 });
 
-it('validates the dto', function (array $payload, string $field) {
+it('validates the dto', function (array $payload, string $field) use ($sourceUrl) {
     FetchWikiSourceDocumentDTO::validateAndCreate([
-        'url' => SOURCE_URL, 'series' => 'course-selection-notes', 'term' => '115-1', 'title' => '標題',
+        'url' => $sourceUrl, 'series' => 'course-selection-notes', 'term' => '115-1', 'title' => '標題',
         ...$payload,
     ]);
 })->with([
