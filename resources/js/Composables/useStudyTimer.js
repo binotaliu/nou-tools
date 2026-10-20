@@ -1,4 +1,9 @@
 import { reactive, ref } from 'vue'
+import {
+  clockLabel,
+  clockNow as sharedClockNow,
+  remainingLabel as sharedRemainingLabel,
+} from '../study-room-clock'
 import { playTimerFinishedSound } from '../study-room-sound'
 
 // The Study Room page's <Head title> (resources/js/Pages/StudyRoom/Show.vue)
@@ -48,50 +53,12 @@ export default function useStudyTimer(
   let tickHandle = null
   let lastNotifiedTimerEndsAt = null
 
-  function pad2(n) {
-    return String(n).padStart(2, '0')
-  }
-
-  function clockLabel(totalSeconds) {
-    const minutes = Math.floor(totalSeconds / 60)
-    const seconds = totalSeconds % 60
-
-    if (minutes < 60) {
-      return pad2(minutes) + ':' + pad2(seconds)
-    }
-
-    const hours = Math.floor(minutes / 60)
-
-    return hours + ':' + pad2(minutes % 60) + ':' + pad2(seconds)
-  }
-
-  // A paused timer's clock is frozen at the moment it was paused, so its
-  // countdown, count-up and progress bar all stop there instead of ticking.
   function clockNow(seat) {
-    return seat.pausedAt ? Date.parse(seat.pausedAt) : now.value
+    return sharedClockNow(seat, now.value)
   }
 
   function remainingLabel(seat) {
-    if (seat.timerEndsAt) {
-      const diffMs = Date.parse(seat.timerEndsAt) - clockNow(seat)
-
-      if (diffMs > 0) {
-        return clockLabel(Math.ceil(diffMs / 1000))
-      }
-
-      return '+' + clockLabel(Math.floor(-diffMs / 1000))
-    }
-
-    if (seat.timerStartedAt) {
-      const elapsedSeconds = Math.max(
-        0,
-        Math.floor((clockNow(seat) - Date.parse(seat.timerStartedAt)) / 1000)
-      )
-
-      return clockLabel(elapsedSeconds)
-    }
-
-    return ''
+    return sharedRemainingLabel(seat, now.value)
   }
 
   function timerLabel(seat) {
