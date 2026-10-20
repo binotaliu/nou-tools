@@ -315,3 +315,53 @@ it('keeps the tape playing on the desk in focus mode, and Esc closes the popover
     $page->assertAttribute('[data-testid="study-room-music-play"]', 'aria-pressed', 'true')
         ->assertSeeIn('[data-testid="study-room-music-title"]', 'Cafe Tape');
 });
+
+it('keeps the tape in a pill when the listener leaves the room, and drops it on eject', function () use ($studyRoomPlaylist, $openStudyRoomForMusic, $stubMediaElement) {
+    $studyRoomPlaylist('雨聲', ['Rain Tape', 'Cafe Tape']);
+
+    $page = $openStudyRoomForMusic();
+    $stubMediaElement($page);
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-player"]\') !== null');
+
+    $page->assertMissing('[data-testid="shell-player"]')
+        ->click('[data-testid="study-room-music-play"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-cassette"]\') !== null');
+
+    // An in-app visit: the page unmounts but the document (and the tape) stays.
+    $page->click('[data-testid="site-footer"] a[href="/about"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="shell-player"]\') !== null');
+
+    $page->assertVisible('[data-testid="shell-player"]')
+        ->assertSeeIn('[data-testid="shell-player-title"]', 'Rain Tape')
+        ->assertMissing('[data-testid="shell-player-timer"]')
+        ->assertAttribute('[data-testid="shell-player-toggle"]', 'aria-label', '暫停背景音樂');
+
+    $page->click('[data-testid="shell-player-next"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="shell-player-title"]\')?.textContent.includes(\'Cafe Tape\')');
+
+    $page->click('[data-testid="shell-player-toggle"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="shell-player-toggle"]\')?.getAttribute(\'aria-label\') === \'播放背景音樂\'');
+
+    // The way back lands on the room with the same tape still in its deck.
+    $page->click('[data-testid="shell-player-room"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-music-cassette"]\') !== null');
+
+    $page->assertMissing('[data-testid="shell-player"]')
+        ->assertSeeIn('[data-testid="study-room-music-title"]', 'Cafe Tape');
+
+    $page->click('[data-testid="site-footer"] a[href="/about"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="shell-player-eject"]\') !== null');
+
+    $page->click('[data-testid="shell-player-eject"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="shell-player"]\') === null');
+
+    $page->assertMissing('[data-testid="shell-player"]');
+});

@@ -9,6 +9,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import AdaptableNav from '../Components/AdaptableNav.vue'
 import BottomNav from '../Components/BottomNav.vue'
+import useStudyRoomBackground from '../Composables/useStudyRoomBackground'
 import usePwaStandalone from '../Composables/usePwaStandalone'
 import useScheduleDeviceBackup from '../Composables/useScheduleDeviceBackup'
 import CookieConsentBanner from '../Components/CookieConsentBanner.vue'
@@ -20,6 +21,7 @@ import {
   navItems,
   settingsItem,
 } from '../navigation'
+import ShellPlayer from '../Components/StudyRoom/ShellPlayer.vue'
 import Notification from '../Components/Notification.vue'
 
 // Room for a fixed bottom banner (study room's ActionBanner) to sit over
@@ -31,6 +33,8 @@ import ThemeSwitcherPopover from '../Components/ThemeSwitcherPopover.vue'
 const page = usePage()
 const { isPwa } = usePwaStandalone()
 useScheduleDeviceBackup()
+
+const studyRoomBackground = useStudyRoomBackground()
 
 const footerLinkClass =
   'inline-block py-1 pointer-coarse:py-2.5 text-theme-700 hover:text-theme-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100'
@@ -91,6 +95,11 @@ function onDocumentKeydown(event) {
 }
 
 onMounted(() => {
+  // The room page runs its own socket and heartbeat.
+  if (!currentPath.value.startsWith('/study-room')) {
+    studyRoomBackground.bootstrap()
+  }
+
   document.addEventListener('click', onDocumentClick)
   document.addEventListener('keydown', onDocumentKeydown)
 })
@@ -491,6 +500,8 @@ const adaptableOther = computed(() =>
     :more-items="bottomMoreItems"
     :current-path="currentPath"
   />
+
+  <ShellPlayer :current-path="currentPath" />
 
   <CookieConsentBanner />
 </template>

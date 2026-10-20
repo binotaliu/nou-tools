@@ -32,7 +32,11 @@ function clamp01(value) {
 // this listener: nothing is synced through the socket. A "tape" is loaded
 // (`loaded`) once the listener presses play or picks a playlist, and ejecting
 // unloads it — that is what the deck's window shows.
-export default function useStudyRoomMusic() {
+//
+// There is one deck per tab (see the default export): it outlives the study
+// room page so the music keeps playing while the listener browses, and the
+// shell's pill (Components/StudyRoom/ShellPlayer.vue) controls it from there.
+function createStudyRoomMusic() {
   const playlists = ref([])
   const playlistIndex = ref(0)
   const trackIndex = ref(0)
@@ -59,6 +63,10 @@ export default function useStudyRoomMusic() {
   let consecutiveFailures = 0
 
   async function load() {
+    if (playlists.value.length > 0) {
+      return
+    }
+
     try {
       const response = await window.axios.get('/study-room/music/playlists')
 
@@ -268,7 +276,8 @@ export default function useStudyRoomMusic() {
     navigator.mediaSession.setActionHandler('previoustrack', previous)
   }
 
-  // Called when the page unmounts so the music doesn't outlive the room.
+  // Stops everything, e.g. on sign-out. The study room page does not call it
+  // when it unmounts: the tape keeps playing in the shell.
   function dispose() {
     if (audio) {
       audio.pause()
@@ -309,4 +318,12 @@ export default function useStudyRoomMusic() {
     setVolume,
     dispose,
   })
+}
+
+let instance = null
+
+export default function useStudyRoomMusic() {
+  instance ??= createStudyRoomMusic()
+
+  return instance
 }

@@ -42,6 +42,7 @@ import LiveAnnouncer from '../../Components/StudyRoom/LiveAnnouncer.vue'
 import useSeatGrid from '../../Composables/useSeatGrid'
 import useSeatRovingFocus from '../../Composables/useSeatRovingFocus'
 import useStudyRoomAnnouncer from '../../Composables/useStudyRoomAnnouncer'
+import useStudyRoomBackground from '../../Composables/useStudyRoomBackground'
 import useStudyRoomAnnouncements from '../../Composables/useStudyRoomAnnouncements'
 import useStudyRoomDemo from '../../Composables/useStudyRoomDemo'
 import useStudyRoomMusic from '../../Composables/useStudyRoomMusic'
@@ -79,6 +80,7 @@ const sky = useStudyRoomSky(props.clientConfig)
 const profile = useStudyRoomProfile(props.profile, props.emojiChoices)
 const goal = useStudyGoal(props.profile.goal)
 const music = useStudyRoomMusic()
+const background = useStudyRoomBackground()
 const announcer = useStudyRoomAnnouncer()
 
 // Only `supported` and `enable` are used. `disable()` would call
@@ -357,6 +359,8 @@ onMounted(async () => {
 
   timer.initTabIndicators()
   sky.startClock()
+  // The page's own socket and heartbeat take over from the shell's.
+  background.stop()
   socket.start()
   music.load()
 
@@ -400,7 +404,17 @@ onMounted(async () => {
 onUnmounted(() => {
   sky.stopClock()
   socket.stop()
-  music.dispose()
+
+  // The tape keeps playing in the shell; a held seat keeps its heartbeat and
+  // timer readout there too.
+  if (props.hasSchedule && socket.heldSeatCode && socket.mySeat()) {
+    background.handOff(socket.mySeat(), {
+      playSound: profile.playSoundOnTimerEnd,
+      heartbeatIntervalSeconds: props.clientConfig.heartbeatIntervalSeconds,
+    })
+  } else {
+    background.clear()
+  }
   clearTimeout(signUpHighlightHandle)
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 

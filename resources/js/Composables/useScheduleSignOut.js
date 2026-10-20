@@ -1,6 +1,8 @@
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { clearDeviceBackup } from './scheduleDeviceStorage'
+import useStudyRoomBackground from './useStudyRoomBackground'
+import useStudyRoomMusic from './useStudyRoomMusic'
 
 // Signs this browser out of the remembered schedule. The server cannot know
 // which push subscription belongs to this browser, so it is looked up here,
@@ -39,6 +41,9 @@ export default function useScheduleSignOut() {
     router.delete('/schedules/device', {
       data: { pushEndpoint: subscription?.endpoint ?? null },
       onSuccess: () => {
+        // The seat is released server-side; the shell must not resume it.
+        useStudyRoomBackground().clear()
+        useStudyRoomMusic().dispose()
         subscription?.unsubscribe().catch(() => {})
       },
       onFinish: () => {
