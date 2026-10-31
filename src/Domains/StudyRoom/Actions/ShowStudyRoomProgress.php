@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace NouTools\Domains\StudyRoom\Actions;
 
 use App\Models\StudyRoomSession;
-use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Date;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
@@ -33,12 +32,12 @@ final readonly class ShowStudyRoomProgress
         $today = Date::now($timezone)->startOfDay()->toImmutable();
 
         $weekStart = $data->week !== null
-            ? CarbonImmutable::parse($data->week, $timezone)->startOfWeek(CarbonInterface::MONDAY)
+            ? Date::parse($data->week, $timezone)->startOfWeek(CarbonInterface::MONDAY)
             : $today->startOfWeek(CarbonInterface::MONDAY);
 
         $monthStart = $data->month !== null
-            ? CarbonImmutable::parse($data->month.'-01', $timezone)
-            : ($data->week !== null ? CarbonImmutable::parse($data->week, $timezone)->startOfMonth() : $today->startOfMonth());
+            ? Date::parse($data->month.'-01', $timezone)
+            : ($data->week !== null ? Date::parse($data->week, $timezone)->startOfMonth() : $today->startOfMonth());
 
         $gridStart = $monthStart->startOfWeek(CarbonInterface::MONDAY);
 

@@ -7,7 +7,6 @@ namespace App\Models;
 use App\Enums\StudyActivityVerb;
 use App\Enums\StudyTimerMode;
 use Database\Factories\StudyRoomSessionFactory;
-use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -43,11 +42,11 @@ final class StudyRoomSession extends Model
      * Drops 面授 sessions; a null verb counts as ordinary study.
      *
      * @param  Builder<StudyRoomSession>  $query
+     * @return Builder<StudyRoomSession>
      */
-    #[Scope]
-    protected function excludingInPersonClass(Builder $query): void
+    public function scopeExcludingInPersonClass(Builder $query): Builder
     {
-        $query->where(function (Builder $query): void {
+        return $query->where(function (Builder $query): void {
             $query->whereNull('activity_verb')
                 ->orWhere('activity_verb', '!=', StudyActivityVerb::InPersonClass->value);
         });
