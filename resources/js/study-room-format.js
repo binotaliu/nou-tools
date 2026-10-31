@@ -16,3 +16,11 @@ export function sessionDurationLabel(session) {
 
   return label + '（超時 ' + formatDurationLabel(session.overtimeSeconds) + '）'
 }
+
+// Short form ("4時23分") for tight spots such as chart columns.
+export function formatCompactDurationLabel(totalSeconds) {
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+
+  return hours > 0 ? hours + '時' + minutes + '分' : minutes + '分'
+}

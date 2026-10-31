@@ -11,6 +11,7 @@ import IncludeInPersonToggle from '../../Components/StudyRoom/IncludeInPersonTog
 import SubjectPieChart from '../../Components/StudyRoom/SubjectPieChart.vue'
 import useStudyChartFilter from '../../Composables/useStudyChartFilter'
 import {
+  formatCompactDurationLabel,
   formatDurationLabel,
   sessionDurationLabel,
 } from '../../study-room-format'
@@ -283,7 +284,7 @@ function onToggle(value) {
               </button>
             </div>
 
-            <div class="flex items-end justify-between gap-1.5">
+            <div class="flex items-start justify-between gap-1.5">
               <div
                 v-for="day in progress.days"
                 :key="day.date"
@@ -299,9 +300,10 @@ function onToggle(value) {
                   class="text-xs font-medium text-theme-700 dark:text-zinc-400"
                   >{{ day.label }}</span
                 >
-                <span class="text-[11px] text-theme-700 dark:text-zinc-400">{{
-                  formatDurationLabel(day.focusSeconds)
-                }}</span>
+                <span
+                  class="text-[11px] whitespace-nowrap text-theme-700 dark:text-zinc-400"
+                  >{{ formatCompactDurationLabel(day.focusSeconds) }}</span
+                >
               </div>
             </div>
 
