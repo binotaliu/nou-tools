@@ -2,7 +2,6 @@
   "timings": {
     "Tests\\Browser\\AccessibilityTest": 11.8969,
     "Tests\\Browser\\Admin\\IsoDateInputTest": 2.0606,
-    "Tests\\Browser\\AltUuFaqTest": 2.1844,
     "Tests\\Browser\\AnalyticsNavigationTest": 0.7251,
     "Tests\\Browser\\Announcements\\AnnouncementIndexTest": 1.545,
     "Tests\\Browser\\AriaStateTest": 4.4621,

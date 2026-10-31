@@ -8,7 +8,7 @@
 // depending on `html[data-nav-style]`. Only one is ever displayed, so the
 // 主要導覽 landmark stays unique. No brand: the app chrome is just navigation.
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { Link } from '@inertiajs/vue3'
+import NavLink from './NavLink.vue'
 import Icon from './Icon.vue'
 import ThemeSwitcherPopover from './ThemeSwitcherPopover.vue'
 import useNavStyle from '../Composables/useNavStyle'
@@ -115,17 +115,18 @@ const toggleClass =
           data-testid="adaptable-nav-tabs-list"
           class="flex min-w-0 items-center gap-0.5 rounded-lg bg-theme-100/70 p-1 dark:bg-zinc-800/70"
         >
-          <Link
+          <NavLink
             v-for="item in primary"
             :key="item.href"
             :href="item.href"
+            :external="item.external"
             :aria-current="item.active ? 'page' : null"
             class="inline-flex min-h-9 items-center gap-1.5 rounded-md px-3 text-sm font-medium whitespace-nowrap transition-all active:scale-95 lg:px-4"
             :class="capsuleClass(item.active)"
           >
             <Icon :name="item.icon" class="hidden size-4 shrink-0 lg:block" />
             <span>{{ item.label }}</span>
-          </Link>
+          </NavLink>
         </nav>
 
         <div class="flex items-center justify-self-end">
@@ -155,10 +156,11 @@ const toggleClass =
               id="adaptable-nav-more-menu"
               class="absolute top-full right-0 z-10 mt-2 w-60 space-y-1 rounded-lg border border-theme-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
             >
-              <Link
+              <NavLink
                 v-for="item in [...more, ...other]"
                 :key="item.href"
                 :href="item.href"
+                :external="item.external"
                 :data-offline-allow="item.offlineAllow ? '' : null"
                 :aria-current="item.active ? 'page' : null"
                 class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
@@ -166,7 +168,7 @@ const toggleClass =
               >
                 <Icon :name="item.icon" class="size-4 shrink-0" />
                 {{ item.label }}
-              </Link>
+              </NavLink>
             </div>
           </div>
         </div>
@@ -185,15 +187,16 @@ const toggleClass =
       >
         <ul class="space-y-1">
           <li v-for="item in primary" :key="item.href">
-            <Link
+            <NavLink
               :href="item.href"
+              :external="item.external"
               :aria-current="item.active ? 'page' : null"
               class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
               :class="itemClass(item.active)"
             >
               <Icon :name="item.icon" class="size-5 shrink-0" />
               {{ item.label }}
-            </Link>
+            </NavLink>
           </li>
         </ul>
 
@@ -205,8 +208,9 @@ const toggleClass =
           </p>
           <ul class="space-y-1">
             <li v-for="item in more" :key="item.href">
-              <Link
+              <NavLink
                 :href="item.href"
+                :external="item.external"
                 :data-offline-allow="item.offlineAllow ? '' : null"
                 :aria-current="item.active ? 'page' : null"
                 class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
@@ -214,7 +218,7 @@ const toggleClass =
               >
                 <Icon :name="item.icon" class="size-5 shrink-0" />
                 {{ item.label }}
-              </Link>
+              </NavLink>
             </li>
           </ul>
         </div>
@@ -223,15 +227,16 @@ const toggleClass =
           class="space-y-1 border-t border-theme-200 pt-3 dark:border-zinc-700"
         >
           <li v-for="item in other" :key="item.href">
-            <Link
+            <NavLink
               :href="item.href"
+              :external="item.external"
               :aria-current="item.active ? 'page' : null"
               class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
               :class="itemClass(item.active)"
             >
               <Icon :name="item.icon" class="size-5 shrink-0" />
               {{ item.label }}
-            </Link>
+            </NavLink>
           </li>
         </ul>
       </nav>

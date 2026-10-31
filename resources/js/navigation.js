@@ -52,8 +52,10 @@ export const navItems = [
 
 export const moreMenuItems = [
   {
-    href: '/alt-uu',
+    href: 'https://alt-uu.binota.org/',
     prefix: '/alt-uu',
+    match: () => false,
+    external: true,
     label: 'Alt UU',
     icon: 'device-phone-mobile',
   },

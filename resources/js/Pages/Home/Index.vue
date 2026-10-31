@@ -9,6 +9,7 @@ import HeroCarousel from '../../Components/Home/HeroCarousel.vue'
 import SiteIntro from '../../Components/Home/SiteIntro.vue'
 import VideoCourses from '../../Components/Home/VideoCourses.vue'
 import Greeting from '../../Components/Greeting.vue'
+import NavLink from '../../Components/NavLink.vue'
 import CommonLinks from '../../Components/CommonLinks.vue'
 import SchoolCalendar from '../../Components/SchoolCalendar.vue'
 import { moreMenuItems, navItems } from '../../navigation'
@@ -128,10 +129,11 @@ onUnmounted(() => {
             class="mt-5 grid grid-cols-4 gap-x-2 gap-y-4 md:grid-cols-6"
             data-testid="home-launcher"
           >
-            <Link
+            <NavLink
               v-for="item in launcherItems"
               :key="item.href"
               :href="item.href"
+              :external="item.external"
               :data-offline-allow="item.offlineAllow ? '' : null"
               class="group flex flex-col items-center gap-1.5 rounded-xl px-1 py-1.5 text-center text-xs leading-tight font-medium text-theme-900/80 transition-colors dark:text-zinc-300"
               data-testid="home-launcher-item"
@@ -144,7 +146,7 @@ onUnmounted(() => {
               <span class="break-words">{{
                 item.shortLabel ?? item.label
               }}</span>
-            </Link>
+            </NavLink>
           </div>
 
           <div

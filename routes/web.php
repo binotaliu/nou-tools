@@ -4,7 +4,6 @@ use App\Csp\DocsApiPolicy;
 use App\Enums\ArticleType;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AccessibilityController;
-use App\Http\Controllers\AltUuController;
 use App\Http\Controllers\AnalyticsConsentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
@@ -112,7 +111,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home')
     ->withMarkdown(HomeIndexMarkdownController::class, uri: '/llms.txt', name: 'llms-txt');
 Route::redirect('/ai.txt', '/llms.txt', 301);
 
-Route::get('/alt-uu', AltUuController::class)->name('alt-uu');
+Route::redirect('/alt-uu', 'https://alt-uu.binota.org/', 301);
 
 Route::get('/about', AboutController::class)->name('about');
 

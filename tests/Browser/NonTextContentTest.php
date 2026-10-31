@@ -28,5 +28,4 @@ it('gives every image an alt attribute on key pages', function (string $path) {
     'newsletter index' => '/newsletter',
     'newsletter issue' => '/newsletter/2026-W39',
     'study room preview' => '/study-room',
-    'alt-uu' => '/alt-uu',
 ]);

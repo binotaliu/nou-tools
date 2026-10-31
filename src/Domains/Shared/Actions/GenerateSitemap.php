@@ -29,7 +29,6 @@ final readonly class GenerateSitemap
     {
         return Collection::make([
             new SitemapUrlViewModel(url: route('home'), changeFrequency: 'daily', priority: 1.0),
-            new SitemapUrlViewModel(url: route('alt-uu'), changeFrequency: 'monthly', priority: 0.5),
             new SitemapUrlViewModel(url: route('about'), changeFrequency: 'yearly', priority: 0.3),
             new SitemapUrlViewModel(url: route('accessibility'), changeFrequency: 'yearly', priority: 0.3),
             new SitemapUrlViewModel(url: route('share'), changeFrequency: 'yearly', priority: 0.3),

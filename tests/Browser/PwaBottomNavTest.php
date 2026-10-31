@@ -130,7 +130,7 @@ it('puts learning progress after my schedule and the newsletter in both navs, an
     $page->click('[data-testid="bottom-nav-more"]');
 
     expect($linkTexts($page, '[data-testid="bottom-nav-sheet"] a'))
-        ->toContain('優惠店家', 'Alt UU', '學校公告', '今日視訊面授');
+        ->toContain('優惠店家', 'Alt UU（另開新分頁）', '學校公告', '今日視訊面授');
 });
 
 it('highlights learning progress, not my schedule, on a learning progress page', function () use ($waitForHeaderNav, $linkTexts) {

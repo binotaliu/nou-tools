@@ -94,10 +94,6 @@
     "path": "/offline"
   },
   {
-    "name": "alt-uu",
-    "path": "/alt-uu"
-  },
-  {
     "name": "schedule-show",
     "path": "/schedules/{schedule}",
     "needsSchedule": true,

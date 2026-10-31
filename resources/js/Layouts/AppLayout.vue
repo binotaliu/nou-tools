@@ -7,6 +7,7 @@
 // route paths (there is no Ziggy route() helper on the frontend).
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
+import NavLink from '../Components/NavLink.vue'
 import AdaptableNav from '../Components/AdaptableNav.vue'
 import BottomNav from '../Components/BottomNav.vue'
 import useStudyRoomBackground from '../Composables/useStudyRoomBackground'
@@ -236,10 +237,11 @@ const adaptableOther = computed(() =>
                 class="absolute top-full right-0 z-10 mt-2 w-80 rounded-2xl border border-theme-200 bg-white p-3 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
               >
                 <div class="grid grid-cols-3 gap-x-2 gap-y-3">
-                  <Link
+                  <NavLink
                     v-for="item in moreMenuItems"
                     :key="item.href"
                     :href="item.href"
+                    :external="item.external"
                     :data-offline-allow="item.offlineAllow ? '' : null"
                     :aria-current="isItemActive(item) ? 'page' : null"
                     class="group flex flex-col items-center gap-1.5 rounded-xl px-1 py-1.5 text-center text-xs leading-tight transition-colors"
@@ -264,7 +266,7 @@ const adaptableOther = computed(() =>
                     <span class="line-clamp-2 break-all">{{
                       item.shortLabel ?? item.label
                     }}</span>
-                  </Link>
+                  </NavLink>
                 </div>
               </div>
             </div>
@@ -308,10 +310,11 @@ const adaptableOther = computed(() =>
           {{ item.label }}
         </Link>
 
-        <Link
+        <NavLink
           v-for="item in moreMenuItems"
           :key="item.href"
           :href="item.href"
+          :external="item.external"
           :data-offline-allow="item.offlineAllow ? '' : null"
           class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
           :class="
@@ -322,7 +325,7 @@ const adaptableOther = computed(() =>
         >
           <Icon :name="item.icon" class="size-4 shrink-0" />
           {{ item.label }}
-        </Link>
+        </NavLink>
       </div>
     </div>
   </header>

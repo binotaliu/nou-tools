@@ -8,7 +8,7 @@
 // so browser tabs, tablets and desktops never show it and the standalone
 // check needs no JS — no flash on cold start.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { Link } from '@inertiajs/vue3'
+import NavLink from './NavLink.vue'
 import Icon from './Icon.vue'
 
 const props = defineProps({
@@ -87,10 +87,11 @@ const tabBase =
           aria-hidden="true"
         ></div>
         <div class="mx-auto grid max-w-xl grid-cols-4 gap-x-2 gap-y-4">
-          <Link
+          <NavLink
             v-for="item in moreItems"
             :key="item.href"
             :href="item.href"
+            :external="item.external"
             :data-offline-allow="item.offlineAllow ? '' : null"
             :aria-current="item.active ? 'page' : null"
             class="group flex flex-col items-center gap-1.5 rounded-xl px-1 py-1.5 text-center text-xs leading-tight transition-colors"
@@ -115,7 +116,7 @@ const tabBase =
             <span class="line-clamp-2 break-all">{{
               item.shortLabel ?? item.label
             }}</span>
-          </Link>
+          </NavLink>
         </div>
       </div>
     </Transition>
@@ -126,10 +127,11 @@ const tabBase =
       data-testid="bottom-nav"
     >
       <div class="grid h-12 grid-cols-5 gap-0.5">
-        <Link
+        <NavLink
           v-for="tab in tabs"
           :key="tab.href"
           :href="tab.href"
+          :external="tab.external"
           :aria-current="tab.active ? 'page' : null"
           :class="[tabBase, tabClass(tab.active)]"
         >
@@ -141,7 +143,7 @@ const tabBase =
           ></span>
           <Icon :name="tab.icon" class="relative size-5 shrink-0" />
           <span class="relative max-w-full truncate px-1">{{ tab.label }}</span>
-        </Link>
+        </NavLink>
 
         <button
           type="button"

@@ -37,16 +37,6 @@ it('server-renders title, description and Open Graph tags on static pages', func
     'new discount store' => ['discount-stores.create', '新增優惠店家 - NOU 小幫手'],
 ]);
 
-it('advertises a generated og:image card on the Alt UU page', function () {
-    $this->get(route('alt-uu'))
-        ->assertSuccessful()
-        ->assertSee('<title>Alt UU - NOU 小幫手</title>', false)
-        ->assertSee('<template data-og-image', false)
-        ->assertSee('給 NOU 同學的 UU 平台瀏覽器 App', false)
-        ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
-        ->assertDontSee(asset('og-image.png'), false);
-});
-
 it('server-renders the video classes page with a generated og:image card', function () {
     $this->get(route('video-classes.index'))
         ->assertSuccessful()

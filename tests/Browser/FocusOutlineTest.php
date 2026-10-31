@@ -127,7 +127,6 @@ it('does not clip the focus outline on pages with data', function (string $page)
         'course' => route('course.show', $courseClass->course),
         'course schedule' => route('course.schedule'),
         'directory' => route('directory.index'),
-        'alt-uu' => route('alt-uu'),
         'newsletter' => route('newsletter.index'),
         'announcements' => route('announcements.index'),
         'discount stores' => route('discount-stores.index'),
@@ -137,7 +136,7 @@ it('does not clip the focus outline on pages with data', function (string $page)
     $visit->assertNoJavaScriptErrors()->assertPresent('main#main-content');
 
     expect($clippedFocusOutlines($visit))->toBe([]);
-})->with(['schedule', 'schedule editor', 'learning progress', 'course', 'course schedule', 'directory', 'alt-uu', 'newsletter', 'announcements', 'discount stores']);
+})->with(['schedule', 'schedule editor', 'learning progress', 'course', 'course schedule', 'directory', 'newsletter', 'announcements', 'discount stores']);
 
 it('does not clip the focus outline in the study room list view', function () use ($clippedFocusOutlines) {
     $page = visit('/study-room')->resize(1280, 900);
