@@ -129,3 +129,11 @@ it('gives iPhone visitors a button to the install guide instead of an install bu
         ->click('[data-testid="pwa-banner-install-guide"]')
         ->assertPathIs('/install');
 });
+
+it('explains what the site is on the about page', function () {
+    visit(route('about'))
+        ->assertVisible('[data-testid="home-site-intro"]')
+        ->assertSeeIn('[data-testid="home-site-intro"]', 'NOU 小幫手是什麼？')
+        ->assertSeeIn('[data-testid="home-site-intro-free"]', '永久免費')
+        ->assertSeeIn('[data-testid="home-site-intro-open-source"]', '經得起檢驗的公開透明');
+});

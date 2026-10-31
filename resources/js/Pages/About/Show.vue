@@ -6,6 +6,7 @@
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Icon from '../../Components/Icon.vue'
+import SiteIntro from '../../Components/Home/SiteIntro.vue'
 import useAnalyticsConsent from '../../Composables/useAnalyticsConsent'
 
 const { granted, toggle, error } = useAnalyticsConsent()
@@ -62,6 +63,9 @@ const linkIconClass = 'size-4 shrink-0 text-theme-700 dark:text-zinc-200'
           </p>
         </div>
       </div>
+
+      <!-- Same introduction the homepage shows to visitors without a schedule. -->
+      <SiteIntro />
 
       <section
         class="rounded-xl border border-theme-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900"

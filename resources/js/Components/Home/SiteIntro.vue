@@ -27,6 +27,24 @@ const points = [
       'NOU 小幫手彙整了學校公告與行事曆等資訊，還幫你整理了空大學生可用的學生優惠，讓你不錯過任何好康。',
   },
 ]
+
+// Promises about the site itself rather than features, laid out side by side
+// under the grid.
+const promises = [
+  {
+    icon: 'gift',
+    title: '永久免費',
+    description: 'NOU 小幫手的所有功能均為免費，且未來亦不會有收費方案或廣告。',
+    testId: 'home-site-intro-free',
+  },
+  {
+    icon: 'code-bracket',
+    title: '經得起檢驗的公開透明',
+    description:
+      'NOU 小幫手是以 AGPL 授權的開放原始碼專案，任何人都能檢視、下載、修改程式碼，也歡迎一起參與開發。',
+    testId: 'home-site-intro-open-source',
+  },
+]
 </script>
 
 <template>
@@ -60,6 +78,29 @@ const points = [
           <p class="mt-0.5 text-sm text-theme-700 dark:text-zinc-400">
             {{ point.description }}
           </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2">
+        <div
+          v-for="promise in promises"
+          :key="promise.title"
+          class="flex items-start gap-3"
+          :data-testid="promise.testId"
+        >
+          <div
+            class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-theme-50 text-theme-700 dark:bg-zinc-800 dark:text-zinc-300"
+          >
+            <Icon :name="promise.icon" class="size-5" aria-hidden="true" />
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-theme-900 dark:text-zinc-100">
+              {{ promise.title }}
+            </p>
+            <p class="mt-0.5 text-sm text-theme-700 dark:text-zinc-400">
+              {{ promise.description }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
