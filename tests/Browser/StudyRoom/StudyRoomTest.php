@@ -583,6 +583,46 @@ it('shows the Stats modal with the 7-day chart and an empty-state log when opene
         '[data-testid="study-room-stats-modal"]',
         '這天沒有紀錄'
     );
+
+    $page->assertVisible('[data-testid="study-room-stats-subject-pie"]')
+        ->assertVisible('[data-testid="study-room-stats-include-in-person"]')
+        ->assertVisible('[data-testid="study-room-stats-session-area"]');
+});
+
+it('opens the progress page from the Stats modal and marks dates with records', function () use ($createScheduleWithCourse) {
+    $schedule = $createScheduleWithCourse();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
+
+    $page->navigate(route('study-room.show'))
+        ->assertVisible('[data-testid="study-room-profile-form"]')
+        ->fill('nickname', '認真讀書中')
+        ->click('[data-testid="study-room-emoji-choices"] label:nth-child(1)')
+        ->click('[data-testid="study-room-profile-submit"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-root"]\') !== null');
+
+    // Mid-day Taipei, so the session lands on today's Taipei date whatever
+    // the clock says, except right around midnight.
+    $endedAt = now('Asia/Taipei')->subMinutes(30)->utc();
+    $date = $endedAt->copy()->timezone('Asia/Taipei')->toDateString();
+    StudyRoomSession::factory()->for($schedule, 'schedule')->create([
+        'subject_label' => '微積分',
+        'started_at' => $endedAt->copy()->subMinutes(25),
+        'ended_at' => $endedAt,
+        'focus_seconds' => 1500,
+    ]);
+
+    $page->navigate(route('study-room.progress'))
+        ->assertVisible('[data-testid="study-room-progress-month"]')
+        ->assertVisible('[data-testid="study-room-progress-dot-'.$date.'"]')
+        ->assertVisible('[data-testid="study-room-progress-subject-pie"]')
+        ->assertSeeIn('[data-testid="study-room-progress-log-'.$date.'"]', '微積分');
 });
 
 it('shows a connection-error message once the room gives up on a realtime connection', function () use ($createScheduleWithCourse) {
