@@ -1,4 +1,6 @@
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
+import useStudyChartFilter from './useStudyChartFilter'
+import { formatDurationLabel, sessionDurationLabel } from '../study-room-format'
 
 // Profile updates are submitted over axios to
 // app/Http/Controllers/StudyRoomProfileController.php (JSON-only), and the
@@ -20,6 +22,8 @@ export default function useStudyRoomProfile(initialProfile, emojiChoices) {
   const statsLoading = ref(false)
   const statsFetched = ref(false)
   const statsDays = ref([])
+  const statsSubjects = ref([])
+  const { includeInPerson: statsIncludeInPerson } = useStudyChartFilter()
   const selectedStatsDate = ref(null)
 
   function openPersonalInfo() {
@@ -85,8 +89,11 @@ export default function useStudyRoomProfile(initialProfile, emojiChoices) {
     statsLoading.value = true
 
     try {
-      const response = await window.axios.get('/study-room/sessions/stats')
+      const response = await window.axios.get('/study-room/sessions/stats', {
+        params: { include_in_person: statsIncludeInPerson.value ? 1 : 0 },
+      })
       statsDays.value = response.data.days
+      statsSubjects.value = response.data.subjects
       statsFetched.value = true
       selectedStatsDate.value = statsDays.value.length
         ? statsDays.value[statsDays.value.length - 1].date
@@ -123,24 +130,13 @@ export default function useStudyRoomProfile(initialProfile, emojiChoices) {
     return { height: percent + '%' }
   }
 
-  function formatDurationLabel(totalSeconds) {
-    const hours = Math.floor(totalSeconds / 3600)
-    const minutes = Math.floor((totalSeconds % 3600) / 60)
+  watch(statsIncludeInPerson, () => {
+    statsFetched.value = false
 
-    return hours > 0 ? hours + ' 小時 ' + minutes + ' 分' : minutes + ' 分'
-  }
-
-  function sessionDurationLabel(session) {
-    const label = formatDurationLabel(session.focusSeconds)
-
-    if (!session.overtimeSeconds) {
-      return label
+    if (statsOpen.value) {
+      loadStats()
     }
-
-    return (
-      label + '（超時 ' + formatDurationLabel(session.overtimeSeconds) + '）'
-    )
-  }
+  })
 
   return reactive({
     nickname,
@@ -155,6 +151,8 @@ export default function useStudyRoomProfile(initialProfile, emojiChoices) {
     statsOpen,
     statsLoading,
     statsDays,
+    statsSubjects,
+    statsIncludeInPerson,
     selectedStatsDate,
     emojiChoices,
     openPersonalInfo,

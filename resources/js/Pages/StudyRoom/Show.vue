@@ -31,6 +31,8 @@ import AccessKeys from '../../Components/StudyRoom/AccessKeys.vue'
 import ActionBanner from '../../Components/StudyRoom/ActionBanner.vue'
 import FocusMode from '../../Components/StudyRoom/FocusMode.vue'
 import Modal from '../../Components/StudyRoom/Modal.vue'
+import IncludeInPersonToggle from '../../Components/StudyRoom/IncludeInPersonToggle.vue'
+import SubjectPieChart from '../../Components/StudyRoom/SubjectPieChart.vue'
 import GoalForm from '../../Components/StudyRoom/GoalForm.vue'
 import PersonalInfoForm from '../../Components/StudyRoom/PersonalInfoForm.vue'
 import RoomToolbar from '../../Components/StudyRoom/RoomToolbar.vue'
@@ -617,6 +619,19 @@ onUnmounted(() => {
           </p>
 
           <div v-show="!profile.statsLoading" class="space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <IncludeInPersonToggle
+                v-model="profile.statsIncludeInPerson"
+                testid="study-room-stats-include-in-person"
+              />
+              <Link
+                href="/study-room/progress"
+                class="text-sm font-medium text-theme-700 underline dark:text-theme-300"
+                data-testid="study-room-stats-progress-link"
+                >詳細進度</Link
+              >
+            </div>
+
             <div>
               <h4
                 class="mb-3 text-sm font-semibold text-theme-900 dark:text-zinc-100"
@@ -661,6 +676,18 @@ onUnmounted(() => {
             </div>
 
             <div class="border-t border-theme-200 pt-4 dark:border-zinc-700">
+              <h4
+                class="mb-3 text-sm font-semibold text-theme-900 dark:text-zinc-100"
+              >
+                科目分佈
+              </h4>
+              <SubjectPieChart
+                :subjects="profile.statsSubjects"
+                testid="study-room-stats-subject-pie"
+              />
+            </div>
+
+            <div class="border-t border-theme-200 pt-4 dark:border-zinc-700">
               <div class="mb-2 flex items-center justify-between">
                 <h4
                   class="text-sm font-semibold text-theme-900 dark:text-zinc-100"
@@ -674,31 +701,37 @@ onUnmounted(() => {
                 }}</span>
               </div>
 
-              <p
-                v-show="profile.selectedStatsDay().sessions.length === 0"
-                class="text-sm text-theme-700 dark:text-zinc-400"
+              <!-- Fixed height: switching days must not resize or shift the modal. -->
+              <div
+                class="h-44 overflow-y-auto"
+                data-testid="study-room-stats-session-area"
               >
-                這天沒有紀錄
-              </p>
-
-              <ul
-                v-show="profile.selectedStatsDay().sessions.length > 0"
-                class="space-y-2"
-                data-testid="study-room-stats-session-log"
-              >
-                <li
-                  v-for="session in profile.selectedStatsDay().sessions"
-                  :key="session.startedAt"
-                  class="flex items-center justify-between gap-2 text-sm"
+                <p
+                  v-show="profile.selectedStatsDay().sessions.length === 0"
+                  class="text-sm text-theme-700 dark:text-zinc-400"
                 >
-                  <span class="truncate text-theme-800 dark:text-zinc-200">{{
-                    session.activityLabel
-                  }}</span>
-                  <span class="shrink-0 text-theme-700 dark:text-zinc-400">{{
-                    profile.sessionDurationLabel(session)
-                  }}</span>
-                </li>
-              </ul>
+                  這天沒有紀錄
+                </p>
+
+                <ul
+                  v-show="profile.selectedStatsDay().sessions.length > 0"
+                  class="space-y-2"
+                  data-testid="study-room-stats-session-log"
+                >
+                  <li
+                    v-for="session in profile.selectedStatsDay().sessions"
+                    :key="session.startedAt"
+                    class="flex items-center justify-between gap-2 text-sm"
+                  >
+                    <span class="truncate text-theme-800 dark:text-zinc-200">{{
+                      session.activityLabel
+                    }}</span>
+                    <span class="shrink-0 text-theme-700 dark:text-zinc-400">{{
+                      profile.sessionDurationLabel(session)
+                    }}</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </Modal>
