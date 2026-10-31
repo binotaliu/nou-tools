@@ -72,6 +72,7 @@ use App\Http\Controllers\StudyRoomHeartbeatController;
 use App\Http\Controllers\StudyRoomNextRoundController;
 use App\Http\Controllers\StudyRoomPauseController;
 use App\Http\Controllers\StudyRoomProfileController;
+use App\Http\Controllers\StudyRoomProgressController;
 use App\Http\Controllers\StudyRoomPushSubscriptionController;
 use App\Http\Controllers\StudyRoomResumeController;
 use App\Http\Controllers\StudyRoomSeatController;
@@ -218,6 +219,7 @@ Route::get('/study-room', [StudyRoomController::class, 'show'])->name('study-roo
     ->withMarkdown(StudyRoomMarkdownController::class);
 
 Route::prefix('study-room')->name('study-room.')->group(function (): void {
+    Route::get('/progress', StudyRoomProgressController::class)->name('progress');
     Route::get('/state', StudyRoomStateController::class)->name('state')->middleware('throttle:120,1');
     Route::get('/sessions', StudyRoomSessionController::class)->name('sessions')->middleware('throttle:60,1');
     Route::get('/sessions/stats', StudyRoomSessionStatsController::class)->name('sessions.stats')->middleware('throttle:60,1');
