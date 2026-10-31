@@ -19,6 +19,8 @@ final class StudyRoomSessionStatsViewModel extends Data
     public function __construct(
         #[DataCollectionOf(StudyRoomDailyFocusViewModel::class)]
         public DataCollection $days,
+        #[DataCollectionOf(StudyRoomSubjectShareViewModel::class)]
+        public DataCollection $subjects,
     ) {}
 
     /**
@@ -55,6 +57,9 @@ final class StudyRoomSessionStatsViewModel extends Data
             );
         }
 
-        return new self(days: StudyRoomDailyFocusViewModel::collect($days, DataCollection::class));
+        return new self(
+            days: StudyRoomDailyFocusViewModel::collect($days, DataCollection::class),
+            subjects: StudyRoomSubjectShareViewModel::slicesFromSessions($sessions),
+        );
     }
 }

@@ -16,7 +16,7 @@ final readonly class ListRecentStudyRoomSessionsForStats
 {
     private const int DAYS = 7;
 
-    public function __invoke(StudentScheduleCookie $viewer): array
+    public function __invoke(StudentScheduleCookie $viewer, bool $includeInPersonClass = false): array
     {
         $timezone = (string) config('app.schedule_timezone');
         $startUtc = Date::now($timezone)->startOfDay()->subDays(self::DAYS - 1)->utc();
@@ -24,7 +24,9 @@ final readonly class ListRecentStudyRoomSessionsForStats
 
         return StudyRoomSession::query()
             ->where('student_schedule_id', $viewer->id)
+            ->when(! $includeInPersonClass, fn ($query) => $query->excludingInPersonClass())
             ->whereBetween('ended_at', [$startUtc, $endUtc])
+            ->with('subjectCourse')
             ->orderByDesc('started_at')
             ->get()
             ->all();

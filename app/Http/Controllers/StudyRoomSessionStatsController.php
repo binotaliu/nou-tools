@@ -20,7 +20,7 @@ final class StudyRoomSessionStatsController extends Controller
         }
 
         $viewModel = StudyRoomSessionStatsViewModel::fromSessions(
-            $listRecentStudyRoomSessionsForStats($viewer),
+            $listRecentStudyRoomSessionsForStats($viewer, $request->boolean('include_in_person')),
             (string) config('app.schedule_timezone'),
         );
 
