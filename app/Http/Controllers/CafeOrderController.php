@@ -13,6 +13,7 @@ use NouTools\Domains\Cafe\Actions\ResolveCafeViewer;
 use NouTools\Domains\Cafe\DataTransferObjects\OrderCoffeeData;
 use NouTools\Domains\Cafe\Exceptions\DineInNeedsSeatException;
 use NouTools\Domains\Cafe\Exceptions\MenuItemUnavailableException;
+use NouTools\Domains\Cafe\Exceptions\TakeawayInCafeException;
 use NouTools\Domains\Cafe\ViewModels\CafeCoffeeViewModel;
 
 final class CafeOrderController extends Controller
@@ -27,7 +28,7 @@ final class CafeOrderController extends Controller
 
         try {
             $order = $orderCoffee($viewer, $input);
-        } catch (InsufficientAcornsException|MenuItemUnavailableException|DineInNeedsSeatException $exception) {
+        } catch (InsufficientAcornsException|MenuItemUnavailableException|DineInNeedsSeatException|TakeawayInCafeException $exception) {
             return response()->json(['message' => $exception->getMessage()], 422);
         }
 

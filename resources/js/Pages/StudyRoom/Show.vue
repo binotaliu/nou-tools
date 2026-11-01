@@ -56,6 +56,7 @@ import usePushSubscription from '../../Composables/usePushSubscription'
 import useStudyRoomSky from '../../Composables/useStudyRoomSky'
 import useStudyRoomSocket from '../../Composables/useStudyRoomSocket'
 import useStudyRoomVoiceSettings from '../../Composables/useStudyRoomVoiceSettings'
+import useTwemoji from '../../Composables/useTwemoji'
 import useStudyTimer from '../../Composables/useStudyTimer'
 
 const props = defineProps({
@@ -295,76 +296,7 @@ function handleVisibilityChange() {
   }
 }
 
-// twemoji renders emoji consistently across platforms. It's dynamically
-// imported rather than loaded globally, since it's only needed on this page
-// — mirrors the echo.js import below.
-let twemojiObserver = null
-let twemojiRafHandle = null
-
-// VoiceOver reads an <img> as 「圖像」 whatever its alt says, so every emoji
-// image is hidden from screen readers and followed by an sr-only twin that
-// reads like the plain character did. The twin carries the character in
-// `data-emoji-text`, spoken through CSS generated content (app.css), so the
-// next parse has no text node to turn into yet another image.
-function speakEmojiAsText(root) {
-  for (const image of root.querySelectorAll('img.emoji:not([aria-hidden])')) {
-    const twin = document.createElement('span')
-    twin.className = 'sr-only'
-    twin.dataset.emojiText = image.alt
-    image.setAttribute('aria-hidden', 'true')
-    image.after(twin)
-  }
-}
-
-// Twemoji's own fallback when an image fails to load puts the character
-// back as text, which would then be spoken twice alongside its twin.
-function restoreEmojiText() {
-  if (this.nextSibling?.dataset?.emojiText !== undefined) {
-    this.nextSibling.remove()
-  }
-
-  this.replaceWith(this.alt)
-}
-
-function parseTwemoji(root) {
-  if (typeof window.twemoji !== 'undefined') {
-    window.twemoji.parse(root, { onerror: restoreEmojiText })
-    speakEmojiAsText(root)
-  }
-}
-
-function scheduleTwemojiParse(root) {
-  if (twemojiRafHandle) {
-    return
-  }
-
-  twemojiRafHandle = requestAnimationFrame(() => {
-    twemojiRafHandle = null
-    parseTwemoji(root)
-  })
-}
-
-async function loadTwemoji(root) {
-  if (window.twemoji) {
-    startTwemojiObserver(root)
-    return
-  }
-
-  const { default: twemoji } = await import('@twemoji/api')
-  window.twemoji = twemoji
-  startTwemojiObserver(root)
-}
-
-function startTwemojiObserver(root) {
-  parseTwemoji(root)
-
-  twemojiObserver = new MutationObserver(() => scheduleTwemojiParse(root))
-  twemojiObserver.observe(root, {
-    childList: true,
-    subtree: true,
-    characterData: true,
-  })
-}
+const twemoji = useTwemoji()
 
 const rootTestidValue = 'study-room-root'
 
@@ -376,7 +308,7 @@ onMounted(async () => {
   timer.initTabIndicators()
   sky.startClock()
   // The page's own socket and heartbeat take over from the shell's.
-  background.stop()
+  background.stopFor('study')
   socket.start()
   music.load()
 
@@ -417,7 +349,7 @@ onMounted(async () => {
   const root = document.querySelector('[data-testid="' + rootTestidValue + '"]')
 
   if (root) {
-    loadTwemoji(root)
+    twemoji.start(root)
   }
 })
 
@@ -433,15 +365,12 @@ onUnmounted(() => {
       heartbeatIntervalSeconds: props.clientConfig.heartbeatIntervalSeconds,
     })
   } else {
-    background.clear()
+    background.clearFor('study')
   }
   clearTimeout(signUpHighlightHandle)
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 
-  if (twemojiObserver) {
-    twemojiObserver.disconnect()
-    twemojiObserver = null
-  }
+  twemoji.stop()
 })
 </script>
 

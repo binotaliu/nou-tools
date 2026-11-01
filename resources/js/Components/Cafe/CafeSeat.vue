@@ -24,19 +24,30 @@ const emit = defineEmits(['activate'])
 
 const mine = computed(() => props.seat.isYou)
 
+// A cup shows from `readyAt` (the drink is still being made before that)
+// until it expires; an empty one stays on the table, drawn faded.
 const coffee = computed(() =>
   props.seat.coffee &&
+  new Date(props.seat.coffee.readyAt).getTime() <= props.now &&
   new Date(props.seat.coffee.expiresAt).getTime() > props.now
     ? props.seat.coffee
     : null
+)
+
+// Someone with a focus timer running is studying here.
+const focusing = computed(
+  () =>
+    props.seat.isOccupied &&
+    props.seat.timerPhase === 'focus' &&
+    props.seat.pausedAt === null
 )
 
 const actionable = computed(
   () =>
     mine.value ||
     (!props.seat.isOccupied &&
-      props.socket.heldSeatCode.value === null &&
-      props.socket.busySeatCode.value === null)
+      props.socket.heldSeatCode === null &&
+      props.socket.busySeatCode === null)
 )
 
 const ariaLabel = computed(() => {
@@ -45,7 +56,7 @@ const ariaLabel = computed(() => {
   }
 
   if (props.seat.isOccupied) {
-    return `${props.seat.label}，${props.seat.nickname ?? '有人'}坐在這裡${coffee.value ? `，桌上有一杯${coffee.value.name}` : ''}`
+    return `${props.seat.label}，${props.seat.nickname ?? '有人'}坐在這裡${focusing.value ? '，專注中' : ''}${coffee.value ? `，桌上有一杯${coffee.value.name}` : ''}`
   }
 
   return `${props.seat.label}，空位${props.canSit ? '，按下入座' : ''}`
@@ -89,7 +100,7 @@ const stateClasses = computed(() => {
     :data-testid="`cafe-seat-${seat.code}`"
     class="group relative flex w-14 flex-col items-center gap-0.5 text-center"
     :class="
-      socket.busySeatCode.value === seat.code
+      socket.busySeatCode === seat.code
         ? 'cursor-wait opacity-50'
         : actionable && !mine
           ? 'cursor-pointer'
@@ -115,9 +126,15 @@ const stateClasses = computed(() => {
       <span
         v-if="coffee"
         class="absolute -top-2 -right-2 text-sm leading-none drop-shadow-sm"
+        :class="coffee.level === 0 ? 'opacity-40' : ''"
         :data-testid="`cafe-seat-${seat.code}-coffee`"
         >{{ coffee.emoji }}</span
       >
+      <span
+        v-if="focusing"
+        class="absolute -right-1.5 -bottom-1.5 size-3 rounded-full border-2 border-[#46342a] bg-emerald-400"
+        :data-testid="`cafe-seat-${seat.code}-focusing`"
+      ></span>
       <span
         v-show="mine"
         class="absolute -top-1.5 -left-2 rounded-full bg-amber-700 px-1 text-[0.5625rem] leading-4 font-semibold text-white shadow-sm"

@@ -3,10 +3,18 @@
 // not from Inertia props, the same split the study room uses. The room is
 // drawn by CafeFloor; the wall, the menu and the note composer open in
 // modals from it (and from the toolbar), so nothing stacks under the map.
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+//
+// A café seat is a study-room seat in another room: once seated, the study
+// room's control panel (ActionBanner, FocusMode, useStudyTimer) runs here
+// too, with a coffee tray on top. 內用 needs the seat and is thrown away when
+// it is left; 外帶 can be ordered without one.
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import Modal from '../../Components/StudyRoom/Modal.vue'
+import ActionBanner from '../../Components/StudyRoom/ActionBanner.vue'
+import FocusMode from '../../Components/StudyRoom/FocusMode.vue'
+import CoffeeTray from '../../Components/Cafe/CoffeeTray.vue'
 import BaristaDialogue from '../../Components/Cafe/BaristaDialogue.vue'
 import CafeFloor from '../../Components/Cafe/CafeFloor.vue'
 import StickyNoteComposer from '../../Components/Cafe/StickyNoteComposer.vue'
@@ -17,6 +25,11 @@ import useAcorns from '../../Composables/useAcorns'
 import useBarista from '../../Composables/useBarista'
 import useCafeSocket from '../../Composables/useCafeSocket'
 import useSessionClock from '../../Composables/useSessionClock'
+import useStudyRoomBackground from '../../Composables/useStudyRoomBackground'
+import useStudyRoomMusic from '../../Composables/useStudyRoomMusic'
+import useStudyRoomSky from '../../Composables/useStudyRoomSky'
+import useStudyTimer from '../../Composables/useStudyTimer'
+import useTwemoji from '../../Composables/useTwemoji'
 
 const props = defineProps({
   cafe: { type: Object, required: true },
@@ -27,12 +40,41 @@ const socket = useCafeSocket({
 })
 
 const acorns = useAcorns()
-const { now } = useSessionClock()
+// Emoji look the same everywhere, as in the study room.
+const twemoji = useTwemoji()
+// A second-by-second clock: a drink appears a few seconds after it is ordered.
+const { now } = useSessionClock(1000)
+const background = useStudyRoomBackground()
+const music = useStudyRoomMusic()
+const sky = useStudyRoomSky(props.cafe.timerConfig)
+
+// The two profile fields the timer and focus mode read.
+const profile = reactive({
+  nickname: props.cafe.nickname,
+  emoji: props.cafe.emoji,
+  playSoundOnTimerEnd: props.cafe.playSoundOnTimerEnd,
+})
+
+const timer = useStudyTimer(
+  socket,
+  props.cafe.timerConfig,
+  props.cafe.pomodoroCycle,
+  profile,
+  props.cafe.verbs,
+  props.cafe.subjects,
+  { title: '咖啡廳 - NOU 小幫手' }
+)
+
+socket.onStateChange(() => {
+  timer.onRoomStateChanged(() => sky.unmountSkyCanvas('focus'))
+})
 
 const menu = ref([])
 const menuOpen = ref(false)
 const orderBusyId = ref(null)
 const orderError = ref(null)
+const trayBusy = ref(false)
+const trayError = ref(null)
 
 const notes = ref([])
 const wallOpen = ref(false)
@@ -111,7 +153,7 @@ async function order({ item, toGo }) {
 
     Object.assign(acorns, response.data.acorns, { loaded: true })
     menuOpen.value = false
-    socket.refresh()
+    await socket.refresh()
     await barista.talk(item.name)
   } catch (error) {
     orderError.value =
@@ -121,16 +163,77 @@ async function order({ item, toGo }) {
   }
 }
 
+// Reordering from the tray: the same drink, the same way, no menu.
+async function reorder(coffee) {
+  trayBusy.value = true
+  trayError.value = null
+
+  try {
+    const response = await window.axios.post('/cafe/orders', {
+      menuItemId: coffee.menuItemId,
+      // You are sitting here (the tray only shows on a seat), so it is dine-in
+      // even if the cup you finished was a takeaway you brought in.
+      toGo: false,
+    })
+
+    Object.assign(acorns, response.data.acorns, { loaded: true })
+    await socket.refresh()
+  } catch (error) {
+    trayError.value = socket.resolveErrorMessage(error)
+  } finally {
+    trayBusy.value = false
+  }
+}
+
+async function sip() {
+  trayBusy.value = true
+  trayError.value = null
+
+  try {
+    await window.axios.post('/cafe/orders/current/sip')
+    await socket.refresh()
+  } catch (error) {
+    trayError.value = socket.resolveErrorMessage(error)
+  } finally {
+    trayBusy.value = false
+  }
+}
+
+async function putAway() {
+  trayBusy.value = true
+  trayError.value = null
+
+  try {
+    await window.axios.delete('/cafe/orders/current')
+    await socket.refresh()
+  } catch (error) {
+    trayError.value = socket.resolveErrorMessage(error)
+  } finally {
+    trayBusy.value = false
+  }
+}
+
 const canSit = computed(() => props.cafe.hasSchedule && props.cafe.hasNickname)
 
 const seats = computed(() => socket.seats())
+
+// The cup on your own table, once it has been made (for focus mode).
+const coffeeOnTable = computed(() => {
+  const coffee = socket.mySeat()?.coffee
+
+  return coffee &&
+    new Date(coffee.readyAt).getTime() <= now.value &&
+    new Date(coffee.expiresAt).getTime() > now.value
+    ? coffee
+    : null
+})
 
 // One Tab stop for the whole room; arrows move between seats in DOM order.
 const activeCode = computed(() => {
   const list = seats.value
 
   return (
-    socket.heldSeatCode.value ??
+    socket.heldSeatCode ??
     list.find(seat => !seat.isOccupied)?.code ??
     list[0]?.code ??
     null
@@ -171,8 +274,49 @@ function handleKeydown(event) {
   }
 }
 
+// Minutes someone may sit without ordering before the seat is given back.
+const graceMinutes = Math.max(1, Math.round(props.cafe.orderGraceSeconds / 60))
+
+// The first control of the panel that is showing, like the study room's.
+const OWN_SEAT_FOCUS = [
+  '[data-testid="study-room-verb-group"] input:checked',
+  '[data-testid="study-room-resume-timer"]',
+  '[data-testid="study-room-next-round"]',
+  '[data-testid="study-room-pause-timer"]',
+  '[data-testid="study-room-start-break"]',
+  '[data-testid="study-room-control-panel-heading"]',
+]
+
+async function openControlPanel() {
+  const expand = document.querySelector(
+    '[data-testid="study-room-banner-expand"]'
+  )
+
+  if (expand && expand.getClientRects().length > 0) {
+    expand.click()
+    await nextTick()
+  }
+
+  for (const selector of OWN_SEAT_FOCUS) {
+    const target = document.querySelector(selector)
+
+    if (target && target.closest('[style*="display: none"]') === null) {
+      target.focus()
+
+      return
+    }
+  }
+}
+
 function activate(seat) {
-  if (seat.isYou || seat.isOccupied) {
+  // Your own seat leads to the control panel.
+  if (seat.isYou) {
+    openControlPanel()
+
+    return
+  }
+
+  if (seat.isOccupied) {
     return
   }
 
@@ -191,17 +335,37 @@ function sitDownQuickly() {
   }
 }
 
-socket.onSeatEvent(async ({ type, code }) => {
+socket.onSeatEvent(async ({ type, code, reason }) => {
+  if (type === 'released' && reason === 'seat.unordered-released') {
+    socket.errorMessage = `入座後 ${graceMinutes} 分鐘內沒有點餐，座位先還給其他同學了。`
+  }
+
   if (type === 'left' || type === 'released') {
     await nextTick()
     document.querySelector('[data-testid="cafe-quick-seat"]')?.focus()
   } else if (type === 'taken') {
     await nextTick()
-    document.querySelector(`[data-seat-code="${code}"]`)?.focus()
+    await openControlPanel()
   }
 })
 
+function handleVisibilityChange() {
+  timer.updateTabIndicators()
+
+  if (!document.hidden) {
+    timer.suppressAlreadyFinishedSound()
+    socket.refresh()
+    socket.heartbeat()
+  }
+}
+
 onMounted(async () => {
+  timer.initTabIndicators()
+  sky.startClock()
+  // The page's own socket and heartbeat take over from the shell's.
+  background.stopFor('cafe')
+  music.load()
+  document.addEventListener('visibilitychange', handleVisibilityChange)
   socket.start()
   socket.onNoteEvent(() => loadNotes())
   import('../../echo')
@@ -210,21 +374,35 @@ onMounted(async () => {
     loadNotes(),
     props.cafe.hasSchedule ? acorns.load() : null,
   ])
+
+  // The whole body, not just the page: the menu, wall and note dialogs are
+  // teleported to <body>, outside `cafe-root`.
+  twemoji.start(document.body)
 })
 
 onUnmounted(() => {
+  sky.stopClock()
   socket.stop()
+  twemoji.stop()
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
 
-  // Leaving the page gives the seat back; the idle sweep is the fallback.
-  if (socket.heldSeatCode.value) {
-    socket.leave()
+  // Leaving the page keeps the seat: the shell carries its timer readout and
+  // heartbeat (the idle sweep is the fallback if the tab is simply closed).
+  if (socket.heldSeatCode && socket.mySeat()) {
+    background.handOff(socket.mySeat(), {
+      playSound: profile.playSoundOnTimerEnd,
+      heartbeatIntervalSeconds: props.cafe.heartbeatIntervalSeconds,
+      room: 'cafe',
+    })
+  } else {
+    background.clearFor('cafe')
   }
 })
 </script>
 
 <template>
   <AppLayout>
-    <Head title="咖啡廳" />
+    <Head title="咖啡廳 - NOU 小幫手" />
 
     <div class="mx-auto max-w-3xl space-y-4 px-4 py-6" data-testid="cafe-root">
       <div class="flex flex-wrap items-center justify-between gap-2">
@@ -234,8 +412,8 @@ onUnmounted(() => {
           </h1>
           <p class="text-sm text-theme-700 dark:text-zinc-400">
             坐下來喝杯咖啡，跟隔壁的同學打個招呼。
-            <span v-if="socket.state.value" data-testid="cafe-occupants">
-              現在有 {{ socket.state.value.occupantCount }} 人在店裡。
+            <span v-if="socket.state" data-testid="cafe-occupants">
+              現在有 {{ socket.state.occupantCount }} 人在店裡。
             </span>
           </p>
         </div>
@@ -273,12 +451,12 @@ onUnmounted(() => {
       </div>
 
       <p
-        v-if="socket.errorMessage.value"
+        v-if="socket.errorMessage"
         role="alert"
         class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-900 dark:bg-red-950/50 dark:text-red-200"
         data-testid="cafe-error"
       >
-        {{ socket.errorMessage.value }}
+        {{ socket.errorMessage }}
       </p>
 
       <p
@@ -297,7 +475,7 @@ onUnmounted(() => {
         aria-label="咖啡廳操作"
       >
         <button
-          v-if="!socket.heldSeatCode.value"
+          v-if="!socket.heldSeatCode"
           type="button"
           accesskey="5"
           data-testid="cafe-quick-seat"
@@ -345,7 +523,7 @@ onUnmounted(() => {
           :socket="socket"
           :can-sit="canSit"
           :can-order="canOrder"
-          :loading="socket.loading.value && !socket.state.value"
+          :loading="socket.loading && !socket.state"
           :now="now"
           :tab-index-for="tabIndexFor"
           :notes="notes"
@@ -433,6 +611,7 @@ onUnmounted(() => {
           v-if="menuOpen"
           :menu="menu"
           :balance="acorns.balance"
+          :seated="socket.heldSeatCode !== null"
           :busy-item-id="orderBusyId"
           :error-message="orderError"
           @order="order"
@@ -458,6 +637,36 @@ onUnmounted(() => {
           @close="composerOpen = false"
         />
       </Modal>
+
+      <ActionBanner
+        v-if="canSit"
+        :visible="socket.heldSeatCode !== null"
+        :timer="timer"
+        :verbs="cafe.verbs"
+        :subjects="cafe.subjects"
+        :client-config="cafe.timerConfig"
+      >
+        <CoffeeTray
+          :coffee="socket.mySeat()?.coffee ?? null"
+          :balance="acorns.balance"
+          :busy="trayBusy"
+          :error-message="trayError"
+          :grace-minutes="graceMinutes"
+          @sip="sip"
+          @reorder="reorder"
+          @put-away="putAway"
+          @open-menu="openMenu"
+        />
+      </ActionBanner>
+
+      <FocusMode
+        v-if="canSit"
+        :sky="sky"
+        :timer="timer"
+        :profile="profile"
+        :music="music"
+        :coffee="coffeeOnTable"
+      />
     </div>
   </AppLayout>
 </template>

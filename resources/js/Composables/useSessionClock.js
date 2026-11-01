@@ -36,8 +36,12 @@ export function sessionState(ymd, startTime, endTime, nowMs) {
   return nowMs >= start - SOON_MS ? 'soon' : 'upcoming'
 }
 
-/** A reactive `now` (ms) that refreshes every 30 seconds while mounted. */
-export default function useSessionClock() {
+/**
+ * A reactive `now` (ms) that refreshes every 30 seconds while mounted, or
+ * every `intervalMs` when a page needs finer steps (the café's cups appear a
+ * few seconds after they are ordered).
+ */
+export default function useSessionClock(intervalMs = 30_000) {
   const now = ref(Date.now())
   let timer = null
 
@@ -45,7 +49,7 @@ export default function useSessionClock() {
     now.value = Date.now()
     timer = setInterval(() => {
       now.value = Date.now()
-    }, 30_000)
+    }, intervalMs)
   })
 
   onUnmounted(() => clearInterval(timer))

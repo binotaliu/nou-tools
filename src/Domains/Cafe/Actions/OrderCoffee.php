@@ -16,13 +16,14 @@ use NouTools\Domains\Acorns\Exceptions\InsufficientAcornsException;
 use NouTools\Domains\Cafe\DataTransferObjects\OrderCoffeeData;
 use NouTools\Domains\Cafe\Exceptions\DineInNeedsSeatException;
 use NouTools\Domains\Cafe\Exceptions\MenuItemUnavailableException;
+use NouTools\Domains\Cafe\Exceptions\TakeawayInCafeException;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 
 /**
  * Buys a coffee with acorns. Only one coffee sits on a student's seat at a
  * time: a new order ends whatever is still on the table. 內用 needs a café
- * seat (and is thrown away when it is left); 外帶 can be ordered anywhere and
- * goes with the student. The drink arrives `cafe.coffee.delivery_seconds`
+ * seat (and is thrown away when it is left) and is all a café seat can order;
+ * 外帶 can be ordered anywhere else and goes with the student. The drink arrives `cafe.coffee.delivery_seconds`
  * after it is ordered. The cup shows on the buyer's seat in whichever room
  * they sit, so that room is told.
  */
@@ -36,6 +37,7 @@ final readonly class OrderCoffee
     /**
      * @throws MenuItemUnavailableException
      * @throws DineInNeedsSeatException
+     * @throws TakeawayInCafeException
      * @throws InsufficientAcornsException
      */
     public function __invoke(StudentScheduleCookie $viewer, OrderCoffeeData $input): CafeOrder
@@ -46,8 +48,14 @@ final readonly class OrderCoffee
             throw new MenuItemUnavailableException;
         }
 
-        if (! $input->toGo && ! $this->holdsCafeSeat($viewer)) {
+        $holdsCafeSeat = $this->holdsCafeSeat($viewer);
+
+        if (! $input->toGo && ! $holdsCafeSeat) {
             throw new DineInNeedsSeatException;
+        }
+
+        if ($input->toGo && $holdsCafeSeat) {
+            throw new TakeawayInCafeException;
         }
 
         $order = DB::transaction(function () use ($viewer, $item, $input): CafeOrder {

@@ -9,11 +9,14 @@ const props = defineProps({
   balance: { type: Number, required: true },
   busyItemId: { type: Number, default: null },
   errorMessage: { type: String, default: null },
+  // 內用 needs a café seat and is all a café seat can order; without one only
+  // 外帶 can be ordered.
+  seated: { type: Boolean, default: true },
 })
 
 const emit = defineEmits(['order', 'close'])
 
-const toGo = ref(false)
+const toGo = ref(!props.seated)
 
 function canAfford(item) {
   return props.balance >= item.price
@@ -40,16 +43,30 @@ function canAfford(item) {
     <fieldset class="mt-2 flex gap-3 text-sm text-theme-800 dark:text-zinc-300">
       <legend class="sr-only">用餐方式</legend>
       <label class="flex items-center gap-1">
-        <input v-model="toGo" type="radio" :value="false" /> 內用
+        <input
+          v-model="toGo"
+          type="radio"
+          :value="false"
+          :disabled="!seated"
+          data-testid="cafe-menu-dine-in"
+        />
+        內用
+        <span v-if="!seated" class="text-xs text-theme-600 dark:text-zinc-400"
+          >（入座後才能內用）</span
+        >
       </label>
       <label class="flex items-center gap-1">
         <input
           v-model="toGo"
           type="radio"
           :value="true"
+          :disabled="seated"
           data-testid="cafe-menu-to-go"
         />
         外帶
+        <span v-if="seated" class="text-xs text-theme-600 dark:text-zinc-400"
+          >（坐在店裡只能內用）</span
+        >
       </label>
     </fieldset>
 

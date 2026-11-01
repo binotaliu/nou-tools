@@ -1,10 +1,16 @@
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 
 // The café mirrors the study room's socket: live seat state is fetched over
 // REST and kept in sync over Echo, never through Inertia props. Every
 // mutation awaits the server and replaces `state` with what it returned, so
 // the client never decides who won a seat. A visitor without a schedule can
 // watch (state + Echo are public) but `take` is refused by the server.
+//
+// A café seat is a study-room seat in another room, so this exposes what
+// useStudyTimer needs of a socket (mySeat, allSeats, setState,
+// resolveErrorMessage, leave, onStateChange) and the focus timer runs here
+// unchanged. Returned reactive(), so callers read `socket.heldSeatCode`, not
+// `.value`.
 export default function useCafeSocket(config) {
   const state = ref(null)
   const loading = ref(true)
@@ -17,6 +23,7 @@ export default function useCafeSocket(config) {
   let heartbeatHandle = null
   const seatEventCallbacks = []
   const noteEventCallbacks = []
+  const stateChangeCallbacks = []
 
   function onSeatEvent(callback) {
     seatEventCallbacks.push(callback)
@@ -27,9 +34,21 @@ export default function useCafeSocket(config) {
     noteEventCallbacks.push(callback)
   }
 
-  function emitSeatEvent(type, code) {
+  // Fires after the room state was replaced or patched, so the timer can
+  // restart its tick and close focus mode when the timer was ended elsewhere.
+  function onStateChange(callback) {
+    stateChangeCallbacks.push(callback)
+  }
+
+  function emitStateChange() {
+    for (const callback of stateChangeCallbacks) {
+      callback()
+    }
+  }
+
+  function emitSeatEvent(type, code, reason = null) {
     for (const callback of seatEventCallbacks) {
-      callback({ type, code })
+      callback({ type, code, reason })
     }
   }
 
@@ -40,6 +59,7 @@ export default function useCafeSocket(config) {
   function setState(next) {
     state.value = next
     heldSeatCode.value = next.seats.find(seat => seat.isYou)?.code ?? null
+    emitStateChange()
   }
 
   async function refresh() {
@@ -90,7 +110,7 @@ export default function useCafeSocket(config) {
 
       if (wasHeld && !payload.seat.isOccupied) {
         heldSeatCode.value = null
-        emitSeatEvent('released', target.code)
+        emitSeatEvent('released', target.code, payload.type)
       }
 
       Object.assign(target, payload.seat, {
@@ -100,6 +120,7 @@ export default function useCafeSocket(config) {
 
     state.value.occupantCount = payload.occupantCount
     state.value.version = payload.version
+    emitStateChange()
   }
 
   function connectRealtime() {
@@ -173,6 +194,10 @@ export default function useCafeSocket(config) {
     return seats().find(seat => seat.code === heldSeatCode.value) ?? null
   }
 
+  function allSeats() {
+    return seats()
+  }
+
   function firstFreeSeat() {
     return seats().find(seat => !seat.isOccupied) ?? null
   }
@@ -203,7 +228,7 @@ export default function useCafeSocket(config) {
     realtime.value = false
   }
 
-  return {
+  return reactive({
     state,
     loading,
     heldSeatCode,
@@ -211,8 +236,11 @@ export default function useCafeSocket(config) {
     errorMessage,
     realtime,
     seats,
+    allSeats,
     mySeat,
     firstFreeSeat,
+    setState,
+    resolveErrorMessage,
     load,
     refresh,
     take,
@@ -222,5 +250,6 @@ export default function useCafeSocket(config) {
     stop,
     onSeatEvent,
     onNoteEvent,
-  }
+    onStateChange,
+  })
 }

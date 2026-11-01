@@ -85,6 +85,8 @@ export default function useStudyRoomDemo(config) {
             emoji: '☕',
             cupStyle: 'mug',
             toGo: false,
+            readyAt: new Date(mountedAt - 1000).toISOString(),
+            level: 1,
             expiresAt: new Date(mountedAt + 60 * 60 * 1000).toISOString(),
           }
         : null,

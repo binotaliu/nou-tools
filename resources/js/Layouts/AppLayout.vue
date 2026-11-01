@@ -96,8 +96,11 @@ function onDocumentKeydown(event) {
 }
 
 onMounted(() => {
-  // The room page runs its own socket and heartbeat.
-  if (!currentPath.value.startsWith('/study-room')) {
+  // The room pages run their own socket and heartbeat.
+  if (
+    !currentPath.value.startsWith('/study-room') &&
+    !currentPath.value.startsWith('/cafe')
+  ) {
     studyRoomBackground.bootstrap()
   }
 

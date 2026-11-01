@@ -6,6 +6,7 @@ namespace NouTools\Domains\StudyRoom\Actions;
 
 use App\Enums\StudyRoomVenue;
 use App\Models\StudyRoomSeat;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use NouTools\Domains\Cafe\Actions\TossDineInOrders;
@@ -37,7 +38,18 @@ final readonly class ReleaseIdleSeats
             ->where('last_seen_at', '<', $cutoff)
             ->get();
 
-        foreach ($idleSeats as $seat) {
+        return $this->release($idleSeats, 'seat.idle-released');
+    }
+
+    /**
+     * Gives each of the seats back (recording its session and, in the café,
+     * throwing away the 內用 drinks) and tells its room.
+     *
+     * @param  Collection<int, StudyRoomSeat>  $seats
+     */
+    public function release(Collection $seats, string $broadcastType): int
+    {
+        foreach ($seats as $seat) {
             $scheduleId = $seat->student_schedule_id;
 
             DB::transaction(function () use ($seat, $scheduleId): void {
@@ -63,9 +75,9 @@ final readonly class ReleaseIdleSeats
                 }
             });
 
-            ($this->broadcastSeatChange)('seat.idle-released', $seat);
+            ($this->broadcastSeatChange)($broadcastType, $seat);
         }
 
-        return $idleSeats->count();
+        return $seats->count();
     }
 }

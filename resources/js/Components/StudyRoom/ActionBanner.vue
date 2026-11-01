@@ -223,6 +223,12 @@ defineProps({
               v-show="!minimized"
               class="relative max-h-[70dvh] overflow-y-auto overscroll-contain px-4 pt-0 pb-4 sm:px-6 sm:pt-6 sm:pb-5"
             >
+              <!-- Whatever else the host page keeps at the seat (the café's
+              coffee tray). Empty in the study room. -->
+              <div v-if="$slots.default" class="mb-4">
+                <slot />
+              </div>
+
               <!-- Spoken through the page's announcer; shown here so a
               failed start/pause/leave isn't silent on screen either. -->
               <p

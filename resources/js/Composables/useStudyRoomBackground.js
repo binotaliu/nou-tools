@@ -1,20 +1,26 @@
 import { reactive } from 'vue'
 import { playTimerFinishedSound } from '../study-room-sound'
 
-// What the study room hands to the shell when its page unmounts while the
-// viewer still holds a seat: the seat's timer columns (for the pill's
+// What the study room (or the café, whose seats are study-room seats in
+// another room) hands to the shell when its page unmounts while the viewer
+// still holds a seat: the seat's timer columns (for the pill's
 // readout) and a heartbeat that keeps the seat alive, since the page's own
 // socket stops with it. There is no Echo here: the viewer's own timer only
 // changes through their own actions, so a refresh when the tab becomes
 // visible again is enough.
 //
 // The hint in localStorage lets a full page load elsewhere pick the seat back
-// up. It is only a hint: `/study-room/state` stays the authority, and a
-// missing seat there clears it.
+// up. It is only a hint: the room's state endpoint stays the authority, and a
+// missing seat there clears it. `room` says which one to ask.
 const HINT_KEY = 'nou:study-room:seated:v1'
 const DEFAULT_INTERVAL_SECONDS = 60
 
-const state = reactive({ seat: null, playSound: false })
+const ROOM_URLS = {
+  study: { state: '/study-room/state', heartbeat: '/study-room/heartbeat' },
+  cafe: { state: '/cafe/state', heartbeat: '/cafe/heartbeat' },
+}
+
+const state = reactive({ seat: null, playSound: false, room: 'study' })
 
 // Bumped by stop(), so a request that was in flight when the room page took
 // over doesn't resurrect the shell's seat afterwards.
@@ -47,6 +53,11 @@ function removeHint() {
 }
 
 function findMySeat(roomState) {
+  // The café's state is a flat list of seats.
+  if (roomState.seats) {
+    return roomState.seats.find(seat => seat.isYou) ?? null
+  }
+
   for (const floor of roomState.floors ?? []) {
     const solo = floor.soloSeats.find(seat => seat.isYou)
 
@@ -88,7 +99,7 @@ function suppressAlreadyFinishedSound() {
 
 async function heartbeat() {
   try {
-    const response = await window.axios.post('/study-room/heartbeat')
+    const response = await window.axios.post(ROOM_URLS[state.room].heartbeat)
 
     if (!response.data.stillSeated) {
       clear()
@@ -102,7 +113,7 @@ async function refresh() {
   const startedIn = generation
 
   try {
-    const response = await window.axios.get('/study-room/state')
+    const response = await window.axios.get(ROOM_URLS[state.room].state)
 
     if (startedIn !== generation) {
       return
@@ -157,14 +168,39 @@ function clear() {
   removeHint()
 }
 
-// Called by the study room page when it unmounts while holding a seat.
-function handOff(seat, { playSound, heartbeatIntervalSeconds }) {
+// The seat the shell is carrying belongs to one room. A page of the other
+// room (the café while a study seat is carried, or the reverse) must leave it
+// alone: stopping its heartbeat would let the seat idle out.
+function ownedBy(room) {
+  const owner = state.seat ? state.room : (readHint()?.room ?? room)
+
+  return owner === room
+}
+
+function stopFor(room) {
+  if (ownedBy(room)) {
+    stop()
+  }
+}
+
+function clearFor(room) {
+  if (ownedBy(room)) {
+    clear()
+  }
+}
+
+// Called by the study room or café page when it unmounts while holding a seat.
+function handOff(
+  seat,
+  { playSound, heartbeatIntervalSeconds, room = 'study' }
+) {
   const interval = heartbeatIntervalSeconds || DEFAULT_INTERVAL_SECONDS
 
+  state.room = room
   state.seat = timerFields(seat)
   state.playSound = Boolean(playSound)
   suppressAlreadyFinishedSound()
-  writeHint({ interval, playSound: state.playSound })
+  writeHint({ interval, playSound: state.playSound, room })
   startHeartbeat(interval)
 }
 
@@ -180,6 +216,7 @@ async function bootstrap() {
   const startedIn = generation
 
   state.playSound = Boolean(hint.playSound)
+  state.room = hint.room === 'cafe' ? 'cafe' : 'study'
   await refresh()
 
   if (state.seat && startedIn === generation) {
@@ -209,5 +246,14 @@ function checkTimerEnd(nowMs) {
 }
 
 export default function useStudyRoomBackground() {
-  return { state, handOff, stop, clear, bootstrap, checkTimerEnd }
+  return {
+    state,
+    handOff,
+    stop,
+    clear,
+    stopFor,
+    clearFor,
+    bootstrap,
+    checkTimerEnd,
+  }
 }

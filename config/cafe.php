@@ -101,6 +101,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Seat
+    |--------------------------------------------------------------------------
+    |
+    | A café seat is for having something: a focus timer cannot start without
+    | a drink on the table, and a student who has ordered nothing
+    | `order_grace_seconds` after sitting down is asked to leave the seat.
+    |
+    */
+
+    'seat' => [
+        'order_grace_seconds' => 180,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Heartbeat
     |--------------------------------------------------------------------------
     |

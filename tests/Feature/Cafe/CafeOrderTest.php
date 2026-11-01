@@ -97,7 +97,7 @@ it('needs a café seat for dine-in but not for takeaway', function () use ($orde
         ->assertJsonPath('message', '內用要先在咖啡廳入座喔，或改點外帶。');
 
     // A study-room seat is not a café seat.
-    StudyRoomSeat::factory()->occupiedBy($schedule)->create();
+    $studySeat = StudyRoomSeat::factory()->occupiedBy($schedule)->create();
     $this->withCredentials()->withCookie('student_schedule', $cookie)
         ->postJson(route('cafe.orders.store'), ['menuItemId' => $item->id, 'toGo' => false])
         ->assertStatus(422);
@@ -191,4 +191,22 @@ it('refuses when acorns are short, the item is off the menu or there is no nickn
 
     expect(CafeOrder::query()->count())->toBe(0)
         ->and(app(ReadAcornBalance::class)($poor->id)->balance)->toBe(2);
+});
+
+it('only lets someone sitting in the café order dine-in', function () use ($orderCookie, $richStudent) {
+    $schedule = $richStudent(10);
+    StudyRoomSeat::factory()->cafe()->occupiedBy($schedule)->create();
+    $item = CafeMenuItem::query()->firstOrFail();
+
+    $this->withCredentials()->withCookie('student_schedule', $orderCookie($schedule))
+        ->postJson(route('cafe.orders.store'), ['menuItemId' => $item->id, 'toGo' => true])
+        ->assertStatus(422)
+        ->assertJsonPath('message', '坐在咖啡廳裡只能內用喔。');
+
+    expect(CafeOrder::query()->count())->toBe(0)
+        ->and(app(ReadAcornBalance::class)($schedule->id)->balance)->toBe(10);
+
+    $this->withCredentials()->withCookie('student_schedule', $orderCookie($schedule))
+        ->postJson(route('cafe.orders.store'), ['menuItemId' => $item->id, 'toGo' => false])
+        ->assertOk();
 });

@@ -26,7 +26,13 @@ export default function useSeatGrid(socket, config) {
       return null
     }
 
-    return new Date(seat.coffee.expiresAt).getTime() > Date.now()
+    // Nothing is on the table until the drink has been made (`readyAt`).
+    const now = Date.now()
+    const readyAt = seat.coffee.readyAt
+      ? new Date(seat.coffee.readyAt).getTime()
+      : 0
+
+    return readyAt <= now && new Date(seat.coffee.expiresAt).getTime() > now
       ? seat.coffee
       : null
   }

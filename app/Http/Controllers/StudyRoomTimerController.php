@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use NouTools\Domains\Cafe\Exceptions\CoffeeRequiredException;
 use NouTools\Domains\StudyRoom\Actions\BuildHeldRoomState;
 use NouTools\Domains\StudyRoom\Actions\ChangeStudyActivity;
 use NouTools\Domains\StudyRoom\Actions\StartStudyTimer;
@@ -29,6 +30,8 @@ final class StudyRoomTimerController extends Controller
             $startStudyTimer($viewer, $input);
         } catch (NoSeatHeldException $exception) {
             return response()->json(['message' => $exception->getMessage()], 403);
+        } catch (CoffeeRequiredException $exception) {
+            return response()->json(['message' => $exception->getMessage()], 422);
         }
 
         return response()->json(['ok' => true, 'state' => $buildStudyRoomState($viewer)]);

@@ -6,10 +6,12 @@ namespace NouTools\Domains\StudyRoom\Actions;
 
 use App\Enums\StudyTimerMode;
 use App\Enums\StudyTimerPhase;
+use App\Models\CafeOrder;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use NouTools\Domains\Cafe\Exceptions\CoffeeRequiredException;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 use NouTools\Domains\StudyRoom\DataTransferObjects\StartStudyTimerData;
 use NouTools\Domains\StudyRoom\Exceptions\NoSeatHeldException;
@@ -43,6 +45,11 @@ final readonly class StartStudyTimer
                 throw new NoSeatHeldException;
             }
 
+            // A café seat is for having something: no drink, no focus.
+            if ($seat->isCafe() && ! $this->hasDrinkOnTable($viewer)) {
+                throw new CoffeeRequiredException;
+            }
+
             $isPomodoro = $data->mode === StudyTimerMode::Pomodoro;
 
             $minutes = match (true) {
@@ -73,6 +80,14 @@ final readonly class StartStudyTimer
         ($this->broadcastSeatChange)('timer.started', $seat);
 
         return $seat;
+    }
+
+    private function hasDrinkOnTable(StudentScheduleCookie $viewer): bool
+    {
+        return CafeOrder::query()
+            ->where('student_schedule_id', $viewer->id)
+            ->where('expires_at', '>', Date::now())
+            ->exists();
     }
 
     /**

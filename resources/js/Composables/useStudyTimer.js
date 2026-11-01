@@ -8,7 +8,8 @@ import { playTimerFinishedSound } from '../study-room-sound'
 
 // The Study Room page's <Head title> (resources/js/Pages/StudyRoom/Show.vue)
 // is a static string with no dynamic segment, so it can be hardcoded here
-// instead of sniffed back out of document.title on every tick.
+// instead of sniffed back out of document.title on every tick. The café runs
+// the same timer and passes its own page title as `options.title`.
 const STUDY_ROOM_TITLE = '自習室 - NOU 小幫手'
 
 // Everything the banner (and focus mode) shows is derived from the held
@@ -24,8 +25,10 @@ export default function useStudyTimer(
   initialCycle,
   profile,
   verbs = [],
-  subjects = []
+  subjects = [],
+  options = {}
 ) {
+  const pageTitle = options.title ?? STUDY_ROOM_TITLE
   const now = ref(Date.now())
   const panelBusy = ref(false)
   const errorMessage = ref(null)
@@ -192,14 +195,14 @@ export default function useStudyTimer(
     }
 
     document.title =
-      remainingLabel(seat) + ' ' + timerPhaseLabel() + ' - ' + STUDY_ROOM_TITLE
+      remainingLabel(seat) + ' ' + timerPhaseLabel() + ' - ' + pageTitle
 
     applyStageFavicon(isOnBreak() ? '#10b981' : '#b05139')
   }
 
   function resetTabIndicators() {
-    if (document.title !== STUDY_ROOM_TITLE) {
-      document.title = STUDY_ROOM_TITLE
+    if (document.title !== pageTitle) {
+      document.title = pageTitle
     }
 
     resetFavicon()

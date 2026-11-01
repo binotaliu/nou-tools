@@ -27,10 +27,22 @@ const background = useStudyRoomBackground()
 
 const seat = computed(() => background.state.seat)
 const hasTimer = computed(() => Boolean(seat.value?.timerMode))
-const onRoomPage = computed(
+const onStudyRoomPage = computed(
   () =>
     props.currentPath === '/study-room' ||
     props.currentPath.startsWith('/study-room/')
+)
+const onCafePage = computed(
+  () => props.currentPath === '/cafe' || props.currentPath.startsWith('/cafe/')
+)
+// The café's seat panel has the timer but its tape controls only live in
+// focus mode, so the pill stays on that page while a tape is loaded.
+const onRoomPage = computed(
+  () => onStudyRoomPage.value || (onCafePage.value && !music.loaded)
+)
+// Back to whichever room the seat (or the page being left) belongs to.
+const inCafe = computed(
+  () => onCafePage.value || background.state.room === 'cafe'
 )
 // The room has its own deck and timer, so the pill only shows elsewhere.
 const visible = computed(
@@ -141,11 +153,11 @@ const buttonClass =
       </template>
 
       <Link
-        href="/study-room"
+        :href="inCafe ? '/cafe' : '/study-room'"
         class="shrink-0 rounded-full px-3 py-2 text-sm font-medium text-theme-700 underline decoration-dotted underline-offset-2 hover:decoration-solid focus-visible:ring-2 focus-visible:ring-theme-500 focus-visible:outline-none dark:text-zinc-200"
         data-testid="shell-player-room"
       >
-        回到自習室
+        {{ inCafe ? '回到咖啡廳' : '回到自習室' }}
       </Link>
 
       <button
