@@ -57,7 +57,8 @@ it('keeps the nameplate and control panel usable at the largest text size on a p
 
     $page->click('[data-testid="study-room-start-timer"]');
 
-    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-your-countdown"]\') !== null');
+    // The timer panel is `v-show`n, so the countdown exists before it has a size.
+    waitUntil($page, 'document.querySelector(\'[data-testid="study-room-timer-activity"]\')?.getBoundingClientRect().width > 0');
 
     // The countdown gets its own row, so the activity label keeps its width.
     expect($width('[data-testid="study-room-timer-activity"]'))->toBeGreaterThan(120);
