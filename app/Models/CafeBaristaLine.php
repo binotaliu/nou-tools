@@ -15,6 +15,9 @@ final class CafeBaristaLine extends Model
     /** @use HasFactory<CafeBaristaLineFactory> */
     use HasFactory;
 
+    // Filament fills these from the admin form; nothing public writes them.
+    protected $fillable = ['trigger', 'conditions', 'text', 'mood', 'replies', 'priority', 'weight', 'is_active'];
+
     protected $casts = [
         'trigger' => BaristaTrigger::class,
         'conditions' => 'array',

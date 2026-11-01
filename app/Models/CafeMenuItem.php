@@ -14,6 +14,9 @@ final class CafeMenuItem extends Model
     /** @use HasFactory<CafeMenuItemFactory> */
     use HasFactory;
 
+    // Filament fills these from the admin form; nothing public writes them.
+    protected $fillable = ['name', 'emoji', 'cup_style', 'description', 'price', 'is_active', 'sort'];
+
     protected $casts = [
         'price' => 'integer',
         'is_active' => 'boolean',
