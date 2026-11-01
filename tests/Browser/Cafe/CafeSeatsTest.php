@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\MusicPlaylist;
+use App\Models\MusicPlaylistItem;
+use App\Models\MusicTrack;
 use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
@@ -55,4 +58,20 @@ it('lets a signed-in student sit down and get up', function () {
     waitUntil($page, 'document.querySelector(\'[data-testid="cafe-quick-seat"]\') !== null');
 
     expect(StudyRoomSeat::query()->where('room', 'cafe')->where('code', 'B01')->value('student_schedule_id'))->toBeNull();
+});
+
+it('has the tape deck under the room, without the shell pill on top of it', function () {
+    $playlist = MusicPlaylist::factory()->create(['title' => '咖啡廳爵士']);
+    MusicPlaylistItem::factory()
+        ->for($playlist, 'playlist')
+        ->for(MusicTrack::factory()->create(['title' => 'Corner Table']), 'track')
+        ->create(['position' => 0]);
+
+    $page = visit(route('cafe.show'));
+    dismissCookieConsentBanner($page);
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-music"]\') !== null');
+
+    $page->assertVisible('[data-testid="cafe-music"]')
+        ->assertMissing('[data-testid="shell-player"]');
 });

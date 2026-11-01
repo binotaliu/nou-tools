@@ -16,6 +16,7 @@ import ActionBanner from '../../Components/StudyRoom/ActionBanner.vue'
 import FocusMode from '../../Components/StudyRoom/FocusMode.vue'
 import CoffeeTray from '../../Components/Cafe/CoffeeTray.vue'
 import BaristaDialogue from '../../Components/Cafe/BaristaDialogue.vue'
+import CassettePlayer from '../../Components/StudyRoom/CassettePlayer.vue'
 import CafeFloor from '../../Components/Cafe/CafeFloor.vue'
 import StickyNoteComposer from '../../Components/Cafe/StickyNoteComposer.vue'
 import StickyNoteWall from '../../Components/Cafe/StickyNoteWall.vue'
@@ -544,6 +545,16 @@ onUnmounted(() => {
           </template>
         </CafeFloor>
       </div>
+
+      <!-- The same tape deck as the study room's Wall (one shared player, so
+      a tape plays on through focus mode and other pages). It sits under the
+      room, where its popover opens over the floor. -->
+      <CassettePlayer
+        v-if="music.available"
+        :music="music"
+        class="mx-auto w-full max-w-xs"
+        data-testid="cafe-music"
+      />
 
       <ul
         class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-theme-700 dark:text-zinc-400"

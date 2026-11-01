@@ -35,11 +35,8 @@ const onStudyRoomPage = computed(
 const onCafePage = computed(
   () => props.currentPath === '/cafe' || props.currentPath.startsWith('/cafe/')
 )
-// The café's seat panel has the timer but its tape controls only live in
-// focus mode, so the pill stays on that page while a tape is loaded.
-const onRoomPage = computed(
-  () => onStudyRoomPage.value || (onCafePage.value && !music.loaded)
-)
+// Both rooms have their own deck and timer, so the pill only shows elsewhere.
+const onRoomPage = computed(() => onStudyRoomPage.value || onCafePage.value)
 // Back to whichever room the seat (or the page being left) belongs to.
 const inCafe = computed(
   () => onCafePage.value || background.state.room === 'cafe'
