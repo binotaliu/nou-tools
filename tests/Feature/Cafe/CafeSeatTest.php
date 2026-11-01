@@ -24,7 +24,8 @@ it('syncs the layout from config and leaves occupied seats alone when it shrinks
     $sync = app(SyncCafeSeats::class);
 
     // 6 stools + 4 tables x 2 + 6 communal
-    expect($sync())->toBe(20);
+    expect($sync())->toBe(20)
+        ->and(CafeSeat::query()->where('code', 'W2-1')->value('label'))->toBe('靠牆 2 號桌 1 位');
 
     $schedule = $profiled();
     CafeSeat::query()->where('code', 'B06')->update(['student_schedule_id' => $schedule->id]);

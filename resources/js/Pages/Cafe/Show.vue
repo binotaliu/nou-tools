@@ -365,13 +365,13 @@ onUnmounted(() => {
       >
         <li class="inline-flex items-center gap-1.5">
           <span
-            class="size-3 rounded-sm border-2 border-b-[3px] border-theme-300 bg-white dark:border-zinc-600 dark:bg-zinc-800"
+            class="size-3 rounded-sm border-2 border-b-[3px] border-[#7d604c] bg-[#46342a]"
           ></span>
           空位
         </li>
         <li class="inline-flex items-center gap-1.5">
           <span
-            class="size-3 rounded-sm border-2 border-theme-400 bg-white dark:border-zinc-500 dark:bg-zinc-800"
+            class="size-3 rounded-sm border-2 border-[#d9c4a5] bg-[#f3e6d3]"
           ></span>
           有人
         </li>

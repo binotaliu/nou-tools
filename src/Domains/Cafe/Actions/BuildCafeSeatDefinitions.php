@@ -39,7 +39,7 @@ final readonly class BuildCafeSeatDefinitions
                     'group_code' => 'W'.$table,
                     'seat_number' => $number,
                     'code' => sprintf('W%d-%d', $table, $number),
-                    'label' => sprintf('窗邊 %d 號桌 %d 位', $table, $number),
+                    'label' => sprintf('靠牆 %d 號桌 %d 位', $table, $number),
                 ];
             }
         }

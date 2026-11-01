@@ -3,7 +3,8 @@
 // or a chair whose backrest sits on the edge that faces away from its table
 // (`backrest`), the same trick the study room's TableChair uses. Like those
 // seats it is `aria-disabled` rather than `disabled` when it can't be taken,
-// so focus never drops and the occupant stays readable.
+// so focus never drops and the occupant stays readable. The colours are the
+// café's own, not the theme's: the room is dark wood in both themes.
 import { computed } from 'vue'
 
 const props = defineProps({
@@ -67,14 +68,14 @@ const shapeClasses = computed(() => {
 
 const stateClasses = computed(() => {
   if (mine.value) {
-    return 'border-amber-400 bg-amber-50 shadow-sm dark:border-amber-600 dark:bg-amber-950/40'
+    return 'border-amber-400 bg-amber-50'
   }
 
   if (props.seat.isOccupied) {
-    return 'border-theme-400 bg-white shadow-sm dark:border-zinc-500 dark:bg-zinc-800'
+    return 'border-[#d9c4a5] bg-[#f3e6d3]'
   }
 
-  return 'border-theme-300 bg-white/70 hover:border-theme-400 hover:bg-white dark:border-zinc-600 dark:bg-zinc-800/60 dark:hover:border-zinc-500 dark:hover:bg-zinc-800'
+  return 'border-[#7d604c] bg-[#46342a] hover:border-[#a08068] hover:bg-[#523d31]'
 })
 </script>
 
@@ -108,11 +109,9 @@ const stateClasses = computed(() => {
       <span v-if="seat.isOccupied" class="text-lg leading-none">{{
         seat.emoji
       }}</span>
-      <span
-        v-else
-        class="text-[0.625rem] font-medium text-theme-700 dark:text-zinc-400"
-        >{{ seat.seatNumber }}</span
-      >
+      <span v-else class="text-[0.625rem] font-medium text-[#d9c4a5]">{{
+        seat.seatNumber
+      }}</span>
       <span
         v-if="coffee"
         class="absolute -top-2 -right-2 text-sm leading-none drop-shadow-sm"
@@ -129,8 +128,8 @@ const stateClasses = computed(() => {
       class="max-w-full truncate text-[0.625rem] leading-tight font-medium"
       :class="
         seat.isOccupied
-          ? 'text-theme-900 dark:text-zinc-100'
-          : 'text-theme-600 opacity-0 transition group-hover:opacity-100 dark:text-zinc-400'
+          ? 'text-amber-50'
+          : 'text-amber-100/80 opacity-0 transition group-hover:opacity-100'
       "
       aria-hidden="true"
     >

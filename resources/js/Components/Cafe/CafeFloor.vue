@@ -1,15 +1,21 @@
 <script setup>
-// The café as one room, drawn the way the study room draws its floors: a
-// thick-bordered box with the back wall at the top (window, the corkboard,
-// the menu board and the espresso machine), the counter with the squirrel
-// behind it and stools in front, then the wood floor with small tables by the
-// side window, the long communal table on a rug, plants in the corners and
-// the door at the bottom right. The corkboard and the menu board are buttons:
-// they open the wall and the menu in modals, so the room itself is the UI.
+// The café as one room, drawn flat the way the study room draws its floors: a
+// thick-bordered box with the back wall at the top, then the counter, then
+// the wood floor. Unlike the study room it keeps its own dim, warm palette in
+// both themes (dark wood, brass lamps, a burgundy rug), like a real café, and
+// it has no windows. Flat fills only: no gradients, glows or drop shadows.
+//
+// The back wall carries shelves of beans and cups, the corkboard and the
+// chalk menu board; the corkboard and the menu board are buttons that open
+// the wall and the menu in modals, so the room itself is the UI. On the
+// counter stand the pastry case, the acorn tip jar, the squirrel and the
+// espresso machine. Below it: the stools, the small tables along the left
+// wall, the long table on a rug, and the door in the right wall.
 //
 // Seats are the real `CafeSeat` buttons (one roving Tab stop, handled by the
 // page), so the drawing never hides who is sitting where.
 import { computed } from 'vue'
+import AcornIcon from '../Acorns/AcornIcon.vue'
 import Barista from './Barista.vue'
 import CafePlant from './CafePlant.vue'
 import CafeSeat from './CafeSeat.vue'
@@ -39,7 +45,9 @@ const communalTop = computed(() =>
 const communalBottom = computed(() =>
   communalSeats.value.slice(Math.ceil(communalSeats.value.length / 2))
 )
-const windowTables = computed(() => {
+// The small tables along the left wall (stored as kind `window`, from before
+// the room lost its windows).
+const smallTables = computed(() => {
   const tables = new Map()
 
   for (const seat of props.seats.filter(item => item.kind === 'window')) {
@@ -57,30 +65,75 @@ const wallLabel = computed(() =>
     ? `便利貼牆，${props.notes.length} 張便利貼，打開看清楚`
     : '便利貼牆，還沒有便利貼，打開看看'
 )
+
+// Pendant lamps over the counter; the middle one only shows from `sm` up,
+// where the wall is wide enough for three.
+const LAMPS = [
+  { position: 'left-[16%]', wide: false },
+  { position: 'left-1/2', wide: true },
+  { position: 'left-[84%]', wide: false },
+]
 </script>
 
 <template>
   <div
-    class="relative overflow-hidden rounded-2xl border-[6px] border-theme-300 bg-theme-100/60 shadow-sm dark:border-zinc-600 dark:bg-zinc-900"
+    class="relative rounded-2xl border-[6px] border-[#5e4535] bg-[#2f231c] shadow-sm [--focus-ring-color:var(--color-amber-300)]"
     data-testid="cafe-floor"
   >
     <!-- ───── back wall ───── -->
     <div
-      class="relative border-b-4 border-theme-300/70 bg-[linear-gradient(to_bottom,var(--color-theme-50),var(--color-theme-100))] px-3 pt-3 dark:border-zinc-700 dark:bg-[linear-gradient(to_bottom,var(--color-zinc-800),var(--color-zinc-900))]"
+      class="relative overflow-hidden rounded-t-[10px] bg-[#3b2b22] bg-[repeating-linear-gradient(90deg,transparent_0_5.5rem,rgba(255,255,255,0.04)_5.5rem_calc(5.5rem+1px))] px-3 pt-11"
       data-testid="cafe-scene"
     >
-      <div class="flex items-end justify-between gap-3">
-        <!-- window with a bit of sky -->
+      <!-- pendant lamps and the flat cone of light under each -->
+      <div
+        v-for="lamp in LAMPS"
+        :key="lamp.position"
+        class="pointer-events-none absolute top-0 -translate-x-1/2 flex-col items-center"
+        :class="[lamp.position, lamp.wide ? 'hidden sm:flex' : 'flex']"
+        aria-hidden="true"
+      >
+        <span class="h-3 w-0.5 bg-[#8a6246]"></span>
+        <span class="h-3.5 w-8 rounded-t-full bg-[#c9974f]"></span>
+        <span class="-mt-1 size-2.5 rounded-full bg-amber-100"></span>
+        <span
+          class="-mt-1 h-24 w-36 bg-amber-100/[0.07] [clip-path:polygon(40%_0,60%_0,100%_100%,0_100%)]"
+        ></span>
+      </div>
+
+      <div class="relative flex items-center justify-center gap-3 sm:gap-5">
+        <!-- shelf: beans and a plant -->
         <div
-          class="hidden h-24 w-24 shrink-0 overflow-hidden rounded-t-full border-4 border-theme-300 bg-linear-to-b from-sky-200 to-sky-50 sm:block dark:border-zinc-600 dark:from-indigo-950 dark:to-slate-800"
+          class="hidden w-24 shrink-0 flex-col gap-4 sm:flex"
           aria-hidden="true"
         >
-          <div
-            class="h-full w-full border-x-2 border-theme-300/70 dark:border-zinc-600/70"
-          >
-            <span
-              class="mt-6 block h-3 w-8 rounded-full bg-white/70 dark:bg-zinc-400/20"
-            ></span>
+          <div>
+            <div class="flex items-end justify-around px-1">
+              <span
+                v-for="n in 3"
+                :key="n"
+                class="relative block w-5 rounded-t-md rounded-b-sm border-2 border-[#d9c4a5] bg-[#5b3a24]"
+                :class="n === 2 ? 'h-8' : 'h-7'"
+              >
+                <span
+                  class="absolute -inset-x-0.5 -top-2 h-1.5 rounded-sm bg-[#c9974f]"
+                ></span>
+              </span>
+            </div>
+            <div class="h-1.5 rounded-sm bg-[#8a6246]"></div>
+          </div>
+          <div>
+            <div class="flex items-end justify-around px-1">
+              <span class="h-8"><CafePlant variant="small" /></span>
+              <span class="flex flex-col items-center gap-px">
+                <span
+                  v-for="n in 3"
+                  :key="n"
+                  class="block h-2 w-5 rounded-b-md bg-[#f3e6d3]"
+                ></span>
+              </span>
+            </div>
+            <div class="h-1.5 rounded-sm bg-[#8a6246]"></div>
           </div>
         </div>
 
@@ -88,23 +141,23 @@ const wallLabel = computed(() =>
         <button
           type="button"
           accesskey="6"
-          class="group relative w-32 shrink-0 rounded-md border-4 border-amber-900/60 bg-amber-900/60 p-px text-left shadow-md transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 sm:w-52 dark:border-amber-800/70 dark:bg-amber-800/70"
+          class="group relative w-36 shrink-0 rounded-md border-4 border-[#8a6246] bg-[#8a6246] p-px text-left transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 sm:w-52"
           :aria-label="wallLabel"
           data-testid="cafe-wall-open"
           @click="emit('open-wall')"
         >
           <StickyNoteBoard :notes="notes" compact />
           <span
-            class="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-theme-800 px-2 py-px text-[0.625rem] font-semibold whitespace-nowrap text-white shadow-sm transition group-hover:bg-theme-900 dark:bg-zinc-700"
+            class="pointer-events-none absolute -bottom-2.5 left-1/2 -translate-x-1/2 rounded-full border-2 border-[#8a6246] bg-[#2f231c] px-2 text-[0.625rem] font-semibold whitespace-nowrap text-amber-50 transition group-hover:bg-[#46342a]"
             aria-hidden="true"
             >便利貼牆</span
           >
         </button>
 
-        <!-- menu board: click to order -->
+        <!-- chalk menu board: click to order -->
         <button
           type="button"
-          class="shrink-0 -rotate-1 rounded-md border-4 border-amber-900/70 bg-zinc-800 px-2 py-2 text-center text-xs font-semibold text-amber-100 shadow-sm transition hover:rotate-0 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-default disabled:hover:-rotate-1 sm:px-3"
+          class="shrink-0 -rotate-1 rounded-md border-4 border-[#8a6246] bg-[#26302a] px-2.5 py-2 text-center text-xs font-semibold text-amber-50 transition hover:rotate-0 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-default disabled:hover:-rotate-1 sm:px-3 sm:py-2.5"
           :disabled="!canOrder"
           :aria-label="
             canOrder ? '今日菜單，打開點餐' : '今日菜單（入座後才能點餐）'
@@ -116,84 +169,158 @@ const wallLabel = computed(() =>
             >今日菜單</span
           >
           <span
-            class="mt-0.5 hidden font-normal whitespace-nowrap text-zinc-300 sm:block"
-            >美式・拿鐵・抹茶拿鐵</span
+            class="mx-auto mt-1 block h-px w-10 bg-amber-50/30"
+            aria-hidden="true"
+          ></span>
+          <span
+            class="mt-1 block leading-snug font-normal whitespace-nowrap text-zinc-300"
+            aria-hidden="true"
+            >美式<span class="hidden sm:inline">・拿鐵・抹茶拿鐵</span></span
+          >
+          <span
+            class="mt-0.5 block text-[0.625rem] font-normal whitespace-nowrap text-amber-200/80 sm:hidden"
+            aria-hidden="true"
+            >拿鐵・抹茶</span
           >
         </button>
 
-        <!-- the squirrel and the espresso machine behind the counter -->
-        <div class="relative flex shrink-0 items-end gap-1" aria-hidden="true">
-          <div class="relative -mb-4">
-            <Barista :mood="baristaMood" class="size-16 sm:size-24" />
+        <!-- shelf: cups and a bottle -->
+        <div
+          class="hidden w-24 shrink-0 flex-col gap-4 sm:flex"
+          aria-hidden="true"
+        >
+          <div>
+            <div class="flex items-end justify-around px-1">
+              <span
+                v-for="n in 3"
+                :key="n"
+                class="relative block h-4 w-5 rounded-b-lg bg-[#f3e6d3] after:absolute after:top-1 after:-right-1.5 after:size-2 after:rounded-full after:border-2 after:border-[#f3e6d3]"
+              ></span>
+            </div>
+            <div class="h-1.5 rounded-sm bg-[#8a6246]"></div>
           </div>
-          <div class="relative hidden sm:block">
+          <div>
+            <div class="flex items-end justify-around px-1">
+              <span class="flex flex-col items-center">
+                <span class="h-2 w-1.5 rounded-t-sm bg-[#4f7a4d]"></span>
+                <span
+                  class="h-7 w-4 rounded-t-md rounded-b-sm bg-[#4f7a4d]"
+                ></span>
+              </span>
+              <span
+                class="relative block h-7 w-6 rounded-t-md rounded-b-sm border-2 border-[#d9c4a5] bg-[#2f1a0e]"
+              >
+                <span
+                  class="absolute -inset-x-0.5 -top-2 h-1.5 rounded-sm bg-[#c9974f]"
+                ></span>
+              </span>
+            </div>
+            <div class="h-1.5 rounded-sm bg-[#8a6246]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- what stands on the counter, with the squirrel behind it -->
+      <div
+        class="relative mt-5 flex items-end justify-between gap-2 px-1 sm:px-4"
+        aria-hidden="true"
+      >
+        <div class="flex items-end gap-2 sm:gap-3">
+          <!-- pastry case -->
+          <div
+            class="w-26 rounded-t-lg border-2 border-b-0 border-[#d9c4a5] bg-[#4a372c] px-1 pt-1 sm:w-34"
+          >
+            <div class="flex justify-around text-sm leading-none sm:text-base">
+              <span>🥐</span><span>🍰</span
+              ><span class="hidden sm:inline">🥯</span>
+            </div>
+            <div class="mt-0.5 h-0.5 bg-[#d9c4a5]"></div>
+            <div
+              class="flex justify-around pt-0.5 text-sm leading-none sm:text-base"
+            >
+              <span>🍪</span><span>🧁</span
+              ><span class="hidden sm:inline">🍩</span>
+            </div>
+          </div>
+
+          <!-- acorn tip jar -->
+          <div class="flex flex-col items-center">
+            <span class="-mb-px h-1.5 w-6 rounded-t-sm bg-[#c9974f]"></span>
+            <span
+              class="flex h-8 w-7 flex-wrap content-end items-end justify-center rounded-b-lg border-2 border-t-0 border-[#d9c4a5] bg-[#4a372c] pb-0.5"
+            >
+              <AcornIcon size="size-3" />
+              <AcornIcon size="size-3" />
+              <AcornIcon size="size-3" />
+            </span>
+          </div>
+
+          <!-- a bud vase -->
+          <div class="hidden flex-col items-center sm:flex">
+            <span class="size-2.5 rounded-full bg-rose-400"></span>
+            <span class="h-3 w-0.5 bg-emerald-500"></span>
+            <span
+              class="h-5 w-3 rounded-t-full rounded-b-sm bg-sky-300/60"
+            ></span>
+          </div>
+        </div>
+
+        <div class="flex items-end gap-1 sm:gap-2">
+          <!-- the squirrel, standing behind the counter -->
+          <div class="relative -mb-5">
+            <Barista :mood="baristaMood" class="size-18 sm:size-24" />
+          </div>
+
+          <!-- espresso machine with cups warming on top -->
+          <div class="relative">
             <span
               v-for="n in 3"
               :key="n"
-              class="absolute -top-3 h-3 w-1 animate-steam rounded-full bg-white/80 motion-reduce:animate-none dark:bg-zinc-300/60"
+              class="absolute top-0 h-3 w-1 animate-steam rounded-full bg-white/70 motion-reduce:animate-none"
               :style="{
-                left: `${8 + n * 10}px`,
+                left: `${10 + n * 9}%`,
                 animationDelay: `${n * 0.7}s`,
               }"
             ></span>
-            <svg viewBox="0 0 80 56" class="h-14 w-20" fill="none">
-              <rect
-                x="4"
-                y="6"
-                width="72"
-                height="34"
-                rx="5"
-                class="fill-zinc-500 dark:fill-zinc-600"
-              />
-              <rect
-                x="10"
-                y="12"
-                width="60"
-                height="8"
-                rx="2"
-                class="fill-zinc-300 dark:fill-zinc-400"
-              />
-              <rect
-                x="22"
-                y="40"
-                width="12"
-                height="10"
-                rx="1.5"
-                class="fill-white dark:fill-zinc-200"
-              />
-              <rect
-                x="46"
-                y="40"
-                width="12"
-                height="10"
-                rx="1.5"
-                class="fill-white dark:fill-zinc-200"
-              />
-              <circle cx="62" cy="28" r="3" class="fill-amber-400" />
+            <svg
+              viewBox="0 0 84 64"
+              class="h-12 w-16 sm:h-16 sm:w-21"
+              fill="none"
+            >
+              <rect x="20" y="0" width="10" height="7" rx="2" fill="#f3e6d3" />
+              <rect x="34" y="1" width="10" height="6" rx="2" fill="#f3e6d3" />
+              <rect x="48" y="0" width="10" height="7" rx="2" fill="#f3e6d3" />
+              <rect x="4" y="7" width="76" height="4" rx="2" fill="#c9974f" />
+              <rect x="6" y="11" width="72" height="34" rx="4" fill="#b9c0c6" />
+              <rect x="12" y="18" width="60" height="7" rx="2" fill="#87919a" />
+              <circle cx="66" cy="34" r="5" fill="#3b2b22" />
+              <circle cx="66" cy="34" r="3.5" fill="#f3e6d3" />
+              <rect x="20" y="45" width="10" height="5" rx="1" fill="#59636c" />
+              <rect x="44" y="45" width="10" height="5" rx="1" fill="#59636c" />
+              <rect x="20" y="52" width="10" height="9" rx="2" fill="#f3e6d3" />
+              <rect x="44" y="52" width="10" height="9" rx="2" fill="#f3e6d3" />
+              <rect x="4" y="61" width="76" height="3" rx="1" fill="#59636c" />
             </svg>
           </div>
         </div>
       </div>
 
-      <!-- the counter: wood top, panelled front -->
-      <div class="relative z-10 -mx-3 mt-2" aria-hidden="true">
+      <!-- the counter: wood top, panelled front, brass foot rail -->
+      <div class="relative z-10 -mx-3" aria-hidden="true">
+        <div class="h-3 bg-[#8a6246]"></div>
         <div
-          class="h-3 bg-amber-800 shadow-[inset_0_2px_0_rgba(255,255,255,0.25)] dark:bg-amber-950"
-        ></div>
-        <div
-          class="h-6 bg-[repeating-linear-gradient(90deg,var(--color-amber-700)_0_2.5rem,var(--color-amber-800)_2.5rem_calc(2.5rem+3px))] dark:bg-[repeating-linear-gradient(90deg,var(--color-amber-900)_0_2.5rem,var(--color-amber-950)_2.5rem_calc(2.5rem+3px))]"
-        ></div>
+          class="relative h-8 bg-[#4d372b] bg-[repeating-linear-gradient(90deg,transparent_0_2.75rem,#3b2a20_2.75rem_calc(2.75rem+3px))]"
+        >
+          <span class="absolute inset-x-0 bottom-1.5 h-1 bg-[#c9974f]"></span>
+        </div>
       </div>
     </div>
 
     <!-- ───── the floor ───── -->
     <div
-      class="relative bg-[repeating-linear-gradient(0deg,transparent_0_2.75rem,rgba(120,72,20,0.08)_2.75rem_calc(2.75rem+1px))] px-3 pt-3 pb-14 sm:px-5 dark:bg-[repeating-linear-gradient(0deg,transparent_0_2.75rem,rgba(255,255,255,0.05)_2.75rem_calc(2.75rem+1px))]"
+      class="relative rounded-b-[10px] bg-[repeating-linear-gradient(0deg,transparent_0_2.75rem,rgba(255,255,255,0.045)_2.75rem_calc(2.75rem+1px))] px-3 pt-4 pb-18 sm:pr-14 sm:pl-6"
     >
-      <p
-        v-if="loading"
-        class="py-10 text-center text-sm text-theme-700 dark:text-zinc-400"
-      >
+      <p v-if="loading" class="py-10 text-center text-sm text-amber-100/70">
         正在開門…
       </p>
 
@@ -219,59 +346,59 @@ const wallLabel = computed(() =>
         </div>
 
         <div
-          class="mt-6 grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start sm:gap-4"
+          class="mt-6 grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start sm:gap-6"
         >
-          <!-- window side: a tall window strip and the small tables -->
-          <div class="relative flex gap-2">
+          <!-- the small tables along the left wall -->
+          <div
+            class="grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-1 sm:gap-y-2"
+            role="group"
+            aria-label="靠牆小桌"
+            data-testid="cafe-small-tables"
+          >
             <div
-              class="hidden w-3 shrink-0 self-stretch rounded-full border-2 border-theme-300 bg-linear-to-b from-sky-200/80 to-sky-50 sm:block dark:border-zinc-600 dark:from-indigo-950 dark:to-slate-800"
-              aria-hidden="true"
-            ></div>
-            <div
-              class="grid flex-1 grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-1 sm:gap-y-2"
+              v-for="table in smallTables"
+              :key="table.code"
+              class="flex items-center justify-center gap-0.5"
               role="group"
-              aria-label="窗邊小桌"
-              data-testid="cafe-window-tables"
+              :aria-label="`靠牆小桌 ${table.code}`"
             >
-              <div
-                v-for="table in windowTables"
-                :key="table.code"
-                class="flex items-center justify-center gap-0.5"
-                role="group"
-                :aria-label="`窗邊小桌 ${table.code}`"
+              <CafeSeat
+                v-if="table.seats[0]"
+                :seat="table.seats[0]"
+                :socket="socket"
+                :can-sit="canSit"
+                :roving-tabindex="tabIndexFor(table.seats[0])"
+                :now="now"
+                backrest="left"
+                @activate="emit('activate', $event)"
+              />
+              <span
+                class="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-[#8a6a54] bg-[#6a4c3a]"
+                aria-hidden="true"
               >
-                <CafeSeat
-                  v-if="table.seats[0]"
-                  :seat="table.seats[0]"
-                  :socket="socket"
-                  :can-sit="canSit"
-                  :roving-tabindex="tabIndexFor(table.seats[0])"
-                  :now="now"
-                  backrest="left"
-                  @activate="emit('activate', $event)"
-                />
+                <!-- a tea light -->
                 <span
-                  class="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-theme-300 bg-theme-200 text-xs shadow-[inset_0_2px_0_rgba(255,255,255,0.6),0_2px_4px_rgba(0,0,0,0.06)] dark:border-zinc-600 dark:bg-zinc-700 dark:shadow-none"
-                  aria-hidden="true"
-                  >☕</span
+                  class="flex size-3.5 items-center justify-center rounded-full bg-[#f3e6d3]"
                 >
-                <CafeSeat
-                  v-if="table.seats[1]"
-                  :seat="table.seats[1]"
-                  :socket="socket"
-                  :can-sit="canSit"
-                  :roving-tabindex="tabIndexFor(table.seats[1])"
-                  :now="now"
-                  backrest="right"
-                  @activate="emit('activate', $event)"
-                />
-              </div>
+                  <span class="size-1.5 rounded-full bg-amber-400"></span>
+                </span>
+              </span>
+              <CafeSeat
+                v-if="table.seats[1]"
+                :seat="table.seats[1]"
+                :socket="socket"
+                :can-sit="canSit"
+                :roving-tabindex="tabIndexFor(table.seats[1])"
+                :now="now"
+                backrest="right"
+                @activate="emit('activate', $event)"
+              />
             </div>
           </div>
 
           <!-- the long table on a rug -->
           <div
-            class="relative mx-auto flex w-full max-w-xs flex-col items-center gap-1 rounded-[2rem] border-4 border-dashed border-rose-300/60 bg-rose-100/50 px-3 py-4 sm:max-w-none dark:border-rose-900/50 dark:bg-rose-950/20"
+            class="relative mx-auto flex w-full max-w-xs flex-col items-center gap-1 rounded-4xl border-4 border-dashed border-[#8c4a42] bg-[#4d2522] px-3 py-4 sm:max-w-none"
             role="group"
             aria-label="大長桌"
             data-testid="cafe-communal"
@@ -290,14 +417,11 @@ const wallLabel = computed(() =>
               />
             </div>
             <div
-              class="flex h-12 w-full max-w-56 items-center justify-center gap-2 rounded-xl border-2 border-theme-300 bg-theme-200 shadow-[inset_0_2px_0_rgba(255,255,255,0.6),0_2px_4px_rgba(0,0,0,0.06)] dark:border-zinc-600 dark:bg-zinc-700 dark:shadow-none"
+              class="flex h-12 w-full max-w-56 items-center justify-center gap-2 rounded-xl border-2 border-[#8a6a54] bg-[#6a4c3a]"
               aria-hidden="true"
             >
               <span class="h-7"><CafePlant variant="small" /></span>
-              <span
-                class="text-xs font-medium text-theme-800 dark:text-zinc-300"
-                >大長桌</span
-              >
+              <span class="text-xs font-medium text-amber-50">大長桌</span>
               <span class="text-base leading-none">📖</span>
             </div>
             <div class="flex justify-center gap-2 sm:gap-4">
@@ -325,27 +449,27 @@ const wallLabel = computed(() =>
         <CafePlant variant="tall" />
       </div>
       <div
-        class="pointer-events-none absolute right-24 bottom-1 hidden h-12 sm:block"
+        class="pointer-events-none absolute right-20 bottom-1 hidden h-12 sm:block"
         aria-hidden="true"
       >
         <CafePlant variant="bush" />
       </div>
 
-      <!-- the door, like the study room's -->
+      <!-- the door, in the right wall, like the study room's -->
       <div
-        class="pointer-events-none absolute right-8 -bottom-[6px] z-10 h-[6px] w-12 bg-theme-50 dark:bg-zinc-950"
+        class="pointer-events-none absolute -right-1.5 bottom-3 z-10 h-12 w-1.5 bg-theme-50 dark:bg-zinc-950"
         aria-hidden="true"
       ></div>
       <div
-        class="pointer-events-none absolute right-8 bottom-0 z-10 size-12 rounded-tl-full border-t border-l border-dashed border-theme-400 dark:border-zinc-500"
+        class="pointer-events-none absolute right-0 bottom-3 z-10 size-12 rounded-tl-full border-t border-l border-dashed border-[#a08068]"
         aria-hidden="true"
       >
         <span
-          class="absolute right-0 bottom-0 h-full w-[3px] origin-bottom -rotate-[70deg] rounded-full bg-theme-500 dark:bg-zinc-400"
+          class="absolute right-0 bottom-0 h-full w-0.75 origin-bottom rotate-[-60deg] rounded-full bg-[#d9c4a5]"
         ></span>
       </div>
       <span
-        class="pointer-events-none absolute right-2 bottom-12 text-[0.625rem] text-theme-600 dark:text-zinc-500"
+        class="pointer-events-none absolute right-2 bottom-17 text-[0.625rem] text-amber-100/60"
         aria-hidden="true"
         >入口</span
       >

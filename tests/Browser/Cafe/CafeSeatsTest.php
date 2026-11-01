@@ -14,6 +14,7 @@ it('shows the café to a visitor with a sign-up hint and no way to sit', functio
     dismissCookieConsentBanner($page);
 
     $page->assertVisible('[data-testid="cafe-scene"]')
+        ->assertVisible('[data-testid="cafe-small-tables"]')
         ->assertVisible('[data-testid="cafe-needs-schedule"]');
 
     waitUntil($page, 'document.querySelectorAll(\'[data-seat-code]\').length === 20');

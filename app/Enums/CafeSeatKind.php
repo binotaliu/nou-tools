@@ -14,7 +14,7 @@ enum CafeSeatKind: string
     {
         return match ($this) {
             self::Bar => '吧台',
-            self::Window => '窗邊小桌',
+            self::Window => '靠牆小桌',
             self::Communal => '大長桌',
         };
     }
