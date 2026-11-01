@@ -27,6 +27,7 @@ import {
   TableCellsIcon,
 } from '@heroicons/vue/24/outline'
 import AppLayout from '../../Layouts/AppLayout.vue'
+import AcornLedgerModal from '../../Components/Acorns/AcornLedgerModal.vue'
 import AccessKeys from '../../Components/StudyRoom/AccessKeys.vue'
 import ActionBanner from '../../Components/StudyRoom/ActionBanner.vue'
 import FocusMode from '../../Components/StudyRoom/FocusMode.vue'
@@ -41,6 +42,7 @@ import TableChair from '../../Components/StudyRoom/TableChair.vue'
 import Wall from '../../Components/StudyRoom/Wall.vue'
 import FloorSkeleton from '../../Components/StudyRoom/FloorSkeleton.vue'
 import LiveAnnouncer from '../../Components/StudyRoom/LiveAnnouncer.vue'
+import useAcorns from '../../Composables/useAcorns'
 import useSeatGrid from '../../Composables/useSeatGrid'
 import useSeatRovingFocus from '../../Composables/useSeatRovingFocus'
 import useStudyRoomAnnouncer from '../../Composables/useStudyRoomAnnouncer'
@@ -81,6 +83,7 @@ const roving = useSeatRovingFocus(socket)
 const sky = useStudyRoomSky(props.clientConfig)
 const profile = useStudyRoomProfile(props.profile, props.emojiChoices)
 const goal = useStudyGoal(props.profile.goal)
+const acorns = useAcorns()
 const music = useStudyRoomMusic()
 const background = useStudyRoomBackground()
 const announcer = useStudyRoomAnnouncer()
@@ -267,6 +270,17 @@ socket.onSeatEvent(async ({ type, code }) => {
   }
 })
 
+// A recorded session moves today's focus total, which is when acorns may have
+// been credited; the balance itself is only ever read from the server.
+watch(
+  () => socket.state?.totals.yourFocusSecondsToday,
+  () => {
+    if (props.hasSchedule && acorns.loaded) {
+      acorns.refresh()
+    }
+  }
+)
+
 socket.onStateChange(() => {
   timer.onRoomStateChanged(() => sky.unmountSkyCanvas('focus'))
 })
@@ -365,6 +379,10 @@ onMounted(async () => {
   background.stop()
   socket.start()
   music.load()
+
+  if (props.hasSchedule) {
+    acorns.load()
+  }
 
   document.addEventListener('visibilitychange', handleVisibilityChange)
 
@@ -554,6 +572,7 @@ onUnmounted(() => {
           :sky="sky"
           :profile="profile"
           :goal="goal"
+          :acorns="hasSchedule ? acorns : null"
           :music="music"
           :demo="!hasSchedule"
           :announcement-html="announcementHtml"
@@ -581,6 +600,18 @@ onUnmounted(() => {
           @close="goal.open = false"
         >
           <GoalForm :key="String(goal.open)" :goal="goal" :push="push" />
+        </Modal>
+
+        <Modal
+          v-if="hasSchedule"
+          :open="acorns.open"
+          title="我的橡實"
+          max-width="max-w-md"
+          teleport-to="#study-room-modal-target"
+          data-testid="study-room-acorns-modal"
+          @close="acorns.open = false"
+        >
+          <AcornLedgerModal :acorns="acorns" />
         </Modal>
 
         <Modal

@@ -6,6 +6,7 @@
 import { computed, ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import { ChartBarIcon, FlagIcon, PencilIcon } from '@heroicons/vue/24/outline'
+import AcornIcon from '../Acorns/AcornIcon.vue'
 import CassettePlayer from './CassettePlayer.vue'
 import GardenScene from './GardenScene.vue'
 import useMarkdownContainers from '../../Composables/useMarkdownContainers'
@@ -20,6 +21,7 @@ const props = defineProps({
   yourGoalSecondsToday: { type: Number, default: 0 },
   yourGoalSecondsThisWeek: { type: Number, default: 0 },
   goal: { type: Object, default: null },
+  acorns: { type: Object, default: null },
   // The visitor has no schedule, so there is no profile to show or edit.
   demo: { type: Boolean, default: false },
 })
@@ -278,6 +280,19 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
                 </template>
               </p>
             </div>
+            <button
+              v-if="acorns && acorns.loaded"
+              type="button"
+              :aria-label="`橡實 ${acorns.balance} 顆，點擊檢視明細`"
+              data-testid="study-room-acorns"
+              class="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-sm font-semibold text-theme-800 transition hover:bg-theme-100 dark:text-amber-300 dark:hover:bg-zinc-700"
+              @click.stop="acorns.open = true"
+            >
+              <AcornIcon />
+              <span class="tabular-nums" aria-hidden="true">{{
+                acorns.balance
+              }}</span>
+            </button>
             <button
               v-if="goal"
               type="button"
