@@ -60,6 +60,12 @@ export const moreMenuItems = [
     icon: 'device-phone-mobile',
   },
   {
+    href: '/cafe',
+    prefix: '/cafe',
+    label: '咖啡廳',
+    icon: 'building-storefront',
+  },
+  {
     href: '/announcements',
     prefix: '/announcements',
     label: '學校公告',

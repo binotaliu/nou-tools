@@ -117,6 +117,20 @@
   }
 }
 
+@keyframes steam {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scaleX(1);
+  }
+  30% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px) scaleX(1.4);
+  }
+}
+
 @keyframes marquee {
   from {
     transform: translateX(0%);
@@ -456,6 +470,11 @@
 
 @utility blink-colon {
   animation: blink-colon 1s step-end infinite;
+}
+
+/* Rising steam over the espresso machine; staggered with `animation-delay`. */
+@utility animate-steam {
+  animation: steam 2.6s ease-out infinite;
 }
 
 @utility animate-marquee {

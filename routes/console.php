@@ -3,6 +3,7 @@
 use App\Console\Commands\DraftNewsletterCommand;
 use App\Console\Commands\FetchAnnouncementsCommand;
 use App\Console\Commands\PublishDueNewsletterIssuesCommand;
+use App\Console\Commands\ReleaseIdleCafeSeatsCommand;
 use App\Console\Commands\ReleaseIdleStudyRoomSeatsCommand;
 use App\Console\Commands\SendClassStartingRemindersCommand;
 use App\Console\Commands\SendStudyGoalRemindersCommand;
@@ -13,6 +14,7 @@ use NouTools\Domains\StudyRoom\Actions\SendStudyTimerEndPushes;
 // NOTE: schedule_timezone is set to Asia/Taipei in config/app.php.
 
 Schedule::command(ReleaseIdleStudyRoomSeatsCommand::class)->everyMinute();
+Schedule::command(ReleaseIdleCafeSeatsCommand::class)->everyMinute();
 
 Schedule::command(SendClassStartingRemindersCommand::class)->everyMinute();
 

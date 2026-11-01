@@ -8,6 +8,10 @@ use App\Http\Controllers\AcornController;
 use App\Http\Controllers\AnalyticsConsentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CafeController;
+use App\Http\Controllers\CafeHeartbeatController;
+use App\Http\Controllers\CafeSeatController;
+use App\Http\Controllers\CafeStateController;
 use App\Http\Controllers\ChangelogController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseScheduleController;
@@ -243,6 +247,15 @@ Route::prefix('study-room')->name('study-room.')->group(function (): void {
 });
 
 Route::get('/acorns', AcornController::class)->name('acorns.show')->middleware('throttle:60,1');
+
+Route::get('/cafe', [CafeController::class, 'show'])->name('cafe.show');
+
+Route::prefix('cafe')->name('cafe.')->group(function (): void {
+    Route::get('/state', CafeStateController::class)->name('state')->middleware('throttle:120,1');
+    Route::post('/seats/{seat}/take', [CafeSeatController::class, 'store'])->name('seats.take')->middleware('throttle:60,1');
+    Route::post('/seat/leave', [CafeSeatController::class, 'destroy'])->name('seat.leave')->middleware('throttle:60,1');
+    Route::post('/heartbeat', CafeHeartbeatController::class)->name('heartbeat')->middleware('throttle:60,1');
+});
 
 Route::prefix('wiki')->name('wiki.')->group(function (): void {
     Route::get('/new', [WikiEditRequestController::class, 'create'])->name('new');

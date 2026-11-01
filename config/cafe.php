@@ -35,4 +35,36 @@ return [
         'welcome_cap' => 20,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Café Layout
+    |--------------------------------------------------------------------------
+    |
+    | Bar stools along the counter, small two-seat tables by the window and
+    | one long communal table. `cafe:sync-seats` reconciles the table with it.
+    |
+    */
+
+    'layout' => [
+        'bar_stools' => 6,
+        'window_tables' => 4,
+        'seats_per_window_table' => 2,
+        'communal_seats' => 6,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Heartbeat
+    |--------------------------------------------------------------------------
+    |
+    | A café seat is kept by a heartbeat while the page is open; one not seen
+    | for `idle_release_seconds` is given back.
+    |
+    */
+
+    'heartbeat' => [
+        'interval_seconds' => 60,
+        'idle_release_seconds' => 1200,
+    ],
+
 ];
