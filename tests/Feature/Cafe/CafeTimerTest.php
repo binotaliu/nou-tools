@@ -92,7 +92,7 @@ it('will not start the timer on a café seat until something is on the table', f
     $this->withCredentials()->withCookie('student_schedule', $cafeTimerCookie($schedule))
         ->postJson(route('study-room.timer.start'), $payload)
         ->assertStatus(422)
-        ->assertJsonPath('message', '在咖啡廳要先點一杯飲料，才能開始專注。');
+        ->assertJsonPath('message', '咖啡廳有低消，請先點餐再開始專注吧。');
 
     expect($seat->fresh()->timer_phase)->toBeNull();
 

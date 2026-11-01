@@ -206,7 +206,7 @@ it('awards on a learning progress save and flashes the result', function () {
         'progress' => ['1' => ['1' => ['video' => true, 'textbook' => true]]],
         'notes' => [],
         'homework' => ['1' => ['1' => ['completed' => true, 'deadline' => null, 'note' => '']]],
-    ])->assertRedirect()->assertSessionHas('success', '學習進度已更新，獲得 4 顆橡實');
+    ])->assertRedirect()->assertSessionHas('success', '已更新學習進度，獲得 4 顆橡實');
 
     expect(app(ReadAcornBalance::class)($schedule->id)->learningToday)->toBe(4);
 });

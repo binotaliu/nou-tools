@@ -108,7 +108,7 @@ async function openMenu() {
     try {
       menu.value = (await window.axios.get('/cafe/menu')).data.menu
     } catch {
-      orderError.value = '菜單暫時打不開，請稍後再試。'
+      orderError.value = '無法開啟菜單，請稍後再試。'
     }
   }
 }
@@ -134,7 +134,7 @@ function openComposer() {
 async function notePosted(data) {
   Object.assign(acorns, data.acorns, { loaded: true })
   composerOpen.value = false
-  noteMessage.value = '便利貼收到了，檢查通過就會貼上牆。'
+  noteMessage.value = '已收到你的便利貼，稍等一下松鼠店長就會把它貼到牆上。'
   await loadNotes()
 }
 
@@ -338,7 +338,7 @@ function sitDownQuickly() {
 
 socket.onSeatEvent(async ({ type, code, reason }) => {
   if (type === 'released' && reason === 'seat.unordered-released') {
-    socket.errorMessage = `入座後 ${graceMinutes} 分鐘內沒有點餐，座位先還給其他同學了。`
+    socket.errorMessage = `由於你沒有點餐，松鼠店長已請你將座位讓給其他同學。`
   }
 
   if (type === 'left' || type === 'released') {
@@ -412,9 +412,9 @@ onUnmounted(() => {
             咖啡廳
           </h1>
           <p class="text-sm text-theme-700 dark:text-zinc-400">
-            坐下來喝杯咖啡，跟隔壁的同學打個招呼。
+            歡迎光臨咖啡廳。
             <span v-if="socket.state" data-testid="cafe-occupants">
-              現在有 {{ socket.state.occupantCount }} 人在店裡。
+              目前有 {{ socket.state.occupantCount }} 個同學在店裡。
             </span>
           </p>
         </div>
@@ -432,7 +432,7 @@ onUnmounted(() => {
         class="rounded-lg border-2 border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100"
         data-testid="cafe-needs-schedule"
       >
-        建立課表（或找回你的課表）就能入座。
+        建立課表後即可入座。
         <Link href="/schedules/create" class="font-semibold underline"
           >建立課表</Link
         >
@@ -448,7 +448,7 @@ onUnmounted(() => {
       >
         先到
         <Link href="/study-room" class="font-semibold underline">自習室</Link>
-        設定暱稱，才能在咖啡廳入座。
+        設定暱稱後方可入座。
       </div>
 
       <p
@@ -517,7 +517,7 @@ onUnmounted(() => {
 
       <div @keydown="handleKeydown">
         <p id="cafe-seat-keys-hint" class="sr-only">
-          用方向鍵在座位間移動，Home、End 移到第一個或最後一個座位。
+          用方向鍵在座位間移動，Home、End 可移到第一或最後一個座位。
         </p>
         <CafeFloor
           :seats="seats"
@@ -600,7 +600,7 @@ onUnmounted(() => {
             data-testid="cafe-wall-compose"
             @click="openComposer"
           >
-            我也要貼一張
+            寫便利貼
           </button>
           <button
             type="button"

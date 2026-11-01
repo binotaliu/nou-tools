@@ -10,6 +10,6 @@ final class CoffeeRequiredException extends RuntimeException
 {
     public function __construct()
     {
-        parent::__construct('在咖啡廳要先點一杯飲料，才能開始專注。');
+        parent::__construct('咖啡廳有低消，請先點餐再開始專注吧。');
     }
 }

@@ -31,11 +31,11 @@ return new class extends Migration
         DB::table('cafe_menu_items')->insert(array_map(
             fn (array $item, int $index): array => [...$item, 'price' => 3, 'is_active' => true, 'sort' => $index, 'created_at' => $now, 'updated_at' => $now],
             [
-                ['name' => '美式咖啡', 'emoji' => '☕', 'cup_style' => 'mug', 'description' => '清爽不加糖，提神首選。'],
-                ['name' => '拿鐵', 'emoji' => '🥛', 'cup_style' => 'glass', 'description' => '牛奶比咖啡多一點的溫柔。'],
-                ['name' => '抹茶拿鐵', 'emoji' => '🍵', 'cup_style' => 'teacup', 'description' => '不想喝咖啡的日子也有選擇。'],
-                ['name' => '熱可可', 'emoji' => '🍫', 'cup_style' => 'mug', 'description' => '讀書讀累了，來點甜的。'],
-                ['name' => '焙茶', 'emoji' => '🫖', 'cup_style' => 'teacup', 'description' => '淡淡的烘焙香，適合夜讀。'],
+                ['name' => '美式咖啡', 'emoji' => '☕', 'cup_style' => 'mug', 'description' => '無糖咖啡。'],
+                ['name' => '拿鐵', 'emoji' => '🥛', 'cup_style' => 'glass', 'description' => '加了一點牛奶的咖啡。'],
+                ['name' => '抹茶拿鐵', 'emoji' => '🍵', 'cup_style' => 'teacup', 'description' => '不喝咖啡也可以考慮抹茶。'],
+                ['name' => '熱可可', 'emoji' => '🍫', 'cup_style' => 'mug', 'description' => '喜歡甜的也可以考慮熱可可。'],
+                ['name' => '焙茶', 'emoji' => '🫖', 'cup_style' => 'teacup', 'description' => '喜歡純茶的同學也可考慮焙茶。'],
             ],
             range(0, 4),
         ));

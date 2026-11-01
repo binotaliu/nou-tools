@@ -22,7 +22,7 @@ final class CafeCurrentOrderController extends Controller
         $viewer = $resolveCafeViewer($request);
 
         if ($viewer === null) {
-            return response()->json(['message' => '請先到自習室設定暱稱。'], 403);
+            return response()->json(['message' => '請先至自習室設定暱稱。'], 403);
         }
 
         try {
@@ -39,7 +39,7 @@ final class CafeCurrentOrderController extends Controller
         $viewer = $resolveCafeViewer($request);
 
         if ($viewer === null) {
-            return response()->json(['message' => '請先到自習室設定暱稱。'], 403);
+            return response()->json(['message' => '請先至自習室設定暱稱。'], 403);
         }
 
         try {

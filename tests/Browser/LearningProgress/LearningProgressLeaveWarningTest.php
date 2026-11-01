@@ -69,7 +69,7 @@ it('stops warning once the changes are saved', function () use ($openLearningPro
 
     $page->script(TICK_FIRST_BOX);
     $page->click('[data-testid="learning-progress-header"] button[data-analytics-event="learning_progress_save"]')
-        ->assertSee('學習進度已更新');
+        ->assertSee('已更新學習進度');
 
     expect($page->script(BEFOREUNLOAD_PREVENTED))->toBeFalse();
 

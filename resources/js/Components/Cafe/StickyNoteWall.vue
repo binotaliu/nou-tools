@@ -51,7 +51,7 @@ function formatDate(iso) {
     </div>
 
     <p class="mt-2 text-xs text-theme-700 dark:text-zinc-400">
-      點一張便利貼看清楚一點。
+      點擊便利貼以放大。
     </p>
 
     <div
@@ -85,7 +85,7 @@ function formatDate(iso) {
           v-if="selected.status !== 'published'"
           class="mt-1 text-xs text-amber-800 dark:text-amber-300"
         >
-          還在審核，通過後大家就看得到了。
+          松鼠店長好像還沒幫你把這張便利貼貼上去。
         </p>
         <button
           v-if="selected.canReport"

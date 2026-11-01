@@ -99,7 +99,7 @@ it('needs text or a drawing, a coffee today, acorns, and only one a day', functi
 
     $post($buyer(), $payload(['text' => null]))->assertUnprocessable()->assertJsonValidationErrors(['text', 'drawing']);
 
-    $post($buyer(10, false), $payload())->assertUnprocessable()->assertJsonPath('message', '今天先點一杯飲品，才能跟店長買便利貼。');
+    $post($buyer(10, false), $payload())->assertUnprocessable()->assertJsonPath('message', '低消一杯飲料，才可購買便利貼。');
 
     $poor = $buyer(4);
     $post($poor, $payload())->assertUnprocessable()->assertJsonPath('message', '橡實不夠囉。');
@@ -107,7 +107,7 @@ it('needs text or a drawing, a coffee today, acorns, and only one a day', functi
 
     $rich = $buyer(20);
     $post($rich, $payload())->assertCreated();
-    $post($rich, $payload())->assertUnprocessable()->assertJsonPath('message', '今天已經貼過一張便利貼了，明天再來吧。');
+    $post($rich, $payload())->assertUnprocessable()->assertJsonPath('message', '每人每天只能買一張便利貼。明天再來買吧。');
 });
 
 it('counts the coffee by the Taipei day and refuses blocked schedules', function () use ($buyer, $cookieFor, $payload) {
@@ -124,7 +124,7 @@ it('counts the coffee by the Taipei day and refuses blocked schedules', function
 
     $this->withCredentials()->withCookie('student_schedule', $cookieFor($schedule))
         ->postJson(route('cafe.notes.store'), $payload())
-        ->assertUnprocessable()->assertJsonPath('message', '這份課表目前不能張貼便利貼。');
+        ->assertUnprocessable()->assertJsonPath('message', '店長似乎不想給你便利貼。');
 });
 
 it('publishes a note the screener lets through and broadcasts it', function () {

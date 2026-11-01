@@ -79,7 +79,7 @@ function placeAt(event) {
       class="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-amber-950/70 dark:text-amber-100/60"
       :data-testid="interactive ? 'cafe-wall-empty' : null"
     >
-      牆上還空空的，點杯飲料，當第一個貼便利貼的人吧。
+      牆上還空空的，歡迎購買便利貼。
     </p>
 
     <component

@@ -69,8 +69,7 @@ const canReorder = computed(
       class="flex flex-wrap items-center justify-between gap-2 text-sm text-theme-700 dark:text-zinc-300"
     >
       <span data-testid="cafe-coffee-empty"
-        >先點一杯飲料才能開始專注；入座
-        {{ graceMinutes }} 分鐘內沒點餐，座位會還給其他同學。</span
+        >低消一杯飲料；入座後請在 {{ graceMinutes }} 分鐘內點餐。</span
       >
       <button
         type="button"
@@ -78,7 +77,7 @@ const canReorder = computed(
         data-testid="cafe-tray-order"
         @click="emit('open-menu')"
       >
-        點一杯
+        點餐
       </button>
     </div>
 
@@ -106,7 +105,7 @@ const canReorder = computed(
             class="text-xs text-theme-700 dark:text-zinc-400"
             data-testid="cafe-coffee-making"
           >
-            製作中…還要 {{ secondsLeft }} 秒
+            製作中…
           </p>
           <p
             v-else

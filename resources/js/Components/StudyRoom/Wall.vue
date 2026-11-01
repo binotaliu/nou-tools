@@ -283,7 +283,7 @@ useMarkdownContainers(announcementRoot, [() => props.announcementHtml])
             <button
               v-if="acorns && acorns.loaded"
               type="button"
-              :aria-label="`橡實 ${acorns.balance} 顆，點擊檢視明細`"
+              :aria-label="`橡實 ${acorns.balance} 顆，點擊以檢視明細`"
               data-testid="study-room-acorns"
               class="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-sm font-semibold text-theme-800 transition hover:bg-theme-100 dark:text-amber-300 dark:hover:bg-zinc-700"
               @click.stop="acorns.open = true"

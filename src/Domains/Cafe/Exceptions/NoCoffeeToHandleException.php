@@ -8,7 +8,7 @@ use RuntimeException;
 
 final class NoCoffeeToHandleException extends RuntimeException
 {
-    public function __construct(string $message = '桌上沒有可以喝的飲品。')
+    public function __construct(string $message = '桌上沒有餐點。')
     {
         parent::__construct($message);
     }

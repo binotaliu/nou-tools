@@ -35,9 +35,9 @@ final class LearningProgressController extends Controller
         $result = $updateLearningProgress($schedule, $term, $input);
 
         $message = match (true) {
-            $result['awarded'] > 0 => "學習進度已更新，獲得 {$result['awarded']} 顆橡實",
-            $result['capped'] => '學習進度已更新，今日學習進度橡實已達上限',
-            default => '學習進度已更新',
+            $result['awarded'] > 0 => "已更新學習進度，獲得 {$result['awarded']} 顆橡實",
+            $result['capped'] => '已更新學習進度',
+            default => '已更新學習進度',
         };
 
         return redirect()

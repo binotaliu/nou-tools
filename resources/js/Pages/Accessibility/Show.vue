@@ -42,7 +42,7 @@ const keyGroups = [
     testid: 'accessibility-cafe-keys',
     title: '咖啡廳',
     keys: [
-      { key: '4', target: '跟店長再聊一句（聊完一句話後才有）' },
+      { key: '4', target: '跟店長說話' },
       { key: '5', target: '快速入座（未入座時）' },
       { key: '6', target: '打開便利貼牆' },
     ],

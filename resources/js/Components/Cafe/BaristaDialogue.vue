@@ -43,7 +43,7 @@ defineEmits(['more', 'close'])
       class="mt-1 text-sm text-theme-800 dark:text-zinc-200"
       data-testid="cafe-barista-quiet"
     >
-      店長在後面整理豆子，晚點再來找他聊聊吧。
+      店長好像在忙，晚點再來找他聊聊吧。
     </p>
 
     <template v-else>

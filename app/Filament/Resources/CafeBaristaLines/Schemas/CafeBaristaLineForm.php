@@ -29,13 +29,13 @@ class CafeBaristaLineForm
                 Section::make('台詞')
                     ->schema([
                         Select::make('trigger')
-                            ->label('什麼時候說')
+                            ->label('顯示時機')
                             ->options(collect(BaristaTrigger::cases())->mapWithKeys(fn (BaristaTrigger $trigger): array => [$trigger->value => $trigger->label()]))
                             ->required()
                             ->live(),
                         Textarea::make('text')
                             ->label('內容')
-                            ->helperText('可用 {nickname} 暱稱、{course} 課程、{exam} 期中考／期末考、{days} 還有幾天、{event} 行事曆事件、{acorns} 橡實數、{study_minutes} 今天專注分鐘、{drink} 剛點的飲品。用到的資料這位客人沒有時，這句就不會出現。')
+                            ->helperText('可用 {nickname} 暱稱、{course} 課程、{exam} 期中考／期末考、{days} 還有幾天、{event} 行事曆事件、{acorns} 橡實數、{study_minutes} 今天專注分鐘、{drink} 剛點的飲品。當該變數無值時，則不適用此台詞。')
                             ->required()
                             ->rows(3)
                             ->maxLength(500)
@@ -47,7 +47,7 @@ class CafeBaristaLineForm
                             ->default('happy'),
                         TextInput::make('priority')
                             ->label('優先順序')
-                            ->helperText('數字越大越優先；同一級才會隨機挑。考試相關建議 40 以上。')
+                            ->helperText('較大數字優先。數字相同時將隨機選擇。')
                             ->numeric()
                             ->default(0)
                             ->required(),
@@ -66,7 +66,7 @@ class CafeBaristaLineForm
                     ->columnSpanFull(),
 
                 Section::make('條件')
-                    ->description('依「什麼時候說」顯示對應的條件，沒填的欄位不設限。')
+                    ->description('將依照「顯示時機」顯示對應條件。')
                     ->schema([
                         Select::make('conditions.period')
                             ->label('時段')
@@ -74,28 +74,28 @@ class CafeBaristaLineForm
                             ->required($is(BaristaTrigger::TimeOfDay))
                             ->visible($is(BaristaTrigger::TimeOfDay)),
                         Select::make('conditions.exam')
-                            ->label('哪一種考試')
-                            ->options(['any' => '都可以', 'midterm' => '期中考', 'final' => '期末考'])
+                            ->label('考試類型')
+                            ->options(['any' => '全部', 'midterm' => '期中考', 'final' => '期末考'])
                             ->default('any')
                             ->visible($is(BaristaTrigger::ExamUpcoming)),
                         TextInput::make('conditions.min_days')
-                            ->label('最少還有幾天')
+                            ->label('最少天數')
                             ->numeric()
                             ->minValue(0)
                             ->visible($is(BaristaTrigger::ExamUpcoming, BaristaTrigger::SchoolEventUpcoming)),
                         TextInput::make('conditions.max_days')
-                            ->label('最多還有幾天')
+                            ->label('最大天數')
                             ->numeric()
                             ->minValue(0)
                             ->visible($is(BaristaTrigger::ExamUpcoming, BaristaTrigger::SchoolEventUpcoming)),
                         TextInput::make('conditions.max_days_since')
-                            ->label('考完幾天內')
+                            ->label('考試後指定天數內')
                             ->numeric()
                             ->minValue(1)
                             ->default(3)
                             ->visible($is(BaristaTrigger::AfterExam)),
                         TextInput::make('conditions.min_minutes')
-                            ->label('今天至少專注幾分鐘')
+                            ->label('今日最少專注時間')
                             ->numeric()
                             ->minValue(1)
                             ->default(60)
@@ -114,8 +114,8 @@ class CafeBaristaLineForm
                     ->columns(2)
                     ->columnSpanFull(),
 
-                Section::make('客人的回應按鈕')
-                    ->description('最多三個。「點餐」會打開菜單，「便利貼」會帶客人到便利貼牆。')
+                Section::make('回應按鈕')
+                    ->description('最多三個。「點餐」可開啟菜單，「便利貼」可開啟便利貼牆。')
                     ->schema([
                         Repeater::make('replies')
                             ->hiddenLabel()

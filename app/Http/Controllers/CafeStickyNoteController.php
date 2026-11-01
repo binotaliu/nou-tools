@@ -27,7 +27,7 @@ final class CafeStickyNoteController extends Controller
         $viewer = $resolveCafeViewer($request);
 
         if ($viewer === null) {
-            return response()->json(['message' => '請先到自習室設定暱稱，才能貼便利貼。'], 403);
+            return response()->json(['message' => '請先至自習室設定暱稱，方可使用便利貼。'], 403);
         }
 
         try {

@@ -10,6 +10,6 @@ final class MenuItemUnavailableException extends RuntimeException
 {
     public function __construct()
     {
-        parent::__construct('這項飲品今天沒有供應。');
+        parent::__construct('今日未提供此餐點。');
     }
 }

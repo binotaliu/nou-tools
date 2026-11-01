@@ -52,7 +52,7 @@ function canAfford(item) {
         />
         內用
         <span v-if="!seated" class="text-xs text-theme-600 dark:text-zinc-400"
-          >（入座後才能內用）</span
+          >（請先選擇座位）</span
         >
       </label>
       <label class="flex items-center gap-1">
@@ -65,7 +65,7 @@ function canAfford(item) {
         />
         外帶
         <span v-if="seated" class="text-xs text-theme-600 dark:text-zinc-400"
-          >（坐在店裡只能內用）</span
+          >（入座後僅限內容）</span
         >
       </label>
     </fieldset>

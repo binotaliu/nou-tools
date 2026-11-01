@@ -170,7 +170,7 @@ async function submit() {
     <div v-show="step === 'draw'" class="space-y-3">
       <fieldset>
         <legend class="mb-1 text-xs text-theme-700 dark:text-zinc-400">
-          紙的顏色
+          便利貼顏色
         </legend>
         <div class="flex gap-2">
           <label
@@ -206,7 +206,7 @@ async function submit() {
           for="cafe-note-text"
           class="mb-1 block text-xs text-theme-700 dark:text-zinc-400"
         >
-          想說的話（也可以只畫圖）
+          文字留言（也可以只畫圖）
         </label>
         <input
           id="cafe-note-text"
@@ -227,7 +227,7 @@ async function submit() {
     <!-- Step 2: place it on the wall as it is now. -->
     <div v-if="step === 'place'" class="space-y-2">
       <p class="text-xs text-theme-700 dark:text-zinc-400">
-        點一下牆面，決定貼在哪裡。
+        選擇要張貼的位置。
       </p>
       <div
         class="rounded-xl border-[6px] border-amber-900/60 bg-amber-900/60 p-0.5 dark:border-amber-800/60 dark:bg-amber-800/60"
@@ -276,12 +276,12 @@ async function submit() {
         <StickyNoteBoard :notes="notes" :draft="draft" />
       </div>
       <p class="text-sm text-theme-800 dark:text-zinc-200">
-        便利貼會先經過檢查，通過後貼在牆上
-        <span class="whitespace-nowrap">{{ lifetimeDays }} 天</span>。花
+        松鼠店長正在忙，可能會過幾分鐘才貼上便利貼
+        <span class="whitespace-nowrap">{{ lifetimeDays }} 天</span>。消費
         <span class="inline-flex items-center gap-0.5 font-semibold"
           ><AcornIcon /> {{ price }}</span
         >
-        顆橡實，你有 {{ balance }} 顆。
+        顆橡實，目前有 {{ balance }} 顆。
       </p>
     </div>
 
@@ -303,7 +303,7 @@ async function submit() {
         data-testid="cafe-note-next"
         @click="goToPlace"
       >
-        下一步：選位置
+        下一步：選擇位置
       </button>
       <button
         v-if="step === 'place'"
@@ -312,7 +312,7 @@ async function submit() {
         data-testid="cafe-note-place-next"
         @click="step = 'confirm'"
       >
-        就貼這裡
+        張貼
       </button>
       <button
         v-if="step === 'confirm'"
@@ -322,7 +322,7 @@ async function submit() {
         data-testid="cafe-note-submit"
         @click="submit"
       >
-        貼上牆 <AcornIcon /> {{ price }}
+        貼上 <AcornIcon /> {{ price }}
       </button>
       <button
         v-if="step !== 'draw'"
@@ -338,7 +338,7 @@ async function submit() {
         class="text-sm text-theme-700 underline dark:text-zinc-400"
         @click="emit('close')"
       >
-        先不貼了
+        取消
       </button>
       <span v-if="!canPay" class="text-xs text-theme-700 dark:text-zinc-400">
         橡實不夠，目前有 {{ balance }} 顆

@@ -24,7 +24,7 @@ final class CafeSeatController extends Controller
         $viewer = $resolveCafeViewer($request);
 
         if ($viewer === null) {
-            return response()->json(['message' => '請先到自習室設定暱稱，才能在咖啡廳入座。'], 403);
+            return response()->json(['message' => '請先至自習室設定暱稱後方可入座。'], 403);
         }
 
         try {
@@ -43,7 +43,7 @@ final class CafeSeatController extends Controller
         $viewer = $resolveCafeViewer($request);
 
         if ($viewer === null) {
-            return response()->json(['message' => '請先到自習室設定暱稱。'], 403);
+            return response()->json(['message' => '請先至自習室設定暱稱。'], 403);
         }
 
         $leaveCafeSeat($viewer);

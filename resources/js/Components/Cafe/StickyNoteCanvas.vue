@@ -153,7 +153,7 @@ defineExpose({ toBlob, toDataURL, hasContent })
         :height="SIZE"
         class="size-full cursor-crosshair touch-none"
         role="img"
-        aria-label="便利貼畫布，需要用滑鼠或觸控作畫"
+        aria-label="便利貼畫布，使用滑鼠或觸控以塗鴉"
         data-testid="sticky-note-canvas"
         @pointerdown="start"
         @pointermove="move"

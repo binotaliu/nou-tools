@@ -24,11 +24,11 @@ class CafeStickyNotesTable
         return $table
             ->columns([
                 ImageColumn::make('drawing')
-                    ->label('圖')
+                    ->label('圖畫')
                     ->state(fn (CafeStickyNote $record): ?string => $record->drawing_path === null ? null : route('cafe.notes.drawing', $record))
                     ->square()
                     ->size(64),
-                TextColumn::make('text')->label('文字')->wrap()->placeholder('（只有圖）'),
+                TextColumn::make('text')->label('文字')->wrap()->placeholder('（僅圖畫）'),
                 TextColumn::make('status')
                     ->label('狀態')
                     ->badge()
@@ -42,7 +42,7 @@ class CafeStickyNotesTable
                 TextColumn::make('schedule.studyRoomProfile.nickname')->label('暱稱')->placeholder('—'),
                 TextColumn::make('ai_verdict.reason')->label('AI 判斷')->wrap()->placeholder('—'),
                 TextColumn::make('report_count')->label('檢舉')->sortable(),
-                TextColumn::make('created_at')->label('買下時間')->dateTime('m/d H:i')->sortable(),
+                TextColumn::make('created_at')->label('購入時間')->dateTime('m/d H:i')->sortable(),
                 TextColumn::make('expires_at')->label('下架時間')->dateTime('m/d H:i')->placeholder('—'),
             ])
             ->filters([
@@ -60,7 +60,7 @@ class CafeStickyNotesTable
                     ->visible(fn (CafeStickyNote $record): bool => in_array($record->status, [StickyNoteStatus::Screening, StickyNoteStatus::PendingReview, StickyNoteStatus::Hidden], true))
                     ->action(function (CafeStickyNote $record): void {
                         app(PublishStickyNote::class)($record);
-                        Notification::make()->title('已貼上牆')->success()->send();
+                        Notification::make()->title('已發佈')->success()->send();
                     }),
                 Action::make('decline')
                     ->label('退回並退還橡實')
@@ -70,7 +70,7 @@ class CafeStickyNotesTable
                     ->visible(fn (CafeStickyNote $record): bool => $record->status !== StickyNoteStatus::Declined)
                     ->action(function (CafeStickyNote $record): void {
                         app(DeclineStickyNote::class)($record);
-                        Notification::make()->title('已退回，橡實已退還')->success()->send();
+                        Notification::make()->title('已退回並歸還橡實')->success()->send();
                     }),
                 Action::make('hide')
                     ->label('下架')
@@ -83,7 +83,7 @@ class CafeStickyNotesTable
                         Notification::make()->title('已下架')->success()->send();
                     }),
                 Action::make('toggleBlock')
-                    ->label(fn (CafeStickyNote $record): string => $record->schedule?->cafe_blocked_at === null ? '封鎖貼便利貼' : '解除封鎖')
+                    ->label(fn (CafeStickyNote $record): string => $record->schedule?->cafe_blocked_at === null ? '封鎖便利貼功能' : '解除封鎖')
                     ->icon('heroicon-o-no-symbol')
                     ->color('gray')
                     ->requiresConfirmation()
@@ -91,7 +91,7 @@ class CafeStickyNotesTable
                     ->action(function (CafeStickyNote $record): void {
                         $blocked = $record->schedule->cafe_blocked_at === null;
                         app(BlockCafeSchedule::class)($record->schedule, $blocked);
-                        Notification::make()->title($blocked ? '已封鎖這份課表貼便利貼' : '已解除封鎖')->success()->send();
+                        Notification::make()->title($blocked ? '已封鎖該課表使用者的便利貼功能' : '已解除封鎖')->success()->send();
                     }),
             ]);
     }

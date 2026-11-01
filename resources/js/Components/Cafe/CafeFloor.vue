@@ -62,8 +62,8 @@ const smallTables = computed(() => {
 
 const wallLabel = computed(() =>
   props.notes.length
-    ? `便利貼牆，${props.notes.length} 張便利貼，打開看清楚`
-    : '便利貼牆，還沒有便利貼，打開看看'
+    ? `便利貼牆，目前共有 ${props.notes.length} 張便利貼`
+    : '便利貼牆，還沒有便利貼'
 )
 
 // Pendant lamps over the counter; the middle one only shows from `sm` up,
@@ -159,11 +159,7 @@ const LAMPS = [
           type="button"
           class="shrink-0 -rotate-1 rounded-md border-4 border-[#8a6246] bg-[#26302a] px-2.5 py-2 text-center text-xs font-semibold text-amber-50 transition hover:rotate-0 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-default disabled:hover:-rotate-1 sm:px-3 sm:py-2.5"
           :disabled="!canOrder"
-          :aria-label="
-            canOrder
-              ? '今日菜單，打開點餐'
-              : '今日菜單（要先建立課表並設定暱稱）'
-          "
+          :aria-label="canOrder ? '今日菜單，按一下以點餐' : '今日菜單'"
           data-testid="cafe-menu-board"
           @click="emit('open-menu')"
         >
@@ -273,7 +269,7 @@ const LAMPS = [
             <button
               type="button"
               class="block rounded-lg transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2"
-              aria-label="和松鼠店長聊聊"
+              aria-label="和店長聊聊"
               data-testid="cafe-talk-barista"
               @click="emit('talk')"
             >

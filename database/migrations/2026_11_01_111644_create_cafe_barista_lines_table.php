@@ -29,8 +29,8 @@ return new class extends Migration
         });
 
         $now = Date::now();
-        $order = ['label' => '我想點餐', 'response' => '請看菜單，慢慢挑。', 'action' => 'order'];
-        $chat = ['label' => '隨便聊聊', 'response' => '好呀，我正好有空。', 'action' => 'none'];
+        $order = ['label' => '點餐', 'response' => '菜單在這裡，要點菜時再跟我說即可。', 'action' => 'order'];
+        $chat = ['label' => '隨便聊聊', 'response' => '嗨，要來聊聊嗎？', 'action' => 'none'];
 
         $line = fn (string $trigger, string $text, array $conditions = [], string $mood = 'happy', array $replies = [], int $priority = 0, int $weight = 1): array => [
             'trigger' => $trigger,
@@ -50,37 +50,37 @@ return new class extends Migration
 
         DB::table('cafe_barista_lines')->insert([
             $line('greeting', '歡迎光臨！今天想喝點什麼？', [], 'happy', [$order, $chat]),
-            $line('greeting', '{nickname}，來啦！老位子還幫你留著。', [], 'happy', [$order]),
-            $line('greeting', '今天的豆子特別香，要不要來一杯？', [], 'thinking', [$order]),
+            $line('greeting', '{nickname}，今天也來啦！要喝什麼呢？', [], 'happy', [$order]),
+            $line('greeting', '今天很適合來杯咖啡喔！', [], 'thinking', [$order]),
             $line('greeting', '歡迎回來，{nickname}。', [], 'happy', [$order, $chat]),
-            $line('first_visit', '第一次來嗎？我是這裡的店長松鼠。吧台、靠牆小桌、大長桌都可以坐，累了就點杯東西。', [], 'happy', [$order, ['label' => '好的', 'response' => '有問題隨時叫我。', 'action' => 'none']], 60),
-            $line('time_of_day', '早安！先來一杯把腦袋叫醒吧。', $period('morning'), 'happy', [$order], 10),
-            $line('time_of_day', '下午容易想睡，來杯咖啡撐一下？', $period('afternoon'), 'thinking', [$order], 10),
-            $line('time_of_day', '晚上了，今天讀了多少？', $period('evening'), 'question', [$order, $chat], 10),
-            $line('time_of_day', '這麼晚還沒睡？別忘了休息，身體比成績重要。', $period('late_night'), 'worried', [$order], 10),
-            $line('weekend', '週末還來讀書，{nickname} 真的很自律。', [], 'happy', [$order], 10),
-            $line('weekend', '假日的店裡特別悠閒，正好慢慢讀。', [], 'happy', [$chat], 10),
-            $line('studied_today', '今天已經專注 {study_minutes} 分鐘了，不錯喔！', ['min_minutes' => 60], 'happy', [$order], 20),
-            $line('studied_today', '專注超過兩小時了，休息一下，喝杯熱的吧。', ['min_minutes' => 120], 'surprised', [$order], 25),
-            $line('acorns_low', '橡實只剩 {acorns} 顆了，去自習室專注一下再回來吧。', ['max' => 2], 'thinking', [], 20),
-            $line('acorns_many', '你已經存了 {acorns} 顆橡實！它們三十天就過期，趁新鮮用掉吧。', ['min' => 15], 'surprised', [$order], 20),
-            $line('school_event_upcoming', '{event} 還有 {days} 天，有準備好嗎？', ['min_days' => 1, 'max_days' => 14], 'question', [], 30),
-            $line('school_event_upcoming', '今天就是{event}，加油！', ['min_days' => 0, 'max_days' => 0], 'happy', [], 35),
-            $line('exam_upcoming', '期中考還有 {days} 天，{course}準備得如何？', $exam('midterm', 8, 21), 'question', [$chat], 40),
-            $line('exam_upcoming', '快期中考了，準備得如何？{course}看完了嗎？', $exam('midterm', 1, 7), 'worried', [$order, $chat], 42),
+            $line('first_visit', '歡迎光臨！我是這裡的店長，松鼠。有空位都可以坐喔！', [], 'happy', [$order, ['label' => '好的', 'response' => '要點餐隨時都可以跟我說。', 'action' => 'none']], 60),
+            $line('time_of_day', '早安！要來杯咖啡開機一下嗎？', $period('morning'), 'happy', [$order], 10),
+            $line('time_of_day', '下午了，要來杯咖啡撐一下嗎？', $period('afternoon'), 'thinking', [$order], 10),
+            $line('time_of_day', '晚安，今天讀得如何呢？', $period('evening'), 'question', [$order, $chat], 10),
+            $line('time_of_day', '半夜也來讀書嗎？', $period('late_night'), 'worried', [$order], 10),
+            $line('weekend', '週末正是適合讀書的時候！加油，{nickname}。', [], 'happy', [$order], 10),
+            $line('weekend', '假日跟平日感覺很不一樣呢。', [], 'happy', [$chat], 10),
+            $line('studied_today', '今天專注了 {study_minutes} 分鐘了，好厲害！', ['min_minutes' => 60], 'happy', [$order], 20),
+            $line('studied_today', '今天讀了兩個小時了，也要記得休息喔！', ['min_minutes' => 120], 'surprised', [$order], 25),
+            $line('acorns_low', '看樣子你只有 {acorns} 顆橡實了，去自習室專注一下再回來吧。', ['max' => 2], 'thinking', [], 20),
+            $line('acorns_many', '你已經存了 {acorns} 顆橡實！記得，橡實只能保存 30 天，記得在還沒壞掉前把他們花掉！', ['min' => 15], 'surprised', [$order], 20),
+            $line('school_event_upcoming', '{event}還有 {days} 天，準備得如何？', ['min_days' => 1, 'max_days' => 14], 'question', [], 30),
+            $line('school_event_upcoming', '今天就是{event}了，加油！', ['min_days' => 0, 'max_days' => 0], 'happy', [], 35),
+            $line('exam_upcoming', '期中考還有 {days} 天，準備得如何？', $exam('midterm', 8, 21), 'question', [$chat], 40),
+            $line('exam_upcoming', '快期中考了，準備得如何？考試範圍都看完了嗎？', $exam('midterm', 1, 7), 'worried', [$order, $chat], 42),
             $line('exam_upcoming', '期末考還有 {days} 天，現在開始複習剛剛好。', $exam('final', 8, 21), 'thinking', [$chat], 40),
-            $line('exam_upcoming', '期末考快到了！{course}的重點整理好了沒？', $exam('final', 1, 7), 'worried', [$order, $chat], 42),
-            $line('exam_day', '今天{exam}，{course}對吧？深呼吸，你可以的！', [], 'happy', [], 50),
-            $line('after_exam', '考完{course}了？辛苦啦，今天好好犒賞自己。', ['max_days_since' => 3], 'happy', [$order], 40),
-            $line('small_talk', '聽說松鼠都會把橡實藏起來然後忘記在哪。我不會，我都記在帳本上。', [], 'happy', [], 5),
-            $line('small_talk', '讀書累了就看看遠處，眼睛也要休息。', [], 'thinking', [], 5),
-            $line('small_talk', '便利貼牆上有人畫了很可愛的圖，點完飲料可以去看看。', [], 'happy', [], 5),
-            $line('small_talk', '坐吧台的客人可以直接跟我聊天喔。', [], 'happy', [], 5),
-            $line('order_thanks', '好的，馬上來！{drink}小心燙。', [], 'happy', [], 0),
-            $line('order_thanks', '{drink}來囉，慢慢享用。', [], 'happy', [], 0),
-            $line('offer_sticky_note', '喝了{drink}的客人可以跟我買一張便利貼，貼在牆上跟大家說說話，要 5 顆橡實。', [], 'happy', [
-                ['label' => '我想買', 'response' => '好，去牆那邊挑一張吧。', 'action' => 'note'],
-                ['label' => '下次吧', 'response' => '隨時都可以。', 'action' => 'none'],
+            $line('exam_upcoming', '期末考快到了！準備得如何？', $exam('final', 1, 7), 'worried', [$order, $chat], 42),
+            $line('exam_day', '今天{exam}對吧？加油！', [], 'happy', [], 50),
+            $line('after_exam', '考完了？辛苦啦，也要記得好好休息喔！', ['max_days_since' => 3], 'happy', [$order], 40),
+            $line('small_talk', '聽說松鼠都會把橡實藏起來然後忘記在哪。我也常常忘記自己把東西放到哪裡了⋯⋯', [], 'happy', [], 5),
+            $line('small_talk', '讀書的時候也要記得讓眼睛休息一下喔～', [], 'thinking', [], 5),
+            $line('small_talk', '有人在便利貼上畫了很可愛的圖呢！', [], 'happy', [], 5),
+            $line('small_talk', '無聊的時候可以來跟我說話喔！', [], 'happy', [], 5),
+            $line('order_thanks', '好的，馬上來！', [], 'happy', [], 0),
+            $line('order_thanks', '{drink}來囉，請慢用。', [], 'happy', [], 0),
+            $line('offer_sticky_note', '有點餐就可以跟我買便利貼，5 顆橡實一張。', [], 'happy', [
+                ['label' => '購買', 'response' => '選一張你喜歡的顏色吧。', 'action' => 'note'],
+                ['label' => '下次再說', 'response' => '想買的時候再跟我說喔～', 'action' => 'none'],
             ], 10),
         ]);
     }

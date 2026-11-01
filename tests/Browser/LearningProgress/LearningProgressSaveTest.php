@@ -56,7 +56,7 @@ it('saves ticked weeks, notes and homework without a full page load', function (
     expect(['table', 'homework', 'week', 'subject'])->toContain($label);
 
     $page->click('[data-testid="learning-progress-header"] button[data-analytics-event="learning_progress_save"]')
-        ->assertSee('學習進度已更新');
+        ->assertSee('已更新學習進度');
 
     $stored = $learningProgress->refresh();
 
@@ -98,7 +98,7 @@ it('shows the saved toast again on every save, not just the first', function () 
     $save = '[data-testid="learning-progress-header"] button[data-analytics-event="learning_progress_save"]';
     $toast = 'document.querySelector(\'[data-testid="notification"] [class*="pointer-events-auto"]\')?.style.display !== \'none\'';
 
-    $page->click($save)->assertSee('學習進度已更新');
+    $page->click($save)->assertSee('已更新學習進度');
 
     // The toast hides itself after about 5s; the second save must bring it back.
     waitUntil($page, '(document.querySelector(\'[data-testid="notification"] [class*="pointer-events-auto"]\')?.style.display) === \'none\'', 10000);
@@ -107,5 +107,5 @@ it('shows the saved toast again on every save, not just the first', function () 
     $page->click($save);
 
     waitUntil($page, $toast);
-    $page->assertSee('學習進度已更新');
+    $page->assertSee('已更新學習進度');
 });

@@ -42,7 +42,7 @@ it('asks about the midterm when it is a week away', function () use ($baristaCoo
         ->getJson(route('cafe.barista'))
         ->assertOk()
         ->assertJsonPath('line.trigger', 'exam_upcoming')
-        ->assertJsonPath('line.text', '快期中考了，準備得如何？虛構學概論看完了嗎？');
+        ->assertJsonPath('line.text', '快期中考了，準備得如何？考試範圍都看完了嗎？');
 });
 
 it('reacts to an exam today and one that just ended', function () use ($baristaCookie, $regular) {
@@ -57,7 +57,7 @@ it('reacts to an exam today and one that just ended', function () use ($baristaC
 
     $this->withCredentials()->withCookie('student_schedule', $cookie)->getJson(route('cafe.barista'))
         ->assertJsonPath('line.trigger', 'exam_day')
-        ->assertJsonPath('line.text', '今天期末考，虛構學概論對吧？深呼吸，你可以的！');
+        ->assertJsonPath('line.text', '今天期末考對吧？加油！');
 
     Date::setTestNow(Date::now()->addDays(2));
 
@@ -78,7 +78,7 @@ it('mentions the next school event with its countdown', function () use ($barist
     $this->withCredentials()->withCookie('student_schedule', $baristaCookie($schedule))
         ->getJson(route('cafe.barista'))
         ->assertJsonPath('line.trigger', 'school_event_upcoming')
-        ->assertJsonPath('line.text', '虛構選課日 還有 6 天，有準備好嗎？');
+        ->assertJsonPath('line.text', '虛構選課日還有 6 天，準備得如何？');
 });
 
 it('falls back to the clock for a visitor and never uses a line it cannot fill', function () {
@@ -125,7 +125,7 @@ it('reads high-balance and low-balance lines from the ledger', function () use (
     $this->withCredentials()->withCookie('student_schedule', $baristaCookie($schedule))
         ->getJson(route('cafe.barista'))
         ->assertJsonPath('line.trigger', 'acorns_many')
-        ->assertJsonPath('line.text', '你已經存了 20 顆橡實！它們三十天就過期，趁新鮮用掉吧。');
+        ->assertJsonPath('line.text', '你已經存了 20 顆橡實！記得，橡實只能保存 30 天，記得在還沒壞掉前把他們花掉！');
 });
 
 it('answers an order with a thank-you or a sticky note offer that names the drink', function () use ($baristaCookie, $regular) {
@@ -137,7 +137,7 @@ it('answers an order with a thank-you or a sticky note offer that names the drin
         ->json('line');
 
     expect($line['trigger'])->toBe('offer_sticky_note')
-        ->and($line['text'])->toContain('拿鐵')
+        ->and($line['text'])->toContain('便利貼')
         ->and($line['replies'])->toHaveCount(2)
         ->and($line['replies'][0]['action'])->toBe('note');
 });

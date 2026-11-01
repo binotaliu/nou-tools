@@ -93,7 +93,7 @@ it('runs the focus timer from the panel on a café seat and keeps it when leavin
     // No drink, no focus: the server says so in the panel.
     $page->click('[data-testid="study-room-start-timer"]');
     waitUntil($page, 'document.querySelector(\'[data-testid="study-room-timer-error"]\') !== null');
-    $page->assertSeeIn('[data-testid="study-room-timer-error"]', '先點一杯飲料');
+    $page->assertSeeIn('[data-testid="study-room-timer-error"]', '先點餐飲料');
 
     CafeOrder::factory()->for($schedule, 'schedule')->create();
     $page->click('[data-testid="study-room-start-timer"]');
