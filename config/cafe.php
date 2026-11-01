@@ -66,15 +66,15 @@ return [
     */
 
     'notes' => [
-        'price' => 5,
-        'lifetime_days' => 14,
+        'price' => 15,
+        'lifetime_days' => 30,
         'max_text_length' => 60,
         'drawing_size' => 480,
         'drawing_max_kb' => 300,
         'paper_colors' => ['yellow', 'pink', 'blue', 'green', 'orange'],
         'wall_limit' => 60,
         // Readers' reports hide a note for review at this many.
-        'report_threshold' => 3,
+        'report_threshold' => 5,
 
         'ai' => [
             'provider' => env('CAFE_AI_PROVIDER', 'anthropic'),
@@ -97,7 +97,7 @@ return [
 
     'arcade' => [
         'horoscope' => [
-            'price' => 2,
+            'price' => 4,
             'salt' => env('CAFE_HOROSCOPE_SALT'),
         ],
     ],
