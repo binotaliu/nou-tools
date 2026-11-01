@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\CafeSeat;
+use App\Models\StudyRoomSeat;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use NouTools\Domains\Cafe\Actions\BuildCafeState;
@@ -16,8 +16,11 @@ use NouTools\Domains\Cafe\Exceptions\CafeSeatUnavailableException;
 
 final class CafeSeatController extends Controller
 {
-    public function store(Request $request, CafeSeat $seat, ResolveCafeViewer $resolveCafeViewer, TakeCafeSeat $takeCafeSeat, BuildCafeState $buildCafeState): JsonResponse
+    public function store(Request $request, StudyRoomSeat $seat, ResolveCafeViewer $resolveCafeViewer, TakeCafeSeat $takeCafeSeat, BuildCafeState $buildCafeState): JsonResponse
     {
+        // `{seat}` binds any seat by code; only café seats are takeable here.
+        abort_unless($seat->isCafe(), 404);
+
         $viewer = $resolveCafeViewer($request);
 
         if ($viewer === null) {

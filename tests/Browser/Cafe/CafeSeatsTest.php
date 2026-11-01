@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\CafeSeat;
 use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
+use App\Models\StudyRoomSeat;
 use Illuminate\Support\Str;
 
 // Seats are claimed through resources/js/Composables/useCafeSocket.js, so the
@@ -48,11 +48,11 @@ it('lets a signed-in student sit down and get up', function () {
 
     $page->assertSeeIn('[data-testid="cafe-seat-B01"]', '拿鐵同學');
 
-    expect(CafeSeat::query()->where('code', 'B01')->value('student_schedule_id'))->toBe($schedule->id);
+    expect(StudyRoomSeat::query()->where('room', 'cafe')->where('code', 'B01')->value('student_schedule_id'))->toBe($schedule->id);
 
     $page->click('[data-testid="cafe-leave"]');
 
     waitUntil($page, 'document.querySelector(\'[data-testid="cafe-quick-seat"]\') !== null');
 
-    expect(CafeSeat::query()->where('code', 'B01')->value('student_schedule_id'))->toBeNull();
+    expect(StudyRoomSeat::query()->where('room', 'cafe')->where('code', 'B01')->value('student_schedule_id'))->toBeNull();
 });

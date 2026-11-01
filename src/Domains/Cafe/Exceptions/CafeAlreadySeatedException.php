@@ -8,8 +8,8 @@ use RuntimeException;
 
 final class CafeAlreadySeatedException extends RuntimeException
 {
-    public function __construct()
+    public function __construct(string $message = '你已經坐在咖啡廳的座位上了。')
     {
-        parent::__construct('你已經坐在咖啡廳的座位上了。');
+        parent::__construct($message);
     }
 }

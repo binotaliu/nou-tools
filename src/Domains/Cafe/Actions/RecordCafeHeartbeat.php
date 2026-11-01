@@ -4,23 +4,16 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Cafe\Actions;
 
-use App\Models\CafeSeat;
-use Illuminate\Support\Facades\Date;
+use App\Enums\StudyRoomVenue;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
+use NouTools\Domains\StudyRoom\Actions\RecordHeartbeat;
 
 final readonly class RecordCafeHeartbeat
 {
+    public function __construct(private RecordHeartbeat $recordHeartbeat) {}
+
     public function __invoke(StudentScheduleCookie $viewer): bool
     {
-        $seat = CafeSeat::query()->where('student_schedule_id', $viewer->id)->first();
-
-        if ($seat === null) {
-            return false;
-        }
-
-        $seat->last_seen_at = Date::now();
-        $seat->saveOrFail();
-
-        return true;
+        return ($this->recordHeartbeat)($viewer, StudyRoomVenue::Cafe);
     }
 }

@@ -17,6 +17,8 @@ final class CafeOrder extends Model
     protected $casts = [
         'to_go' => 'boolean',
         'price_paid' => 'integer',
+        'ready_at' => 'datetime',
+        'sips_taken' => 'integer',
         'expires_at' => 'datetime',
     ];
 

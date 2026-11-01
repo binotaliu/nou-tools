@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\StudyRoom\Actions;
 
+use App\Enums\StudyRoomVenue;
 use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Date;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
@@ -19,9 +20,10 @@ use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
  */
 final readonly class RecordHeartbeat
 {
-    public function __invoke(StudentScheduleCookie $viewer): bool
+    public function __invoke(StudentScheduleCookie $viewer, StudyRoomVenue $room = StudyRoomVenue::Study): bool
     {
         $seat = StudyRoomSeat::query()
+            ->inRoom($room)
             ->where('student_schedule_id', $viewer->id)
             ->first();
 

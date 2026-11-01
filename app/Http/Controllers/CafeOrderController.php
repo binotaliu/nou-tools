@@ -11,6 +11,7 @@ use NouTools\Domains\Acorns\Exceptions\InsufficientAcornsException;
 use NouTools\Domains\Cafe\Actions\OrderCoffee;
 use NouTools\Domains\Cafe\Actions\ResolveCafeViewer;
 use NouTools\Domains\Cafe\DataTransferObjects\OrderCoffeeData;
+use NouTools\Domains\Cafe\Exceptions\DineInNeedsSeatException;
 use NouTools\Domains\Cafe\Exceptions\MenuItemUnavailableException;
 use NouTools\Domains\Cafe\ViewModels\CafeCoffeeViewModel;
 
@@ -26,7 +27,7 @@ final class CafeOrderController extends Controller
 
         try {
             $order = $orderCoffee($viewer, $input);
-        } catch (InsufficientAcornsException|MenuItemUnavailableException $exception) {
+        } catch (InsufficientAcornsException|MenuItemUnavailableException|DineInNeedsSeatException $exception) {
             return response()->json(['message' => $exception->getMessage()], 422);
         }
 

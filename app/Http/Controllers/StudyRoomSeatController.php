@@ -20,6 +20,8 @@ final class StudyRoomSeatController extends Controller
 {
     public function store(Request $request, StudyRoomSeat $seat, TakeSeat $takeSeat, BuildStudyRoomState $buildStudyRoomState): JsonResponse
     {
+        abort_if($seat->isCafe(), 404);
+
         $viewer = $this->requireProfiledViewer($request);
 
         if ($viewer instanceof JsonResponse) {

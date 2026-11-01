@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\StudyRoom\Actions;
 
+use App\Enums\StudyRoomVenue;
 use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Date;
@@ -26,6 +27,7 @@ final readonly class SyncStudyRoomSeats
             $now = Date::now();
 
             $rows = array_map(fn (array $definition): array => [
+                'room' => StudyRoomVenue::Study->value,
                 'floor' => $definition['floor'],
                 'kind' => $definition['kind']->value,
                 'group_code' => $definition['group_code'],
@@ -43,11 +45,12 @@ final readonly class SyncStudyRoomSeats
             );
 
             StudyRoomSeat::query()
+                ->inRoom(StudyRoomVenue::Study)
                 ->whereNotIn('code', array_column($definitions, 'code'))
                 ->whereNull('student_schedule_id')
                 ->delete();
 
-            return StudyRoomSeat::query()->count();
+            return StudyRoomSeat::query()->inRoom(StudyRoomVenue::Study)->count();
         });
     }
 }

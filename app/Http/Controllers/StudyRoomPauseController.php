@@ -6,14 +6,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use NouTools\Domains\StudyRoom\Actions\BuildStudyRoomState;
+use NouTools\Domains\StudyRoom\Actions\BuildHeldRoomState;
 use NouTools\Domains\StudyRoom\Actions\PauseStudyTimer;
 use NouTools\Domains\StudyRoom\Exceptions\CannotPauseTimerException;
 use NouTools\Domains\StudyRoom\Exceptions\NoSeatHeldException;
 
 final class StudyRoomPauseController extends Controller
 {
-    public function __invoke(Request $request, PauseStudyTimer $pauseStudyTimer, BuildStudyRoomState $buildStudyRoomState): JsonResponse
+    public function __invoke(Request $request, PauseStudyTimer $pauseStudyTimer, BuildHeldRoomState $buildStudyRoomState): JsonResponse
     {
         $viewer = $request->studentScheduleFromCookie();
 

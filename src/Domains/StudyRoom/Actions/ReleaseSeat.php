@@ -7,6 +7,7 @@ namespace NouTools\Domains\StudyRoom\Actions;
 use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use NouTools\Domains\Cafe\Actions\TossDineInOrders;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
 
 /**
@@ -29,6 +30,7 @@ final readonly class ReleaseSeat
 {
     public function __construct(
         private RecordStudySession $recordStudySession,
+        private TossDineInOrders $tossDineInOrders,
     ) {}
 
     public function __invoke(StudentScheduleCookie $viewer): ?StudyRoomSeat
@@ -61,6 +63,10 @@ final readonly class ReleaseSeat
             $seat->paused_at = null;
             $seat->timer_end_notified_at = null;
             $seat->saveOrFail();
+
+            if ($seat->isCafe()) {
+                ($this->tossDineInOrders)($viewer->id);
+            }
 
             return $seat;
         });

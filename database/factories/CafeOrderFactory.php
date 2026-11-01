@@ -27,6 +27,8 @@ final class CafeOrderFactory extends Factory
             'emoji' => '☕',
             'cup_style' => 'mug',
             'to_go' => false,
+            'ready_at' => Date::now()->subMinute(),
+            'sips_taken' => 0,
             'price_paid' => 3,
             'expires_at' => Date::now()->addHours(2),
         ];

@@ -16,7 +16,7 @@ final readonly class LeaveSeat
 {
     public function __construct(
         private ReleaseSeat $releaseSeat,
-        private BroadcastStudyRoomChange $broadcastStudyRoomChange,
+        private BroadcastSeatChange $broadcastSeatChange,
     ) {}
 
     public function __invoke(StudentScheduleCookie $viewer): void
@@ -24,7 +24,7 @@ final readonly class LeaveSeat
         $seat = ($this->releaseSeat)($viewer);
 
         if ($seat !== null) {
-            ($this->broadcastStudyRoomChange)('seat.left', $seat);
+            ($this->broadcastSeatChange)('seat.left', $seat);
         }
     }
 }

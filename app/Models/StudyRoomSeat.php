@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\StudyActivityVerb;
+use App\Enums\StudyRoomVenue;
 use App\Enums\StudySeatKind;
 use App\Enums\StudyTimerMode;
 use App\Enums\StudyTimerPhase;
 use Database\Factories\StudyRoomSeatFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +21,7 @@ final class StudyRoomSeat extends Model
     use HasFactory;
 
     protected $fillable = [
+        'room',
         'floor',
         'kind',
         'group_code',
@@ -41,6 +44,7 @@ final class StudyRoomSeat extends Model
     ];
 
     protected $casts = [
+        'room' => StudyRoomVenue::class,
         'kind' => StudySeatKind::class,
         'activity_verb' => StudyActivityVerb::class,
         'timer_mode' => StudyTimerMode::class,
@@ -54,6 +58,20 @@ final class StudyRoomSeat extends Model
         'paused_at' => 'datetime',
         'timer_end_notified_at' => 'datetime',
     ];
+
+    /**
+     * @param  Builder<StudyRoomSeat>  $query
+     * @return Builder<StudyRoomSeat>
+     */
+    public function scopeInRoom(Builder $query, StudyRoomVenue $room): Builder
+    {
+        return $query->where('room', $room->value);
+    }
+
+    public function isCafe(): bool
+    {
+        return $this->room === StudyRoomVenue::Cafe;
+    }
 
     /**
      * Seats are addressed by their public code, never by id.

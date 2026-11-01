@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Cafe\Actions;
 
-use App\Models\CafeSeat;
+use App\Enums\StudyRoomVenue;
+use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Date;
 
 /**
- * Idempotently reconciles `cafe_seats` against the layout, keyed on `code`.
+ * Idempotently reconciles café rows of `study_room_seats` against the layout, keyed on `code`.
  * Never touches occupancy, and never evicts an occupied seat.
  */
 final readonly class SyncCafeSeats
@@ -22,8 +23,10 @@ final readonly class SyncCafeSeats
             $definitions = ($this->buildCafeSeatDefinitions)();
             $now = Date::now();
 
-            CafeSeat::query()->upsert(
+            StudyRoomSeat::query()->upsert(
                 array_map(fn (array $definition): array => [
+                    'room' => StudyRoomVenue::Cafe->value,
+                    'floor' => 0,
                     'kind' => $definition['kind']->value,
                     'group_code' => $definition['group_code'],
                     'seat_number' => $definition['seat_number'],
@@ -33,15 +36,16 @@ final readonly class SyncCafeSeats
                     'updated_at' => $now,
                 ], $definitions),
                 ['code'],
-                ['kind', 'group_code', 'seat_number', 'label', 'updated_at'],
+                ['room', 'floor', 'kind', 'group_code', 'seat_number', 'label', 'updated_at'],
             );
 
-            CafeSeat::query()
+            StudyRoomSeat::query()
+                ->inRoom(StudyRoomVenue::Cafe)
                 ->whereNotIn('code', array_column($definitions, 'code'))
                 ->whereNull('student_schedule_id')
                 ->delete();
 
-            return CafeSeat::query()->count();
+            return StudyRoomSeat::query()->inRoom(StudyRoomVenue::Cafe)->count();
         });
     }
 }

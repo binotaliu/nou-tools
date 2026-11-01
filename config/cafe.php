@@ -42,11 +42,16 @@ return [
     |
     | A coffee sits on the buyer's seat (café and study room) for
     | `duration_minutes`; a new order replaces the one still on the table.
+    | The drink arrives `delivery_seconds` after it is ordered and takes
+    | `sips` sips to finish. 內用 is thrown away when the buyer leaves the
+    | café seat; 外帶 keeps its lifetime.
     |
     */
 
     'coffee' => [
         'duration_minutes' => 120,
+        'delivery_seconds' => 6,
+        'sips' => 5,
     ],
 
     /*

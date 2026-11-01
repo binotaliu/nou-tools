@@ -4,36 +4,35 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Cafe\Actions;
 
-use App\Models\CafeSeat;
+use App\Enums\StudyRoomVenue;
+use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Date;
-use NouTools\Domains\Cafe\ViewModels\CafeSeatViewModel;
 use NouTools\Domains\Cafe\ViewModels\CafeStateViewModel;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
+use NouTools\Domains\StudyRoom\Actions\ResolveSeatVersionSignature;
+use NouTools\Domains\StudyRoom\ViewModels\StudyRoomSeatViewModel;
 
 final readonly class BuildCafeState
 {
+    public function __construct(private ResolveSeatVersionSignature $resolveSeatVersionSignature) {}
+
     public function __invoke(?StudentScheduleCookie $viewer): CafeStateViewModel
     {
-        $seats = CafeSeat::query()
-            ->with(['schedule.studyRoomProfile', 'schedule.activeCafeOrder'])
+        $seats = StudyRoomSeat::query()
+            ->inRoom(StudyRoomVenue::Cafe)
+            ->with(['schedule.studyRoomProfile', 'schedule.activeCafeOrder', 'subjectCourse'])
             ->orderBy('id')
             ->get();
 
         $viewerId = $viewer?->id;
         $viewModels = $seats
-            ->map(fn (CafeSeat $seat): CafeSeatViewModel => CafeSeatViewModel::fromModel($seat, $viewerId))
+            ->map(fn (StudyRoomSeat $seat): StudyRoomSeatViewModel => StudyRoomSeatViewModel::fromModel($seat, $viewerId))
             ->all();
 
         // `isYou` is viewer-relative and must not move the version, or two
         // viewers of the same room would never share an ETag.
         $signature = $seats
-            ->map(fn (CafeSeat $seat): string => implode('|', [
-                $seat->code,
-                $seat->student_schedule_id ?? '-',
-                $seat->schedule?->studyRoomProfile?->nickname ?? '-',
-                $seat->schedule?->studyRoomProfile?->emoji ?? '-',
-                $seat->schedule?->activeCafeOrder?->id ?? '-',
-            ]))
+            ->map(fn (StudyRoomSeat $seat): string => ($this->resolveSeatVersionSignature)($seat))
             ->implode(';');
 
         return new CafeStateViewModel(

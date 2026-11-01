@@ -38,7 +38,7 @@ final class StudyTimerFinished extends Notification
             ->title($this->title())
             ->icon('/icons/icon-192.png')
             ->body($this->body())
-            ->data(['url' => route('study-room.show')])
+            ->data(['url' => route($this->seat->isCafe() ? 'cafe.show' : 'study-room.show')])
             // One notification per seat: a replacement should overwrite the
             // previous round rather than stack up in the tray.
             ->tag("study-timer:{$this->seat->code}")

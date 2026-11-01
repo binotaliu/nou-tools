@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use NouTools\Domains\StudyRoom\Actions\BuildStudyRoomState;
+use NouTools\Domains\StudyRoom\Actions\BuildHeldRoomState;
 use NouTools\Domains\StudyRoom\Actions\ChangeStudyActivity;
 use NouTools\Domains\StudyRoom\Actions\StartStudyTimer;
 use NouTools\Domains\StudyRoom\Actions\StopStudyTimer;
@@ -17,7 +17,7 @@ use NouTools\Domains\StudyRoom\Exceptions\NoSeatHeldException;
 
 final class StudyRoomTimerController extends Controller
 {
-    public function store(StartStudyTimerData $input, Request $request, StartStudyTimer $startStudyTimer, BuildStudyRoomState $buildStudyRoomState): JsonResponse
+    public function store(StartStudyTimerData $input, Request $request, StartStudyTimer $startStudyTimer, BuildHeldRoomState $buildStudyRoomState): JsonResponse
     {
         $viewer = $request->studentScheduleFromCookie();
 
@@ -34,7 +34,7 @@ final class StudyRoomTimerController extends Controller
         return response()->json(['ok' => true, 'state' => $buildStudyRoomState($viewer)]);
     }
 
-    public function destroy(Request $request, StopStudyTimer $stopStudyTimer, BuildStudyRoomState $buildStudyRoomState): JsonResponse
+    public function destroy(Request $request, StopStudyTimer $stopStudyTimer, BuildHeldRoomState $buildStudyRoomState): JsonResponse
     {
         $viewer = $request->studentScheduleFromCookie();
 
@@ -51,7 +51,7 @@ final class StudyRoomTimerController extends Controller
         return response()->json(['ok' => true, 'state' => $buildStudyRoomState($viewer)]);
     }
 
-    public function update(ChangeStudyActivityData $input, Request $request, ChangeStudyActivity $changeStudyActivity, BuildStudyRoomState $buildStudyRoomState): JsonResponse
+    public function update(ChangeStudyActivityData $input, Request $request, ChangeStudyActivity $changeStudyActivity, BuildHeldRoomState $buildStudyRoomState): JsonResponse
     {
         $viewer = $request->studentScheduleFromCookie();
 

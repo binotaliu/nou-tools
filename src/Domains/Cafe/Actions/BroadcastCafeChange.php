@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\Cafe\Actions;
 
 use App\Events\CafeUpdated;
-use App\Models\CafeSeat;
+use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -17,7 +17,7 @@ final readonly class BroadcastCafeChange
 {
     public function __construct(private BuildCafeState $buildCafeState) {}
 
-    public function __invoke(string $type, ?CafeSeat $seat = null): void
+    public function __invoke(string $type, ?StudyRoomSeat $seat = null): void
     {
         try {
             $state = ($this->buildCafeState)(null);

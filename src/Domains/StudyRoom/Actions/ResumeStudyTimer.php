@@ -22,7 +22,7 @@ use NouTools\Domains\StudyRoom\Exceptions\TimerNotPausedException;
 final readonly class ResumeStudyTimer
 {
     public function __construct(
-        private BroadcastStudyRoomChange $broadcastStudyRoomChange,
+        private BroadcastSeatChange $broadcastSeatChange,
     ) {}
 
     public function __invoke(StudentScheduleCookie $viewer): StudyRoomSeat
@@ -54,7 +54,7 @@ final readonly class ResumeStudyTimer
             return $seat;
         });
 
-        ($this->broadcastStudyRoomChange)('timer.resumed', $seat);
+        ($this->broadcastSeatChange)('timer.resumed', $seat);
 
         return $seat;
     }

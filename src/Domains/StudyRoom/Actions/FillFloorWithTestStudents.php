@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\StudyRoom\Actions;
 
 use App\Enums\StudyActivityVerb;
+use App\Enums\StudyRoomVenue;
 use App\Enums\StudyTimerMode;
 use App\Enums\StudyTimerPhase;
 use App\Models\StudentSchedule;
@@ -38,6 +39,7 @@ final readonly class FillFloorWithTestStudents
         /** @var array<int, StudyRoomSeat> $filledSeats */
         $filledSeats = DB::transaction(function () use ($floor): array {
             $emptySeats = StudyRoomSeat::query()
+                ->inRoom(StudyRoomVenue::Study)
                 ->where('floor', $floor)
                 ->whereNull('student_schedule_id')
                 ->orderBy('id')

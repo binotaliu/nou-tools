@@ -13,8 +13,8 @@ use RuntimeException;
  */
 final class AlreadySeatedException extends RuntimeException
 {
-    public function __construct()
+    public function __construct(string $message = '請先離開目前的座位，才能選擇其他座位。')
     {
-        parent::__construct('請先離開目前的座位，才能選擇其他座位。');
+        parent::__construct($message);
     }
 }

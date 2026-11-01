@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Cafe\Actions;
 
-use App\Models\CafeSeat;
+use App\Enums\StudyRoomVenue;
 use App\Models\StudyRoomProfile;
+use App\Models\StudyRoomSeat;
 use Illuminate\Http\Request;
 use NouTools\Domains\Cafe\ViewModels\CafePageViewModel;
 
@@ -15,7 +16,7 @@ final readonly class ShowCafePage
 
     public function __invoke(Request $request): CafePageViewModel
     {
-        if (CafeSeat::query()->count() === 0) {
+        if (StudyRoomSeat::query()->inRoom(StudyRoomVenue::Cafe)->count() === 0) {
             ($this->syncCafeSeats)();
         }
 

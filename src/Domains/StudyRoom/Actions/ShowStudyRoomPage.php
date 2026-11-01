@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\StudyRoom\Actions;
 
 use App\Enums\StudyActivityVerb;
+use App\Enums\StudyRoomVenue;
 use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
@@ -32,7 +33,7 @@ final readonly class ShowStudyRoomPage
 
     public function __invoke(Request $request): StudyRoomPageData
     {
-        if (StudyRoomSeat::query()->count() === 0) {
+        if (StudyRoomSeat::query()->inRoom(StudyRoomVenue::Study)->count() === 0) {
             ($this->syncStudyRoomSeats)();
         }
 

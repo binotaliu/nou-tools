@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\Shared\Actions;
 
+use App\Enums\StudyRoomVenue;
 use App\Models\StudyRoomSeat;
 use App\Models\StudyRoomSession;
 use Illuminate\Support\Facades\Date;
@@ -62,8 +63,8 @@ final readonly class ResolveStudyRoomMetrics
             });
 
         return [
-            'occupied' => StudyRoomSeat::query()->whereNotNull('student_schedule_id')->count(),
-            'capacity' => StudyRoomSeat::query()->count(),
+            'occupied' => StudyRoomSeat::query()->inRoom(StudyRoomVenue::Study)->whereNotNull('student_schedule_id')->count(),
+            'capacity' => StudyRoomSeat::query()->inRoom(StudyRoomVenue::Study)->count(),
             'focusHoursThisWeek' => round($weekFocusSeconds / 3600, 1),
             'sessionsToday' => $sessionsToday,
             'completionRate' => $weekSessions === 0 ? 0.0 : round($weekCompleted / $weekSessions * 100, 1),

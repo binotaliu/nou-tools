@@ -19,7 +19,7 @@ final readonly class StopStudyTimer
 {
     public function __construct(
         private RecordStudySession $recordStudySession,
-        private BroadcastStudyRoomChange $broadcastStudyRoomChange,
+        private BroadcastSeatChange $broadcastSeatChange,
     ) {}
 
     public function __invoke(StudentScheduleCookie $viewer): StudyRoomSeat
@@ -50,7 +50,7 @@ final readonly class StopStudyTimer
             return $seat;
         });
 
-        ($this->broadcastStudyRoomChange)('timer.stopped', $seat);
+        ($this->broadcastSeatChange)('timer.stopped', $seat);
 
         return $seat;
     }

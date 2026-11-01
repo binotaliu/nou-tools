@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\StudyRoomVenue;
 use App\Enums\StudySeatKind;
 use App\Models\StudentSchedule;
 use App\Models\StudyRoomSeat;
@@ -24,6 +25,7 @@ final class StudyRoomSeatFactory extends Factory
         $seatNumber = $this->faker->unique()->numberBetween(1, 12);
 
         return [
+            'room' => StudyRoomVenue::Study,
             'floor' => 1,
             'kind' => StudySeatKind::Solo,
             'group_code' => null,
@@ -58,6 +60,24 @@ final class StudyRoomSeatFactory extends Factory
             'group_code' => $groupCode,
             'seat_number' => $seatNumber,
             'label' => '共享桌 '.$groupCode.' 座位 '.$seatNumber,
+        ]);
+    }
+
+    /**
+     * A café bar stool (room = cafe, floor 0).
+     */
+    public function cafe(?int $number = null): self
+    {
+        $number ??= $this->faker->unique()->numberBetween(1, 99);
+
+        return $this->state(fn (array $attributes): array => [
+            'room' => StudyRoomVenue::Cafe,
+            'floor' => 0,
+            'kind' => StudySeatKind::Bar,
+            'group_code' => null,
+            'seat_number' => $number,
+            'code' => sprintf('B%02d', $number),
+            'label' => sprintf('吧台 %02d 號', $number),
         ]);
     }
 }

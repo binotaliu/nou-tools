@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NouTools\Domains\StudyRoom\Actions;
 
 use App\Enums\StudyActivityVerb;
+use App\Enums\StudyRoomVenue;
 use App\Enums\StudySeatKind;
 use App\Models\StudyRoomProfile;
 use App\Models\StudyRoomSeat;
@@ -24,6 +25,7 @@ final readonly class BuildStudyRoomState
 {
     public function __construct(
         private ResolveOpenFloorCount $resolveOpenFloorCount,
+        private ResolveSeatVersionSignature $resolveSeatVersionSignature,
     ) {}
 
     public function __invoke(?StudentScheduleCookie $viewer): StudyRoomStateViewModel
@@ -31,6 +33,7 @@ final readonly class BuildStudyRoomState
         $openFloors = ($this->resolveOpenFloorCount)();
 
         $seats = StudyRoomSeat::query()
+            ->inRoom(StudyRoomVenue::Study)
             ->where('floor', '<=', $openFloors)
             ->with(['schedule.studyRoomProfile', 'schedule.activeCafeOrder', 'subjectCourse'])
             ->orderBy('floor')
@@ -166,19 +169,7 @@ final readonly class BuildStudyRoomState
     {
         $signature = $seats
             ->sortBy('id')
-            ->map(fn (StudyRoomSeat $seat): string => implode('|', [
-                $seat->id,
-                $seat->student_schedule_id ?? '',
-                $seat->schedule?->activeCafeOrder?->id ?? '',
-                $seat->activity_verb?->value ?? '',
-                $seat->subject_course_id ?? '',
-                $seat->subject_label ?? '',
-                $seat->timer_mode?->value ?? '',
-                $seat->timer_phase?->value ?? '',
-                $seat->timer_round ?? '',
-                $seat->timer_started_at?->getTimestamp() ?? '',
-                $seat->timer_ends_at?->getTimestamp() ?? '',
-            ]))
+            ->map(fn (StudyRoomSeat $seat): string => ($this->resolveSeatVersionSignature)($seat))
             ->implode(';');
 
         // Totals (today's focused seconds, site-wide and for this viewer)

@@ -8,12 +8,18 @@ enum StudySeatKind: string
 {
     case Solo = 'solo';
     case Shared = 'shared';
+    case Bar = 'bar';
+    case Window = 'window';
+    case Communal = 'communal';
 
     public function label(): string
     {
         return match ($this) {
             self::Solo => '單人座',
             self::Shared => '共享桌',
+            self::Bar => '吧台',
+            self::Window => '靠牆小桌',
+            self::Communal => '大長桌',
         };
     }
 

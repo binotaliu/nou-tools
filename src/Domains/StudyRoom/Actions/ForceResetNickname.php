@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\DB;
 final readonly class ForceResetNickname
 {
     public function __construct(
-        private BroadcastStudyRoomChange $broadcastStudyRoomChange,
+        private BroadcastSeatChange $broadcastSeatChange,
     ) {}
 
     public function __invoke(StudyRoomProfile $profile, User $actingAdmin): StudyRoomProfile
@@ -43,7 +43,7 @@ final readonly class ForceResetNickname
         });
 
         if ($seat !== null) {
-            ($this->broadcastStudyRoomChange)('seat.updated', $seat);
+            ($this->broadcastSeatChange)('seat.updated', $seat);
         }
 
         return $profile;

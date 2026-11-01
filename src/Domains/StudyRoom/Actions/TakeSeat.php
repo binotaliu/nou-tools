@@ -40,11 +40,15 @@ final readonly class TakeSeat
                 throw new FloorClosedException;
             }
 
-            $alreadySeated = StudyRoomSeat::query()
+            $heldSeat = StudyRoomSeat::query()
                 ->where('student_schedule_id', $viewer->id)
-                ->exists();
+                ->first();
 
-            if ($alreadySeated) {
+            if ($heldSeat?->isCafe()) {
+                throw new AlreadySeatedException('你正坐在咖啡廳，請先離座再到自習室。');
+            }
+
+            if ($heldSeat !== null) {
                 throw new AlreadySeatedException;
             }
 

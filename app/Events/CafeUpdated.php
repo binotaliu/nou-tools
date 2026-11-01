@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-use App\Models\CafeSeat;
+use App\Models\StudyRoomSeat;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use NouTools\Domains\Cafe\ViewModels\CafeSeatViewModel;
+use NouTools\Domains\StudyRoom\ViewModels\StudyRoomSeatViewModel;
 
 /**
  * One café change (a seat taken or left, later a coffee ordered or a sticky
@@ -24,7 +24,7 @@ final class CafeUpdated implements ShouldBroadcastNow
 
     public function __construct(
         public string $type,
-        public ?CafeSeat $seat,
+        public ?StudyRoomSeat $seat,
         public int $occupantCount,
         public string $version,
     ) {}
@@ -48,7 +48,7 @@ final class CafeUpdated implements ShouldBroadcastNow
             'type' => $this->type,
             'seatCode' => $this->seat?->code,
             // Built without a viewer: the client derives `isYou` itself.
-            'seat' => $this->seat === null ? null : CafeSeatViewModel::fromModel($this->seat, null),
+            'seat' => $this->seat === null ? null : StudyRoomSeatViewModel::fromModel($this->seat, null),
             'occupantCount' => $this->occupantCount,
             'version' => $this->version,
         ];

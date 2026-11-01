@@ -32,7 +32,7 @@ final readonly class StartBreak
 {
     public function __construct(
         private RecordStudySession $recordStudySession,
-        private BroadcastStudyRoomChange $broadcastStudyRoomChange,
+        private BroadcastSeatChange $broadcastSeatChange,
     ) {}
 
     public function __invoke(StudentScheduleCookie $viewer): StudyRoomSeat
@@ -82,7 +82,7 @@ final readonly class StartBreak
             return $seat;
         });
 
-        ($this->broadcastStudyRoomChange)('timer.break', $seat);
+        ($this->broadcastSeatChange)('timer.break', $seat);
 
         return $seat;
     }

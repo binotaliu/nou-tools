@@ -5,34 +5,37 @@ declare(strict_types=1);
 namespace NouTools\Domains\Cafe\Actions;
 
 use App\Enums\AcornTransactionKind;
+use App\Enums\StudyRoomVenue;
 use App\Models\CafeMenuItem;
 use App\Models\CafeOrder;
-use App\Models\CafeSeat;
 use App\Models\StudyRoomSeat;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use NouTools\Domains\Acorns\Actions\SpendAcorns;
 use NouTools\Domains\Acorns\Exceptions\InsufficientAcornsException;
 use NouTools\Domains\Cafe\DataTransferObjects\OrderCoffeeData;
+use NouTools\Domains\Cafe\Exceptions\DineInNeedsSeatException;
 use NouTools\Domains\Cafe\Exceptions\MenuItemUnavailableException;
 use NouTools\Domains\Schedules\ValueObjects\StudentScheduleCookie;
-use NouTools\Domains\StudyRoom\Actions\BroadcastStudyRoomChange;
 
 /**
  * Buys a coffee with acorns. Only one coffee sits on a student's seat at a
- * time: a new order ends whatever is still on the table. The cup shows on the
- * buyer's café seat and study-room seat, so both rooms are told.
+ * time: a new order ends whatever is still on the table. 內用 needs a café
+ * seat (and is thrown away when it is left); 外帶 can be ordered anywhere and
+ * goes with the student. The drink arrives `cafe.coffee.delivery_seconds`
+ * after it is ordered. The cup shows on the buyer's seat in whichever room
+ * they sit, so that room is told.
  */
 final readonly class OrderCoffee
 {
     public function __construct(
         private SpendAcorns $spendAcorns,
-        private BroadcastCafeChange $broadcastCafeChange,
-        private BroadcastStudyRoomChange $broadcastStudyRoomChange,
+        private BroadcastCoffeeChange $broadcastCoffeeChange,
     ) {}
 
     /**
      * @throws MenuItemUnavailableException
+     * @throws DineInNeedsSeatException
      * @throws InsufficientAcornsException
      */
     public function __invoke(StudentScheduleCookie $viewer, OrderCoffeeData $input): CafeOrder
@@ -41,6 +44,10 @@ final readonly class OrderCoffee
 
         if ($item === null) {
             throw new MenuItemUnavailableException;
+        }
+
+        if (! $input->toGo && ! $this->holdsCafeSeat($viewer)) {
+            throw new DineInNeedsSeatException;
         }
 
         $order = DB::transaction(function () use ($viewer, $item, $input): CafeOrder {
@@ -59,6 +66,7 @@ final readonly class OrderCoffee
             $order->cup_style = $item->cup_style;
             $order->to_go = $input->toGo;
             $order->price_paid = $item->price;
+            $order->ready_at = $now->copy()->addSeconds((int) config('cafe.coffee.delivery_seconds'));
             $order->expires_at = $now->copy()->addMinutes((int) config('cafe.coffee.duration_minutes'));
             $order->saveOrFail();
 
@@ -70,18 +78,16 @@ final readonly class OrderCoffee
             return $order;
         });
 
-        $cafeSeat = CafeSeat::query()->where('student_schedule_id', $viewer->id)->first();
-
-        if ($cafeSeat !== null) {
-            ($this->broadcastCafeChange)('coffee.ordered', $cafeSeat);
-        }
-
-        $studySeat = StudyRoomSeat::query()->where('student_schedule_id', $viewer->id)->first();
-
-        if ($studySeat !== null) {
-            ($this->broadcastStudyRoomChange)('seat.coffee', $studySeat);
-        }
+        ($this->broadcastCoffeeChange)($viewer->id, 'coffee.ordered');
 
         return $order;
+    }
+
+    private function holdsCafeSeat(StudentScheduleCookie $viewer): bool
+    {
+        return StudyRoomSeat::query()
+            ->inRoom(StudyRoomVenue::Cafe)
+            ->where('student_schedule_id', $viewer->id)
+            ->exists();
     }
 }

@@ -24,7 +24,7 @@ use NouTools\Domains\StudyRoom\ValueObjects\PomodoroCycle;
 final readonly class StartNextRound
 {
     public function __construct(
-        private BroadcastStudyRoomChange $broadcastStudyRoomChange,
+        private BroadcastSeatChange $broadcastSeatChange,
     ) {}
 
     public function __invoke(StudentScheduleCookie $viewer): StudyRoomSeat
@@ -61,7 +61,7 @@ final readonly class StartNextRound
             return $seat;
         });
 
-        ($this->broadcastStudyRoomChange)('timer.started', $seat);
+        ($this->broadcastSeatChange)('timer.started', $seat);
 
         return $seat;
     }

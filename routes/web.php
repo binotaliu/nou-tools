@@ -10,6 +10,7 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CafeBaristaController;
 use App\Http\Controllers\CafeController;
+use App\Http\Controllers\CafeCurrentOrderController;
 use App\Http\Controllers\CafeHeartbeatController;
 use App\Http\Controllers\CafeMenuController;
 use App\Http\Controllers\CafeOrderController;
@@ -267,6 +268,8 @@ Route::prefix('cafe')->name('cafe.')->group(function (): void {
     Route::get('/barista', CafeBaristaController::class)->name('barista')->middleware('throttle:60,1');
     Route::get('/menu', CafeMenuController::class)->name('menu')->middleware('throttle:60,1');
     Route::post('/orders', CafeOrderController::class)->name('orders.store')->middleware('throttle:20,1');
+    Route::post('/orders/current/sip', [CafeCurrentOrderController::class, 'sip'])->name('orders.current.sip')->middleware('throttle:60,1');
+    Route::delete('/orders/current', [CafeCurrentOrderController::class, 'destroy'])->name('orders.current.destroy')->middleware('throttle:30,1');
     Route::post('/heartbeat', CafeHeartbeatController::class)->name('heartbeat')->middleware('throttle:60,1');
 });
 

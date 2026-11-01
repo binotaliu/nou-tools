@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NouTools\Domains\StudyRoom\Actions;
 
+use App\Enums\StudyRoomVenue;
 use App\Models\StudyRoomSeat;
 
 /**
@@ -24,6 +25,7 @@ final readonly class ResolveOpenFloorCount
     public function __invoke(): int
     {
         $floorCounts = StudyRoomSeat::query()
+            ->inRoom(StudyRoomVenue::Study)
             ->selectRaw('floor, COUNT(*) as total, COUNT(student_schedule_id) as occupied')
             ->groupBy('floor')
             ->orderBy('floor')

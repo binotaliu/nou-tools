@@ -30,7 +30,7 @@ final readonly class ChangeStudyActivity
 {
     public function __construct(
         private RecordStudySession $recordStudySession,
-        private BroadcastStudyRoomChange $broadcastStudyRoomChange,
+        private BroadcastSeatChange $broadcastSeatChange,
     ) {}
 
     public function __invoke(StudentScheduleCookie $viewer, ChangeStudyActivityData $data): StudyRoomSeat
@@ -64,7 +64,7 @@ final readonly class ChangeStudyActivity
             return $seat;
         });
 
-        ($this->broadcastStudyRoomChange)('timer.activity_changed', $seat);
+        ($this->broadcastSeatChange)('timer.activity_changed', $seat);
 
         return $seat;
     }
