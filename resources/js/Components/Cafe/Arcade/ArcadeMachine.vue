@@ -19,7 +19,7 @@ const GAMES = [
   {
     key: 'horoscope',
     label: '星座運勢',
-    blurb: '投幣抽今天的運勢',
+    blurb: '看看今天的運勢',
     emoji: '🔮',
     component: HoroscopeGame,
   },

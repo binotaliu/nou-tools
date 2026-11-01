@@ -51,11 +51,11 @@ const hint = computed(() => {
   }
 
   if (!props.hasSchedule) {
-    return '建立課表後才能投幣。'
+    return '需要有課表才可使用此功能。'
   }
 
   if (!props.hasNickname) {
-    return '先到自習室設定暱稱後才能投幣。'
+    return '請先至自習室設定暱稱後才可使用。'
   }
 
   if (!canAfford.value) {
@@ -291,9 +291,7 @@ onMounted(async () => {
 
     <!-- pick -->
     <div v-else class="mt-2 space-y-3">
-      <p class="text-sm text-amber-100/80">
-        選一個星座，投幣後可以看到今天的運勢。同一個星座今天再看不用再付。
-      </p>
+      <p class="text-sm text-amber-100/80">選擇星座以檢視運勢。</p>
 
       <fieldset>
         <legend class="sr-only">選擇星座</legend>
