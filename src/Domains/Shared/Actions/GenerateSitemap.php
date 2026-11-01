@@ -41,6 +41,7 @@ final readonly class GenerateSitemap
             new SitemapUrlViewModel(url: route('discount-stores.index'), changeFrequency: 'daily', priority: 0.7),
             new SitemapUrlViewModel(url: route('discount-stores.create'), changeFrequency: 'yearly', priority: 0.3),
             new SitemapUrlViewModel(url: route('study-room.show'), changeFrequency: 'daily', priority: 0.6),
+            new SitemapUrlViewModel(url: route('cafe.show'), changeFrequency: 'daily', priority: 0.5),
             new SitemapUrlViewModel(url: route('wiki.index'), changeFrequency: 'daily', priority: 0.7),
             new SitemapUrlViewModel(url: route('wiki.all'), changeFrequency: 'daily', priority: 0.6),
         ])

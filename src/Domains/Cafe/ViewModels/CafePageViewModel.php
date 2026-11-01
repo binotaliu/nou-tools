@@ -15,5 +15,7 @@ final class CafePageViewModel extends Data
         public ?string $emoji,
         public int $heartbeatIntervalSeconds,
         public int $connectTimeoutSeconds,
+        public int $notePrice,
+        public int $noteMaxLength,
     ) {}
 }

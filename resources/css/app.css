@@ -1188,3 +1188,20 @@ html[data-reduce-motion='true'] *::after {
     forced-color-adjust: auto;
   }
 }
+
+/* Sticky-note paper colours for the café wall and the drawing pad. */
+.note-paper-yellow {
+  background-color: #fff3a8;
+}
+.note-paper-pink {
+  background-color: #ffd0dc;
+}
+.note-paper-blue {
+  background-color: #cfe6ff;
+}
+.note-paper-green {
+  background-color: #d4f2c6;
+}
+.note-paper-orange {
+  background-color: #ffd9b0;
+}

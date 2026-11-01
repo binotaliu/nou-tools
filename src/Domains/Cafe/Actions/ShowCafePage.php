@@ -31,6 +31,8 @@ final readonly class ShowCafePage
             emoji: $profile?->emoji,
             heartbeatIntervalSeconds: (int) config('cafe.heartbeat.interval_seconds'),
             connectTimeoutSeconds: (int) config('study-room.realtime.connect_timeout_seconds'),
+            notePrice: (int) config('cafe.notes.price'),
+            noteMaxLength: (int) config('cafe.notes.max_text_length'),
         );
     }
 }

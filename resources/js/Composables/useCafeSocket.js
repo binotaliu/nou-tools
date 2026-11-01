@@ -16,9 +16,15 @@ export default function useCafeSocket(config) {
   let channel = null
   let heartbeatHandle = null
   const seatEventCallbacks = []
+  const noteEventCallbacks = []
 
   function onSeatEvent(callback) {
     seatEventCallbacks.push(callback)
+  }
+
+  // The wall changed (a note was posted or taken down): the page re-reads it.
+  function onNoteEvent(callback) {
+    noteEventCallbacks.push(callback)
   }
 
   function emitSeatEvent(type, code) {
@@ -66,6 +72,14 @@ export default function useCafeSocket(config) {
   function applyDelta(payload) {
     if (!state.value) {
       refresh()
+      return
+    }
+
+    if (payload.type?.startsWith('note.')) {
+      for (const callback of noteEventCallbacks) {
+        callback(payload.type)
+      }
+
       return
     }
 
@@ -207,5 +221,6 @@ export default function useCafeSocket(config) {
     start,
     stop,
     onSeatEvent,
+    onNoteEvent,
   }
 }

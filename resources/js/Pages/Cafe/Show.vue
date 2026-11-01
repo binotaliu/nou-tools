@@ -5,6 +5,8 @@ import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
 import BaristaDialogue from '../../Components/Cafe/BaristaDialogue.vue'
+import StickyNoteComposer from '../../Components/Cafe/StickyNoteComposer.vue'
+import StickyNoteWall from '../../Components/Cafe/StickyNoteWall.vue'
 import MenuSheet from '../../Components/Cafe/MenuSheet.vue'
 import CafeScene from '../../Components/Cafe/CafeScene.vue'
 import CafeSeat from '../../Components/Cafe/CafeSeat.vue'
@@ -29,10 +31,16 @@ const menuOpen = ref(false)
 const orderBusyId = ref(null)
 const orderError = ref(null)
 
+const notes = ref([])
+const composerOpen = ref(false)
+const noteMessage = ref(null)
+
 const barista = useBarista({
   onAction(action) {
     if (action === 'order') {
       openMenu()
+    } else if (action === 'note') {
+      openComposer()
     }
   },
 })
@@ -61,6 +69,39 @@ async function openMenu() {
   document.querySelector('[data-testid="cafe-menu"]')?.scrollIntoView({
     block: 'nearest',
   })
+}
+
+async function loadNotes() {
+  try {
+    notes.value = (await window.axios.get('/cafe/notes')).data.notes
+  } catch {
+    // The wall keeps what it had.
+  }
+}
+
+async function openComposer() {
+  if (!canOrder.value) {
+    return
+  }
+
+  composerOpen.value = true
+  noteMessage.value = null
+
+  await nextTick()
+  document.querySelector('[data-testid="cafe-note-composer"]')?.scrollIntoView({
+    block: 'nearest',
+  })
+}
+
+async function notePosted(data) {
+  Object.assign(acorns, data.acorns, { loaded: true })
+  composerOpen.value = false
+  noteMessage.value = '便利貼收到了，檢查通過就會貼上牆。'
+  await loadNotes()
+}
+
+function reportNote(note) {
+  window.axios.post(`/cafe/notes/${note.id}/report`).catch(() => {})
 }
 
 async function order({ item, toGo }) {
@@ -184,10 +225,12 @@ socket.onSeatEvent(async ({ type, code }) => {
 
 onMounted(async () => {
   socket.start()
+  socket.onNoteEvent(() => loadNotes())
   import('../../echo')
   await Promise.all([
     socket.load(),
     barista.talk(),
+    loadNotes(),
     props.cafe.hasSchedule ? acorns.load() : null,
   ])
 })
@@ -288,6 +331,15 @@ onUnmounted(() => {
         >
           點餐
         </button>
+        <button
+          v-if="!composerOpen"
+          type="button"
+          class="rounded-lg border-2 border-b-4 border-theme-300 bg-white px-3 py-1.5 text-sm font-semibold text-theme-900 transition active:translate-y-px active:border-b-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+          data-testid="cafe-open-note"
+          @click="openComposer"
+        >
+          買便利貼
+        </button>
         <span
           v-if="acorns.loaded"
           class="text-sm text-theme-800 dark:text-amber-300"
@@ -306,6 +358,24 @@ onUnmounted(() => {
         @order="order"
         @close="menuOpen = false"
       />
+
+      <StickyNoteComposer
+        v-if="composerOpen"
+        :price="cafe.notePrice"
+        :max-length="cafe.noteMaxLength"
+        :balance="acorns.balance"
+        @posted="notePosted"
+        @close="composerOpen = false"
+      />
+
+      <p
+        v-if="noteMessage"
+        role="status"
+        class="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200"
+        data-testid="cafe-note-message"
+      >
+        {{ noteMessage }}
+      </p>
 
       <div @keydown="handleKeydown">
         <CafeScene />
@@ -400,6 +470,8 @@ onUnmounted(() => {
           </template>
         </div>
       </div>
+
+      <StickyNoteWall :notes="notes" @report="reportNote" />
     </div>
   </AppLayout>
 </template>
