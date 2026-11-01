@@ -34,6 +34,8 @@ it('greets with a line, takes an order, spends acorns and puts the cup on the se
     dismissCookieConsentBanner($page);
 
     waitUntil($page, 'document.querySelectorAll(\'[data-seat-code]\').length === 20');
+    $page->assertMissing('[data-testid="cafe-barista"]')
+        ->click('[data-testid="cafe-talk-barista"]');
     waitUntil($page, 'document.querySelector(\'[data-testid="cafe-barista-line"]\')?.textContent.trim().length > 0');
     waitUntil($page, 'document.querySelector(\'[data-testid="cafe-acorns"]\') !== null');
 

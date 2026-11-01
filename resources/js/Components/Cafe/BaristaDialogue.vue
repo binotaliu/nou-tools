@@ -1,24 +1,24 @@
 <script setup>
-// The game-style dialogue box under the room: the squirrel itself stands
-// behind the counter on the floor map, so this is its speech panel — a name
-// tag, the typed line and the reply buttons. Clicking the text skips the
-// typewriter.
+// The squirrel's speech bubble, drawn on the floor map right above the
+// barista (rendered in CafeFloor's `barista-bubble` slot) and only mounted
+// while a conversation is open: a name tag, the typed line and the reply
+// buttons. Clicking the text skips the typewriter.
 defineProps({
   barista: { type: Object, required: true },
 })
 
-defineEmits(['more'])
+defineEmits(['more', 'close'])
 </script>
 
 <template>
   <section
-    class="relative rounded-xl border-2 border-b-4 border-theme-300 bg-white p-3 pt-4 dark:border-zinc-600 dark:bg-zinc-800"
+    class="absolute bottom-full left-1/2 z-30 mb-3 w-64 -translate-x-1/2 rounded-xl border-2 border-b-4 border-theme-300 bg-white p-3 pt-4 text-left sm:w-72 dark:border-zinc-600 dark:bg-zinc-800"
     aria-labelledby="cafe-barista-heading"
     data-testid="cafe-barista"
   >
-    <!-- the tail of the speech bubble points up at the counter -->
+    <!-- the tail of the speech bubble points down at the squirrel -->
     <span
-      class="absolute -top-2 left-[calc(100%-5.5rem)] size-3.5 rotate-45 border-t-2 border-l-2 border-theme-300 bg-white dark:border-zinc-600 dark:bg-zinc-800"
+      class="absolute -bottom-2 left-1/2 size-3.5 -translate-x-1/2 rotate-45 border-r-2 border-b-2 border-theme-300 bg-white dark:border-zinc-600 dark:bg-zinc-800"
       aria-hidden="true"
     ></span>
 
@@ -28,6 +28,15 @@ defineEmits(['more'])
     >
       松鼠店長
     </h2>
+
+    <button
+      type="button"
+      class="absolute -top-3 right-2 rounded-full border-2 border-theme-300 bg-theme-50 px-2 text-xs font-semibold text-theme-800 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200"
+      data-testid="cafe-barista-close"
+      @click="$emit('close')"
+    >
+      關閉
+    </button>
 
     <p
       v-if="barista.failed"

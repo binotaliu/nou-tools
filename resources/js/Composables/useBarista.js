@@ -21,6 +21,7 @@ export default function useBarista({ onAction }) {
   const typed = ref('')
   const loading = ref(false)
   const failed = ref(false)
+  const open = ref(false)
 
   let typer = null
 
@@ -58,6 +59,7 @@ export default function useBarista({ onAction }) {
   }
 
   async function talk(drink = null) {
+    open.value = true
     loading.value = true
     failed.value = false
     answer.value = null
@@ -87,6 +89,11 @@ export default function useBarista({ onAction }) {
     }
   }
 
+  function close() {
+    clearInterval(typer)
+    open.value = false
+  }
+
   onUnmounted(() => clearInterval(typer))
 
   return reactive({
@@ -97,7 +104,9 @@ export default function useBarista({ onAction }) {
     replies,
     loading,
     failed,
+    open,
     typing,
+    close,
     talk,
     choose,
     skipTyping,

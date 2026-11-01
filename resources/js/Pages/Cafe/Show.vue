@@ -207,7 +207,6 @@ onMounted(async () => {
   import('../../echo')
   await Promise.all([
     socket.load(),
-    barista.talk(),
     loadNotes(),
     props.cafe.hasSchedule ? acorns.load() : null,
   ])
@@ -355,10 +354,18 @@ onUnmounted(() => {
           @activate="activate"
           @open-wall="wallOpen = true"
           @open-menu="openMenu"
-        />
+          @talk="barista.talk()"
+        >
+          <template #barista-bubble>
+            <BaristaDialogue
+              v-if="barista.open"
+              :barista="barista"
+              @more="barista.talk()"
+              @close="barista.close()"
+            />
+          </template>
+        </CafeFloor>
       </div>
-
-      <BaristaDialogue :barista="barista" @more="barista.talk()" />
 
       <ul
         class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-theme-700 dark:text-zinc-400"

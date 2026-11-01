@@ -33,7 +33,7 @@ const props = defineProps({
   baristaMood: { type: String, default: 'happy' },
 })
 
-const emit = defineEmits(['activate', 'open-wall', 'open-menu'])
+const emit = defineEmits(['activate', 'open-wall', 'open-menu', 'talk'])
 
 const barSeats = computed(() => props.seats.filter(seat => seat.kind === 'bar'))
 const communalSeats = computed(() =>
@@ -268,7 +268,16 @@ const LAMPS = [
         <div class="flex items-end gap-1 sm:gap-2">
           <!-- the squirrel, standing behind the counter -->
           <div class="relative -mb-5">
-            <Barista :mood="baristaMood" class="size-18 sm:size-24" />
+            <button
+              type="button"
+              class="block rounded-lg transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2"
+              aria-label="和松鼠店長聊聊"
+              data-testid="cafe-talk-barista"
+              @click="emit('talk')"
+            >
+              <Barista :mood="baristaMood" class="size-18 sm:size-24" />
+            </button>
+            <slot name="barista-bubble" />
           </div>
 
           <!-- espresso machine with cups warming on top -->
