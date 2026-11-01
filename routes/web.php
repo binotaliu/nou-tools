@@ -8,6 +8,7 @@ use App\Http\Controllers\AcornController;
 use App\Http\Controllers\AnalyticsConsentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CafeBaristaController;
 use App\Http\Controllers\CafeController;
 use App\Http\Controllers\CafeHeartbeatController;
 use App\Http\Controllers\CafeMenuController;
@@ -256,6 +257,7 @@ Route::prefix('cafe')->name('cafe.')->group(function (): void {
     Route::get('/state', CafeStateController::class)->name('state')->middleware('throttle:120,1');
     Route::post('/seats/{seat}/take', [CafeSeatController::class, 'store'])->name('seats.take')->middleware('throttle:60,1');
     Route::post('/seat/leave', [CafeSeatController::class, 'destroy'])->name('seat.leave')->middleware('throttle:60,1');
+    Route::get('/barista', CafeBaristaController::class)->name('barista')->middleware('throttle:60,1');
     Route::get('/menu', CafeMenuController::class)->name('menu')->middleware('throttle:60,1');
     Route::post('/orders', CafeOrderController::class)->name('orders.store')->middleware('throttle:20,1');
     Route::post('/heartbeat', CafeHeartbeatController::class)->name('heartbeat')->middleware('throttle:60,1');
