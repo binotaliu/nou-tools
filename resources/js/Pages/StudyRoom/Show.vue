@@ -810,14 +810,35 @@ onUnmounted(() => {
                   ></div>
                   <Link
                     href="/cafe"
-                    class="group absolute top-1/2 left-0 z-20 flex -translate-y-1/2 items-center gap-1 rounded-r-lg border-2 border-l-0 border-amber-800 bg-amber-100 py-1.5 pr-2 pl-1.5 text-xs font-semibold text-amber-950 hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100 dark:hover:bg-amber-900"
+                    class="group absolute top-1/2 left-2 z-20 flex w-16 -translate-y-1/2 flex-col items-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-600"
                     data-testid="study-room-cafe-door"
                     aria-label="前往咖啡廳"
                   >
-                    <span aria-hidden="true">☕</span>
-                    <span class="[writing-mode:vertical-rl]" aria-hidden="true"
-                      >咖啡廳</span
+                    <span
+                      class="flex w-full flex-col items-center gap-0.5 rounded-sm border-[3px] border-[#8a6a4a] bg-[#26332f] px-1 py-1.5 text-center font-semibold text-[#f1ede2] transition group-hover:bg-[#2f3f3a]"
+                      aria-hidden="true"
                     >
+                      <span class="text-base leading-none">☕</span>
+                      <span class="text-xs leading-tight">咖啡廳</span>
+                      <span
+                        class="text-[0.625rem] leading-tight text-[#f1ede2]/70"
+                        >營業中</span
+                      >
+                      <span class="text-xs leading-none text-[#f1ede2]/80"
+                        >←</span
+                      >
+                    </span>
+                    <span
+                      class="-mt-px flex w-full justify-between px-1"
+                      aria-hidden="true"
+                    >
+                      <span
+                        class="h-2 w-[3px] origin-top rotate-12 bg-[#8a6a4a]"
+                      ></span>
+                      <span
+                        class="h-2 w-[3px] origin-top -rotate-12 bg-[#8a6a4a]"
+                      ></span>
+                    </span>
                   </Link>
                   <div
                     class="pointer-events-none absolute right-8 -bottom-[6px] z-10 h-[6px] w-12 bg-theme-50 dark:bg-zinc-950"
