@@ -8,6 +8,7 @@ use App\Enums\StudyTimerPhase;
 use App\Models\StudyRoomSeat;
 use App\Models\StudyRoomSession;
 use Illuminate\Support\Facades\Date;
+use NouTools\Domains\Acorns\Actions\AwardStudyAcorns;
 
 /**
  * The single place that turns a seat's running timer state into a
@@ -41,6 +42,8 @@ use Illuminate\Support\Facades\Date;
  */
 final readonly class RecordStudySession
 {
+    public function __construct(private AwardStudyAcorns $awardStudyAcorns) {}
+
     public function __invoke(StudyRoomSeat $seat): ?StudyRoomSession
     {
         if ($seat->student_schedule_id === null) {
@@ -87,6 +90,8 @@ final readonly class RecordStudySession
         $session->overtime_seconds = $overtimeSeconds;
         $session->was_completed = $wasCompleted;
         $session->saveOrFail();
+
+        ($this->awardStudyAcorns)($session->student_schedule_id, $effectiveEnd);
 
         return $session;
     }

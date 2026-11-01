@@ -4,6 +4,7 @@ use App\Csp\DocsApiPolicy;
 use App\Enums\ArticleType;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AccessibilityController;
+use App\Http\Controllers\AcornController;
 use App\Http\Controllers\AnalyticsConsentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
@@ -240,6 +241,8 @@ Route::prefix('study-room')->name('study-room.')->group(function (): void {
     Route::put('/goal-reminder', StudyRoomGoalReminderController::class)->name('goal-reminder.update')->middleware('throttle:10,1');
     Route::post('/heartbeat', StudyRoomHeartbeatController::class)->name('heartbeat')->middleware('throttle:60,1');
 });
+
+Route::get('/acorns', AcornController::class)->name('acorns.show')->middleware('throttle:60,1');
 
 Route::prefix('wiki')->name('wiki.')->group(function (): void {
     Route::get('/new', [WikiEditRequestController::class, 'create'])->name('new');

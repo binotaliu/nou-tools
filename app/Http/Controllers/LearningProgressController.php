@@ -32,13 +32,19 @@ final class LearningProgressController extends Controller
 
     public function update(UpdateLearningProgressData $input, StudentSchedule $schedule, string $term, UpdateLearningProgress $updateLearningProgress)
     {
-        $updateLearningProgress($schedule, $term, $input);
+        $result = $updateLearningProgress($schedule, $term, $input);
+
+        $message = match (true) {
+            $result['awarded'] > 0 => "學習進度已更新，獲得 {$result['awarded']} 顆橡實",
+            $result['capped'] => '學習進度已更新，今日學習進度橡實已達上限',
+            default => '學習進度已更新',
+        };
 
         return redirect()
             ->route('learning-progress.show', [
                 'schedule' => $schedule,
                 'term' => $term,
             ])
-            ->with('success', '學習進度已更新');
+            ->with('success', $message);
     }
 }
