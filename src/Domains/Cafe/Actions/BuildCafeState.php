@@ -15,7 +15,7 @@ final readonly class BuildCafeState
     public function __invoke(?StudentScheduleCookie $viewer): CafeStateViewModel
     {
         $seats = CafeSeat::query()
-            ->with('schedule.studyRoomProfile')
+            ->with(['schedule.studyRoomProfile', 'schedule.activeCafeOrder'])
             ->orderBy('id')
             ->get();
 
@@ -32,6 +32,7 @@ final readonly class BuildCafeState
                 $seat->student_schedule_id ?? '-',
                 $seat->schedule?->studyRoomProfile?->nickname ?? '-',
                 $seat->schedule?->studyRoomProfile?->emoji ?? '-',
+                $seat->schedule?->activeCafeOrder?->id ?? '-',
             ]))
             ->implode(';');
 

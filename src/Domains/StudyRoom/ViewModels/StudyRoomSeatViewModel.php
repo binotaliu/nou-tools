@@ -10,6 +10,7 @@ use App\Enums\StudyTimerMode;
 use App\Enums\StudyTimerPhase;
 use App\Models\StudyRoomSeat;
 use DateTimeInterface;
+use NouTools\Domains\Cafe\ViewModels\CafeCoffeeViewModel;
 use NouTools\Domains\StudyRoom\ValueObjects\PomodoroCycle;
 use Spatie\LaravelData\Data;
 
@@ -41,6 +42,7 @@ final class StudyRoomSeatViewModel extends Data
         public ?DateTimeInterface $timerEndsAt,
         public ?DateTimeInterface $timerStartedAt,
         public ?DateTimeInterface $pausedAt,
+        public ?CafeCoffeeViewModel $coffee = null,
     ) {}
 
     public static function fromModel(StudyRoomSeat $seat, ?int $viewerScheduleId): self
@@ -68,6 +70,7 @@ final class StudyRoomSeatViewModel extends Data
             timerEndsAt: $seat->timer_ends_at,
             timerStartedAt: $seat->timer_started_at,
             pausedAt: $seat->paused_at,
+            coffee: CafeCoffeeViewModel::fromOrder($seat->schedule?->activeCafeOrder),
         );
     }
 }

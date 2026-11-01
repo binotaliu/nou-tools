@@ -24,6 +24,7 @@ final class CafeSeatViewModel extends Data
         public bool $isYou,
         public ?string $nickname,
         public ?string $emoji,
+        public ?CafeCoffeeViewModel $coffee = null,
     ) {}
 
     public static function fromModel(CafeSeat $seat, ?int $viewerScheduleId): self
@@ -40,6 +41,7 @@ final class CafeSeatViewModel extends Data
             isYou: $viewerScheduleId !== null && $seat->student_schedule_id === $viewerScheduleId,
             nickname: $profile?->nickname,
             emoji: $profile?->emoji,
+            coffee: CafeCoffeeViewModel::fromOrder($seat->schedule?->activeCafeOrder),
         );
     }
 }

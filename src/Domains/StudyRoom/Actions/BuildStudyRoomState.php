@@ -32,7 +32,7 @@ final readonly class BuildStudyRoomState
 
         $seats = StudyRoomSeat::query()
             ->where('floor', '<=', $openFloors)
-            ->with(['schedule.studyRoomProfile', 'subjectCourse'])
+            ->with(['schedule.studyRoomProfile', 'schedule.activeCafeOrder', 'subjectCourse'])
             ->orderBy('floor')
             ->orderBy('seat_number')
             ->get();
@@ -169,6 +169,7 @@ final readonly class BuildStudyRoomState
             ->map(fn (StudyRoomSeat $seat): string => implode('|', [
                 $seat->id,
                 $seat->student_schedule_id ?? '',
+                $seat->schedule?->activeCafeOrder?->id ?? '',
                 $seat->activity_verb?->value ?? '',
                 $seat->subject_course_id ?? '',
                 $seat->subject_label ?? '',

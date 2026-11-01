@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Date;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use Ramsey\Uuid\Uuid;
 
@@ -111,6 +112,28 @@ final class StudentSchedule extends Model
     public function studyRoomSeat(): HasOne
     {
         return $this->hasOne(StudyRoomSeat::class);
+    }
+
+    /**
+     * The coffee currently on the student's seat: their latest order that
+     * has not run out yet.
+     *
+     * @return HasOne<CafeOrder, $this>
+     */
+    public function activeCafeOrder(): HasOne
+    {
+        return $this->hasOne(CafeOrder::class)->ofMany(
+            ['id' => 'max'],
+            fn ($query) => $query->where('expires_at', '>', Date::now()),
+        );
+    }
+
+    /**
+     * @return HasMany<CafeOrder, $this>
+     */
+    public function cafeOrders(): HasMany
+    {
+        return $this->hasMany(CafeOrder::class);
     }
 
     /**
