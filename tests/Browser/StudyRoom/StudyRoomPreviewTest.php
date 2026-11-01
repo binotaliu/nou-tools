@@ -81,3 +81,13 @@ it('points 快速入座 at the sign-up banner in the preview', function () {
 
     expect($tookSeat)->toBeFalse();
 });
+
+it('connects the ground floor to the café through a door and back', function () {
+    $page = visit(route('study-room.show'));
+
+    $page->assertVisible('[data-testid="study-room-cafe-door"]')
+        ->click('[data-testid="study-room-cafe-door"]')
+        ->waitForEvent('load')
+        ->assertPathIs('/cafe')
+        ->assertVisible('[data-testid="cafe-study-room-door"]');
+});

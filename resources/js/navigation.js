@@ -33,6 +33,12 @@ export const navItems = [
   {
     href: '/study-room',
     prefix: '/study-room',
+    // The café is part of the study room: its door is on the ground floor.
+    match: path =>
+      path === '/study-room' ||
+      path.startsWith('/study-room/') ||
+      path === '/cafe' ||
+      path.startsWith('/cafe/'),
     label: '自習室',
     icon: 'academic-cap',
   },
@@ -58,12 +64,6 @@ export const moreMenuItems = [
     external: true,
     label: 'Alt UU',
     icon: 'device-phone-mobile',
-  },
-  {
-    href: '/cafe',
-    prefix: '/cafe',
-    label: '咖啡廳',
-    icon: 'building-storefront',
   },
   {
     href: '/announcements',

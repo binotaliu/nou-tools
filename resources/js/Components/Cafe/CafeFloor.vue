@@ -11,10 +11,11 @@
 // counter stand the pastry case, the acorn tip jar, the squirrel and the
 // espresso machine. Below it: the stools, the small tables along the left
 // wall, the long table on a rug, the arcade cabinet beside the tall plant (a button
-// that opens the kiosk in a modal, accesskey `7`) and the door in the right wall.
+// that opens the kiosk in a modal, accesskey `7`) and the door in the right wall (a link back to the study room).
 //
 // Seats are the real `CafeSeat` buttons (one roving Tab stop, handled by the
 // page), so the drawing never hides who is sitting where.
+import { Link } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import AcornIcon from '../Acorns/AcornIcon.vue'
 import ArcadeCabinet from './ArcadeCabinet.vue'
@@ -495,10 +496,11 @@ const LAMPS = [
           class="absolute right-0 bottom-0 h-full w-0.75 origin-bottom rotate-[-60deg] rounded-full bg-[#d9c4a5]"
         ></span>
       </div>
-      <span
-        class="pointer-events-none absolute right-2 bottom-17 text-[0.625rem] text-amber-100/60"
-        aria-hidden="true"
-        >入口</span
+      <Link
+        href="/study-room"
+        class="absolute right-1 bottom-17 z-20 rounded px-1 text-[0.625rem] text-amber-100/80 underline-offset-2 hover:text-amber-50 hover:underline focus-visible:outline-2 focus-visible:outline-amber-300"
+        data-testid="cafe-study-room-door"
+        >通往自習室</Link
       >
     </div>
   </div>

@@ -803,6 +803,22 @@ onUnmounted(() => {
                 ></div>
 
                 <template v-if="grid.isGroundFloor(floor)">
+                  <!-- the café's doorway in the left wall, with its sign -->
+                  <div
+                    class="pointer-events-none absolute top-1/2 -left-[6px] z-10 h-12 w-[6px] -translate-y-1/2 bg-theme-50 dark:bg-zinc-950"
+                    aria-hidden="true"
+                  ></div>
+                  <Link
+                    href="/cafe"
+                    class="group absolute top-1/2 left-0 z-20 flex -translate-y-1/2 items-center gap-1 rounded-r-lg border-2 border-l-0 border-amber-800 bg-amber-100 py-1.5 pr-2 pl-1.5 text-xs font-semibold text-amber-950 hover:bg-amber-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100 dark:hover:bg-amber-900"
+                    data-testid="study-room-cafe-door"
+                    aria-label="前往咖啡廳"
+                  >
+                    <span aria-hidden="true">☕</span>
+                    <span class="[writing-mode:vertical-rl]" aria-hidden="true"
+                      >咖啡廳</span
+                    >
+                  </Link>
                   <div
                     class="pointer-events-none absolute right-8 -bottom-[6px] z-10 h-[6px] w-12 bg-theme-50 dark:bg-zinc-950"
                     aria-hidden="true"
