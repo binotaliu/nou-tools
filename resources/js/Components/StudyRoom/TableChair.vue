@@ -98,6 +98,13 @@ onUnmounted(() => {
       >
         剩餘 {{ timer.timerLabel(seat) }}
       </p>
+      <p
+        v-if="grid.coffeeFor(seat)"
+        class="mt-1 text-xs text-theme-700 dark:text-zinc-300"
+        :data-testid="grid.seatTestId(seat) + '-coffee'"
+      >
+        {{ grid.coffeeFor(seat).emoji }} {{ grid.coffeeFor(seat).name }}
+      </p>
       <span
         class="absolute top-full left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rotate-45 border-r border-b border-theme-200 bg-white dark:border-zinc-600 dark:bg-zinc-800"
         aria-hidden="true"

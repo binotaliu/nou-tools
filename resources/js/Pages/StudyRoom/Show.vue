@@ -933,6 +933,12 @@ onUnmounted(() => {
                           v-show="seat.isOccupied"
                           class="absolute top-1.5 left-2 h-1.5 w-4 rounded-[2px] bg-sky-400/80 dark:bg-sky-500/70"
                         ></span>
+                        <span
+                          v-if="grid.coffeeFor(seat)"
+                          class="absolute -top-1 left-1/2 -translate-x-1/2 text-xs leading-none"
+                          :data-testid="grid.seatTestId(seat) + '-coffee'"
+                          >{{ grid.coffeeFor(seat).emoji }}</span
+                        >
                       </span>
 
                       <div
@@ -1166,6 +1172,7 @@ onUnmounted(() => {
           :timer="timer"
           :profile="profile"
           :music="music"
+          :coffee="socket.mySeat() ? grid.coffeeFor(socket.mySeat()) : null"
         />
       </div>
     </div>

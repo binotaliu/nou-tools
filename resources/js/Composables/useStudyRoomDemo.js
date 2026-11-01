@@ -8,7 +8,13 @@ import { reactive, ref } from 'vue'
 // mutation is a no-op except take(), which raises the sign-up prompt.
 const OCCUPANTS = [
   { nickname: '小浣熊', emoji: '🦝', activity: '讀 統計學', minutes: 18 },
-  { nickname: '阿榕', emoji: '🌱', activity: '寫 心理學作業', minutes: 12 },
+  {
+    nickname: '阿榕',
+    emoji: '🌱',
+    activity: '寫 心理學作業',
+    minutes: 12,
+    coffee: '拿鐵',
+  },
   { nickname: '夜貓', emoji: '🐱', activity: '複習 民法概要', minutes: 21 },
   {
     nickname: '小滿',
@@ -73,6 +79,15 @@ export default function useStudyRoomDemo(config) {
         ? new Date(mountedAt - 5 * 60 * 1000).toISOString()
         : null,
       pausedAt: occupant?.paused ? new Date(mountedAt).toISOString() : null,
+      coffee: occupant?.coffee
+        ? {
+            name: occupant.coffee,
+            emoji: '☕',
+            cupStyle: 'mug',
+            toGo: false,
+            expiresAt: new Date(mountedAt + 60 * 60 * 1000).toISOString(),
+          }
+        : null,
     }
   }
 

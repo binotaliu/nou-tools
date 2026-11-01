@@ -22,6 +22,8 @@ const props = defineProps({
   timer: { type: Object, required: true },
   profile: { type: Object, required: true },
   music: { type: Object, required: true },
+  // The cup on the viewer's own seat, if there is one still warm.
+  coffee: { type: Object, default: null },
 })
 
 function handleEscape(event) {
@@ -462,6 +464,15 @@ onUnmounted(() => {
       class="absolute bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-1/2 z-10 w-64 max-w-[calc(100%-2rem)] -translate-x-1/2"
     >
       <CassettePlayer :music="music" />
+    </div>
+
+    <div
+      v-if="coffee"
+      class="pointer-events-none absolute bottom-[10%] left-[6%] text-[clamp(1.75rem,6vmin,3.5rem)] leading-none"
+      data-testid="study-room-focus-coffee"
+      aria-hidden="true"
+    >
+      {{ coffee.emoji }}
     </div>
 
     <svg

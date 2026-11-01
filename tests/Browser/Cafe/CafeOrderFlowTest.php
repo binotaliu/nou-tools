@@ -1,0 +1,82 @@
+<?php
+
+use App\Models\AcornTransaction;
+use App\Models\CafeOrder;
+use App\Models\StudentSchedule;
+use App\Models\StudyRoomProfile;
+use App\Models\StudyRoomSeat;
+use Illuminate\Support\Str;
+
+// Talking to the barista, ordering and the cup that shows up on both seats are
+// driven client-side (useBarista.js, MenuSheet.vue, useCafeSocket.js).
+
+$signedInStudent = function ($test): array {
+    $schedule = StudentSchedule::create(['uuid' => Str::uuid(), 'name' => 'Browser Order Schedule']);
+    StudyRoomProfile::factory()->for($schedule, 'schedule')->create(['nickname' => '點餐同學']);
+    AcornTransaction::factory()->for($schedule, 'schedule')->credit(10)->create();
+
+    $page = visit(route('schedules.show', $schedule));
+    $page->script('navigator.serviceWorker.ready');
+
+    $page->assertVisible('[data-testid="remember-schedule-modal"]')
+        ->click('[data-testid="remember-schedule-confirm"]')
+        ->assertMissing('[data-testid="remember-schedule-modal"]');
+
+    waitUntil($page, 'document.cookie !== undefined', 2000);
+
+    return [$schedule, $page];
+};
+
+it('greets with a line, takes an order, spends acorns and puts the cup on the seat', function () use ($signedInStudent) {
+    [$schedule, $page] = $signedInStudent($this);
+
+    $page->navigate(route('cafe.show'));
+    dismissCookieConsentBanner($page);
+
+    waitUntil($page, 'document.querySelectorAll(\'[data-seat-code]\').length === 20');
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-barista-line"]\')?.textContent.trim().length > 0');
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-acorns"]\') !== null');
+
+    $page->assertSeeIn('[data-testid="cafe-acorns"]', '10 顆橡實')
+        ->click('[data-testid="cafe-seat-B01"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-leave"]\') !== null');
+
+    $page->click('[data-testid="cafe-open-menu"]');
+
+    waitUntil($page, 'document.querySelectorAll(\'[data-testid^="cafe-order-"]\').length === 5');
+
+    $page->assertSeeIn('[data-testid="cafe-menu-balance"]', '10');
+
+    $page->click('[data-testid="cafe-order-2"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-seat-B01-coffee"]\') !== null');
+
+    $page->assertMissing('[data-testid="cafe-menu"]')
+        ->assertSeeIn('[data-testid="cafe-acorns"]', '7 顆橡實');
+
+    expect(CafeOrder::query()->where('student_schedule_id', $schedule->id)->count())->toBe(1);
+});
+
+it('shows the cup on the study room carrel too', function () use ($signedInStudent) {
+    [$schedule, $page] = $signedInStudent($this);
+
+    StudyRoomSeat::factory()->occupiedBy($schedule)->create([
+        'floor' => 1,
+        'seat_number' => 1,
+        'code' => '1-S01',
+        'label' => '1F 單人座 01',
+    ]);
+    CafeOrder::factory()->for($schedule, 'schedule')->create(['name' => '拿鐵', 'emoji' => '🥛']);
+
+    $page->navigate(route('study-room.show'));
+    dismissCookieConsentBanner($page);
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="seat-1-S01-coffee"]\') !== null');
+
+    $page->assertVisible('[data-testid="seat-1-S01-coffee"]');
+
+    $label = $page->script("document.querySelector('[data-testid=\"seat-1-S01\"]').getAttribute('aria-label')");
+
+    expect($label)->toContain('桌上有一杯拿鐵');
+});

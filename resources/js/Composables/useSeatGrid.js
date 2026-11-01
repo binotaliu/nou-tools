@@ -18,6 +18,19 @@ export default function useSeatGrid(socket, config) {
   // The whole seat in one sentence, since occupied seats stay focusable and
   // this is all a screen reader hears of them: who, what, and how long.
   // `spokenTimer` is timer.spokenTimerLabel(seat), rounded to minutes.
+  // The cup on a seat, until it runs out. Read at render time: the room
+  // re-renders every second while a timer runs, and nothing is broadcast when
+  // a coffee simply expires.
+  function coffeeFor(seat) {
+    if (!seat.coffee) {
+      return null
+    }
+
+    return new Date(seat.coffee.expiresAt).getTime() > Date.now()
+      ? seat.coffee
+      : null
+  }
+
   function seatAriaLabel(seat, spokenTimer = '') {
     if (!seat.isOccupied) {
       return seat.label + '，空位'
@@ -34,7 +47,14 @@ export default function useSeatGrid(socket, config) {
     // The hint reads last on your own seat, after what's on it.
     const hint = isMine(seat) ? parts.splice(2, 1) : []
 
-    parts.push(thoughtBubbleText(seat), spokenTimer, ...hint)
+    const coffee = coffeeFor(seat)
+
+    parts.push(
+      thoughtBubbleText(seat),
+      spokenTimer,
+      coffee ? '桌上有一杯' + coffee.name : '',
+      ...hint
+    )
 
     return parts.filter(Boolean).join('，')
   }
@@ -261,6 +281,7 @@ export default function useSeatGrid(socket, config) {
     seatTestId,
     seatAriaLabel,
     isSeatActionable,
+    coffeeFor,
     onOwnSeatActivated,
     activateSeat,
     firstFreeSeat,

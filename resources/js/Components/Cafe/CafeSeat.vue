@@ -11,11 +11,20 @@ const props = defineProps({
   rovingTabindex: { type: Number, default: -1 },
   // `stool` sits at the counter, `chair` at a table.
   variant: { type: String, default: 'chair' },
+  // Reactive "now" (ms) so a cup disappears when its coffee runs out.
+  now: { type: Number, default: () => Date.now() },
 })
 
 const emit = defineEmits(['activate'])
 
 const mine = computed(() => props.seat.isYou)
+
+const coffee = computed(() =>
+  props.seat.coffee &&
+  new Date(props.seat.coffee.expiresAt).getTime() > props.now
+    ? props.seat.coffee
+    : null
+)
 
 const actionable = computed(
   () =>
@@ -31,7 +40,7 @@ const ariaLabel = computed(() => {
   }
 
   if (props.seat.isOccupied) {
-    return `${props.seat.label}，${props.seat.nickname ?? '有人'}坐在這裡`
+    return `${props.seat.label}，${props.seat.nickname ?? '有人'}坐在這裡${coffee.value ? `，桌上有一杯${coffee.value.name}` : ''}`
   }
 
   return `${props.seat.label}，空位${props.canSit ? '，按下入座' : ''}`
@@ -91,6 +100,13 @@ const ariaLabel = computed(() => {
     >
       {{ seat.isOccupied ? seat.nickname : '空位' }}
     </span>
+    <span
+      v-if="coffee"
+      class="absolute -bottom-2 -left-1 text-base leading-none"
+      aria-hidden="true"
+      :data-testid="`cafe-seat-${seat.code}-coffee`"
+      >{{ coffee.emoji }}</span
+    >
     <span
       v-if="mine"
       class="absolute -top-2 -right-1 rounded-full bg-amber-400 px-1.5 text-[0.625rem] font-bold text-amber-950"

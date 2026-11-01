@@ -1,12 +1,17 @@
 <script setup>
 // 咖啡廳 — the shell. Live seat state comes from useCafeSocket (REST + Echo),
 // not from Inertia props, the same split the study room uses.
-import { computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
+import BaristaDialogue from '../../Components/Cafe/BaristaDialogue.vue'
+import MenuSheet from '../../Components/Cafe/MenuSheet.vue'
 import CafeScene from '../../Components/Cafe/CafeScene.vue'
 import CafeSeat from '../../Components/Cafe/CafeSeat.vue'
+import useAcorns from '../../Composables/useAcorns'
+import useBarista from '../../Composables/useBarista'
 import useCafeSocket from '../../Composables/useCafeSocket'
+import useSessionClock from '../../Composables/useSessionClock'
 
 const props = defineProps({
   cafe: { type: Object, required: true },
@@ -15,6 +20,70 @@ const props = defineProps({
 const socket = useCafeSocket({
   heartbeatIntervalSeconds: props.cafe.heartbeatIntervalSeconds,
 })
+
+const acorns = useAcorns()
+const { now } = useSessionClock()
+
+const menu = ref([])
+const menuOpen = ref(false)
+const orderBusyId = ref(null)
+const orderError = ref(null)
+
+const barista = useBarista({
+  onAction(action) {
+    if (action === 'order') {
+      openMenu()
+    }
+  },
+})
+
+const canOrder = computed(
+  () => props.cafe.hasSchedule && props.cafe.hasNickname
+)
+
+async function openMenu() {
+  if (!canOrder.value) {
+    return
+  }
+
+  menuOpen.value = true
+  orderError.value = null
+
+  if (!menu.value.length) {
+    try {
+      menu.value = (await window.axios.get('/cafe/menu')).data.menu
+    } catch {
+      orderError.value = '菜單暫時打不開，請稍後再試。'
+    }
+  }
+
+  await nextTick()
+  document.querySelector('[data-testid="cafe-menu"]')?.scrollIntoView({
+    block: 'nearest',
+  })
+}
+
+async function order({ item, toGo }) {
+  orderBusyId.value = item.id
+  orderError.value = null
+
+  try {
+    const response = await window.axios.post('/cafe/orders', {
+      menuItemId: item.id,
+      toGo,
+    })
+
+    Object.assign(acorns, response.data.acorns, { loaded: true })
+    menuOpen.value = false
+    socket.refresh()
+    await barista.talk(item.name)
+  } catch (error) {
+    orderError.value =
+      error.response?.data?.message ?? '網路好像不太穩定，請稍後再試一次。'
+  } finally {
+    orderBusyId.value = null
+  }
+}
 
 const canSit = computed(() => props.cafe.hasSchedule && props.cafe.hasNickname)
 
@@ -116,7 +185,11 @@ socket.onSeatEvent(async ({ type, code }) => {
 onMounted(async () => {
   socket.start()
   import('../../echo')
-  await socket.load()
+  await Promise.all([
+    socket.load(),
+    barista.talk(),
+    props.cafe.hasSchedule ? acorns.load() : null,
+  ])
 })
 
 onUnmounted(() => {
@@ -203,6 +276,37 @@ onUnmounted(() => {
         {{ socket.errorMessage.value }}
       </p>
 
+      <BaristaDialogue :barista="barista" @more="barista.talk()" />
+
+      <div v-if="canOrder" class="flex flex-wrap items-center gap-2">
+        <button
+          v-if="!menuOpen"
+          type="button"
+          class="rounded-lg border-2 border-b-4 border-theme-300 bg-white px-3 py-1.5 text-sm font-semibold text-theme-900 transition active:translate-y-px active:border-b-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+          data-testid="cafe-open-menu"
+          @click="openMenu"
+        >
+          點餐
+        </button>
+        <span
+          v-if="acorns.loaded"
+          class="text-sm text-theme-800 dark:text-amber-300"
+          data-testid="cafe-acorns"
+        >
+          你有 {{ acorns.balance }} 顆橡實
+        </span>
+      </div>
+
+      <MenuSheet
+        v-if="menuOpen"
+        :menu="menu"
+        :balance="acorns.balance"
+        :busy-item-id="orderBusyId"
+        :error-message="orderError"
+        @order="order"
+        @close="menuOpen = false"
+      />
+
       <div @keydown="handleKeydown">
         <CafeScene />
 
@@ -233,6 +337,7 @@ onUnmounted(() => {
                   :socket="socket"
                   :can-sit="canSit"
                   :roving-tabindex="tabIndexFor(seat)"
+                  :now="now"
                   variant="stool"
                   @activate="activate"
                 />
@@ -260,6 +365,7 @@ onUnmounted(() => {
                       :socket="socket"
                       :can-sit="canSit"
                       :roving-tabindex="tabIndexFor(seat)"
+                      :now="now"
                       @activate="activate"
                     />
                   </div>
@@ -285,6 +391,7 @@ onUnmounted(() => {
                     :socket="socket"
                     :can-sit="canSit"
                     :roving-tabindex="tabIndexFor(seat)"
+                    :now="now"
                     @activate="activate"
                   />
                 </div>
