@@ -10,12 +10,14 @@
 // the wall and the menu in modals, so the room itself is the UI. On the
 // counter stand the pastry case, the acorn tip jar, the squirrel and the
 // espresso machine. Below it: the stools, the small tables along the left
-// wall, the long table on a rug, and the door in the right wall.
+// wall, the long table on a rug, the arcade cabinet beside the tall plant (a button
+// that opens the kiosk in a modal, accesskey `7`) and the door in the right wall.
 //
 // Seats are the real `CafeSeat` buttons (one roving Tab stop, handled by the
 // page), so the drawing never hides who is sitting where.
 import { computed } from 'vue'
 import AcornIcon from '../Acorns/AcornIcon.vue'
+import ArcadeCabinet from './ArcadeCabinet.vue'
 import Barista from './Barista.vue'
 import CafePlant from './CafePlant.vue'
 import CafeSeat from './CafeSeat.vue'
@@ -33,7 +35,13 @@ const props = defineProps({
   baristaMood: { type: String, default: 'happy' },
 })
 
-const emit = defineEmits(['activate', 'open-wall', 'open-menu', 'talk'])
+const emit = defineEmits([
+  'activate',
+  'open-wall',
+  'open-menu',
+  'open-arcade',
+  'talk',
+])
 
 const barSeats = computed(() => props.seats.filter(seat => seat.kind === 'bar'))
 const communalSeats = computed(() =>
@@ -447,6 +455,18 @@ const LAMPS = [
           </div>
         </div>
       </template>
+
+      <!-- the arcade cabinet, standing right of the tall plant: click to play -->
+      <button
+        type="button"
+        accesskey="7"
+        class="absolute bottom-1 left-14 rounded-lg transition hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 sm:left-16"
+        aria-label="遊樂機台"
+        data-testid="cafe-arcade-open"
+        @click="emit('open-arcade')"
+      >
+        <ArcadeCabinet />
+      </button>
 
       <!-- plants in the corners -->
       <div

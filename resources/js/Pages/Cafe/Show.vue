@@ -21,6 +21,7 @@ import CafeFloor from '../../Components/Cafe/CafeFloor.vue'
 import StickyNoteComposer from '../../Components/Cafe/StickyNoteComposer.vue'
 import StickyNoteWall from '../../Components/Cafe/StickyNoteWall.vue'
 import MenuSheet from '../../Components/Cafe/MenuSheet.vue'
+import ArcadeMachine from '../../Components/Cafe/Arcade/ArcadeMachine.vue'
 import AcornIcon from '../../Components/Acorns/AcornIcon.vue'
 import useAcorns from '../../Composables/useAcorns'
 import useBarista from '../../Composables/useBarista'
@@ -80,6 +81,7 @@ const trayError = ref(null)
 const notes = ref([])
 const wallOpen = ref(false)
 const composerOpen = ref(false)
+const arcadeOpen = ref(false)
 const noteMessage = ref(null)
 
 const barista = useBarista({
@@ -533,6 +535,7 @@ onUnmounted(() => {
           @activate="activate"
           @open-wall="wallOpen = true"
           @open-menu="openMenu"
+          @open-arcade="arcadeOpen = true"
           @talk="barista.talk()"
         >
           <template #barista-bubble>
@@ -628,6 +631,32 @@ onUnmounted(() => {
           @order="order"
           @close="menuOpen = false"
         />
+      </Modal>
+
+      <Modal
+        :open="arcadeOpen"
+        title="遊樂機台"
+        max-width="max-w-lg"
+        data-testid="cafe-arcade-modal"
+        @close="arcadeOpen = false"
+      >
+        <ArcadeMachine
+          v-if="arcadeOpen"
+          :can-play="canOrder"
+          :has-schedule="cafe.hasSchedule"
+          :has-nickname="cafe.hasNickname"
+          :balance="acorns.balance"
+          @spent="Object.assign(acorns, $event, { loaded: true })"
+        />
+        <template #footer>
+          <button
+            type="button"
+            class="rounded-lg border-2 border-b-4 border-theme-300 bg-white px-3 py-1.5 text-sm font-medium text-theme-900 transition active:translate-y-px active:border-b-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+            @click="arcadeOpen = false"
+          >
+            關閉
+          </button>
+        </template>
       </Modal>
 
       <Modal
