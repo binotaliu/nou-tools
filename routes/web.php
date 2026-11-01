@@ -8,6 +8,7 @@ use App\Http\Controllers\AcornController;
 use App\Http\Controllers\AnalyticsConsentController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CafeArcadeHoroscopeController;
 use App\Http\Controllers\CafeBaristaController;
 use App\Http\Controllers\CafeController;
 use App\Http\Controllers\CafeCurrentOrderController;
@@ -271,6 +272,8 @@ Route::prefix('cafe')->name('cafe.')->group(function (): void {
     Route::post('/orders/current/sip', [CafeCurrentOrderController::class, 'sip'])->name('orders.current.sip')->middleware('throttle:60,1');
     Route::delete('/orders/current', [CafeCurrentOrderController::class, 'destroy'])->name('orders.current.destroy')->middleware('throttle:30,1');
     Route::post('/heartbeat', CafeHeartbeatController::class)->name('heartbeat')->middleware('throttle:60,1');
+    Route::get('/arcade/horoscope', [CafeArcadeHoroscopeController::class, 'show'])->name('arcade.horoscope.show')->middleware('throttle:60,1');
+    Route::post('/arcade/horoscope', [CafeArcadeHoroscopeController::class, 'store'])->name('arcade.horoscope.store')->middleware('throttle:20,1');
 });
 
 Route::prefix('wiki')->name('wiki.')->group(function (): void {

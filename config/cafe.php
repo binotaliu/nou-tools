@@ -84,6 +84,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Arcade (遊樂機台)
+    |--------------------------------------------------------------------------
+    |
+    | A kiosk on the café floor that hosts small games, each paid with acorns.
+    | Horoscope: `price` acorns unlock one sign's reading for the rest of the
+    | Taipei day. The reading is calculated, not written: `salt` seeds it (it
+    | falls back to the app key) so nobody can precompute tomorrow's fortune
+    | from the public algorithm.
+    |
+    */
+
+    'arcade' => [
+        'horoscope' => [
+            'price' => 2,
+            'salt' => env('CAFE_HOROSCOPE_SALT'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Café Layout
     |--------------------------------------------------------------------------
     |
