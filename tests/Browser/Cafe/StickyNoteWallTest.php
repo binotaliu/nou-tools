@@ -170,3 +170,31 @@ it('shows published notes on the wall with their drawings and lets a reader open
 
     expect($note->fresh()->report_count)->toBe(1);
 });
+
+it('keeps an unposted draft in local storage and restores it, and blocks drawing without a coffee today', function () use ($signedIn) {
+    [$schedule, $page] = $signedIn();
+
+    $page->navigate(route('cafe.show'));
+    dismissCookieConsentBanner($page);
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-open-note"]\') !== null');
+
+    $page->click('[data-testid="cafe-open-note"]')
+        ->assertVisible('[data-testid="cafe-note-composer"]')
+        ->fill('[data-testid="cafe-note-text"]', '還沒貼的草稿');
+
+    waitUntil($page, 'localStorage.getItem("nou:cafe:note-draft:v1") !== null');
+
+    $page->navigate(route('cafe.show'));
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-open-note"]\') !== null');
+    $page->click('[data-testid="cafe-open-note"]');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-note-text"]\')?.value === "還沒貼的草稿"');
+
+    CafeOrder::query()->where('student_schedule_id', $schedule->id)->delete();
+
+    $page->navigate(route('cafe.show'));
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-open-note"]\') !== null');
+    $page->click('[data-testid="cafe-open-note"]')
+        ->assertVisible('[data-testid="cafe-note-blocked"]')
+        ->assertMissing('[data-testid="cafe-note-composer"]');
+});

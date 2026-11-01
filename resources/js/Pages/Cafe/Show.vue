@@ -115,22 +115,40 @@ async function openMenu() {
   }
 }
 
+// Why the viewer cannot buy a note today (no drink yet, already posted...).
+const noteBlockedReason = ref(null)
+const noteBlockedMessage = ref(null)
+
 async function loadNotes() {
   try {
-    notes.value = (await window.axios.get('/cafe/notes')).data.notes
+    const data = (await window.axios.get('/cafe/notes')).data
+    notes.value = data.notes
+    noteBlockedReason.value = data.blockedReason ?? null
   } catch {
     // The wall keeps what it had.
   }
 }
 
-function openComposer() {
+async function openComposer() {
   if (!canOrder.value) {
     return
   }
 
+  // Ordering a drink since the page loaded changes the answer, so ask again.
+  await loadNotes()
+
   wallOpen.value = false
-  composerOpen.value = true
   noteMessage.value = null
+  noteBlockedMessage.value = null
+
+  if (noteBlockedReason.value) {
+    composerOpen.value = false
+    noteBlockedMessage.value = noteBlockedReason.value
+
+    return
+  }
+
+  composerOpen.value = true
 }
 
 async function notePosted(data) {
@@ -460,6 +478,15 @@ onUnmounted(() => {
         data-testid="cafe-error"
       >
         {{ socket.errorMessage }}
+      </p>
+
+      <p
+        v-if="noteBlockedMessage"
+        role="alert"
+        class="rounded-lg border-2 border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100"
+        data-testid="cafe-note-blocked"
+      >
+        {{ noteBlockedMessage }}
       </p>
 
       <p

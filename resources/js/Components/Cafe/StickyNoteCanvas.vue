@@ -133,12 +133,33 @@ function toBlob() {
   return new Promise(resolve => canvas.value.toBlob(resolve, 'image/png'))
 }
 
-// A preview of the drawing for the placement and confirmation steps.
+// A serialisable copy of the bitmap, for the draft kept in local storage.
 function toDataURL() {
   return canvas.value.toDataURL('image/png')
 }
 
-defineExpose({ toBlob, toDataURL, hasContent })
+// Paints a saved drawing back (a PNG data URL). Decoded by hand and drawn from
+// an ImageBitmap, because loading a data: URL into an <img> or fetch() would
+// run into the page's CSP.
+async function load(dataUrl) {
+  try {
+    const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1)
+    const binary = atob(base64)
+    const bytes = Uint8Array.from(binary, char => char.charCodeAt(0))
+    const bitmap = await createImageBitmap(
+      new Blob([bytes], { type: 'image/png' })
+    )
+
+    context().drawImage(bitmap, 0, 0, SIZE, SIZE)
+    bitmap.close?.()
+    hasContent.value = true
+    emit('change', true)
+  } catch {
+    // An unreadable draft is just dropped.
+  }
+}
+
+defineExpose({ toBlob, toDataURL, load, hasContent })
 </script>
 
 <template>

@@ -248,3 +248,14 @@ it('removes expired notes and their drawings when pruning', function () {
         ->and(CafeStickyNote::query()->whereKey($fresh->id)->exists())->toBeTrue();
     Storage::disk('cafe_sticky_notes')->assertMissing('old.png');
 });
+
+it('tells the notes index why a viewer cannot buy a note yet', function () use ($buyer, $cookieFor) {
+    $thirsty = $buyer(coffee: false);
+    $served = $buyer();
+
+    $as = fn (StudentSchedule $schedule) => $this->withCredentials()->withCookie('student_schedule', $cookieFor($schedule))->getJson(route('cafe.notes.index'));
+
+    $as($thirsty)->assertOk()->assertJsonPath('blockedReason', '低消一杯飲料，才可購買便利貼。');
+    $as($served)->assertOk()->assertJsonPath('blockedReason', null);
+    $this->getJson(route('cafe.notes.index'))->assertOk()->assertJsonPath('blockedReason', null);
+});

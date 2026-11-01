@@ -6,7 +6,7 @@
 // across the steps so going back keeps the strokes and the PNG is exported
 // from the same canvas at the end. The server decides everything that
 // matters (coffee today, one a day, acorns); this only shows what it says.
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import AcornIcon from '../Acorns/AcornIcon.vue'
 import StickyNoteBoard from './StickyNoteBoard.vue'
 import StickyNoteCanvas from './StickyNoteCanvas.vue'
@@ -35,6 +35,49 @@ const STEPS = [
   { id: 'place', label: '選位置' },
   { id: 'confirm', label: '確認' },
 ]
+
+// The unposted draft survives closing the dialog and reloading the page.
+const DRAFT_KEY = 'nou:cafe:note-draft:v1'
+
+function readDraft() {
+  try {
+    return JSON.parse(localStorage.getItem(DRAFT_KEY)) ?? null
+  } catch {
+    return null
+  }
+}
+
+function writeDraft() {
+  try {
+    if (!hasContent.value) {
+      localStorage.removeItem(DRAFT_KEY)
+
+      return
+    }
+
+    localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify({
+        paperColor: paperColor.value,
+        text: text.value,
+        x: x.value,
+        y: y.value,
+        rotation: rotation.value,
+        drawing: drew.value ? pad.value.toDataURL() : null,
+      })
+    )
+  } catch {
+    // Storage may be blocked or full; the draft is a convenience.
+  }
+}
+
+function clearDraft() {
+  try {
+    localStorage.removeItem(DRAFT_KEY)
+  } catch {
+    // Nothing to clear.
+  }
+}
 
 const step = ref('draw')
 const text = ref('')
@@ -65,14 +108,56 @@ const draft = computed(() => ({
   text: text.value.trim() || null,
 }))
 
-function goToPlace() {
+function releaseImage() {
+  if (imageUrl.value) {
+    URL.revokeObjectURL(imageUrl.value)
+    imageUrl.value = null
+  }
+}
+
+// A blob: URL (allowed by the CSP), not a data: one, for the previews.
+async function goToPlace() {
   if (!hasContent.value) {
     return
   }
 
-  imageUrl.value = drew.value ? pad.value.toDataURL() : null
+  releaseImage()
+
+  if (drew.value) {
+    imageUrl.value = URL.createObjectURL(await pad.value.toBlob())
+  }
+
   step.value = 'place'
 }
+
+function onPadChange(value) {
+  drew.value = value
+  writeDraft()
+}
+
+onMounted(async () => {
+  const saved = readDraft()
+
+  if (!saved) {
+    return
+  }
+
+  paperColor.value = COLORS.some(color => color.id === saved.paperColor)
+    ? saved.paperColor
+    : 'yellow'
+  text.value = String(saved.text ?? '').slice(0, props.maxLength)
+  x.value = clamp(Number(saved.x) || 0.5)
+  y.value = clamp(Number(saved.y) || 0.5)
+  rotation.value = Number(saved.rotation) || 0
+
+  if (typeof saved.drawing === 'string') {
+    await pad.value?.load(saved.drawing)
+  }
+})
+
+watch([paperColor, text, x, y], writeDraft)
+
+onBeforeUnmount(releaseImage)
 
 function place(position) {
   x.value = position.x
@@ -123,6 +208,7 @@ async function submit() {
 
   try {
     const response = await window.axios.post('/cafe/notes', form)
+    clearDraft()
     emit('posted', response.data)
   } catch (error) {
     errorMessage.value = firstError(error)
@@ -198,7 +284,7 @@ async function submit() {
       <StickyNoteCanvas
         ref="pad"
         :paper-color="paperColor"
-        @change="drew = $event"
+        @change="onPadChange"
       />
 
       <div>

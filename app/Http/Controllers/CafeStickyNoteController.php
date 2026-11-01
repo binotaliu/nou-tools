@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use NouTools\Domains\Acorns\Actions\ReadAcornBalance;
 use NouTools\Domains\Acorns\Exceptions\InsufficientAcornsException;
+use NouTools\Domains\Cafe\Actions\DescribeStickyNoteEligibility;
 use NouTools\Domains\Cafe\Actions\ListStickyNotes;
 use NouTools\Domains\Cafe\Actions\PostStickyNote;
 use NouTools\Domains\Cafe\Actions\ResolveCafeViewer;
@@ -17,9 +18,14 @@ use NouTools\Domains\Cafe\ViewModels\StickyNoteViewModel;
 
 final class CafeStickyNoteController extends Controller
 {
-    public function index(Request $request, ListStickyNotes $listStickyNotes): JsonResponse
+    public function index(Request $request, ListStickyNotes $listStickyNotes, DescribeStickyNoteEligibility $describeStickyNoteEligibility): JsonResponse
     {
-        return response()->json(['notes' => $listStickyNotes($request->studentScheduleFromCookie())]);
+        $viewer = $request->studentScheduleFromCookie();
+
+        return response()->json([
+            'notes' => $listStickyNotes($viewer),
+            'blockedReason' => $viewer === null ? null : $describeStickyNoteEligibility($viewer->id),
+        ]);
     }
 
     public function store(PostStickyNoteData $input, Request $request, ResolveCafeViewer $resolveCafeViewer, PostStickyNote $postStickyNote, ReadAcornBalance $readAcornBalance): JsonResponse

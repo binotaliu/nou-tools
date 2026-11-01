@@ -29,6 +29,10 @@ final class PublicSitePolicy implements Preset
 
         $policy->add(Directive::IMG, '*.tile.openstreetmap.org');
 
+        // The café's sticky note composer previews the drawing it has just
+        // exported from its canvas as a blob: URL.
+        $policy->add(Directive::IMG, 'blob:');
+
         // Twemoji script is bundled via npm (@twemoji/api); emoji image assets
         // are still fetched from jsDelivr's default CDN base at runtime, since
         // nicknames can contain arbitrary emoji beyond our fixed seat-choice list.
