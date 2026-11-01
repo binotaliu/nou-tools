@@ -8,7 +8,7 @@ use App\Enums\StudyRoomVenue;
 use App\Models\StudyRoomSeat;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Date;
-use NouTools\Domains\StudyRoom\Actions\ReleaseIdleSeats;
+use NouTools\Domains\StudyRoom\Actions\ReleaseSeats;
 
 /**
  * Asks a student to leave a café seat they sat down at without ordering
@@ -17,7 +17,7 @@ use NouTools\Domains\StudyRoom\Actions\ReleaseIdleSeats;
  */
 final readonly class ReleaseUnorderedCafeSeats
 {
-    public function __construct(private ReleaseIdleSeats $releaseIdleSeats) {}
+    public function __construct(private ReleaseSeats $releaseSeats) {}
 
     public function __invoke(): int
     {
@@ -33,6 +33,6 @@ final readonly class ReleaseUnorderedCafeSeats
                 ->whereColumn('cafe_orders.created_at', '>=', 'study_room_seats.occupied_at'))
             ->get();
 
-        return $this->releaseIdleSeats->release($seats, 'seat.unordered-released');
+        return ($this->releaseSeats)($seats, 'seat.unordered-released');
     }
 }
