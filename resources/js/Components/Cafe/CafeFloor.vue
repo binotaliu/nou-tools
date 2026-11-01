@@ -373,7 +373,7 @@ const LAMPS = [
             <div
               v-for="table in smallTables"
               :key="table.code"
-              class="flex items-center justify-center gap-0.5"
+              class="flex items-start justify-center gap-0.5"
               role="group"
               :aria-label="`靠牆小桌 ${table.code}`"
             >
@@ -388,7 +388,7 @@ const LAMPS = [
                 @activate="emit('activate', $event)"
               />
               <span
-                class="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-[#8a6a54] bg-[#6a4c3a]"
+                class="mt-1 flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-[#8a6a54] bg-[#6a4c3a]"
                 aria-hidden="true"
               >
                 <!-- a tea light -->

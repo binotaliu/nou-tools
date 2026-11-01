@@ -98,14 +98,15 @@ const stateClasses = computed(() => {
     :aria-label="ariaLabel"
     :data-seat-code="seat.code"
     :data-testid="`cafe-seat-${seat.code}`"
-    class="group relative flex w-14 flex-col items-center gap-0.5 text-center"
-    :class="
+    class="group relative flex w-14 items-center gap-0.5 text-center"
+    :class="[
+      backrest === 'top' ? 'flex-col-reverse' : 'flex-col',
       socket.busySeatCode === seat.code
         ? 'cursor-wait opacity-50'
         : actionable && !mine
           ? 'cursor-pointer'
-          : 'cursor-default'
-    "
+          : 'cursor-default',
+    ]"
     @click="emit('activate', seat)"
   >
     <span
