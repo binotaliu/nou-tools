@@ -79,6 +79,7 @@ final class StudentSchedule extends Model
         'announcement_categories' => 'json',
         'last_calendar_sync_at' => 'datetime',
         'wiki_blocked_at' => 'datetime',
+        'cafe_blocked_at' => 'datetime',
         'notify_on_class_start' => 'boolean',
     ];
 

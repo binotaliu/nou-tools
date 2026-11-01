@@ -86,6 +86,12 @@ return [
             'prefix' => 'wiki-screenshots',
         ],
 
+        'cafe_sticky_notes' => [
+            'driver' => 'scoped',
+            'disk' => env('CAFE_STICKY_NOTES_DISK', 'local'),
+            'prefix' => 'cafe-sticky-notes',
+        ],
+
         'music_tracks' => [
             'driver' => 'scoped',
             'disk' => env('MUSIC_TRACKS_DISK', 'public'),

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Controller;
 use App\Models\Announcement;
+use App\Models\CafeStickyNote;
 use App\Models\CalendarDay;
 use App\Models\ChangelogPost;
 use App\Models\ClassSchedule;
@@ -55,6 +56,7 @@ arch()->preset()->strict()
         Announcement::class,
         ChangelogPost::class,
         CalendarDay::class,
+        CafeStickyNote::class,
         ClassSchedule::class,
         Course::class,
         CourseClass::class,

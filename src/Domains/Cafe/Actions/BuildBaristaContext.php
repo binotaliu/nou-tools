@@ -29,6 +29,7 @@ final readonly class BuildBaristaContext
     public function __construct(
         private ListUpcomingSchoolEvents $listUpcomingSchoolEvents,
         private ReadAcornBalance $readAcornBalance,
+        private CanPostStickyNote $canPostStickyNote,
     ) {}
 
     public function __invoke(?StudentScheduleCookie $viewer, ?string $drink = null): BaristaContext
@@ -42,6 +43,7 @@ final readonly class BuildBaristaContext
         $studyMinutes = 0;
         $acorns = 0;
         $isFirstVisit = false;
+        $canPostNote = false;
 
         if ($viewer !== null) {
             $nickname = StudyRoomProfile::query()
@@ -57,6 +59,7 @@ final readonly class BuildBaristaContext
                 ->sum('focus_seconds'), 60);
 
             $acorns = ($this->readAcornBalance)($viewer->id)->balance;
+            $canPostNote = ($this->canPostStickyNote)($viewer->id);
             $isFirstVisit = ! CafeOrder::query()->where('student_schedule_id', $viewer->id)->exists()
                 && ! AcornTransaction::query()->where('student_schedule_id', $viewer->id)->where('amount', '<', 0)->exists();
         }
@@ -71,7 +74,7 @@ final readonly class BuildBaristaContext
             studyMinutesToday: $studyMinutes,
             acorns: $acorns,
             isFirstVisit: $isFirstVisit,
-            canPostNote: $viewer !== null,
+            canPostNote: $canPostNote,
             drink: $drink,
         );
     }

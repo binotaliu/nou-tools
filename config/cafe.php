@@ -51,6 +51,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Sticky notes
+    |--------------------------------------------------------------------------
+    |
+    | Bought with acorns after a coffee that day, at most one a day. A note is
+    | screened by an AI model before it goes on the wall; the model can only
+    | let a note through or hold it for an admin, never turn it down.
+    |
+    */
+
+    'notes' => [
+        'price' => 5,
+        'lifetime_days' => 14,
+        'max_text_length' => 60,
+        'drawing_size' => 480,
+        'drawing_max_kb' => 300,
+        'paper_colors' => ['yellow', 'pink', 'blue', 'green', 'orange'],
+        'wall_limit' => 60,
+        // Readers' reports hide a note for review at this many.
+        'report_threshold' => 3,
+
+        'ai' => [
+            'provider' => env('CAFE_AI_PROVIDER', 'anthropic'),
+            'model' => env('CAFE_AI_MODEL', 'claude-haiku-5-5'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Café Layout
     |--------------------------------------------------------------------------
     |

@@ -7,6 +7,7 @@ use App\Console\Commands\ReleaseIdleCafeSeatsCommand;
 use App\Console\Commands\ReleaseIdleStudyRoomSeatsCommand;
 use App\Console\Commands\SendClassStartingRemindersCommand;
 use App\Console\Commands\SendStudyGoalRemindersCommand;
+use App\Models\CafeStickyNote;
 use App\Models\ScheduleDevice;
 use Illuminate\Support\Facades\Schedule;
 use NouTools\Domains\StudyRoom\Actions\SendStudyTimerEndPushes;
@@ -21,6 +22,7 @@ Schedule::command(SendClassStartingRemindersCommand::class)->everyMinute();
 Schedule::command(SendStudyGoalRemindersCommand::class)->everyMinute();
 
 Schedule::command('model:prune', ['--model' => ScheduleDevice::class])->daily();
+Schedule::command('model:prune', ['--model' => CafeStickyNote::class])->daily();
 
 // 自習室計時器結束推播。Sub-minute so the notification lands within ~10s of
 // zero instead of up to a minute late, which a countdown would feel.
