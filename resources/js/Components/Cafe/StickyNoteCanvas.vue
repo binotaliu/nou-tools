@@ -133,7 +133,12 @@ function toBlob() {
   return new Promise(resolve => canvas.value.toBlob(resolve, 'image/png'))
 }
 
-defineExpose({ toBlob, hasContent })
+// A preview of the drawing for the placement and confirmation steps.
+function toDataURL() {
+  return canvas.value.toDataURL('image/png')
+}
+
+defineExpose({ toBlob, toDataURL, hasContent })
 </script>
 
 <template>

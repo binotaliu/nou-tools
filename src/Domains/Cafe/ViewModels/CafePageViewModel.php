@@ -17,5 +17,6 @@ final class CafePageViewModel extends Data
         public int $connectTimeoutSeconds,
         public int $notePrice,
         public int $noteMaxLength,
+        public int $noteLifetimeDays,
     ) {}
 }

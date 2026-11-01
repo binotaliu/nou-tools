@@ -44,7 +44,7 @@ const keyGroups = [
     keys: [
       { key: '4', target: '跟店長再聊一句（聊完一句話後才有）' },
       { key: '5', target: '快速入座（未入座時）' },
-      { key: '6', target: '移到便利貼牆' },
+      { key: '6', target: '打開便利貼牆' },
     ],
   },
   {

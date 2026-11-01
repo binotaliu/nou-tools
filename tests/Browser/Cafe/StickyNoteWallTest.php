@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 // The pad, the placement and the wall are client-side (StickyNoteCanvas.vue,
-// StickyNoteComposer.vue, StickyNoteWall.vue). Strokes are synthetic pointer
+// StickyNoteComposer.vue, StickyNoteBoard.vue, StickyNoteWall.vue). The wall
+// opens in a modal from the corkboard on the floor map; the composer is three
+// steps (draw, place on the real wall, confirm). Strokes are synthetic pointer
 // events on the canvas. The test server does not parse multipart bodies, so the
 // upload itself is stubbed here and covered by StickyNoteTest (Feature).
 
@@ -33,7 +35,7 @@ $signedIn = function (): array {
     return [$schedule, $page];
 };
 
-it('builds a 480 square png and the note form from a drawing and some text', function () use ($signedIn) {
+it('draws a note, places it on the wall, confirms and sends a 480 square png with the text', function () use ($signedIn) {
     [, $page] = $signedIn();
 
     $page->navigate(route('cafe.show'));
@@ -41,17 +43,20 @@ it('builds a 480 square png and the note form from a drawing and some text', fun
 
     waitUntil($page, 'document.querySelector(\'[data-testid="cafe-open-note"]\') !== null');
 
-    $page->assertVisible('[data-testid="cafe-wall-empty"]')
-        ->click('[data-testid="cafe-open-note"]')
-        ->assertVisible('[data-testid="cafe-note-composer"]');
+    // The wall lives on the back wall of the floor map and opens in a modal.
+    $page->click('[data-testid="cafe-wall-open"]')
+        ->assertVisible('[data-testid="cafe-wall-empty"]')
+        ->click('[data-testid="cafe-wall-compose"]')
+        ->assertVisible('[data-testid="cafe-note-composer"]')
+        ->assertMissing('[data-testid="cafe-wall"]');
 
-    $submitDisabled = $page->script("document.querySelector('[data-testid=\"cafe-note-submit\"]').disabled");
-    expect($submitDisabled)->toBeTrue();
+    $nextDisabled = $page->script("document.querySelector('[data-testid=\"cafe-note-next\"]').disabled");
+    expect($nextDisabled)->toBeTrue();
 
     $page->script(<<<'JS'
         (() => {
             window.axios.post = async (url, form) => {
-                window.__sent = { url, text: form.get('text'), color: form.get('paperColor'), blob: form.get('drawing') };
+                window.__sent = { url, text: form.get('text'), color: form.get('paperColor'), x: form.get('x'), y: form.get('y'), blob: form.get('drawing') };
 
                 return { data: { acorns: { balance: 5, recent: [] } } };
             };
@@ -78,7 +83,26 @@ it('builds a 480 square png and the note form from a drawing and some text', fun
 
     waitUntil($page, '!document.querySelector(\'[data-testid="sticky-note-clear"]\').disabled');
 
-    $page->click('[data-testid="cafe-note-submit"]');
+    // Step 2 shows the real wall with the draft on it; a click moves the draft.
+    $page->click('[data-testid="cafe-note-next"]')
+        ->assertVisible('[data-testid="cafe-note-placement"]')
+        ->assertVisible('[data-testid="cafe-note-draft"]');
+
+    $page->script(<<<'JS'
+        (() => {
+            const board = document.querySelector('[data-testid="cafe-note-placement"] > div');
+            const rect = board.getBoundingClientRect();
+            board.dispatchEvent(new MouseEvent('click', {
+                clientX: rect.left + rect.width * 0.9, clientY: rect.top + rect.height * 0.9, bubbles: true,
+            }));
+        })()
+    JS);
+
+    // Step 3 shows it once more and carries the price.
+    $page->click('[data-testid="cafe-note-place-next"]')
+        ->assertVisible('[data-testid="cafe-note-preview"]')
+        ->assertSeeIn('[data-testid="cafe-note-submit"]', '5')
+        ->click('[data-testid="cafe-note-submit"]');
 
     waitUntil($page, 'document.querySelector(\'[data-testid="cafe-note-message"]\') !== null');
 
@@ -90,6 +114,8 @@ it('builds a 480 square png and the note form from a drawing and some text', fun
                 url: window.__sent.url,
                 text: window.__sent.text,
                 color: window.__sent.color,
+                x: Number(window.__sent.x),
+                y: Number(window.__sent.y),
                 type: window.__sent.blob.type,
                 width: bitmap.width,
                 height: bitmap.height,
@@ -101,6 +127,8 @@ it('builds a 480 square png and the note form from a drawing and some text', fun
         'url' => '/cafe/notes',
         'text' => '期中考加油',
         'color' => 'pink',
+        'x' => 1,
+        'y' => 1,
         'type' => 'image/png',
         'width' => 480,
         'height' => 480,
@@ -124,9 +152,10 @@ it('shows published notes on the wall with their drawings and lets a reader open
     $page->navigate(route('cafe.show'));
     dismissCookieConsentBanner($page);
 
-    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-note-'.$note->id.'"]\') !== null');
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-wall-open"] img\') !== null');
 
-    $page->assertMissing('[data-testid="cafe-wall-empty"]')
+    $page->click('[data-testid="cafe-wall-open"]')
+        ->assertMissing('[data-testid="cafe-wall-empty"]')
         ->assertMissing('[data-testid="cafe-note-'.$held->id.'"]')
         ->click('[data-testid="cafe-note-'.$note->id.'"]')
         ->assertSeeIn('[data-testid="cafe-note-detail"]', '牆上的同學')

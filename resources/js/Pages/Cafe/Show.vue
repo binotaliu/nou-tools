@@ -1,15 +1,18 @@
 <script setup>
 // 咖啡廳 — the shell. Live seat state comes from useCafeSocket (REST + Echo),
-// not from Inertia props, the same split the study room uses.
+// not from Inertia props, the same split the study room uses. The room is
+// drawn by CafeFloor; the wall, the menu and the note composer open in
+// modals from it (and from the toolbar), so nothing stacks under the map.
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import AppLayout from '../../Layouts/AppLayout.vue'
+import Modal from '../../Components/StudyRoom/Modal.vue'
 import BaristaDialogue from '../../Components/Cafe/BaristaDialogue.vue'
+import CafeFloor from '../../Components/Cafe/CafeFloor.vue'
 import StickyNoteComposer from '../../Components/Cafe/StickyNoteComposer.vue'
 import StickyNoteWall from '../../Components/Cafe/StickyNoteWall.vue'
 import MenuSheet from '../../Components/Cafe/MenuSheet.vue'
-import CafeScene from '../../Components/Cafe/CafeScene.vue'
-import CafeSeat from '../../Components/Cafe/CafeSeat.vue'
+import AcornIcon from '../../Components/Acorns/AcornIcon.vue'
 import useAcorns from '../../Composables/useAcorns'
 import useBarista from '../../Composables/useBarista'
 import useCafeSocket from '../../Composables/useCafeSocket'
@@ -32,6 +35,7 @@ const orderBusyId = ref(null)
 const orderError = ref(null)
 
 const notes = ref([])
+const wallOpen = ref(false)
 const composerOpen = ref(false)
 const noteMessage = ref(null)
 
@@ -64,11 +68,6 @@ async function openMenu() {
       orderError.value = '菜單暫時打不開，請稍後再試。'
     }
   }
-
-  await nextTick()
-  document.querySelector('[data-testid="cafe-menu"]')?.scrollIntoView({
-    block: 'nearest',
-  })
 }
 
 async function loadNotes() {
@@ -79,18 +78,14 @@ async function loadNotes() {
   }
 }
 
-async function openComposer() {
+function openComposer() {
   if (!canOrder.value) {
     return
   }
 
+  wallOpen.value = false
   composerOpen.value = true
   noteMessage.value = null
-
-  await nextTick()
-  document.querySelector('[data-testid="cafe-note-composer"]')?.scrollIntoView({
-    block: 'nearest',
-  })
 }
 
 async function notePosted(data) {
@@ -129,23 +124,6 @@ async function order({ item, toGo }) {
 const canSit = computed(() => props.cafe.hasSchedule && props.cafe.hasNickname)
 
 const seats = computed(() => socket.seats())
-
-const barSeats = computed(() => seats.value.filter(seat => seat.kind === 'bar'))
-const communalSeats = computed(() =>
-  seats.value.filter(seat => seat.kind === 'communal')
-)
-const windowTables = computed(() => {
-  const tables = new Map()
-
-  for (const seat of seats.value.filter(item => item.kind === 'window')) {
-    tables.set(seat.groupCode, [...(tables.get(seat.groupCode) ?? []), seat])
-  }
-
-  return [...tables.entries()].map(([code, tableSeats]) => ({
-    code,
-    seats: tableSeats,
-  }))
-})
 
 // One Tab stop for the whole room; arrows move between seats in DOM order.
 const activeCode = computed(() => {
@@ -262,28 +240,13 @@ onUnmounted(() => {
             </span>
           </p>
         </div>
-        <div class="flex gap-2">
-          <button
-            v-if="!socket.heldSeatCode.value"
-            type="button"
-            accesskey="5"
-            data-testid="cafe-quick-seat"
-            class="rounded-lg border-2 border-b-4 border-theme-700 bg-theme-800 px-3 py-1.5 text-sm font-semibold text-white transition active:translate-y-px active:border-b-2 disabled:opacity-50 dark:border-theme-900 dark:bg-theme-700"
-            :disabled="!canSit || !socket.firstFreeSeat()"
-            @click="sitDownQuickly"
-          >
-            快速入座
-          </button>
-          <button
-            v-else
-            type="button"
-            data-testid="cafe-leave"
-            class="rounded-lg border-2 border-b-4 border-theme-300 bg-white px-3 py-1.5 text-sm font-semibold text-theme-900 transition active:translate-y-px active:border-b-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
-            @click="socket.leave()"
-          >
-            離開座位
-          </button>
-        </div>
+        <span
+          v-if="acorns.loaded"
+          class="inline-flex items-center gap-1 rounded-full bg-theme-100 px-2.5 py-1 text-xs font-semibold text-theme-800 tabular-nums dark:bg-zinc-800 dark:text-amber-300"
+          data-testid="cafe-acorns"
+        >
+          <AcornIcon /> 你有 {{ acorns.balance }} 顆橡實
+        </span>
       </div>
 
       <div
@@ -319,55 +282,6 @@ onUnmounted(() => {
         {{ socket.errorMessage.value }}
       </p>
 
-      <BaristaDialogue :barista="barista" @more="barista.talk()" />
-
-      <div v-if="canOrder" class="flex flex-wrap items-center gap-2">
-        <button
-          v-if="!menuOpen"
-          type="button"
-          class="rounded-lg border-2 border-b-4 border-theme-300 bg-white px-3 py-1.5 text-sm font-semibold text-theme-900 transition active:translate-y-px active:border-b-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
-          data-testid="cafe-open-menu"
-          @click="openMenu"
-        >
-          點餐
-        </button>
-        <button
-          v-if="!composerOpen"
-          type="button"
-          class="rounded-lg border-2 border-b-4 border-theme-300 bg-white px-3 py-1.5 text-sm font-semibold text-theme-900 transition active:translate-y-px active:border-b-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
-          data-testid="cafe-open-note"
-          @click="openComposer"
-        >
-          買便利貼
-        </button>
-        <span
-          v-if="acorns.loaded"
-          class="text-sm text-theme-800 dark:text-amber-300"
-          data-testid="cafe-acorns"
-        >
-          你有 {{ acorns.balance }} 顆橡實
-        </span>
-      </div>
-
-      <MenuSheet
-        v-if="menuOpen"
-        :menu="menu"
-        :balance="acorns.balance"
-        :busy-item-id="orderBusyId"
-        :error-message="orderError"
-        @order="order"
-        @close="menuOpen = false"
-      />
-
-      <StickyNoteComposer
-        v-if="composerOpen"
-        :price="cafe.notePrice"
-        :max-length="cafe.noteMaxLength"
-        :balance="acorns.balance"
-        @posted="notePosted"
-        @close="composerOpen = false"
-      />
-
       <p
         v-if="noteMessage"
         role="status"
@@ -377,101 +291,166 @@ onUnmounted(() => {
         {{ noteMessage }}
       </p>
 
-      <div @keydown="handleKeydown">
-        <CafeScene />
-
-        <div
-          class="space-y-5 rounded-b-xl border-[6px] border-t-0 border-theme-300 bg-theme-50 p-4 dark:border-zinc-600 dark:bg-zinc-900"
-          data-testid="cafe-floor"
+      <!-- toolbar, like the study room's RoomToolbar -->
+      <div
+        class="flex flex-wrap items-center gap-2"
+        role="toolbar"
+        aria-label="咖啡廳操作"
+      >
+        <button
+          v-if="!socket.heldSeatCode.value"
+          type="button"
+          accesskey="5"
+          data-testid="cafe-quick-seat"
+          class="rounded-lg border-2 border-b-4 border-theme-700 bg-theme-800 px-3 py-1.5 text-sm font-semibold text-white transition active:translate-y-px active:border-b-2 disabled:opacity-50 dark:border-theme-900 dark:bg-theme-700"
+          :disabled="!canSit || !socket.firstFreeSeat()"
+          @click="sitDownQuickly"
         >
-          <p
-            v-if="socket.loading.value && !socket.state.value"
-            class="py-6 text-center text-sm text-theme-700 dark:text-zinc-400"
+          快速入座
+        </button>
+        <button
+          v-else
+          type="button"
+          data-testid="cafe-leave"
+          class="rounded-lg border-2 border-b-4 border-theme-300 bg-white px-3 py-1.5 text-sm font-semibold text-theme-900 transition active:translate-y-px active:border-b-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+          @click="socket.leave()"
+        >
+          離開座位
+        </button>
+        <template v-if="canOrder">
+          <button
+            type="button"
+            class="rounded-lg border-2 border-b-4 border-theme-300 bg-white px-3 py-1.5 text-sm font-semibold text-theme-900 transition active:translate-y-px active:border-b-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+            data-testid="cafe-open-menu"
+            @click="openMenu"
           >
-            正在開門…
-          </p>
-
-          <template v-else>
-            <section aria-labelledby="cafe-bar-heading">
-              <h2
-                id="cafe-bar-heading"
-                class="mb-1.5 text-xs font-semibold tracking-widest text-theme-700 dark:text-zinc-400"
-              >
-                吧台
-              </h2>
-              <div class="grid grid-cols-3 gap-2 sm:grid-cols-6">
-                <CafeSeat
-                  v-for="seat in barSeats"
-                  :key="seat.code"
-                  :seat="seat"
-                  :socket="socket"
-                  :can-sit="canSit"
-                  :roving-tabindex="tabIndexFor(seat)"
-                  :now="now"
-                  variant="stool"
-                  @activate="activate"
-                />
-              </div>
-            </section>
-
-            <section aria-labelledby="cafe-window-heading">
-              <h2
-                id="cafe-window-heading"
-                class="mb-1.5 text-xs font-semibold tracking-widest text-theme-700 dark:text-zinc-400"
-              >
-                窗邊小桌
-              </h2>
-              <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <div
-                  v-for="table in windowTables"
-                  :key="table.code"
-                  class="rounded-xl border-2 border-dashed border-theme-300 p-1.5 dark:border-zinc-600"
-                >
-                  <div class="grid grid-cols-2 gap-1.5">
-                    <CafeSeat
-                      v-for="seat in table.seats"
-                      :key="seat.code"
-                      :seat="seat"
-                      :socket="socket"
-                      :can-sit="canSit"
-                      :roving-tabindex="tabIndexFor(seat)"
-                      :now="now"
-                      @activate="activate"
-                    />
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section aria-labelledby="cafe-communal-heading">
-              <h2
-                id="cafe-communal-heading"
-                class="mb-1.5 text-xs font-semibold tracking-widest text-theme-700 dark:text-zinc-400"
-              >
-                大長桌
-              </h2>
-              <div
-                class="rounded-xl border-2 border-dashed border-theme-300 p-1.5 dark:border-zinc-600"
-              >
-                <div class="grid grid-cols-3 gap-1.5 sm:grid-cols-6">
-                  <CafeSeat
-                    v-for="seat in communalSeats"
-                    :key="seat.code"
-                    :seat="seat"
-                    :socket="socket"
-                    :can-sit="canSit"
-                    :roving-tabindex="tabIndexFor(seat)"
-                    :now="now"
-                    @activate="activate"
-                  />
-                </div>
-              </div>
-            </section>
-          </template>
-        </div>
+            點餐
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border-2 border-b-4 border-theme-300 bg-white px-3 py-1.5 text-sm font-semibold text-theme-900 transition active:translate-y-px active:border-b-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+            data-testid="cafe-open-note"
+            @click="openComposer"
+          >
+            買便利貼
+          </button>
+        </template>
       </div>
 
-      <StickyNoteWall :notes="notes" @report="reportNote" />
+      <div @keydown="handleKeydown">
+        <p id="cafe-seat-keys-hint" class="sr-only">
+          用方向鍵在座位間移動，Home、End 移到第一個或最後一個座位。
+        </p>
+        <CafeFloor
+          :seats="seats"
+          :socket="socket"
+          :can-sit="canSit"
+          :can-order="canOrder"
+          :loading="socket.loading.value && !socket.state.value"
+          :now="now"
+          :tab-index-for="tabIndexFor"
+          :notes="notes"
+          :barista-mood="barista.mood"
+          aria-describedby="cafe-seat-keys-hint"
+          @activate="activate"
+          @open-wall="wallOpen = true"
+          @open-menu="openMenu"
+        />
+      </div>
+
+      <BaristaDialogue :barista="barista" @more="barista.talk()" />
+
+      <ul
+        class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-theme-700 dark:text-zinc-400"
+      >
+        <li class="inline-flex items-center gap-1.5">
+          <span
+            class="size-3 rounded-sm border-2 border-b-[3px] border-theme-300 bg-white dark:border-zinc-600 dark:bg-zinc-800"
+          ></span>
+          空位
+        </li>
+        <li class="inline-flex items-center gap-1.5">
+          <span
+            class="size-3 rounded-sm border-2 border-theme-400 bg-white dark:border-zinc-500 dark:bg-zinc-800"
+          ></span>
+          有人
+        </li>
+        <li class="inline-flex items-center gap-1.5">
+          <span
+            class="rounded-full bg-amber-700 px-1 text-xs leading-4 font-semibold text-white"
+            >你</span
+          >
+          你的座位
+        </li>
+        <li class="inline-flex items-center gap-1.5">
+          <span aria-hidden="true">☕</span>
+          桌上有飲料
+        </li>
+      </ul>
+
+      <Modal
+        :open="wallOpen"
+        title="便利貼牆"
+        max-width="max-w-2xl"
+        data-testid="cafe-wall-modal"
+        @close="wallOpen = false"
+      >
+        <StickyNoteWall v-if="wallOpen" :notes="notes" @report="reportNote" />
+        <template #footer>
+          <button
+            v-if="canOrder"
+            type="button"
+            class="mr-auto rounded-lg border-2 border-b-4 border-theme-700 bg-theme-800 px-3 py-1.5 text-sm font-semibold text-white transition active:translate-y-px active:border-b-2 dark:border-theme-900 dark:bg-theme-700"
+            data-testid="cafe-wall-compose"
+            @click="openComposer"
+          >
+            我也要貼一張
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border-2 border-b-4 border-theme-300 bg-white px-3 py-1.5 text-sm font-medium text-theme-900 transition active:translate-y-px active:border-b-2 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+            @click="wallOpen = false"
+          >
+            關閉
+          </button>
+        </template>
+      </Modal>
+
+      <Modal
+        :open="menuOpen"
+        max-width="max-w-md"
+        data-testid="cafe-menu-modal"
+        @close="menuOpen = false"
+      >
+        <MenuSheet
+          v-if="menuOpen"
+          :menu="menu"
+          :balance="acorns.balance"
+          :busy-item-id="orderBusyId"
+          :error-message="orderError"
+          @order="order"
+          @close="menuOpen = false"
+        />
+      </Modal>
+
+      <Modal
+        :open="composerOpen"
+        title="寫一張便利貼"
+        max-width="max-w-lg"
+        data-testid="cafe-note-modal"
+        @close="composerOpen = false"
+      >
+        <StickyNoteComposer
+          v-if="composerOpen"
+          :price="cafe.notePrice"
+          :max-length="cafe.noteMaxLength"
+          :lifetime-days="cafe.noteLifetimeDays"
+          :balance="acorns.balance"
+          :notes="notes"
+          @posted="notePosted"
+          @close="composerOpen = false"
+        />
+      </Modal>
     </div>
   </AppLayout>
 </template>

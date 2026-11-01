@@ -33,6 +33,7 @@ final readonly class ShowCafePage
             connectTimeoutSeconds: (int) config('study-room.realtime.connect_timeout_seconds'),
             notePrice: (int) config('cafe.notes.price'),
             noteMaxLength: (int) config('cafe.notes.max_text_length'),
+            noteLifetimeDays: (int) config('cafe.notes.lifetime_days'),
         );
     }
 }

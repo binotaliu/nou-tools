@@ -1,6 +1,7 @@
 <script setup>
 // 松鼠店長. A small SVG squirrel in an apron whose face follows the line's
-// mood. Decorative: the dialogue box carries the words.
+// mood. Decorative: the dialogue box carries the words. Size it from the
+// caller (`class="size-24"`).
 defineProps({
   mood: { type: String, default: 'happy' },
 })
@@ -9,7 +10,7 @@ defineProps({
 <template>
   <svg
     viewBox="0 0 96 96"
-    class="size-24 shrink-0"
+    class="shrink-0"
     fill="none"
     aria-hidden="true"
     focusable="false"

@@ -21,15 +21,11 @@ function canAfford(item) {
 </script>
 
 <template>
-  <section
-    class="rounded-xl border-2 border-b-4 border-theme-300 bg-white p-3 dark:border-zinc-600 dark:bg-zinc-800"
-    aria-labelledby="cafe-menu-heading"
-    data-testid="cafe-menu"
-  >
+  <section aria-labelledby="cafe-menu-heading" data-testid="cafe-menu">
     <div class="flex items-center justify-between gap-2">
       <h2
         id="cafe-menu-heading"
-        class="text-sm font-semibold text-theme-900 dark:text-zinc-100"
+        class="text-lg font-semibold text-theme-900 dark:text-zinc-100"
       >
         菜單
       </h2>
