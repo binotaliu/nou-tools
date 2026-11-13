@@ -4,12 +4,14 @@ use App\Enums\AcornTransactionKind;
 use App\Enums\BaristaTrigger;
 use App\Enums\StickyNoteStatus;
 use App\Enums\UserRole;
+use App\Filament\Resources\AcornTransactions\Pages\ListAcornTransactions;
 use App\Filament\Resources\CafeBaristaLines\Pages\CreateCafeBaristaLine;
 use App\Filament\Resources\CafeBaristaLines\Pages\EditCafeBaristaLine;
 use App\Filament\Resources\CafeBaristaLines\Pages\ListCafeBaristaLines;
 use App\Filament\Resources\CafeMenuItems\Pages\CreateCafeMenuItem;
 use App\Filament\Resources\CafeMenuItems\Pages\ListCafeMenuItems;
 use App\Filament\Resources\CafeStickyNotes\Pages\ListCafeStickyNotes;
+use App\Filament\Widgets\AcornSpendingStats;
 use App\Models\AcornTransaction;
 use App\Models\CafeBaristaLine;
 use App\Models\CafeMenuItem;
@@ -18,6 +20,7 @@ use App\Models\StudentSchedule;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Livewire\Livewire;
+use NouTools\Domains\Acorns\Actions\GrantAcornsAsAdmin;
 use NouTools\Domains\Acorns\Actions\ReadAcornBalance;
 use NouTools\Domains\Acorns\Actions\SpendAcorns;
 
@@ -106,4 +109,33 @@ it('lets an admin approve, decline with a refund, hide and block from the sticky
     expect($held->fresh()->status)->toBe(StickyNoteStatus::Declined)
         ->and($author->fresh()->cafe_blocked_at)->not->toBeNull()
         ->and(app(ReadAcornBalance::class)($author->id)->balance)->toBe(5);
+});
+
+it('lets an admin give acorns from the ledger page', function () {
+    $schedule = StudentSchedule::factory()->create();
+
+    Livewire::test(ListAcornTransactions::class)
+        ->callAction('grant', ['student_schedule_id' => $schedule->id, 'amount' => 15, 'reason' => '補償'])
+        ->assertHasNoActionErrors();
+
+    $transaction = AcornTransaction::query()->where('student_schedule_id', $schedule->id)->firstOrFail();
+
+    expect($transaction->kind)->toBe(AcornTransactionKind::AdminAdjust)
+        ->and($transaction->amount)->toBe(15)
+        ->and($transaction->meta['reason'])->toBe('補償')
+        ->and(app(ReadAcornBalance::class)($schedule->id)->balance)->toBe(15);
+
+    Livewire::test(ListAcornTransactions::class)->assertCanSeeTableRecords([$transaction]);
+});
+
+it('counts the people who spent acorns on the dashboard card', function () {
+    $spender = StudentSchedule::factory()->create();
+    $saver = StudentSchedule::factory()->create();
+    app(GrantAcornsAsAdmin::class)($spender->id, 20, null, auth()->user());
+    app(GrantAcornsAsAdmin::class)($saver->id, 20, null, auth()->user());
+    app(SpendAcorns::class)($spender->id, 5, AcornTransactionKind::CoffeePurchase);
+
+    Livewire::test(AcornSpendingStats::class)
+        ->assertSee('今日花費人數')
+        ->assertSee('今天花費 5 顆橡實');
 });

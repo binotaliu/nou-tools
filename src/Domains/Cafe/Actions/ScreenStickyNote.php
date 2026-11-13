@@ -22,6 +22,7 @@ final readonly class ScreenStickyNote
     public function __construct(
         private PublishStickyNote $publishStickyNote,
         private HoldStickyNoteForReview $holdStickyNoteForReview,
+        private NotifyStickyNoteScreened $notifyStickyNoteScreened,
     ) {}
 
     public function __invoke(CafeStickyNote $note): CafeStickyNote
@@ -42,14 +43,21 @@ final readonly class ScreenStickyNote
             Log::warning('Sticky note screening failed.', ['note' => $note->id, 'exception' => $throwable->getMessage()]);
             report($throwable);
 
-            return ($this->holdStickyNoteForReview)($note, ['verdict' => 'review', 'reason' => '自動審查失敗，請人工檢視。']);
+            return $this->notified(($this->holdStickyNoteForReview)($note, ['verdict' => 'review', 'reason' => '自動審查失敗，請人工檢視。']));
         }
 
         if ($verdict === 'allow') {
-            return ($this->publishStickyNote)($note, ['verdict' => 'allow', 'reason' => $reason]);
+            return $this->notified(($this->publishStickyNote)($note, ['verdict' => 'allow', 'reason' => $reason]));
         }
 
-        return ($this->holdStickyNoteForReview)($note, ['verdict' => 'review', 'reason' => $reason]);
+        return $this->notified(($this->holdStickyNoteForReview)($note, ['verdict' => 'review', 'reason' => $reason]));
+    }
+
+    private function notified(CafeStickyNote $note): CafeStickyNote
+    {
+        ($this->notifyStickyNoteScreened)($note);
+
+        return $note;
     }
 
     private function prompt(CafeStickyNote $note): string

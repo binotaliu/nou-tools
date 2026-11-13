@@ -9,6 +9,7 @@ use App\Models\CafeStickyNote;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use NouTools\Domains\Cafe\Actions\HoldStickyNoteForReview;
+use NouTools\Domains\Cafe\Actions\NotifyStickyNoteScreened;
 use NouTools\Domains\Cafe\Actions\ScreenStickyNote;
 use Throwable;
 
@@ -41,6 +42,8 @@ final class ScreenStickyNoteJob implements ShouldQueue
             return;
         }
 
-        app(HoldStickyNoteForReview::class)($note, ['verdict' => 'review', 'reason' => '審查工作中斷，請人工檢視。']);
+        $held = app(HoldStickyNoteForReview::class)($note, ['verdict' => 'review', 'reason' => '審查工作中斷，請人工檢視。']);
+
+        app(NotifyStickyNoteScreened::class)($held);
     }
 }

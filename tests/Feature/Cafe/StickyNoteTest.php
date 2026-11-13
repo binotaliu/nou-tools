@@ -8,9 +8,11 @@ use App\Models\CafeOrder;
 use App\Models\CafeStickyNote;
 use App\Models\StudentSchedule;
 use App\Models\StudyRoomProfile;
+use App\Notifications\StickyNoteScreened;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -258,4 +260,28 @@ it('tells the notes index why a viewer cannot buy a note yet', function () use (
     $as($thirsty)->assertOk()->assertJsonPath('blockedReason', '低消一杯飲料，才可購買便利貼。');
     $as($served)->assertOk()->assertJsonPath('blockedReason', null);
     $this->getJson(route('cafe.notes.index'))->assertOk()->assertJsonPath('blockedReason', null);
+});
+
+it('sends a Discord notification for a note whether it is published or held', function () {
+    config(['services.discord.webhooks.sticky_notes' => 'https://discord.test/hook']);
+    Notification::fake();
+
+    StickyNoteScreener::fake([['verdict' => 'allow', 'reason' => '日常鼓勵'], ['verdict' => 'review', 'reason' => '含電話號碼']]);
+    $allowed = CafeStickyNote::factory()->status(StickyNoteStatus::Screening)->create();
+    $held = CafeStickyNote::factory()->status(StickyNoteStatus::Screening)->create();
+
+    app(ScreenStickyNote::class)($allowed);
+    app(ScreenStickyNote::class)($held);
+
+    Notification::assertSentOnDemandTimes(StickyNoteScreened::class, 2);
+});
+
+it('sends no notification without a webhook', function () {
+    config(['services.discord.webhooks.sticky_notes' => null]);
+    Notification::fake();
+    StickyNoteScreener::fake([['verdict' => 'allow', 'reason' => 'ok']]);
+
+    app(ScreenStickyNote::class)(CafeStickyNote::factory()->status(StickyNoteStatus::Screening)->create());
+
+    Notification::assertNothingSent();
 });
