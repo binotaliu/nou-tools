@@ -49,7 +49,7 @@ it('opens the cabinet from the floor, spends a coin on a sign and shows the read
 
     $page->assertSeeIn('[data-testid="horoscope-result-heading"]', '獅子座')
         ->assertSeeIn('[data-testid="horoscope-score-overall"]', '整體運')
-        ->assertSeeIn('[data-testid="cafe-acorns"]', '8 顆橡實');
+        ->assertSeeIn('[data-testid="cafe-acorns"]', (10 - config('cafe.arcade.horoscope.price')).' 顆橡實');
 
     expect(ArcadePlay::query()->where('student_schedule_id', $schedule->id)->value('choice'))->toBe('leo');
 
@@ -62,7 +62,7 @@ it('opens the cabinet from the floor, spends a coin on a sign and shows the read
     $page->click('[data-testid="horoscope-insert-coin"]');
     waitUntil($page, 'document.querySelector(\'[data-testid="horoscope-result"]\') !== null');
 
-    $page->assertSeeIn('[data-testid="cafe-acorns"]', '8 顆橡實');
+    $page->assertSeeIn('[data-testid="cafe-acorns"]', (10 - config('cafe.arcade.horoscope.price')).' 顆橡實');
 
     expect(ArcadePlay::query()->count())->toBe(1);
 });

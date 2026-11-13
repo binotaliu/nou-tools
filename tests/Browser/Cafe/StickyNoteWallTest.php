@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
 $signedIn = function (): array {
     $schedule = StudentSchedule::create(['uuid' => Str::uuid(), 'name' => 'Browser Note Schedule']);
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create(['nickname' => '塗鴉同學']);
-    AcornTransaction::factory()->for($schedule, 'schedule')->credit(10)->create();
+    AcornTransaction::factory()->for($schedule, 'schedule')->credit(20)->create();
     CafeOrder::factory()->for($schedule, 'schedule')->create();
 
     $page = visit(route('schedules.show', $schedule));
@@ -101,7 +101,7 @@ it('draws a note, places it on the wall, confirms and sends a 480 square png wit
     // Step 3 shows it once more and carries the price.
     $page->click('[data-testid="cafe-note-place-next"]')
         ->assertVisible('[data-testid="cafe-note-preview"]')
-        ->assertSeeIn('[data-testid="cafe-note-submit"]', '5')
+        ->assertSeeIn('[data-testid="cafe-note-submit"]', (string) config('cafe.notes.price'))
         ->click('[data-testid="cafe-note-submit"]');
 
     waitUntil($page, 'document.querySelector(\'[data-testid="cafe-note-message"]\') !== null');

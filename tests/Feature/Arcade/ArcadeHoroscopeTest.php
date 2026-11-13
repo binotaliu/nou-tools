@@ -32,13 +32,13 @@ it('charges the price and stores the reading when a coin goes in', function () u
         ->assertJsonPath('reading.scores.0.key', 'overall')
         ->assertJsonCount(5, 'reading.scores')
         ->assertJsonCount(2, 'reading.advice')
-        ->assertJsonPath('acorns.balance', 8);
+        ->assertJsonPath('acorns.balance', 10 - config('cafe.arcade.horoscope.price'));
 
     $play = ArcadePlay::query()->firstOrFail();
     expect($play->game)->toBe(ArcadeGame::Horoscope)
         ->and($play->choice)->toBe('leo')
         ->and($play->acorn_transaction_id)->not->toBeNull()
-        ->and(AcornTransaction::query()->where('kind', AcornTransactionKind::ArcadePlay)->value('amount'))->toBe(-2);
+        ->and(AcornTransaction::query()->where('kind', AcornTransactionKind::ArcadePlay)->value('amount'))->toBe(-config('cafe.arcade.horoscope.price'));
 });
 
 it('shows the same reading again for the same sign on the same day without charging', function () use ($arcadeCookie, $player) {
@@ -47,7 +47,7 @@ it('shows the same reading again for the same sign on the same day without charg
         ->postJson(route('cafe.arcade.horoscope.store'), ['sign' => 'aries']);
 
     $first = $request()->assertOk()->json('reading');
-    $second = $request()->assertOk()->assertJsonPath('acorns.balance', 8)->json('reading');
+    $second = $request()->assertOk()->assertJsonPath('acorns.balance', 10 - config('cafe.arcade.horoscope.price'))->json('reading');
 
     expect($second)->toBe($first)
         ->and(ArcadePlay::query()->count())->toBe(1)
@@ -63,7 +63,7 @@ it('charges again for another sign', function () use ($arcadeCookie, $player) {
             ->assertOk();
     }
 
-    expect(app(ReadAcornBalance::class)($schedule->id)->balance)->toBe(6)
+    expect(app(ReadAcornBalance::class)($schedule->id)->balance)->toBe(10 - 2 * config('cafe.arcade.horoscope.price'))
         ->and(ArcadePlay::query()->count())->toBe(2);
 });
 
@@ -76,7 +76,7 @@ it('charges again after the Taipei day rolls over', function () use ($arcadeCook
 
     $request()->assertOk();
     $this->travelTo(Carbon::parse('2026-11-04 00:30', 'Asia/Taipei'));
-    $request()->assertOk()->assertJsonPath('acorns.balance', 6);
+    $request()->assertOk()->assertJsonPath('acorns.balance', 10 - 2 * config('cafe.arcade.horoscope.price'));
 
     expect(ArcadePlay::query()->pluck('played_on')->sort()->values()->all())->toBe(['2026-11-03', '2026-11-04']);
 });
@@ -127,7 +127,7 @@ it('lists the signs, the price and only the readings unlocked today', function (
     $this->withCredentials()->withCookie('student_schedule', $arcadeCookie($schedule))
         ->getJson(route('cafe.arcade.horoscope.show'))
         ->assertOk()
-        ->assertJsonPath('machine.price', 2)
+        ->assertJsonPath('machine.price', config('cafe.arcade.horoscope.price'))
         ->assertJsonCount(12, 'machine.signs')
         ->assertJsonCount(1, 'machine.unlocked')
         ->assertJsonPath('machine.unlocked.0.sign', 'gemini');

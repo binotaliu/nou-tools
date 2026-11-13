@@ -27,7 +27,7 @@ $cookieFor = function (StudentSchedule $schedule): string {
 };
 
 // A student who bought a coffee today and holds acorns.
-$buyer = function (int $acorns = 10, bool $coffee = true): StudentSchedule {
+$buyer = function (int $acorns = 20, bool $coffee = true): StudentSchedule {
     $schedule = StudentSchedule::factory()->create();
     StudyRoomProfile::factory()->for($schedule, 'schedule')->create(['nickname' => '便利貼同學']);
     AcornTransaction::factory()->for($schedule, 'schedule')->credit($acorns)->create();
@@ -62,7 +62,7 @@ it('sells a note for acorns after a coffee today and queues the screening', func
         ->assertCreated()
         ->assertJsonPath('note.status', 'screening')
         ->assertJsonPath('note.isMine', true)
-        ->assertJsonPath('acorns.balance', 5);
+        ->assertJsonPath('acorns.balance', 20 - config('cafe.notes.price'));
 
     $note = CafeStickyNote::query()->firstOrFail();
 
@@ -167,7 +167,7 @@ it('holds the note when the model errors or the job dies', function () {
 });
 
 it('refunds the acorns when an admin declines a note', function () use ($buyer, $cookieFor, $payload) {
-    $schedule = $buyer(10);
+    $schedule = $buyer(20);
     $this->withCredentials()->withCookie('student_schedule', $cookieFor($schedule))
         ->postJson(route('cafe.notes.store'), $payload())->assertCreated();
 
@@ -176,7 +176,7 @@ it('refunds the acorns when an admin declines a note', function () use ($buyer, 
     app(DeclineStickyNote::class)($note);
 
     expect($note->fresh()->status)->toBe(StickyNoteStatus::Declined)
-        ->and(app(ReadAcornBalance::class)($schedule->id)->balance)->toBe(10);
+        ->and(app(ReadAcornBalance::class)($schedule->id)->balance)->toBe(20);
 });
 
 it('shows published notes to everyone and a pending note only to its author', function () use ($buyer, $cookieFor) {
@@ -216,7 +216,7 @@ it('serves a drawing only for a published note or to its author', function () us
     $this->withCredentials()->withCookie('student_schedule', $cookieFor($author))->get(route('cafe.notes.drawing', $pending))->assertOk();
 });
 
-it('hides a note after three reports, one per session', function () {
+it('hides a note once the report threshold is reached, one per session', function () {
     $note = CafeStickyNote::factory()->create();
 
     // The session is the reader: the cookie must be pinned or every request is a new one.
@@ -229,12 +229,17 @@ it('hides a note after three reports, one per session', function () {
     expect($note->fresh()->report_count)->toBe(1);
 
     $report = app(ReportStickyNote::class);
-    $report($note, 'another-session');
+    $threshold = (int) config('cafe.notes.report_threshold');
+
+    foreach (range(2, $threshold - 1) as $index) {
+        $report($note, "session-{$index}");
+    }
+
     expect($note->fresh()->status)->toBe(StickyNoteStatus::Published);
 
-    $report($note, 'a-third-session');
+    $report($note, 'last-session');
 
-    expect($note->fresh()->report_count)->toBe(3)
+    expect($note->fresh()->report_count)->toBe($threshold)
         ->and($note->fresh()->status)->toBe(StickyNoteStatus::PendingReview);
     Event::assertDispatched(CafeUpdated::class, fn (CafeUpdated $event): bool => $event->type === 'note.removed');
 });
