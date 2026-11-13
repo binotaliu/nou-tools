@@ -54,8 +54,13 @@ function formatDate(iso) {
       點擊便利貼以放大。
     </p>
 
+    <!-- Keyed by note: Twemoji replaces the text node an emoji lives in, which
+         detaches the node Vue patches. Without a fresh panel (and the name in
+         its own element below), opening another note kept the first author's
+         name and emoji. -->
     <div
       v-if="selected"
+      :key="selected.id"
       class="mt-2 flex items-start gap-3 rounded-xl border-2 border-theme-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800"
       data-testid="cafe-note-detail"
     >
@@ -68,7 +73,10 @@ function formatDate(iso) {
       />
       <div class="min-w-0 flex-1 text-sm">
         <p class="font-semibold text-theme-900 dark:text-zinc-100">
-          {{ selected.emoji }} {{ selected.nickname ?? '同學' }}
+          <span v-if="selected.emoji" class="mr-1">{{ selected.emoji }}</span>
+          <span data-testid="cafe-note-author">{{
+            selected.nickname ?? '同學'
+          }}</span>
           <span
             v-if="selected.publishedAt"
             class="text-xs font-normal text-theme-600 dark:text-zinc-400"

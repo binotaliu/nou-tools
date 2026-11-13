@@ -1,8 +1,13 @@
 // twemoji renders emoji consistently across platforms. It is dynamically
 // imported rather than loaded globally, since only the pages that draw
 // people and cups need it (the study room and the café) — mirrors the echo.js
-// import. Vue keeps patching the text it rendered, so a MutationObserver
-// re-parses whatever changed.
+// import. A MutationObserver re-parses whatever Vue adds.
+//
+// Twemoji replaces a text node that contains an emoji, so Vue's next patch of
+// that node lands on a detached node and the observer never sees it. Keep each
+// emoji in its own element, and key that element (or its parent) when the
+// character can change. Never share its text node with other dynamic text, or
+// that text sticks on the first value.
 export default function useTwemoji() {
   let observer = null
   let rafHandle = null

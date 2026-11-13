@@ -171,6 +171,46 @@ it('shows published notes on the wall with their drawings and lets a reader open
     expect($note->fresh()->report_count)->toBe(1);
 });
 
+it('shows the author of the note just opened, not the one opened before it', function () use ($signedIn) {
+    $firstAuthor = StudentSchedule::factory()->create();
+    StudyRoomProfile::factory()->for($firstAuthor, 'schedule')->create(['nickname' => '第一位同學', 'emoji' => '📚']);
+    $first = CafeStickyNote::factory()->for($firstAuthor, 'schedule')->create([
+        'text' => '第一張',
+        'x' => 0.05,
+        'y' => 0.05,
+    ]);
+
+    $secondAuthor = StudentSchedule::factory()->create();
+    StudyRoomProfile::factory()->for($secondAuthor, 'schedule')->create(['nickname' => '第二位同學', 'emoji' => '🌱']);
+    $second = CafeStickyNote::factory()->for($secondAuthor, 'schedule')->create([
+        'text' => '第二張',
+        'x' => 0.7,
+        'y' => 0.55,
+    ]);
+
+    [, $page] = $signedIn();
+
+    $page->navigate(route('cafe.show'));
+    dismissCookieConsentBanner($page);
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-wall-open"]\') !== null');
+
+    $page->click('[data-testid="cafe-wall-open"]')
+        ->click('[data-testid="cafe-note-'.$first->id.'"]')
+        ->assertSeeIn('[data-testid="cafe-note-author"]', '第一位同學');
+
+    // Twemoji must have replaced the emoji's text node before the next click.
+    // That replacement is what used to leave the first author's name on screen.
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-note-detail"] img.emoji\')?.alt === "📚"');
+
+    $page->click('[data-testid="cafe-note-'.$second->id.'"]')
+        ->assertSeeIn('[data-testid="cafe-note-author"]', '第二位同學')
+        ->assertDontSeeIn('[data-testid="cafe-note-detail"]', '第一位同學')
+        ->assertSeeIn('[data-testid="cafe-note-detail"]', '第二張');
+
+    waitUntil($page, 'document.querySelector(\'[data-testid="cafe-note-detail"] img.emoji\')?.alt === "🌱"');
+});
+
 it('keeps an unposted draft in local storage and restores it, and blocks drawing without a coffee today', function () use ($signedIn) {
     [$schedule, $page] = $signedIn();
 
