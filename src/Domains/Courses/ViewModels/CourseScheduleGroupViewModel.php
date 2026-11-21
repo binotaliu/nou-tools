@@ -31,7 +31,7 @@ final class CourseScheduleGroupViewModel extends Data
     }
 
     /**
-     * @param  Collection<int, Course>  $courses
+     * @param  Collection<int, Course>  $courses  already in display order
      */
     public static function fromCourses(Collection $courses): self
     {
@@ -42,7 +42,7 @@ final class CourseScheduleGroupViewModel extends Data
             weekdayOrder: $first->final_date->dayOfWeekIso,
             examTimeStart: $first->exam_time_start,
             courses: CourseScheduleCourseViewModel::collect(
-                $courses->sortBy('name')->map(fn (Course $course) => CourseScheduleCourseViewModel::fromModel($course))->values(),
+                $courses->map(fn (Course $course) => CourseScheduleCourseViewModel::fromModel($course))->values(),
                 DataCollection::class,
             ),
         );

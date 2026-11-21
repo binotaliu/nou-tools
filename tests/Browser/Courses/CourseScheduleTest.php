@@ -110,3 +110,33 @@ it('regroups courses by credits when 學分數 is selected', function () {
         ->assertSeeIn('[data-testid="schedule-section-credits"] [data-testid="schedule-desktop-table"]', 'Three Credit Course')
         ->assertSeeIn('[data-testid="schedule-section-credits"] [data-testid="schedule-desktop-table"]', 'Two Credit Course');
 });
+
+it('lists the courses of an exam slot by department, then by name, with courses without a department last', function () {
+    $term = config('app.current_semester');
+    $finalDate = now()->next('Saturday');
+
+    foreach ([
+        ['Alpha No Department', null],
+        ['Zeta Business', '商學系'],
+        ['Beta Humanities', '人文學系'],
+        ['Alpha Business', '商學系'],
+    ] as [$name, $department]) {
+        Course::factory()->create([
+            'name' => $name,
+            'term' => $term,
+            'department' => $department,
+            'final_date' => $finalDate,
+            'exam_time_start' => '15:00',
+            'exam_time_end' => '16:10',
+        ]);
+    }
+
+    $page = visit(route('course.schedule'))
+        ->assertSee('Zeta Business');
+
+    $names = json_decode($page->script(<<<'JS'
+        JSON.stringify([...document.querySelectorAll('[data-testid="schedule-section-general"] [data-testid="schedule-desktop-table"] tbody th')].map(th => th.textContent.trim()))
+    JS), true);
+
+    expect($names)->toBe(['Beta Humanities', 'Alpha Business', 'Zeta Business', 'Alpha No Department']);
+});

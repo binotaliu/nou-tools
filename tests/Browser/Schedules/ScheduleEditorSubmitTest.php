@@ -104,3 +104,24 @@ it('asks whether to add to the existing schedule or start over', function () {
         ->assertMissing('[data-testid="schedule-existing-choice"]')
         ->assertPresent('[data-testid="course-checkbox-'.$course->id.'"]');
 });
+
+it('lists the courses to pick by department, then by name', function () {
+    config()->set('app.current_semester', '2025B');
+
+    foreach ([
+        ['Zeta Business', '商學系'],
+        ['Beta Humanities', '人文學系'],
+        ['Alpha Business', '商學系'],
+    ] as [$name, $department]) {
+        Course::factory()->create(['term' => '2025B', 'name' => $name, 'department' => $department]);
+    }
+
+    $page = visit(route('schedules.create', ['term' => '2025B']))
+        ->assertSee('Zeta Business');
+
+    $names = json_decode($page->script(<<<'JS'
+        JSON.stringify([...document.querySelectorAll('[data-testid="schedule-desktop-table"] tbody th')].map(th => th.textContent.trim()))
+    JS), true);
+
+    expect($names)->toBe(['Beta Humanities', 'Alpha Business', 'Zeta Business']);
+});

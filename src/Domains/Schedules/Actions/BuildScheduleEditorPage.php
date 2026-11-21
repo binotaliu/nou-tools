@@ -47,7 +47,7 @@ final readonly class BuildScheduleEditorPage
                             });
                     })->orderBy('is_tentative')->orderBy('type');
                 }])
-                ->orderBy('name')
+                ->orderByDepartmentThenName()
                 ->get()
                 ->map(fn (Course $course) => ScheduleEditorCourseViewModel::fromModel($course)),
             DataCollection::class,

@@ -22,7 +22,7 @@ final readonly class BuildCourseSchedulePage
         $courses = Course::query()
             ->general()
             ->where('term', $selectedTerm)
-            ->orderBy('name')
+            ->orderByDepartmentThenName()
             ->get();
 
         $general = $courses->filter(fn (Course $course) => $course->final_date && $course->exam_time_start);
@@ -46,7 +46,7 @@ final readonly class BuildCourseSchedulePage
             availableTerms: $this->availableTerms($selectedTerm),
             groups: CourseScheduleGroupViewModel::collect($groups, DataCollection::class),
             microCreditOrRemoteCourses: CourseScheduleCourseViewModel::collect(
-                $microCreditOrRemote->sortBy('name')->map(fn (Course $course) => CourseScheduleCourseViewModel::fromModel($course))->values(),
+                $microCreditOrRemote->map(fn (Course $course) => CourseScheduleCourseViewModel::fromModel($course))->values(),
                 DataCollection::class,
             ),
         );

@@ -143,3 +143,36 @@ test('course schedule page returns markdown when the client requests it via the 
     $response->assertStatus(200)
         ->assertHeader('Content-Type', 'text/markdown; charset=utf-8');
 });
+
+test('courses are ordered by department, then by name, with courses without a department last', function () {
+    $term = config('app.current_semester');
+
+    foreach ([
+        ['Alpha No Department', null],
+        ['Zeta Business', '商學系'],
+        ['Beta Humanities', '人文學系'],
+        ['Alpha Business', '商學系'],
+    ] as [$name, $department]) {
+        Course::factory()->create([
+            'name' => $name,
+            'term' => $term,
+            'department' => $department,
+            'final_date' => now()->next('Saturday'),
+            'exam_time_start' => '09:00',
+            'exam_time_end' => '10:10',
+        ]);
+        Course::factory()->create(['name' => "{$name} Remote", 'term' => $term, 'department' => $department]);
+    }
+
+    $this->get(route('course.schedule'))->assertInertia(function (Assert $page) {
+        $viewModel = $page->toArray()['props']['viewModel'];
+
+        expect(collect($viewModel['groups'][0]['courses'])->pluck('name')->all())
+            ->toBe(['Beta Humanities', 'Alpha Business', 'Zeta Business', 'Alpha No Department'])
+            ->and(collect($viewModel['microCreditOrRemoteCourses'])->pluck('name')->all())
+            ->toBe(['Beta Humanities Remote', 'Alpha Business Remote', 'Zeta Business Remote', 'Alpha No Department Remote']);
+    });
+
+    $this->get(route('course.schedule.md'))
+        ->assertSeeInOrder(['Beta Humanities', 'Alpha Business', 'Zeta Business', 'Alpha No Department']);
+});

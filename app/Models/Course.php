@@ -68,6 +68,23 @@ final class Course extends Model
     }
 
     /**
+     * Course lists order: by 學系, then by name, with courses that have no
+     * 學系 last so the named departments stay together.
+     *
+     * @param  Builder<Course>  $query
+     * @return Builder<Course>
+     */
+    public function scopeOrderByDepartmentThenName(Builder $query): Builder
+    {
+        $department = $query->getModel()->qualifyColumn('department');
+
+        return $query
+            ->orderByRaw("CASE WHEN {$department} IS NULL OR {$department} = '' THEN 1 ELSE 0 END")
+            ->orderBy($department)
+            ->orderBy($query->getModel()->qualifyColumn('name'));
+    }
+
+    /**
      * Courses whose name equals the given title once {@see self::TITLE_PUNCTUATION}
      * is stripped from both, so importers reading different sources find
      * the same row instead of creating a near-duplicate.

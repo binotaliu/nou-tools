@@ -10,8 +10,22 @@ export const FIELD_META = {
   examLabel: { title: '考試時間', thClass: 'w-56', tdClass: '' },
 }
 
-function sortByName(list) {
-  return [...list].sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant'))
+// Courses within a group are listed by 學系, then by name. Courses without a
+// 學系 go last so the named departments stay together at the top.
+function sortByDepartmentThenName(list) {
+  return [...list].sort(
+    (a, b) =>
+      compareDepartments(a.department, b.department) ||
+      a.name.localeCompare(b.name, 'zh-Hant')
+  )
+}
+
+function compareDepartments(a, b) {
+  if (!a || !b) {
+    return Number(!a) - Number(!b)
+  }
+
+  return a.localeCompare(b, 'zh-Hant')
 }
 
 function groupByExamTime(list) {
@@ -34,7 +48,10 @@ function groupByExamTime(list) {
   })
 
   return [...map.values()]
-    .map(group => ({ ...group, courses: sortByName(group.courses) }))
+    .map(group => ({
+      ...group,
+      courses: sortByDepartmentThenName(group.courses),
+    }))
     .sort(
       (a, b) =>
         a.weekdayOrder - b.weekdayOrder ||
@@ -59,7 +76,10 @@ function groupByField(list, keyFn, fallbackLabel, compare) {
   })
 
   return [...map.values()]
-    .map(group => ({ ...group, courses: sortByName(group.courses) }))
+    .map(group => ({
+      ...group,
+      courses: sortByDepartmentThenName(group.courses),
+    }))
     .sort((a, b) => {
       if (a.key === '__none__') {
         return 1
@@ -149,7 +169,13 @@ export function useCourseFilters(courses) {
           key: 'micro',
           title: '微學分與全遠距',
           groups: micro.length
-            ? [{ key: 'micro', label: null, courses: sortByName(micro) }]
+            ? [
+                {
+                  key: 'micro',
+                  label: null,
+                  courses: sortByDepartmentThenName(micro),
+                },
+              ]
             : [],
           emptyMessage:
             all.filter(course => course.section === 'micro').length === 0
