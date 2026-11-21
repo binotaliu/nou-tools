@@ -84,8 +84,9 @@ final class FetchCourseMapCommand extends Command
 
             foreach ($courses as $courseData) {
                 $existing = Course::query()
-                    ->where('name', $courseData['name'])
                     ->where('term', $term)
+                    ->whereNameMatches($courseData['name'])
+                    ->orderBy('id')
                     ->first();
 
                 if ($existing) {

@@ -6,7 +6,6 @@ namespace NouTools\Domains\Courses\Actions;
 
 use App\Models\Course;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 
 final class ImportExamSchedulesFromJson
 {
@@ -65,15 +64,10 @@ final class ImportExamSchedulesFromJson
 
     private function updateCourseExamSchedule(string $title, string $term, ?string $midtermDate, string $finalDate, string $startTime, string $endTime, int &$success, int &$failed): void
     {
-        $normalizedTitle = Str::withoutCourseTitlePunctuation($title);
         $course = Course::query()
             ->where('term', $term)
-            ->where(function ($query) use ($normalizedTitle) {
-                $query->whereRaw(
-                    "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, '（', ''), '）', ''), '(', ''), ')', ''), '：', ''), ':', ''), '～', ''), '~', ''), '—', ''), '－', ''), '-', ''), '–', ''), '　', ''), ' ', '') = ?",
-                    [$normalizedTitle],
-                );
-            })
+            ->whereNameMatches($title)
+            ->orderBy('id')
             ->first();
 
         if (! $course) {

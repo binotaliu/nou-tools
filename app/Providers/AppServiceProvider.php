@@ -185,7 +185,7 @@ final class AppServiceProvider extends ServiceProvider
         // Strips punctuation/whitespace variants (full-width and half-width)
         // so course titles from different sources can be compared for equality.
         Str::macro('withoutCourseTitlePunctuation', function (string $value): string {
-            return str_replace(['（', '）', '(', ')', '：', ':', '～', '~', '—', '－', '-', '–', '　', ' '], '', trim($value));
+            return str_replace(Course::TITLE_PUNCTUATION, '', trim($value));
         });
 
         // Strips characters that are illegal in filenames on common filesystems,

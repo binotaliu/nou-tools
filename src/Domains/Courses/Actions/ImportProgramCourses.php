@@ -63,10 +63,16 @@ final readonly class ImportProgramCourses
      */
     private function importCourse(string $term, Program $program, array $courseData): CourseClass
     {
-        $course = Course::query()->firstOrCreate(
-            ['name' => $courseData['name'], 'term' => $term],
-            ['is_special_program_only' => true],
-        );
+        $course = Course::query()
+            ->where('term', $term)
+            ->whereNameMatches($courseData['name'])
+            ->orderBy('id')
+            ->first()
+            ?? Course::query()->create([
+                'name' => $courseData['name'],
+                'term' => $term,
+                'is_special_program_only' => true,
+            ]);
 
         $class = CourseClass::query()->updateOrCreate(
             [

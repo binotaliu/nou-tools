@@ -70,6 +70,16 @@ it('shares an existing general course without flagging it', function () use ($sa
         ->and($general->classes()->whereNotNull('program_id')->count())->toBe(2);
 });
 
+it('shares an existing course whose name differs only in spacing', function () use ($sampleProgramsByRegion) {
+    $general = Course::factory()->create(['name' => '測試課程 甲', 'term' => '2026A']);
+
+    app(ImportProgramCourses::class)('2026A', $sampleProgramsByRegion());
+
+    expect(Course::query()->where('name', '測試課程甲')->exists())->toBeFalse()
+        ->and($general->fresh()->is_special_program_only)->toBeFalse()
+        ->and($general->classes()->whereNotNull('program_id')->count())->toBe(2);
+});
+
 it('drops dates the page no longer lists', function () use ($sampleProgramsByRegion) {
     app(ImportProgramCourses::class)('2026A', $sampleProgramsByRegion());
 

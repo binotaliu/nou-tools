@@ -345,3 +345,33 @@ it('fetches summer courses from vc0 and keeps backup classrooms on the same clas
     expect($lifestyleSchedules[0]->date->format('Y-m-d'))->toBe('2026-07-14');
     expect($lifestyleSchedules[1]->date->format('Y-m-d'))->toBe('2026-08-04');
 });
+
+it('reuses a course whose name differs only in spacing', function () {
+    $existing = Course::factory()->create(['name' => '測試 課程乙', 'term' => '2025B']);
+
+    $vc1Html = <<<'HTML'
+    <html><body><div class="row">
+        <div class="card h-100">
+            <div class="card-body">
+                <h4 class="card-title">01.測試課程乙</h4>
+                <h6 class="card-subtitle mb-2">時間：09:00~10:50</h6>
+            </div>
+            <div class="card-footer">
+                <class_icon><a href="https://example.test/room"><img src="images/zzz101.png" alt="zzz101" /></a></class_icon>
+                <h5><c1text>測試教師甲老師</c1text></h5>
+                <h6><c3text>09/19、10/17</c3text></h6>
+            </div>
+        </div>
+    </div></body></html>
+    HTML;
+
+    Http::fake([
+        'vc.nou.edu.tw/vc1/*' => Http::response($vc1Html, 200),
+        'vc.nou.edu.tw/*' => Http::response('<html><body></body></html>', 200),
+    ]);
+
+    $this->artisan('course:fetch', ['term' => '2025B'])->assertSuccessful();
+
+    expect(Course::query()->where('term', '2025B')->count())->toBe(1)
+        ->and($existing->classes()->count())->toBe(1);
+});

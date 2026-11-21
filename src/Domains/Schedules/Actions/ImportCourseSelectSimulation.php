@@ -10,7 +10,6 @@ use App\Models\Course;
 use App\Models\CourseClass;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 
 final readonly class ImportCourseSelectSimulation
 {
@@ -192,22 +191,14 @@ final readonly class ImportCourseSelectSimulation
 
     private function findOrCreateCourse(string $term, string $name): Course
     {
-        $normalizedName = Str::withoutCourseTitlePunctuation($name);
-
-        $course = Course::query()
+        return Course::query()
             ->where('term', $term)
-            ->where(function ($query) use ($normalizedName) {
-                $query->where('name', $normalizedName)
-                    ->orWhereRaw(
-                        "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, '（', ''), '）', ''), '(', ''), ')', ''), '：', ''), ':', ''), '～', ''), '~', ''), '—', ''), '－', ''), '-', ''), '–', ''), '　', ''), ' ', '') = ?",
-                        [$normalizedName],
-                    );
-            })
-            ->first();
-
-        return $course ?? Course::query()->firstOrCreate([
-            'name' => $name,
-            'term' => $term,
-        ]);
+            ->whereNameMatches($name)
+            ->orderBy('id')
+            ->first()
+            ?? Course::query()->create([
+                'name' => $name,
+                'term' => $term,
+            ]);
     }
 }

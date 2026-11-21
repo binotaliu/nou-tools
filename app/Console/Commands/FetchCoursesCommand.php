@@ -59,9 +59,12 @@ final class FetchCoursesCommand extends Command
             $courses = $parseNouCourses($html, $type);
 
             foreach ($courses as $courseData) {
-                $course = Course::query()->firstOrCreate(
-                    ['name' => $courseData['name'], 'term' => $term],
-                );
+                $course = Course::query()
+                    ->where('term', $term)
+                    ->whereNameMatches($courseData['name'])
+                    ->orderBy('id')
+                    ->first()
+                    ?? Course::query()->create(['name' => $courseData['name'], 'term' => $term]);
 
                 if ($course->is_special_program_only) {
                     $course->update(['is_special_program_only' => false]);

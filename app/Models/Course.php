@@ -10,11 +10,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 
 final class Course extends Model
 {
     /** @use HasFactory<CourseFactory> */
     use HasFactory;
+
+    /**
+     * Punctuation and whitespace that differ between the school's sources
+     * for the same course title (course map, class pages, 選課注意事項 PDF),
+     * e.g. `生命敘說與傳記 AI 實務` vs `生命敘說與傳記AI實務`.
+     *
+     * @var list<string>
+     */
+    public const array TITLE_PUNCTUATION = ['（', '）', '(', ')', '：', ':', '～', '~', '—', '－', '-', '–', '　', ' '];
 
     protected $fillable = [
         'name',
@@ -55,6 +65,28 @@ final class Course extends Model
     public function scopeGeneral(Builder $query): Builder
     {
         return $query->where('is_special_program_only', false);
+    }
+
+    /**
+     * Courses whose name equals the given title once {@see self::TITLE_PUNCTUATION}
+     * is stripped from both, so importers reading different sources find
+     * the same row instead of creating a near-duplicate.
+     *
+     * @param  Builder<Course>  $query
+     * @return Builder<Course>
+     */
+    public function scopeWhereNameMatches(Builder $query, string $name): Builder
+    {
+        $strippedColumn = $query->getModel()->qualifyColumn('name');
+
+        foreach (self::TITLE_PUNCTUATION as $_) {
+            $strippedColumn = "REPLACE({$strippedColumn}, ?, '')";
+        }
+
+        return $query->whereRaw(
+            "{$strippedColumn} = ?",
+            [...self::TITLE_PUNCTUATION, Str::withoutCourseTitlePunctuation($name)],
+        );
     }
 
     /**
