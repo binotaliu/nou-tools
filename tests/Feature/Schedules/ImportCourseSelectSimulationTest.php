@@ -125,7 +125,7 @@ it('does nothing when the file is missing', function () {
 
     $result = (new ImportCourseSelectSimulation)('2026A');
 
-    expect($result)->toBe(['terms' => 0, 'classes' => 0]);
+    expect($result)->toBe(['terms' => 0, 'classes' => 0, 'exams' => 0]);
     expect(CourseClass::query()->where('is_tentative', true)->count())->toBe(0);
 });
 
@@ -275,3 +275,87 @@ it('retypes every existing video-session class to micro_credit when the course i
     // editor should still label it as such rather than "微學分".
     expect(ScheduleEditorCourseClassViewModel::fromModel($morning)->typeLabel)->toBe('上午班');
 });
+
+it('imports exam dates and zero-padded times from the exam slots', function () {
+    File::shouldReceive('get')
+        ->with(resource_path('data/course-select-sim.json'))
+        ->andReturn(json_encode([
+            '2026B' => [
+                'examDates' => [
+                    'mid' => ['saturday' => '2027-04-17', 'sunday' => '2027-04-18'],
+                    'final' => ['saturday' => '2027-06-19', 'sunday' => '2027-06-20'],
+                ],
+                'courses' => [
+                    '1' => '測試週六課程',
+                    '2' => '測試 週日課程',
+                    '3' => '測試期中隨班課程',
+                ],
+                'videoSessions' => [],
+                'exam' => [
+                    '週六 13:30~14:40' => ['1'],
+                    '週日 8:30~9:40' => ['2'],
+                    '週日 10:00~11:10' => ['3'],
+                    '期中隨班評量' => ['3'],
+                ],
+            ],
+        ]));
+
+    $existing = Course::factory()->create(['name' => '測試週日課程', 'term' => '2026B']);
+
+    $result = (new ImportCourseSelectSimulation)('2026B');
+
+    expect($result['exams'])->toBe(3);
+
+    $saturday = Course::query()->where('name', '測試週六課程')->where('term', '2026B')->firstOrFail();
+    expect($saturday->midterm_date->toDateString())->toBe('2027-04-17')
+        ->and($saturday->final_date->toDateString())->toBe('2027-06-19')
+        ->and($saturday->exam_time_start)->toBe('13:30')
+        ->and($saturday->exam_time_end)->toBe('14:40');
+
+    $existing->refresh();
+    expect(Course::query()->where('term', '2026B')->count())->toBe(3)
+        ->and($existing->midterm_date->toDateString())->toBe('2027-04-18')
+        ->and($existing->final_date->toDateString())->toBe('2027-06-20')
+        ->and($existing->exam_time_start)->toBe('08:30')
+        ->and($existing->exam_time_end)->toBe('09:40');
+
+    $finalOnly = Course::query()->where('name', '測試期中隨班課程')->where('term', '2026B')->firstOrFail();
+    expect($finalOnly->midterm_date)->toBeNull()
+        ->and($finalOnly->final_date->toDateString())->toBe('2027-06-20')
+        ->and($finalOnly->exam_time_start)->toBe('10:00')
+        ->and($finalOnly->exam_time_end)->toBe('11:10');
+});
+
+it('clears the exam schedule of courses without a central exam', function (string $category) {
+    File::shouldReceive('get')
+        ->with(resource_path('data/course-select-sim.json'))
+        ->andReturn(json_encode([
+            '2026B' => [
+                'examDates' => [
+                    'mid' => ['saturday' => '2027-04-17', 'sunday' => '2027-04-18'],
+                    'final' => ['saturday' => '2027-06-19', 'sunday' => '2027-06-20'],
+                ],
+                'courses' => ['1' => '測試無集中考試課程'],
+                'videoSessions' => [],
+                'exam' => [$category => ['1']],
+            ],
+        ]));
+
+    $course = Course::factory()->create([
+        'name' => '測試無集中考試課程',
+        'term' => '2026B',
+        'midterm_date' => '2027-04-17',
+        'final_date' => '2027-06-19',
+        'exam_time_start' => '13:30',
+        'exam_time_end' => '14:40',
+    ]);
+
+    (new ImportCourseSelectSimulation)('2026B');
+
+    $course->refresh();
+
+    expect($course->midterm_date)->toBeNull()
+        ->and($course->final_date)->toBeNull()
+        ->and($course->exam_time_start)->toBeNull()
+        ->and($course->exam_time_end)->toBeNull();
+})->with(['隨班評量', '全遠距', '微學分']);
