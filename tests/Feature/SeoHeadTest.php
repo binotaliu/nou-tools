@@ -26,9 +26,6 @@ it('server-renders title, description and Open Graph tags on static pages', func
 })->with([
     'home' => ['home', 'NOU 小幫手'],
     'announcements' => ['announcements.index', '學校公告 - NOU 小幫手'],
-    'school calendar' => ['school-calendar.index', '學校行事曆 - NOU 小幫手'],
-    'directory' => ['directory.index', '連結 / 學習指導中心目錄 - NOU 小幫手'],
-    'course schedule' => ['course.schedule', '本學期開課表 - NOU 小幫手'],
     'about' => ['about', '關於 - NOU 小幫手'],
     'accessibility' => ['accessibility', '無障礙說明 - NOU 小幫手'],
     'share' => ['share', '分享 NOU 小幫手 - NOU 小幫手'],
@@ -45,6 +42,23 @@ it('server-renders the video classes page with a generated og:image card', funct
         ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
         ->assertDontSee(asset('og-image.png'), false);
 });
+
+it('server-renders list pages with a generated og:image card', function (string $routeName, string $title, string $cardText) {
+    Course::factory()->create(['term' => config('app.current_semester'), 'name' => '虛構課程甲']);
+
+    $this->get(route($routeName))
+        ->assertSuccessful()
+        ->assertSee('<title>'.$title.'</title>', false)
+        ->assertSee('<meta data-seo property="og:title" content="'.$title.'" />', false)
+        ->assertSee('<template data-og-image', false)
+        ->assertSee($cardText, false)
+        ->assertSee('<meta property="og:image" content="'.url('/og-image/'), false)
+        ->assertDontSee(asset('og-image.png'), false);
+})->with([
+    'school calendar' => ['school-calendar.index', '學校行事曆 - NOU 小幫手', '開課、選課、期中考、期末考與成績查詢等日期'],
+    'directory' => ['directory.index', '連結 / 學習指導中心目錄 - NOU 小幫手', '學習指導中心的官方連結'],
+    'course schedule' => ['course.schedule', '本學期開課表 - NOU 小幫手', '共 1 門課程'],
+]);
 
 it('server-renders the newsletter index with its Atom feed link', function () {
     $this->get(route('newsletter.index'))
